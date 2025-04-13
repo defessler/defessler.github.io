@@ -1,0 +1,155 @@
+body {
+	overflow: hidden;
+}
+
+body *{
+	color: #C4C0FF;
+	font-size: 50px;
+	font-family: "opensans";
+	user-select: none;
+}
+
+h1 {
+	color: #FFF600;
+	font-family: "rubik";
+	font-size: 85px;
+	margin: 65px 90px 20px;
+	padding: 0;
+	line-height: 1;
+	text-shadow: 4px 4px 2px #000;
+}
+
+ul {
+	margin: 0;
+	padding: 0;
+}
+
+li {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.black-bg {
+	background: url(../img/bg-test.png) no-repeat center left #000;
+	perspective: 3000px;
+	width: 920px;
+}
+
+.panel {
+	transform: scale(0.6) rotateY( 35deg );
+}
+
+.panel, .panel > div{
+	display: inline-block;
+	width: 920px;
+}
+
+.panel-header {
+	background: url(../img/panel-header-bg.png) no-repeat top center;
+	margin-bottom: -1px;
+	min-height: 270px;
+}
+
+.panel-body {
+	background: url(../img/panel-body-bg.png) repeat-y center;
+	min-height: 400px;
+}
+
+.panel-footer {
+	background: url(../img/panel-footer-bg.png) no-repeat center;
+	min-height: 180px;
+}
+
+.stripe-btn {
+	background: none;
+	border: 0;
+	font-family: "opensans";
+	height: 95px;
+	padding-left: 70px;
+	width: 105%;
+	text-align: left;
+	line-height: 1;
+	outline: 0;
+	transition: 0.05s all;
+}
+
+li.active .stripe-btn, .li:hover .stripe-btn {
+	background: url(../img/button-highlight-bg.png) no-repeat center;
+	color: #FFF;
+	font-size: 65px;
+	padding-left: 120px;
+}
+
+.category-selection {
+	vertical-align: top;
+	text-align: center;
+	position: relative;
+}
+
+.category-selection .category-highlight, .category-selection .category-highlight {
+	background: url(../img/category-highlight-bg.png) no-repeat center;
+    background-size: 0 0;
+    transition: 0.1s all;
+    position: absolute;
+    display: block;
+    width: 85%;
+    height: 45px;
+    left: 10%;
+    top: 45px;
+}
+
+li.active .category-selection .category-highlight, .li:hover .category-selection .category-highlight {
+	background-size: 100% 100%;
+}
+
+.category {
+	background: url(../img/category-bg.png) no-repeat center;
+	background-size: 100% 100%;
+	display: inline-block;
+	font-size: 45px;
+	height: 90px;
+	line-height: 1.8;
+	text-align: center;
+	vertical-align: bottom;
+	width: 60%;
+	margin-top: 20px;
+}
+
+.category li {
+	display: none;
+}
+
+.category li.selected {
+	display: block;
+}
+
+.text {
+	position: relative;
+}
+
+li.active .category-selection .category .text, .category-selection .li:hover .category .text {
+	color: #FFF;
+	transition: 0.2 all;
+}
+
+.category-left-arrow {
+	background: url(../img/button-arrow-left.png) no-repeat center;
+	background-size: 100% 100%;
+	display: inline-block;
+	height: 90px;
+	vertical-align: bottom;
+	width: 90px;
+	position: relative;
+	z-index: 1;
+}
+
+.category-right-arrow {
+	background: url(../img/button-arrow-right.png) no-repeat center;
+	background-size: 100% 100%;
+	display: inline-block;
+	height: 90px;
+	vertical-align: bottom;
+	width: 90px;
+	position: relative;
+}
