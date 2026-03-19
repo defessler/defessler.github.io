@@ -356,6 +356,7 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 .btn-cta-primary { color: var(--mk-green); border-color: var(--mk-green); }
 .btn-cta-primary::before { color: var(--mk-comment); }
 .btn-cta-primary:hover { background: var(--mk-green); color: var(--mk-bg); text-decoration: none; }
+.btn-cta-primary:hover::before { color: var(--mk-bg); }
 .btn-cta:not(.btn-cta-primary):hover { color: var(--mk-cyan); border-color: var(--mk-cyan); text-decoration: none; }
 
 /* ============================================================
@@ -437,7 +438,7 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 
 .project-links { display: flex; gap: 0.75rem; flex-wrap: wrap; }
 .project-links a { font-size: 0.8rem; color: var(--mk-orange); }
-.project-links a::before { content: '→ '; }
+.project-links a::before { content: '→ '; color: var(--mk-comment); }
 
 /* Featured project cards — vertical, 2-col grid */
 .featured-grid {
@@ -777,6 +778,7 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 }
 .btn-print::before { content: '$ '; color: var(--mk-comment); }
 .btn-print:hover { background: var(--mk-green); color: var(--mk-bg); }
+.btn-print:hover::before { color: var(--mk-bg); }
 
 /* ============================================================
    Print — Monokai-flavored ink-efficient output
