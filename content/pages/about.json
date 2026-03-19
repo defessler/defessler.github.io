@@ -5,13 +5,14 @@
   "headline": "Senior Gameplay Engineer",
   "photo": "./img/me.jpg",
   "bio": [
-    "I am a Senior Gameplay Engineer with a passion for building the systems that make games feel alive — mission frameworks, cinematic pipelines, progression, and the invisible scaffolding players never see but always feel.",
-    "I grew up making games with RPG Maker, taught myself C++, and never looked back. I've shipped titles across PC, console, and mobile at studios ranging from indie to AAA."
+    "I'm a Senior Gameplay Engineer focused on the systems behind the game — mission logic, cinematic tooling, progression, and the frameworks that everything else depends on.",
+    "I grew up making games with RPG Maker, taught myself C++, and haven't stopped building. I've shipped on PC, console, and mobile — from three-person pitches at FireForge to Hearthstone at Blizzard."
   ],
   "stats": [
     { "label": "current",  "value": "Lightspeed LA" },
     { "label": "role",     "value": "Senior Gameplay Engineer" },
-    { "label": "focus",    "value": "Gameplay Systems / Missions / IGC" }
+    { "label": "project",  "value": "Unannounced — Open World" },
+    { "label": "focus",    "value": "Open World / Gameplay Systems / IGC" }
   ],
   "skills": ["C/C++", "C#", "Lua", "Unreal Engine", "Unity", "JavaScript", "Git", "Perforce"],
   "highlights": [

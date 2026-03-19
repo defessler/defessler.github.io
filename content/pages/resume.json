@@ -5,7 +5,8 @@
     "name": "Doug Fessler",
     "headline": "Senior Gameplay Engineer",
     "contact": {
-      "email": "defessler@gmail.com",
+      "email_user": "defessler",
+      "email_domain": "gmail.com",
       "website": "http://dougfessler.com"
     },
     "objective": "To continue growing and learning while creating fun and engaging gameplay experiences — building the systems that drive player agency, narrative, and progression.",
@@ -23,16 +24,8 @@
         "end": "Present",
         "projects": [
           {
-            "name": "Unannounced Project",
-            "platform": "Open World",
-            "type": "Single Player",
-            "bullets": [
-              "Senior Gameplay Engineer on an unannounced open-world title built in Unreal Engine 5."
-            ]
-          },
-          {
             "name": "Last Sentinel",
-            "platform": "PC/PS5/XSX",
+            "platform": "Unannounced",
             "type": "Single Player",
             "bullets": [
               "Architected a Mission system to manage data layers and control mission flow. Enabled designers to fast forward, rewind, and debug mission objectives with minimal iteration cost.",

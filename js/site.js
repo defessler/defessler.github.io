@@ -229,7 +229,11 @@ function renderResume(page) {
   const r = page.data;
 
   const contactParts = [];
-  if (r.contact.email)    contactParts.push(`<span><a href="mailto:${escape(r.contact.email)}">${escape(r.contact.email)}</a></span>`);
+  if (r.contact.email_user && r.contact.email_domain) {
+    contactParts.push(`<span class="obf-email" data-u="${escape(r.contact.email_user)}" data-d="${escape(r.contact.email_domain)}" title="click to reveal">[click to reveal email]</span>`);
+  } else if (r.contact.email) {
+    contactParts.push(`<span><a href="mailto:${escape(r.contact.email)}">${escape(r.contact.email)}</a></span>`);
+  }
   if (r.contact.location) contactParts.push(`<span>${escape(r.contact.location)}</span>`);
   if (r.contact.website)  contactParts.push(`<span><a href="${escape(r.contact.website)}" target="_blank" rel="noopener">${escape(r.contact.website)}</a></span>`);
 
@@ -347,6 +351,14 @@ async function init() {
   // Close mobile nav on link click
   document.getElementById('nav-links').addEventListener('click', () => {
     document.getElementById('site-nav').classList.remove('nav-open');
+  });
+
+  // Email obfuscation — reveal on click
+  document.getElementById('page-content').addEventListener('click', e => {
+    const el = e.target.closest('.obf-email');
+    if (!el) return;
+    const email = el.dataset.u + '@' + el.dataset.d;
+    el.outerHTML = `<span><a href="mailto:${email}">${email}</a></span>`;
   });
 
   try {

@@ -25,7 +25,7 @@
         {
           "title": "Journal, Quests & Achievements",
           "period": "2020–2022",
-          "description": "Built and extended systems within the Hearthstone Journal — daily and weekly quest tracking, achievement pipelines, reward progression, and the data-driven mission framework delivering player objectives across multiple expansion cycles."
+          "description": "Built and extended systems within the Hearthstone Journal — daily and weekly quest tracking, achievement pipelines, reward progression, and the scripted mission system used to define player objectives for each expansion cycle."
         }
       ],
       "links": []
@@ -38,7 +38,6 @@
       "unreleased": true,
       "image": "./img/last-sentinel.jpg",
       "tech": ["Unreal Engine 5", "C++"],
-      "platforms": ["PC", "PS5", "XSX"],
       "description": "Senior Gameplay Engineer on this narrative open-world action game set in a futuristic Tokyo. Architected a Mission system to manage data layers and control mission flow — enabling designers to fast-forward, rewind, and debug objectives. Created an IGC (In-Game Cinematic) framework for scripting multi-character animated scenes with props, moving platforms, and QTEs in a data-driven way. Integrated UE5's Level Sequencer into the scripting framework. Extended save/load architecture to handle mission checkpoints, open-world auto-saves, and mid-mission snapshots. Developed a UI framework using an MVVM pattern integrated with UE5's ViewModel architecture.",
       "links": [
         { "label": "Official Site", "url": "https://lastsentinelgame.com/" }
@@ -76,7 +75,7 @@
       "image": "./img/vessels-of-rath.jpg",
       "tech": ["Unreal Engine 4", "C++"],
       "platforms": ["PC"],
-      "description": "Action RPG developed internally at WhiteMoon Dreams as a technical showcase for the studio's Orbital platform — a cloud-based SaaS system for dynamic game content delivery and scalable game services.",
+      "description": "Action RPG developed internally at WhiteMoon Dreams to showcase the studio's Orbital platform, a cloud backend for hosting and serving live game content.",
       "links": [
         { "label": "WhiteMoon Dreams", "url": "https://whitemoondreams.com/" }
       ]
