@@ -64,9 +64,13 @@ function renderNav(site) {
     .map(s => `<a href="${escape(s.url)}" target="_blank" rel="noopener" class="social-link social-${escape(s.icon)}" title="${escape(s.label)}">${escape(s.label)}</a>`)
     .join('');
 
+  const emailHTML = (site.email_user && site.email_domain)
+    ? `<span class="nav-email obf-email" data-u="${escape(site.email_user)}" data-d="${escape(site.email_domain)}" title="click to reveal">[email]</span>`
+    : site.email ? `<span class="nav-email">${escape(site.email)}</span>` : '';
+
   document.getElementById('nav-social').innerHTML = `
     <div class="social-links">${socialHTML}</div>
-    <span class="nav-email">${escape(site.email)}</span>
+    ${emailHTML}
   `;
 }
 

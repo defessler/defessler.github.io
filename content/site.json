@@ -9,5 +9,6 @@
     { "label": "GitHub",   "url": "https://github.com/defessler",            "icon": "github" },
     { "label": "LinkedIn", "url": "https://linkedin.com/in/dougfessler",     "icon": "linkedin" }
   ],
-  "email": "defessler@gmail.com"
+  "email_user": "defessler",
+  "email_domain": "gmail.com"
 }

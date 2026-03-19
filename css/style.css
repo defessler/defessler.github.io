@@ -283,8 +283,8 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
   padding-bottom: 0.35rem;
   margin-bottom: 1rem;
 }
-.about-section h2::before { content: '/* '; color: var(--mk-pink); }
-.about-section h2::after  { content: ' */'; color: var(--mk-pink); }
+.about-section h2::before { content: '/* '; color: var(--mk-green); }
+.about-section h2::after  { content: ' */'; color: var(--mk-green); }
 
 /* About — skills tags */
 .skills-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
@@ -626,8 +626,8 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
   padding-bottom: 0.35rem;
   margin-bottom: 1rem;
 }
-.resume-section h2::before { content: '/* '; color: var(--mk-pink); }
-.resume-section h2::after  { content: ' */'; color: var(--mk-pink); }
+.resume-section h2::before { content: '/* '; color: var(--mk-green); }
+.resume-section h2::after  { content: ' */'; color: var(--mk-green); }
 
 /* Skills */
 .skills-grid { display: flex; flex-direction: column; gap: 0.4rem; }

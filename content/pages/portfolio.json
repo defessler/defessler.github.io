@@ -3,6 +3,19 @@
   "title": "Portfolio",
   "projects": [
     {
+      "title": "Last Sentinel",
+      "company": "Lightspeed LA",
+      "year": "2022–Present",
+      "featured": true,
+      "unreleased": true,
+      "image": "./img/last-sentinel.jpg",
+      "tech": ["Unreal Engine 5", "C++"],
+      "description": "Senior Gameplay Engineer on this narrative open-world action game set in a futuristic Tokyo. Architected a Mission system to manage data layers and control mission flow — enabling designers to fast-forward, rewind, and debug objectives. Created an IGC (In-Game Cinematic) framework for scripting multi-character animated scenes with props, moving platforms, and QTEs in a data-driven way. Integrated UE5's Level Sequencer into the scripting framework. Extended save/load architecture to handle mission checkpoints, open-world auto-saves, and mid-mission snapshots. Developed a UI framework using an MVVM pattern integrated with UE5's ViewModel architecture.",
+      "links": [
+        { "label": "Official Site", "url": "https://lastsentinelgame.com/" }
+      ]
+    },
+    {
       "title": "Hearthstone",
       "company": "Blizzard Entertainment",
       "year": "2018–2022",
@@ -29,19 +42,6 @@
         }
       ],
       "links": []
-    },
-    {
-      "title": "Last Sentinel",
-      "company": "Lightspeed LA",
-      "year": "2022–Present",
-      "featured": true,
-      "unreleased": true,
-      "image": "./img/last-sentinel.jpg",
-      "tech": ["Unreal Engine 5", "C++"],
-      "description": "Senior Gameplay Engineer on this narrative open-world action game set in a futuristic Tokyo. Architected a Mission system to manage data layers and control mission flow — enabling designers to fast-forward, rewind, and debug objectives. Created an IGC (In-Game Cinematic) framework for scripting multi-character animated scenes with props, moving platforms, and QTEs in a data-driven way. Integrated UE5's Level Sequencer into the scripting framework. Extended save/load architecture to handle mission checkpoints, open-world auto-saves, and mid-mission snapshots. Developed a UI framework using an MVVM pattern integrated with UE5's ViewModel architecture.",
-      "links": [
-        { "label": "Official Site", "url": "https://lastsentinelgame.com/" }
-      ]
     },
     {
       "title": "Ghostbusters",
