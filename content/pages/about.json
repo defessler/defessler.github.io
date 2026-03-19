@@ -2,36 +2,35 @@
   "type": "about",
   "title": "About",
   "name": "Doug Fessler",
-  "headline": "Software Engineer",
+  "headline": "Senior Gameplay Engineer",
   "photo": "./img/me.jpg",
   "bio": [
-    "I am a Software Engineer that has grown up with a passion for creating things. I began creating games at an early age with an application called RPG Maker.",
-    "I taught myself C++ and when I discovered a game programming library called Allegro I fell in love with programming and never looked back."
+    "I am a Senior Gameplay Engineer with a passion for building the systems that make games feel alive — mission frameworks, cinematic pipelines, progression, and the invisible scaffolding players never see but always feel.",
+    "I grew up making games with RPG Maker, taught myself C++, and never looked back. I've shipped titles across PC, console, and mobile at studios ranging from indie to AAA."
   ],
   "stats": [
-    { "label": "current",  "value": "Blizzard Entertainment" },
-    { "label": "role",     "value": "Software Engineer" },
-    { "label": "location", "value": "Irvine, CA" },
-    { "label": "focus",    "value": "Game Dev / Systems / UI" }
+    { "label": "current",  "value": "Lightspeed LA" },
+    { "label": "role",     "value": "Senior Gameplay Engineer" },
+    { "label": "focus",    "value": "Gameplay Systems / Missions / IGC" }
   ],
-  "skills": ["C/C++", "C#", "JavaScript", "Lua", "Unreal Engine", "Unity", "HTML/CSS", "Git", "Perforce"],
+  "skills": ["C/C++", "C#", "Lua", "Unreal Engine", "Unity", "JavaScript", "Git", "Perforce"],
   "highlights": [
     {
-      "title": "Hearthstone",
-      "context": "Blizzard Entertainment",
-      "description": "UI Framework and features engineering on one of the world's most popular digital card games.",
+      "title": "Last Sentinel",
+      "context": "Lightspeed LA",
+      "description": "Mission systems, IGC framework, and cinematic tooling for a narrative open-world action game.",
       "href": "#portfolio"
     },
     {
-      "title": "StarBlood Arena",
-      "context": "WhiteMoon Dreams",
-      "description": "AI, game modes, and matchmaking for a PS4/PSVR multiplayer arena shooter.",
+      "title": "Hearthstone",
+      "context": "Blizzard Entertainment",
+      "description": "Solo adventures, journal systems, quests, and achievements across eight major expansions.",
       "href": "#portfolio"
     },
     {
       "title": "Ghostbusters",
       "context": "FireForge",
-      "description": "Gameplay and AI systems on the official Ghostbusters tie-in game for PC, PS4, and Xbox One.",
+      "description": "AI and gameplay ability systems on the official Ghostbusters tie-in for PC, PS4, and Xbox One.",
       "href": "#portfolio"
     }
   ],

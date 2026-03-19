@@ -154,6 +154,18 @@ function renderPortfolio(page) {
       ? `<div class="card-image"><img src="${escape(p.image)}" alt="${escape(p.title)}" loading="lazy"></div>`
       : '';
     const badgeHTML = p.unreleased ? `<span class="badge-unreleased">unreleased</span>` : '';
+    const subprojectsHTML = (p.subprojects || []).length ? `
+      <div class="subprojects">
+        ${p.subprojects.map(s => `
+          <div class="subproject">
+            <div class="subproject-header">
+              <span class="subproject-title">${escape(s.title)}</span>
+              ${s.period ? `<span class="subproject-period">${escape(s.period)}</span>` : ''}
+            </div>
+            <p>${escape(s.description)}</p>
+          </div>
+        `).join('')}
+      </div>` : '';
     return `
       <div class="project-card project-card-featured">
         ${imageHTML}
@@ -164,7 +176,8 @@ function renderPortfolio(page) {
             ${p.year ? `<span class="project-year">${escape(p.year)}</span>` : ''}
           </div>
           ${tagsHTML}
-          <p>${p.description}</p>
+          <p class="project-summary">${escape(p.description)}</p>
+          ${subprojectsHTML}
           ${linksHTML}
         </div>
       </div>
@@ -180,16 +193,22 @@ function renderPortfolio(page) {
       ? `<div class="project-links">${p.links.map(l => `<a href="${escape(l.url)}" target="_blank" rel="noopener">${escape(l.label)}</a>`).join('')}</div>`
       : '';
     const badgeHTML = p.unreleased ? `<span class="badge-unreleased">unreleased</span>` : '';
+    const imageHTML = p.image
+      ? `<div class="card-image-small"><img src="${escape(p.image)}" alt="${escape(p.title)}" loading="lazy"></div>`
+      : '';
     return `
       <div class="project-card">
-        <div class="project-header">
-          <h3>${escape(p.title)}${badgeHTML}</h3>
-          ${p.company ? `<span class="project-company">${escape(p.company)}</span>` : ''}
-          ${p.year ? `<span class="project-year">${escape(p.year)}</span>` : ''}
+        ${imageHTML}
+        <div class="project-card-content">
+          <div class="project-header">
+            <h3>${escape(p.title)}${badgeHTML}</h3>
+            ${p.company ? `<span class="project-company">${escape(p.company)}</span>` : ''}
+            ${p.year ? `<span class="project-year">${escape(p.year)}</span>` : ''}
+          </div>
+          ${tagsHTML}
+          <p>${escape(p.description)}</p>
+          ${linksHTML}
         </div>
-        ${tagsHTML}
-        <p>${p.description}</p>
-        ${linksHTML}
       </div>
     `;
   }).join('');

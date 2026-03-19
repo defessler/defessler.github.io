@@ -3,25 +3,57 @@
   "title": "Resume",
   "data": {
     "name": "Doug Fessler",
-    "headline": "Software Engineer",
+    "headline": "Senior Gameplay Engineer",
     "contact": {
       "email": "defessler@gmail.com",
-      "location": "Irvine, CA",
       "website": "http://dougfessler.com"
     },
-    "objective": "To continue growing and learning while creating fun and engaging digital experiences using the skills and strong work ethic that I've developed throughout my career.",
+    "objective": "To continue growing and learning while creating fun and engaging gameplay experiences — building the systems that drive player agency, narrative, and progression.",
     "skills": [
-      { "category": "Engines",         "items": ["Unreal Engine", "Unity"] },
-      { "category": "Languages",       "items": ["C/C++", "C#", "Lua", "JavaScript", "HTML/CSS", "MySQL"] },
-      { "category": "Software",        "items": ["Visual Studio", "Sublime Text", "Eclipse", "Adobe Photoshop"] },
-      { "category": "Version Control", "items": ["Git", "Perforce", "SVN", "CVS"] }
+      { "category": "Engines",         "items": ["Unreal Engine 5", "Unreal Engine 4", "Unity"] },
+      { "category": "Languages",       "items": ["C/C++", "C#", "Lua", "JavaScript", "HTML/CSS"] },
+      { "category": "Software",        "items": ["Visual Studio", "Rider", "Perforce", "Git"] },
+      { "category": "Specializations", "items": ["Mission Systems", "Cinematic Frameworks", "Gameplay Systems", "Progression & Quest Systems"] }
     ],
     "experience": [
+      {
+        "company": "Lightspeed LA",
+        "title": "Senior Gameplay Engineer",
+        "start": "2022",
+        "end": "Present",
+        "projects": [
+          {
+            "name": "Unannounced Project",
+            "platform": "Open World",
+            "type": "Single Player",
+            "bullets": [
+              "Senior Gameplay Engineer on an unannounced open-world title built in Unreal Engine 5."
+            ]
+          },
+          {
+            "name": "Last Sentinel",
+            "platform": "PC/PS5/XSX",
+            "type": "Single Player",
+            "bullets": [
+              "Architected a Mission system to manage data layers and control mission flow. Enabled designers to fast forward, rewind, and debug mission objectives with minimal iteration cost.",
+              "Created an IGC (In-Game Cinematic) framework that empowered designers to script aligned multi-character animated scenes. Supported props, moving platforms, and QTEs in a data-driven way.",
+              "Integrated UE5's Level Sequencer into scripting framework and provided multiple binding strategies.",
+              "Partnered with design and animation teams to define standards and best practices for scene alignment.",
+              "Extended save/load architecture to handle complex contextual saving. Supported mission checkpoints, open world auto saves, quick saves, and multiple mid-mission snapshots.",
+              "Created an initial Investigation system to support designer driven detective mechanics. Implemented scanning, hot/cold search feedback, and clue filtering.",
+              "Built a marker system with compass to help players navigate the open world and mission flow.",
+              "Developed a UI framework (MVVM pattern) and integrated it with UE5's ViewModel architecture.",
+              "Organized and led scripting workshops to onboard designers to new tooling. Provided hands-on mentorship, script reviews, and ongoing support.",
+              "Mentored and advised both in-house and co-development engineers. Fostered strong technical alignment, knowledge sharing, and consistency across teams."
+            ]
+          }
+        ]
+      },
       {
         "company": "Blizzard Entertainment",
         "title": "Software Engineer",
         "start": "09/2018",
-        "end": "Present",
+        "end": "2022",
         "projects": [
           {
             "name": "Hearthstone",
@@ -31,17 +63,17 @@
               {
                 "name": "Framework Team",
                 "bullets": [
-                  "Designed and implemented features for UI Framework built in Unity using C# making it easier to build 3D perspective UI.",
-                  "Optimized UI Framework to run more efficiently.",
-                  "Helped to implement Lua scripting framework on the server using C++.",
-                  "Provide guidance around Lua and UI Frameworks to designers and engineers across the team."
+                  "Implemented a Lua scripting framework on the game server using C++, enabling data-driven mission and quest scripting across multiple teams.",
+                  "Contributed to improvements to the Unity/C# UI framework for 3D perspective UI.",
+                  "Provided guidance on scripting and framework systems to designers and engineers across the team."
                 ]
               },
               {
                 "name": "Features Team",
                 "bullets": [
-                  "Refactored hero picker to allow for implementing heroes through data.",
-                  "Implemented design for The Dalaran Heist and Tombs of Terror solo adventures."
+                  "Implemented the design for The Dalaran Heist and Tombs of Terror solo adventure experiences.",
+                  "Built and extended systems within the Hearthstone Journal — daily and weekly quest tracking, achievement pipelines, and reward progression across multiple expansion cycles.",
+                  "Refactored hero picker to allow for implementing heroes through data."
                 ]
               }
             ]
@@ -55,24 +87,21 @@
         "end": "09/2018",
         "projects": [
           {
-            "name": "Unannounced Project",
-            "platform": "PC",
-            "type": "Online Multiplayer",
-            "bullets": [
-              "Added traversal system for jumping, climbing, and sliding with tools for designers to mark appropriate areas in the editor.",
-              "Added system for players to perform multiplayer sync moves with different effects based on player's class and position.",
-              "Integrated UE4's attribute system, updated it to support pulling data from a local or remote source, and added caching for quick updates.",
-              "Integrated gameplay features and UI for spectator interaction from a separate mobile application."
-            ]
-          },
-          {
             "name": "StarBlood Arena",
             "platform": "PS4/PSVR",
             "type": "Online Multiplayer",
             "bullets": [
-              "Improved custom AI navigation generation, added difficulty levels, improved basic AI combat, and added AI for capture the flag game mode.",
+              "Improved custom AI navigation generation, added difficulty levels, and improved basic AI combat.",
               "Set up framework for sending match configurations to matchmaking service and refactored team system to support data from matchmaking.",
               "Implemented single player and cooperative game modes. Optimized wave defense game mode by implementing a pool manager."
+            ]
+          },
+          {
+            "name": "Vessels of Rath",
+            "platform": "PC",
+            "type": "Single Player",
+            "bullets": [
+              "Gameplay engineering on an internal action RPG developed to showcase the studio's Orbital cloud platform."
             ]
           }
         ]
@@ -90,7 +119,7 @@
             "bullets": [
               "Audited existing code base and retrofitted support for multiplayer.",
               "Implemented a loadout system built around UE4's gameplay abilities and attributes.",
-              "Laid ground work for a proper build process in order to make builds more readily available."
+              "Laid groundwork for a proper build process to make builds more readily available."
             ]
           }
         ]
@@ -103,7 +132,6 @@
         "bullets": [
           "Developed platform C++ SDK and Unreal Engine 4 SDK.",
           "Created platform integration examples in Unreal Engine 4.",
-          "Integrated Coherent UI and Coherent UIGT into Unreal Engine 4.",
           "Developed playable game prototypes used in sales pitches and demonstrations.",
           "Designed and built software around platform's RESTful APIs."
         ],
@@ -113,8 +141,9 @@
             "platform": "PS4, Xbox One, PC",
             "type": "Local Multiplayer",
             "bullets": [
+              "Worked on AI and gameplay ability systems supporting designers through scripting exposure and troubleshooting.",
               "Modified engine to use dialog audio based on culture settings.",
-              "Improved AI by adding a box volume to allow restricting AI movement to an area."
+              "Improved AI by adding a box volume to restrict AI movement to designer-defined areas."
             ]
           }
         ]
@@ -138,7 +167,7 @@
         "end": "07/2011",
         "bullets": [
           "Full stack development and maintenance on all company websites.",
-          "Maintain company LAN, servers, and other computer systems support."
+          "Maintained company LAN, servers, and other computer systems."
         ]
       }
     ],
@@ -152,6 +181,6 @@
         "additional": "Computer Systems Certificate"
       }
     ],
-    "interests": "Software Engineering, Game Development, Web Development, Gaming, and Computer Hardware. Favorite games: Super Smash Bros., Metal Gear Solid, Final Fantasy, Dark Souls, Hearthstone, World of Warcraft, Overwatch."
+    "interests": "Game Development, Software Engineering, Gaming, and Computer Hardware. Favorite games: Super Smash Bros., Metal Gear Solid, Final Fantasy, Dark Souls, Hearthstone, World of Warcraft, Overwatch."
   }
 }
