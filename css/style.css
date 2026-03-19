@@ -781,44 +781,72 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 .btn-print:hover::before { color: var(--mk-bg); }
 
 /* ============================================================
-   Print — Monokai-flavored ink-efficient output
+   Print — clean white with Monokai accent colors
    ============================================================ */
 @media print {
-  /* Override palette with print-safe variants */
+  @page { margin: 1.25cm 1.5cm; }
+
+  /* Print-safe Monokai palette */
   :root {
-    --mk-bg:      #fff;
-    --mk-surface: #f4f4f4;
-    --mk-gutter:  #e8e8e8;
-    --mk-fg:      #1a1a1a;
-    --mk-comment: #666;
-    --mk-green:   #2e7d2e;
-    --mk-pink:    #b0003a;
-    --mk-cyan:    #006876;
-    --mk-yellow:  #6b5900;
-    --mk-orange:  #8b4500;
-    --mk-purple:  #5a2d9b;
-    --mk-border:  #ccc;
-    --color-bg:   #fff;
-    --color-surface: #f4f4f4;
-    --color-header:  #e8e8e8;
-    --color-text:    #1a1a1a;
+    --mk-bg:      #ffffff;
+    --mk-surface: #ffffff;   /* no card bg ink waste */
+    --mk-gutter:  #f0f0f0;
+    --mk-fg:      #111111;
+    --mk-comment: #888888;
+    --mk-green:   #1a6b1a;   /* name, section headings */
+    --mk-pink:    #b8003a;   /* company names */
+    --mk-cyan:    #005f70;   /* skill categories, job headline, tags */
+    --mk-yellow:  #7a5200;   /* skill items, project labels — readable amber */
+    --mk-orange:  #944500;   /* dates */
+    --mk-purple:  #5c2d99;   /* job titles */
+    --mk-border:  #dddddd;
+    --color-bg:      #ffffff;
+    --color-surface: #ffffff;
+    --color-text:    #111111;
   }
 
   /* Remove decorative chrome */
   #site-header    { display: none; }
   .resume-actions { display: none; }
-  body::after     { display: none; }  /* no scanlines */
+  body::after     { display: none; }
 
   /* Layout */
+  body          { background: #fff; }
   #page-content { padding: 0; max-width: 100%; }
   .resume-page  { max-width: 100%; }
   .job-entry    { page-break-inside: avoid; }
 
-  /* Strip glow effects */
+  /* Strip glow/shadow effects */
   * { text-shadow: none !important; box-shadow: none !important; }
 
-  /* Links — show URL, keep color */
+  /* Green accent line under header — letterhead feel */
+  .resume-header { border-bottom: 2px solid var(--mk-green); }
+
+  /* Remove card surfaces — white bg everywhere */
+  .project-card,
+  .project-card-featured,
+  .highlight-card { background: transparent; border: none; border-left: none; }
+
+  /* Section headings — keep /* */ markers, clean underline */
+  .resume-section h2,
+  .about-section h2  { border-bottom-color: var(--mk-green); }
+
+  /* Restore opacity on body text — don't print faint */
+  .bio p,
+  .job-bullets li,
+  .project-list li li,
+  .sub-team li,
+  .project-body p,
+  .project-card-content p { opacity: 1; }
+
+  /* Links */
   a { text-decoration: underline; }
+
+  /* Tags — bordered box, no dark bg */
+  .tag {
+    background: transparent;
+    border-color: var(--mk-cyan);
+  }
 }
 
 /* ============================================================
