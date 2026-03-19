@@ -50,6 +50,9 @@ body {
   color: var(--color-text);
   line-height: 1.6;
   min-height: 100vh;
+  overflow-x: hidden;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Scanline overlay */
@@ -259,7 +262,7 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
   margin-bottom: 0.75rem;
   border-radius: var(--radius);
 }
-.project-card:hover { background: #45443a; }
+.project-card:hover { background: #363636; }
 
 /* Colorful left borders cycling through Monokai colors */
 .project-card:nth-child(1) { border-left-color: var(--mk-pink);   }
@@ -432,9 +435,16 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 }
 
 /* ============================================================
-   Mobile
+   Medium screens — hide email, compress nav
    ============================================================ */
-@media (max-width: 640px) {
+@media (max-width: 1024px) {
+  .nav-email { display: none; }
+}
+
+/* ============================================================
+   Tablet / small desktop — hamburger menu
+   ============================================================ */
+@media (max-width: 900px) {
   .nav-toggle { display: flex; }
 
   #nav-links,
@@ -448,7 +458,12 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 
   #nav-links  { flex-direction: column; }
   #nav-social { flex-direction: column; align-items: flex-start; gap: 0.5rem; padding-bottom: 0.75rem; }
+}
 
+/* ============================================================
+   Mobile
+   ============================================================ */
+@media (max-width: 640px) {
   .hero           { flex-direction: column; text-align: center; gap: 1rem; }
   .entry-meta     { flex-direction: column; }
   .resume-contact { flex-direction: column; gap: 0.35rem; }
