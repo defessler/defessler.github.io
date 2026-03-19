@@ -397,6 +397,77 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 .project-links a { font-size: 0.8rem; color: var(--mk-orange); }
 .project-links a::before { content: '→ '; }
 
+/* Featured project cards */
+.featured-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.project-card-featured {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  padding: 0;
+}
+
+.project-card-featured:hover { background: #363636; }
+
+.project-card-featured:nth-child(1) { border-left-color: var(--mk-pink);   }
+.project-card-featured:nth-child(2) { border-left-color: var(--mk-orange); }
+.project-card-featured:nth-child(3) { border-left-color: var(--mk-yellow); }
+.project-card-featured:nth-child(4) { border-left-color: var(--mk-green);  }
+
+.card-image {
+  width: 260px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.project-body {
+  padding: 1.25rem 1.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.project-body p { color: var(--mk-fg); opacity: 0.8; font-size: 0.875rem; margin-bottom: 0.6rem; line-height: 1.55; }
+
+.badge-unreleased {
+  display: inline-block;
+  font-size: 0.6rem;
+  color: var(--mk-yellow);
+  border: 1px solid var(--mk-yellow);
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--radius);
+  margin-left: 0.5rem;
+  vertical-align: middle;
+  opacity: 0.75;
+  text-transform: lowercase;
+  letter-spacing: 0.04em;
+}
+
+.other-projects-heading {
+  font-size: 0.8rem;
+  color: var(--mk-comment);
+  font-weight: 400;
+  margin: 0.5rem 0 1rem;
+  border-bottom: 1px solid var(--mk-border);
+  padding-bottom: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  .project-card-featured { flex-direction: column; }
+  .card-image { width: 100%; height: 180px; }
+}
+
 /* ============================================================
    Resume Page
    ============================================================ */

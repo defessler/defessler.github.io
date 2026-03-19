@@ -7,7 +7,7 @@ const CONTENT_PATH = './content';
 // Utilities
 // ============================================================
 async function fetchJSON(url) {
-  const res = await fetch(url);
+  const res = await fetch(url, { cache: 'no-cache' });
   if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${url}`);
   return res.json();
 }
@@ -138,7 +138,11 @@ function renderAbout(page) {
 }
 
 function renderPortfolio(page) {
-  const cards = (page.projects || []).map(p => {
+  const projects = page.projects || [];
+  const featured = projects.filter(p => p.featured);
+  const others   = projects.filter(p => !p.featured);
+
+  const featuredHTML = featured.map(p => {
     const tags = [...(p.platforms || []), ...(p.tech || [])];
     const tagsHTML = tags.length
       ? `<div class="project-tags">${tags.map(t => `<span class="tag">${escape(t)}</span>`).join('')}</div>`
@@ -146,10 +150,40 @@ function renderPortfolio(page) {
     const linksHTML = (p.links || []).length
       ? `<div class="project-links">${p.links.map(l => `<a href="${escape(l.url)}" target="_blank" rel="noopener">${escape(l.label)}</a>`).join('')}</div>`
       : '';
+    const imageHTML = p.image
+      ? `<div class="card-image"><img src="${escape(p.image)}" alt="${escape(p.title)}" loading="lazy"></div>`
+      : '';
+    const badgeHTML = p.unreleased ? `<span class="badge-unreleased">unreleased</span>` : '';
+    return `
+      <div class="project-card project-card-featured">
+        ${imageHTML}
+        <div class="project-body">
+          <div class="project-header">
+            <h3>${escape(p.title)}${badgeHTML}</h3>
+            ${p.company ? `<span class="project-company">${escape(p.company)}</span>` : ''}
+            ${p.year ? `<span class="project-year">${escape(p.year)}</span>` : ''}
+          </div>
+          ${tagsHTML}
+          <p>${p.description}</p>
+          ${linksHTML}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const othersHTML = others.map(p => {
+    const tags = [...(p.platforms || []), ...(p.tech || [])];
+    const tagsHTML = tags.length
+      ? `<div class="project-tags">${tags.map(t => `<span class="tag">${escape(t)}</span>`).join('')}</div>`
+      : '';
+    const linksHTML = (p.links || []).length
+      ? `<div class="project-links">${p.links.map(l => `<a href="${escape(l.url)}" target="_blank" rel="noopener">${escape(l.label)}</a>`).join('')}</div>`
+      : '';
+    const badgeHTML = p.unreleased ? `<span class="badge-unreleased">unreleased</span>` : '';
     return `
       <div class="project-card">
         <div class="project-header">
-          <h3>${escape(p.title)}</h3>
+          <h3>${escape(p.title)}${badgeHTML}</h3>
           ${p.company ? `<span class="project-company">${escape(p.company)}</span>` : ''}
           ${p.year ? `<span class="project-year">${escape(p.year)}</span>` : ''}
         </div>
@@ -163,7 +197,11 @@ function renderPortfolio(page) {
   return `
     <div class="portfolio-page">
       <h1>${escape(page.title)}</h1>
-      <div class="project-grid">${cards}</div>
+      <div class="featured-grid">${featuredHTML}</div>
+      ${others.length ? `
+        <h2 class="other-projects-heading">// Other Projects</h2>
+        <div class="project-grid">${othersHTML}</div>
+      ` : ''}
     </div>
   `;
 }

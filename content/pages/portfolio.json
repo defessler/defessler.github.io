@@ -1,0 +1,109 @@
+{
+  "type": "portfolio",
+  "title": "Portfolio",
+  "projects": [
+    {
+      "title": "Hearthstone",
+      "company": "Blizzard Entertainment",
+      "year": "2018–2021",
+      "featured": true,
+      "image": "./img/hearthstone.jpg",
+      "tech": ["Unity", "C#", "C++", "Lua"],
+      "platforms": ["PC", "Mac", "iOS", "Android"],
+      "description": "Software Engineer on the Hearthstone team across eight major expansions — Rastakhan's Rumble, Rise of Shadows, Saviors of Uldum, Descent of Dragons, Ashes of Outland, Scholomance Academy, Madness at the Darkmoon Faire, and Forged in the Barrens. On the Framework Team, designed and optimized a Unity/C# UI framework for 3D perspective UI and helped implement a Lua scripting framework on the game server. On the Features Team, implemented the design for The Dalaran Heist and Tombs of Terror solo adventure experiences, and refactored the hero picker to be fully data-driven.",
+      "links": []
+    },
+    {
+      "title": "Last Sentinel",
+      "company": "WhiteMoon Dreams",
+      "year": "2016–2018",
+      "featured": true,
+      "unreleased": true,
+      "image": "./img/last-sentinel.jpg",
+      "tech": ["Unreal Engine 4", "C++"],
+      "platforms": ["PC"],
+      "description": "Gameplay Programmer on this unreleased open-world action game set in a futuristic Tokyo. Developed the traversal system covering jumping, climbing, and sliding, with editor tooling for designers to mark traversable areas. Implemented a multiplayer sync moves system with class-based and positional effects. Integrated UE4's attribute system with local and remote data source support plus caching, and built spectator interaction features driven from a companion mobile application.",
+      "links": [
+        { "label": "Official Site", "url": "https://lastsentinelgame.com/" }
+      ]
+    },
+    {
+      "title": "Ghostbusters",
+      "company": "FireForge",
+      "year": "2016",
+      "featured": true,
+      "image": "./img/ghostbusters.jpg",
+      "tech": ["Unreal Engine 4", "C++"],
+      "platforms": ["PC", "Xbox One", "PS4"],
+      "description": "Software Engineer at FireForge on the Ghostbusters game tied to the 2016 film. Worked on the AI and gameplay ability system, supporting designers by exposing features to scripting and troubleshooting gameplay issues. Modified the engine to handle dialog audio based on culture/locale settings and improved AI movement with a box volume constraint system.",
+      "links": [
+        { "label": "Steam Store", "url": "http://store.steampowered.com/app/425310/" }
+      ]
+    },
+    {
+      "title": "StarBlood Arena",
+      "company": "WhiteMoon Dreams",
+      "year": "2017",
+      "featured": true,
+      "image": "./img/starblood-arena.jpg",
+      "tech": ["Unreal Engine 4", "C++"],
+      "platforms": ["PS4", "PSVR"],
+      "description": "Gameplay Programmer on this frenetic 360-degree PSVR arena shooter. Improved custom AI navigation generation and added difficulty levels for more varied combat. Implemented single-player and cooperative game modes, including a wave defense mode optimized with a pool manager. Set up the framework for sending match configurations to the matchmaking service and refactored the team system to support matchmaking data.",
+      "links": []
+    },
+    {
+      "title": "Vessels of Rath",
+      "company": "WhiteMoon Dreams",
+      "year": "2016",
+      "unreleased": true,
+      "tech": ["Unreal Engine 4", "C++"],
+      "platforms": ["PC"],
+      "description": "Action RPG developed internally at WhiteMoon Dreams as a technical showcase for the studio's Orbital platform — a cloud-based SaaS system for dynamic game content delivery and scalable game services.",
+      "links": [
+        { "label": "WhiteMoon Dreams", "url": "https://whitemoondreams.com/" }
+      ]
+    },
+    {
+      "title": "RTS Prototype",
+      "company": "FireForge",
+      "year": "2014",
+      "tech": ["Unreal Engine 4", "C++"],
+      "platforms": ["PC"],
+      "description": "Online multiplayer RTS game prototype built with a team of 3 engineers. Worked on AI, formations, UI, ability/attribute system, targeting system, and various other systems. Used in multiple sales pitches.",
+      "links": [
+        { "label": "Video (YouTube)", "url": "https://www.youtube.com/watch?v=HpZjskXGb7I" }
+      ]
+    },
+    {
+      "title": "Shadowrun Crossfire Digital Prototype",
+      "company": "FireForge",
+      "year": "2014",
+      "tech": ["Node.js", "Socket.IO", "JavaScript"],
+      "platforms": ["Web"],
+      "description": "Proof of concept prototype demonstrating an online version of the Shadowrun Crossfire tabletop game. Developed in under a week, helping win an RFP. Worked on the Socket.IO implementation and UI integration.",
+      "links": [
+        { "label": "Video (YouTube)", "url": "https://www.youtube.com/watch?v=vM3ETWOIpPg" }
+      ]
+    },
+    {
+      "title": "Crazy 88s",
+      "company": "Personal",
+      "year": "2015",
+      "tech": ["Unity", "C#"],
+      "platforms": ["PC", "Mobile"],
+      "description": "Personal project made with a group of friends. A card game framework in Unity to implement favorite card games and play them digitally online via phone or PC.",
+      "links": [
+        { "label": "Video (YouTube)", "url": "https://www.youtube.com/watch?v=VQD9AU6qpAs" }
+      ]
+    },
+    {
+      "title": "Furball Frenzy",
+      "company": "Personal",
+      "year": "2015",
+      "tech": ["Unity", "C#"],
+      "platforms": ["Android", "Web"],
+      "description": "Personal project made to help a friend with her senior art thesis. A simple cat matching game in the vein of Bejeweled with a few twists, built in two weeks. Worked on gameplay, sprite animation, and the matching algorithm.",
+      "links": []
+    }
+  ]
+}

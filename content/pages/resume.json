@@ -1,0 +1,157 @@
+{
+  "type": "resume",
+  "title": "Resume",
+  "data": {
+    "name": "Doug Fessler",
+    "headline": "Software Engineer",
+    "contact": {
+      "email": "defessler@gmail.com",
+      "location": "Irvine, CA",
+      "website": "http://dougfessler.com"
+    },
+    "objective": "To continue growing and learning while creating fun and engaging digital experiences using the skills and strong work ethic that I've developed throughout my career.",
+    "skills": [
+      { "category": "Engines",         "items": ["Unreal Engine", "Unity"] },
+      { "category": "Languages",       "items": ["C/C++", "C#", "Lua", "JavaScript", "HTML/CSS", "MySQL"] },
+      { "category": "Software",        "items": ["Visual Studio", "Sublime Text", "Eclipse", "Adobe Photoshop"] },
+      { "category": "Version Control", "items": ["Git", "Perforce", "SVN", "CVS"] }
+    ],
+    "experience": [
+      {
+        "company": "Blizzard Entertainment",
+        "title": "Software Engineer",
+        "start": "09/2018",
+        "end": "Present",
+        "projects": [
+          {
+            "name": "Hearthstone",
+            "platform": "PC/Mac/iOS/Android",
+            "type": "Online Multiplayer",
+            "teams": [
+              {
+                "name": "Framework Team",
+                "bullets": [
+                  "Designed and implemented features for UI Framework built in Unity using C# making it easier to build 3D perspective UI.",
+                  "Optimized UI Framework to run more efficiently.",
+                  "Helped to implement Lua scripting framework on the server using C++.",
+                  "Provide guidance around Lua and UI Frameworks to designers and engineers across the team."
+                ]
+              },
+              {
+                "name": "Features Team",
+                "bullets": [
+                  "Refactored hero picker to allow for implementing heroes through data.",
+                  "Implemented design for The Dalaran Heist and Tombs of Terror solo adventures."
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "company": "WhiteMoon Dreams",
+        "title": "Gameplay Programmer",
+        "start": "09/2016",
+        "end": "09/2018",
+        "projects": [
+          {
+            "name": "Unannounced Project",
+            "platform": "PC",
+            "type": "Online Multiplayer",
+            "bullets": [
+              "Added traversal system for jumping, climbing, and sliding with tools for designers to mark appropriate areas in the editor.",
+              "Added system for players to perform multiplayer sync moves with different effects based on player's class and position.",
+              "Integrated UE4's attribute system, updated it to support pulling data from a local or remote source, and added caching for quick updates.",
+              "Integrated gameplay features and UI for spectator interaction from a separate mobile application."
+            ]
+          },
+          {
+            "name": "StarBlood Arena",
+            "platform": "PS4/PSVR",
+            "type": "Online Multiplayer",
+            "bullets": [
+              "Improved custom AI navigation generation, added difficulty levels, improved basic AI combat, and added AI for capture the flag game mode.",
+              "Set up framework for sending match configurations to matchmaking service and refactored team system to support data from matchmaking.",
+              "Implemented single player and cooperative game modes. Optimized wave defense game mode by implementing a pool manager."
+            ]
+          }
+        ]
+      },
+      {
+        "company": "Dark Rift Entertainment",
+        "title": "Gameplay Programmer",
+        "start": "06/2016",
+        "end": "12/2016",
+        "projects": [
+          {
+            "name": "Embers of War",
+            "platform": "PC",
+            "type": "Online Multiplayer",
+            "bullets": [
+              "Audited existing code base and retrofitted support for multiplayer.",
+              "Implemented a loadout system built around UE4's gameplay abilities and attributes.",
+              "Laid ground work for a proper build process in order to make builds more readily available."
+            ]
+          }
+        ]
+      },
+      {
+        "company": "FireForge",
+        "title": "Software Engineer",
+        "start": "11/2013",
+        "end": "06/2016",
+        "bullets": [
+          "Developed platform C++ SDK and Unreal Engine 4 SDK.",
+          "Created platform integration examples in Unreal Engine 4.",
+          "Integrated Coherent UI and Coherent UIGT into Unreal Engine 4.",
+          "Developed playable game prototypes used in sales pitches and demonstrations.",
+          "Designed and built software around platform's RESTful APIs."
+        ],
+        "projects": [
+          {
+            "name": "Ghostbusters 2016",
+            "platform": "PS4, Xbox One, PC",
+            "type": "Local Multiplayer",
+            "bullets": [
+              "Modified engine to use dialog audio based on culture settings.",
+              "Improved AI by adding a box volume to allow restricting AI movement to an area."
+            ]
+          }
+        ]
+      }
+    ],
+    "additional_experience": [
+      {
+        "company": "Hanson",
+        "title": "Web Developer",
+        "start": "07/2011",
+        "end": "11/2013",
+        "bullets": [
+          "Full stack responsive site estimates and build outs.",
+          "Updated sites with new content, creating new graphics, layout designs, and animations."
+        ]
+      },
+      {
+        "company": "All American Coach",
+        "title": "Web Developer",
+        "start": "05/2010",
+        "end": "07/2011",
+        "bullets": [
+          "Full stack development and maintenance on all company websites.",
+          "Maintain company LAN, servers, and other computer systems support."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "school": "Owens Community College",
+        "start": "2006",
+        "end": "2010",
+        "degree": "Associates of Applied Science",
+        "field": "Computer Science",
+        "additional": "Computer Systems Certificate"
+      }
+    ],
+    "interests": "Software Engineering, Game Development, Web Development, Gaming, and Computer Hardware. Favorite games: Super Smash Bros., Metal Gear Solid, Final Fantasy, Dark Souls, Hearthstone, World of Warcraft, Overwatch."
+  }
+}
