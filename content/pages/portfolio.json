@@ -5,12 +5,26 @@
     {
       "title": "Last Sentinel",
       "company": "Lightspeed LA",
-      "year": "2022–Present",
+      "year": "2022-Present",
       "featured": true,
       "unreleased": true,
       "image": "./img/last-sentinel.jpg",
       "tech": ["Unreal Engine 5", "C++"],
-      "description": "Senior Gameplay Engineer on this narrative open-world action game set in a futuristic Tokyo. Architected a Mission system to manage data layers and control mission flow — enabling designers to fast-forward, rewind, and debug objectives. Created an IGC (In-Game Cinematic) framework for scripting multi-character animated scenes with props, moving platforms, and QTEs in a data-driven way. Integrated UE5's Level Sequencer into the scripting framework. Extended save/load architecture to handle mission checkpoints, open-world auto-saves, and mid-mission snapshots. Developed a UI framework using an MVVM pattern integrated with UE5's ViewModel architecture.",
+      "description": "Senior Gameplay Engineer on a narrative open-world action game set in futuristic Tokyo.",
+      "subprojects": [
+        {
+          "title": "Mission System",
+          "description": "Architected a data-layered mission system for controlling mission flow. Built designer tools for fast-forward, rewind, and in-editor objective debugging. Extended save/load to support mission checkpoints, open-world auto-saves, and mid-mission snapshots."
+        },
+        {
+          "title": "IGC Framework",
+          "description": "Built an In-Game Cinematic framework for scripting multi-character animated scenes with support for props, moving platforms, and QTEs. Integrated UE5's Level Sequencer with multiple actor binding strategies."
+        },
+        {
+          "title": "World and UI Systems",
+          "description": "Built a marker and compass system for open-world navigation and mission flow. Developed a UI framework using an MVVM pattern integrated with UE5's ViewModel architecture. Led scripting workshops and mentored designers and co-development engineers."
+        }
+      ],
       "links": [
         { "label": "Official Site", "url": "https://lastsentinelgame.com/" }
       ]
@@ -18,30 +32,34 @@
     {
       "title": "Hearthstone",
       "company": "Blizzard Entertainment",
-      "year": "2018–2022",
+      "year": "2018-2022",
       "featured": true,
       "image": "./img/hearthstone.jpg",
       "tech": ["Unity", "C#", "C++", "Lua"],
       "platforms": ["PC", "Mac", "iOS", "Android"],
-      "description": "Software Engineer on the Hearthstone team across eight major expansions, focused on solo adventure experiences and the systems that power the in-game Journal — quests, achievements, missions, and reward progression.",
+      "description": "Software Engineer on the Hearthstone team across eight major expansions, focused on solo adventure experiences and the systems powering the in-game Journal: quests, achievements, missions, and reward progression.",
       "subprojects": [
         {
-          "title": "Framework & Scripting",
-          "period": "2018–2019",
+          "title": "Framework and Scripting",
+          "period": "2018-2019",
           "description": "Implemented a Lua scripting framework on the game server enabling data-driven mission and quest scripting. Refactored the hero picker to be fully data-driven. Contributed to UI framework improvements in Unity/C#."
         },
         {
           "title": "Solo Adventures",
-          "period": "2019–2020",
-          "description": "Implemented the design for The Dalaran Heist (Rise of Shadows) and Tombs of Terror (Saviors of Uldum) — building mission flow, encounter management, and the systems powering branching adventure progression."
+          "period": "2019-2020",
+          "description": "Implemented the design for The Dalaran Heist (Rise of Shadows) and Tombs of Terror (Saviors of Uldum), building mission flow, encounter management, and the systems powering branching adventure progression."
         },
         {
-          "title": "Journal, Quests & Achievements",
-          "period": "2020–2022",
-          "description": "Built and extended systems within the Hearthstone Journal — daily and weekly quest tracking, achievement pipelines, reward progression, and the scripted mission system used to define player objectives for each expansion cycle."
+          "title": "Journal, Quests and Achievements",
+          "period": "2020-2022",
+          "description": "Built and extended systems within the Hearthstone Journal: daily and weekly quest tracking, achievement pipelines, reward progression, and the scripted mission system used to define player objectives for each expansion cycle."
         }
       ],
-      "links": []
+      "links": [
+        { "label": "The Dalaran Heist", "url": "https://hearthstone.fandom.com/wiki/The_Dalaran_Heist" },
+        { "label": "Tombs of Terror",   "url": "https://hearthstone.fandom.com/wiki/Tombs_of_Terror" },
+        { "label": "Hearthstone Journal", "url": "https://hearthstone.fandom.com/wiki/Journal" }
+      ]
     },
     {
       "title": "Ghostbusters",
@@ -51,7 +69,17 @@
       "image": "./img/ghostbusters.jpg",
       "tech": ["Unreal Engine 4", "C++"],
       "platforms": ["PC", "Xbox One", "PS4"],
-      "description": "Software Engineer at FireForge on the Ghostbusters game tied to the 2016 film. Worked on the AI and gameplay ability system, supporting designers by exposing features to scripting. Modified the engine to handle dialog audio based on culture/locale settings and improved AI movement with a box volume constraint system.",
+      "description": "Software Engineer at FireForge on the official Ghostbusters tie-in for the 2016 film.",
+      "subprojects": [
+        {
+          "title": "AI and Ability System",
+          "description": "Developed gameplay ability systems and improved AI movement with a box volume constraint system. Exposed features to Blueprint scripting for designer access."
+        },
+        {
+          "title": "Audio Localization",
+          "description": "Modified the engine's audio system to route dialog based on culture and locale settings."
+        }
+      ],
       "links": [
         { "label": "Steam Store", "url": "http://store.steampowered.com/app/425310/" }
       ]
@@ -64,7 +92,17 @@
       "image": "./img/starblood-arena.jpg",
       "tech": ["Unreal Engine 4", "C++"],
       "platforms": ["PS4", "PSVR"],
-      "description": "Gameplay Programmer on this 360-degree PSVR arena shooter. Improved custom AI navigation generation and added difficulty levels. Implemented single-player and cooperative game modes, including a wave defense mode optimized with a pool manager. Set up the framework for sending match configurations to the matchmaking service and refactored the team system to support matchmaking data.",
+      "description": "Gameplay Programmer on a 360-degree PS4/PSVR arena shooter.",
+      "subprojects": [
+        {
+          "title": "AI and Navigation",
+          "description": "Improved custom AI navigation mesh generation and added tunable difficulty levels. Improved AI combat targeting and basic behavior."
+        },
+        {
+          "title": "Game Modes and Matchmaking",
+          "description": "Implemented single-player and cooperative game modes including a wave defense mode optimized with an object pool manager. Built the framework for sending match configurations to the matchmaking service and refactored the team system to support it."
+        }
+      ],
       "links": []
     },
     {
@@ -115,15 +153,6 @@
       "links": [
         { "label": "Video (YouTube)", "url": "https://www.youtube.com/watch?v=VQD9AU6qpAs" }
       ]
-    },
-    {
-      "title": "Furball Frenzy",
-      "company": "Personal",
-      "year": "2015",
-      "tech": ["Unity", "C#"],
-      "platforms": ["Android", "Web"],
-      "description": "Personal project made to help a friend with her senior art thesis. A simple cat matching game in the vein of Bejeweled built in two weeks. Worked on gameplay, sprite animation, and the matching algorithm.",
-      "links": []
     }
   ]
 }

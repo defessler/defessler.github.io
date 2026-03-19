@@ -9,7 +9,7 @@
       "email_domain": "gmail.com",
       "website": "http://dougfessler.com"
     },
-    "objective": "To continue growing and learning while creating fun and engaging gameplay experiences — building the systems that drive player agency, narrative, and progression.",
+    "objective": "To continue growing and learning while creating fun and engaging gameplay experiences, building the systems that drive player agency, narrative, and progression.",
     "skills": [
       { "category": "Engines",         "items": ["Unreal Engine 5", "Unreal Engine 4", "Unity"] },
       { "category": "Languages",       "items": ["C/C++", "C#", "Lua", "JavaScript", "HTML/CSS"] },
@@ -65,7 +65,7 @@
                 "name": "Features Team",
                 "bullets": [
                   "Implemented the design for The Dalaran Heist and Tombs of Terror solo adventure experiences.",
-                  "Built and extended systems within the Hearthstone Journal — daily and weekly quest tracking, achievement pipelines, and reward progression across multiple expansion cycles.",
+                  "Built and extended systems within the Hearthstone Journal: daily and weekly quest tracking, achievement pipelines, and reward progression across multiple expansion cycles.",
                   "Refactored hero picker to allow for implementing heroes through data."
                 ]
               }
