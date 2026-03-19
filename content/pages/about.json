@@ -1,0 +1,42 @@
+{
+  "type": "about",
+  "title": "About",
+  "name": "Doug Fessler",
+  "headline": "Software Engineer",
+  "photo": "./img/me.jpg",
+  "bio": [
+    "I am a Software Engineer that has grown up with a passion for creating things. I began creating games at an early age with an application called RPG Maker.",
+    "I taught myself C++ and when I discovered a game programming library called Allegro I fell in love with programming and never looked back."
+  ],
+  "stats": [
+    { "label": "current",  "value": "Blizzard Entertainment" },
+    { "label": "role",     "value": "Software Engineer" },
+    { "label": "location", "value": "Irvine, CA" },
+    { "label": "focus",    "value": "Game Dev / Systems / UI" }
+  ],
+  "skills": ["C/C++", "C#", "JavaScript", "Lua", "Unreal Engine", "Unity", "HTML/CSS", "Git", "Perforce"],
+  "highlights": [
+    {
+      "title": "Hearthstone",
+      "context": "Blizzard Entertainment",
+      "description": "UI Framework and features engineering on one of the world's most popular digital card games.",
+      "href": "#portfolio"
+    },
+    {
+      "title": "StarBlood Arena",
+      "context": "WhiteMoon Dreams",
+      "description": "AI, game modes, and matchmaking for a PS4/PSVR multiplayer arena shooter.",
+      "href": "#portfolio"
+    },
+    {
+      "title": "Ghostbusters",
+      "context": "FireForge",
+      "description": "Gameplay and AI systems on the official Ghostbusters tie-in game for PC, PS4, and Xbox One.",
+      "href": "#portfolio"
+    }
+  ],
+  "cta": [
+    { "label": "view portfolio", "href": "#portfolio", "primary": true },
+    { "label": "view resume",    "href": "#resume",    "primary": false }
+  ]
+}
