@@ -357,8 +357,8 @@ async function init() {
     document.getElementById('site-nav').classList.remove('nav-open');
   });
 
-  // Email obfuscation — reveal on click
-  document.getElementById('page-content').addEventListener('click', e => {
+  // Email obfuscation — reveal on click (covers both nav and page content)
+  document.addEventListener('click', e => {
     const el = e.target.closest('.obf-email');
     if (!el) return;
     const email = el.dataset.u + '@' + el.dataset.d;
