@@ -56,8 +56,10 @@
         }
       ],
       "links": [
-        { "label": "The Dalaran Heist", "url": "https://hearthstone.fandom.com/wiki/The_Dalaran_Heist" },
-        { "label": "Tombs of Terror",   "url": "https://hearthstone.fandom.com/wiki/Tombs_of_Terror" },
+        { "label": "The Dalaran Heist",   "url": "https://hearthstone.fandom.com/wiki/The_Dalaran_Heist" },
+        { "label": "Rise of Shadows",     "url": "https://hearthstone.fandom.com/wiki/Rise_of_Shadows" },
+        { "label": "Tombs of Terror",     "url": "https://hearthstone.fandom.com/wiki/Tombs_of_Terror" },
+        { "label": "Saviors of Uldum",    "url": "https://hearthstone.fandom.com/wiki/Saviors_of_Uldum" },
         { "label": "Hearthstone Journal", "url": "https://hearthstone.fandom.com/wiki/Journal" }
       ]
     },
