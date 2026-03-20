@@ -165,7 +165,7 @@
       "image": "./img/furball-frenzy.jpg",
       "tech": ["Unity", "C#"],
       "platforms": ["Web"],
-      "description": "Personal project made in Unity to help a friend with her senior art thesis project. I worked together with friends to put this prototype together in the span of two weeks to meet the deadline for the project. This is a simple cat matching game in the vein of bejeweled with a few twists. I worked on handling gameplay, animating sprites from art assets, and integrating the matching algorithm.",
+      "description": "Personal project made in Unity to help a friend with her senior art thesis. Built with a small group of friends in two weeks. A simple cat matching game in the vein of Bejeweled with a few twists — I handled gameplay, sprite animation, and the matching algorithm.",
       "links": [
         { "label": "Play in Browser", "url": "./projects/furball-frenzy/" }
       ]
