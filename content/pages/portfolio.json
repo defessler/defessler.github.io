@@ -1,0 +1,162 @@
+{
+  "type": "portfolio",
+  "title": "Portfolio",
+  "projects": [
+    {
+      "title": "Last Sentinel",
+      "company": "Lightspeed LA",
+      "year": "2022-Present",
+      "featured": true,
+      "unreleased": true,
+      "image": "./img/last-sentinel.jpg",
+      "tech": ["Unreal Engine 5", "C++"],
+      "description": "Senior Gameplay Engineer on a narrative open-world action game set in futuristic Tokyo.",
+      "subprojects": [
+        {
+          "title": "Mission System",
+          "description": "Built and owned a Mission system that drives mission flow and manages UE5 World Partition data layers, controlling which open-world content loads and unloads based on mission state. Built designer tools for fast-forward, rewind, and in-editor objective debugging. Extended save/load to support mission checkpoints, open-world auto-saves, and mid-mission snapshots."
+        },
+        {
+          "title": "IGC Framework",
+          "description": "Built an In-Game Cinematic framework for scripting multi-character animated scenes with support for props, moving platforms, and QTEs. Integrated UE5's Level Sequencer with multiple actor binding strategies."
+        },
+        {
+          "title": "World and UI Systems",
+          "description": "Built a marker and compass system for open-world navigation and mission flow. Developed a UI framework using an MVVM pattern integrated with UE5's ViewModel architecture. Led scripting workshops and mentored designers and co-development engineers."
+        }
+      ],
+      "links": [
+        { "label": "Official Site", "url": "https://lastsentinelgame.com/" }
+      ]
+    },
+    {
+      "title": "Hearthstone",
+      "company": "Blizzard Entertainment",
+      "year": "2018-2022",
+      "featured": true,
+      "image": "./img/hearthstone.jpg",
+      "tech": ["Unity", "C#", "C++", "Lua"],
+      "platforms": ["PC", "Mac", "iOS", "Android"],
+      "description": "Software Engineer on the Hearthstone team across eight major expansions, focused on solo adventure experiences and the systems powering the in-game Journal: quests, achievements, missions, and reward progression.",
+      "subprojects": [
+        {
+          "title": "Framework and Scripting",
+          "period": "2018-2019",
+          "description": "Implemented a Lua scripting framework on the game server enabling data-driven mission and quest scripting. Refactored the hero picker to be fully data-driven. Contributed to UI framework improvements in Unity/C#."
+        },
+        {
+          "title": "Solo Adventures",
+          "period": "2019-2020",
+          "description": "Implemented the design for The Dalaran Heist (Rise of Shadows) and Tombs of Terror (Saviors of Uldum), building mission flow, encounter management, and the systems powering branching adventure progression."
+        },
+        {
+          "title": "Journal, Quests and Achievements",
+          "period": "2020-2022",
+          "description": "Built and extended systems within the Hearthstone Journal: daily and weekly quest tracking, achievement pipelines, reward progression, and the scripted mission system used to define player objectives for each expansion cycle."
+        }
+      ],
+      "links": [
+        { "label": "The Dalaran Heist",   "url": "https://hearthstone.fandom.com/wiki/The_Dalaran_Heist" },
+        { "label": "Rise of Shadows",     "url": "https://hearthstone.fandom.com/wiki/Rise_of_Shadows" },
+        { "label": "Tombs of Terror",     "url": "https://hearthstone.fandom.com/wiki/Tombs_of_Terror" },
+        { "label": "Saviors of Uldum",    "url": "https://hearthstone.fandom.com/wiki/Saviors_of_Uldum" },
+        { "label": "Hearthstone Journal", "url": "https://hearthstone.fandom.com/wiki/Journal" }
+      ]
+    },
+    {
+      "title": "Ghostbusters",
+      "company": "FireForge",
+      "year": "2016",
+      "featured": true,
+      "image": "./img/ghostbusters.jpg",
+      "tech": ["Unreal Engine 4", "C++"],
+      "platforms": ["PC", "Xbox One", "PS4"],
+      "description": "Software Engineer at FireForge on the official Ghostbusters tie-in for the 2016 film.",
+      "subprojects": [
+        {
+          "title": "AI and Ability System",
+          "description": "Developed gameplay ability systems and improved AI movement with a box volume constraint system. Exposed features to Blueprint scripting for designer access."
+        },
+        {
+          "title": "Audio Localization",
+          "description": "Modified the engine's audio system to route dialog based on culture and locale settings."
+        }
+      ],
+      "links": [
+        { "label": "Steam Store", "url": "http://store.steampowered.com/app/425310/" }
+      ]
+    },
+    {
+      "title": "StarBlood Arena",
+      "company": "WhiteMoon Dreams",
+      "year": "2017",
+      "featured": true,
+      "image": "./img/starblood-arena.jpg",
+      "tech": ["Unreal Engine 4", "C++"],
+      "platforms": ["PS4", "PSVR"],
+      "description": "Gameplay Programmer on a 360-degree PS4/PSVR arena shooter.",
+      "subprojects": [
+        {
+          "title": "AI and Navigation",
+          "description": "Improved custom AI navigation mesh generation and added tunable difficulty levels. Improved AI combat targeting and basic behavior."
+        },
+        {
+          "title": "Game Modes and Matchmaking",
+          "description": "Implemented single-player and cooperative game modes including a wave defense mode optimized with an object pool manager. Built the framework for sending match configurations to the matchmaking service and refactored the team system to support it."
+        }
+      ],
+      "links": [
+        { "label": "Metacritic", "url": "https://www.metacritic.com/game/starblood-arena/" }
+      ]
+    },
+    {
+      "title": "Vessels of Rath",
+      "company": "WhiteMoon Dreams",
+      "year": "2016",
+      "unreleased": true,
+      "image": "./img/vessels-of-rath.jpg",
+      "tech": ["Unreal Engine 4", "C++"],
+      "platforms": ["PC"],
+      "description": "Action RPG developed internally at WhiteMoon Dreams to showcase the studio's Orbital platform, a cloud backend for hosting and serving live game content.",
+      "links": [
+        { "label": "WhiteMoon Dreams", "url": "https://whitemoondreams.com/" }
+      ]
+    },
+    {
+      "title": "RTS Prototype",
+      "company": "FireForge",
+      "year": "2014",
+      "image": "./img/rts-prototype.jpg",
+      "tech": ["Unreal Engine 4", "C++"],
+      "platforms": ["PC"],
+      "description": "Online multiplayer RTS prototype built with a team of 3 engineers. Worked on AI, formations, ability/attribute system, targeting system, and various other systems. Used in multiple sales pitches.",
+      "links": [
+        { "label": "Video (YouTube)", "url": "https://www.youtube.com/watch?v=HpZjskXGb7I" }
+      ]
+    },
+    {
+      "title": "Shadowrun Crossfire Digital Prototype",
+      "company": "FireForge",
+      "year": "2014",
+      "image": "./img/shadowrun-crossfire.jpg",
+      "tech": ["Node.js", "Socket.IO", "JavaScript"],
+      "platforms": ["Web"],
+      "description": "Proof of concept prototype demonstrating an online version of the Shadowrun Crossfire tabletop game. Developed in under a week, helping win an RFP. Worked on the Socket.IO implementation and UI integration.",
+      "links": [
+        { "label": "Video (YouTube)", "url": "https://www.youtube.com/watch?v=vM3ETWOIpPg" }
+      ]
+    },
+    {
+      "title": "Crazy 88s",
+      "company": "Personal",
+      "year": "2015",
+      "image": "./img/crazy-88s.jpg",
+      "tech": ["Unity", "C#"],
+      "platforms": ["PC", "Mobile"],
+      "description": "Personal project made with a group of friends. A card game framework in Unity to implement favorite card games and play them digitally online via phone or PC.",
+      "links": [
+        { "label": "Video (YouTube)", "url": "https://www.youtube.com/watch?v=VQD9AU6qpAs" }
+      ]
+    }
+  ]
+}

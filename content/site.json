@@ -1,0 +1,14 @@
+{
+  "title": "Doug Fessler",
+  "nav": [
+    { "label": "About",     "page": "about" },
+    { "label": "Portfolio", "page": "portfolio" },
+    { "label": "Resume",    "page": "resume" }
+  ],
+  "social": [
+    { "label": "GitHub",   "url": "https://github.com/defessler",            "icon": "github" },
+    { "label": "LinkedIn", "url": "https://linkedin.com/in/dougfessler",     "icon": "linkedin" }
+  ],
+  "email_user": "defessler",
+  "email_domain": "gmail.com"
+}

@@ -1,0 +1,174 @@
+{
+  "type": "resume",
+  "title": "Resume",
+  "data": {
+    "name": "Doug Fessler",
+    "headline": "Senior Gameplay Engineer",
+    "contact": {
+      "email_user": "defessler",
+      "email_domain": "gmail.com",
+      "website": "http://dougfessler.com"
+    },
+    "objective": "To continue growing and learning while creating fun and engaging gameplay experiences, building the systems that drive player agency, narrative, and progression.",
+    "skills": [
+      { "category": "Engines",         "items": ["Unreal Engine 5", "Unreal Engine 4", "Unity"] },
+      { "category": "Languages",       "items": ["C/C++", "C#", "Lua", "JavaScript", "HTML/CSS"] },
+      { "category": "Software",        "items": ["Visual Studio", "Rider", "Perforce", "Git"] },
+      { "category": "Specializations", "items": ["Mission Systems", "Cinematic Frameworks", "Gameplay Systems", "Progression & Quest Systems"] }
+    ],
+    "experience": [
+      {
+        "company": "Lightspeed LA",
+        "title": "Senior Gameplay Engineer",
+        "start": "04/2022",
+        "end": "Present",
+        "projects": [
+          {
+            "name": "Last Sentinel",
+            "platform": "Unannounced",
+            "type": "Single Player",
+            "bullets": [
+              "Architected and owned a Mission system that drives mission flow and manages UE5 World Partition data layers, controlling which open-world content loads based on mission state. Built designer tools for fast-forward, rewind, and in-editor objective debugging.",
+              "Created an IGC framework for scripting multi-character animated scenes with support for props, moving platforms, and QTEs. Integrated UE5's Level Sequencer with multiple actor binding strategies.",
+              "Partnered with design and animation to define scene alignment standards and best practices.",
+              "Extended save/load to handle mission checkpoints, open-world auto-saves, quick saves, and mid-mission snapshots.",
+              "Built an Investigation system with scanning, hot/cold feedback, and clue filtering. Added a marker and compass system for open-world navigation.",
+              "Developed a UI framework using MVVM pattern integrated with UE5's ViewModel architecture.",
+              "Led scripting workshops and mentored designers and co-development engineers across teams."
+            ]
+          }
+        ]
+      },
+      {
+        "company": "Blizzard Entertainment",
+        "title": "Software Engineer",
+        "start": "09/2018",
+        "end": "04/2022",
+        "projects": [
+          {
+            "name": "Hearthstone",
+            "platform": "PC/Mac/iOS/Android",
+            "type": "Online Multiplayer",
+            "teams": [
+              {
+                "name": "Framework Team",
+                "bullets": [
+                  "Implemented a Lua scripting framework on the game server using C++, enabling data-driven mission and quest scripting across multiple teams.",
+                  "Contributed to improvements to the Unity/C# UI framework for 3D perspective UI.",
+                  "Provided guidance on scripting and framework systems to designers and engineers across the team."
+                ]
+              },
+              {
+                "name": "Features Team",
+                "bullets": [
+                  "Implemented the design for The Dalaran Heist and Tombs of Terror solo adventure experiences.",
+                  "Built and extended systems within the Hearthstone Journal: daily and weekly quest tracking, achievement pipelines, and reward progression across multiple expansion cycles.",
+                  "Refactored hero picker to allow for implementing heroes through data."
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "company": "WhiteMoon Dreams",
+        "title": "Gameplay Programmer",
+        "start": "09/2016",
+        "end": "09/2018",
+        "projects": [
+          {
+            "name": "StarBlood Arena",
+            "platform": "PS4/PSVR",
+            "type": "Online Multiplayer",
+            "bullets": [
+              "Improved custom AI navigation generation, added difficulty levels, and improved basic AI combat.",
+              "Set up framework for sending match configurations to matchmaking service and refactored team system to support data from matchmaking.",
+              "Implemented single player and cooperative game modes. Optimized wave defense game mode by implementing a pool manager."
+            ]
+          },
+          {
+            "name": "Vessels of Rath",
+            "platform": "PC",
+            "type": "Single Player",
+            "bullets": [
+              "Gameplay engineering on an internal action RPG developed to showcase the studio's Orbital cloud platform."
+            ]
+          }
+        ]
+      },
+      {
+        "company": "Dark Rift Entertainment",
+        "title": "Gameplay Programmer",
+        "start": "06/2016",
+        "end": "12/2016",
+        "projects": [
+          {
+            "name": "Embers of War",
+            "platform": "PC",
+            "type": "Online Multiplayer",
+            "bullets": [
+              "Audited existing code base and retrofitted support for multiplayer.",
+              "Implemented a loadout system built around UE4's gameplay abilities and attributes.",
+              "Laid groundwork for a proper build process to make builds more readily available."
+            ]
+          }
+        ]
+      },
+      {
+        "company": "FireForge",
+        "title": "Software Engineer",
+        "start": "11/2013",
+        "end": "06/2016",
+        "bullets": [
+          "Developed platform C++ and Unreal Engine 4 SDKs, and playable prototypes used in sales pitches.",
+          "Designed and built software around the platform's RESTful APIs."
+        ],
+        "projects": [
+          {
+            "name": "Ghostbusters 2016",
+            "platform": "PS4, Xbox One, PC",
+            "type": "Local Multiplayer",
+            "bullets": [
+              "Worked on AI and gameplay ability systems supporting designers through scripting exposure and troubleshooting.",
+              "Modified engine to use dialog audio based on culture settings.",
+              "Improved AI by adding a box volume to restrict AI movement to designer-defined areas."
+            ]
+          }
+        ]
+      }
+    ],
+    "additional_experience": [
+      {
+        "company": "Hanson",
+        "title": "Web Developer",
+        "start": "07/2011",
+        "end": "11/2013",
+        "bullets": [
+          "Full stack responsive site estimates and build outs.",
+          "Updated sites with new content, creating new graphics, layout designs, and animations."
+        ]
+      },
+      {
+        "company": "All American Coach",
+        "title": "Web Developer",
+        "start": "05/2010",
+        "end": "07/2011",
+        "bullets": [
+          "Full stack development and maintenance on all company websites.",
+          "Maintained company LAN, servers, and other computer systems."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "school": "Owens Community College",
+        "start": "2006",
+        "end": "2010",
+        "degree": "Associates of Applied Science",
+        "field": "Computer Science",
+        "additional": "Computer Systems Certificate"
+      }
+    ],
+    "interests": "Game Development, Software Engineering, Gaming, and Computer Hardware.<br>Favorite games: Super Smash Bros., Metal Gear Solid, Final Fantasy, Dark Souls, Hearthstone, World of Warcraft, Overwatch."
+  }
+}
