@@ -30,18 +30,6 @@
       ]
     },
     {
-      "title": "Furball Frenzy",
-      "company": "Personal",
-      "year": "2023",
-      "image": "./img/furball-frenzy.jpg",
-      "tech": ["Unity", "C#"],
-      "platforms": ["Web"],
-      "description": "Personal project. A casual arcade game built in Unity and published as a WebGL browser game.",
-      "links": [
-        { "label": "Play in Browser", "url": "./projects/furball-frenzy/" }
-      ]
-    },
-    {
       "title": "Hearthstone",
       "company": "Blizzard Entertainment",
       "year": "2018-2022",
@@ -168,6 +156,18 @@
       "description": "Proof of concept prototype demonstrating an online version of the Shadowrun Crossfire tabletop game. Developed in under a week, helping win an RFP. Worked on the Socket.IO implementation and UI integration.",
       "links": [
         { "label": "Video (YouTube)", "url": "https://www.youtube.com/watch?v=vM3ETWOIpPg" }
+      ]
+    },
+    {
+      "title": "Furball Frenzy",
+      "company": "Personal",
+      "year": "2013",
+      "image": "./img/furball-frenzy.jpg",
+      "tech": ["Unity", "C#"],
+      "platforms": ["Web"],
+      "description": "Personal project. A casual arcade game built in Unity and published as a WebGL browser game.",
+      "links": [
+        { "label": "Play in Browser", "url": "./projects/furball-frenzy/" }
       ]
     }
   ]
