@@ -30,6 +30,18 @@
       ]
     },
     {
+      "title": "Furball Frenzy",
+      "company": "Personal",
+      "year": "2023",
+      "image": "./img/furball-frenzy.jpg",
+      "tech": ["Unity", "C#"],
+      "platforms": ["Web"],
+      "description": "Personal project. A casual arcade game built in Unity and published as a WebGL browser game.",
+      "links": [
+        { "label": "Play in Browser", "url": "./projects/furball-frenzy/" }
+      ]
+    },
+    {
       "title": "Hearthstone",
       "company": "Blizzard Entertainment",
       "year": "2018-2022",
@@ -64,29 +76,6 @@
       ]
     },
     {
-      "title": "Ghostbusters",
-      "company": "FireForge",
-      "year": "2016",
-      "featured": true,
-      "image": "./img/ghostbusters.jpg",
-      "tech": ["Unreal Engine 4", "C++"],
-      "platforms": ["PC", "Xbox One", "PS4"],
-      "description": "Software Engineer at FireForge on the official Ghostbusters tie-in for the 2016 film.",
-      "subprojects": [
-        {
-          "title": "AI and Ability System",
-          "description": "Developed gameplay ability systems and improved AI movement with a box volume constraint system. Exposed features to Blueprint scripting for designer access."
-        },
-        {
-          "title": "Audio Localization",
-          "description": "Modified the engine's audio system to route dialog based on culture and locale settings."
-        }
-      ],
-      "links": [
-        { "label": "Steam Store", "url": "http://store.steampowered.com/app/425310/" }
-      ]
-    },
-    {
       "title": "StarBlood Arena",
       "company": "WhiteMoon Dreams",
       "year": "2017",
@@ -110,6 +99,29 @@
       ]
     },
     {
+      "title": "Ghostbusters",
+      "company": "FireForge",
+      "year": "2016",
+      "featured": true,
+      "image": "./img/ghostbusters.jpg",
+      "tech": ["Unreal Engine 4", "C++"],
+      "platforms": ["PC", "Xbox One", "PS4"],
+      "description": "Software Engineer at FireForge on the official Ghostbusters tie-in for the 2016 film.",
+      "subprojects": [
+        {
+          "title": "AI and Ability System",
+          "description": "Developed gameplay ability systems and improved AI movement with a box volume constraint system. Exposed features to Blueprint scripting for designer access."
+        },
+        {
+          "title": "Audio Localization",
+          "description": "Modified the engine's audio system to route dialog based on culture and locale settings."
+        }
+      ],
+      "links": [
+        { "label": "Steam Store", "url": "http://store.steampowered.com/app/425310/" }
+      ]
+    },
+    {
       "title": "Vessels of Rath",
       "company": "WhiteMoon Dreams",
       "year": "2016",
@@ -120,6 +132,18 @@
       "description": "Action RPG developed internally at WhiteMoon Dreams to showcase the studio's Orbital platform, a cloud backend for hosting and serving live game content.",
       "links": [
         { "label": "WhiteMoon Dreams", "url": "https://whitemoondreams.com/" }
+      ]
+    },
+    {
+      "title": "Crazy 88s",
+      "company": "Personal",
+      "year": "2015",
+      "image": "./img/crazy-88s.jpg",
+      "tech": ["Unity", "C#"],
+      "platforms": ["PC", "Mobile"],
+      "description": "Personal project made with a group of friends. A card game framework in Unity to implement favorite card games and play them digitally online via phone or PC.",
+      "links": [
+        { "label": "Video (YouTube)", "url": "https://www.youtube.com/watch?v=VQD9AU6qpAs" }
       ]
     },
     {
@@ -144,29 +168,6 @@
       "description": "Proof of concept prototype demonstrating an online version of the Shadowrun Crossfire tabletop game. Developed in under a week, helping win an RFP. Worked on the Socket.IO implementation and UI integration.",
       "links": [
         { "label": "Video (YouTube)", "url": "https://www.youtube.com/watch?v=vM3ETWOIpPg" }
-      ]
-    },
-    {
-      "title": "Furball Frenzy",
-      "company": "Personal",
-      "year": "2023",
-      "tech": ["Unity", "C#"],
-      "platforms": ["Web"],
-      "description": "Personal project. A casual arcade game built in Unity and published as a WebGL browser game.",
-      "links": [
-        { "label": "Play in Browser", "url": "./projects/furball-frenzy/" }
-      ]
-    },
-    {
-      "title": "Crazy 88s",
-      "company": "Personal",
-      "year": "2015",
-      "image": "./img/crazy-88s.jpg",
-      "tech": ["Unity", "C#"],
-      "platforms": ["PC", "Mobile"],
-      "description": "Personal project made with a group of friends. A card game framework in Unity to implement favorite card games and play them digitally online via phone or PC.",
-      "links": [
-        { "label": "Video (YouTube)", "url": "https://www.youtube.com/watch?v=VQD9AU6qpAs" }
       ]
     }
   ]
