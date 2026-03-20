@@ -147,6 +147,17 @@
       ]
     },
     {
+      "title": "Furball Frenzy",
+      "company": "Personal",
+      "year": "2023",
+      "tech": ["Unity", "C#"],
+      "platforms": ["Web"],
+      "description": "Personal project. A casual arcade game built in Unity and published as a WebGL browser game.",
+      "links": [
+        { "label": "Play in Browser", "url": "./projects/furball-frenzy/" }
+      ]
+    },
+    {
       "title": "Crazy 88s",
       "company": "Personal",
       "year": "2015",
