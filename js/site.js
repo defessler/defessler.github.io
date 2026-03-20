@@ -274,6 +274,8 @@ function renderResume(page) {
         <div class="resume-contact">${contactParts.join('')}</div>
       </div>
 
+      ${r.objective ? `<section class="resume-section"><h2>Objective</h2><p>${r.objective}</p></section>` : ''}
+
       <section class="resume-section">
         <h2>Experience</h2>
         ${expHTML}
@@ -291,7 +293,6 @@ function renderResume(page) {
         ${eduHTML}
       </section>
 
-      ${r.objective ? `<section class="resume-section resume-hide-print"><h2>Objective</h2><p>${r.objective}</p></section>` : ''}
       ${r.interests ? `<section class="resume-section resume-hide-print"><h2>Interests</h2><p>${r.interests}</p></section>` : ''}
 
       <div class="resume-actions">
