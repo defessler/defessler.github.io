@@ -5,8 +5,9 @@
   "headline": "Senior Gameplay Engineer",
   "photo": "./img/me.jpg",
   "bio": [
-    "I'm a Senior Gameplay Engineer focused on the systems behind the game: mission logic, cinematic tooling, progression, and the frameworks that everything else depends on.",
-    "I grew up making games with RPG Maker, taught myself C++, and haven't stopped building. I've shipped on PC, console, and mobile, from three-person pitches at FireForge to Hearthstone at Blizzard."
+    "I'm a Senior Gameplay Engineer at Lightspeed LA, currently working on Last Sentinel. Most of my work lives between design and the engine: mission systems, in-game cinematics, save architecture, quest logic. The goal is always the same. Give designers the tools to author and debug their own work without needing an engineer in the room. When that works, it's invisible. When it doesn't, everyone knows.",
+    "I got into this through RPG Maker. Spent a lot of weekends trying to make it do things it wasn't designed for, eventually hit a ceiling, and decided to learn C++ to get past it. That led to FireForge, shipping Ghostbusters and a couple of prototypes, then Blizzard where I worked on Hearthstone for four years across eight expansions. I've been on teams of three and teams of fifty. Both have trade-offs.",
+    "Open world is a different scale. Bigger design space, more tangled dependencies, edge cases that compound in ways you don't expect until you're in them. I like that kind of problem. The approach stays the same: build things that are easy to reason about, give people real feedback when something breaks, and keep the iteration loop short."
   ],
   "stats": [
     { "label": "current",  "value": "Lightspeed LA" },
