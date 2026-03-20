@@ -37,7 +37,7 @@
       "image": "./img/hearthstone.jpg",
       "tech": ["Unity", "C#", "C++", "Lua"],
       "platforms": ["PC", "Mac", "iOS", "Android"],
-      "description": "Software Engineer on the Hearthstone team across eight major expansions, focused on solo adventure experiences and the systems powering the in-game Journal: quests, achievements, missions, and reward progression.",
+      "description": "Software Engineer on the Hearthstone team across five major expansions, focused on solo adventure experiences and the systems powering the in-game Journal: quests, achievements, missions, and reward progression.",
       "subprojects": [
         {
           "title": "Framework and Scripting",

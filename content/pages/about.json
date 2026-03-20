@@ -6,7 +6,7 @@
   "photo": "./img/me.jpg",
   "bio": [
     "I'm a Senior Gameplay Engineer at Lightspeed LA, currently working on Last Sentinel. Most of my work lives between design and the engine: mission systems, in-game cinematics, save architecture, quest logic. The goal is always the same: build tools that let designers author and debug their own work independently.",
-    "I got into this through RPG Maker. Spent a lot of weekends making it do things it wasn't designed for, which eventually pushed me to learn C++ so I could go further. That led to FireForge, shipping Ghostbusters and a couple of prototypes, then Blizzard where I worked on Hearthstone for four years across eight expansions. I've been on teams of three and teams of fifty, and genuinely enjoyed both."
+    "I got into this through RPG Maker. Spent a lot of weekends making it do things it wasn't designed for, which eventually pushed me to learn C++ so I could go further. That led to FireForge, shipping Ghostbusters and a couple of prototypes, then Blizzard where I worked on Hearthstone for three years across five expansions. I've been on teams of three and teams of over 300, including contract studios overseas, and genuinely enjoyed both."
   ],
   "stats": [
     { "label": "current",  "value": "Lightspeed LA" },
@@ -25,7 +25,7 @@
     {
       "title": "Hearthstone",
       "context": "Blizzard Entertainment",
-      "description": "Solo adventures, journal systems, quests, and achievements across eight major expansions.",
+      "description": "Solo adventures, journal systems, quests, and achievements across five major expansions.",
       "href": "#portfolio"
     },
     {
