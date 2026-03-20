@@ -87,6 +87,11 @@
 
       loadingBar.style.display = "block";
 
+      // Unity calls requestPointerLock() when Cursor.lockState is set to Locked,
+      // which hides the OS cursor. Override it here to keep the cursor visible.
+      canvas.requestPointerLock = function() {};
+      Object.defineProperty(document, 'pointerLockElement', { get: () => null });
+
       var script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = () => {
