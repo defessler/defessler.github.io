@@ -20,7 +20,7 @@
       {
         "company": "Lightspeed LA",
         "title": "Senior Gameplay Engineer",
-        "start": "2022",
+        "start": "04/2022",
         "end": "Present",
         "projects": [
           {
@@ -28,16 +28,13 @@
             "platform": "Unannounced",
             "type": "Single Player",
             "bullets": [
-              "Architected a Mission system to manage data layers and control mission flow. Enabled designers to fast forward, rewind, and debug mission objectives with minimal iteration cost.",
-              "Created an IGC (In-Game Cinematic) framework that empowered designers to script aligned multi-character animated scenes. Supported props, moving platforms, and QTEs in a data-driven way.",
-              "Integrated UE5's Level Sequencer into scripting framework and provided multiple binding strategies.",
-              "Partnered with design and animation teams to define standards and best practices for scene alignment.",
-              "Extended save/load architecture to handle complex contextual saving. Supported mission checkpoints, open world auto saves, quick saves, and multiple mid-mission snapshots.",
-              "Created an initial Investigation system to support designer driven detective mechanics. Implemented scanning, hot/cold search feedback, and clue filtering.",
-              "Built a marker system with compass to help players navigate the open world and mission flow.",
-              "Developed a UI framework (MVVM pattern) and integrated it with UE5's ViewModel architecture.",
-              "Organized and led scripting workshops to onboard designers to new tooling. Provided hands-on mentorship, script reviews, and ongoing support.",
-              "Mentored and advised both in-house and co-development engineers. Fostered strong technical alignment, knowledge sharing, and consistency across teams."
+              "Architected and owned a Mission system that drives mission flow and manages UE5 World Partition data layers, controlling which open-world content loads based on mission state. Built designer tools for fast-forward, rewind, and in-editor objective debugging.",
+              "Created an IGC framework for scripting multi-character animated scenes with support for props, moving platforms, and QTEs. Integrated UE5's Level Sequencer with multiple actor binding strategies.",
+              "Partnered with design and animation to define scene alignment standards and best practices.",
+              "Extended save/load to handle mission checkpoints, open-world auto-saves, quick saves, and mid-mission snapshots.",
+              "Built an Investigation system with scanning, hot/cold feedback, and clue filtering. Added a marker and compass system for open-world navigation.",
+              "Developed a UI framework using MVVM pattern integrated with UE5's ViewModel architecture.",
+              "Led scripting workshops and mentored designers and co-development engineers across teams."
             ]
           }
         ]
@@ -46,7 +43,7 @@
         "company": "Blizzard Entertainment",
         "title": "Software Engineer",
         "start": "09/2018",
-        "end": "2022",
+        "end": "04/2022",
         "projects": [
           {
             "name": "Hearthstone",
@@ -123,10 +120,8 @@
         "start": "11/2013",
         "end": "06/2016",
         "bullets": [
-          "Developed platform C++ SDK and Unreal Engine 4 SDK.",
-          "Created platform integration examples in Unreal Engine 4.",
-          "Developed playable game prototypes used in sales pitches and demonstrations.",
-          "Designed and built software around platform's RESTful APIs."
+          "Developed platform C++ and Unreal Engine 4 SDKs, and playable prototypes used in sales pitches.",
+          "Designed and built software around the platform's RESTful APIs."
         ],
         "projects": [
           {

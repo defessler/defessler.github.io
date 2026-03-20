@@ -14,7 +14,7 @@
       "subprojects": [
         {
           "title": "Mission System",
-          "description": "Architected a data-layered mission system for controlling mission flow. Built designer tools for fast-forward, rewind, and in-editor objective debugging. Extended save/load to support mission checkpoints, open-world auto-saves, and mid-mission snapshots."
+          "description": "Built and owned a Mission system that drives mission flow and manages UE5 World Partition data layers, controlling which open-world content loads and unloads based on mission state. Built designer tools for fast-forward, rewind, and in-editor objective debugging. Extended save/load to support mission checkpoints, open-world auto-saves, and mid-mission snapshots."
         },
         {
           "title": "IGC Framework",
@@ -105,7 +105,9 @@
           "description": "Implemented single-player and cooperative game modes including a wave defense mode optimized with an object pool manager. Built the framework for sending match configurations to the matchmaking service and refactored the team system to support it."
         }
       ],
-      "links": []
+      "links": [
+        { "label": "Metacritic", "url": "https://www.metacritic.com/game/starblood-arena/" }
+      ]
     },
     {
       "title": "Vessels of Rath",
