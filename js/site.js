@@ -239,7 +239,7 @@ function renderResume(page) {
     contactParts.push(`<span><a href="mailto:${escape(r.contact.email)}">${escape(r.contact.email)}</a></span>`);
   }
   if (r.contact.location) contactParts.push(`<span>${escape(r.contact.location)}</span>`);
-  if (r.contact.website)  contactParts.push(`<span><a href="${escape(r.contact.website)}" target="_blank" rel="noopener">${escape(r.contact.website)}</a></span>`);
+  if (r.contact.website)  contactParts.push(`<span class="print-only"><a href="${escape(r.contact.website)}" target="_blank" rel="noopener">${escape(r.contact.website)}</a></span>`);
 
   const skillsHTML = (r.skills || []).map(s => `
     <div class="skill-row">
@@ -268,6 +268,9 @@ function renderResume(page) {
 
   return `
     <div class="resume-page">
+      <div class="resume-actions">
+        <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
+      </div>
       <div class="resume-header">
         <h1>${escape(r.name)}</h1>
         <p class="resume-headline">${escape(r.headline)}</p>
