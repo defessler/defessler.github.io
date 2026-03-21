@@ -609,13 +609,12 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
    ============================================================ */
 .resume-page { max-width: 760px; }
 
-.resume-header-top {
+.resume-headline-row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
 }
-.resume-header-top .resume-hide-print { margin-left: auto; }
 
 .resume-header {
   border-bottom: 1px solid var(--mk-border);
