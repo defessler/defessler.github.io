@@ -28,9 +28,13 @@ function getSlug() {
   return location.hash.replace(/^#\/?/, '') || 'about';
 }
 
+let currentSlug = null;
+
 async function loadPage(site) {
   const slug = getSlug();
   const main = document.getElementById('page-content');
+  const isNewPage = slug !== currentSlug;
+  currentSlug = slug;
 
   // Update active nav link
   document.querySelectorAll('#nav-links a').forEach(a => {
@@ -45,7 +49,7 @@ async function loadPage(site) {
     if (!renderer) throw new Error(`Unknown page type: "${page.type}"`);
     main.innerHTML = renderer(page);
     document.title = page.title ? `${page.title} — ${site.title}` : site.title;
-    runTerminalFX(main);
+    if (isNewPage) runTerminalFX(main);
   } catch (err) {
     main.innerHTML = `<div class="error-page"><h2>Page not found</h2><p>Could not load <code>${escape(slug)}</code>.</p></div>`;
     console.error(err);
