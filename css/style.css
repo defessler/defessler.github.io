@@ -834,6 +834,10 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
   .project-list li li, .sub-team li { margin-bottom: 0.15rem; line-height: 1.45; }
   .entry-meta     { margin-bottom: 0.3rem; }
 
+  /* Darken project subtext for readability */
+  .project-label em,
+  .project-label .project-type { color: #555555; }
+
   /* Page break: skills + additional go to page 2 */
   .resume-section-break { page-break-before: always; }
 
