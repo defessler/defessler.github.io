@@ -28,7 +28,13 @@ function escape(str) {
 // Routing
 // ============================================================
 function getSlug() {
-  return location.hash.replace(/^#\/?/, '') || 'about';
+  return (location.hash.replace(/^#\/?/, '').split('/')[0]) || 'about';
+}
+function getScrollTarget() {
+  return location.hash.replace(/^#\/?/, '').split('/')[1] || null;
+}
+function slugify(str) {
+  return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
 let currentSlug = null;
@@ -61,6 +67,11 @@ async function loadPage(site) {
         }));
       await Promise.all([document.fonts.ready, ...imgs]);
       runTerminalFX(main);
+    }
+    const scrollTarget = getScrollTarget();
+    if (scrollTarget) {
+      const el = document.getElementById(scrollTarget);
+      if (el) glitchScrollTo(el);
     }
     isPrinting = false;
   } catch (err) {
@@ -190,7 +201,7 @@ function renderPortfolio(page) {
         `).join('')}
       </div>` : '';
     return `
-      <div class="project-card project-card-featured">
+      <div class="project-card project-card-featured" id="${slugify(p.title)}">
         ${imageHTML}
         <div class="project-body">
           <div class="project-header">
@@ -220,7 +231,7 @@ function renderPortfolio(page) {
       ? `<div class="card-image-small"><img src="${escape(p.image)}${IMG_VER}" alt="${escape(p.title)}" loading="lazy"></div>`
       : '';
     return `
-      <div class="project-card">
+      <div class="project-card" id="${slugify(p.title)}">
         ${imageHTML}
         <div class="project-card-content">
           <div class="project-header">
@@ -366,6 +377,26 @@ function renderJob(job) {
 // ============================================================
 // Terminal FX — page transition animation
 // ============================================================
+function glitchScrollTo(el) {
+  const navHeight = document.getElementById('site-header')?.offsetHeight || 0;
+  const targetY = el.getBoundingClientRect().top + window.scrollY - navHeight - 16;
+  const startY = window.scrollY;
+  const dist   = targetY - startY;
+  const steps  = 10;
+  const stepSize = dist / steps;
+  let current = 0;
+
+  function jump() {
+    if (current >= steps) { window.scrollTo(0, targetY); return; }
+    // Glitch: overshoot and snap back on alternate steps
+    const overshoot = current % 2 === 1 ? stepSize * 0.35 : 0;
+    window.scrollTo(0, startY + stepSize * (current + 1) + overshoot);
+    current++;
+    setTimeout(jump, 28);
+  }
+  jump();
+}
+
 function runTerminalFX(container) {
   const go = (el, cls, ms) => {
     el.style.animationDelay = ms + 'ms';

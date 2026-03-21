@@ -20,19 +20,19 @@
       "title": "Last Sentinel",
       "context": "Lightspeed LA",
       "description": "Mission systems, IGC framework, and cinematic tooling for a narrative open-world action game.",
-      "href": "#portfolio"
+      "href": "#portfolio/last-sentinel"
     },
     {
       "title": "Hearthstone",
       "context": "Blizzard Entertainment",
       "description": "Solo adventures, journal systems, quests, and achievements across five major expansions.",
-      "href": "#portfolio"
+      "href": "#portfolio/hearthstone"
     },
     {
       "title": "Ghostbusters",
       "context": "FireForge",
       "description": "AI and gameplay ability systems on the official Ghostbusters tie-in for PC, PS4, and Xbox One.",
-      "href": "#portfolio"
+      "href": "#portfolio/ghostbusters"
     }
   ],
   "cta": [
