@@ -251,7 +251,7 @@ function renderResume(page) {
 
   const expHTML   = (r.experience || []).map(renderJob).join('');
   const addExpHTML = r.additional_experience
-    ? `<section class="resume-section"><h2>Additional Experience</h2>${r.additional_experience.map(renderJob).join('')}</section>`
+    ? `<section class="resume-section resume-section-break"><h2>Additional Experience</h2>${r.additional_experience.map(renderJob).join('')}</section>`
     : '';
 
   const eduHTML = (r.education || []).map(edu => `
@@ -283,7 +283,7 @@ function renderResume(page) {
         ${expHTML}
       </section>
 
-      <section class="resume-section resume-section-break">
+      <section class="resume-section">
         <h2>Technical Skills</h2>
         <div class="skills-grid">${skillsHTML}</div>
       </section>
