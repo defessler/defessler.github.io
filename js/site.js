@@ -304,7 +304,7 @@ function renderResume(page) {
 
       ${addExpHTML}
 
-      ${r.interests ? `<section class="resume-section resume-hide-print"><h2>Interests</h2><p>${r.interests}</p></section>` : ''}
+      ${r.interests ? `<section class="resume-section"><h2>Interests</h2><div class="interests-wrap">${r.interests}</div></section>` : ''}
 
       <div class="resume-actions">
         <button class="btn-print" onclick="doPrint()">Print / Save as PDF</button>

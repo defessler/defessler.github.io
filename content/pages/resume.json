@@ -182,6 +182,6 @@
         "additional": "Computer Systems Certificate"
       }
     ],
-    "interests": "<span class=\"interest-row\"><span class=\"interest-label\">interests</span>Game Development, Software Engineering, Gaming, and Computer Hardware.</span><span class=\"interest-row\"><span class=\"interest-label\">games</span>StarCraft 2, Metal Gear Solid, Final Fantasy, Super Smash Bros., World of Warcraft, and Overwatch.</span>"
+    "interests": "<span class=\"interest-tags\"><span class=\"tag\">Game Development</span><span class=\"tag\">Software Engineering</span><span class=\"tag\">Gaming</span><span class=\"tag\">Computer Hardware</span></span><span class=\"interest-tags interest-tags-games\"><span class=\"tag\">StarCraft 2</span><span class=\"tag\">Metal Gear Solid</span><span class=\"tag\">Final Fantasy</span><span class=\"tag\">Super Smash Bros.</span><span class=\"tag\">World of Warcraft</span><span class=\"tag\">Overwatch</span></span>"
   }
 }
