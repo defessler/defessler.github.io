@@ -4,6 +4,10 @@
 const CONTENT_PATH = './content';
 const IMG_VER = '?v=2';
 
+let isPrinting = false;
+window.addEventListener('afterprint', () => { isPrinting = false; });
+function doPrint() { isPrinting = true; window.print(); }
+
 // ============================================================
 // Utilities
 // ============================================================
@@ -49,7 +53,7 @@ async function loadPage(site) {
     if (!renderer) throw new Error(`Unknown page type: "${page.type}"`);
     main.innerHTML = renderer(page);
     document.title = page.title ? `${page.title} — ${site.title}` : site.title;
-    if (isNewPage) runTerminalFX(main);
+    if (isNewPage && !isPrinting) runTerminalFX(main);
   } catch (err) {
     main.innerHTML = `<div class="error-page"><h2>Page not found</h2><p>Could not load <code>${escape(slug)}</code>.</p></div>`;
     console.error(err);
@@ -276,7 +280,7 @@ function renderResume(page) {
     <div class="resume-page">
       <div class="resume-header">
         <h1>${escape(r.name)}</h1>
-        <div class="resume-hide-print resume-print-btn-top"><button class="btn-print" onclick="window.print()">Print / Save as PDF</button></div>
+        <div class="resume-hide-print resume-print-btn-top"><button class="btn-print" onclick="doPrint()">Print / Save as PDF</button></div>
         <p class="resume-headline">${escape(r.headline)}</p>
         <div class="resume-contact">${contactParts.join('')}</div>
       </div>
@@ -303,7 +307,7 @@ function renderResume(page) {
       ${r.interests ? `<section class="resume-section resume-hide-print"><h2>Interests</h2><p>${r.interests}</p></section>` : ''}
 
       <div class="resume-actions">
-        <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
+        <button class="btn-print" onclick="doPrint()">Print / Save as PDF</button>
       </div>
     </div>
   `;
