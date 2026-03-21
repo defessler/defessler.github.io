@@ -60,7 +60,7 @@
         "projects": [
           {
             "name": "Hearthstone",
-            "platform": "PC/Mac/iOS/Android",
+            "platform": "PC/Mac/iOS/Android · Unity",
             "type": "Online Multiplayer",
             "teams": [
               {
@@ -91,7 +91,7 @@
         "projects": [
           {
             "name": "StarBlood Arena",
-            "platform": "PS4/PSVR",
+            "platform": "PS4/PSVR · Unreal Engine 4",
             "type": "Online Multiplayer",
             "bullets": [
               "Improved custom AI navigation generation, added difficulty levels, and improved basic AI combat.",
@@ -101,7 +101,7 @@
           },
           {
             "name": "Vessels of Rath",
-            "platform": "PC",
+            "platform": "PC · Unreal Engine 4",
             "type": "Single Player",
             "bullets": [
               "Gameplay engineering on an internal action RPG developed to showcase the studio's Orbital cloud platform."
