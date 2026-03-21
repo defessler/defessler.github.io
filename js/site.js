@@ -234,7 +234,8 @@ function renderResume(page) {
 
   const contactParts = [];
   if (r.contact.email_user && r.contact.email_domain) {
-    contactParts.push(`<span class="obf-email" data-u="${escape(r.contact.email_user)}" data-d="${escape(r.contact.email_domain)}" title="click to reveal">[click to reveal email]</span>`);
+    const emailAddr = `${r.contact.email_user}@${r.contact.email_domain}`;
+    contactParts.push(`<span class="obf-email screen-only" data-u="${escape(r.contact.email_user)}" data-d="${escape(r.contact.email_domain)}" title="click to reveal">[click to reveal email]</span><span class="print-only">${escape(emailAddr)}</span>`);
   } else if (r.contact.email) {
     contactParts.push(`<span><a href="mailto:${escape(r.contact.email)}">${escape(r.contact.email)}</a></span>`);
   }
