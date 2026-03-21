@@ -822,7 +822,7 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 
   /* Layout */
   body          { background: #fff; }
-  html          { font-size: 14px; }
+  html          { font-size: 13.5px; }
   #page-content { padding: 0; max-width: 100%; }
   .resume-page  { max-width: 100%; }
 
@@ -831,7 +831,7 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
   .resume-section { margin-bottom: 1rem; }
   .job-entry      { margin-bottom: 0.85rem; padding-bottom: 0.85rem; page-break-inside: avoid; }
   .project-list > li { margin-bottom: 0.4rem; }
-  .project-list li li, .sub-team li { margin-bottom: 0.15rem; line-height: 1.45; }
+  .project-list li li, .sub-team li { margin-bottom: 0.15rem; line-height: 1.4; }
   .entry-meta     { margin-bottom: 0.3rem; }
 
   /* Darken project subtext for readability */
