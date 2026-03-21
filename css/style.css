@@ -618,8 +618,8 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 
 .resume-header {
   border-bottom: 1px solid var(--mk-border);
-  padding-bottom: 1rem;
-  margin-bottom: 1.75rem;
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.25rem;
 }
 
 .resume-header h1 {
@@ -651,7 +651,7 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 }
 .obf-email:hover { color: var(--mk-orange); }
 
-.resume-section { margin-bottom: 2rem; }
+.resume-section { margin-bottom: 2.75rem; }
 
 .resume-section h2 {
   font-size: 0.7rem;
@@ -661,13 +661,13 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
   color: var(--mk-green);
   border-bottom: 1px solid var(--mk-border);
   padding-bottom: 0.35rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.35rem;
 }
 .resume-section h2::before { content: '/* '; color: var(--mk-comment); }
 .resume-section h2::after  { content: ' */'; color: var(--mk-comment); }
 
 /* Skills */
-.skills-grid { display: flex; flex-direction: column; gap: 0.4rem; }
+.skills-grid { display: flex; flex-direction: column; gap: 0.65rem; }
 
 .skill-row { display: flex; gap: 1rem; font-size: 0.85rem; }
 
@@ -684,8 +684,8 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 
 /* Job entries */
 .job-entry {
-  margin-bottom: 1.5rem;
-  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
   border-bottom: 1px solid var(--mk-border);
 }
 .job-entry:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
@@ -711,10 +711,10 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 .entry-dates  { font-size: 0.8rem; color: var(--mk-comment); white-space: nowrap; flex-shrink: 0; }
 
 .job-bullets { padding-left: 1.25rem; margin-bottom: 0.75rem; }
-.job-bullets li { font-size: 0.85rem; color: var(--mk-fg); opacity: 0.8; margin-bottom: 0.25rem; }
+.job-bullets li { font-size: 0.85rem; color: var(--mk-fg); opacity: 0.8; margin-bottom: 0.4rem; }
 
 .project-list { list-style: none; padding: 0; margin-top: 0.25rem; }
-.project-list > li { margin-bottom: 0.75rem; }
+.project-list > li { margin-bottom: 1rem; }
 .project-list > li:last-child { margin-bottom: 0; }
 
 .project-label {
