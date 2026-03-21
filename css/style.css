@@ -781,7 +781,6 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 .btn-print::before { content: '$ '; color: var(--mk-comment); }
 .btn-print:hover { background: var(--mk-green); color: var(--mk-bg); }
 .btn-print:hover::before { color: var(--mk-bg); }
-.print-only { display: none; }
 
 /* ============================================================
    Print — clean white with Monokai accent colors
@@ -832,8 +831,10 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 
   /* Hide screen-only sections */
   .resume-hide-print { display: none; }
-  .screen-only { display: none !important; }
-  .print-only  { display: inline !important; }
+
+  /* Reconstruct obfuscated email for print without exposing plaintext in DOM */
+  .obf-email { font-size: 0; }
+  .obf-email::after { content: attr(data-u) "@" attr(data-d); font-size: 13px; color: var(--mk-fg); }
 
   /* Strip glow/shadow effects */
   * { text-shadow: none !important; box-shadow: none !important; }
