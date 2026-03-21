@@ -609,12 +609,6 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
    ============================================================ */
 .resume-page { max-width: 760px; }
 
-.resume-headline-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-}
 
 .resume-header {
   border-bottom: 1px solid var(--mk-border);
@@ -639,11 +633,12 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
   display: flex;
   gap: 1.5rem;
   flex-wrap: wrap;
-  margin-top: 0.6rem;
+  margin-top: 0.35rem;
   font-size: 0.8rem;
   color: var(--mk-comment);
 }
 .resume-contact a { color: var(--mk-orange); }
+.resume-contact .resume-hide-print { margin-left: auto; }
 .obf-email {
   color: var(--mk-comment);
   cursor: pointer;
