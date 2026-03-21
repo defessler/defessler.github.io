@@ -17,9 +17,9 @@
   "skills": ["C/C++", "C#", "Lua", "Unreal Engine", "Unity", "JavaScript", "Git", "Perforce"],
   "highlights": [
     {
-      "title": "Unannounced",
-      "context": "Blizzard Entertainment",
-      "description": "Currently in pre-production on an unannounced title.",
+      "title": "Last Sentinel",
+      "context": "Lightspeed LA",
+      "description": "Mission systems, IGC framework, and cinematic tooling for a narrative open-world action game.",
       "href": "#portfolio"
     },
     {
