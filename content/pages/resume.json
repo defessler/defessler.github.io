@@ -18,10 +18,24 @@
     ],
     "experience": [
       {
+        "company": "Blizzard Entertainment",
+        "title": "Senior Gameplay Engineer",
+        "start": "03/2026",
+        "end": "Present",
+        "projects": [
+          {
+            "name": "Unannounced",
+            "platform": "Unannounced",
+            "type": "Unannounced",
+            "bullets": []
+          }
+        ]
+      },
+      {
         "company": "Lightspeed LA",
         "title": "Senior Gameplay Engineer",
         "start": "04/2022",
-        "end": "Present",
+        "end": "03/2026",
         "projects": [
           {
             "name": "Last Sentinel",
