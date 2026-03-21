@@ -53,12 +53,12 @@ async function loadPage(site) {
     main.innerHTML = renderer(page);
     document.title = page.title ? `${page.title} — ${site.title}` : site.title;
     if (isNewPage) {
-      const imgs = [...main.querySelectorAll('img')].map(img =>
-        img.complete ? Promise.resolve() : new Promise(r => {
+      const imgs = [...main.querySelectorAll('img')]
+        .filter(img => img.loading !== 'lazy')
+        .map(img => img.complete ? Promise.resolve() : new Promise(r => {
           img.addEventListener('load',  r, { once: true });
           img.addEventListener('error', r, { once: true });
-        })
-      );
+        }));
       await Promise.all([document.fonts.ready, ...imgs]);
       runTerminalFX(main);
     }
