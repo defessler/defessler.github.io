@@ -288,12 +288,12 @@ function renderResume(page) {
         <div class="skills-grid">${skillsHTML}</div>
       </section>
 
-      ${addExpHTML}
-
       <section class="resume-section">
         <h2>Education</h2>
         ${eduHTML}
       </section>
+
+      ${addExpHTML}
 
       ${r.interests ? `<section class="resume-section resume-hide-print"><h2>Interests</h2><p>${r.interests}</p></section>` : ''}
 
