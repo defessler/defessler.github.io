@@ -772,6 +772,7 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 .edu-entry { margin-bottom: 1rem; }
 .edu-entry:last-child { margin-bottom: 0; }
 .entry-additional { font-size: 0.825rem; color: var(--mk-comment); margin-top: 0.2rem; }
+.interests-games { display: block; margin-top: 0.5rem; }
 
 /* Resume actions */
 .resume-actions { margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--mk-border); }
