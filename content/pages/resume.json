@@ -38,8 +38,7 @@
         "projects": [
           {
             "name": "Last Sentinel",
-            "platform": "Unannounced",
-            "type": "Single Player",
+            "platform": "Unreal Engine 5",
             "bullets": [
               "Architected and owned a Mission system that drives mission flow and manages UE5 World Partition data layers, controlling which open-world content loads based on mission state. Built designer tools for fast-forward, rewind, and in-editor objective debugging.",
               "Created an IGC framework for scripting multi-character animated scenes with support for props, moving platforms, and QTEs. Integrated UE5's Level Sequencer with multiple actor binding strategies.",
