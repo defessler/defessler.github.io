@@ -5,7 +5,7 @@ const CONTENT_PATH = './content';
 const IMG_VER = '?v=2';
 
 let isPrinting = false;
-window.addEventListener('afterprint', () => { isPrinting = false; });
+window.addEventListener('afterprint', () => { setTimeout(() => { isPrinting = false; }, 500); });
 function doPrint() { isPrinting = true; window.print(); }
 
 // ============================================================
