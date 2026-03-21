@@ -801,18 +801,20 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
   to   { clip-path: inset(0 0% 0 0); }
 }
 @keyframes term-scan-in {
-  from { clip-path: inset(0 0 100% 0); opacity: 0; }
-  to   { clip-path: inset(0 0 0% 0);   opacity: 1; }
+  from { clip-path: inset(0 0 100% 0); }
+  to   { clip-path: inset(0 0 0% 0); }
 }
 @keyframes term-img-in {
-  0%   { filter: brightness(4) saturate(0); opacity: 0; }
-  25%  { filter: brightness(1.5) saturate(0); opacity: 0.7; }
-  65%  { filter: brightness(0.9) saturate(0.6); opacity: 0.9; }
-  100% { filter: brightness(1) saturate(1); opacity: 1; }
+  0%   { opacity: 0; }
+  33%  { opacity: 0; }
+  34%  { opacity: 1; filter: brightness(3) saturate(0) contrast(2); }
+  66%  { filter: brightness(3) saturate(0) contrast(2); }
+  67%  { filter: brightness(1) saturate(1) contrast(1); }
+  100% { filter: brightness(1) saturate(1) contrast(1); }
 }
-.term-type-in { animation: term-type-in 0.22s ease-out both; }
-.term-scan-in { animation: term-scan-in 0.2s  ease-out both; }
-.term-img-in  { animation: term-img-in  0.4s  ease-out both; }
+.term-type-in { animation: term-type-in 0.25s steps(12, end) both; }
+.term-scan-in { animation: term-scan-in 0.2s  steps(8,  end) both; }
+.term-img-in  { animation: term-img-in  0.3s  steps(1,  end) both; }
 @media print {
   .term-type-in, .term-scan-in, .term-img-in { animation: none !important; }
 }

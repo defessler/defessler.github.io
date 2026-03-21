@@ -355,23 +355,23 @@ function runTerminalFX(container) {
     el.classList.add(cls);
   };
 
-  // Headings — left-to-right type reveal
+  // Headings — left-to-right discrete type reveal
   container.querySelectorAll('h1, h2, h3, .resume-headline, .headline').forEach((el, i) => {
-    go(el, 'term-type-in', 10 + i * 20);
+    go(el, 'term-type-in', i * 12);
   });
 
-  // Content blocks — top-down scan reveal
+  // Content blocks — top-down stepped scan reveal
   container.querySelectorAll([
     '.hero', '.bio', '.about-stats', '.about-section', '.about-cta',
     '.resume-header', '.job-entry', '.edu-entry',
     '.project-card-featured', '.project-card:not(.project-card-featured)',
   ].join(', ')).forEach((el, i) => {
-    go(el, 'term-scan-in', 20 + i * 40);
+    go(el, 'term-scan-in', i * 25);
   });
 
-  // Images — CRT power-on flicker
+  // Images — instant CRT snap-on
   container.querySelectorAll('img').forEach((el, i) => {
-    go(el, 'term-img-in', 30 + i * 60);
+    go(el, 'term-img-in', i * 40);
   });
 }
 
