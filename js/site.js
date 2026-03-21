@@ -44,6 +44,7 @@ async function loadPage(site) {
     if (!renderer) throw new Error(`Unknown page type: "${page.type}"`);
     main.innerHTML = renderer(page);
     document.title = page.title ? `${page.title} — ${site.title}` : site.title;
+    runTerminalFX(main);
   } catch (err) {
     main.innerHTML = `<div class="error-page"><h2>Page not found</h2><p>Could not load <code>${escape(slug)}</code>.</p></div>`;
     console.error(err);
@@ -342,6 +343,35 @@ function renderJob(job) {
       ${projectsHTML ? `<ul class="project-list">${projectsHTML}</ul>` : ''}
     </div>
   `;
+}
+
+// ============================================================
+// Terminal FX — page transition animation
+// ============================================================
+function runTerminalFX(container) {
+  const go = (el, cls, ms) => {
+    el.style.animationDelay = ms + 'ms';
+    el.classList.add(cls);
+  };
+
+  // Headings — left-to-right type reveal
+  container.querySelectorAll('h1, h2, h3, .resume-headline, .headline').forEach((el, i) => {
+    go(el, 'term-type-in', 10 + i * 20);
+  });
+
+  // Content blocks — top-down scan reveal
+  container.querySelectorAll([
+    '.hero', '.bio', '.about-stats', '.about-section', '.about-cta',
+    '.resume-header', '.job-entry', '.edu-entry',
+    '.project-card-featured', '.project-card:not(.project-card-featured)',
+  ].join(', ')).forEach((el, i) => {
+    go(el, 'term-scan-in', 20 + i * 40);
+  });
+
+  // Images — CRT power-on flicker
+  container.querySelectorAll('img').forEach((el, i) => {
+    go(el, 'term-img-in', 30 + i * 60);
+  });
 }
 
 // ============================================================

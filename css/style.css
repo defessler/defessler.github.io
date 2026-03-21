@@ -792,6 +792,30 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 .print-only { display: none; }
 
 /* ============================================================
+   Terminal FX — page transition animations
+   ============================================================ */
+@keyframes term-type-in {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0% 0 0); }
+}
+@keyframes term-scan-in {
+  from { clip-path: inset(0 0 100% 0); opacity: 0; }
+  to   { clip-path: inset(0 0 0% 0);   opacity: 1; }
+}
+@keyframes term-img-in {
+  0%   { filter: brightness(4) saturate(0); opacity: 0; }
+  25%  { filter: brightness(1.5) saturate(0); opacity: 0.7; }
+  65%  { filter: brightness(0.9) saturate(0.6); opacity: 0.9; }
+  100% { filter: brightness(1) saturate(1); opacity: 1; }
+}
+.term-type-in { animation: term-type-in 0.22s ease-out both; }
+.term-scan-in { animation: term-scan-in 0.2s  ease-out both; }
+.term-img-in  { animation: term-img-in  0.4s  ease-out both; }
+@media print {
+  .term-type-in, .term-scan-in, .term-img-in { animation: none !important; }
+}
+
+/* ============================================================
    Print — clean white with Monokai accent colors
    ============================================================ */
 @media print {
