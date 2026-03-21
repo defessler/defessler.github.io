@@ -615,6 +615,7 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
   justify-content: space-between;
   gap: 1rem;
 }
+.resume-header-top .resume-hide-print { margin-left: auto; }
 
 .resume-header {
   border-bottom: 1px solid var(--mk-border);
