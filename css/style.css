@@ -643,7 +643,9 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
   position: absolute;
   top: 0;
   right: 0;
+  z-index: 10;
 }
+.resume-header h1 { pointer-events: none; }
 .obf-email {
   color: var(--mk-comment);
   cursor: pointer;
