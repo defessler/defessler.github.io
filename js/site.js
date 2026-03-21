@@ -268,11 +268,11 @@ function renderResume(page) {
 
   return `
     <div class="resume-page">
-      <div class="resume-actions">
-        <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
-      </div>
       <div class="resume-header">
-        <h1>${escape(r.name)}</h1>
+        <div class="resume-header-top">
+          <h1>${escape(r.name)}</h1>
+          <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
+        </div>
         <p class="resume-headline">${escape(r.headline)}</p>
         <div class="resume-contact">${contactParts.join('')}</div>
       </div>
