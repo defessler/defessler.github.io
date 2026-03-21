@@ -822,7 +822,7 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 
   /* Layout */
   body          { background: #fff; }
-  html          { font-size: 13px; }
+  html          { font-size: 14px; }
   #page-content { padding: 0; max-width: 100%; }
   .resume-page  { max-width: 100%; }
 
