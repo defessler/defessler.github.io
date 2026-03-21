@@ -797,6 +797,45 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 .print-only { display: none; }
 
 /* ============================================================
+   Terminal FX — glitch scroll VFX
+   ============================================================ */
+@keyframes term-glitch-shift {
+  0%   { transform: translateX(0);     filter: none; }
+  10%  { transform: translateX(-8px);  filter: hue-rotate(90deg) brightness(1.4); }
+  11%  { transform: translateX(8px);   filter: hue-rotate(-90deg) saturate(3); }
+  12%  { transform: translateX(-4px);  filter: brightness(0.6); }
+  13%  { transform: translateX(0);     filter: none; }
+  28%  { transform: translateX(0);     filter: none; }
+  29%  { transform: translateX(6px);   filter: hue-rotate(45deg) brightness(1.3); }
+  30%  { transform: translateX(-6px);  filter: none; }
+  31%  { transform: translateX(0); }
+  45%  { transform: translateX(0);     filter: none; }
+  46%  { transform: translateX(-3px);  filter: brightness(1.6) saturate(0); }
+  47%  { transform: translateX(0);     filter: none; }
+  100% { transform: translateX(0);     filter: none; }
+}
+@keyframes term-glitch-flash {
+  0%,  13%, 31%, 47% { opacity: 1; }
+  7%,  20%, 38%, 60% { opacity: 0; }
+  100% { opacity: 0; }
+}
+.term-glitch-fx {
+  animation: term-glitch-shift 0.38s steps(1, end) forwards;
+}
+.term-glitch-fx::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(166, 226, 46, 0.06);
+  pointer-events: none;
+  z-index: 9999;
+  animation: term-glitch-flash 0.38s steps(1, end) forwards;
+}
+@media print {
+  .term-glitch-fx, .term-glitch-fx::before { animation: none !important; }
+}
+
+/* ============================================================
    Terminal FX — page transition animations
    ============================================================ */
 @keyframes term-type-in {

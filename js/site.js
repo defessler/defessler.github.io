@@ -380,21 +380,12 @@ function renderJob(job) {
 function glitchScrollTo(el) {
   const navHeight = document.getElementById('site-header')?.offsetHeight || 0;
   const targetY = el.getBoundingClientRect().top + window.scrollY - navHeight - 16;
-  const startY = window.scrollY;
-  const dist   = targetY - startY;
-  const steps  = 10;
-  const stepSize = dist / steps;
-  let current = 0;
+  const main = document.getElementById('page-content');
 
-  function jump() {
-    if (current >= steps) { window.scrollTo(0, targetY); return; }
-    // Glitch: overshoot and snap back on alternate steps
-    const overshoot = current % 2 === 1 ? stepSize * 0.35 : 0;
-    window.scrollTo(0, startY + stepSize * (current + 1) + overshoot);
-    current++;
-    setTimeout(jump, 28);
-  }
-  jump();
+  // Instant jump then play glitch VFX over it
+  window.scrollTo(0, targetY);
+  main.classList.add('term-glitch-fx');
+  main.addEventListener('animationend', () => main.classList.remove('term-glitch-fx'), { once: true });
 }
 
 function runTerminalFX(container) {
