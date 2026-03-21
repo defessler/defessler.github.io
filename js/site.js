@@ -2,7 +2,7 @@
 // Config
 // ============================================================
 const CONTENT_PATH = './content';
-const IMG_VER = '?v=2';
+const IMG_VER = '?v=3';
 
 let isPrinting = false;
 function doPrint() { isPrinting = true; window.print(); }
