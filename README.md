@@ -1,6 +1,6 @@
 # defessler.github.io
 
-Personal portfolio site for Doug Fessler, Senior Gameplay Engineer at Blizzard Entertainment.
+Personal portfolio site for Doug Fessler.
 
 ## Stack
 
