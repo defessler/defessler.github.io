@@ -5,21 +5,21 @@
   "headline": "Senior Gameplay Engineer",
   "photo": "./img/me.jpg",
   "bio": [
-    "I'm a Senior Gameplay Engineer at Lightspeed LA, currently working on Last Sentinel. I spend most of my time on the boundary between design and the engine: mission systems, in-game cinematics, save architecture, quest logic. The goal is always the same: build tools that let designers author and debug their own work independently.",
+    "I'm a Senior Gameplay Engineer at Blizzard Entertainment, currently working on an unannounced project. I spend most of my time on the boundary between design and the engine: mission systems, in-game cinematics, save architecture, quest logic. The goal is always the same: build tools that let designers author and debug their own work independently.",
     "I got into this through RPG Maker. Spent a lot of weekends making it do things it wasn't designed for, which eventually pushed me to learn C++ so I could go further. That led to FireForge, shipping Ghostbusters and a couple of prototypes, then Blizzard where I worked on Hearthstone for three years across five expansions. I've been on teams of three and teams of over 300, including contract studios overseas, and genuinely enjoyed both."
   ],
   "stats": [
-    { "label": "current",  "value": "Lightspeed LA" },
+    { "label": "current",  "value": "Blizzard Entertainment" },
     { "label": "role",     "value": "Senior Gameplay Engineer" },
-    { "label": "project",  "value": "Last Sentinel" },
+    { "label": "project",  "value": "Unannounced" },
     { "label": "focus",    "value": "Mission Systems / Open World / Gameplay / IGC" }
   ],
   "skills": ["C/C++", "C#", "Lua", "Unreal Engine", "Unity", "JavaScript", "Git", "Perforce"],
   "highlights": [
     {
-      "title": "Last Sentinel",
-      "context": "Lightspeed LA",
-      "description": "Mission systems, IGC framework, and cinematic tooling for a narrative open-world action game.",
+      "title": "Unannounced",
+      "context": "Blizzard Entertainment",
+      "description": "Currently in pre-production on an unannounced title.",
       "href": "#portfolio"
     },
     {
