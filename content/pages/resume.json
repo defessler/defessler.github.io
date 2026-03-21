@@ -117,7 +117,7 @@
         "projects": [
           {
             "name": "Embers of War",
-            "platform": "PC",
+            "platform": "PC · Unreal Engine 4",
             "type": "Online Multiplayer",
             "bullets": [
               "Audited existing code base and retrofitted support for multiplayer.",
@@ -139,7 +139,7 @@
         "projects": [
           {
             "name": "Ghostbusters 2016",
-            "platform": "PS4, Xbox One, PC",
+            "platform": "PS4, Xbox One, PC · Unreal Engine 4",
             "type": "Local Multiplayer",
             "bullets": [
               "Worked on AI and gameplay ability systems supporting designers through scripting exposure and troubleshooting.",
