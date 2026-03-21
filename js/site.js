@@ -52,7 +52,16 @@ async function loadPage(site) {
     if (!renderer) throw new Error(`Unknown page type: "${page.type}"`);
     main.innerHTML = renderer(page);
     document.title = page.title ? `${page.title} — ${site.title}` : site.title;
-    if (isNewPage) runTerminalFX(main);
+    if (isNewPage) {
+      const imgs = [...main.querySelectorAll('img')].map(img =>
+        img.complete ? Promise.resolve() : new Promise(r => {
+          img.addEventListener('load',  r, { once: true });
+          img.addEventListener('error', r, { once: true });
+        })
+      );
+      await Promise.all([document.fonts.ready, ...imgs]);
+      runTerminalFX(main);
+    }
     isPrinting = false;
   } catch (err) {
     main.innerHTML = `<div class="error-page"><h2>Page not found</h2><p>Could not load <code>${escape(slug)}</code>.</p></div>`;
