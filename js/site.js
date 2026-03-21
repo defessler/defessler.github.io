@@ -2,6 +2,7 @@
 // Config
 // ============================================================
 const CONTENT_PATH = './content';
+const IMG_VER = '?v=2';
 
 // ============================================================
 // Utilities
@@ -82,7 +83,7 @@ const renderers = { about: renderAbout, portfolio: renderPortfolio, resume: rend
 
 function renderAbout(page) {
   const photoHTML = page.photo
-    ? `<img src="${escape(page.photo)}" alt="${escape(page.name)}" class="profile-photo">`
+    ? `<img src="${escape(page.photo)}${IMG_VER}" alt="${escape(page.name)}" class="profile-photo">`
     : '';
 
   const bioHTML = (page.bio || []).map(p => `<p>${p}</p>`).join('');
@@ -156,7 +157,7 @@ function renderPortfolio(page) {
       ? `<div class="project-links">${p.links.map(l => `<a href="${escape(l.url)}" target="_blank" rel="noopener">${escape(l.label)}</a>`).join('')}</div>`
       : '';
     const imageHTML = p.image
-      ? `<div class="card-image"><img src="${escape(p.image)}" alt="${escape(p.title)}" loading="lazy"></div>`
+      ? `<div class="card-image"><img src="${escape(p.image)}${IMG_VER}" alt="${escape(p.title)}" loading="lazy"></div>`
       : '';
     const badgeHTML = p.unreleased ? `<span class="badge-unreleased">unreleased</span>` : '';
     const subprojectsHTML = (p.subprojects || []).length ? `
@@ -199,7 +200,7 @@ function renderPortfolio(page) {
       : '';
     const badgeHTML = p.unreleased ? `<span class="badge-unreleased">unreleased</span>` : '';
     const imageHTML = p.image
-      ? `<div class="card-image-small"><img src="${escape(p.image)}" alt="${escape(p.title)}" loading="lazy"></div>`
+      ? `<div class="card-image-small"><img src="${escape(p.image)}${IMG_VER}" alt="${escape(p.title)}" loading="lazy"></div>`
       : '';
     return `
       <div class="project-card">
