@@ -611,6 +611,7 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 
 
 .resume-header {
+  position: relative;
   border-bottom: 1px solid var(--mk-border);
   padding-bottom: 1.4rem;
   margin-bottom: 2.25rem;
@@ -631,7 +632,6 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 
 .resume-contact {
   display: flex;
-  align-items: center;
   gap: 1.5rem;
   flex-wrap: wrap;
   margin-top: 0.35rem;
@@ -639,7 +639,11 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
   color: var(--mk-comment);
 }
 .resume-contact a { color: var(--mk-orange); }
-.resume-contact .resume-hide-print { margin-left: auto; }
+.resume-print-btn-top {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
 .obf-email {
   color: var(--mk-comment);
   cursor: pointer;
