@@ -623,6 +623,7 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 }
 
 .resume-header h1 {
+  display: none;
   font-size: 1.8rem;
   font-weight: 700;
   color: var(--mk-green);
@@ -819,6 +820,9 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
   #site-header    { display: none; }
   .resume-actions { display: none; }
   body::after     { display: none; }
+
+  /* Restore name for print since nav is hidden */
+  .resume-header h1 { display: block; }
 
   /* Layout */
   body          { background: #fff; }
