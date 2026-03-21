@@ -631,6 +631,7 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 
 .resume-contact {
   display: flex;
+  align-items: center;
   gap: 1.5rem;
   flex-wrap: wrap;
   margin-top: 0.35rem;
