@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CP2077 · Iconic Tracker</title>
+<style>
+  :root {
+    --bg:      #0a0a0f;
+    --panel:   #12121c;
+    --border:  #1e1e30;
+    --cyan:    #00d4ff;
+    --yellow:  #f0e040;
+    --green:   #39d353;
+    --red:     #ff4455;
+    --muted:   #888;
+    --text:    #e0e0e0;
+    --open-bg: #0a2030;
+    --open-fg: #00d4ff;
+    --ready-bg:#0a2a12;
+    --ready-fg:#39d353;
+    --locked-bg:#2a0a0e;
+    --locked-fg:#ff4455;
+    --unknown-bg:#1e1a08;
+    --unknown-fg:#f0e040;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Courier New', monospace; font-size: 13px; }
+
+  /* ── Header ── */
+  header { padding: 24px 32px 16px; border-bottom: 1px solid var(--border); }
+  header h1 { font-size: 22px; letter-spacing: 4px; color: var(--cyan); text-transform: uppercase; }
+  header h1 span { color: var(--yellow); }
+  .save-meta { margin-top: 6px; color: var(--muted); font-size: 11px; letter-spacing: 1px; }
+  .save-meta b { color: var(--text); }
+
+  /* ── Layout ── */
+  .container { display: grid; grid-template-columns: 280px 1fr; gap: 0; min-height: calc(100vh - 70px); }
+
+  /* ── Sidebar ── */
+  aside { background: var(--panel); border-right: 1px solid var(--border); padding: 20px 16px; }
+  .section-title { font-size: 10px; letter-spacing: 3px; color: var(--cyan); text-transform: uppercase; margin: 16px 0 8px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+  .section-title:first-child { margin-top: 0; }
+
+  .stat-row { display: flex; justify-content: space-between; padding: 3px 0; }
+  .stat-label { color: var(--muted); }
+  .stat-value { color: var(--text); font-weight: bold; }
+  .stat-value.cyan { color: var(--cyan); }
+  .stat-value.yellow { color: var(--yellow); }
+  .stat-value.green  { color: var(--green); }
+  .stat-value.red    { color: var(--red); }
+
+  .attr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 8px; }
+  .attr-item { display: flex; justify-content: space-between; }
+
+  .choice-yes { color: var(--green); }
+  .choice-no  { color: var(--muted); }
+
+  /* ── Main content ── */
+  main { padding: 20px 24px; }
+
+  /* ── Summary bar ── */
+  .summary { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .badge {
+    padding: 8px 16px; border-radius: 2px; font-size: 11px; letter-spacing: 1px;
+    text-transform: uppercase; font-weight: bold; border: 1px solid;
+  }
+  .badge.open    { background: var(--open-bg);    color: var(--open-fg);    border-color: var(--open-fg); }
+  .badge.ready   { background: var(--ready-bg);   color: var(--ready-fg);   border-color: var(--ready-fg); }
+  .badge.locked  { background: var(--locked-bg);  color: var(--locked-fg);  border-color: var(--locked-fg); }
+  .badge.unknown { background: var(--unknown-bg); color: var(--unknown-fg); border-color: var(--unknown-fg); }
+
+  /* ── Filter bar ── */
+  .filters { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+  .filter-btn {
+    padding: 4px 12px; background: var(--panel); border: 1px solid var(--border);
+    color: var(--muted); cursor: pointer; font-family: inherit; font-size: 11px;
+    letter-spacing: 1px; text-transform: uppercase; transition: all 0.15s;
+  }
+  .filter-btn:hover, .filter-btn.active { border-color: var(--cyan); color: var(--cyan); }
+  .filter-btn.active { background: #001a22; }
+  input[type=search] {
+    background: var(--panel); border: 1px solid var(--border); color: var(--text);
+    padding: 4px 10px; font-family: inherit; font-size: 12px; width: 200px;
+    outline: none; margin-left: auto;
+  }
+  input[type=search]:focus { border-color: var(--cyan); }
+  input[type=search]::placeholder { color: var(--muted); }
+
+  /* ── Weapon table ── */
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left; padding: 6px 10px; font-size: 10px; letter-spacing: 2px;
+    color: var(--cyan); text-transform: uppercase; border-bottom: 1px solid var(--border);
+    cursor: pointer; user-select: none; white-space: nowrap;
+  }
+  th:hover { color: var(--yellow); }
+  th .sort-arrow { color: var(--muted); margin-left: 4px; }
+  td { padding: 7px 10px; border-bottom: 1px solid #0e0e1a; vertical-align: top; }
+  tr:hover td { background: #0e0e1a; }
+
+  .weapon-name { font-weight: bold; color: var(--text); }
+  .weapon-note { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .type-badge {
+    display: inline-block; padding: 1px 6px; border-radius: 2px; font-size: 10px;
+    letter-spacing: 1px; background: #1a1a2a; color: var(--muted); border: 1px solid var(--border);
+  }
+  .mission-text { color: var(--text); }
+  .mission-none { color: var(--muted); font-style: italic; }
+
+  .status-pill {
+    display: inline-block; padding: 2px 8px; border-radius: 2px; font-size: 10px;
+    letter-spacing: 1px; font-weight: bold; text-transform: uppercase; white-space: nowrap;
+  }
+  .status-open    { background: var(--open-bg);    color: var(--open-fg); }
+  .status-ready   { background: var(--ready-bg);   color: var(--ready-fg); }
+  .status-locked  { background: var(--locked-bg);  color: var(--locked-fg); }
+  .status-unknown { background: var(--unknown-bg); color: var(--unknown-fg); }
+
+  .hidden { display: none !important; }
+
+  /* ── Quest log section ── */
+  .quest-section { margin-top: 28px; }
+  .quest-section h2 { font-size: 11px; letter-spacing: 3px; color: var(--cyan); text-transform: uppercase; margin-bottom: 8px; }
+  .quest-list { display: flex; flex-wrap: wrap; gap: 4px; max-height: 220px; overflow-y: auto; }
+  .q-tag {
+    padding: 2px 8px; font-size: 10px; background: var(--panel); border: 1px solid var(--border);
+    color: var(--muted); letter-spacing: 0.5px;
+  }
+  .q-tag.mq  { border-color: #1a3a6a; color: #6699ff; }
+  .q-tag.sq  { border-color: #1a4a2a; color: #66cc88; }
+  .q-tag.q   { border-color: #3a2a1a; color: #cc9944; }
+  .q-tag.sa  { border-color: #3a1a3a; color: #cc66cc; }
+  .q-tag.sts { border-color: #1a1a3a; color: #9999cc; }
+</style>
+</head>
+<body>
+<header>
+  <h1>CYBERPUNK <span>2077</span> · ICONIC WEAPON TRACKER</h1>
+  <div class="save-meta" id="saveMeta"></div>
+</header>
+
+<div class="container">
+  <aside id="sidebar"></aside>
+  <main>
+    <div class="summary" id="summary"></div>
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="ready">Can Loot</button>
+      <button class="filter-btn" data-filter="locked">Locked</button>
+      <button class="filter-btn" data-filter="open">Open World</button>
+      <button class="filter-btn" data-filter="unknown">Unknown</button>
+      <input type="search" id="searchBox" placeholder="Search weapons…">
+    </div>
+    <table id="weaponTable">
+      <thead>
+        <tr>
+          <th data-col="name">Weapon <span class="sort-arrow">↕</span></th>
+          <th data-col="type">Type <span class="sort-arrow">↕</span></th>
+          <th data-col="mission">Mission Gate <span class="sort-arrow">↕</span></th>
+          <th data-col="status">Status <span class="sort-arrow">↕</span></th>
+        </tr>
+      </thead>
+      <tbody id="weaponBody"></tbody>
+    </table>
+    <div class="quest-section">
+      <h2>Completed Quests</h2>
+      <div class="quest-list" id="questList"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+const DATA = {"save": {"name": "QuickSave-3", "level": 60, "street_cred": 50, "life_path": "Corporate", "body_gender": "Female", "play_time": "95h 14m", "difficulty": "Hard", "build_patch": "2.31", "timestamp": "15:07:25, 22.03.2026", "is_modded": true, "has_ep1": true, "attributes": {"Body": 16, "Intelligence": 20, "Reflexes": 15, "Tech": 20, "Cool": 10}, "finished_quests": ["cbj_ep1_02", "cbj_ep1_03", "cbj_ep1_04", "cbj_ep1_05", "cbj_ep1_06", "cbj_ep1_07", "cbj_ep1_08", "cbj_ep1_09", "cbj_ep1_10", "cbj_ep1_11", "ma_bls_ina_se1_07", "ma_bls_ina_se1_08", "ma_bls_ina_se1_13", "ma_bls_ina_se1_22", "ma_cct_cpz_06", "ma_cct_dtn_03", "ma_cct_dtn_07", "ma_hey_gle_02", "ma_hey_rey_05", "ma_hey_spr_04", "ma_hey_spr_06", "ma_pac_cvi_08", "ma_std_arr_06", "ma_std_arr_11", "ma_std_rcr_04", "ma_std_rcr_10", "ma_std_rcr_11", "ma_std_rcr_14", "ma_wat_kab_02", "ma_wat_kab_08", "ma_wat_kab_10", "ma_wat_lch_06", "ma_wat_nid_03", "ma_wat_nid_15", "ma_wat_nid_22", "ma_wbr_jpn_16", "mq001", "mq002", "mq003", "mq005", "mq008", "mq010", "mq011", "mq012", "mq013", "mq014", "mq015", "mq016", "mq021", "mq022", "mq023", "mq024", "mq025", "mq026", "mq032", "mq033", "mq035", "mq037", "mq038", "mq040", "mq041", "mq043", "mq044", "mq049", "mq055", "mq057", "mq058", "mq301", "mq303", "mq305", "mq306", "q000", "q001", "q003", "q004", "q005", "q101", "q103", "q104", "q105", "q108", "q110", "q300", "q301", "q302", "q303", "q304", "sa_ep1_303", "sa_ep1_31", "sa_ep1_32", "sa_ep1_34", "sa_ep1_37", "sa_ep1_38", "sa_ep1_39", "sa_ep1_courier", "sq004", "sq006", "sq012", "sq018", "sq021", "sq023", "sq024", "sq025", "sq026", "sq027", "sq029", "sq030", "sq_q001_wakako", "sts_bls_ina_02", "sts_bls_ina_03", "sts_bls_ina_04", "sts_bls_ina_05", "sts_bls_ina_06", "sts_bls_ina_07", "sts_bls_ina_08", "sts_bls_ina_09", "sts_bls_ina_11", "sts_cct_cpz_01", "sts_cct_dtn_02", "sts_cct_dtn_03", "sts_cct_dtn_04", "sts_cct_dtn_05", "sts_ep1_01", "sts_ep1_03", "sts_ep1_04", "sts_ep1_06", "sts_ep1_07", "sts_ep1_08", "sts_ep1_10", "sts_ep1_12", "sts_ep1_13", "sts_hey_gle_01", "sts_hey_gle_03", "sts_hey_gle_04", "sts_hey_gle_05", "sts_hey_gle_06", "sts_hey_rey_01", "sts_hey_rey_02", "sts_hey_rey_06", "sts_hey_rey_08", "sts_hey_rey_09", "sts_hey_spr_01", "sts_hey_spr_03", "sts_hey_spr_06", "sts_pac_cvi_02", "sts_pac_wwd_05", "sts_std_arr_01", "sts_std_arr_03", "sts_std_arr_05", "sts_std_arr_06", "sts_std_arr_10", "sts_std_arr_11", "sts_std_arr_12", "sts_std_rcr_01", "sts_std_rcr_02", "sts_std_rcr_03", "sts_std_rcr_04", "sts_std_rcr_05", "sts_wat_kab_01", "sts_wat_kab_02", "sts_wat_kab_03", "sts_wat_kab_04", "sts_wat_kab_05", "sts_wat_kab_06", "sts_wat_kab_07", "sts_wat_kab_08", "sts_wat_kab_101", "sts_wat_kab_102", "sts_wat_kab_107", "sts_wat_lch_01", "sts_wat_lch_03", "sts_wat_lch_05", "sts_wat_lch_06", "sts_wat_nid_01", "sts_wat_nid_02", "sts_wat_nid_03", "sts_wat_nid_04", "sts_wat_nid_05", "sts_wat_nid_06", "sts_wat_nid_07", "sts_wat_nid_12", "sts_wbr_hil_01", "sts_wbr_hil_06", "sts_wbr_hil_07", "sts_wbr_jpn_01", "sts_wbr_jpn_02", "sts_wbr_jpn_03", "sts_wbr_jpn_05", "sts_wbr_jpn_12", "we_ep1_01", "we_ep1_05", "wst_ep1_04", "wst_ep1_05", "wst_ep1_11", "wst_ep1_21"], "active_facts": ["ep1_active", "ep1_side_content", "mq301_03_frame_jurij", "mq301_done", "mq301_finished", "mq301_start", "mq303_bodies_hidden", "mq303_done", "mq303_finale_shock", "mq303_gangers_attack", "mq303_start", "mq303_v_knows_actors", "mq304_active", "mq304_start", "q000_corpo_background", "q003_meredith_won", "q003_royce_dead", "q101_done", "q103_helped_panam", "q103_rogue_met", "q104_done", "q108_done", "q110_done", "q110_voodoo_queen_dead", "q301_done", "q304_done", "q304_kurt_dead", "q304_songbirds_path", "q304_started", "q306_active", "q306_start", "sq004_done", "sq004_mitch_available", "sq012_done", "sq012_fact_holt_killed_mayor", "sq012_fact_warn_river", "sq012_started", "sq018_done", "sq021_done", "sq021_good_farm_chosen", "sq021_randy_saved", "sq023_joshua_inside", "sq024_done", "sq025_done", "sq027_done", "sq030_done", "sq030_judy_lover", "sq030_romance", "sq032_03_mikoshi_known", "sq032_q104_used", "sq032_q105_used", "sq032_q110_used"], "quest_counts": {"main": 35, "side": 13, "story": 16, "street": 81, "minor": 26, "total": 195}, "choices": {"Romanced Judy": true, "River Ward — saved": true, "Royce killed": true, "Helped Panam": true, "Voodoo Queen dead": true, "Meredith contract won": true, "Phantom Liberty": true}}, "weapons": [{"name": "Dying Night", "type": "Pistol", "mission": "", "note": "Wilson's shop (2nd Amendment, Little China)", "status": "open", "label": "Open World"}, {"name": "Guts", "type": "Shotgun", "mission": "", "note": "Crate near Maelstrom HQ, All Foods", "status": "open", "label": "Open World"}, {"name": "Blue Fang", "type": "Knife", "mission": "", "note": "Tyger Claws boss in Kabuki", "status": "open", "label": "Open World"}, {"name": "Headhunter", "type": "Revolver", "mission": "", "note": "Open world / enemy drop", "status": "open", "label": "Open World"}, {"name": "Skippy", "type": "Smart Pistol", "mission": "", "note": "Alley in Vista Del Rey (gig area)", "status": "open", "label": "Open World"}, {"name": "Comrade's Hammer", "type": "Revolver", "mission": "", "note": "Hidden cache near Aldecaldos camp", "status": "open", "label": "Open World"}, {"name": "Kongou", "type": "Pistol", "mission": "The Heist", "note": "Yorinobu's room at Konpeki Plaza", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Satori", "type": "Katana", "mission": "The Heist", "note": "On the AV during The Heist", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Chaos", "type": "Pistol", "mission": "The Pickup", "note": "Royce must be dead", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Buzzsaw", "type": "SMG", "mission": "The Pickup", "note": "Maelstrom HQ / Royce drop", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Plan B", "type": "Pistol", "mission": "Playing for Time", "note": "Dex's body at the scrapyard", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Cocktail Stick", "type": "Knife", "mission": "Automatic Love", "note": "Dropped by Woodman", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Sir John Phallustiff", "type": "Melee", "mission": "Venus in Furs", "note": "Given by Gary the Prophet (linked to Automatic Love)", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Stinger", "type": "Knife", "mission": "The Space In Between", "note": "Dropped by Fingers in his clinic", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Fenrir", "type": "SMG", "mission": "Disasterpiece", "note": "Spider Murphy's scav den", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Guillotine", "type": "SMG", "mission": "Ex-Factor", "note": "Enemy drop during Maelstrom fight", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Scalpel", "type": "Katana", "mission": "Lightning Breaks", "note": "Dropped by Sasquatch (Animals boss)", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Widow Maker", "type": "Tech Rifle", "mission": "Ghost Town", "note": "Kill Nash — must have helped Panam", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Problem Solver", "type": "SMG", "mission": "Ghost Town", "note": "Dropped by Nash", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Byakko", "type": "Katana", "mission": "We Gotta Live Together", "note": "Chest in Aldecaldos camp", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "O'Five", "type": "Sniper Rifle", "mission": "Both Sides, Now", "note": "Aldecaldos farm during mission", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Psalm 11:6", "type": "Assault Rifle", "mission": "Riders on the Storm", "note": "Raffen Shiv camp", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Overwatch", "type": "Sniper Rifle", "mission": "Riders on the Storm", "note": "Given by Panam after saving Saul", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Ba Xing Chong", "type": "Shotgun", "mission": "I'll Fly Away", "note": "Mitch's workspace in Aldecaldos camp", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Amnesty", "type": "Revolver", "mission": "Queen of the Highway", "note": "Given by Panam at mission end", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Crash", "type": "Revolver", "mission": "Beat on the Brat", "note": "Reward from Duke", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Bloody Maria", "type": "Shotgun", "mission": "Beat on the Brat", "note": "Dropped by Razor Hughes (final fight)", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Archangel", "type": "Revolver", "mission": "Following the River", "note": "Given by River Ward at quest end", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Breakthrough", "type": "Sniper Rifle", "mission": "I Fought The Law", "note": "Evidence locker in NCPD station", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Mox", "type": "Shotgun", "mission": "Pisces", "note": "Judy's apartment — requires romance", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Pride", "type": "Pistol", "mission": "Pyramid Song", "note": "Judy's apartment at quest end", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Erebus", "type": "SMG", "mission": "Somewhat Damaged", "note": "Phantom Liberty reward", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Hawk", "type": "Assault Rifle", "mission": "Somewhat Damaged", "note": "Phantom Liberty reward", "status": "ready", "label": "Quest Done — Can Loot!"}, {"name": "Rasetsu", "type": "Sniper Rifle", "mission": "Somewhat Damaged", "note": "Phantom Liberty reward", "status": "ready", "label": "Quest Done — Can Loot!"}]};
+
+// ── Render sidebar ───────────────────────────────────────────────────────────
+function renderSidebar() {
+  const s = DATA.save;
+  const el = document.getElementById('sidebar');
+
+  const row = (label, value, cls='') =>
+    `<div class="stat-row"><span class="stat-label">${label}</span><span class="stat-value ${cls}">${value}</span></div>`;
+
+  el.innerHTML = `
+    <div class="section-title">Player</div>
+    ${row('Level',        s.level,       'cyan')}
+    ${row('Street Cred',  s.street_cred, 'cyan')}
+    ${row('Life Path',    s.life_path)}
+    ${row('Difficulty',   s.difficulty)}
+    ${row('Play Time',    s.play_time,   'yellow')}
+    ${row('Game Patch',   s.build_patch)}
+    ${row('Phantom Liberty', s.has_ep1 ? 'Yes' : 'No', s.has_ep1 ? 'green' : 'red')}
+    ${row('Modded',       s.is_modded ? 'Yes' : 'No', s.is_modded ? 'yellow' : '')}
+
+    <div class="section-title">Attributes</div>
+    <div class="attr-grid">
+      ${Object.entries(s.attributes).map(([k,v]) =>
+        `<div class="attr-item"><span class="stat-label">${k}</span><span class="stat-value cyan">${v}</span></div>`
+      ).join('')}
+    </div>
+
+    <div class="section-title">Quests Completed</div>
+    ${row('Main (mq*)',     s.quest_counts.main)}
+    ${row('Side (sq*)',     s.quest_counts.side)}
+    ${row('Story (q*)',     s.quest_counts.story)}
+    ${row('Street stories', s.quest_counts.street)}
+    ${row('Minor',          s.quest_counts.minor)}
+    ${row('Total',          s.quest_counts.total, 'cyan')}
+
+    <div class="section-title">Notable Choices</div>
+    ${Object.entries(s.choices).map(([k,v]) =>
+      `<div class="stat-row">
+        <span class="stat-label">${k}</span>
+        <span class="${v ? 'choice-yes' : 'choice-no'}">${v ? 'Yes' : 'No'}</span>
+      </div>`
+    ).join('')}
+  `;
+
+  document.getElementById('saveMeta').innerHTML =
+    `Save: <b>${s.name}</b> &nbsp;|&nbsp; ${s.timestamp}`;
+}
+
+// ── Render weapons ────────────────────────────────────────────────────────────
+const STATUS_LABELS = {
+  open:    'Open World',
+  ready:   'Can Loot',
+  locked:  'Locked',
+  unknown: 'Check Manually',
+};
+
+function renderSummary(weapons) {
+  const counts = { open:0, ready:0, locked:0, unknown:0 };
+  weapons.forEach(w => counts[w.status]++);
+  const el = document.getElementById('summary');
+  el.innerHTML = Object.entries(counts).map(([k,v]) =>
+    `<div class="badge ${k}">${v} ${STATUS_LABELS[k]}</div>`
+  ).join('');
+}
+
+function renderWeapons(weapons) {
+  const tbody = document.getElementById('weaponBody');
+  tbody.innerHTML = weapons.map(w => `
+    <tr data-status="${w.status}" data-name="${w.name.toLowerCase()}" data-type="${w.type.toLowerCase()}" data-mission="${w.mission.toLowerCase()}">
+      <td>
+        <div class="weapon-name">${w.name}</div>
+        <div class="weapon-note">${w.note}</div>
+      </td>
+      <td><span class="type-badge">${w.type}</span></td>
+      <td>${w.mission
+        ? `<span class="mission-text">${w.mission}</span>`
+        : `<span class="mission-none">—</span>`}</td>
+      <td><span class="status-pill status-${w.status}">${STATUS_LABELS[w.status]}</span></td>
+    </tr>
+  `).join('');
+}
+
+function renderQuestList() {
+  const el = document.getElementById('questList');
+  el.innerHTML = DATA.save.finished_quests.map(q => {
+    let cls = 'q-tag';
+    if (q.startsWith('mq'))  cls += ' mq';
+    else if (q.startsWith('sq')) cls += ' sq';
+    else if (q.startsWith('sa')) cls += ' sa';
+    else if (q.startsWith('sts'))cls += ' sts';
+    else if (/^q\d/.test(q)) cls += ' q';
+    return `<span class="${cls}">${q}</span>`;
+  }).join('');
+}
+
+// ── Filtering & sorting ───────────────────────────────────────────────────────
+let activeFilter = 'all';
+let activeSort   = { col: 'status', dir: 1 };
+
+function applyFilter() {
+  const q = document.getElementById('searchBox').value.toLowerCase();
+  document.querySelectorAll('#weaponBody tr').forEach(tr => {
+    const matchFilter = activeFilter === 'all' || tr.dataset.status === activeFilter;
+    const matchSearch = !q || tr.dataset.name.includes(q) || tr.dataset.type.includes(q) || tr.dataset.mission.includes(q);
+    tr.classList.toggle('hidden', !(matchFilter && matchSearch));
+  });
+}
+
+const SORT_ORDER = { ready:0, open:1, locked:2, unknown:3 };
+
+function sortWeapons(weapons, col, dir) {
+  return [...weapons].sort((a, b) => {
+    let av = a[col], bv = b[col];
+    if (col === 'status') { av = SORT_ORDER[a.status]; bv = SORT_ORDER[b.status]; }
+    if (av < bv) return -dir;
+    if (av > bv) return  dir;
+    return 0;
+  });
+}
+
+// ── Wire up events ────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  renderSidebar();
+  let weapons = DATA.weapons;
+  weapons = sortWeapons(weapons, activeSort.col, activeSort.dir);
+  renderSummary(weapons);
+  renderWeapons(weapons);
+  renderQuestList();
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.filter;
+      applyFilter();
+    });
+  });
+
+  document.getElementById('searchBox').addEventListener('input', applyFilter);
+
+  document.querySelectorAll('th[data-col]').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.col;
+      if (activeSort.col === col) activeSort.dir *= -1;
+      else { activeSort.col = col; activeSort.dir = 1; }
+      weapons = sortWeapons(weapons, activeSort.col, activeSort.dir);
+      renderWeapons(weapons);
+      applyFilter();
+    });
+  });
+});
+</script>
+</body>
+</html>
