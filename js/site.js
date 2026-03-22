@@ -380,12 +380,13 @@ function renderJob(job) {
 function glitchScrollTo(el) {
   const navHeight = document.getElementById('site-header')?.offsetHeight || 0;
   const targetY = el.getBoundingClientRect().top + window.scrollY - navHeight - 16;
-  const main = document.getElementById('page-content');
 
-  // Instant jump then play glitch VFX over it
+  // Cover the screen, jump instantly underneath, then wipe overlay away top-to-bottom
+  const overlay = document.createElement('div');
+  overlay.className = 'glitch-hack-overlay';
+  document.body.appendChild(overlay);
   window.scrollTo(0, targetY);
-  main.classList.add('term-glitch-fx');
-  main.addEventListener('animationend', () => main.classList.remove('term-glitch-fx'), { once: true });
+  overlay.addEventListener('animationend', () => overlay.remove(), { once: true });
 }
 
 function runTerminalFX(container) {
