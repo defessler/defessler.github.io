@@ -385,7 +385,7 @@ function glitchScrollTo(el) {
   const overlay = document.createElement('div');
   overlay.className = 'glitch-hack-overlay';
   document.body.appendChild(overlay);
-  window.scrollTo(0, targetY);
+  window.scrollTo({ top: targetY, behavior: 'instant' });
   overlay.addEventListener('animationend', () => overlay.remove(), { once: true });
 }
 
