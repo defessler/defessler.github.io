@@ -15,7 +15,7 @@
       { "category": "Engines",         "items": ["Unreal Engine 5", "Unreal Engine 4", "Unity"] },
       { "category": "Languages",       "items": ["C/C++", "C#", "Lua", "JavaScript", "HTML/CSS"] },
       { "category": "Software",        "items": ["Visual Studio", "Rider", "Perforce", "Git"] },
-      { "category": "Specializations", "items": ["Mission Systems", "Cinematic Frameworks", "Gameplay Systems", "Progression & Quest Systems"] }
+      { "category": "Specializations", "items": ["Mission Systems", "Cinematic Frameworks", "Gameplay Systems"] }
     ],
     "experience": [
       {
