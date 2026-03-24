@@ -419,15 +419,26 @@ function runTerminalFX(container) {
 // Boot
 // ============================================================
 async function init() {
-  // Mobile nav toggle
+  // Mobile nav toggle with retro open/close animation
+  function closeNav() {
+    const nav = document.getElementById('site-nav');
+    if (!nav.classList.contains('nav-open')) return;
+    nav.classList.add('nav-closing');
+    document.getElementById('nav-links').addEventListener('animationend', () => {
+      nav.classList.remove('nav-open', 'nav-closing');
+    }, { once: true });
+  }
+
   document.getElementById('nav-toggle').addEventListener('click', () => {
-    document.getElementById('site-nav').classList.toggle('nav-open');
+    const nav = document.getElementById('site-nav');
+    if (nav.classList.contains('nav-open') || nav.classList.contains('nav-closing')) {
+      closeNav();
+    } else {
+      nav.classList.add('nav-open');
+    }
   });
 
-  // Close mobile nav on link click
-  document.getElementById('nav-links').addEventListener('click', () => {
-    document.getElementById('site-nav').classList.remove('nav-open');
-  });
+  document.getElementById('nav-links').addEventListener('click', () => { closeNav(); });
 
   // Email obfuscation — reveal on click (covers both nav and page content)
   document.addEventListener('click', e => {
