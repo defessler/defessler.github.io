@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tutorials · BlueprintReader docs</title>
+<meta name="description" content="Learn BlueprintReader by doing — short, story-driven tutorials: read a Blueprint, author a mechanic by asking, refactor atomically, and recover from errors." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Cinzel:wght@600;700&family=JetBrains+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="docs.css" />
+</head>
+<body>
+<div class="bg"></div><div class="grain"></div>
+<div class="wrap">
+
+  <aside class="side">
+    <a class="brand" href="../index.html"><span class="sig">◈</span> BlueprintReader</a>
+    <a class="home" href="../index.html">← back to site</a>
+    <nav>
+      <h4>Get started</h4>
+      <a href="index.html">Quickstart &amp; setup →</a>
+      <h4>Learn by doing</h4>
+      <a href="#read">① Read my Blueprint</a>
+      <a href="#author">② Say it, don't wire it</a>
+      <a href="#atomic">③ All or nothing</a>
+      <a href="#debug">④ When the ritual fails</a>
+      <h4>Look it up</h4>
+      <a href="reference.html">Tool &amp; config reference →</a>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <span class="crumbs">docs / <b>tutorials</b></span>
+      <span class="badge">learn by doing</span>
+    </div>
+
+    <article class="doc">
+      <h1>Learn it by <span class="arc">asking</span>.</h1>
+      <p class="lead">Four short stories. Each is a real thing you'd want to do, the exact
+        sentence you'd say to your AI, and what BlueprintReader does under the hood. No tool
+        memorization required — that's the whole point.</p>
+
+      <div class="stories">
+        <a class="story" href="#read"><span class="g">⌖</span><h3>Read my Blueprint</h3>
+          <p>Understand an asset you've never seen.</p><span class="via">via bp-reader · bp-audit</span></a>
+        <a class="story" href="#author"><span class="g">✶</span><h3>Say it, don't wire it</h3>
+          <p>Turn a sentence into a compiled function.</p><span class="via">via bp-batches</span></a>
+        <a class="story" href="#atomic"><span class="g">⟁</span><h3>All or nothing</h3>
+          <p>A multi-step refactor that can't half-apply.</p><span class="via">via bp-batches</span></a>
+        <a class="story" href="#debug"><span class="g">⚕</span><h3>When the ritual fails</h3>
+          <p>Read an error and recover.</p><span class="via">via bp-debug</span></a>
+      </div>
+
+      <!-- 1 -->
+      <h2 id="read">① Read my Blueprint <span class="aud new">good first one</span></h2>
+      <p>You opened a project and there's a <code>BP_Enemy</code> nobody documented. Instead of
+        clicking through every graph, ask.</p>
+      <div class="chat">
+        <div class="turn you"><span class="who">you</span>What does BP_Enemy do? Give me the gist, then the event graph.</div>
+        <div class="turn ai"><span class="who">BlueprintReader · your AI</span>
+          BP_Enemy (parent: Character) — 5 variables, 2 functions. <code>BeginPlay</code> seeds
+          health and starts a patrol Timeline; <code>OnPerceptionUpdated</code> switches to a
+          chase state and calls <code>FireWeapon</code>. Here's the event graph topology…
+          <div class="tools" style="margin-top:.6rem">used <b>list_blueprints</b> → <b>summarize_blueprint</b> → <b>get_graph</b></div>
+        </div>
+      </div>
+      <p>Want a whole folder at once? Hand it to the audit agent:</p>
+      <div class="chat">
+        <div class="turn you"><span class="who">you</span>Audit /Game/AI — which Blueprints override BeginPlay, and are any variables unused?</div>
+        <div class="turn ai"><span class="who">bp-audit agent</span>
+          Scanned 23 Blueprints. 6 override <code>BeginPlay</code>; <code>BP_Turret</code> has
+          3 variables never read; <code>BP_Spawner</code> references a deleted actor class…
+          <div class="tools" style="margin-top:.6rem">a read-only fan-out — <b>nothing was modified</b></div>
+        </div>
+      </div>
+      <div class="note tip"><p>Reads can't change anything, so this is the safest way to start —
+        no need to enable writes. Great for code review and onboarding.</p></div>
+
+      <!-- 2 -->
+      <h2 id="author">② Say it, don't wire it</h2>
+      <p>You want a dash. You <em>could</em> place the nodes by hand… or describe it.</p>
+      <div class="chat">
+        <div class="turn you"><span class="who">you</span>Give the player a Dash: a function that adds a forward impulse, with a 2-second cooldown so it can't be spammed.</div>
+        <div class="turn ai"><span class="who">BlueprintReader · your AI</span>
+          Added <code>bCanDash</code> (bool) and <code>DashCooldown</code> (float = 2.0). Created
+          a <code>Dash</code> function: guards on <code>bCanDash</code>, applies
+          <code>AddImpulse</code> along the actor forward vector, then clears the flag and
+          re-enables it on a 2s timer. Compiled clean.
+          <div class="tools" style="margin-top:.6rem">used <b>add_variable</b> ×2 → <b>add_function</b> → <b>add_node</b> → <b>wire_pins</b> → <b>set_pin_default</b> → <b>compile_function</b></div>
+        </div>
+      </div>
+      <div class="note arc"><p><strong>Under the hood:</strong> with the <code>bp-batches</code>
+        skill installed, your AI assembles the whole function as one unit and runs
+        <code>compile_function</code> to confirm it builds — you get a working node graph, not a
+        pile of disconnected nodes.</p></div>
+
+      <!-- 3 -->
+      <h2 id="atomic">③ All or nothing <span class="aud vet">the safety one</span></h2>
+      <p>Renames and restructures are where things break. Make the AI do it as a single
+        transaction that either fully lands or fully reverts.</p>
+      <div class="chat">
+        <div class="turn you"><span class="who">you</span>Rename <code>Health</code> to <code>CurrentHealth</code>, add a <code>MaxHealth</code> float, and clamp damage against it — all as one atomic change. Preview it first.</div>
+        <div class="turn ai"><span class="who">BlueprintReader · your AI</span>
+          Here's the dry run: 1 rename, 1 new variable, 2 rewired nodes, 1 clamp inserted — no
+          conflicts. Apply it?
+          <div class="tools" style="margin-top:.6rem">used <b>preview_ops</b> (nothing written yet)</div>
+        </div>
+        <div class="turn you"><span class="who">you</span>Apply.</div>
+        <div class="turn ai"><span class="who">BlueprintReader · your AI</span>
+          Applied as one batch, compiled, saved, backed up. If the clamp had failed to compile,
+          the rename would have rolled back too — your graph is never left half-done.
+          <div class="tools" style="margin-top:.6rem">used <b>apply_ops</b> <span style="color:var(--ink-dim)">(atomic:true)</span> → rolled-forward, backup written</div>
+        </div>
+      </div>
+      <div class="note warn"><p><strong>Why preview?</strong> <code>preview_ops</code> is a
+        read-only dry run — it tells you exactly what a batch will touch before a single byte is
+        written. The <code>bp-batches</code> skill teaches the AI to always offer it for
+        multi-step edits.</p></div>
+
+      <!-- 4 -->
+      <h2 id="debug">④ When the ritual fails</h2>
+      <p>Errors happen. With the <code>bp-debug</code> skill, they're legible instead of
+        cryptic.</p>
+      <div class="chat">
+        <div class="turn you"><span class="who">you</span>That returned <code>AssetNotFound: /Game/AI/BP_Enemy.BP_Enemy</code>. What went wrong?</div>
+        <div class="turn ai"><span class="who">bp-debug · your AI</span>
+          You passed an <em>object</em> path; BlueprintReader addresses assets by <em>package</em>
+          path. Drop the <code>.BP_Enemy</code> suffix → <code>/Game/AI/BP_Enemy</code>. Re-running
+          now… found it, 5 variables. (If a name's just close, the error lists the real ones so
+          you can pick.)
+          <div class="tools" style="margin-top:.6rem">no asset touched — failed calls are side-effect-free</div>
+        </div>
+      </div>
+      <div class="note tip"><p>Every error names what it tried, why it failed, and the closest
+        valid value. A failed write makes <em>no</em> change, so you can always just fix the
+        input and re-ask.</p></div>
+
+      <div class="pager">
+        <a href="index.html">← Get started</a>
+        <a href="reference.html">Reference: every tool, by category →</a>
+      </div>
+    </article>
+  </div>
+</div>
+<script>
+  const links=[...document.querySelectorAll('.side nav a[href^="#"]')];
+  const map=new Map(links.map(a=>[a.getAttribute('href').slice(1),a]));
+  const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){
+    links.forEach(l=>l.classList.remove('active'));map.get(e.target.id)?.classList.add('active');}}),
+    {rootMargin:'-20% 0px -70% 0px'});
+  document.querySelectorAll('.doc h2[id]').forEach(s=>io.observe(s));
+</script>
+</body>
+</html>
