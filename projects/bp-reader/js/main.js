@@ -1,4 +1,4 @@
-/* BlueprintReader — Arcane Terminal · interactions */
+/* BlueprintReader: Arcane Terminal · interactions */
 (() => {
   'use strict';
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -26,20 +26,23 @@
   );
   document.querySelectorAll('.reveal-up').forEach((el) => io.observe(el));
 
-  /* ---- count-up for hero stats ---- */
+  /* ---- count-up for hero stats: quick up to (target - 7), then a rapid slow-down
+     over the final seven, the last two beats slowest so the number settles gently. ---- */
   document.querySelectorAll('[data-count]').forEach((el) => {
     const target = parseInt(el.dataset.count, 10);
-    if (reduce) { el.textContent = target; return; }
+    if (reduce || !target) { el.textContent = String(target); return; }
+    // delays (ms) before showing target-6 .. target (rapid slow-down; last two slowest).
+    const tail = [48, 88, 152, 240, 344, 464, 576];
+    const delayBefore = (v) => { const k = v - (target - 6); return k < 0 ? 5 : tail[k]; };
     const seen = new IntersectionObserver((ents) => {
       if (!ents[0].isIntersecting) return;
       seen.disconnect();
-      const t0 = performance.now(), dur = 1100;
-      const tick = (t) => {
-        const p = Math.min(1, (t - t0) / dur);
-        el.textContent = Math.round((1 - Math.pow(1 - p, 3)) * target);
-        if (p < 1) requestAnimationFrame(tick);
+      let v = 0;
+      const step = () => {
+        el.textContent = String(v);
+        if (v < target) setTimeout(() => { v++; step(); }, delayBefore(v + 1));
       };
-      requestAnimationFrame(tick);
+      step();
     }, { threshold: 0.6 });
     seen.observe(el);
   });
@@ -60,9 +63,17 @@
   const runTerminal = () => {
     if (started || !out) return; started = true;
     if (reduce) { out.innerHTML = script.map((l) => `<span class="${l.c}">${l.t}</span>`).join('\n'); return; }
+    out.style.transition = 'opacity 500ms ease';
     let li = 0;
     const line = () => {
-      if (li >= script.length) { setTimeout(() => { out.innerHTML = ''; li = 0; started = true; line(); }, 4200); return; }
+      if (li >= script.length) {
+        // pause on the finished conversation, then fade out before retyping
+        setTimeout(() => {
+          out.style.opacity = '0';
+          setTimeout(() => { out.innerHTML = ''; li = 0; out.style.opacity = '1'; line(); }, 500);
+        }, 4200);
+        return;
+      }
       const { c, t } = script[li++];
       const span = document.createElement('span');
       span.className = c; out.appendChild(span);
@@ -91,8 +102,35 @@
     );
   }));
 
+  /* ---- seamless marquee: clone the set to overflow the viewport, then mirror it
+     so translateX(-50%) lands exactly one set over and never snaps or gaps ---- */
+  (() => {
+    const track = document.querySelector('.marquee-track');
+    const marquee = track && track.parentElement;
+    const set = track && track.querySelector('.marquee-set');
+    if (!track || !marquee || !set) return;
+    const base = [...set.children].map((n) => n.cloneNode(true));
+    const build = () => {
+      set.replaceChildren(...base.map((n) => n.cloneNode(true)));
+      let guard = 0;
+      while (set.scrollWidth < marquee.offsetWidth + 80 && guard++ < 60) {
+        base.forEach((n) => set.appendChild(n.cloneNode(true)));
+      }
+      const setW = set.scrollWidth;
+      while (track.children.length > 1) track.removeChild(track.lastChild);
+      const clone = set.cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      track.appendChild(clone);
+      // constant scroll speed (~90px/s) regardless of how wide the set ended up
+      track.style.setProperty('--marquee-dur', Math.max(20, Math.round(setW / 90)) + 's');
+    };
+    build();
+    let rt;
+    addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(build, 200); });
+  })();
+
   /* ====================================================================
-     Blueprint-node constellation — the signature backdrop.
+     Blueprint-node constellation, the signature backdrop.
      Nodes drift; nearby nodes wire together; pins pulse; parallax to mouse.
      ==================================================================== */
   const cv = document.getElementById('constellation');

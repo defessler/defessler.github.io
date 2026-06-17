@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>BlueprintReader — AI that speaks Blueprint</title>
-<meta name="description" content="A corruption-safe MCP server that lets Claude, Copilot, and Cursor read and author Unreal Engine 5 Blueprints in plain language. 82 proven tools. No editor scripting." />
+<title>BlueprintReader: AI that speaks Blueprint</title>
+<meta name="description" content="A corruption-safe MCP server that lets any MCP client read and author Unreal Engine 5 Blueprints in plain language. 82 proven tools. No editor scripting." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Cinzel:wght@500;600;700&family=JetBrains+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -48,9 +48,9 @@
     </h1>
 
     <p class="hero-sub reveal" data-d="2">
-      Point Claude, Copilot, or Cursor at your project and just <em>ask</em>.
+      Point your AI assistant at your project and just <em>ask</em>.
       It reads and rewrites your Unreal&nbsp;Engine&nbsp;5 Blueprints in plain
-      language — no editor scripting, no C++, and <strong>nothing that can
+      language, with no editor scripting, no C++, and <strong>nothing that can
       corrupt your assets.</strong>
     </p>
 
@@ -65,9 +65,8 @@
 
     <ul class="hero-stats reveal" data-d="4">
       <li><b data-count="82">82</b><span>proven tools</span></li>
-      <li><b>0</b><span>ways to corrupt a project</span></li>
-      <li><b>3</b><span>AI clients supported</span></li>
-      <li><b>5.8</b><span>Unreal Engine</span></li>
+      <li><b>0</b><span>corruption vectors</span></li>
+      <li><b>5.8+</b><span>Unreal Engine</span></li>
     </ul>
   </div>
 
@@ -76,15 +75,12 @@
   </a>
 </section>
 
-<!-- ░░ MARQUEE ░░ -->
+<!-- MARQUEE: one set; JS clones it to fill the viewport and mirrors it for a seamless loop -->
 <div class="marquee" aria-hidden="true">
   <div class="marquee-track">
-    <span>READ ANY BLUEPRINT</span><i>◇</i><span>AUTHOR SAFELY</span><i>◇</i>
-    <span>SPEAK IN PLAIN LANGUAGE</span><i>◇</i><span>ATOMIC + BACKED-UP WRITES</span><i>◇</i>
-    <span>WORKS HEADLESS</span><i>◇</i><span>CLAUDE · COPILOT · CURSOR</span><i>◇</i>
-    <span>READ ANY BLUEPRINT</span><i>◇</i><span>AUTHOR SAFELY</span><i>◇</i>
-    <span>SPEAK IN PLAIN LANGUAGE</span><i>◇</i><span>ATOMIC + BACKED-UP WRITES</span><i>◇</i>
-    <span>WORKS HEADLESS</span><i>◇</i><span>CLAUDE · COPILOT · CURSOR</span><i>◇</i>
+    <div class="marquee-set">
+      <span>READ ANY BLUEPRINT</span><i>◇</i><span>AUTHOR SAFELY</span><i>◇</i><span>SPEAK IN PLAIN LANGUAGE</span><i>◇</i><span>ATOMIC + BACKED-UP WRITES</span><i>◇</i><span>WORKS HEADLESS</span><i>◇</i><span>ANY MCP CLIENT</span><i>◇</i>
+    </div>
   </div>
 </div>
 
@@ -99,13 +95,13 @@
     <article class="card reveal-up" style="--i:0">
       <div class="card-glyph">⌖</div>
       <h3>See everything</h3>
-      <p>Variables, functions, graphs, nodes, components, interfaces, timelines — your AI reads the whole structure of a Blueprint, no guessing.</p>
+      <p>Variables, functions, graphs, nodes, components, interfaces, timelines: your AI reads the whole structure of a Blueprint, no guessing.</p>
       <span class="card-tag">read</span>
     </article>
     <article class="card reveal-up" style="--i:1">
       <div class="card-glyph">✶</div>
       <h3>Author by asking</h3>
-      <p>"Add a dash ability with a 2-second cooldown." It spawns the variables, wires the nodes, and compiles — the way you'd do it by hand, but spoken.</p>
+      <p>"Add a dash ability with a 2-second cooldown." It spawns the variables, wires the nodes, and compiles, the way you'd do it by hand, but spoken.</p>
       <span class="card-tag">write</span>
     </article>
     <article class="card reveal-up" style="--i:2">
@@ -117,19 +113,19 @@
     <article class="card reveal-up" style="--i:3">
       <div class="card-glyph">⟁</div>
       <h3>All-or-nothing batches</h3>
-      <p>Chain a dozen edits into one transaction. If step seven fails, the whole thing rolls back — your graph is never left half-rewritten.</p>
+      <p>Chain a dozen edits into one transaction. If step seven fails, the whole thing rolls back; your graph is never left half-rewritten.</p>
       <span class="card-tag">atomic</span>
     </article>
     <article class="card reveal-up" style="--i:4">
       <div class="card-glyph">◎</div>
       <h3>Your AI, your client</h3>
-      <p>Speaks the Model Context Protocol, so it drops straight into Claude, GitHub Copilot, or Cursor. Point it at a <code>.uproject</code> and go.</p>
+      <p>Speaks the Model Context Protocol, so it works with any MCP client, Claude included. Point it at a <code>.uproject</code> and go.</p>
       <span class="card-tag">mcp</span>
     </article>
     <article class="card reveal-up" style="--i:5">
       <div class="card-glyph">◳</div>
       <h3>Runs in the dark</h3>
-      <p>Drives a headless editor or talks to a live one over a socket — auto-routing per call. No babysitting an editor window required.</p>
+      <p>Drives a headless editor or talks to a live one over a socket, auto-routing per call. No babysitting an editor window required.</p>
       <span class="card-tag">headless</span>
     </article>
   </div>
@@ -157,14 +153,14 @@
       <li class="step reveal-up" style="--i:2">
         <span class="step-no">03</span>
         <h3>Watch it weave</h3>
-        <p>It reads, edits, compiles, and saves — atomically, backed up, on the real asset. You review the diff.</p>
+        <p>It reads, edits, compiles, and saves: atomically, backed up, on the real asset. You review the diff.</p>
       </li>
     </ol>
 
     <div class="terminal reveal-up" style="--i:1">
       <div class="terminal-bar">
         <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-        <em>claude — blueprintreader</em>
+        <em>claude · blueprintreader</em>
       </div>
       <pre class="terminal-body"><code id="typed"></code><span class="caret">▋</span></pre>
     </div>
@@ -177,17 +173,19 @@
   <div class="summon-inner reveal-up">
     <span class="kicker">// ACQUIRE</span>
     <h2>One package.<br>The proven core.</h2>
-    <p>A single, focused build — only the tools we'd stake our reputation on,
+    <p>A single, focused build with only the tools we'd stake our reputation on,
       every one verified against real projects. Landing on Epic's Fab marketplace.</p>
     <div class="summon-cta">
-      <a class="btn btn-primary big" href="#" data-soon>
-        <span>⚡ Coming to Fab</span>
-      </a>
+      <span class="soon-wrap">
+        <a class="btn btn-primary big" href="#" data-soon>
+          <span>⚡ Coming to Fab</span>
+        </a>
+      </span>
       <a class="btn btn-ghost big" href="docs/index.html">
         <span>▸ Start with the docs</span>
       </a>
     </div>
-    <p class="fineprint">Built for Unreal&nbsp;Engine&nbsp;5.8 · community-supported · no telemetry</p>
+    <p class="fineprint">Built for Unreal&nbsp;Engine&nbsp;5.8 · no&nbsp;telemetry</p>
   </div>
 </section>
 
@@ -198,7 +196,7 @@
     <span class="brand-sigil" aria-hidden="true">◈</span> BlueprintReader
   </div>
   <p class="foot-note">Made for builders who'd rather describe a mechanic than wire it by hand.</p>
-  <p class="foot-legal">Unreal Engine is a trademark of Epic Games, Inc. — referenced for compatibility only. All artwork original.</p>
+  <p class="foot-legal">Unreal Engine is a trademark of Epic Games, Inc., referenced for compatibility only. All artwork original.</p>
 </footer>
 
 <script src="js/main.js"></script>
