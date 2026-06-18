@@ -1,6 +1,8 @@
 /* =========================================================================
-   BlueprintReader: "Arcane Terminal"
+   Aethyr: "Arcane Terminal"
    Cyberpunk neon × holographic sci-fi × arcane fantasy. Original art only.
+   Brand tokens, type, motion, and IP rules: ../../STYLE_GUIDE.md
+   (see "Brand and visual identity"). Keep this :root the source of truth.
    ========================================================================= */
 
 :root{
@@ -72,8 +74,10 @@ a{color:inherit;text-decoration:none}
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 .vignette{
-  z-index:6;
-  background:radial-gradient(120% 100% at 50% 0%,transparent 55%,rgba(3,3,8,.85) 100%);
+  /* below content (z-index 5) so it darkens the backdrop edges only and never
+     paints over the footer / summon text; softer stop so the bottom stays legible */
+  z-index:3;
+  background:radial-gradient(120% 100% at 50% 0%,transparent 62%,rgba(3,3,8,.5) 100%);
 }
 
 /* ---- nav ---- */
@@ -89,11 +93,17 @@ a{color:inherit;text-decoration:none}
   backdrop-filter:blur(14px) saturate(140%);
   border-bottom:1px solid var(--line);
 }
-.brand{display:flex;align-items:center;gap:.6rem;font-family:var(--f-arcane);
-  font-weight:700;font-size:1.12rem;letter-spacing:.04em}
-.brand-sigil{color:var(--cyan);text-shadow:var(--glow-cyan);font-size:1.2rem;
-  animation:spin 9s linear infinite;display:inline-block}
-@keyframes spin{to{transform:rotate(360deg)}}
+.brand{display:flex;align-items:center;gap:.6rem}
+.brand-lockup{width:clamp(150px,22vw,260px);height:auto;display:block}
+.vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0}
+/* couple the lockup's themable strokes to the brand tokens
+   (leave .xtl-cut and the bespoke facet tints baked into the SVG) */
+.brand-lockup .xtl-edge{stroke:var(--cyan)}
+.xtl-wordmark{stroke:var(--ink)}
+.xtl-glint-violet{stroke:var(--violet)}
+.xtl-glint-magenta{stroke:var(--magenta)}
+.xtl-glint-ember{stroke:var(--ember)}
 .nav-links{display:flex;align-items:center;gap:clamp(14px,2.4vw,34px);
   font-family:var(--f-display);font-size:.82rem;letter-spacing:.08em;text-transform:uppercase}
 .nav-links a{color:var(--ink-dim);transition:color .25s}
@@ -299,13 +309,47 @@ a{color:inherit;text-decoration:none}
 .foot{position:relative;z-index:5;border-top:1px solid var(--line);
   padding:46px clamp(20px,7vw,120px);background:rgba(7,7,16,.7);text-align:center}
 .foot-brand{font-family:var(--f-arcane);font-weight:700;font-size:1.1rem;letter-spacing:.04em}
+.foot-mark{width:20px;height:20px;vertical-align:-4px;
+  filter:drop-shadow(0 0 8px rgba(28,230,255,.45))}
 .foot-note{color:var(--ink-dim);margin:.6rem 0;font-weight:300}
 .foot-legal{font-family:var(--f-mono);font-size:.68rem;color:#5a608a;letter-spacing:.04em}
+
+/* ---- brand lockup micro-animation ----
+   Cheap (small SVG), so it stays on for mobile; the global
+   prefers-reduced-motion:reduce rule below turns it off when requested.
+   Every keyframe returns to its 0% state so each loop is seamless. */
+@media (prefers-reduced-motion: no-preference){
+  .brand-lockup{animation:aethyr-breathe 6s var(--ease) infinite}
+  @keyframes aethyr-breathe{0%,100%{opacity:.94}50%{opacity:1}}
+
+  .brand-lockup .xtl-core{transform-box:fill-box;transform-origin:center;
+    animation:xtl-core-breathe 6.5s var(--ease) infinite}
+  @keyframes xtl-core-breathe{0%,100%{opacity:.78}50%{opacity:1}}
+
+  .xtl-glint-violet{animation:xtl-glint 5.5s var(--ease) infinite}
+  .xtl-glint-magenta{animation:xtl-glint 5.5s var(--ease) .9s infinite}
+  .xtl-glint-ember{animation:xtl-glint 5.5s var(--ease) 1.8s infinite}
+  @keyframes xtl-glint{0%,100%{opacity:.35}50%{opacity:.7}}
+
+  .brand-lockup .xtl-shard{animation:xtl-twinkle 7s ease-in-out infinite}
+  .brand-lockup .xtl-shard:nth-child(3n){animation-duration:8.5s;animation-delay:1.2s}
+  .brand-lockup .xtl-shard:nth-child(3n+1){animation-duration:6s;animation-delay:.6s}
+  @keyframes xtl-twinkle{
+    0%,100%{opacity:var(--o,.6);transform:translateX(0)}
+    50%{opacity:calc(var(--o,.6)*.6);transform:translateX(1.5px)}}
+}
 
 /* ---- responsive ---- */
 @media(max-width:860px){
   .flow-wrap{grid-template-columns:1fr}
   .nav-links a:not(.nav-cta){display:none}
+}
+/* mobile: drop the GPU-heavy compositing layers (full-screen blend-mode overlays)
+   and the drifting canvas so the page renders smoothly on phones. The static
+   gradient backdrop (grid horizon + vignette) stays; the canvas is skipped in JS. */
+@media(max-width:760px){
+  .scanlines,.grain{display:none}
+  .summon-ring{animation:none;opacity:.4}
 }
 @media(prefers-reduced-motion:reduce){
   *{animation:none!important}

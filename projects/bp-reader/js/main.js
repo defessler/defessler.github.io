@@ -1,4 +1,4 @@
-/* BlueprintReader: Arcane Terminal · interactions */
+/* Aethyr: Arcane Terminal · interactions */
 (() => {
   'use strict';
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -134,7 +134,11 @@
      Nodes drift; nearby nodes wire together; pins pulse; parallax to mouse.
      ==================================================================== */
   const cv = document.getElementById('constellation');
-  if (!cv || reduce) return;
+  // Skip the animated canvas on reduced-motion AND on small / touch screens:
+  // the per-frame redraw is the main cause of jank on phones, so they keep
+  // the static gradient backdrop instead.
+  const lowPower = innerWidth < 760 || matchMedia('(pointer:coarse)').matches;
+  if (!cv || reduce || lowPower) return;
   const ctx = cv.getContext('2d');
   let W, H, DPR, nodes, mx = 0.5, my = 0.5, raf;
 

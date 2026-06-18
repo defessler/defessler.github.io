@@ -3,19 +3,25 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Get Started · BlueprintReader docs</title>
-<meta name="description" content="Install BlueprintReader, connect Claude / Copilot / Cursor over MCP, install the skills + audit agent, and make your first edit by asking." />
+<title>Get Started · Aethyr docs</title>
+<meta name="description" content="Install Aethyr, connect Claude / Copilot / Cursor over MCP, install the skills + audit agent, and make your first edit by asking." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Cinzel:wght@600;700&family=JetBrains+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="docs.css" />
+<link rel="icon" type="image/svg+xml" href="../img/brand/aethyr-crystal.svg" />
+<link rel="icon" type="image/png" sizes="48x48" href="../img/brand/aethyr-favicon-48.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="../img/brand/aethyr-favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="../img/brand/aethyr-favicon-16.png" />
+<link rel="apple-touch-icon" href="../img/brand/aethyr-icon-512.png" />
+<meta name="theme-color" content="#070710" />
 </head>
 <body>
 <div class="bg"></div><div class="grain"></div>
 <div class="wrap">
 
   <aside class="side">
-    <a class="brand" href="../index.html"><span class="sig">◈</span> BlueprintReader</a>
+    <a class="brand" href="../index.html"><img class="sig" src="../img/brand/aethyr-crystal.svg" alt="" aria-hidden="true" width="18" height="18"> Aethyr</a>
     <a class="home" href="../index.html">← back to site</a>
     <nav>
       <h4>Get started</h4>
@@ -39,7 +45,7 @@
 
     <article class="doc">
       <h1>Speak <span class="arc">Blueprint</span>.</h1>
-      <p class="lead">BlueprintReader is an MCP server that lets your AI assistant read and
+      <p class="lead">Aethyr is an MCP server that lets your AI assistant read and
         author Unreal&nbsp;Engine&nbsp;5 Blueprints in plain language. This page gets you
         from zero to your first AI-made edit in about five minutes.</p>
       <p><span class="aud new">New here</span> <span class="aud vet">UE veteran</span>
@@ -51,7 +57,7 @@
       <ul>
         <li>A <strong>UE editor plugin</strong> that knows how to introspect and safely
           mutate Blueprint assets.</li>
-        <li>A <strong>standalone MCP server</strong> (<code>BlueprintReaderMcp</code>) that
+        <li>A <strong>standalone MCP server</strong> (<code>AethyrMcp</code>) that
           speaks the Model Context Protocol, so AI clients can drive that plugin by talking
           to it: no Python, no editor scripting, no C++.</li>
       </ul>
@@ -61,12 +67,12 @@
 
       <h2 id="quickstart">5-minute quickstart</h2>
       <ol>
-        <li><strong>Get the plugin.</strong> Install BlueprintReader from Fab
+        <li><strong>Get the plugin.</strong> Install Aethyr from Fab
           <span class="sku fab">Fab</span> into your project's <code>Plugins/</code> folder
           and enable it. <span class="aud new">New</span> Restart the editor when prompted.</li>
         <li><strong>Point it at your project.</strong> The server needs to know which
           <code>.uproject</code> to drive. It auto-discovers one above its own folder, or you
-          set <code>BP_READER_PROJECT</code> (next step).</li>
+          set <code>AETHYR_PROJECT</code> (next step).</li>
         <li><strong>Connect your AI client</strong> over MCP (below).</li>
         <li><strong>Ask it something.</strong> Try: <em>"List the Blueprints under /Game and
           tell me what BP_PlayerCharacter does."</em></li>
@@ -76,24 +82,24 @@
         tutorials</a>.</p></div>
 
       <h2 id="connect">Connect your AI</h2>
-      <p>BlueprintReader is a standard MCP <em>stdio</em> server. Add it to your client's MCP
+      <p>Aethyr is a standard MCP <em>stdio</em> server. Add it to your client's MCP
         config. The shape is the same everywhere, only the file location differs.</p>
 
       <h3>Claude Code / Claude Desktop / Cursor / Copilot</h3>
       <pre><code><span class="c">// mcpServers block (claude_desktop_config.json, .cursor/mcp.json, .mcp.json, etc.)</span>
 {
   <span class="k">"mcpServers"</span>: {
-    <span class="k">"blueprintreader"</span>: {
-      <span class="k">"command"</span>: <span class="s">"C:/Path/To/BlueprintReaderMcp.exe"</span>,
+    <span class="k">"aethyr"</span>: {
+      <span class="k">"command"</span>: <span class="s">"C:/Path/To/AethyrMcp.exe"</span>,
       <span class="k">"env"</span>: {
-        <span class="k">"BP_READER_PROJECT"</span>: <span class="s">"C:/Path/To/YourGame.uproject"</span>,
-        <span class="k">"BP_READER_ALLOW_WRITE"</span>: <span class="s">"1"</span>
+        <span class="k">"AETHYR_PROJECT"</span>: <span class="s">"C:/Path/To/YourGame.uproject"</span>,
+        <span class="k">"AETHYR_ALLOW_WRITE"</span>: <span class="s">"1"</span>
       }
     }
   }
 }</code></pre>
       <div class="note arc"><p><strong>Read-only by default.</strong> The server refuses every
-        write tool until you set <code>BP_READER_ALLOW_WRITE=1</code>, so an exploratory
+        write tool until you set <code>AETHYR_ALLOW_WRITE=1</code>, so an exploratory
         session can't change anything by accident. Leave it off until you want edits.</p></div>
       <p><span class="aud vet">Vet</span> The backend is <code>auto</code> by default: it
         probes per call and routes to a <strong>live</strong> editor if one's open (over a
@@ -106,7 +112,7 @@
         (<code>Install-ClaudeAssets.ps1</code>), or point your client's skills folder at the
         plugin's <code>Claude/</code> directory.</p>
       <ul>
-        <li><code>bp-reader</code>: the core skill: reading and editing a Blueprint, the wire
+        <li><code>aethyr</code>: the core skill: reading and editing a Blueprint, the wire
           format, per-tool guidance.</li>
         <li><code>bp-batches</code>: multi-step edits as one atomic transaction
           (<code>apply_ops</code> / <code>preview_ops</code> / <code>compile_function</code>).</li>

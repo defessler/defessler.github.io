@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Aethyr">
+  <title>Aethyr</title>
+  <desc>Cyan faceted crystal mark, lit from within, on a textured deep-void field. Opaque app-tile icon (apple-touch / og:image).</desc>
+  <!-- AETHYR app-tile icon (512x512, OPAQUE). Crafted dark field: void base + fine grain + cyan depth glow + vignette, with the crystal centered. -->
+  <defs>
+    <!-- fine fractal grain, matched to the site's .grain (fractalNoise baseFrequency .9 numOctaves 2). Desaturated to a neutral dark grey so it reads as crafted texture, not coloured static. -->
+    <filter id="iconGrain" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0" result="mono"/>
+    </filter>
+    <!-- faint cyan depth glow behind the crystal -->
+    <radialGradient id="iconDepth" cx="50%" cy="46%" r="58%">
+      <stop offset="0%" stop-color="#1ce6ff" stop-opacity=".26"/>
+      <stop offset="48%" stop-color="#1ce6ff" stop-opacity=".08"/>
+      <stop offset="100%" stop-color="#1ce6ff" stop-opacity="0"/>
+    </radialGradient>
+    <!-- gentle vignette: corners slightly darker for depth -->
+    <radialGradient id="iconVignette" cx="50%" cy="50%" r="72%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="68%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity=".55"/>
+    </radialGradient>
+
+    <!-- crystal defs (suffixed to avoid id collisions with the standalone crystal svg) -->
+    <radialGradient id="gemAura_i"><stop offset="0%" stop-color="#1ce6ff" stop-opacity=".42"/><stop offset="55%" stop-color="#1ce6ff" stop-opacity=".12"/><stop offset="100%" stop-color="#1ce6ff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="coreGlow_i"><stop offset="0%" stop-color="#ffffff" stop-opacity=".85"/><stop offset="45%" stop-color="#bff7ff" stop-opacity=".30"/><stop offset="100%" stop-color="#bff7ff" stop-opacity="0"/></radialGradient>
+    <filter id="glow_i" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+
+  <!-- 1. opaque void base -->
+  <rect x="0" y="0" width="512" height="512" fill="#070710"/>
+
+  <!-- 2. fine grain overlay (neutral dark grey, low opacity) -->
+  <rect x="0" y="0" width="512" height="512" filter="url(#iconGrain)" opacity=".12"/>
+
+  <!-- 3a. faint cyan depth glow behind the crystal -->
+  <rect x="0" y="0" width="512" height="512" fill="url(#iconDepth)"/>
+  <!-- 3b. gentle vignette for corner depth -->
+  <rect x="0" y="0" width="512" height="512" fill="url(#iconVignette)"/>
+
+  <!-- 4. the crystal, centered with ~96px margins (320-unit art in a 512 canvas) -->
+  <svg x="96" y="96" width="320" height="320" viewBox="110 24 320 320">
+    <ellipse cx="270" cy="185" rx="150" ry="190" fill="url(#gemAura_i)"/>
+    <g>
+      <polygon points="270,46 215,110 270,110" fill="#16c4ec"/>
+      <polygon points="270,54 232,98 270,98" fill="#aef2ff" opacity=".55"/>
+      <polygon points="270,46 270,110 325,110" fill="#0e8fc0"/>
+      <polygon points="215,110 180,150 270,150 270,110" fill="#1ce6ff" opacity=".92"/>
+      <polygon points="325,110 270,110 270,150 360,150" fill="#16c4ec"/>
+      <polygon points="180,150 270,150 270,236 225,236" fill="#0e6ea8"/>
+      <polygon points="270,150 360,150 315,236 270,236" fill="#0a4f80"/>
+      <polygon points="225,236 270,236 270,322" fill="#0a4a72"/>
+      <polygon points="270,236 315,236 270,322" fill="#0a4a78"/>
+      <g stroke="#1ce6ff" stroke-width="1" opacity=".35">
+        <line x1="215" y1="110" x2="325" y2="110"/>
+        <line x1="180" y1="150" x2="360" y2="150"/>
+        <line x1="225" y1="236" x2="315" y2="236"/>
+      </g>
+      <ellipse cx="270" cy="130" rx="20" ry="34" fill="url(#coreGlow_i)"/>
+      <g filter="url(#glow_i)" opacity=".9"><path d="M270,116 L272,130 L270,150 L268,130 Z" fill="#ffffff"/><path d="M256,131 L270,129 L284,131 L270,133 Z" fill="#ffffff" opacity=".7"/></g>
+      <g filter="url(#glow_i)">
+        <polygon points="270,46 360,150 270,322 180,150" fill="none" stroke="#1ce6ff" stroke-width="5" stroke-linejoin="round"/>
+        <line x1="270" y1="46" x2="270" y2="322" stroke="#cdf6ff" stroke-width="3"/>
+        <line x1="300" y1="80" x2="330" y2="120" stroke="#9b6bff" stroke-width="1.5" opacity=".6"/>
+        <line x1="240" y1="80" x2="212" y2="118" stroke="#ff2bd6" stroke-width="1.5" opacity=".5"/>
+      </g>
+    </g>
+  </svg>
+</svg>
