@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Window Layout Manager — Doug Fessler</title>
+  <title>Window Layout Manager - Doug Fessler</title>
   <meta name="description" content="Save and restore window layouts across monitor setups on Windows. Free portable app by Doug Fessler.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -215,9 +215,6 @@
       color: var(--mk-yellow);
     }
     .out .dim { color: var(--mk-comment); }
-    .req-table { font-size: 0.9rem; border-collapse: collapse; }
-    .req-table td { padding: 0.15rem 1.5rem 0.15rem 0; vertical-align: top; }
-    .req-table td:first-child { color: var(--mk-comment); white-space: nowrap; }
 
     details.notes { margin-top: 0.9rem; font-size: 0.85rem; }
     details.notes summary { cursor: pointer; color: var(--mk-cyan); }
@@ -267,7 +264,7 @@
     <div class="term-window">
       <div class="term-titlebar">
         <span class="term-dots"><span></span><span></span><span></span></span>
-        <span>wlm@dougfessler — ~/window-layout-manager</span>
+        <span>wlm@dougfessler: ~/window-layout-manager</span>
       </div>
       <div class="term-body">
 
@@ -280,7 +277,7 @@
 ╚███╔███╔╝███████╗██║ ╚═╝ ██║
  ╚══╝╚══╝ ╚══════╝╚═╝     ╚═╝  <span class="banner-sub">WINDOW · LAYOUT · MANAGER</span></pre>
         <p class="tagline">Save and restore <em>window layouts</em> across monitor setups on Windows.</p>
-        <p class="byline">// free · portable · no installer · no telemetry — by <a href="/">Doug Fessler</a></p>
+        <p class="byline">// free · portable · no installer · no telemetry · by <a href="/">Doug Fessler</a></p>
 
         <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --download</span></p>
         <div class="download-card">
@@ -304,7 +301,7 @@
         <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial</span></p>
         <div class="tutorial-card">
           <div class="tut-text">
-            <div>New here? The tutorial walks through every feature — profiles, the visual editor, auto-activation, hold mode — in about ten minutes.</div>
+            <div>New here? The tutorial walks through every feature (profiles, the visual editor, auto-activation, hold mode) in about ten minutes.</div>
             <div class="tut-fine">// 13 topics · real screenshots · no fluff</div>
           </div>
           <a class="btn-tutorial" href="tutorial/">open the tutorial</a>
@@ -313,34 +310,34 @@
         <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --features</span></p>
         <div class="out">
           <ul>
-            <li><strong>Layout profiles</strong> — capture every window's position, size, and state; restore with one click, a global hotkey, or the CLI.</li>
-            <li><strong>Monitor-aware</strong> — profiles bind to monitor sets and auto-activate when your displays change: docking, streaming with a virtual display, plugging into a projector.</li>
-            <li><strong>Smart re-matching</strong> — finds the right windows again even after apps restart, titles change, or Windows shoves everything onto one screen.</li>
-            <li><strong>Virtual desktops</strong> — windows go back to the desktop they were saved on.</li>
-            <li><strong>Hold mode</strong> — pin a layout live; if an app moves its window, it gets put back.</li>
-            <li><strong>Visual editor</strong> — drag windows around a minimap of your monitors, with snapping, undo/redo, and per-window history.</li>
-            <li><strong>Scriptable</strong> — <code>--load="Profile"</code> from the command line, <code>wlm://</code> links, taskbar jump list.</li>
-            <li><strong>Self-updating</strong> — checks this page's feed, verifies the download by size + sha256, swaps itself in place.</li>
+            <li><strong>Layout profiles</strong> - Capture every window's position, size, and state. Restore with one click, a global hotkey, or the CLI.</li>
+            <li><strong>Monitor-aware</strong> - Profiles bind to monitor sets and auto-activate when your displays change: docking, streaming with a virtual display, plugging into a projector.</li>
+            <li><strong>Smart re-matching</strong> - Tries to find the right windows again even after apps restart, titles change, or Windows shoves everything onto one screen.</li>
+            <li><strong>Virtual desktops</strong> - Windows go back to the desktop they were saved on.</li>
+            <li><strong>Hold mode</strong> - Pin a layout live. If an app moves its window, it gets put back.</li>
+            <li><strong>Visual editor</strong> - Drag windows around a minimap of your monitors, with snapping, undo/redo, and per-window history.</li>
+            <li><strong>Scriptable</strong> - <code>--load="Profile"</code> from the command line, <code>wlm://</code> links, and the taskbar jump list.</li>
+            <li><strong>Self-updating</strong> - Checks this page's feed, verifies the download by size + sha256, and swaps itself in place.</li>
           </ul>
         </div>
 
         <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --install</span></p>
         <div class="out">
           <ol>
-            <li>Download the zip above and extract it anywhere <span class="dim">(e.g. <code>C:\Apps\WindowLayoutManager</code>)</span>.</li>
+            <li>Download the zip above and extract it anywhere <span class="dim">(e.g., <code>C:\Apps\WindowLayoutManager</code>)</span>.</li>
             <li>Run <code>WindowLayoutManager.exe</code>.</li>
-            <li>Arrange your windows, hit <em>Save layout</em>, done. It lives in the tray.</li>
+            <li>Arrange your windows, hit "Save layout", done. It lives in the tray.</li>
           </ol>
-          <p class="dim" style="margin-top:0.8rem">// SmartScreen may warn on first run — the build is unsigned. "More info" → "Run anyway".</p>
+          <p class="dim" style="margin-top:0.8rem">// SmartScreen may warn on first run since the build is unsigned. "More info" -> "Run anyway".</p>
         </div>
 
         <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --requirements</span></p>
         <div class="out">
-          <table class="req-table">
-            <tr><td>os</td><td>Windows 10 / 11 (x64) — virtual-desktop features need Windows 11</td></tr>
-            <tr><td>install</td><td>none — portable folder, delete it to uninstall</td></tr>
-            <tr><td>network</td><td>only for update checks against this page</td></tr>
-          </table>
+          <ul>
+            <li>os - Windows 10 / 11 (x64). Virtual-desktop features need Windows 11.</li>
+            <li>install - None. It's a portable folder, so deleting the folder uninstalls it.</li>
+            <li>network - Only used for update checks against this page.</li>
+          </ul>
         </div>
 
         <p class="prompt-line cursor"><span class="u">wlm</span><span class="p">:~</span>$&nbsp;</p>
