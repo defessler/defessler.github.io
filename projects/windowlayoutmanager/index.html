@@ -160,6 +160,20 @@
     }
     .btn-tutorial:hover { background: rgba(102, 217, 239, 0.12); color: var(--mk-cyan); text-decoration: none; }
     .btn-tutorial::before { content: '📖 '; }
+    .tutorial-card {
+      background: var(--mk-gutter);
+      border: 1px solid var(--mk-border);
+      border-left: 3px solid var(--mk-cyan);
+      border-radius: 4px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.25rem;
+    }
+    .tut-text { flex: 1; min-width: 240px; }
+    .tut-fine { color: var(--mk-comment); font-size: 0.8rem; margin-top: 0.3rem; }
     .dl-meta { font-size: 0.85rem; color: var(--mk-comment); flex: 1; min-width: 240px; }
     .dl-meta .v { color: var(--mk-purple); }
     .dl-meta .pre-badge {
@@ -272,7 +286,6 @@
         <div class="download-card">
           <a class="btn-download" id="dl-btn"
              href="https://github.com/defessler/WindowLayoutManager-releases/releases/latest">Download for Windows</a>
-          <a class="btn-tutorial" href="tutorial/">tutorial</a>
           <div class="dl-meta">
             <div id="dl-version">latest release<span class="pre-badge" id="dl-pre" hidden>pre-release</span></div>
             <div id="dl-info">x64 · portable .zip</div>
@@ -287,6 +300,15 @@
           <summary>release notes</summary>
           <pre id="notes-body"></pre>
         </details>
+
+        <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial</span></p>
+        <div class="tutorial-card">
+          <div class="tut-text">
+            <div>New here? The tutorial walks through every feature — profiles, the visual editor, auto-activation, hold mode — in about ten minutes.</div>
+            <div class="tut-fine">// 13 topics · real screenshots · no fluff</div>
+          </div>
+          <a class="btn-tutorial" href="tutorial/">open the tutorial</a>
+        </div>
 
         <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --features</span></p>
         <div class="out">
