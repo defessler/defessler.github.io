@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tutorial — Window Layout Manager</title>
+  <meta name="description" content="Walkthrough of every Window Layout Manager feature: profiles, the visual editor, monitor binding, auto-activation, hold mode, virtual desktops, and the CLI.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --mk-bg:      #1e1e1e;
+      --mk-surface: #2d2d2d;
+      --mk-gutter:  #141414;
+      --mk-fg:      #F8F8F2;
+      --mk-comment: #75715E;
+      --mk-pink:    #F92672;
+      --mk-orange:  #FD971F;
+      --mk-yellow:  #E6DB74;
+      --mk-green:   #A6E22E;
+      --mk-cyan:    #66D9EF;
+      --mk-purple:  #AE81FF;
+      --mk-border:  #49483E;
+      --font: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 15px; scroll-behavior: smooth; }
+    body {
+      font-family: var(--font); background: var(--mk-bg); color: var(--mk-fg);
+      line-height: 1.6; min-height: 100vh; overflow-x: hidden; word-break: break-word;
+    }
+    body::after {
+      content: ''; position: fixed; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px,
+        rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px);
+      pointer-events: none; z-index: 9999;
+    }
+    a { color: var(--mk-orange); text-decoration: none; }
+    a:hover { color: var(--mk-yellow); text-decoration: underline; }
+
+    .top-nav {
+      background: var(--mk-gutter); border-bottom: 1px solid var(--mk-border);
+      padding: 0.8rem 1.5rem; display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 0.5rem;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .top-nav .brand {
+      color: var(--mk-green); font-weight: 700;
+      text-shadow: 0.03em 0 0 rgba(249, 38, 114, 0.35), -0.03em 0 0 rgba(102, 217, 239, 0.35);
+    }
+    .top-nav .brand::before { content: '> '; color: var(--mk-comment); }
+    .top-nav .brand:hover { text-decoration: none; color: var(--mk-green); }
+    .top-nav .nav-right { color: var(--mk-comment); font-size: 0.85rem; }
+    .top-nav .nav-right a { margin-left: 1.2rem; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 2.5rem 1rem 4rem; }
+
+    .term-window {
+      background: var(--mk-surface); border: 1px solid var(--mk-border);
+      border-radius: 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.55); overflow: hidden;
+    }
+    .term-titlebar {
+      background: var(--mk-gutter); border-bottom: 1px solid var(--mk-border);
+      padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.75rem;
+      font-size: 0.8rem; color: var(--mk-comment);
+    }
+    .term-dots { display: flex; gap: 6px; }
+    .term-dots span { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+    .term-dots span:nth-child(1) { background: var(--mk-pink); }
+    .term-dots span:nth-child(2) { background: var(--mk-yellow); }
+    .term-dots span:nth-child(3) { background: var(--mk-green); }
+    .term-body { padding: 1.5rem 1.75rem 2rem; }
+
+    .prompt-line { color: var(--mk-comment); margin: 2.6rem 0 0.9rem; font-size: 0.95rem; }
+    .prompt-line:first-child { margin-top: 0; }
+    .prompt-line .u { color: var(--mk-green); }
+    .prompt-line .p { color: var(--mk-cyan); }
+    .prompt-line .cmd { color: var(--mk-fg); font-weight: 500; }
+
+    h1 { font-size: 1.35rem; color: var(--mk-green); margin-bottom: 0.4rem; }
+    h2 { font-size: 1.08rem; color: var(--mk-green); margin-bottom: 0.6rem; }
+    .lede { color: var(--mk-fg); margin-bottom: 0.3rem; }
+    .lede em, p em { color: var(--mk-cyan); font-style: normal; }
+    .dim { color: var(--mk-comment); }
+
+    .toc { list-style: none; column-count: 2; column-gap: 2.5rem; font-size: 0.9rem; }
+    .toc li { padding-left: 1.3rem; position: relative; margin-bottom: 0.3rem; break-inside: avoid; }
+    .toc li::before { content: '▸'; position: absolute; left: 0; color: var(--mk-pink); }
+    @media (max-width: 620px) { .toc { column-count: 1; } }
+
+    section p { margin-bottom: 0.7rem; font-size: 0.95rem; }
+    section ul { list-style: none; margin: 0 0 0.8rem; }
+    section li { padding-left: 1.4rem; position: relative; margin-bottom: 0.45rem; font-size: 0.92rem; }
+    section li::before { content: '▸'; position: absolute; left: 0; color: var(--mk-pink); }
+    section li strong { color: var(--mk-green); font-weight: 600; }
+    code, kbd {
+      background: var(--mk-gutter); border: 1px solid var(--mk-border);
+      border-radius: 3px; padding: 0.05em 0.4em; font-size: 0.85em;
+      color: var(--mk-yellow); font-family: var(--font);
+    }
+    kbd { color: var(--mk-cyan); }
+
+    .shot {
+      margin: 1rem 0 0.4rem; border: 1px solid var(--mk-border); border-radius: 6px;
+      overflow: hidden; background: var(--mk-gutter);
+    }
+    .shot img { display: block; width: 100%; height: auto; }
+    .caption { color: var(--mk-comment); font-size: 0.78rem; margin-bottom: 0.4rem; }
+
+    .tip {
+      background: var(--mk-gutter); border: 1px solid var(--mk-border);
+      border-left: 3px solid var(--mk-cyan); border-radius: 4px;
+      padding: 0.7rem 1rem; font-size: 0.85rem; margin: 0.9rem 0;
+    }
+    .tip::before { content: '// tip: '; color: var(--mk-cyan); }
+
+    .cursor::after { content: '▍'; color: var(--mk-green); animation: blink 1.1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    footer { text-align: center; color: var(--mk-comment); font-size: 0.8rem; padding: 0 1rem 2.5rem; }
+    @media (max-width: 560px) { .term-body { padding: 1.1rem 1rem 1.5rem; } }
+  </style>
+</head>
+<body>
+  <nav class="top-nav">
+    <a class="brand" href="/">Doug Fessler</a>
+    <span class="nav-right">~/window-layout-manager/tutorial
+      <a href="../">download</a>
+    </span>
+  </nav>
+
+  <main>
+    <div class="term-window">
+      <div class="term-titlebar">
+        <span class="term-dots"><span></span><span></span><span></span></span>
+        <span>wlm@dougfessler — ~/window-layout-manager/tutorial</span>
+      </div>
+      <div class="term-body">
+
+        <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial</span></p>
+        <h1>Window Layout Manager — feature walkthrough</h1>
+        <p class="lede">Everything the app does, in the order you'll meet it. Ten minutes, start to finish. Need the app first? <a href="../">Grab it on the download page</a>.</p>
+
+        <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">ls topics/</span></p>
+        <ul class="toc">
+          <li><a href="#basics">The main window</a></li>
+          <li><a href="#profiles">Saving &amp; loading layouts</a></li>
+          <li><a href="#hotkeys">Global hotkeys</a></li>
+          <li><a href="#visual">The visual editor</a></li>
+          <li><a href="#editor">Precise edits, undo &amp; history</a></li>
+          <li><a href="#binding">Monitor binding &amp; auto-activation</a></li>
+          <li><a href="#hold">Hold mode</a></li>
+          <li><a href="#desktops">Virtual desktops</a></li>
+          <li><a href="#palette">Command palette &amp; keyboard</a></li>
+          <li><a href="#updates">Updates</a></li>
+          <li><a href="#blacklist">Blacklist</a></li>
+          <li><a href="#companion">Companion software</a></li>
+          <li><a href="#cli">CLI, links &amp; automation</a></li>
+        </ul>
+
+        <section id="basics">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial basics</span></p>
+          <h2>The main window</h2>
+          <p>Profiles live in the left sidebar; the selected profile's windows fill the right pane. Every row shows the app, its title at save time, and <em>where &amp; how</em> it restores — monitor, virtual desktop, size, position, and state.</p>
+          <div class="shot"><img src="img/01-main-list.png" alt="Main window: profile sidebar and window list" loading="lazy"></div>
+          <p class="caption">The Coding profile: six windows across two monitors and two virtual desktops.</p>
+          <ul>
+            <li><strong>⌨ chip</strong> next to a profile — it has a global hotkey.</li>
+            <li><strong>● / ○ dot</strong> — bound / not bound to a monitor setup (see <a href="#binding">auto-activation</a>).</li>
+            <li><strong>Footer hints</strong> — the whole app drives from the keyboard: <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>Enter</kbd> to load, <kbd>/</kbd> to filter, <kbd>?</kbd> for the full map.</li>
+          </ul>
+        </section>
+
+        <section id="profiles">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial profiles</span></p>
+          <h2>Saving &amp; loading layouts</h2>
+          <p>Arrange your windows the way you like, hit <em>+ new profile</em>, name it — done. WLM captures every visible window's position, size, state (normal / minimized / maximized), monitor, and virtual desktop.</p>
+          <ul>
+            <li><strong>Load</strong> puts every captured window back — even after apps restarted, titles changed, or Windows shoved everything onto one screen. The matcher re-finds windows by process, class, title signature, owner identity, and position.</li>
+            <li><strong>Update</strong> re-captures the current arrangement into the selected profile (your hotkey, binding, and history are preserved).</li>
+            <li><strong>Load details</strong> shows a per-window report of the last load — what matched, what moved, what was missing.</li>
+            <li>Apps that open their windows late (IDEs re-floating tool panels, Electron apps) are <strong>re-applied automatically</strong> for up to ~2 minutes after a load.</li>
+          </ul>
+          <div class="tip">Profiles are plain JSON in <code>%APPDATA%\window-layout-manager\profiles</code> (the FOLDER button opens it) — hand-editable, with schema autocomplete in most editors.</div>
+        </section>
+
+        <section id="hotkeys">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial hotkeys</span></p>
+          <h2>Global hotkeys</h2>
+          <p>Click the hotkey chip on any profile to bind a system-wide shortcut. Press the combination you want — WLM records it live and warns about conflicts with other profiles or the auto-activation hotkey.</p>
+          <div class="shot"><img src="img/04-hotkey-capture.png" alt="Hotkey capture modal" loading="lazy"></div>
+          <p class="caption">Hotkeys fire from anywhere — no need for the WLM window to be open.</p>
+        </section>
+
+        <section id="visual">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial visual</span></p>
+          <h2>The visual editor</h2>
+          <p>Switch the view to <em>VISUAL</em> for a live minimap of your saved layout: monitors to scale, one tab per virtual desktop, every window draggable.</p>
+          <div class="shot"><img src="img/02-visual-editor.png" alt="Visual editor with two monitors" loading="lazy"></div>
+          <p class="caption">Drag to move, corner-drag to resize; edges snap to monitors and other windows (<kbd>Alt</kbd> disables snapping).</p>
+          <ul>
+            <li>Select a window to get <strong>Edit / Block app / Remove</strong> in the panel below the canvas.</li>
+            <li>Drag a window between monitors — its target monitor and relative position update automatically.</li>
+            <li>Edits auto-save after a beat; the <em>unsaved</em> badge tells you when a write is pending.</li>
+          </ul>
+        </section>
+
+        <section id="editor">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial editing</span></p>
+          <h2>Precise edits, undo &amp; history</h2>
+          <p>The EDIT button (list view) or Edit panel (visual view) opens exact fields for any window: desktop, monitor, state, and pixel-perfect X/Y/width/height.</p>
+          <div class="shot"><img src="img/03-window-editor.png" alt="Per-window editor modal" loading="lazy"></div>
+          <ul>
+            <li><kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd> — undo/redo any edit, with a labeled trail.</li>
+            <li><kbd>Ctrl+H</kbd> or <strong>History</strong> — browse and restore full saved versions of the profile (every Update keeps a snapshot).</li>
+            <li>Windows tracked live (see <a href="#hold">Hold mode</a>) also keep a <strong>per-window position history</strong> you can roll back individually.</li>
+          </ul>
+        </section>
+
+        <section id="binding">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial auto-activation</span></p>
+          <h2>Monitor binding &amp; auto-activation</h2>
+          <p>Bind a profile to your current monitor setup and WLM can restore it <em>by itself</em> whenever that setup reappears — docking the laptop, starting a Parsec session with a virtual display, plugging into the projector.</p>
+          <div class="shot"><img src="img/06-settings-autoactivation.png" alt="Auto-activation settings tab" loading="lazy"></div>
+          <ul>
+            <li><strong>Triggers</strong> — on monitor change, at app launch, and/or a dedicated hotkey. All off by default; you opt in.</li>
+            <li><strong>Best-guess remap</strong> — when your monitors <em>almost</em> match a saved setup, WLM picks the closest mapping, applies it, and remembers the decision so it never asks twice.</li>
+            <li>The <strong>Status</strong> panel logs every decision auto-activation makes, so you can always see why a profile did (or didn't) fire.</li>
+          </ul>
+        </section>
+
+        <section id="hold">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial hold</span></p>
+          <h2>Hold mode</h2>
+          <p>The <em>Hold layout</em> toggle (next to the hotkey chip) pins a profile as the live layout. While holding, WLM watches your windows a few times a second:</p>
+          <ul>
+            <li>An app moves or resizes its own window? It's put straight back.</li>
+            <li><em>You</em> drag a window yourself? WLM records the move into the profile instead of fighting you — your layout evolves as you work.</li>
+            <li>Loading a different profile releases the hold automatically; explicit action always wins.</li>
+          </ul>
+          <div class="tip">Hold is ideal for apps that "helpfully" reposition themselves after fullscreen games, RDP sessions, or monitor sleep.</div>
+        </section>
+
+        <section id="desktops">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial desktops</span></p>
+          <h2>Virtual desktops</h2>
+          <p>On Windows 11, profiles capture which virtual desktop each window lives on, and Load sends every window back to its desktop — creating missing desktops if the profile needs more than currently exist. The visual editor shows one tab per desktop; the per-window editor lets you reassign a window to any desktop, or leave it <em>unmapped</em> to stay wherever it is.</p>
+        </section>
+
+        <section id="palette">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial keyboard</span></p>
+          <h2>Command palette &amp; keyboard</h2>
+          <p><kbd>Ctrl+K</kbd> opens the command palette: every action and every profile, fuzzy-searchable.</p>
+          <div class="shot"><img src="img/09-command-palette.png" alt="Command palette" loading="lazy"></div>
+          <ul>
+            <li>Vim-style navigation everywhere: <kbd>j</kbd>/<kbd>k</kbd>, <kbd>gg</kbd>/<kbd>G</kbd>, <kbd>/</kbd> filter, <kbd>Tab</kbd> to switch panes.</li>
+            <li>Single-key actions on the focused profile: <kbd>Enter</kbd> load, <kbd>r</kbd> rename, <kbd>d</kbd> delete, <kbd>n</kbd> new.</li>
+            <li><kbd>?</kbd> shows the complete keyboard reference.</li>
+          </ul>
+        </section>
+
+        <section id="updates">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial updates</span></p>
+          <h2>Updates</h2>
+          <p>WLM checks <a href="../">this site's update feed</a> on launch and on a schedule you control. When a new build is out, a badge appears in the title bar; one click downloads, verifies the file against its published size and sha256, and swaps the new build in place.</p>
+          <div class="shot"><img src="img/05-settings-updates.png" alt="Updates settings tab" loading="lazy"></div>
+        </section>
+
+        <section id="blacklist">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial blacklist</span></p>
+          <h2>Blacklist</h2>
+          <p>Keep noise out of your captures. Rules match on process name, window class, or title — the <em>Block app</em> button in the visual editor adds one in a click. Blacklisted windows are ignored at save <em>and</em> at load.</p>
+          <div class="shot"><img src="img/07-settings-blacklist.png" alt="Blacklist settings tab" loading="lazy"></div>
+        </section>
+
+        <section id="companion">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial companions</span></p>
+          <h2>Companion software</h2>
+          <p>The Companion tab detects complementary tools — PowerToys for live drag-snap zones, virtual display drivers for headless monitors, Windows Terminal and PowerShell 7 for scripting — and offers one-click installs for whatever's missing.</p>
+          <div class="shot"><img src="img/08-settings-companion.png" alt="Companion software settings tab" loading="lazy"></div>
+        </section>
+
+        <section id="cli">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial cli</span></p>
+          <h2>CLI, links &amp; automation</h2>
+          <ul>
+            <li><code>WindowLayoutManager.exe --load="Coding"</code> — load a profile from a script, Task Scheduler job, or Stream Deck button. Works whether or not WLM is already running.</li>
+            <li><code>wlm://load/Coding</code> — the same, as a clickable link. <code>wlm://show</code> raises the window.</li>
+            <li><strong>Taskbar jump list</strong> — right-click the WLM taskbar icon for one-click profile loads.</li>
+            <li><strong>Post-load hook</strong> — a profile's JSON can carry a <code>postLoad</code> command (e.g. switch an OBS scene) that runs after a successful load.</li>
+            <li>WLM lives in the <strong>tray</strong>: closing the window keeps hotkeys, hold mode, and auto-activation running.</li>
+          </ul>
+        </section>
+
+        <p class="prompt-line cursor"><span class="u">wlm</span><span class="p">:~</span>$&nbsp;</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <a href="../">download</a> · <a href="/">dougfessler.com</a> · © Doug Fessler
+  </footer>
+</body>
+</html>
