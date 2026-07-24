@@ -106,6 +106,9 @@
     .shot {
       margin: 1rem 0 0.4rem; border: 1px solid var(--mk-border); border-radius: 6px;
       overflow: hidden; background: var(--mk-gutter);
+      /* Lift screenshots above the fixed scanline overlay (z-index 9999)
+         so they stay crisp while the rest of the page keeps the effect. */
+      position: relative; z-index: 10000;
     }
     .shot img { display: block; width: 100%; height: auto; }
     .caption { color: var(--mk-comment); font-size: 0.78rem; margin-bottom: 0.4rem; }
