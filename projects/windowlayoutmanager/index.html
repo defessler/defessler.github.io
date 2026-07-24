@@ -146,6 +146,20 @@
     }
     .btn-download:hover { background: var(--mk-yellow); color: #141414; text-decoration: none; }
     .btn-download::before { content: '⭳ '; }
+    .btn-tutorial {
+      display: inline-block;
+      background: transparent;
+      color: var(--mk-cyan);
+      border: 1px solid var(--mk-cyan);
+      font-weight: 700;
+      font-family: var(--font);
+      font-size: 1rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .btn-tutorial:hover { background: rgba(102, 217, 239, 0.12); color: var(--mk-cyan); text-decoration: none; }
+    .btn-tutorial::before { content: '📖 '; }
     .dl-meta { font-size: 0.85rem; color: var(--mk-comment); flex: 1; min-width: 240px; }
     .dl-meta .v { color: var(--mk-purple); }
     .dl-meta .pre-badge {
@@ -258,13 +272,13 @@
         <div class="download-card">
           <a class="btn-download" id="dl-btn"
              href="https://github.com/defessler/WindowLayoutManager-releases/releases/latest">Download for Windows</a>
+          <a class="btn-tutorial" href="tutorial/">tutorial</a>
           <div class="dl-meta">
             <div id="dl-version">latest release<span class="pre-badge" id="dl-pre" hidden>pre-release</span></div>
             <div id="dl-info">x64 · portable .zip</div>
             <div class="dl-sha" id="dl-sha" hidden>sha256: <span class="h" id="dl-sha-hex"></span></div>
           </div>
           <div class="dl-links">
-            <a href="tutorial/">tutorial</a>
             <a href="https://github.com/defessler/WindowLayoutManager-releases/releases">all releases</a>
             <a href="updates.json">update feed</a>
           </div>
