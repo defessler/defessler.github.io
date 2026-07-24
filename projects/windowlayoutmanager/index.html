@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Window Layout Manager — Doug Fessler</title>
+  <meta name="description" content="Save and restore window layouts across monitor setups on Windows. Free portable app by Doug Fessler.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --mk-bg:      #1e1e1e;
+      --mk-surface: #2d2d2d;
+      --mk-gutter:  #141414;
+      --mk-fg:      #F8F8F2;
+      --mk-comment: #75715E;
+      --mk-pink:    #F92672;
+      --mk-orange:  #FD971F;
+      --mk-yellow:  #E6DB74;
+      --mk-green:   #A6E22E;
+      --mk-cyan:    #66D9EF;
+      --mk-purple:  #AE81FF;
+      --mk-border:  #49483E;
+      --font: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 15px; scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--mk-bg);
+      color: var(--mk-fg);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+      word-break: break-word;
+    }
+    /* Scanline overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg,
+        transparent, transparent 3px,
+        rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px);
+      pointer-events: none;
+      z-index: 9999;
+    }
+    a { color: var(--mk-orange); text-decoration: none; }
+    a:hover { color: var(--mk-yellow); text-decoration: underline; }
+
+    .top-nav {
+      background: var(--mk-gutter);
+      border-bottom: 1px solid var(--mk-border);
+      padding: 0.8rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .top-nav .brand {
+      color: var(--mk-green);
+      font-weight: 700;
+      text-shadow: 0.03em 0 0 rgba(249, 38, 114, 0.35), -0.03em 0 0 rgba(102, 217, 239, 0.35);
+    }
+    .top-nav .brand::before { content: '> '; color: var(--mk-comment); }
+    .top-nav .brand:hover { text-decoration: none; color: var(--mk-green); }
+    .top-nav .nav-right { color: var(--mk-comment); font-size: 0.85rem; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 2.5rem 1rem 4rem; }
+
+    .term-window {
+      background: var(--mk-surface);
+      border: 1px solid var(--mk-border);
+      border-radius: 6px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+      overflow: hidden;
+    }
+    .term-titlebar {
+      background: var(--mk-gutter);
+      border-bottom: 1px solid var(--mk-border);
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.8rem;
+      color: var(--mk-comment);
+    }
+    .term-dots { display: flex; gap: 6px; }
+    .term-dots span { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+    .term-dots span:nth-child(1) { background: var(--mk-pink); }
+    .term-dots span:nth-child(2) { background: var(--mk-yellow); }
+    .term-dots span:nth-child(3) { background: var(--mk-green); }
+    .term-body { padding: 1.5rem 1.75rem 2rem; }
+
+    .prompt-line {
+      color: var(--mk-comment);
+      margin: 2.2rem 0 0.9rem;
+      font-size: 0.95rem;
+    }
+    .prompt-line:first-child { margin-top: 0; }
+    .prompt-line .u { color: var(--mk-green); }
+    .prompt-line .p { color: var(--mk-cyan); }
+    .prompt-line .cmd { color: var(--mk-fg); font-weight: 500; }
+
+    .banner {
+      color: var(--mk-green);
+      font-size: clamp(0.55rem, 2.4vw, 0.95rem);
+      line-height: 1.25;
+      overflow-x: auto;
+      text-shadow: 0.06em 0 0 rgba(249, 38, 114, 0.3), -0.06em 0 0 rgba(102, 217, 239, 0.3);
+      margin-bottom: 0.75rem;
+    }
+    .banner-sub { color: var(--mk-pink); letter-spacing: 0.08em; text-shadow: none; }
+    h1 { position: absolute; left: -9999px; } /* banner is the visual h1; keep a real one for a11y/SEO */
+    .tagline { color: var(--mk-fg); font-size: 1.05rem; margin-bottom: 0.35rem; }
+    .tagline em { color: var(--mk-cyan); font-style: normal; }
+    .byline { color: var(--mk-comment); font-size: 0.85rem; }
+    .byline a { color: var(--mk-comment); text-decoration: underline; }
+    .byline a:hover { color: var(--mk-yellow); }
+
+    .download-card {
+      background: var(--mk-gutter);
+      border: 1px solid var(--mk-border);
+      border-left: 3px solid var(--mk-green);
+      border-radius: 4px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1.25rem;
+    }
+    .btn-download {
+      display: inline-block;
+      background: var(--mk-green);
+      color: #141414;
+      font-weight: 700;
+      font-family: var(--font);
+      font-size: 1rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-download:hover { background: var(--mk-yellow); color: #141414; text-decoration: none; }
+    .btn-download::before { content: '⭳ '; }
+    .dl-meta { font-size: 0.85rem; color: var(--mk-comment); flex: 1; min-width: 240px; }
+    .dl-meta .v { color: var(--mk-purple); }
+    .dl-meta .pre-badge {
+      color: var(--mk-orange);
+      border: 1px solid var(--mk-orange);
+      border-radius: 3px;
+      padding: 0 0.4em;
+      font-size: 0.75rem;
+      margin-left: 0.4em;
+    }
+    .dl-sha {
+      margin-top: 0.4rem;
+      font-size: 0.72rem;
+      color: var(--mk-comment);
+      word-break: break-all;
+    }
+    .dl-sha .h { color: var(--mk-cyan); }
+    .dl-links { width: 100%; font-size: 0.85rem; color: var(--mk-comment); }
+    .dl-links a { margin-right: 1.25rem; }
+
+    .out { font-size: 0.95rem; }
+    .out ul { list-style: none; }
+    .out li { padding-left: 1.4rem; position: relative; margin-bottom: 0.55rem; }
+    .out li::before { content: '▸'; position: absolute; left: 0; color: var(--mk-pink); }
+    .out li strong { color: var(--mk-green); font-weight: 600; }
+    .out ol { list-style: none; counter-reset: step; }
+    .out ol li { counter-increment: step; }
+    .out ol li::before {
+      content: counter(step) '.';
+      color: var(--mk-cyan);
+      left: 0;
+    }
+    .out code {
+      background: var(--mk-gutter);
+      border: 1px solid var(--mk-border);
+      border-radius: 3px;
+      padding: 0.05em 0.4em;
+      font-size: 0.85em;
+      color: var(--mk-yellow);
+    }
+    .out .dim { color: var(--mk-comment); }
+    .req-table { font-size: 0.9rem; border-collapse: collapse; }
+    .req-table td { padding: 0.15rem 1.5rem 0.15rem 0; vertical-align: top; }
+    .req-table td:first-child { color: var(--mk-comment); white-space: nowrap; }
+
+    details.notes { margin-top: 0.9rem; font-size: 0.85rem; }
+    details.notes summary { cursor: pointer; color: var(--mk-cyan); }
+    details.notes pre {
+      margin-top: 0.6rem;
+      padding: 0.9rem 1.1rem;
+      background: var(--mk-gutter);
+      border: 1px solid var(--mk-border);
+      border-radius: 4px;
+      white-space: pre-wrap;
+      font-family: var(--font);
+      font-size: 0.8rem;
+      color: var(--mk-fg);
+      max-height: 340px;
+      overflow-y: auto;
+    }
+
+    .cursor::after {
+      content: '▍';
+      color: var(--mk-green);
+      animation: blink 1.1s steps(1) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    footer {
+      text-align: center;
+      color: var(--mk-comment);
+      font-size: 0.8rem;
+      padding: 0 1rem 2.5rem;
+    }
+    @media (max-width: 560px) {
+      .term-body { padding: 1.1rem 1rem 1.5rem; }
+      .download-card { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-nav">
+    <a class="brand" href="/">Doug Fessler</a>
+    <span class="nav-right">~/projects/window-layout-manager</span>
+  </nav>
+
+  <main>
+    <h1>Window Layout Manager</h1>
+    <div class="term-window">
+      <div class="term-titlebar">
+        <span class="term-dots"><span></span><span></span><span></span></span>
+        <span>wlm@dougfessler — ~/window-layout-manager</span>
+      </div>
+      <div class="term-body">
+
+        <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --about</span></p>
+        <pre class="banner" aria-hidden="true">
+██╗    ██╗██╗     ███╗   ███╗
+██║    ██║██║     ████╗ ████║
+██║ █╗ ██║██║     ██╔████╔██║
+██║███╗██║██║     ██║╚██╔╝██║
+╚███╔███╔╝███████╗██║ ╚═╝ ██║
+ ╚══╝╚══╝ ╚══════╝╚═╝     ╚═╝  <span class="banner-sub">WINDOW · LAYOUT · MANAGER</span></pre>
+        <p class="tagline">Save and restore <em>window layouts</em> across monitor setups on Windows.</p>
+        <p class="byline">// free · portable · no installer · no telemetry — by <a href="/">Doug Fessler</a></p>
+
+        <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --download</span></p>
+        <div class="download-card">
+          <a class="btn-download" id="dl-btn"
+             href="https://github.com/defessler/WindowLayoutManager-releases/releases/latest">Download for Windows</a>
+          <div class="dl-meta">
+            <div id="dl-version">latest release<span class="pre-badge" id="dl-pre" hidden>pre-release</span></div>
+            <div id="dl-info">x64 · portable .zip</div>
+            <div class="dl-sha" id="dl-sha" hidden>sha256: <span class="h" id="dl-sha-hex"></span></div>
+          </div>
+          <div class="dl-links">
+            <a href="https://github.com/defessler/WindowLayoutManager-releases/releases">all releases</a>
+            <a href="updates.json">update feed</a>
+          </div>
+        </div>
+        <details class="notes" id="notes-wrap" hidden>
+          <summary>release notes</summary>
+          <pre id="notes-body"></pre>
+        </details>
+
+        <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --features</span></p>
+        <div class="out">
+          <ul>
+            <li><strong>Layout profiles</strong> — capture every window's position, size, and state; restore with one click, a global hotkey, or the CLI.</li>
+            <li><strong>Monitor-aware</strong> — profiles bind to monitor sets and auto-activate when your displays change: docking, streaming with a virtual display, plugging into a projector.</li>
+            <li><strong>Smart re-matching</strong> — finds the right windows again even after apps restart, titles change, or Windows shoves everything onto one screen.</li>
+            <li><strong>Virtual desktops</strong> — windows go back to the desktop they were saved on.</li>
+            <li><strong>Hold mode</strong> — pin a layout live; if an app moves its window, it gets put back.</li>
+            <li><strong>Visual editor</strong> — drag windows around a minimap of your monitors, with snapping, undo/redo, and per-window history.</li>
+            <li><strong>Scriptable</strong> — <code>--load="Profile"</code> from the command line, <code>wlm://</code> links, taskbar jump list.</li>
+            <li><strong>Self-updating</strong> — checks this page's feed, verifies the download by size + sha256, swaps itself in place.</li>
+          </ul>
+        </div>
+
+        <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --install</span></p>
+        <div class="out">
+          <ol>
+            <li>Download the zip above and extract it anywhere <span class="dim">(e.g. <code>C:\Apps\WindowLayoutManager</code>)</span>.</li>
+            <li>Run <code>WindowLayoutManager.exe</code>.</li>
+            <li>Arrange your windows, hit <em>Save layout</em>, done. It lives in the tray.</li>
+          </ol>
+          <p class="dim" style="margin-top:0.8rem">// SmartScreen may warn on first run — the build is unsigned. "More info" → "Run anyway".</p>
+        </div>
+
+        <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --requirements</span></p>
+        <div class="out">
+          <table class="req-table">
+            <tr><td>os</td><td>Windows 10 / 11 (x64) — virtual-desktop features need Windows 11</td></tr>
+            <tr><td>install</td><td>none — portable folder, delete it to uninstall</td></tr>
+            <tr><td>network</td><td>only for update checks against this page</td></tr>
+          </table>
+        </div>
+
+        <p class="prompt-line cursor"><span class="u">wlm</span><span class="p">:~</span>$&nbsp;</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <a href="/">dougfessler.com</a> · © Doug Fessler
+  </footer>
+
+  <script>
+    // Fill the download card from the same manifest the in-app updater
+    // polls, so this page and the app can never disagree about "latest".
+    (async () => {
+      try {
+        const res = await fetch('updates.json', { cache: 'no-cache' });
+        if (!res.ok) return;
+        const feed = await res.json();
+        const l = feed && feed.latest;
+        if (!l || !l.url || !l.version) return;
+        document.getElementById('dl-btn').href = l.url;
+        document.getElementById('dl-version').firstChild.textContent = 'v' + l.version;
+        if (l.prerelease) document.getElementById('dl-pre').hidden = false;
+        const parts = ['x64 · portable .zip'];
+        if (l.sizeBytes) parts.push((l.sizeBytes / (1024 * 1024)).toFixed(1) + ' MB');
+        if (l.publishedAt) {
+          const d = new Date(l.publishedAt);
+          if (!isNaN(d)) parts.push(d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }));
+        }
+        document.getElementById('dl-info').textContent = parts.join(' · ');
+        const sha = String(l.sha256 || '').replace(/^sha256:/i, '');
+        if (/^[0-9a-f]{64}$/i.test(sha)) {
+          document.getElementById('dl-sha-hex').textContent = sha;
+          document.getElementById('dl-sha').hidden = false;
+        }
+        if (l.notes) {
+          document.getElementById('notes-body').textContent = l.notes;
+          document.getElementById('notes-wrap').hidden = false;
+        }
+      } catch (_) { /* static fallbacks already link to the releases page */ }
+    })();
+  </script>
+</body>
+</html>
