@@ -89,6 +89,8 @@
     .toc li::before { content: '▸'; position: absolute; left: 0; color: var(--mk-pink); }
     @media (max-width: 620px) { .toc { column-count: 1; } }
 
+    /* Anchor jumps must clear the sticky nav, or it covers the heading. */
+    section { scroll-margin-top: 4.5rem; }
     section p { margin-bottom: 0.7rem; font-size: 0.95rem; }
     section ul { list-style: none; margin: 0 0 0.8rem; }
     section li { padding-left: 1.4rem; position: relative; margin-bottom: 0.45rem; font-size: 0.92rem; }
@@ -119,6 +121,18 @@
     @keyframes blink { 50% { opacity: 0; } }
 
     footer { text-align: center; color: var(--mk-comment); font-size: 0.8rem; padding: 0 1rem 2.5rem; }
+
+    #backtotop {
+      position: fixed; right: 1.2rem; bottom: 1.2rem; z-index: 200;
+      background: var(--mk-gutter); color: var(--mk-cyan);
+      border: 1px solid var(--mk-cyan); border-radius: 4px;
+      font-family: var(--font); font-size: 0.85rem; font-weight: 600;
+      padding: 0.5rem 0.9rem; cursor: pointer;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    #backtotop.show { opacity: 1; pointer-events: auto; }
+    #backtotop:hover { background: rgba(102, 217, 239, 0.12); }
+
     @media (max-width: 560px) { .term-body { padding: 1.1rem 1rem 1.5rem; } }
   </style>
 </head>
@@ -301,5 +315,12 @@
   <footer>
     <a href="../">download</a> · <a href="/">dougfessler.com</a> · © Doug Fessler
   </footer>
+
+  <button id="backtotop" title="back to top (vim: gg)">↑ gg</button>
+  <script>
+    const btt = document.getElementById('backtotop');
+    addEventListener('scroll', () => btt.classList.toggle('show', scrollY > 400), { passive: true });
+    btt.addEventListener('click', () => scrollTo({ top: 0, behavior: 'smooth' }));
+  </script>
 </body>
 </html>
