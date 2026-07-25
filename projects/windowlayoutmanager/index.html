@@ -364,7 +364,7 @@
         document.getElementById('dl-version').firstChild.textContent = 'v' + l.version;
         if (l.prerelease) document.getElementById('dl-pre').hidden = false;
         const parts = ['x64 · portable .zip'];
-        if (l.sizeBytes) parts.push((l.sizeBytes / (1024 * 1024)).toFixed(1) + ' MB');
+        if (l.sizeBytes) parts.push((l.sizeBytes / 1e6).toFixed(1) + ' MB');
         if (l.publishedAt) {
           const d = new Date(l.publishedAt);
           if (!isNaN(d)) parts.push(d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }));

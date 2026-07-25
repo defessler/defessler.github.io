@@ -93,6 +93,12 @@
 
     /* Anchor jumps must clear the sticky nav, or it covers the heading. */
     section { scroll-margin-top: 4.5rem; }
+    @media (max-width: 560px) {
+      /* Keep the nav one row on phones (drop the decorative path) and
+         leave headroom in case it still wraps. */
+      .nav-path { display: none; }
+      section { scroll-margin-top: 5.5rem; }
+    }
     section p { margin-bottom: 0.7rem; font-size: 0.95rem; }
     section ul { list-style: none; margin: 0 0 0.8rem; }
     section li { padding-left: 1.4rem; position: relative; margin-bottom: 0.45rem; font-size: 0.92rem; }
@@ -133,9 +139,11 @@
       border: 1px solid var(--mk-cyan); border-radius: 4px;
       font-family: var(--font); font-size: 0.85rem; font-weight: 600;
       padding: 0.5rem 0.9rem; cursor: pointer;
-      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+      /* visibility too: opacity alone leaves an invisible keyboard tab stop */
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 0.2s, visibility 0.2s;
     }
-    #backtotop.show { opacity: 1; pointer-events: auto; }
+    #backtotop.show { opacity: 1; visibility: visible; pointer-events: auto; }
     #backtotop:hover { background: rgba(102, 217, 239, 0.12); }
 
     @media (max-width: 560px) { .term-body { padding: 1.1rem 1rem 1.5rem; } }
@@ -144,7 +152,7 @@
 <body>
   <nav class="top-nav">
     <a class="brand" href="/">Doug Fessler</a>
-    <span class="nav-right">~/window-layout-manager/tutorial
+    <span class="nav-right"><span class="nav-path">~/window-layout-manager/tutorial</span>
       <a href="../">download</a>
     </span>
   </nav>
@@ -322,7 +330,7 @@
     <a href="../">download</a> · <a href="/">dougfessler.com</a> · © Doug Fessler
   </footer>
 
-  <button id="backtotop" title="back to top (vim: gg)">↑ gg</button>
+  <button id="backtotop" aria-label="Back to top" title="back to top (vim: gg)">↑ gg</button>
   <script>
     const btt = document.getElementById('backtotop');
     addEventListener('scroll', () => btt.classList.toggle('show', scrollY > 400), { passive: true });
