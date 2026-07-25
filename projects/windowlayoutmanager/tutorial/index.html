@@ -43,7 +43,9 @@
       background: var(--mk-gutter); border-bottom: 1px solid var(--mk-border);
       padding: 0.8rem 1.5rem; display: flex; justify-content: space-between;
       align-items: center; flex-wrap: wrap; gap: 0.5rem;
-      position: sticky; top: 0; z-index: 100;
+      /* Above the screenshots (10000), which sit above the scanline
+         overlay (9999) — otherwise images slide over the bar on scroll. */
+      position: sticky; top: 0; z-index: 10001;
     }
     .top-nav .brand {
       color: var(--mk-green); font-weight: 700;
@@ -126,7 +128,7 @@
     footer { text-align: center; color: var(--mk-comment); font-size: 0.8rem; padding: 0 1rem 2.5rem; }
 
     #backtotop {
-      position: fixed; right: 1.2rem; bottom: 1.2rem; z-index: 200;
+      position: fixed; right: 1.2rem; bottom: 1.2rem; z-index: 10001;
       background: var(--mk-gutter); color: var(--mk-cyan);
       border: 1px solid var(--mk-cyan); border-radius: 4px;
       font-family: var(--font); font-size: 0.85rem; font-weight: 600;
