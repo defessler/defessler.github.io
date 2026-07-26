@@ -55,23 +55,49 @@
     .top-nav .brand:hover { text-decoration: none; color: var(--mk-green); }
     .top-nav .nav-right { color: var(--mk-comment); font-size: 0.85rem; }
     .top-nav .nav-right a { margin-left: 1.2rem; }
-    /* Filled chip, matching the splash page exactly. */
+    /* Filled cyan chip with the shimmer sweep, matching the splash page. */
     .nav-coffee {
-      background: var(--mk-yellow);
-      color: #141414;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      background: var(--mk-cyan);
+      color: #08222b;
       border-radius: 3px;
       padding: 0.28rem 0.75rem;
       font-weight: 700;
       white-space: nowrap;
-      transition: background 0.12s, transform 0.12s;
+      transition: background 0.12s, transform 0.12s, box-shadow 0.12s;
     }
     .nav-coffee:hover {
-      background: var(--mk-green);
-      color: #141414;
+      background: #8ce8fa;
+      color: #08222b;
       text-decoration: none;
       transform: translateY(-1px);
+      box-shadow: 0 2px 10px rgba(102, 217, 239, 0.35);
     }
     .nav-coffee::before { content: '☕ '; }
+    .nav-coffee::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg,
+        transparent 35%,
+        rgba(255, 255, 255, 0.85) 50%,
+        transparent 65%);
+      transform: translateX(-130%);
+      pointer-events: none;
+    }
+    .nav-coffee.shimmer::after {
+      animation: coffee-shimmer 0.95s cubic-bezier(0.25, 0.6, 0.3, 1);
+    }
+    @keyframes coffee-shimmer {
+      from { transform: translateX(-130%); }
+      to   { transform: translateX(130%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .nav-coffee.shimmer::after { animation: none; }
+      .nav-coffee:hover { transform: none; }
+    }
 
     main { max-width: 900px; margin: 0 auto; padding: 2.5rem 1rem 4rem; }
 
@@ -176,7 +202,7 @@
     <span class="nav-right"><span class="nav-path">~/window-layout-manager/tutorial</span>
       <a href="../">download</a>
       <a class="nav-coffee" href="https://ko-fi.com/dougfessler" target="_blank" rel="noopener"
-         title="Buy me a coffee (opens ko-fi.com)">make coffee</a>
+         title="Opens ko-fi.com">buy me a coffee</a>
     </span>
   </nav>
 
@@ -358,6 +384,24 @@
     const btt = document.getElementById('backtotop');
     addEventListener('scroll', () => btt.classList.toggle('show', scrollY > 400), { passive: true });
     btt.addEventListener('click', () => scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // Random shimmer on the donate chip — see the splash page for why the
+    // interval is randomised rather than a fixed CSS animation.
+    (() => {
+      const chips = document.querySelectorAll('.nav-coffee');
+      if (!chips.length) return;
+      if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      chips.forEach((chip) => {
+        const sweep = () => {
+          if (document.hidden) return;
+          chip.classList.add('shimmer');
+          setTimeout(() => chip.classList.remove('shimmer'), 1000);
+        };
+        const schedule = () => setTimeout(() => { sweep(); schedule(); },
+          5000 + Math.random() * 9000);
+        setTimeout(() => { sweep(); schedule(); }, 1200 + Math.random() * 1800);
+      });
+    })();
   </script>
 </body>
 </html>

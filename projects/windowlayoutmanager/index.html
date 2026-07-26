@@ -178,25 +178,53 @@
     /* Donate: a quiet nav-bar link rather than a section of its own.
        Muted by default so it never competes with the download CTA, and
        deliberately not Ko-fi's own branding - the page has its voice. */
-    /* Filled chip: the header bar is otherwise all muted text, so a solid
-       yellow block is the one thing in it that reads as a button. Still
-       small, and yellow keeps it distinct from the green download CTA. */
+    /* Filled cyan chip: the header bar is otherwise all muted text, so a
+       solid block is the one thing in it that reads as a button. */
     .nav-coffee {
-      background: var(--mk-yellow);
-      color: #141414;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      background: var(--mk-cyan);
+      color: #08222b;
       border-radius: 3px;
       padding: 0.28rem 0.75rem;
       font-weight: 700;
       white-space: nowrap;
-      transition: background 0.12s, transform 0.12s;
+      transition: background 0.12s, transform 0.12s, box-shadow 0.12s;
     }
     .nav-coffee:hover {
-      background: var(--mk-green);
-      color: #141414;
+      background: #8ce8fa;
+      color: #08222b;
       text-decoration: none;
       transform: translateY(-1px);
+      box-shadow: 0 2px 10px rgba(102, 217, 239, 0.35);
     }
     .nav-coffee::before { content: '☕ '; }
+    /* Shimmer: a light band sweeping across the chip, fired at random
+       intervals by the script at the end of the body (CSS alone can only
+       do fixed cadences, which reads as a metronome). */
+    .nav-coffee::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg,
+        transparent 35%,
+        rgba(255, 255, 255, 0.85) 50%,
+        transparent 65%);
+      transform: translateX(-130%);
+      pointer-events: none;
+    }
+    .nav-coffee.shimmer::after {
+      animation: coffee-shimmer 0.95s cubic-bezier(0.25, 0.6, 0.3, 1);
+    }
+    @keyframes coffee-shimmer {
+      from { transform: translateX(-130%); }
+      to   { transform: translateX(130%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .nav-coffee.shimmer::after { animation: none; }
+      .nav-coffee:hover { transform: none; }
+    }
     /* Drop the decorative path on phones so the bar keeps to one row now
        that it carries two links. */
     @media (max-width: 560px) { .nav-path { display: none; } }
@@ -283,7 +311,7 @@
     <span class="nav-right"><span class="nav-path">~/projects/window-layout-manager</span>
       <a href="tutorial/" style="margin-left:1.2rem">tutorial</a>
       <a class="nav-coffee" href="https://ko-fi.com/dougfessler" target="_blank" rel="noopener"
-         style="margin-left:1.2rem" title="Buy me a coffee (opens ko-fi.com)">make coffee</a>
+         style="margin-left:1.2rem" title="Opens ko-fi.com">buy me a coffee</a>
     </span>
   </nav>
 
@@ -410,6 +438,26 @@
           document.getElementById('notes-wrap').hidden = false;
         }
       } catch (_) { /* static fallbacks already link to the releases page */ }
+    })();
+
+    // Random shimmer on the donate chip. A fixed CSS cadence reads as a
+    // metronome; randomising the gap makes it feel like a catch of light
+    // rather than a blinking advert. Skipped entirely when the tab is
+    // hidden or the user asked for reduced motion.
+    (() => {
+      const chips = document.querySelectorAll('.nav-coffee');
+      if (!chips.length) return;
+      if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      chips.forEach((chip) => {
+        const sweep = () => {
+          if (document.hidden) return;
+          chip.classList.add('shimmer');
+          setTimeout(() => chip.classList.remove('shimmer'), 1000);
+        };
+        const schedule = () => setTimeout(() => { sweep(); schedule(); },
+          5000 + Math.random() * 9000);
+        setTimeout(() => { sweep(); schedule(); }, 1200 + Math.random() * 1800);
+      });
     })();
   </script>
 </body>
