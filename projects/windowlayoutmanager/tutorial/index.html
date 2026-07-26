@@ -237,6 +237,7 @@
       .top-nav { padding: 0.7rem 1rem; gap: 0.7rem 1rem; }
       .top-nav .nav-right { width: 100%; justify-content: space-between; gap: 0.75rem; }
       .top-nav .nav-right > a:not(.nav-coffee) { padding: 0.35rem 0; }
+      .nav-coffee { font-size: 0.8rem; padding: 0.32rem 0.7rem; }
 
       /* Screenshots are the point of this page; give them the full
          width and a visible hint that they open full size. */
@@ -251,6 +252,9 @@
       .term-titlebar > span:last-child {
         overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
       }
+    }
+    @media (max-width: 380px) {
+      .nav-coffee { font-size: 0.74rem; padding: 0.28rem 0.6rem; }
     }
   </style>
 </head>
