@@ -55,10 +55,22 @@
     .top-nav .brand:hover { text-decoration: none; color: var(--mk-green); }
     .top-nav .nav-right { color: var(--mk-comment); font-size: 0.85rem; }
     .top-nav .nav-right a { margin-left: 1.2rem; }
-    /* Quiet donate link — muted until hovered, never competing with the
-       page's own links. */
-    .nav-coffee { color: var(--mk-comment); }
-    .nav-coffee:hover { color: var(--mk-yellow); text-decoration: none; }
+    /* Bordered chip: visible enough to register as an affordance, small
+       enough to stay nav chrome. Matches the splash page exactly. */
+    .nav-coffee {
+      color: var(--mk-yellow);
+      border: 1px solid var(--mk-border);
+      border-radius: 3px;
+      padding: 0.2rem 0.6rem;
+      white-space: nowrap;
+      transition: border-color 0.1s, background 0.1s;
+    }
+    .nav-coffee:hover {
+      color: var(--mk-yellow);
+      border-color: var(--mk-yellow);
+      background: rgba(230, 219, 116, 0.12);
+      text-decoration: none;
+    }
     .nav-coffee::before { content: '☕ '; }
 
     main { max-width: 900px; margin: 0 auto; padding: 2.5rem 1rem 4rem; }

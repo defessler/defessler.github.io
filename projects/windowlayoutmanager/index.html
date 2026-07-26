@@ -178,8 +178,23 @@
     /* Donate: a quiet nav-bar link rather than a section of its own.
        Muted by default so it never competes with the download CTA, and
        deliberately not Ko-fi's own branding - the page has its voice. */
-    .nav-coffee { color: var(--mk-comment); }
-    .nav-coffee:hover { color: var(--mk-yellow); text-decoration: none; }
+    /* A bordered chip rather than plain text: enough presence to read as
+       an affordance next to the nav links, still small enough that the
+       green download CTA stays the loudest thing on the page. */
+    .nav-coffee {
+      color: var(--mk-yellow);
+      border: 1px solid var(--mk-border);
+      border-radius: 3px;
+      padding: 0.2rem 0.6rem;
+      white-space: nowrap;
+      transition: border-color 0.1s, background 0.1s;
+    }
+    .nav-coffee:hover {
+      color: var(--mk-yellow);
+      border-color: var(--mk-yellow);
+      background: rgba(230, 219, 116, 0.12);
+      text-decoration: none;
+    }
     .nav-coffee::before { content: '☕ '; }
     /* Drop the decorative path on phones so the bar keeps to one row now
        that it carries two links. */
