@@ -55,9 +55,12 @@
     .top-nav .brand:hover { text-decoration: none; color: var(--mk-green); }
     .top-nav .nav-right { color: var(--mk-comment); font-size: 0.85rem; }
     .top-nav .nav-right a { margin-left: 1.2rem; }
-    /* Filled cyan chip with the shimmer sweep, matching the splash page. */
+    /* Filled cyan chip with the pink/green glitch, matching the splash
+       page. display:inline-block is load-bearing: overflow:hidden does
+       not clip an inline element, so artifacts would spill into the nav. */
     .nav-coffee {
       position: relative;
+      display: inline-block;
       overflow: hidden;
       isolation: isolate;
       background: var(--mk-cyan);
@@ -66,37 +69,56 @@
       padding: 0.28rem 0.75rem;
       font-weight: 700;
       white-space: nowrap;
-      transition: background 0.12s, transform 0.12s, box-shadow 0.12s;
+      transition: background 0.12s, box-shadow 0.12s;
     }
     .nav-coffee:hover {
       background: #8ce8fa;
       color: #08222b;
       text-decoration: none;
-      transform: translateY(-1px);
       box-shadow: 0 2px 10px rgba(102, 217, 239, 0.35);
     }
-    .nav-coffee::before { content: '☕ '; }
+    .nav-coffee::before,
     .nav-coffee::after {
-      content: '';
+      content: attr(data-label);
       position: absolute;
       inset: 0;
-      background: linear-gradient(105deg,
-        transparent 35%,
-        rgba(255, 255, 255, 0.85) 50%,
-        transparent 65%);
-      transform: translateX(-130%);
+      padding: inherit;
+      background: inherit;
       pointer-events: none;
+      opacity: 0;
     }
-    .nav-coffee.shimmer::after {
-      animation: coffee-shimmer 0.95s cubic-bezier(0.25, 0.6, 0.3, 1);
+    .nav-coffee::before { color: var(--mk-pink); }
+    .nav-coffee::after  { color: var(--mk-green); }
+    .nav-coffee.glitch::before { animation: glitch-pink 0.45s steps(2, end); }
+    .nav-coffee.glitch::after  { animation: glitch-green 0.45s steps(2, end); }
+    .nav-coffee.glitch         { animation: glitch-jitter 0.45s steps(2, end); }
+    @keyframes glitch-pink {
+      0%   { opacity: 1; clip-path: inset(0 0 78% 0);   transform: translate(-0.35em, -0.06em); }
+      20%  { opacity: 1; clip-path: inset(42% 0 34% 0); transform: translate(0.40em,  0.05em); }
+      40%  { opacity: 1; clip-path: inset(68% 0 10% 0); transform: translate(-0.50em, 0.08em); }
+      60%  { opacity: 1; clip-path: inset(18% 0 58% 0); transform: translate(0.30em, -0.05em); }
+      80%  { opacity: 1; clip-path: inset(86% 0 2% 0);  transform: translate(-0.25em, 0.04em); }
+      100% { opacity: 0; clip-path: inset(0 0 100% 0);  transform: none; }
     }
-    @keyframes coffee-shimmer {
-      from { transform: translateX(-130%); }
-      to   { transform: translateX(130%); }
+    @keyframes glitch-green {
+      0%   { opacity: 1; clip-path: inset(60% 0 20% 0); transform: translate(0.45em,  0.05em); }
+      20%  { opacity: 1; clip-path: inset(10% 0 70% 0); transform: translate(-0.40em, -0.06em); }
+      40%  { opacity: 1; clip-path: inset(35% 0 45% 0); transform: translate(0.50em,  0.02em); }
+      60%  { opacity: 1; clip-path: inset(78% 0 6% 0);  transform: translate(-0.30em, 0.06em); }
+      80%  { opacity: 1; clip-path: inset(4% 0 88% 0);  transform: translate(0.28em, -0.04em); }
+      100% { opacity: 0; clip-path: inset(0 0 100% 0);  transform: none; }
+    }
+    @keyframes glitch-jitter {
+      0%, 100% { transform: none; }
+      15% { transform: translate(1px, -1px) skewX(-8deg); }
+      35% { transform: translate(-2px, 1px) skewX(6deg); }
+      55% { transform: translate(2px, 0)    skewX(-4deg); }
+      75% { transform: translate(-1px, -1px) skewX(5deg); }
     }
     @media (prefers-reduced-motion: reduce) {
-      .nav-coffee.shimmer::after { animation: none; }
-      .nav-coffee:hover { transform: none; }
+      .nav-coffee.glitch,
+      .nav-coffee.glitch::before,
+      .nav-coffee.glitch::after { animation: none; }
     }
 
     main { max-width: 900px; margin: 0 auto; padding: 2.5rem 1rem 4rem; }
@@ -202,7 +224,7 @@
     <span class="nav-right"><span class="nav-path">~/window-layout-manager/tutorial</span>
       <a href="../">download</a>
       <a class="nav-coffee" href="https://ko-fi.com/dougfessler" target="_blank" rel="noopener"
-         title="Opens ko-fi.com">buy me a coffee</a>
+         title="Opens ko-fi.com" data-label="☕ buy me a coffee">☕ buy me a coffee</a>
     </span>
   </nav>
 
@@ -385,21 +407,21 @@
     addEventListener('scroll', () => btt.classList.toggle('show', scrollY > 400), { passive: true });
     btt.addEventListener('click', () => scrollTo({ top: 0, behavior: 'smooth' }));
 
-    // Random shimmer on the donate chip — see the splash page for why the
-    // interval is randomised rather than a fixed CSS animation.
+    // Random glitch burst on the donate chip — see the splash page for
+    // why the interval is randomised rather than a fixed CSS animation.
     (() => {
       const chips = document.querySelectorAll('.nav-coffee');
       if (!chips.length) return;
       if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       chips.forEach((chip) => {
-        const sweep = () => {
+        const burst = () => {
           if (document.hidden) return;
-          chip.classList.add('shimmer');
-          setTimeout(() => chip.classList.remove('shimmer'), 1000);
+          chip.classList.add('glitch');
+          setTimeout(() => chip.classList.remove('glitch'), 500);
         };
-        const schedule = () => setTimeout(() => { sweep(); schedule(); },
+        const schedule = () => setTimeout(() => { burst(); schedule(); },
           5000 + Math.random() * 9000);
-        setTimeout(() => { sweep(); schedule(); }, 1200 + Math.random() * 1800);
+        setTimeout(() => { burst(); schedule(); }, 1200 + Math.random() * 1800);
       });
     })();
   </script>
