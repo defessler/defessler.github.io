@@ -104,6 +104,21 @@ function renderNav(site) {
   `;
 }
 
+// Footer — optional, driven by site.json's `footer` block. Absent or
+// empty means no footer chrome renders at all.
+function renderFooter(site) {
+  const el = document.getElementById('site-footer');
+  if (!el) return;
+  const f = site.footer;
+  const links = (f && Array.isArray(f.links)) ? f.links : [];
+  if (links.length === 0) { el.innerHTML = ''; return; }
+  const note = f.note ? `<span class="footer-note">${escape(f.note)}</span>` : '';
+  const items = links
+    .map(l => `<a href="${escape(l.url)}">${escape(l.label)}</a>`)
+    .join('<span class="footer-sep">·</span>');
+  el.innerHTML = `${note}${items}`;
+}
+
 // ============================================================
 // Page Renderers
 // ============================================================
@@ -451,6 +466,7 @@ async function init() {
   try {
     const site = await fetchJSON(`${CONTENT_PATH}/site.json`);
     renderNav(site);
+    renderFooter(site);
     window.addEventListener('hashchange', () => loadPage(site));
     loadPage(site);
   } catch (err) {

@@ -191,6 +191,30 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 .error-page { text-align: center; padding: 4rem; color: var(--mk-comment); }
 
 /* ============================================================
+   Site footer — deliberately quiet. Comment-colored, small, and
+   below the fold of every page; it exists so side projects are
+   reachable (and crawlable) from the root without advertising.
+   ============================================================ */
+#site-footer {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--mk-comment);
+  border-top: 1px solid var(--mk-border);
+}
+#site-footer:empty { display: none; }
+#site-footer a { color: var(--mk-comment); text-decoration: none; }
+#site-footer a:hover { color: var(--mk-cyan); text-decoration: none; }
+.footer-note::before { content: '// '; }
+.footer-note::after { content: ':'; }
+.footer-sep { color: var(--mk-border); }
+
+/* ============================================================
    About Page
    ============================================================ */
 .hero {
@@ -896,6 +920,7 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
   html          { font-size: 13.5px; }
   #page-content { padding: 0; max-width: 100%; }
   .resume-page  { max-width: 100%; }
+  #site-footer  { display: none; }   /* chrome, not resume content */
 
   /* Compact spacing to fit experience on page 1 */
   .resume-header  { margin-bottom: 1rem; padding-bottom: 0.6rem; }

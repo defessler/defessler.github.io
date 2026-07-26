@@ -10,5 +10,11 @@
     { "label": "LinkedIn", "url": "https://linkedin.com/in/dougfessler",     "icon": "linkedin" }
   ],
   "email_user": "defessler",
-  "email_domain": "gmail.com"
+  "email_domain": "gmail.com",
+  "footer": {
+    "note": "tools",
+    "links": [
+      { "label": "Window Layout Manager", "url": "/projects/windowlayoutmanager/" }
+    ]
+  }
 }
