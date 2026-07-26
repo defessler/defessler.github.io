@@ -55,6 +55,11 @@
     .top-nav .brand:hover { text-decoration: none; color: var(--mk-green); }
     .top-nav .nav-right { color: var(--mk-comment); font-size: 0.85rem; }
     .top-nav .nav-right a { margin-left: 1.2rem; }
+    /* Quiet donate link — muted until hovered, never competing with the
+       page's own links. */
+    .nav-coffee { color: var(--mk-comment); }
+    .nav-coffee:hover { color: var(--mk-yellow); text-decoration: none; }
+    .nav-coffee::before { content: '☕ '; }
 
     main { max-width: 900px; margin: 0 auto; padding: 2.5rem 1rem 4rem; }
 
@@ -158,6 +163,8 @@
     <a class="brand" href="/">Doug Fessler</a>
     <span class="nav-right"><span class="nav-path">~/window-layout-manager/tutorial</span>
       <a href="../">download</a>
+      <a class="nav-coffee" href="https://ko-fi.com/dougfessler" target="_blank" rel="noopener"
+         title="Buy me a coffee">coffee</a>
     </span>
   </nav>
 

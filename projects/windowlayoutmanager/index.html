@@ -175,38 +175,15 @@
     .tut-text { flex: 1; min-width: 240px; }
     .tut-fine { color: var(--mk-comment); font-size: 0.8rem; margin-top: 0.3rem; }
 
-    /* Donate: same card grammar as download/tutorial, yellow accent so it
-       reads as the third, softest call to action. Deliberately NOT the
-       official Ko-fi branding - the page has its own voice. */
-    .donate-card {
-      background: var(--mk-gutter);
-      border: 1px solid var(--mk-border);
-      border-left: 3px solid var(--mk-yellow);
-      border-radius: 4px;
-      padding: 1.25rem 1.5rem;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1.25rem;
-    }
-    .donate-text { flex: 1; min-width: 240px; }
-    .donate-text em { color: var(--mk-cyan); font-style: normal; }
-    .donate-fine { color: var(--mk-comment); font-size: 0.8rem; margin-top: 0.3rem; }
-    .btn-coffee {
-      display: inline-block;
-      background: transparent;
-      color: var(--mk-yellow);
-      border: 1px solid var(--mk-yellow);
-      font-weight: 700;
-      font-family: var(--font);
-      font-size: 1rem;
-      padding: 0.75rem 1.5rem;
-      border-radius: 4px;
-      white-space: nowrap;
-    }
-    .btn-coffee:hover { background: rgba(230, 219, 116, 0.12); color: var(--mk-yellow); text-decoration: none; }
-    .btn-coffee::before { content: '☕ '; }
+    /* Donate: a quiet nav-bar link rather than a section of its own.
+       Muted by default so it never competes with the download CTA, and
+       deliberately not Ko-fi's own branding - the page has its voice. */
+    .nav-coffee { color: var(--mk-comment); }
+    .nav-coffee:hover { color: var(--mk-yellow); text-decoration: none; }
+    .nav-coffee::before { content: '☕ '; }
+    /* Drop the decorative path on phones so the bar keeps to one row now
+       that it carries two links. */
+    @media (max-width: 560px) { .nav-path { display: none; } }
     .dl-meta { font-size: 0.85rem; color: var(--mk-comment); flex: 1; min-width: 240px; }
     .dl-meta .v { color: var(--mk-purple); }
     .dl-meta .pre-badge {
@@ -287,8 +264,10 @@
 <body>
   <nav class="top-nav">
     <a class="brand" href="/">Doug Fessler</a>
-    <span class="nav-right">~/projects/window-layout-manager
+    <span class="nav-right"><span class="nav-path">~/projects/window-layout-manager</span>
       <a href="tutorial/" style="margin-left:1.2rem">tutorial</a>
+      <a class="nav-coffee" href="https://ko-fi.com/dougfessler" target="_blank" rel="noopener"
+         style="margin-left:1.2rem" title="Buy me a coffee">coffee</a>
     </span>
   </nav>
 
@@ -338,15 +317,6 @@
             <div class="tut-fine">// 13 topics · real screenshots · no fluff</div>
           </div>
           <a class="btn-tutorial" href="tutorial/">open the tutorial</a>
-        </div>
-
-        <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --donate</span></p>
-        <div class="donate-card">
-          <div class="donate-text">
-            <div>WLM is <em>free</em> and always will be. If it keeps your windows where they belong, you can buy me a coffee. It funds the caffeine behind the next release.</div>
-            <div class="donate-fine">// one-off · no account needed · every release stays free either way</div>
-          </div>
-          <a class="btn-coffee" href="https://ko-fi.com/dougfessler" target="_blank" rel="noopener">buy me a coffee</a>
         </div>
 
         <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --features</span></p>
