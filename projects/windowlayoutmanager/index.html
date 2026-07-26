@@ -442,7 +442,47 @@
       .term-titlebar > span:last-child {
         overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
       }
+
+      /* Under 16px, iOS Safari zooms the page when a field takes focus and
+         never zooms back out. Not worth the two-pixel aesthetic. */
+      .rf-input { font-size: 16px; }
     }
+    /* --- Anonymous report form ------------------------------------- */
+    #report-form { max-width: 640px; }
+    .rf-kind { display: flex; gap: 1.2rem; margin: 0.2rem 0 0.9rem; flex-wrap: wrap; }
+    .rf-kind label { display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; }
+    .rf-kind input { accent-color: var(--mk-cyan); }
+    .rf-label {
+      display: block; margin: 0.85rem 0 0.3rem;
+      color: var(--mk-comment); font-size: 0.78rem; letter-spacing: 0.04em;
+    }
+    .rf-input {
+      width: 100%; box-sizing: border-box;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--mk-border);
+      border-radius: 4px;
+      color: var(--mk-fg);
+      font: inherit; font-size: 0.86rem;
+      padding: 0.5rem 0.6rem;
+    }
+    .rf-input::placeholder { color: var(--mk-comment); opacity: 0.75; }
+    .rf-input:focus { outline: none; border-color: var(--mk-cyan); }
+    textarea.rf-input { resize: vertical; min-height: 5.5rem; line-height: 1.5; }
+    .rf-turnstile { margin: 0.9rem 0 0; min-height: 0; }
+    .rf-turnstile:not(:empty) { min-height: 70px; }
+    .rf-submit {
+      margin-top: 0.9rem;
+      background: var(--mk-cyan); color: #04141a;
+      border: none; border-radius: 4px;
+      font: inherit; font-weight: 700; font-size: 0.86rem;
+      padding: 0.55rem 1.1rem; cursor: pointer;
+    }
+    .rf-submit:hover { filter: brightness(1.12); }
+    .rf-submit:disabled { opacity: 0.55; cursor: default; filter: none; }
+    .rf-note { margin: 0.7rem 0 0; font-size: 0.8rem; min-height: 1.2em; }
+    .rf-note.err { color: var(--mk-pink); }
+    .rf-note.ok  { color: var(--mk-green); }
+
     /* The CTA labels are nowrap, so on the narrowest phones they need to
        shed a little size or they spill past their own button. */
     @media (max-width: 380px) {
@@ -548,12 +588,41 @@
         <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --feedback</span></p>
         <div class="out">
           <p>Found something broken, or want WLM to do something it doesn't?</p>
-          <ul>
-            <li><a href="https://github.com/defessler/WindowLayoutManager-releases/issues/new?template=bug_report.yml" target="_blank" rel="noopener">Report a bug</a> - the app can fill most of this in for you: Settings -&gt; Diagnostics -&gt; "Report a bug".</li>
-            <li><a href="https://github.com/defessler/WindowLayoutManager-releases/issues/new?template=feature_request.yml" target="_blank" rel="noopener">Request a feature</a> - describing the situation you're stuck in helps more than describing a solution.</li>
-            <li><a href="https://github.com/defessler/WindowLayoutManager-releases/issues" target="_blank" rel="noopener">Browse what's already reported</a>.</li>
-          </ul>
-          <p class="dim">// needs a free GitHub account, since that's where the tracker lives</p>
+
+          <!-- Shown only when the relay is configured (see RELAY at the
+               bottom of this file). Reports go straight to the tracker
+               with no account of any kind. -->
+          <div id="report-box" hidden>
+            <form id="report-form" novalidate>
+              <div class="rf-kind">
+                <label><input type="radio" name="kind" value="bug" checked /> <span>bug</span></label>
+                <label><input type="radio" name="kind" value="feature" /> <span>feature request</span></label>
+              </div>
+              <label class="rf-label" for="rf-title">one-line summary</label>
+              <input id="rf-title" class="rf-input" type="text" maxlength="160" required
+                     placeholder="windows land on the wrong monitor after undocking" />
+              <label class="rf-label" for="rf-body">details</label>
+              <textarea id="rf-body" class="rf-input" rows="6" required
+                        placeholder="what you did, what happened, what you expected instead"></textarea>
+              <label class="rf-label" for="rf-contact">contact (optional)</label>
+              <input id="rf-contact" class="rf-input" type="text" maxlength="120"
+                     placeholder="only if you want a reply - this becomes public" />
+              <div id="rf-turnstile" class="rf-turnstile"></div>
+              <button id="rf-submit" class="rf-submit" type="submit">send report</button>
+              <p id="rf-note" class="rf-note" role="status" aria-live="polite"></p>
+            </form>
+            <p class="dim">// no account, no sign-in. The app version of this form lives in Settings -&gt; Diagnostics.</p>
+          </div>
+
+          <!-- Fallback while the relay is not configured. -->
+          <div id="report-links">
+            <ul>
+              <li><a href="https://github.com/defessler/WindowLayoutManager-releases/issues/new?template=bug_report.yml" target="_blank" rel="noopener">Report a bug</a> - the app can fill most of this in for you: Settings -&gt; Diagnostics -&gt; "Report a bug".</li>
+              <li><a href="https://github.com/defessler/WindowLayoutManager-releases/issues/new?template=feature_request.yml" target="_blank" rel="noopener">Request a feature</a> - describing the situation you're stuck in helps more than describing a solution.</li>
+              <li><a href="https://github.com/defessler/WindowLayoutManager-releases/issues" target="_blank" rel="noopener">Browse what's already reported</a>.</li>
+            </ul>
+            <p class="dim">// needs a free GitHub account, since that's where the tracker lives</p>
+          </div>
         </div>
 
         <p class="prompt-line cursor"><span class="u">wlm</span><span class="p">:~</span>$&nbsp;</p>
@@ -614,6 +683,90 @@
         const schedule = () => setTimeout(() => { burst(); schedule(); },
           14000 + Math.random() * 20000);
         setTimeout(() => { burst(); schedule(); }, 2000 + Math.random() * 2500);
+      });
+    })();
+
+    // --- Anonymous report form -------------------------------------
+    // Fill both values in once the relay is deployed (see relay/README.md
+    // in the app repo). Until then the page keeps showing the GitHub
+    // links, which work but ask for an account.
+    const RELAY = {
+      url: '',            // e.g. 'https://wlm-report-relay.<sub>.workers.dev'
+      turnstileKey: '',   // Turnstile *site* key (public; the secret lives in the worker)
+    };
+
+    (() => {
+      const box = document.getElementById('report-box');
+      const links = document.getElementById('report-links');
+      if (!box || !RELAY.url || !RELAY.turnstileKey) return;   // stay on the links
+      box.hidden = false;
+      if (links) links.hidden = true;
+
+      const form = document.getElementById('report-form');
+      const note = document.getElementById('rf-note');
+      const submit = document.getElementById('rf-submit');
+      const say = (msg, cls) => { note.textContent = msg; note.className = 'rf-note' + (cls ? ' ' + cls : ''); };
+
+      // Turnstile is a third-party script, so it loads on first interaction
+      // rather than on every page view. Most visitors never touch the form.
+      let widgetId = null, loading = null;
+      function loadTurnstile() {
+        if (loading) return loading;
+        loading = new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+          s.async = true; s.defer = true;
+          s.onload = () => {
+            // The standard widget is a fixed 300px wide, which overflows a
+            // 320px phone once page padding is accounted for.
+            const size = window.innerWidth < 360 ? 'compact' : 'normal';
+            widgetId = window.turnstile.render('#rf-turnstile',
+              { sitekey: RELAY.turnstileKey, theme: 'dark', size });
+            resolve();
+          };
+          s.onerror = () => reject(new Error('bot check failed to load'));
+          document.head.appendChild(s);
+        });
+        return loading;
+      }
+      form.addEventListener('focusin', () => { loadTurnstile().catch(() => {}); }, { once: true });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const title = document.getElementById('rf-title').value.trim();
+        const body = document.getElementById('rf-body').value.trim();
+        if (!title) return say('A one-line summary, please.', 'err');
+        if (body.length < 10) return say('Tell me a bit more about what happened.', 'err');
+
+        submit.disabled = true;
+        say('Sending...');
+        try {
+          await loadTurnstile();
+          const token = window.turnstile.getResponse(widgetId);
+          if (!token) { submit.disabled = false; return say('Finish the bot check above, then send.', 'err'); }
+
+          const res = await fetch(RELAY.url, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+              source: 'web',
+              turnstileToken: token,
+              kind: form.querySelector('input[name=kind]:checked').value,
+              title, body,
+              contact: document.getElementById('rf-contact').value.trim(),
+            }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data.ok) throw new Error(data.error || 'Could not send that. Try again in a moment.');
+          form.reset();
+          window.turnstile.reset(widgetId);
+          say('Sent. Filed as issue #' + data.number + '. Thanks.', 'ok');
+        } catch (err) {
+          say(err.message, 'err');
+          if (window.turnstile && widgetId !== null) window.turnstile.reset(widgetId);
+        } finally {
+          submit.disabled = false;
+        }
       });
     })();
   </script>
