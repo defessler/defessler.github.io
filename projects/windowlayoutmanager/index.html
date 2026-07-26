@@ -25,7 +25,15 @@
       --font: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-size: 15px; scroll-behavior: smooth; }
+    /* text-size-adjust: Chrome on Android inflates text in blocks it
+       decides are "too small", which silently rescales the ASCII art
+       relative to everything around it. */
+    html {
+      font-size: 15px;
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
     body {
       font-family: var(--font);
       background: var(--mk-bg);
@@ -115,13 +123,37 @@
 
     .banner {
       color: var(--mk-green);
-      font-size: clamp(0.55rem, 2.4vw, 0.95rem);
-      line-height: 1.25;
+      /* 27 columns wide; ~0.6em per char in a monospace face, so this
+         keeps the art inside even a 320px viewport without scrolling. */
+      font-size: clamp(0.62rem, 3.1vw, 1.15rem);
+      line-height: 1.15;
+      /* overflow-y must be pinned: setting only overflow-x makes the
+         other axis compute to `auto`, and sub-pixel line-height rounding
+         then leaves ~1px of vertical overflow — enough for Chrome to put
+         a scrollbar through the logo. */
       overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 3px;   /* absorb that rounding rather than clipping it */
       text-shadow: 0.06em 0 0 rgba(249, 38, 114, 0.3), -0.06em 0 0 rgba(102, 217, 239, 0.3);
       margin-bottom: 0.75rem;
+      /* Ligatures would fuse sequences like \_/ into a single glyph and
+         break the column grid; the explicit fallbacks keep the art on a
+         real monospace face if the webfont is blocked or still loading. */
+      font-family: 'JetBrains Mono', 'Consolas', 'DejaVu Sans Mono', 'Courier New', monospace;
+      font-variant-ligatures: none;
+      font-feature-settings: 'liga' 0, 'calt' 0;
+      letter-spacing: 0;
+      font-weight: 700;      /* thickens the strokes; monospace keeps the grid */
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
     }
-    .banner-sub { color: var(--mk-pink); letter-spacing: 0.08em; text-shadow: none; }
+    .banner-sub {
+      display: block;
+      margin-top: 0.6rem;
+      color: var(--mk-pink);
+      letter-spacing: 0.08em;
+      text-shadow: none;
+    }
     h1 { position: absolute; left: -9999px; } /* banner is the visual h1; keep a real one for a11y/SEO */
     .tagline { color: var(--mk-fg); font-size: 1.05rem; margin-bottom: 0.35rem; }
     .tagline em { color: var(--mk-cyan); font-style: normal; }
@@ -154,7 +186,8 @@
       white-space: nowrap;
     }
     .btn-download:hover { background: var(--mk-yellow); color: #141414; text-decoration: none; }
-    .btn-download::before { content: '⭳ '; }
+    /* Plain arrow: the previous U+2B33 rendered as a tofu box on Android. */
+    .btn-download::before { content: '↓ '; }
     .btn-tutorial {
       display: inline-block;
       background: transparent;
@@ -346,16 +379,16 @@
       .term-body { padding: 1.1rem 1rem 1.5rem; }
       main { padding: 1.5rem 0.75rem 3rem; }
 
-      /* Nav: brand on its own row, then the links spread across a full
-         row beneath it. Letting the group wrap as a unit keeps the
-         coffee chip from landing beside the brand with the text link
-         stranded underneath. */
-      .top-nav { padding: 0.7rem 1rem; gap: 0.7rem 1rem; }
+      /* One row: title left, coffee chip right. The tutorial link is
+         dropped — the page body carries a full tutorial card a screen
+         below, so the nav copy is redundant on a phone. */
+      .top-nav { padding: 0.7rem 1rem; gap: 0.7rem 1rem; flex-wrap: nowrap; }
       .nav-path { display: none; }
-      .top-nav .nav-right { width: 100%; justify-content: space-between; gap: 0.75rem; }
-      .top-nav .nav-right > a:not(.nav-coffee) { padding: 0.35rem 0; }  /* taller tap target */
+      .top-nav .nav-right > a:not(.nav-coffee) { display: none; }
+      .top-nav .nav-right { width: auto; gap: 0; flex-shrink: 0; }
+      .top-nav .brand { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
       /* The chip is sized for a desktop header; at phone width it wants
-         to be proportionate to the row it shares. */
+         to be proportionate to the title it shares the row with. */
       .nav-coffee { font-size: 0.8rem; padding: 0.32rem 0.7rem; }
 
       /* The subtitle shares the ASCII art's last line on desktop; at
@@ -407,13 +440,19 @@
       <div class="term-body">
 
         <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --about</span></p>
+        <!-- Plain ASCII only. The previous version used Unicode block and
+             box-drawing characters, which Chrome on Android resolves from
+             different fallback fonts per glyph — the strokes then land on
+             mismatched metrics and the logo tears itself apart. Every
+             character below is in the base ASCII range, so one font
+             renders all of it at one advance width. -->
         <pre class="banner" aria-hidden="true">
-██╗    ██╗██╗     ███╗   ███╗
-██║    ██║██║     ████╗ ████║
-██║ █╗ ██║██║     ██╔████╔██║
-██║███╗██║██║     ██║╚██╔╝██║
-╚███╔███╔╝███████╗██║ ╚═╝ ██║
- ╚══╝╚══╝ ╚══════╝╚═╝     ╚═╝  <span class="banner-sub">WINDOW · LAYOUT · MANAGER</span></pre>
+__        __ _      __  __
+\ \      / /| |    |  \/  |
+ \ \ /\ / / | |    | |\/| |
+  \ V  V /  | |___ | |  | |
+   \_/\_/   |_____||_|  |_|
+<span class="banner-sub">WINDOW &middot; LAYOUT &middot; MANAGER</span></pre>
         <p class="tagline">Save and restore <em>window layouts</em> across monitor setups on Windows.</p>
         <p class="byline">// free · portable · no installer · no telemetry · by <a href="/">Doug Fessler</a></p>
 
