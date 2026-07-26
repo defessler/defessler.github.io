@@ -140,10 +140,24 @@
 
     .banner {
       color: var(--mk-green);
-      /* 29 columns of art (plus the inline subtitle on desktop); ~0.6em
-         per char, so this keeps it inside even a 320px viewport. */
-      font-size: clamp(0.6rem, 2.9vw, 0.95rem);
-      line-height: 1.15;
+      /* Above the scanline overlay (z-index 9999). Those 1px lines every
+         4px are invisible over text, but over solid blocks they read as
+         seams slicing the logo into a grid — which is what looked like
+         misalignment on a high-DPI phone, where the lines land right on
+         the pixel grid. */
+      position: relative;
+      z-index: 10000;
+      /* Whole-pixel cells, deliberately. JetBrains Mono advances 0.6em,
+         so only font sizes that are multiples of 5px give an integer
+         cell width — anything else (a vw-based clamp especially) lands
+         each column on a different sub-pixel offset and antialiasing
+         draws seams straight through the solid blocks. 15px -> 9px
+         cells, 10px -> 6px cells. */
+      font-size: 15px;
+      /* Full-block glyphs fill their em box, so any leading shows up as a
+         dark seam straight through the letters. line-height:1 butts the
+         rows together. */
+      line-height: 1;
       /* overflow-y must be pinned: setting only overflow-x makes the
          other axis compute to `auto`, and sub-pixel line-height rounding
          then leaves ~1px of vertical overflow — enough for Chrome to put
@@ -151,7 +165,11 @@
       overflow-x: auto;
       overflow-y: hidden;
       padding-bottom: 3px;   /* absorb that rounding rather than clipping it */
-      text-shadow: 0.06em 0 0 rgba(249, 38, 114, 0.3), -0.06em 0 0 rgba(102, 217, 239, 0.3);
+      /* No chromatic-aberration shadow here. On text it reads as a subtle
+         CRT fringe; on solid blocks the offset copies read as a second,
+         misaligned logo — which is exactly what it looked like on a
+         high-DPI phone. The effect stays on the site title, where the
+         glyphs are thin enough for it to work. */
       margin-bottom: 0.75rem;
       /* Ligatures would fuse sequences like \_/ into a single glyph and
          break the column grid; the explicit fallbacks keep the art on a
@@ -403,9 +421,12 @@
          to be proportionate to the title it shares the row with. */
       .nav-coffee { font-size: 0.8rem; padding: 0.32rem 0.7rem; }
 
+      /* 10px keeps the 6px-per-cell whole-pixel grid; 29 columns = 174px,
+         which fits even a 320px screen. */
+      .banner { font-size: 10px; }
       /* The subtitle shares the art's last line on desktop; at phone
          widths that combined length overflows, so give it its own line. */
-      .banner-sub { display: block; margin-top: 0.5rem; letter-spacing: 0.05em; }
+      .banner-sub { display: block; margin-top: 0.5rem; letter-spacing: 0.05em; font-size: 0.75rem; }
 
       /* Full-width CTAs read better than centred pills on a phone, and
          give a much larger tap target. */
