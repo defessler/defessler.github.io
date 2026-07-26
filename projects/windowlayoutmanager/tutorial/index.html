@@ -55,21 +55,21 @@
     .top-nav .brand:hover { text-decoration: none; color: var(--mk-green); }
     .top-nav .nav-right { color: var(--mk-comment); font-size: 0.85rem; }
     .top-nav .nav-right a { margin-left: 1.2rem; }
-    /* Bordered chip: visible enough to register as an affordance, small
-       enough to stay nav chrome. Matches the splash page exactly. */
+    /* Filled chip, matching the splash page exactly. */
     .nav-coffee {
-      color: var(--mk-yellow);
-      border: 1px solid var(--mk-border);
+      background: var(--mk-yellow);
+      color: #141414;
       border-radius: 3px;
-      padding: 0.2rem 0.6rem;
+      padding: 0.28rem 0.75rem;
+      font-weight: 700;
       white-space: nowrap;
-      transition: border-color 0.1s, background 0.1s;
+      transition: background 0.12s, transform 0.12s;
     }
     .nav-coffee:hover {
-      color: var(--mk-yellow);
-      border-color: var(--mk-yellow);
-      background: rgba(230, 219, 116, 0.12);
+      background: var(--mk-green);
+      color: #141414;
       text-decoration: none;
+      transform: translateY(-1px);
     }
     .nav-coffee::before { content: '☕ '; }
 
@@ -176,7 +176,7 @@
     <span class="nav-right"><span class="nav-path">~/window-layout-manager/tutorial</span>
       <a href="../">download</a>
       <a class="nav-coffee" href="https://ko-fi.com/dougfessler" target="_blank" rel="noopener"
-         title="Buy me a coffee">coffee</a>
+         title="Buy me a coffee (opens ko-fi.com)">make coffee</a>
     </span>
   </nav>
 

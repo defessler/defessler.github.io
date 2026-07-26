@@ -178,22 +178,23 @@
     /* Donate: a quiet nav-bar link rather than a section of its own.
        Muted by default so it never competes with the download CTA, and
        deliberately not Ko-fi's own branding - the page has its voice. */
-    /* A bordered chip rather than plain text: enough presence to read as
-       an affordance next to the nav links, still small enough that the
-       green download CTA stays the loudest thing on the page. */
+    /* Filled chip: the header bar is otherwise all muted text, so a solid
+       yellow block is the one thing in it that reads as a button. Still
+       small, and yellow keeps it distinct from the green download CTA. */
     .nav-coffee {
-      color: var(--mk-yellow);
-      border: 1px solid var(--mk-border);
+      background: var(--mk-yellow);
+      color: #141414;
       border-radius: 3px;
-      padding: 0.2rem 0.6rem;
+      padding: 0.28rem 0.75rem;
+      font-weight: 700;
       white-space: nowrap;
-      transition: border-color 0.1s, background 0.1s;
+      transition: background 0.12s, transform 0.12s;
     }
     .nav-coffee:hover {
-      color: var(--mk-yellow);
-      border-color: var(--mk-yellow);
-      background: rgba(230, 219, 116, 0.12);
+      background: var(--mk-green);
+      color: #141414;
       text-decoration: none;
+      transform: translateY(-1px);
     }
     .nav-coffee::before { content: '☕ '; }
     /* Drop the decorative path on phones so the bar keeps to one row now
@@ -282,7 +283,7 @@
     <span class="nav-right"><span class="nav-path">~/projects/window-layout-manager</span>
       <a href="tutorial/" style="margin-left:1.2rem">tutorial</a>
       <a class="nav-coffee" href="https://ko-fi.com/dougfessler" target="_blank" rel="noopener"
-         style="margin-left:1.2rem" title="Buy me a coffee">coffee</a>
+         style="margin-left:1.2rem" title="Buy me a coffee (opens ko-fi.com)">make coffee</a>
     </span>
   </nav>
 
@@ -308,15 +309,17 @@
 
         <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --download</span></p>
         <div class="download-card">
+          <!-- Direct asset URL, not /releases/latest: the script below
+               overwrites it from the feed, and this static fallback should
+               download rather than land on a repo listing. -->
           <a class="btn-download" id="dl-btn"
-             href="https://github.com/defessler/WindowLayoutManager-releases/releases/latest">Download for Windows</a>
+             href="https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.54/WindowLayoutManager-v1.1.0-dev.54-win-x64.zip">Download for Windows</a>
           <div class="dl-meta">
             <div id="dl-version">latest release<span class="pre-badge" id="dl-pre" hidden>pre-release</span></div>
             <div id="dl-info">x64 · portable .zip</div>
             <div class="dl-sha" id="dl-sha" hidden>sha256: <span class="h" id="dl-sha-hex"></span></div>
           </div>
           <div class="dl-links">
-            <a href="https://github.com/defessler/WindowLayoutManager-releases/releases">all releases</a>
             <a href="updates.json">update feed</a>
           </div>
         </div>
