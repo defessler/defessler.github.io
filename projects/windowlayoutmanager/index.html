@@ -9,6 +9,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* Google Fonts serves JetBrains Mono only in latin/cyrillic/greek
+       subsets — box-drawing and block elements (U+2500–259F) are in NONE
+       of them. The logo's characters therefore fell back to a system
+       font per glyph, and on Android that font is not monospace, so the
+       columns sheared apart. This is the same JetBrains Mono, subset to
+       exactly the glyphs the logo uses (980 bytes) and self-hosted so it
+       cannot depend on a rotating CDN URL. Same font, same metrics, so
+       the art lines up with its own spaces. */
+    @font-face {
+      font-family: 'JetBrains Mono';
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: block;
+      src: url('jbm-blocks.woff2') format('woff2');
+      unicode-range: U+2550-2551, U+2554, U+2557, U+255A, U+255D, U+2560, U+2563, U+2566, U+2569, U+2588;
+    }
+
     :root {
       --mk-bg:      #1e1e1e;
       --mk-surface: #2d2d2d;
@@ -123,9 +140,9 @@
 
     .banner {
       color: var(--mk-green);
-      /* 27 columns wide; ~0.6em per char in a monospace face, so this
-         keeps the art inside even a 320px viewport without scrolling. */
-      font-size: clamp(0.62rem, 3.1vw, 1.15rem);
+      /* 29 columns of art (plus the inline subtitle on desktop); ~0.6em
+         per char, so this keeps it inside even a 320px viewport. */
+      font-size: clamp(0.6rem, 2.9vw, 0.95rem);
       line-height: 1.15;
       /* overflow-y must be pinned: setting only overflow-x makes the
          other axis compute to `auto`, and sub-pixel line-height rounding
@@ -143,17 +160,12 @@
       font-variant-ligatures: none;
       font-feature-settings: 'liga' 0, 'calt' 0;
       letter-spacing: 0;
-      font-weight: 700;      /* thickens the strokes; monospace keeps the grid */
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
     }
-    .banner-sub {
-      display: block;
-      margin-top: 0.6rem;
-      color: var(--mk-pink);
-      letter-spacing: 0.08em;
-      text-shadow: none;
-    }
+    /* Inline on the art's last line, as before. It only moves to its own
+       line on phones, where the combined width would otherwise overflow. */
+    .banner-sub { color: var(--mk-pink); letter-spacing: 0.08em; text-shadow: none; }
     h1 { position: absolute; left: -9999px; } /* banner is the visual h1; keep a real one for a11y/SEO */
     .tagline { color: var(--mk-fg); font-size: 1.05rem; margin-bottom: 0.35rem; }
     .tagline em { color: var(--mk-cyan); font-style: normal; }
@@ -391,9 +403,8 @@
          to be proportionate to the title it shares the row with. */
       .nav-coffee { font-size: 0.8rem; padding: 0.32rem 0.7rem; }
 
-      /* The subtitle shares the ASCII art's last line on desktop; at
-         phone widths that pushed the block past the viewport and forced
-         an internal scrollbar through the logo. */
+      /* The subtitle shares the art's last line on desktop; at phone
+         widths that combined length overflows, so give it its own line. */
       .banner-sub { display: block; margin-top: 0.5rem; letter-spacing: 0.05em; }
 
       /* Full-width CTAs read better than centred pills on a phone, and
@@ -440,19 +451,15 @@
       <div class="term-body">
 
         <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --about</span></p>
-        <!-- Plain ASCII only. The previous version used Unicode block and
-             box-drawing characters, which Chrome on Android resolves from
-             different fallback fonts per glyph — the strokes then land on
-             mismatched metrics and the logo tears itself apart. Every
-             character below is in the base ASCII range, so one font
-             renders all of it at one advance width. -->
+        <!-- Every glyph here is covered by the @font-face above, so the
+             whole logo renders from one font at one advance width. -->
         <pre class="banner" aria-hidden="true">
-__        __ _      __  __
-\ \      / /| |    |  \/  |
- \ \ /\ / / | |    | |\/| |
-  \ V  V /  | |___ | |  | |
-   \_/\_/   |_____||_|  |_|
-<span class="banner-sub">WINDOW &middot; LAYOUT &middot; MANAGER</span></pre>
+██╗    ██╗██╗     ███╗   ███╗
+██║    ██║██║     ████╗ ████║
+██║ █╗ ██║██║     ██╔████╔██║
+██║███╗██║██║     ██║╚██╔╝██║
+╚███╔███╔╝███████╗██║ ╚═╝ ██║
+ ╚══╝╚══╝ ╚══════╝╚═╝     ╚═╝  <span class="banner-sub">WINDOW &middot; LAYOUT &middot; MANAGER</span></pre>
         <p class="tagline">Save and restore <em>window layouts</em> across monitor setups on Windows.</p>
         <p class="byline">// free · portable · no installer · no telemetry · by <a href="/">Doug Fessler</a></p>
 
