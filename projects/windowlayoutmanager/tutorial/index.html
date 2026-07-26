@@ -65,8 +65,9 @@
       isolation: isolate;
       background: var(--mk-cyan);
       color: #08222b;
-      border-radius: 3px;
-      padding: 0.28rem 0.75rem;
+      border-radius: 4px;
+      padding: 0.45rem 1.05rem;
+      font-size: 0.95rem;
       font-weight: 700;
       white-space: nowrap;
       transition: background 0.12s, box-shadow 0.12s;
@@ -89,31 +90,39 @@
     }
     .nav-coffee::before { color: var(--mk-pink); }
     .nav-coffee::after  { color: var(--mk-green); }
-    .nav-coffee.glitch::before { animation: glitch-pink 0.45s steps(2, end); }
-    .nav-coffee.glitch::after  { animation: glitch-green 0.45s steps(2, end); }
-    .nav-coffee.glitch         { animation: glitch-jitter 0.45s steps(2, end); }
+    .nav-coffee.glitch::before { animation: glitch-pink 0.55s steps(2, end); }
+    .nav-coffee.glitch::after  { animation: glitch-green 0.55s steps(2, end); }
+    .nav-coffee.glitch         { animation: glitch-jitter 0.55s steps(2, end); }
     @keyframes glitch-pink {
-      0%   { opacity: 1; clip-path: inset(0 0 78% 0);   transform: translate(-0.35em, -0.06em); }
-      20%  { opacity: 1; clip-path: inset(42% 0 34% 0); transform: translate(0.40em,  0.05em); }
-      40%  { opacity: 1; clip-path: inset(68% 0 10% 0); transform: translate(-0.50em, 0.08em); }
-      60%  { opacity: 1; clip-path: inset(18% 0 58% 0); transform: translate(0.30em, -0.05em); }
-      80%  { opacity: 1; clip-path: inset(86% 0 2% 0);  transform: translate(-0.25em, 0.04em); }
+      0%   { opacity: 1; clip-path: inset(0 0 82% 0);   transform: translate(-0.55em, -0.09em) scaleY(1.10); }
+      12%  { opacity: 1; clip-path: inset(28% 0 52% 0); transform: translate(0.72em,   0.07em) scaleY(0.92); }
+      24%  { opacity: 1; clip-path: inset(62% 0 14% 0); transform: translate(-0.85em,  0.11em) scaleY(1.14); }
+      36%  { opacity: 1; clip-path: inset(8% 0 74% 0);  transform: translate(0.52em,  -0.10em) scaleY(0.88); }
+      48%  { opacity: 1; clip-path: inset(44% 0 30% 0); transform: translate(-0.68em,  0.05em) scaleY(1.06); }
+      60%  { opacity: 1; clip-path: inset(84% 0 4% 0);  transform: translate(0.78em,   0.09em) scaleY(1.18); }
+      72%  { opacity: 1; clip-path: inset(18% 0 66% 0); transform: translate(-0.46em, -0.07em) scaleY(0.95); }
+      86%  { opacity: 1; clip-path: inset(56% 0 24% 0); transform: translate(0.62em,   0.06em) scaleY(1.09); }
       100% { opacity: 0; clip-path: inset(0 0 100% 0);  transform: none; }
     }
     @keyframes glitch-green {
-      0%   { opacity: 1; clip-path: inset(60% 0 20% 0); transform: translate(0.45em,  0.05em); }
-      20%  { opacity: 1; clip-path: inset(10% 0 70% 0); transform: translate(-0.40em, -0.06em); }
-      40%  { opacity: 1; clip-path: inset(35% 0 45% 0); transform: translate(0.50em,  0.02em); }
-      60%  { opacity: 1; clip-path: inset(78% 0 6% 0);  transform: translate(-0.30em, 0.06em); }
-      80%  { opacity: 1; clip-path: inset(4% 0 88% 0);  transform: translate(0.28em, -0.04em); }
+      0%   { opacity: 1; clip-path: inset(66% 0 16% 0); transform: translate(0.62em,   0.08em) scaleY(0.90); }
+      12%  { opacity: 1; clip-path: inset(6% 0 78% 0);  transform: translate(-0.75em, -0.09em) scaleY(1.16); }
+      24%  { opacity: 1; clip-path: inset(38% 0 42% 0); transform: translate(0.88em,   0.04em) scaleY(0.94); }
+      36%  { opacity: 1; clip-path: inset(74% 0 8% 0);  transform: translate(-0.55em,  0.10em) scaleY(1.12); }
+      48%  { opacity: 1; clip-path: inset(20% 0 62% 0); transform: translate(0.70em,  -0.06em) scaleY(0.89); }
+      60%  { opacity: 1; clip-path: inset(50% 0 28% 0); transform: translate(-0.80em,  0.07em) scaleY(1.15); }
+      72%  { opacity: 1; clip-path: inset(2% 0 90% 0);  transform: translate(0.48em,   0.09em) scaleY(0.96); }
+      86%  { opacity: 1; clip-path: inset(80% 0 6% 0);  transform: translate(-0.64em, -0.05em) scaleY(1.08); }
       100% { opacity: 0; clip-path: inset(0 0 100% 0);  transform: none; }
     }
     @keyframes glitch-jitter {
       0%, 100% { transform: none; }
-      15% { transform: translate(1px, -1px) skewX(-8deg); }
-      35% { transform: translate(-2px, 1px) skewX(6deg); }
-      55% { transform: translate(2px, 0)    skewX(-4deg); }
-      75% { transform: translate(-1px, -1px) skewX(5deg); }
+      10% { transform: translate(3px, -2px) skewX(-14deg); }
+      25% { transform: translate(-4px, 2px) skewX(12deg) scaleY(1.07); }
+      40% { transform: translate(4px, -1px) skewX(-9deg) scaleY(0.94); }
+      55% { transform: translate(-3px, 2px) skewX(14deg); }
+      70% { transform: translate(3px, 1px)  skewX(-11deg) scaleY(1.05); }
+      85% { transform: translate(-2px, -2px) skewX(7deg); }
     }
     @media (prefers-reduced-motion: reduce) {
       .nav-coffee.glitch,
@@ -417,11 +426,11 @@
         const burst = () => {
           if (document.hidden) return;
           chip.classList.add('glitch');
-          setTimeout(() => chip.classList.remove('glitch'), 500);
+          setTimeout(() => chip.classList.remove('glitch'), 600);
         };
         const schedule = () => setTimeout(() => { burst(); schedule(); },
-          5000 + Math.random() * 9000);
-        setTimeout(() => { burst(); schedule(); }, 1200 + Math.random() * 1800);
+          14000 + Math.random() * 20000);
+        setTimeout(() => { burst(); schedule(); }, 2000 + Math.random() * 2500);
       });
     })();
   </script>
