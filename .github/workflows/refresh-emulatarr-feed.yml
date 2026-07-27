@@ -1,7 +1,7 @@
 name: Refresh Emulatarr feed
 
 # Keeps projects/emulatarr/updates.json in step with the newest
-# `installer-v*` release in defessler/game-rom-manager, which is what the
+# `installer-v*` release in defessler/Emulatarr-releases, which is what the
 # product page's download button reads.
 #
 # Why a poll here rather than a push from the release workflow: pushing
@@ -31,31 +31,31 @@ jobs:
 
       - name: Pull the newest installer-v release feed
         env:
-          # Only used for the rate limit. The repo is public, so this
-          # would work unauthenticated too, just with a smaller budget.
-          GH_TOKEN: ${{ github.token }}
-          SOURCE_REPO: defessler/game-rom-manager
+          SOURCE_REPO: defessler/Emulatarr-releases
         run: |
           python3 - <<'PY'
           import json, os, pathlib, urllib.request
 
           repo = os.environ['SOURCE_REPO']
-          token = os.environ.get('GH_TOKEN', '')
 
+          # Deliberately unauthenticated. This repo's built-in GITHUB_TOKEN
+          # is scoped to this repo, and sending it at another one gets a
+          # 404 rather than a 403 - GitHub will not confirm a repo exists
+          # to a token that cannot see it. The source repo is public, so no
+          # credential is needed. The unauthenticated budget is 60 requests
+          # an hour per IP against two calls on a 6-hourly poll.
           def get(url, raw=False):
               req = urllib.request.Request(url)
-              req.add_header('Accept',
-                             'application/octet-stream' if raw
-                             else 'application/vnd.github+json')
-              if token:
-                  req.add_header('Authorization', f'Bearer {token}')
+              if not raw:
+                  req.add_header('Accept', 'application/vnd.github+json')
               with urllib.request.urlopen(req, timeout=30) as r:
                   return r.read()
 
           releases = json.loads(get(f'https://api.github.com/repos/{repo}/releases?per_page=100'))
 
-          # Same filter the in-app updater uses: this repo also cuts plain
-          # v* releases for the NAS scripts, and those are not the wizard.
+          # Same filter the in-app updater uses. Only `installer-v*` tags are
+          # builds of the wizard; the NAS script bundle ships under plain
+          # `v*` tags and must never be offered as an app download.
           def version_key(rel):
               v = rel['tag_name'].removeprefix('installer-v')
               base = v.split('-', 1)[0]
@@ -80,7 +80,10 @@ jobs:
               raise SystemExit(
                   f"{newest['tag_name']} has no updates.json asset - nothing to sync")
 
-          feed = json.loads(get(asset['url'], raw=True))
+          # browser_download_url, not the API asset endpoint: it serves the
+          # bytes directly on a public repo instead of needing an
+          # octet-stream Accept header and a redirect hop.
+          feed = json.loads(get(asset['browser_download_url'], raw=True))
           out = pathlib.Path('projects/emulatarr/updates.json')
           new = json.dumps(feed, indent=2) + '\n'
           if out.exists() and out.read_text(encoding='utf-8') == new:

@@ -308,7 +308,7 @@
   <nav class="top-nav">
     <a class="brand" href="/">Doug Fessler</a>
     <span class="nav-right"><span class="nav-path">~/projects/emulatarr</span>
-      <a href="https://github.com/defessler/game-rom-manager" target="_blank" rel="noopener">source</a>
+      <a href="https://github.com/defessler/Emulatarr-releases" target="_blank" rel="noopener">source</a>
     </span>
   </nav>
 
@@ -350,7 +350,7 @@
                listing. The repo also cuts plain v* releases for the NAS
                scripts, so /latest is not reliably the wizard. -->
           <a class="btn-download" id="dl-btn"
-             href="https://github.com/defessler/game-rom-manager/releases/download/installer-v0.1.0/emulatarr-installer-win-unpacked.zip">Download for Windows</a>
+             href="https://github.com/defessler/Emulatarr-releases/releases/download/installer-v0.1.0/emulatarr-installer-win-unpacked.zip">Download for Windows</a>
           <div class="dl-meta">
             <div id="dl-version">latest release<span class="pre-badge" id="dl-pre" hidden>pre-release</span></div>
             <div id="dl-info">x64 · portable .zip</div>
@@ -362,7 +362,7 @@
             <summary>release notes</summary>
           </details>
           <a class="all-releases"
-             href="https://github.com/defessler/game-rom-manager/releases?q=installer-v"
+             href="https://github.com/defessler/Emulatarr-releases/releases?q=installer-v"
              target="_blank" rel="noopener">all releases</a>
         </div>
         <pre class="notes-body" id="notes-body" hidden></pre>
@@ -422,25 +422,25 @@
         <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --by-hand</span></p>
         <div class="out">
           <p>The wizard uploads exactly one folder, <code>nas/scripts/</code>, and runs <code>setup.sh</code> inside it. Copying that folder across yourself and running the script is a supported route, not a fallback. If you would rather see every command, start with
-          <a href="https://github.com/defessler/game-rom-manager/blob/main/QUICKSTART.md" target="_blank" rel="noopener">QUICKSTART.md</a>.</p>
+          <a href="https://github.com/defessler/Emulatarr-releases/blob/main/QUICKSTART.md" target="_blank" rel="noopener">QUICKSTART.md</a>.</p>
         </div>
 
         <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --docs</span></p>
         <div class="out">
           <ul>
-            <li><a href="https://github.com/defessler/game-rom-manager/blob/main/docs/research-report.md" target="_blank" rel="noopener">The research report</a> - the full cited writeup behind all of this: hardware, RomM, acquisition, dumping, playback, architecture, legal.</li>
-            <li><a href="https://github.com/defessler/game-rom-manager/blob/main/docs/clients.md" target="_blank" rel="noopener">Clients</a> - per-device setup for Android, iOS, Steam Deck, and PC.</li>
-            <li><a href="https://github.com/defessler/game-rom-manager/blob/main/docs/remote-access.md" target="_blank" rel="noopener">Remote access</a> - Tailscale, DSM reverse proxy, and the Cloudflare Tunnel caveat.</li>
-            <li><a href="https://github.com/defessler/game-rom-manager/blob/main/docs/rom-sourcing.md" target="_blank" rel="noopener">Sourcing and ingest</a> - the dump, verify, organize, compress pipeline.</li>
-            <li><a href="https://github.com/defessler/game-rom-manager/blob/main/BUILD-PLAN.md" target="_blank" rel="noopener">Build plan</a> - milestones, shopping list, and the critical path.</li>
+            <li><a href="https://github.com/defessler/Emulatarr-releases/blob/main/docs/research-report.md" target="_blank" rel="noopener">The research report</a> - the full cited writeup behind all of this: hardware, RomM, acquisition, dumping, playback, architecture, legal.</li>
+            <li><a href="https://github.com/defessler/Emulatarr-releases/blob/main/docs/clients.md" target="_blank" rel="noopener">Clients</a> - per-device setup for Android, iOS, Steam Deck, and PC.</li>
+            <li><a href="https://github.com/defessler/Emulatarr-releases/blob/main/docs/remote-access.md" target="_blank" rel="noopener">Remote access</a> - Tailscale, DSM reverse proxy, and the Cloudflare Tunnel caveat.</li>
+            <li><a href="https://github.com/defessler/Emulatarr-releases/blob/main/docs/rom-sourcing.md" target="_blank" rel="noopener">Sourcing and ingest</a> - the dump, verify, organize, compress pipeline.</li>
+            <li><a href="https://github.com/defessler/Emulatarr-releases/blob/main/BUILD-PLAN.md" target="_blank" rel="noopener">Build plan</a> - milestones, shopping list, and the critical path.</li>
           </ul>
         </div>
 
         <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --feedback</span></p>
         <div class="out">
           <ul>
-            <li><a href="https://github.com/defessler/game-rom-manager/issues/new" target="_blank" rel="noopener">Report a bug</a> - the wizard has a Troubleshooting panel and a diagnostics collector. Paste that output in and it saves a round trip.</li>
-            <li><a href="https://github.com/defessler/game-rom-manager/issues" target="_blank" rel="noopener">Browse what is already reported</a>.</li>
+            <li><a href="https://github.com/defessler/Emulatarr-releases/issues/new" target="_blank" rel="noopener">Report a bug</a> - the wizard has a Troubleshooting panel and a diagnostics collector. Paste that output in and it saves a round trip.</li>
+            <li><a href="https://github.com/defessler/Emulatarr-releases/issues" target="_blank" rel="noopener">Browse what is already reported</a>.</li>
           </ul>
           <p class="dim">// needs a free GitHub account, since that is where the tracker lives</p>
         </div>
@@ -468,7 +468,7 @@
     // Fill the download card from the same release the in-app updater
     // finds, so this page and the wizard can never disagree about which
     // build is "latest". updates.json is written by the release workflow
-    // in defessler/game-rom-manager and mirrored here.
+    // in defessler/Emulatarr-releases and mirrored here.
     (async () => {
       try {
         const res = await fetch('updates.json', { cache: 'no-cache' });
