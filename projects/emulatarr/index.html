@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Emulatarr - Doug Fessler</title>
+  <meta name="description" content="A desktop wizard that stands up a self-hosted retro game library on your NAS over SSH. Free, portable, bring your own games.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Every piece of ASCII art on this page is drawn with plain ASCII:
+       + - | # and spaces. That is deliberate. The Window Layout Manager
+       page needed two self-hosted font subsets because Google's
+       JetBrains Mono ships no box-drawing or block glyphs (U+2500-259F),
+       so those characters fell back per-glyph to whatever the system had
+       and the columns sheared apart on Android. Staying inside ASCII
+       means one font, one advance width, and no subset to keep in sync.
+       If you ever reach for a box-drawing character here, read the long
+       comment at the top of ../windowlayoutmanager/index.html first. */
+
+    :root {
+      --mk-bg:      #1e1e1e;
+      --mk-surface: #2d2d2d;
+      --mk-gutter:  #141414;
+      --mk-fg:      #F8F8F2;
+      --mk-comment: #75715E;
+      --mk-pink:    #F92672;
+      --mk-orange:  #FD971F;
+      --mk-yellow:  #E6DB74;
+      --mk-green:   #A6E22E;
+      --mk-cyan:    #66D9EF;
+      --mk-purple:  #AE81FF;
+      --mk-border:  #49483E;
+      --font: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Courier New', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* Chrome on Android inflates text in blocks it decides are "too
+       small", which silently rescales the ASCII art against everything
+       around it. */
+    html {
+      font-size: 15px;
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+    body {
+      font-family: var(--font);
+      background: var(--mk-bg);
+      color: var(--mk-fg);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+      word-break: break-word;
+    }
+    /* Scanline overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg,
+        transparent, transparent 3px,
+        rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px);
+      pointer-events: none;
+      z-index: 9999;
+    }
+    a { color: var(--mk-orange); text-decoration: none; }
+    a:hover { color: var(--mk-yellow); text-decoration: underline; }
+
+    .top-nav {
+      background: var(--mk-gutter);
+      border-bottom: 1px solid var(--mk-border);
+      padding: 0.8rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .top-nav .brand {
+      color: var(--mk-green);
+      font-weight: 700;
+      text-shadow: 0.03em 0 0 rgba(249, 38, 114, 0.35), -0.03em 0 0 rgba(102, 217, 239, 0.35);
+    }
+    .top-nav .brand::before { content: '> '; color: var(--mk-comment); }
+    .top-nav .brand:hover { text-decoration: none; color: var(--mk-green); }
+    .top-nav .nav-right {
+      color: var(--mk-comment);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+    /* The path is the longest thing in the bar and the least useful, so
+       it is the first to go when the phone gets narrow. */
+    @media (max-width: 560px) { .nav-path { display: none; } }
+
+    main { max-width: 900px; margin: 0 auto; padding: 2.5rem 1rem 4rem; }
+
+    .term-window {
+      background: var(--mk-surface);
+      border: 1px solid var(--mk-border);
+      border-radius: 6px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+      overflow: hidden;
+    }
+    .term-titlebar {
+      background: var(--mk-gutter);
+      border-bottom: 1px solid var(--mk-border);
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.8rem;
+      color: var(--mk-comment);
+    }
+    .term-dots { display: flex; gap: 6px; }
+    .term-dots span { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+    .term-dots span:nth-child(1) { background: var(--mk-pink); }
+    .term-dots span:nth-child(2) { background: var(--mk-yellow); }
+    .term-dots span:nth-child(3) { background: var(--mk-green); }
+    .term-body { padding: 1.5rem 1.75rem 2rem; }
+    @media (max-width: 560px) { .term-body { padding: 1.25rem 1rem 1.5rem; } }
+
+    .prompt-line {
+      color: var(--mk-comment);
+      margin: 2.2rem 0 0.9rem;
+      font-size: 0.95rem;
+    }
+    .prompt-line:first-child { margin-top: 0; }
+    .prompt-line .u { color: var(--mk-green); }
+    .prompt-line .p { color: var(--mk-cyan); }
+    .prompt-line .cmd { color: var(--mk-fg); font-weight: 500; }
+    .prompt-line.cursor::after {
+      content: '_';
+      color: var(--mk-green);
+      animation: blink 1.1s steps(2, end) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) {
+      .prompt-line.cursor::after { animation: none; }
+    }
+
+    /* Art blocks. Sized in whole pixels for the same reason the WLM
+       banner is: JetBrains Mono advances 0.6em, so only multiples of 5px
+       give an integer cell width. A vw-based clamp lands every column on
+       a different sub-pixel offset and the verticals go ragged. */
+    .art {
+      font-size: 15px;
+      line-height: 1.15;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 3px;
+      position: relative;
+      z-index: 10000;    /* above the scanlines, which otherwise seam it */
+      font-variant-ligatures: none;
+      font-feature-settings: 'liga' 0, 'calt' 0;
+      letter-spacing: 0;
+      color: var(--mk-green);
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 420px) { .art { font-size: 10px; } }
+    .art .b1 { color: var(--mk-cyan); }
+    .art .b2 { color: var(--mk-pink); }
+    .art .b3 { color: var(--mk-orange); }
+    .art .dimline { color: var(--mk-comment); }
+
+    .hero { display: flex; gap: 1.75rem; align-items: center; flex-wrap: wrap; }
+    .hero-text { flex: 1; min-width: 260px; }
+    .wordmark {
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: var(--mk-green);
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+      text-shadow: 0.03em 0 0 rgba(249, 38, 114, 0.35), -0.03em 0 0 rgba(102, 217, 239, 0.35);
+    }
+    .tagline { color: var(--mk-fg); font-size: 1.05rem; margin: 0.5rem 0 0.35rem; }
+    .tagline em { color: var(--mk-cyan); font-style: normal; }
+    .byline { color: var(--mk-comment); font-size: 0.85rem; }
+    .byline a { color: var(--mk-comment); text-decoration: underline; }
+    .byline a:hover { color: var(--mk-yellow); }
+
+    .download-card {
+      background: var(--mk-gutter);
+      border: 1px solid var(--mk-border);
+      border-left: 3px solid var(--mk-green);
+      border-radius: 4px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1.25rem;
+    }
+    .btn-download {
+      display: inline-block;
+      background: var(--mk-green);
+      color: #141414;
+      font-weight: 700;
+      font-family: var(--font);
+      font-size: 1rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-download:hover { background: var(--mk-yellow); color: #141414; text-decoration: none; }
+    /* Plain arrow. U+2B33 renders as a tofu box on Android. */
+    .btn-download::before { content: '↓ '; }
+    .dl-meta { font-size: 0.85rem; color: var(--mk-comment); }
+    #dl-version { color: var(--mk-fg); font-weight: 600; }
+    .pre-badge {
+      color: var(--mk-orange);
+      border: 1px solid var(--mk-orange);
+      border-radius: 3px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.05rem 0.4rem;
+      margin-left: 0.5rem;
+      white-space: nowrap;
+    }
+    .dl-sha { font-size: 0.7rem; margin-top: 0.2rem; word-break: break-all; }
+    .dl-sha .h { color: var(--mk-cyan); }
+
+    .notes-row {
+      display: flex;
+      align-items: baseline;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      margin-top: 0.8rem;
+    }
+    details.notes summary {
+      cursor: pointer;
+      color: var(--mk-cyan);
+      font-size: 0.85rem;
+    }
+    details.notes summary:hover { color: var(--mk-yellow); }
+    .all-releases { font-size: 0.85rem; }
+    .notes-body {
+      margin-top: 0.8rem;
+      background: var(--mk-gutter);
+      border: 1px solid var(--mk-border);
+      border-radius: 4px;
+      padding: 1rem 1.15rem;
+      font-size: 0.82rem;
+      line-height: 1.55;
+      color: var(--mk-fg);
+      white-space: pre-wrap;
+      max-height: 26rem;
+      overflow-y: auto;
+    }
+
+    .out { color: var(--mk-fg); font-size: 0.92rem; }
+    .out ul, .out ol { margin: 0 0 0 1.25rem; }
+    .out li { margin-bottom: 0.55rem; }
+    .out li strong { color: var(--mk-green); font-weight: 600; }
+    .out p { margin-bottom: 0.7rem; }
+    .out code {
+      background: var(--mk-gutter);
+      border: 1px solid var(--mk-border);
+      border-radius: 3px;
+      padding: 0.05rem 0.35rem;
+      font-size: 0.85em;
+      color: var(--mk-yellow);
+      word-break: break-word;
+    }
+    .dim { color: var(--mk-comment); font-size: 0.85rem; }
+
+    /* The wizard's six screens, as a strip of chips. Wraps to as many
+       rows as the viewport needs rather than scrolling sideways. */
+    .screens { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+    .screens span {
+      border: 1px solid var(--mk-border);
+      border-bottom: 2px solid var(--mk-cyan);
+      border-radius: 3px;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.82rem;
+      color: var(--mk-fg);
+      background: var(--mk-gutter);
+      white-space: nowrap;
+    }
+
+    .note-card {
+      background: var(--mk-gutter);
+      border: 1px solid var(--mk-border);
+      border-left: 3px solid var(--mk-orange);
+      border-radius: 4px;
+      padding: 1rem 1.25rem;
+      font-size: 0.88rem;
+    }
+    .note-card strong { color: var(--mk-orange); }
+
+    footer {
+      text-align: center;
+      color: var(--mk-comment);
+      font-size: 0.85rem;
+      padding: 0 1rem 2.5rem;
+    }
+
+    @media (max-width: 380px) {
+      .btn-download { font-size: 0.88rem; padding: 0.7rem 0.6rem; }
+      .wordmark { font-size: 1.7rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-nav">
+    <a class="brand" href="/">Doug Fessler</a>
+    <span class="nav-right"><span class="nav-path">~/projects/emulatarr</span>
+      <a href="https://github.com/defessler/game-rom-manager" target="_blank" rel="noopener">source</a>
+    </span>
+  </nav>
+
+  <main>
+    <h1 class="wordmark-sr" style="position:absolute;left:-9999px">Emulatarr</h1>
+    <div class="term-window">
+      <div class="term-titlebar">
+        <span class="term-dots"><span></span><span></span><span></span></span>
+        <span>emulatarr@dougfessler: ~/emulatarr</span>
+      </div>
+      <div class="term-body">
+
+        <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --about</span></p>
+        <div class="hero">
+          <!-- The cartridge from the app icon, redrawn in ASCII. The
+               three bars are the same three bars, same colours. -->
+          <pre class="art" aria-hidden="true">+-------------------------+
+|                         |
+|  +-------------------+  |
+|  | <span class="b1">###############</span>   |  |
+|  | <span class="b2">##########</span>        |  |
+|  | <span class="b3">######</span>            |  |
+|  +-------------------+  |
+|                         |
++----+---------------+----+
+     +-+-+-+-+-+-+-+-+</pre>
+          <div class="hero-text">
+            <div class="wordmark" aria-hidden="true">Emulatarr</div>
+            <p class="tagline">A desktop wizard that stands up a <em>self-hosted retro game library</em> on your NAS, over SSH.</p>
+            <p class="byline">// free · portable · nothing installs on your PC · by <a href="/">Doug Fessler</a></p>
+          </div>
+        </div>
+
+        <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --download</span></p>
+        <div class="download-card">
+          <!-- Direct asset URL rather than /releases/latest. The script
+               at the bottom overwrites it from the feed, and this static
+               fallback should download rather than land on a repo
+               listing. The repo also cuts plain v* releases for the NAS
+               scripts, so /latest is not reliably the wizard. -->
+          <a class="btn-download" id="dl-btn"
+             href="https://github.com/defessler/game-rom-manager/releases/download/installer-v0.1.0/emulatarr-installer-win-unpacked.zip">Download for Windows</a>
+          <div class="dl-meta">
+            <div id="dl-version">latest release<span class="pre-badge" id="dl-pre" hidden>pre-release</span></div>
+            <div id="dl-info">x64 · portable .zip</div>
+            <div class="dl-sha" id="dl-sha" hidden>sha256: <span class="h" id="dl-sha-hex"></span></div>
+          </div>
+        </div>
+        <div class="notes-row">
+          <details class="notes" id="notes-wrap" hidden>
+            <summary>release notes</summary>
+          </details>
+          <a class="all-releases"
+             href="https://github.com/defessler/game-rom-manager/releases?q=installer-v"
+             target="_blank" rel="noopener">all releases</a>
+        </div>
+        <pre class="notes-body" id="notes-body" hidden></pre>
+
+        <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --what-it-does</span></p>
+        <div class="out">
+          <p>Six screens, start to finish:</p>
+          <div class="screens">
+            <span>Welcome</span><span>Connect</span><span>Detect</span><span>Configure</span><span>Run</span><span>Done</span>
+          </div>
+          <ul>
+            <li><strong>Connects over SSH</strong> - password or key, with the privilege escalation worked out for you. Sudo passwords are masked at fixed width before they reach the screen or the log, so the length does not leak either.</li>
+            <li><strong>Looks before it leaps</strong> - one batched probe reports your platform, architecture, container runtime, free space, and whether the web port is already taken, before anything is written.</li>
+            <li><strong>Writes the config</strong> - a form becomes a <code>.env</code>, deterministically. Values are quoted against an allow-list, because the NAS side sources that file.</li>
+            <li><strong>Deploys the stack</strong> - RomM, MariaDB, and Valkey via Docker Compose, plus the folder layout with the right <code>PUID</code>/<code>PGID</code> and Synology ACLs.</li>
+            <li><strong>Streams the whole install</strong> - real output, a step rail that tracks it, and a health check at the end that tells you how many services came up.</li>
+            <li><strong>Remembers your NAS</strong> - profiles are encrypted at rest, and export as a passphrase-wrapped file if you want to move one to another machine.</li>
+            <li><strong>Updates itself</strong> - checks GitHub Releases, verifies the download by size and sha256, and swaps itself in place on restart. Saved profiles survive.</li>
+          </ul>
+          <p class="dim">// idempotent throughout. The network drops, people click Run twice, and neither should hurt.</p>
+        </div>
+
+        <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --the-stack</span></p>
+        <div class="out">
+          <pre class="art" aria-hidden="true"><span class="dimline">   your PC                        your NAS</span>
+  +-----------+   ssh+sftp   +----------------------+
+  |  wizard   |  ---------&gt;  |  <span class="b1">RomM</span> + <span class="b2">MariaDB</span> +   |
+  +-----------+              |  <span class="b3">Valkey</span>  (compose)   |
+                             +----------+-----------+
+                                        |
+                             <span class="dimline">smb / nfs / browser</span>
+                                        |
+                  <span class="dimline">Steam Deck · phone · PC · Batocera</span></pre>
+          <p>The NAS is a library server, not an emulator box. <a href="https://github.com/rommapp/romm" target="_blank" rel="noopener">RomM</a> catalogs and scrapes your collection and serves the files. Light systems play in the browser through EmulatorJS, which runs client-side. Heavier ones play on a real device that mounts the library over SMB or NFS.</p>
+        </div>
+
+        <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --install</span></p>
+        <div class="out">
+          <ol>
+            <li>Download the zip above and extract it anywhere <span class="dim">(for example <code>C:\Apps\Emulatarr</code>)</span>.</li>
+            <li>Run <code>Emulatarr Installer.exe</code>.</li>
+            <li>Point it at your NAS and walk the six screens.</li>
+          </ol>
+          <p class="dim">// SmartScreen may warn on first run, since the build is unsigned. "More info" then "Run anyway".</p>
+        </div>
+
+        <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --requirements</span></p>
+        <div class="out">
+          <ul>
+            <li>wizard - Windows 10 or 11 (x64). It is a portable folder, so deleting the folder uninstalls it.</li>
+            <li>nas - an x86-64 NAS running Docker or Podman, reachable over SSH. Built and tested against a Synology DS1522+ with Container Manager.</li>
+            <li>storage - size the volume around the disc systems you actually want. Cartridges are tens of GB. PS2 alone is around 15 TB.</li>
+            <li>games - bring your own. Nothing here ships or links to game files.</li>
+          </ul>
+        </div>
+
+        <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --by-hand</span></p>
+        <div class="out">
+          <p>The wizard uploads exactly one folder, <code>nas/scripts/</code>, and runs <code>setup.sh</code> inside it. Copying that folder across yourself and running the script is a supported route, not a fallback. If you would rather see every command, start with
+          <a href="https://github.com/defessler/game-rom-manager/blob/main/QUICKSTART.md" target="_blank" rel="noopener">QUICKSTART.md</a>.</p>
+        </div>
+
+        <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --docs</span></p>
+        <div class="out">
+          <ul>
+            <li><a href="https://github.com/defessler/game-rom-manager/blob/main/docs/research-report.md" target="_blank" rel="noopener">The research report</a> - the full cited writeup behind all of this: hardware, RomM, acquisition, dumping, playback, architecture, legal.</li>
+            <li><a href="https://github.com/defessler/game-rom-manager/blob/main/docs/clients.md" target="_blank" rel="noopener">Clients</a> - per-device setup for Android, iOS, Steam Deck, and PC.</li>
+            <li><a href="https://github.com/defessler/game-rom-manager/blob/main/docs/remote-access.md" target="_blank" rel="noopener">Remote access</a> - Tailscale, DSM reverse proxy, and the Cloudflare Tunnel caveat.</li>
+            <li><a href="https://github.com/defessler/game-rom-manager/blob/main/docs/rom-sourcing.md" target="_blank" rel="noopener">Sourcing and ingest</a> - the dump, verify, organize, compress pipeline.</li>
+            <li><a href="https://github.com/defessler/game-rom-manager/blob/main/BUILD-PLAN.md" target="_blank" rel="noopener">Build plan</a> - milestones, shopping list, and the critical path.</li>
+          </ul>
+        </div>
+
+        <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --feedback</span></p>
+        <div class="out">
+          <ul>
+            <li><a href="https://github.com/defessler/game-rom-manager/issues/new" target="_blank" rel="noopener">Report a bug</a> - the wizard has a Troubleshooting panel and a diagnostics collector. Paste that output in and it saves a round trip.</li>
+            <li><a href="https://github.com/defessler/game-rom-manager/issues" target="_blank" rel="noopener">Browse what is already reported</a>.</li>
+          </ul>
+          <p class="dim">// needs a free GitHub account, since that is where the tracker lives</p>
+        </div>
+
+        <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --legal</span></p>
+        <div class="out">
+          <div class="note-card">
+            <strong>Bring your own games.</strong> RomM ships no game files, and neither does this. The
+            recommended route is dumping discs and cartridges you physically own, which is the defensible
+            one. Downloading games you do not own is generally infringement in the US even when you own the
+            original cartridge. Not legal advice.
+          </div>
+        </div>
+
+        <p class="prompt-line cursor"><span class="u">emulatarr</span><span class="p">:~</span>$&nbsp;</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <a href="/">dougfessler.com</a> · © Doug Fessler
+  </footer>
+
+  <script>
+    // Fill the download card from the same release the in-app updater
+    // finds, so this page and the wizard can never disagree about which
+    // build is "latest". updates.json is written by the release workflow
+    // in defessler/game-rom-manager and mirrored here.
+    (async () => {
+      try {
+        const res = await fetch('updates.json', { cache: 'no-cache' });
+        if (!res.ok) return;
+        const feed = await res.json();
+        const l = feed && feed.latest;
+        if (!l || !l.url || !l.version) return;
+        document.getElementById('dl-btn').href = l.url;
+        document.getElementById('dl-version').firstChild.textContent = 'v' + l.version;
+        if (l.prerelease) document.getElementById('dl-pre').hidden = false;
+        const parts = ['x64 · portable .zip'];
+        if (l.sizeBytes) parts.push((l.sizeBytes / 1e6).toFixed(1) + ' MB');
+        if (l.publishedAt) {
+          const d = new Date(l.publishedAt);
+          if (!isNaN(d)) parts.push(d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }));
+        }
+        document.getElementById('dl-info').textContent = parts.join(' · ');
+        const sha = String(l.sha256 || '').replace(/^sha256:/i, '');
+        if (/^[0-9a-f]{64}$/i.test(sha)) {
+          document.getElementById('dl-sha-hex').textContent = sha;
+          document.getElementById('dl-sha').hidden = false;
+        }
+        if (l.notes) {
+          const body = document.getElementById('notes-body');
+          const wrap = document.getElementById('notes-wrap');
+          body.textContent = l.notes;
+          wrap.hidden = false;
+          // The body sits outside the <details> so the disclosure stays a
+          // single line next to "all releases", which means the toggle
+          // has to drive it by hand.
+          wrap.addEventListener('toggle', () => { body.hidden = !wrap.open; });
+        }
+      } catch (_) { /* the static fallbacks already point at the release */ }
+    })();
+  </script>
+</body>
+</html>

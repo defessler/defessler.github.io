@@ -1,0 +1,14 @@
+{
+  "product": "Emulatarr",
+  "latest": {
+    "version": "0.1.0",
+    "tag": "installer-v0.1.0",
+    "publishedAt": "2026-07-27T16:24:29Z",
+    "url": "https://github.com/defessler/game-rom-manager/releases/download/installer-v0.1.0/emulatarr-installer-win-unpacked.zip",
+    "sizeBytes": 118474161,
+    "sha256": "18b1997df0dfe6b022ecbefc482e7e24bc15cdd45ca5c5b33ab1943206075c03",
+    "prerelease": false,
+    "pageUrl": "https://dougfessler.com/projects/emulatarr/",
+    "notes": "## installer-v0.1.0 \u2014 the first build of the wizard\n\nEmulatarr stands up a self-hosted retro game library on your NAS. It runs on\nyour PC, connects over SSH, and deploys the RomM stack (RomM, MariaDB, Valkey)\non the other end. Nothing installs locally.\n\nSix screens: Welcome, Connect, Detect, Configure, Run, Done.\n\n**What it handles for you**\n\n- SSH with password or key, and the privilege escalation worked out per NAS. Sudo passwords are masked at a fixed width before they reach the screen or the log, so the length doesn't leak either.\n- One batched probe that reports platform, architecture, container runtime, free space, and whether the web port is already taken, before anything is written.\n- A form that becomes a `.env` deterministically, with values quoted against an allow-list, because the NAS side sources that file.\n- The folder layout with the right `PUID`/`PGID` and Synology ACLs, skipping the slow recursive pass unless you ask for it.\n- The install itself, streamed back live, with a step rail that tracks it and a health check at the end.\n- Per-NAS profiles, encrypted at rest, exportable as a passphrase-wrapped file.\n\n**Updating**\n\nThe wizard polls GitHub Releases, shows a **New version** banner, and applies\nthe update on **Restart & install**. It verifies the download by size and\nsha256 first. Saved profiles in `%APPDATA%\\emulatarr-installer\\` survive.\n\n---\n\n**Download:** `emulatarr-installer-win-unpacked.zip` \u2014 extract anywhere on your\nWindows machine and run `Emulatarr Installer.exe`. Nothing is installed\nlocally; the wizard drives your NAS over SSH. SmartScreen may warn on first\nrun since the build is unsigned.\n\nPrefer to skip the wizard? The NAS-side scripts are released separately as\n`game-rom-manager-installer.zip` under the plain `v*` tags \u2014 see\n`QUICKSTART.md`. The wizard uploads exactly `nas/scripts/`, so doing it by hand\nis a supported route rather than a fallback.\n\nPage: https://dougfessler.com/projects/emulatarr/\n"
+  }
+}
