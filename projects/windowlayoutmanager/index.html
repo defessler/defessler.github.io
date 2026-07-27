@@ -39,6 +39,18 @@
          spaces back to a fallback face and reproduce the shear. */
       src: url('jbm-blocks-v2.woff2') format('woff2');
     }
+    /* Same reasoning as the logo, for the monitor diagram: a drawn figure
+       only holds its shape if the frame pieces and the blanks between
+       them come from one font at one advance, and box-drawing is absent
+       from Google's default JetBrains Mono subsets. This carries the six
+       line pieces the diagram uses plus U+20, under its own family. */
+    @font-face {
+      font-family: 'WLM Draw';
+      font-style: normal;
+      font-weight: 400;
+      font-display: block;
+      src: url('jbm-draw-v1.woff2') format('woff2');
+    }
 
     :root {
       --mk-bg:      #1e1e1e;
@@ -472,6 +484,31 @@
          never zooms back out. Not worth the two-pixel aesthetic. */
       .rf-input { font-size: 16px; }
     }
+    /* --- Two-monitor diagram --------------------------------------- */
+    .layout-diagram {
+      font-family: 'WLM Draw', 'Consolas', 'DejaVu Sans Mono', 'Courier New', monospace;
+      /* 38 columns. Multiples of 5px keep the 0.6em advance on whole
+         pixels, same as the logo. 15px -> 9px cells -> 342px wide. */
+      font-size: 15px;
+      line-height: 1.05;      /* rows butt together so verticals look continuous */
+      margin: 0 0 1.1rem;
+      font-variant-ligatures: none;
+      font-feature-settings: 'liga' 0, 'calt' 0;
+      letter-spacing: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+    .layout-diagram .mn { color: var(--mk-cyan); }    /* screens and stands */
+    .layout-diagram .wa { color: var(--mk-yellow); }
+    .layout-diagram .wb { color: var(--mk-green); }
+    .layout-diagram .wc { color: var(--mk-pink); }
+    @media (max-width: 560px) {
+      /* 38 cols x 6px = 228px, clears a 320px screen. */
+      .layout-diagram { font-size: 10px; }
+    }
+
     /* --- Anonymous report form ------------------------------------- */
     #report-form { max-width: 640px; }
     .rf-kind { display: flex; gap: 1.2rem; margin: 0.2rem 0 0.9rem; flex-wrap: wrap; }
@@ -586,6 +623,21 @@
 
         <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --features</span></p>
         <div class="out">
+          <!-- What the app is for, drawn rather than screenshotted. Rows are
+               placed on a grid by the generator in scratchpad, so editing a
+               line by hand will bend the frames. Cyan is the screens, the
+               other three colours are windows held in place across them. -->
+          <pre class="layout-diagram" aria-hidden="true">
+<span class="mn">┌────────────────────┐</span>
+<span class="mn">│</span> <span class="wa">┌───────┐</span><span class="wb">┌───────┐</span> <span class="mn">│</span>  <span class="mn">┌────────────┐</span>
+<span class="mn">│</span> <span class="wa">│</span>       <span class="wa">│</span><span class="wb">│</span>       <span class="wb">│</span> <span class="mn">│</span>  <span class="mn">│</span> <span class="wb">┌────┐</span><span class="wc">┌──┐</span> <span class="mn">│</span>
+<span class="mn">│</span> <span class="wa">└───────┘</span><span class="wb">│</span>       <span class="wb">│</span> <span class="mn">│</span>  <span class="mn">│</span> <span class="wb">│</span>    <span class="wb">│</span><span class="wc">│</span>  <span class="wc">│</span> <span class="mn">│</span>
+<span class="mn">│</span> <span class="wc">┌───────┐</span><span class="wb">│</span>       <span class="wb">│</span> <span class="mn">│</span>  <span class="mn">│</span> <span class="wb">│</span>    <span class="wb">│</span><span class="wc">└──┘</span> <span class="mn">│</span>
+<span class="mn">│</span> <span class="wc">│</span>       <span class="wc">│</span><span class="wb">│</span>       <span class="wb">│</span> <span class="mn">│</span>  <span class="mn">│</span> <span class="wb">│</span>    <span class="wb">│</span>     <span class="mn">│</span>
+<span class="mn">│</span> <span class="wc">└───────┘</span><span class="wb">└───────┘</span> <span class="mn">│</span>  <span class="mn">│</span> <span class="wb">└────┘</span>     <span class="mn">│</span>
+<span class="mn">└────────────────────┘</span>  <span class="mn">└────────────┘</span>
+           <span class="mn">│</span>                   <span class="mn">│</span>
+        <span class="mn">───┴───</span>              <span class="mn">──┴──</span></pre>
           <ul>
             <li><strong>Layout profiles</strong> - Capture every window's position, size, and state. Restore with one click, a global hotkey, or the CLI.</li>
             <li><strong>Monitor-aware</strong> - Profiles bind to monitor sets and auto-activate when your displays change: docking, streaming with a virtual display, plugging into a projector.</li>
