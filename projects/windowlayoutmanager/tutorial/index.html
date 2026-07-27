@@ -298,6 +298,7 @@
           <li><a href="#updates">Updates</a></li>
           <li><a href="#blacklist">Blacklist</a></li>
           <li><a href="#companion">Companion Software</a></li>
+          <li><a href="#diagnostics">Diagnostics &amp; Reporting a Bug</a></li>
           <li><a href="#cli">CLI, Links &amp; Automation</a></li>
         </ul>
 
@@ -421,6 +422,15 @@
           <h2>Companion Software</h2>
           <p>The "Companion software" tab detects complementary tools (PowerToys for live drag-snap zones, virtual display drivers for headless monitors, Windows Terminal and PowerShell 7 for scripting) and offers one-click installs for whatever's missing.</p>
           <div class="shot"><a href="img/08-settings-companion.png" target="_blank" rel="noopener" title="Open full size"><img src="img/08-settings-companion.png" alt="Companion software settings tab" loading="lazy"></a></div>
+        </section>
+
+        <section id="diagnostics">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial diagnostics</span></p>
+          <h2>Diagnostics &amp; Reporting a Bug</h2>
+          <p>The "Diagnostics" tab shows the app version and the exact paths WLM is reading and writing, which is usually the fastest way to work out why something isn't behaving. "Copy to clipboard" grabs the whole dump, and "Open profiles folder" and "Open crash log" take you straight to the files.</p>
+          <p>"Report a bug" and "Request a feature" open a short form. You'll see exactly what gets sent before anything leaves your machine, the diagnostics dump is optional, and your Windows username is stripped out of the paths. Issues are public, so anything you type there is too.</p>
+          <div class="shot"><a href="img/10-settings-diagnostics.png" target="_blank" rel="noopener" title="Open full size"><img src="img/10-settings-diagnostics.png" alt="Diagnostics settings tab" loading="lazy"></a></div>
+          <p class="caption">// a load that didn't restore everything also links to a per-window report from its notification</p>
         </section>
 
         <section id="cli">
