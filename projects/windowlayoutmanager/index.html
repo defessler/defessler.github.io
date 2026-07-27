@@ -39,18 +39,6 @@
          spaces back to a fallback face and reproduce the shear. */
       src: url('jbm-blocks-v2.woff2') format('woff2');
     }
-    /* Same trick for the support panel: a box-drawn frame only lines up if
-       the borders and the text inside them come from one font at one
-       advance. This subset carries every glyph that panel uses — box
-       pieces, the dots, and the handful of letters — under a private
-       family name so nothing can resolve elsewhere. */
-    @font-face {
-      font-family: 'WLM Term';
-      font-style: normal;
-      font-weight: 400;
-      font-display: block;
-      src: url('jbm-term-v1.woff2') format('woff2');
-    }
 
     :root {
       --mk-bg:      #1e1e1e;
@@ -484,40 +472,6 @@
          never zooms back out. Not worth the two-pixel aesthetic. */
       .rf-input { font-size: 16px; }
     }
-    /* --- Support panel (ASCII port of the Ko-fi cover graphic) ------ */
-    .support-panel {
-      font-family: 'WLM Term', 'Consolas', 'DejaVu Sans Mono', 'Courier New', monospace;
-      /* 38 columns. Multiples of 5px keep the 0.6em advance on whole
-         pixels, same reasoning as the logo. 15px -> 9px -> 342px wide. */
-      font-size: 15px;
-      line-height: 1.15;
-      color: var(--mk-border);          /* the frame itself stays quiet */
-      margin: 0.2rem 0 0;
-      font-variant-ligatures: none;
-      font-feature-settings: 'liga' 0, 'calt' 0;
-      letter-spacing: 0;
-      overflow-x: auto;
-      overflow-y: hidden;
-      -webkit-text-size-adjust: 100%;
-      text-size-adjust: 100%;
-    }
-    .sp-d1 { color: var(--mk-pink); }
-    .sp-d2 { color: var(--mk-yellow); }
-    .sp-d3 { color: var(--mk-green); }
-    .sp-dim { color: var(--mk-comment); }
-    .sp-prompt { color: var(--mk-green); }
-    .sp-cmd { color: var(--mk-fg); }
-    .sp-out { color: var(--mk-cyan); }   /* command output, as on the Ko-fi card */
-    .sp-cursor { color: var(--mk-green); animation: blink 1.1s step-end infinite; }
-    .support-panel-link { display: inline-block; text-decoration: none; max-width: 100%; }
-    .support-panel-link:hover .sp-cmd,
-    .support-panel-link:focus-visible .sp-cmd { color: var(--mk-cyan); }
-    .support-panel-link:focus-visible { outline: 1px solid var(--mk-cyan); outline-offset: 3px; }
-    @media (max-width: 560px) {
-      /* 38 cols x 6px = 228px, so the frame still clears a 320px screen. */
-      .support-panel { font-size: 10px; }
-    }
-
     /* --- Anonymous report form ------------------------------------- */
     #report-form { max-width: 640px; }
     .rf-kind { display: flex; gap: 1.2rem; margin: 0.2rem 0 0.9rem; flex-wrap: wrap; }
@@ -702,38 +656,6 @@
             </ul>
             <p class="dim">// needs a free GitHub account, since that's where the tracker lives</p>
           </div>
-        </div>
-
-        <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --support</span></p>
-        <div class="out">
-          <!-- The Ko-fi cover graphic, redrawn in box characters. One
-               anchor wraps the whole thing so the art itself can stay
-               aria-hidden without trapping focus inside it.
-
-               Editing this: every row must stay exactly 38 characters
-               wide, counting the ║ on both ends and ignoring the <span>
-               tags. Change a line's text and you have to fix its trailing
-               padding by the same amount, or the right-hand border walks
-               off. Widening past 38 makes the frame scroll on a 320px
-               phone. -->
-          <a class="support-panel-link" href="https://ko-fi.com/dougfessler"
-             target="_blank" rel="noopener"
-             aria-label="Support Window Layout Manager on Ko-fi"><pre class="support-panel" aria-hidden="true">
-╔════════════════════════════════════╗
-║  <span class="sp-d1">●</span><span class="sp-d2">●</span><span class="sp-d3">●</span><span class="sp-dim">  doug@dougfessler: ~</span>          ║
-╠════════════════════════════════════╣
-║                                    ║
-║  <span class="sp-prompt">  doug:~$ </span><span class="sp-cmd">cat ./price</span>             ║
-║  <span class="sp-out">  free. always has been.</span>          ║
-║                                    ║
-║  <span class="sp-prompt">  doug:~$ </span><span class="sp-cmd">cat ./why-tip</span>           ║
-║  <span class="sp-out">  tips don't unlock anything.</span>     ║
-║  <span class="sp-out">  they buy the next release.</span>      ║
-║                                    ║
-║  <span class="sp-prompt">  doug:~$ </span><span class="sp-cmd">./support --coffee</span> <span class="sp-cursor">█</span>    ║
-║                                    ║
-╚════════════════════════════════════╝</pre></a>
-          <p class="dim">// WLM is free and stays free. Tips buy the next release, nothing else.</p>
         </div>
 
         <p class="prompt-line cursor"><span class="u">wlm</span><span class="p">:~</span>$&nbsp;</p>
