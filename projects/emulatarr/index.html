@@ -9,15 +9,34 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Every piece of ASCII art on this page is drawn with plain ASCII:
-       + - | # and spaces. That is deliberate. The Window Layout Manager
-       page needed two self-hosted font subsets because Google's
-       JetBrains Mono ships no box-drawing or block glyphs (U+2500-259F),
-       so those characters fell back per-glyph to whatever the system had
-       and the columns sheared apart on Android. Staying inside ASCII
-       means one font, one advance width, and no subset to keep in sync.
-       If you ever reach for a box-drawing character here, read the long
-       comment at the top of ../windowlayoutmanager/index.html first. */
+    /* Google Fonts serves JetBrains Mono in latin/cyrillic/greek subsets
+       only — block elements (U+2550–2588) are in none of them, so the
+       logo's characters fell back per glyph and, on Android, to a font
+       that is not monospace. Same JetBrains Mono, subset to exactly the
+       seven glyphs the logo uses plus U+20, self-hosted so it cannot
+       depend on a rotating CDN URL. Shared byte-for-byte with the Window
+       Layout Manager page, which is where the full write-up lives.
+
+       Its own family name, deliberately NOT 'JetBrains Mono': declaring
+       it under that name collides with the faces the Google <link>
+       declares, and composing one family from both sets leaves the block
+       glyphs resolving past it to Consolas (0.5498em) while the spaces
+       between them come from Google's copy (0.6em). Two advance widths
+       in one grid is a shear you can see.
+
+       The corollary that matters when editing: this file has NOTHING but
+       those seven glyphs and a space. Put a letter inside .banner and it
+       falls back to another face at another advance and bends the art.
+       Latin text goes in .banner-sub, which asks for the real font back.
+       Every other diagram on this page is plain ASCII for the same
+       reason — one font, one advance, nothing to keep in sync. */
+    @font-face {
+      font-family: 'EMU Blocks';
+      font-style: normal;
+      font-weight: 400;
+      font-display: block;
+      src: url('jbm-blocks-v2.woff2') format('woff2');
+    }
 
     :root {
       --mk-bg:      #1e1e1e;
@@ -36,8 +55,7 @@
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     /* Chrome on Android inflates text in blocks it decides are "too
-       small", which silently rescales the ASCII art against everything
-       around it. */
+       small", which silently rescales the art against everything else. */
     html {
       font-size: 15px;
       scroll-behavior: smooth;
@@ -84,6 +102,8 @@
     }
     .top-nav .brand::before { content: '> '; color: var(--mk-comment); }
     .top-nav .brand:hover { text-decoration: none; color: var(--mk-green); }
+    /* Flex so the links stay one group; without it the span's children
+       wrap independently and strand a link on its own row. */
     .top-nav .nav-right {
       color: var(--mk-comment);
       font-size: 0.85rem;
@@ -91,9 +111,91 @@
       align-items: center;
       gap: 1.2rem;
     }
-    /* The path is the longest thing in the bar and the least useful, so
-       it is the first to go when the phone gets narrow. */
-    @media (max-width: 560px) { .nav-path { display: none; } }
+
+    /* Donate: a quiet nav-bar chip rather than a section of its own.
+       The header is otherwise all muted text, so a solid block is the one
+       thing in it that reads as a button. display:inline-block is
+       load-bearing — overflow:hidden does not clip an inline element, so
+       the glitch artifacts would spill across the nav. */
+    .nav-coffee {
+      position: relative;
+      display: inline-block;
+      overflow: hidden;
+      isolation: isolate;
+      background: var(--mk-cyan);
+      color: #08222b;
+      border-radius: 4px;
+      padding: 0.45rem 1.05rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      white-space: nowrap;
+      transition: background 0.12s, box-shadow 0.12s;
+    }
+    .nav-coffee:hover {
+      background: #8ce8fa;
+      color: #08222b;
+      text-decoration: none;
+      box-shadow: 0 2px 10px rgba(102, 217, 239, 0.35);
+    }
+    /* Two opaque copies of the label, one pink and one green, sliced by
+       clip-path and thrown sideways so the chip looks like a badly
+       tracking signal. Both layers are transparent outside their own
+       keyframes, so nothing shows between bursts even if the trigger
+       class lingers. */
+    .nav-coffee::before,
+    .nav-coffee::after {
+      content: attr(data-label);
+      position: absolute;
+      inset: 0;
+      padding: inherit;
+      background: inherit;
+      pointer-events: none;
+      opacity: 0;
+    }
+    .nav-coffee::before { color: var(--mk-pink); }
+    .nav-coffee::after  { color: var(--mk-green); }
+    .nav-coffee.glitch::before { animation: glitch-pink 0.55s steps(2, end); }
+    .nav-coffee.glitch::after  { animation: glitch-green 0.55s steps(2, end); }
+    .nav-coffee.glitch         { animation: glitch-jitter 0.55s steps(2, end); }
+    /* Offsets in em so the same keyframes work at any chip scale. More
+       stops than the displacement needs — the point is that consecutive
+       frames disagree wildly, which is what sells a fault. */
+    @keyframes glitch-pink {
+      0%   { opacity: 1; clip-path: inset(0 0 82% 0);   transform: translate(-0.55em, -0.09em) scaleY(1.10); }
+      12%  { opacity: 1; clip-path: inset(28% 0 52% 0); transform: translate(0.72em,   0.07em) scaleY(0.92); }
+      24%  { opacity: 1; clip-path: inset(62% 0 14% 0); transform: translate(-0.85em,  0.11em) scaleY(1.14); }
+      36%  { opacity: 1; clip-path: inset(8% 0 74% 0);  transform: translate(0.52em,  -0.10em) scaleY(0.88); }
+      48%  { opacity: 1; clip-path: inset(44% 0 30% 0); transform: translate(-0.68em,  0.05em) scaleY(1.06); }
+      60%  { opacity: 1; clip-path: inset(84% 0 4% 0);  transform: translate(0.78em,   0.09em) scaleY(1.18); }
+      72%  { opacity: 1; clip-path: inset(18% 0 66% 0); transform: translate(-0.46em, -0.07em) scaleY(0.95); }
+      86%  { opacity: 1; clip-path: inset(56% 0 24% 0); transform: translate(0.62em,   0.06em) scaleY(1.09); }
+      100% { opacity: 0; clip-path: inset(0 0 100% 0);  transform: none; }
+    }
+    @keyframes glitch-green {
+      0%   { opacity: 1; clip-path: inset(66% 0 16% 0); transform: translate(0.62em,   0.08em) scaleY(0.90); }
+      12%  { opacity: 1; clip-path: inset(6% 0 78% 0);  transform: translate(-0.75em, -0.09em) scaleY(1.16); }
+      24%  { opacity: 1; clip-path: inset(38% 0 42% 0); transform: translate(0.88em,   0.04em) scaleY(0.94); }
+      36%  { opacity: 1; clip-path: inset(74% 0 8% 0);  transform: translate(-0.55em,  0.10em) scaleY(1.12); }
+      48%  { opacity: 1; clip-path: inset(20% 0 62% 0); transform: translate(0.70em,  -0.06em) scaleY(0.89); }
+      60%  { opacity: 1; clip-path: inset(50% 0 28% 0); transform: translate(-0.80em,  0.07em) scaleY(1.15); }
+      72%  { opacity: 1; clip-path: inset(2% 0 90% 0);  transform: translate(0.48em,   0.09em) scaleY(0.96); }
+      86%  { opacity: 1; clip-path: inset(80% 0 6% 0);  transform: translate(-0.64em, -0.05em) scaleY(1.08); }
+      100% { opacity: 0; clip-path: inset(0 0 100% 0);  transform: none; }
+    }
+    @keyframes glitch-jitter {
+      0%, 100% { transform: none; }
+      10% { transform: translate(3px, -2px) skewX(-14deg); }
+      25% { transform: translate(-4px, 2px) skewX(12deg) scaleY(1.07); }
+      40% { transform: translate(4px, -1px) skewX(-9deg) scaleY(0.94); }
+      55% { transform: translate(-3px, 2px) skewX(14deg); }
+      70% { transform: translate(3px, 1px)  skewX(-11deg) scaleY(1.05); }
+      85% { transform: translate(-2px, -2px) skewX(7deg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .nav-coffee.glitch,
+      .nav-coffee.glitch::before,
+      .nav-coffee.glitch::after { animation: none; }
+    }
 
     main { max-width: 900px; margin: 0 auto; padding: 2.5rem 1rem 4rem; }
 
@@ -120,7 +222,6 @@
     .term-dots span:nth-child(2) { background: var(--mk-yellow); }
     .term-dots span:nth-child(3) { background: var(--mk-green); }
     .term-body { padding: 1.5rem 1.75rem 2rem; }
-    @media (max-width: 560px) { .term-body { padding: 1.25rem 1rem 1.5rem; } }
 
     .prompt-line {
       color: var(--mk-comment);
@@ -141,41 +242,81 @@
       .prompt-line.cursor::after { animation: none; }
     }
 
-    /* Art blocks. Sized in whole pixels for the same reason the WLM
-       banner is: JetBrains Mono advances 0.6em, so only multiples of 5px
-       give an integer cell width. A vw-based clamp lands every column on
-       a different sub-pixel offset and the verticals go ragged. */
-    .art {
+    .banner {
+      color: var(--mk-green);
+      /* Above the scanline overlay (z-index 9999). Those 1px lines every
+         4px are invisible over text, but over solid blocks they read as
+         seams slicing the logo into a grid. */
+      position: relative;
+      z-index: 10000;
+      /* Whole-pixel cells, deliberately. JetBrains Mono advances 0.6em,
+         so only sizes that are multiples of 5px give an integer cell
+         width — anything else (a vw-based clamp especially) lands each
+         column on a different sub-pixel offset and antialiasing draws
+         seams through the solid blocks. 15px -> 9px, 10px -> 6px. */
       font-size: 15px;
-      line-height: 1.15;
+      /* Full-block glyphs fill their em box, so any leading shows up as a
+         dark seam through the letters. line-height:1 butts the rows. */
+      line-height: 1;
+      /* overflow-y must be pinned: setting only overflow-x makes the
+         other axis compute to `auto`, and sub-pixel line-height rounding
+         then leaves ~1px of vertical overflow — enough for Chrome to put
+         a scrollbar through the logo. */
       overflow-x: auto;
       overflow-y: hidden;
       padding-bottom: 3px;
-      position: relative;
-      z-index: 10000;    /* above the scanlines, which otherwise seam it */
+      margin-bottom: 0.75rem;
+      /* Ligatures would fuse sequences into one glyph and break the
+         column grid; the fallbacks keep the art on a real monospace face
+         if the webfont is blocked or still loading. */
+      font-family: 'EMU Blocks', 'Consolas', 'DejaVu Sans Mono', 'Courier New', monospace;
       font-variant-ligatures: none;
       font-feature-settings: 'liga' 0, 'calt' 0;
       letter-spacing: 0;
-      color: var(--mk-green);
-      margin-bottom: 1rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
     }
-    @media (max-width: 420px) { .art { font-size: 10px; } }
-    .art .b1 { color: var(--mk-cyan); }
-    .art .b2 { color: var(--mk-pink); }
-    .art .b3 { color: var(--mk-orange); }
-    .art .dimline { color: var(--mk-comment); }
+    /* Latin text, so it needs the real font back — the blocks subset has
+       nothing but its seven glyphs and a space. */
+    .banner-sub {
+      color: var(--mk-pink);
+      letter-spacing: 0.08em;
+      font-size: 0.82rem;
+      margin: -0.35rem 0 0.9rem 0.2rem;
+      font-family: 'JetBrains Mono', 'Consolas', 'DejaVu Sans Mono', 'Courier New', monospace;
+    }
+    /* The wordmark is nine letters wide where WLM's is three, so it can't
+       just shrink its way onto a phone: 77 columns is 693px at 15px and
+       462px at 10px, and a 390px screen has ~330px of usable width. Below
+       the point where even the small size overflows, the block art gives
+       way to type rather than becoming a thing you scroll sideways. */
+    .wordmark-text { display: none; }
+    @media (max-width: 820px) { .banner { font-size: 10px; } }
+    @media (max-width: 560px) {
+      /* The subtitle goes with the art it belongs to — .wordmark-text
+         carries its own copy in the <small>. */
+      .banner, .banner-sub { display: none; }
+      .wordmark-text {
+        display: block;
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--mk-green);
+        line-height: 1.1;
+        margin-bottom: 0.2rem;
+        text-shadow: 0.03em 0 0 rgba(249, 38, 114, 0.35), -0.03em 0 0 rgba(102, 217, 239, 0.35);
+      }
+      .wordmark-text small {
+        display: block;
+        font-size: 0.72rem;
+        font-weight: 400;
+        letter-spacing: 0.08em;
+        color: var(--mk-pink);
+      }
+      .term-body { padding: 1.25rem 1rem 1.5rem; }
+    }
+    h1 { position: absolute; left: -9999px; } /* the banner is the visual h1 */
 
-    .hero { display: flex; gap: 1.75rem; align-items: center; flex-wrap: wrap; }
-    .hero-text { flex: 1; min-width: 260px; }
-    .wordmark {
-      font-size: 2.1rem;
-      font-weight: 700;
-      color: var(--mk-green);
-      letter-spacing: 0.02em;
-      line-height: 1.1;
-      text-shadow: 0.03em 0 0 rgba(249, 38, 114, 0.35), -0.03em 0 0 rgba(102, 217, 239, 0.35);
-    }
-    .tagline { color: var(--mk-fg); font-size: 1.05rem; margin: 0.5rem 0 0.35rem; }
+    .tagline { color: var(--mk-fg); font-size: 1.05rem; margin-bottom: 0.35rem; }
     .tagline em { color: var(--mk-cyan); font-style: normal; }
     .byline { color: var(--mk-comment); font-size: 0.85rem; }
     .byline a { color: var(--mk-comment); text-decoration: underline; }
@@ -206,7 +347,7 @@
       white-space: nowrap;
     }
     .btn-download:hover { background: var(--mk-yellow); color: #141414; text-decoration: none; }
-    /* Plain arrow. U+2B33 renders as a tofu box on Android. */
+    /* Plain arrow: U+2B33 renders as a tofu box on Android. */
     .btn-download::before { content: '↓ '; }
     .dl-meta { font-size: 0.85rem; color: var(--mk-comment); }
     #dl-version { color: var(--mk-fg); font-weight: 600; }
@@ -251,6 +392,57 @@
       overflow-y: auto;
     }
 
+    .tutorial-card {
+      background: var(--mk-gutter);
+      border: 1px solid var(--mk-border);
+      border-left: 3px solid var(--mk-cyan);
+      border-radius: 4px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.25rem;
+    }
+    .tut-text { flex: 1; min-width: 240px; }
+    .tut-fine { color: var(--mk-comment); font-size: 0.8rem; margin-top: 0.3rem; }
+    .btn-tutorial {
+      display: inline-block;
+      background: transparent;
+      color: var(--mk-cyan);
+      border: 1px solid var(--mk-cyan);
+      font-weight: 700;
+      font-family: var(--font);
+      font-size: 1rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .btn-tutorial:hover { background: rgba(102, 217, 239, 0.12); color: var(--mk-cyan); text-decoration: none; }
+    .btn-tutorial::before { content: '📖 '; }
+
+    /* Plain-ASCII art: + - | = and letters, so every character comes from
+       one font at one advance. Whole-pixel sizing for the same reason as
+       the banner. */
+    .art {
+      font-size: 15px;
+      line-height: 1.3;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 3px;
+      position: relative;
+      z-index: 10000;
+      font-variant-ligatures: none;
+      font-feature-settings: 'liga' 0, 'calt' 0;
+      letter-spacing: 0;
+      color: var(--mk-green);
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 720px) { .art { font-size: 10px; } }
+    .art .lbl { color: var(--mk-comment); }
+    .art .svc { color: var(--mk-cyan); }
+    .art .wire { color: var(--mk-pink); }
+
     .out { color: var(--mk-fg); font-size: 0.92rem; }
     .out ul, .out ol { margin: 0 0 0 1.25rem; }
     .out li { margin-bottom: 0.55rem; }
@@ -266,20 +458,6 @@
       word-break: break-word;
     }
     .dim { color: var(--mk-comment); font-size: 0.85rem; }
-
-    /* The wizard's six screens, as a strip of chips. Wraps to as many
-       rows as the viewport needs rather than scrolling sideways. */
-    .screens { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
-    .screens span {
-      border: 1px solid var(--mk-border);
-      border-bottom: 2px solid var(--mk-cyan);
-      border-radius: 3px;
-      padding: 0.3rem 0.7rem;
-      font-size: 0.82rem;
-      color: var(--mk-fg);
-      background: var(--mk-gutter);
-      white-space: nowrap;
-    }
 
     .note-card {
       background: var(--mk-gutter);
@@ -298,9 +476,15 @@
       padding: 0 1rem 2.5rem;
     }
 
+    /* The path is the longest thing in the bar and the least useful, so
+       it goes first; the coffee chip is the last thing to give up room. */
+    @media (max-width: 620px) {
+      .nav-path { display: none; }
+      .top-nav .nav-right { gap: 0.9rem; }
+    }
     @media (max-width: 380px) {
-      .btn-download { font-size: 0.88rem; padding: 0.7rem 0.6rem; }
-      .wordmark { font-size: 1.7rem; }
+      .btn-download, .btn-tutorial { font-size: 0.88rem; padding: 0.7rem 0.6rem; }
+      .nav-coffee { font-size: 0.74rem; padding: 0.28rem 0.6rem; }
     }
   </style>
 </head>
@@ -308,12 +492,15 @@
   <nav class="top-nav">
     <a class="brand" href="/">Doug Fessler</a>
     <span class="nav-right"><span class="nav-path">~/projects/emulatarr</span>
-      <a href="https://github.com/defessler/Emulatarr-releases" target="_blank" rel="noopener">source</a>
+      <a href="tutorial/">tutorial</a>
+      <a class="nav-coffee" href="https://ko-fi.com/dougfessler" target="_blank" rel="noopener"
+         title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
     </span>
   </nav>
 
   <main>
-    <h1 class="wordmark-sr" style="position:absolute;left:-9999px">Emulatarr</h1>
+    <h1>Emulatarr</h1>
     <div class="term-window">
       <div class="term-titlebar">
         <span class="term-dots"><span></span><span></span><span></span></span>
@@ -322,33 +509,31 @@
       <div class="term-body">
 
         <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --about</span></p>
-        <div class="hero">
-          <!-- The cartridge from the app icon, redrawn in ASCII. The
-               three bars are the same three bars, same colours. -->
-          <pre class="art" aria-hidden="true">+-------------------------+
-|                         |
-|  +-------------------+  |
-|  | <span class="b1">###############</span>   |  |
-|  | <span class="b2">##########</span>        |  |
-|  | <span class="b3">######</span>            |  |
-|  +-------------------+  |
-|                         |
-+----+---------------+----+
-     +-+-+-+-+-+-+-+-+</pre>
-          <div class="hero-text">
-            <div class="wordmark" aria-hidden="true">Emulatarr</div>
-            <p class="tagline">A desktop wizard that stands up a <em>self-hosted retro game library</em> on your NAS, over SSH.</p>
-            <p class="byline">// free · portable · nothing installs on your PC · by <a href="/">Doug Fessler</a></p>
-          </div>
-        </div>
+        <!-- Seven glyphs and a space, all from the subset above. Adding a
+             letter here bends the art — see the @font-face comment. -->
+        <pre class="banner" aria-hidden="true">
+███████╗███╗   ███╗██╗   ██╗██╗      █████╗ ████████╗ █████╗ ██████╗ ██████╗
+██╔════╝████╗ ████║██║   ██║██║     ██╔══██╗╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗
+█████╗  ██╔████╔██║██║   ██║██║     ███████║   ██║   ███████║██████╔╝██████╔╝
+██╔══╝  ██║╚██╔╝██║██║   ██║██║     ██╔══██║   ██║   ██╔══██║██╔══██╗██╔══██╗
+███████╗██║ ╚═╝ ██║╚██████╔╝███████╗██║  ██║   ██║   ██║  ██║██║  ██║██║  ██║
+╚══════╝╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝</pre>
+        <!-- On its own line, not inline on the last row like the Window
+             Layout Manager banner does it. That wordmark is 29 columns and
+             has room beside it; this one is 77, and appending the subtitle
+             took the row to 100 columns (900px at 15px) against roughly
+             830px of usable width, which put a scrollbar under the logo
+             and clipped the word. -->
+        <div class="banner-sub" aria-hidden="true">SELF &middot; HOSTED &middot; RETRO</div>
+        <div class="wordmark-text" aria-hidden="true">Emulatarr<small>SELF &middot; HOSTED &middot; RETRO</small></div>
+        <p class="tagline">Stand up a <em>self-hosted retro game library</em> on your NAS, over SSH.</p>
+        <p class="byline">// free · portable · nothing installs on your PC · by <a href="/">Doug Fessler</a></p>
 
         <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --download</span></p>
         <div class="download-card">
-          <!-- Direct asset URL rather than /releases/latest. The script
-               at the bottom overwrites it from the feed, and this static
-               fallback should download rather than land on a repo
-               listing. The repo also cuts plain v* releases for the NAS
-               scripts, so /latest is not reliably the wizard. -->
+          <!-- Direct asset URL rather than /releases/latest. The script at
+               the bottom overwrites it from the feed, and this static
+               fallback should download rather than land on a repo listing. -->
           <a class="btn-download" id="dl-btn"
              href="https://github.com/defessler/Emulatarr-releases/releases/download/installer-v0.1.0/emulatarr-installer-win-unpacked.zip">Download for Windows</a>
           <div class="dl-meta">
@@ -357,6 +542,9 @@
             <div class="dl-sha" id="dl-sha" hidden>sha256: <span class="h" id="dl-sha-hex"></span></div>
           </div>
         </div>
+        <!-- The notes body lives outside the <details> so the disclosure
+             stays one line and "all releases" can sit beside it without
+             being shoved around when the notes open. -->
         <div class="notes-row">
           <details class="notes" id="notes-wrap" hidden>
             <summary>release notes</summary>
@@ -367,36 +555,39 @@
         </div>
         <pre class="notes-body" id="notes-body" hidden></pre>
 
-        <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --what-it-does</span></p>
-        <div class="out">
-          <p>Six screens, start to finish:</p>
-          <div class="screens">
-            <span>Welcome</span><span>Connect</span><span>Detect</span><span>Configure</span><span>Run</span><span>Done</span>
+        <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --tutorial</span></p>
+        <div class="tutorial-card">
+          <div class="tut-text">
+            <div>New here? The walkthrough covers all six screens, the eight install steps, and what to do when one of them goes red.</div>
+            <div class="tut-fine">// 10 topics · the whole wizard, in the order you meet it</div>
           </div>
+          <a class="btn-tutorial" href="tutorial/">open the tutorial</a>
+        </div>
+
+        <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --features</span></p>
+        <div class="out">
+          <pre class="art" aria-hidden="true"><span class="lbl">      your PC                               your NAS</span>
+  +-------------+              +---------------------------------+
+  |   wizard    |              |  <span class="svc">RomM</span>      library and web UI   |
+  |             | <span class="lbl">ssh + sftp</span>   |  <span class="svc">MariaDB</span>   metadata and users   |
+  |             | <span class="wire">=========></span>   |  <span class="svc">Valkey</span>    cache and job queue  |
+  +-------------+              +----------------+----------------+
+                                                |
+                                       <span class="lbl">smb / nfs / browser</span>
+                                                |
+      +--------------------+--------------------+
+      |                    |                    |
+ <span class="lbl">Steam Deck              phone            PC / Batocera</span></pre>
           <ul>
-            <li><strong>Connects over SSH</strong> - password or key, with the privilege escalation worked out for you. Sudo passwords are masked at fixed width before they reach the screen or the log, so the length does not leak either.</li>
+            <li><strong>Connects over SSH</strong> - password or key, with the privilege escalation worked out for you. Sudo passwords are masked at a fixed width before they reach the screen or the log, so the length does not leak either.</li>
             <li><strong>Looks before it leaps</strong> - one batched probe reports your platform, architecture, container runtime, free space, and whether the web port is already taken, before anything is written.</li>
             <li><strong>Writes the config</strong> - a form becomes a <code>.env</code>, deterministically. Values are quoted against an allow-list, because the NAS side sources that file.</li>
-            <li><strong>Deploys the stack</strong> - RomM, MariaDB, and Valkey via Docker Compose, plus the folder layout with the right <code>PUID</code>/<code>PGID</code> and Synology ACLs.</li>
-            <li><strong>Streams the whole install</strong> - real output, a step rail that tracks it, and a health check at the end that tells you how many services came up.</li>
+            <li><strong>Deploys the stack</strong> - RomM, MariaDB and Valkey via Docker Compose, plus the folder layout with the right <code>PUID</code>/<code>PGID</code> and Synology ACLs.</li>
+            <li><strong>Streams the whole install</strong> - real output, a rail that tracks all eight steps, and a health check at the end that tells you how many services came up.</li>
             <li><strong>Remembers your NAS</strong> - profiles are encrypted at rest, and export as a passphrase-wrapped file if you want to move one to another machine.</li>
             <li><strong>Updates itself</strong> - checks GitHub Releases, verifies the download by size and sha256, and swaps itself in place on restart. Saved profiles survive.</li>
           </ul>
           <p class="dim">// idempotent throughout. The network drops, people click Run twice, and neither should hurt.</p>
-        </div>
-
-        <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --the-stack</span></p>
-        <div class="out">
-          <pre class="art" aria-hidden="true"><span class="dimline">   your PC                        your NAS</span>
-  +-----------+   ssh+sftp   +----------------------+
-  |  wizard   |  ---------&gt;  |  <span class="b1">RomM</span> + <span class="b2">MariaDB</span> +   |
-  +-----------+              |  <span class="b3">Valkey</span>  (compose)   |
-                             +----------+-----------+
-                                        |
-                             <span class="dimline">smb / nfs / browser</span>
-                                        |
-                  <span class="dimline">Steam Deck · phone · PC · Batocera</span></pre>
-          <p>The NAS is a library server, not an emulator box. <a href="https://github.com/rommapp/romm" target="_blank" rel="noopener">RomM</a> catalogs and scrapes your collection and serves the files. Light systems play in the browser through EmulatorJS, which runs client-side. Heavier ones play on a real device that mounts the library over SMB or NFS.</p>
         </div>
 
         <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --install</span></p>
@@ -404,7 +595,7 @@
           <ol>
             <li>Download the zip above and extract it anywhere <span class="dim">(for example <code>C:\Apps\Emulatarr</code>)</span>.</li>
             <li>Run <code>Emulatarr Installer.exe</code>.</li>
-            <li>Point it at your NAS and walk the six screens.</li>
+            <li>Point it at your NAS and walk the six screens. The <a href="tutorial/">tutorial</a> covers each one.</li>
           </ol>
           <p class="dim">// SmartScreen may warn on first run, since the build is unsigned. "More info" then "Run anyway".</p>
         </div>
@@ -416,13 +607,8 @@
             <li>nas - an x86-64 NAS running Docker or Podman, reachable over SSH. Built and tested against a Synology DS1522+ with Container Manager.</li>
             <li>storage - size the volume around the disc systems you actually want. Cartridges are tens of GB. PS2 alone is around 15 TB.</li>
             <li>games - bring your own. Nothing here ships or links to game files.</li>
+            <li>by hand - the wizard uploads exactly <code>nas/scripts/</code> and runs <code>setup.sh</code>. Copying that folder across yourself is a supported route, not a fallback: see <a href="https://github.com/defessler/Emulatarr-releases/blob/main/QUICKSTART.md" target="_blank" rel="noopener">QUICKSTART.md</a>.</li>
           </ul>
-        </div>
-
-        <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --by-hand</span></p>
-        <div class="out">
-          <p>The wizard uploads exactly one folder, <code>nas/scripts/</code>, and runs <code>setup.sh</code> inside it. Copying that folder across yourself and running the script is a supported route, not a fallback. If you would rather see every command, start with
-          <a href="https://github.com/defessler/Emulatarr-releases/blob/main/QUICKSTART.md" target="_blank" rel="noopener">QUICKSTART.md</a>.</p>
         </div>
 
         <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --docs</span></p>
@@ -438,6 +624,7 @@
 
         <p class="prompt-line"><span class="u">emulatarr</span><span class="p">:~</span>$ <span class="cmd">emulatarr --feedback</span></p>
         <div class="out">
+          <p>Found something broken, or want the wizard to do something it doesn't?</p>
           <ul>
             <li><a href="https://github.com/defessler/Emulatarr-releases/issues/new" target="_blank" rel="noopener">Report a bug</a> - the wizard has a Troubleshooting panel and a diagnostics collector. Paste that output in and it saves a round trip.</li>
             <li><a href="https://github.com/defessler/Emulatarr-releases/issues" target="_blank" rel="noopener">Browse what is already reported</a>.</li>
@@ -467,8 +654,8 @@
   <script>
     // Fill the download card from the same release the in-app updater
     // finds, so this page and the wizard can never disagree about which
-    // build is "latest". updates.json is written by the release workflow
-    // in defessler/Emulatarr-releases and mirrored here.
+    // build is "latest". updates.json is published by the release workflow
+    // and mirrored here by .github/workflows/refresh-emulatarr-feed.yml.
     (async () => {
       try {
         const res = await fetch('updates.json', { cache: 'no-cache' });
@@ -496,12 +683,31 @@
           const wrap = document.getElementById('notes-wrap');
           body.textContent = l.notes;
           wrap.hidden = false;
-          // The body sits outside the <details> so the disclosure stays a
-          // single line next to "all releases", which means the toggle
-          // has to drive it by hand.
+          // The body sits outside the <details>, so the disclosure has to
+          // drive it by hand.
           wrap.addEventListener('toggle', () => { body.hidden = !wrap.open; });
         }
       } catch (_) { /* the static fallbacks already point at the release */ }
+    })();
+
+    // Random glitch burst on the donate chip. A fixed CSS cadence reads as
+    // a metronome; randomising the gap makes it look like a signal fault.
+    // Skipped entirely when the tab is hidden or the user asked for
+    // reduced motion.
+    (() => {
+      const chips = document.querySelectorAll('.nav-coffee');
+      if (!chips.length) return;
+      if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      chips.forEach((chip) => {
+        const burst = () => {
+          if (document.hidden) return;
+          chip.classList.add('glitch');
+          setTimeout(() => chip.classList.remove('glitch'), 600);
+        };
+        const schedule = () => setTimeout(() => { burst(); schedule(); },
+          14000 + Math.random() * 20000);
+        setTimeout(() => { burst(); schedule(); }, 2000 + Math.random() * 2500);
+      });
     })();
   </script>
 </body>
