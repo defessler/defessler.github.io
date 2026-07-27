@@ -17,13 +17,27 @@
        exactly the glyphs the logo uses (980 bytes) and self-hosted so it
        cannot depend on a rotating CDN URL. Same font, same metrics, so
        the art lines up with its own spaces. */
+    /* Its own family name, deliberately NOT 'JetBrains Mono'.
+       This file used to be declared under that name, colliding with the
+       faces the Google Fonts <link> declares. Composing one family out of
+       both sets left the block glyphs resolving past it to Consolas
+       (0.5498em) while the spaces between them came from Google's copy
+       (0.6em). All six rows are exactly 29 columns, but with two advance
+       widths in play each row painted a different pixel width — 248.2,
+       246.7, 244.4, 242.9, 240.7 — which is the shear you could see.
+       A private family name removes the ambiguity, and the subset now
+       carries U+20 so the spaces come from the same file as the blocks.
+       Do not add a unicode-range: a glyph this file lacks should fall
+       back to a real monospace face, not render as tofu. */
     @font-face {
-      font-family: 'JetBrains Mono';
+      font-family: 'WLM Blocks';
       font-style: normal;
-      font-weight: 100 900;
+      font-weight: 400;
       font-display: block;
-      src: url('jbm-blocks.woff2') format('woff2');
-      unicode-range: U+2550-2551, U+2554, U+2557, U+255A, U+255D, U+2560, U+2563, U+2566, U+2569, U+2588;
+      /* Versioned filename on purpose: the previous file lacked U+20, and
+         a visitor holding it in cache alongside this CSS would send the
+         spaces back to a fallback face and reproduce the shear. */
+      src: url('jbm-blocks-v2.woff2') format('woff2');
     }
 
     :root {
@@ -174,7 +188,7 @@
       /* Ligatures would fuse sequences like \_/ into a single glyph and
          break the column grid; the explicit fallbacks keep the art on a
          real monospace face if the webfont is blocked or still loading. */
-      font-family: 'JetBrains Mono', 'Consolas', 'DejaVu Sans Mono', 'Courier New', monospace;
+      font-family: 'WLM Blocks', 'Consolas', 'DejaVu Sans Mono', 'Courier New', monospace;
       font-variant-ligatures: none;
       font-feature-settings: 'liga' 0, 'calt' 0;
       letter-spacing: 0;
@@ -183,7 +197,12 @@
     }
     /* Inline on the art's last line, as before. It only moves to its own
        line on phones, where the combined width would otherwise overflow. */
-    .banner-sub { color: var(--mk-pink); letter-spacing: 0.08em; text-shadow: none; }
+    /* Latin text, so it needs the real font back — the blocks subset has
+       nothing but the seven box glyphs and a space. */
+    .banner-sub {
+      color: var(--mk-pink); letter-spacing: 0.08em; text-shadow: none;
+      font-family: 'JetBrains Mono', 'Consolas', 'DejaVu Sans Mono', 'Courier New', monospace;
+    }
     h1 { position: absolute; left: -9999px; } /* banner is the visual h1; keep a real one for a11y/SEO */
     .tagline { color: var(--mk-fg); font-size: 1.05rem; margin-bottom: 0.35rem; }
     .tagline em { color: var(--mk-cyan); font-style: normal; }
