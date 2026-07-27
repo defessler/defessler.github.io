@@ -112,90 +112,6 @@
       gap: 1.2rem;
     }
 
-    /* Donate: a quiet nav-bar chip rather than a section of its own.
-       The header is otherwise all muted text, so a solid block is the one
-       thing in it that reads as a button. display:inline-block is
-       load-bearing — overflow:hidden does not clip an inline element, so
-       the glitch artifacts would spill across the nav. */
-    .nav-coffee {
-      position: relative;
-      display: inline-block;
-      overflow: hidden;
-      isolation: isolate;
-      background: var(--mk-cyan);
-      color: #08222b;
-      border-radius: 4px;
-      padding: 0.45rem 1.05rem;
-      font-size: 0.95rem;
-      font-weight: 700;
-      white-space: nowrap;
-      transition: background 0.12s, box-shadow 0.12s;
-    }
-    .nav-coffee:hover {
-      background: #8ce8fa;
-      color: #08222b;
-      text-decoration: none;
-      box-shadow: 0 2px 10px rgba(102, 217, 239, 0.35);
-    }
-    /* Two opaque copies of the label, one pink and one green, sliced by
-       clip-path and thrown sideways so the chip looks like a badly
-       tracking signal. Both layers are transparent outside their own
-       keyframes, so nothing shows between bursts even if the trigger
-       class lingers. */
-    .nav-coffee::before,
-    .nav-coffee::after {
-      content: attr(data-label);
-      position: absolute;
-      inset: 0;
-      padding: inherit;
-      background: inherit;
-      pointer-events: none;
-      opacity: 0;
-    }
-    .nav-coffee::before { color: var(--mk-pink); }
-    .nav-coffee::after  { color: var(--mk-green); }
-    .nav-coffee.glitch::before { animation: glitch-pink 0.55s steps(2, end); }
-    .nav-coffee.glitch::after  { animation: glitch-green 0.55s steps(2, end); }
-    .nav-coffee.glitch         { animation: glitch-jitter 0.55s steps(2, end); }
-    /* Offsets in em so the same keyframes work at any chip scale. More
-       stops than the displacement needs — the point is that consecutive
-       frames disagree wildly, which is what sells a fault. */
-    @keyframes glitch-pink {
-      0%   { opacity: 1; clip-path: inset(0 0 82% 0);   transform: translate(-0.55em, -0.09em) scaleY(1.10); }
-      12%  { opacity: 1; clip-path: inset(28% 0 52% 0); transform: translate(0.72em,   0.07em) scaleY(0.92); }
-      24%  { opacity: 1; clip-path: inset(62% 0 14% 0); transform: translate(-0.85em,  0.11em) scaleY(1.14); }
-      36%  { opacity: 1; clip-path: inset(8% 0 74% 0);  transform: translate(0.52em,  -0.10em) scaleY(0.88); }
-      48%  { opacity: 1; clip-path: inset(44% 0 30% 0); transform: translate(-0.68em,  0.05em) scaleY(1.06); }
-      60%  { opacity: 1; clip-path: inset(84% 0 4% 0);  transform: translate(0.78em,   0.09em) scaleY(1.18); }
-      72%  { opacity: 1; clip-path: inset(18% 0 66% 0); transform: translate(-0.46em, -0.07em) scaleY(0.95); }
-      86%  { opacity: 1; clip-path: inset(56% 0 24% 0); transform: translate(0.62em,   0.06em) scaleY(1.09); }
-      100% { opacity: 0; clip-path: inset(0 0 100% 0);  transform: none; }
-    }
-    @keyframes glitch-green {
-      0%   { opacity: 1; clip-path: inset(66% 0 16% 0); transform: translate(0.62em,   0.08em) scaleY(0.90); }
-      12%  { opacity: 1; clip-path: inset(6% 0 78% 0);  transform: translate(-0.75em, -0.09em) scaleY(1.16); }
-      24%  { opacity: 1; clip-path: inset(38% 0 42% 0); transform: translate(0.88em,   0.04em) scaleY(0.94); }
-      36%  { opacity: 1; clip-path: inset(74% 0 8% 0);  transform: translate(-0.55em,  0.10em) scaleY(1.12); }
-      48%  { opacity: 1; clip-path: inset(20% 0 62% 0); transform: translate(0.70em,  -0.06em) scaleY(0.89); }
-      60%  { opacity: 1; clip-path: inset(50% 0 28% 0); transform: translate(-0.80em,  0.07em) scaleY(1.15); }
-      72%  { opacity: 1; clip-path: inset(2% 0 90% 0);  transform: translate(0.48em,   0.09em) scaleY(0.96); }
-      86%  { opacity: 1; clip-path: inset(80% 0 6% 0);  transform: translate(-0.64em, -0.05em) scaleY(1.08); }
-      100% { opacity: 0; clip-path: inset(0 0 100% 0);  transform: none; }
-    }
-    @keyframes glitch-jitter {
-      0%, 100% { transform: none; }
-      10% { transform: translate(3px, -2px) skewX(-14deg); }
-      25% { transform: translate(-4px, 2px) skewX(12deg) scaleY(1.07); }
-      40% { transform: translate(4px, -1px) skewX(-9deg) scaleY(0.94); }
-      55% { transform: translate(-3px, 2px) skewX(14deg); }
-      70% { transform: translate(3px, 1px)  skewX(-11deg) scaleY(1.05); }
-      85% { transform: translate(-2px, -2px) skewX(7deg); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .nav-coffee.glitch,
-      .nav-coffee.glitch::before,
-      .nav-coffee.glitch::after { animation: none; }
-    }
 
     main { max-width: 900px; margin: 0 auto; padding: 2.5rem 1rem 4rem; }
 
@@ -477,14 +393,13 @@
     }
 
     /* The path is the longest thing in the bar and the least useful, so
-       it goes first; the coffee chip is the last thing to give up room. */
+       it is the first to go when the phone gets narrow. */
     @media (max-width: 620px) {
       .nav-path { display: none; }
       .top-nav .nav-right { gap: 0.9rem; }
     }
     @media (max-width: 380px) {
       .btn-download, .btn-tutorial { font-size: 0.88rem; padding: 0.7rem 0.6rem; }
-      .nav-coffee { font-size: 0.74rem; padding: 0.28rem 0.6rem; }
     }
   </style>
 </head>
@@ -493,9 +408,6 @@
     <a class="brand" href="/">Doug Fessler</a>
     <span class="nav-right"><span class="nav-path">~/projects/emulatarr</span>
       <a href="tutorial/">tutorial</a>
-      <a class="nav-coffee" href="https://ko-fi.com/dougfessler" target="_blank" rel="noopener"
-         title="Opens ko-fi.com"
-         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
     </span>
   </nav>
 
@@ -690,25 +602,6 @@
       } catch (_) { /* the static fallbacks already point at the release */ }
     })();
 
-    // Random glitch burst on the donate chip. A fixed CSS cadence reads as
-    // a metronome; randomising the gap makes it look like a signal fault.
-    // Skipped entirely when the tab is hidden or the user asked for
-    // reduced motion.
-    (() => {
-      const chips = document.querySelectorAll('.nav-coffee');
-      if (!chips.length) return;
-      if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      chips.forEach((chip) => {
-        const burst = () => {
-          if (document.hidden) return;
-          chip.classList.add('glitch');
-          setTimeout(() => chip.classList.remove('glitch'), 600);
-        };
-        const schedule = () => setTimeout(() => { burst(); schedule(); },
-          14000 + Math.random() * 20000);
-        setTimeout(() => { burst(); schedule(); }, 2000 + Math.random() * 2500);
-      });
-    })();
   </script>
 </body>
 </html>

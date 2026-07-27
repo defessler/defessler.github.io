@@ -14,8 +14,7 @@
   "footer": {
     "note": "tools",
     "links": [
-      { "label": "Window Layout Manager", "url": "/projects/windowlayoutmanager/" },
-      { "label": "Emulatarr", "url": "/projects/emulatarr/" }
+      { "label": "Window Layout Manager", "url": "/projects/windowlayoutmanager/" }
     ]
   }
 }
