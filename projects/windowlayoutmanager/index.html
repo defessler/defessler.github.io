@@ -708,7 +708,14 @@
         <div class="out">
           <!-- The Ko-fi cover graphic, redrawn in box characters. One
                anchor wraps the whole thing so the art itself can stay
-               aria-hidden without trapping focus inside it. -->
+               aria-hidden without trapping focus inside it.
+
+               Editing this: every row must stay exactly 38 characters
+               wide, counting the ║ on both ends and ignoring the <span>
+               tags. Change a line's text and you have to fix its trailing
+               padding by the same amount, or the right-hand border walks
+               off. Widening past 38 makes the frame scroll on a 320px
+               phone. -->
           <a class="support-panel-link" href="https://ko-fi.com/dougfessler"
              target="_blank" rel="noopener"
              aria-label="Support Window Layout Manager on Ko-fi"><pre class="support-panel" aria-hidden="true">
