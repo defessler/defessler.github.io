@@ -1,0 +1,678 @@
+<title>smartplan vs. feature-dev, pilotfish &amp; Superpowers</title>
+<style>
+  :root {
+    --bg: #eef0ef;
+    --bg-raised: #ffffff;
+    --bg-sunken: #e4e7e5;
+    --text: #14181a;
+    --text-dim: #55605e;
+    --text-faint: #7c8683;
+    --border: #d3d9d6;
+    --border-strong: #b7c0bc;
+
+    --accent: #1f6f63;       /* smartplan — deep teal */
+    --accent-soft: #dcece8;
+
+    --tag-featuredev: #3a5bb8;      /* slate blue */
+    --tag-featuredev-soft: #e2e7f6;
+    --tag-pilotfish: #b95a20;       /* burnt coral */
+    --tag-pilotfish-soft: #f6e6d9;
+    --tag-superpowers: #7648b0;     /* violet */
+    --tag-superpowers-soft: #ede4f6;
+    --tag-smartplan: var(--accent);
+    --tag-smartplan-soft: var(--accent-soft);
+
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+
+    --radius: 3px;
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #101513;
+    --bg-raised: #171e1c;
+    --bg-sunken: #0b0f0e;
+    --text: #e7ece9;
+    --text-dim: #9aa6a1;
+    --text-faint: #6c7773;
+    --border: #2a332f;
+    --border-strong: #3c4844;
+
+    --accent: #52b3a2;
+    --accent-soft: #16302b;
+
+    --tag-featuredev: #86a0f2;
+    --tag-featuredev-soft: #1c2540;
+    --tag-pilotfish: #f0975f;
+    --tag-pilotfish-soft: #3a2413;
+    --tag-superpowers: #bd93e8;
+    --tag-superpowers-soft: #2c1f3d;
+    --tag-smartplan: var(--accent);
+    --tag-smartplan-soft: var(--accent-soft);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #101513;
+      --bg-raised: #171e1c;
+      --bg-sunken: #0b0f0e;
+      --text: #e7ece9;
+      --text-dim: #9aa6a1;
+      --text-faint: #6c7773;
+      --border: #2a332f;
+      --border-strong: #3c4844;
+
+      --accent: #52b3a2;
+      --accent-soft: #16302b;
+
+      --tag-featuredev: #86a0f2;
+      --tag-featuredev-soft: #1c2540;
+      --tag-pilotfish: #f0975f;
+      --tag-pilotfish-soft: #3a2413;
+      --tag-superpowers: #bd93e8;
+      --tag-superpowers-soft: #2c1f3d;
+      --tag-smartplan: var(--accent);
+      --tag-smartplan-soft: var(--accent-soft);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--accent-soft); color: var(--text); }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible, button:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .page {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+  }
+
+  /* ---------- Header ---------- */
+
+  header.hero {
+    padding: 56px 0 28px;
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 0 0 14px;
+  }
+
+  h1 {
+    font-size: 2.15rem;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0 0 14px;
+    text-wrap: balance;
+    font-weight: 700;
+  }
+
+  .dek {
+    font-size: 1.05rem;
+    color: var(--text-dim);
+    max-width: 62ch;
+    margin: 0 0 28px;
+    text-wrap: pretty;
+  }
+
+  .legend {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.03em;
+    padding: 4px 9px 4px 7px;
+    border-radius: var(--radius);
+    white-space: nowrap;
+    line-height: 1.4;
+  }
+
+  .tag::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    flex: none;
+  }
+
+  .tag--smartplan    { color: var(--tag-smartplan);    background: var(--tag-smartplan-soft); }
+  .tag--featuredev   { color: var(--tag-featuredev);   background: var(--tag-featuredev-soft); }
+  .tag--pilotfish    { color: var(--tag-pilotfish);    background: var(--tag-pilotfish-soft); }
+  .tag--superpowers  { color: var(--tag-superpowers);  background: var(--tag-superpowers-soft); }
+
+  /* ---------- Sections ---------- */
+
+  section { margin: 52px 0; }
+
+  h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    margin: 0 0 6px;
+    padding-left: 14px;
+    border-left: 3px solid var(--accent);
+    text-wrap: balance;
+  }
+
+  .section-dek {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    margin: 0 0 22px 17px;
+    max-width: 64ch;
+  }
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 28px 0 8px;
+  }
+
+  p { margin: 0 0 14px; max-width: 68ch; }
+  p:last-child { margin-bottom: 0; }
+
+  ul, ol { margin: 0 0 14px; padding-left: 22px; max-width: 66ch; }
+  li { margin-bottom: 6px; }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.87em;
+    background: var(--bg-sunken);
+    padding: 0.1em 0.35em;
+    border-radius: var(--radius);
+  }
+
+  strong { font-weight: 700; }
+
+  /* ---------- Identity cards ---------- */
+
+  .id-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 0 0 8px;
+  }
+
+  @media (max-width: 620px) {
+    .id-grid { grid-template-columns: 1fr; }
+  }
+
+  .id-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    background: var(--bg-raised);
+    border-top: 3px solid var(--card-color, var(--border-strong));
+  }
+
+  .id-card h4 {
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--card-color, var(--text));
+    font-family: var(--font-mono);
+    letter-spacing: 0.01em;
+  }
+
+  .id-card .role {
+    font-size: 0.82rem;
+    color: var(--text-faint);
+    margin: 0 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: var(--font-mono);
+  }
+
+  .id-card p { font-size: 0.92rem; margin: 0; color: var(--text-dim); }
+
+  /* ---------- Quadrant diagram ---------- */
+
+  .quadrant-wrap {
+    margin: 8px 0 24px;
+  }
+
+  .quadrant {
+    display: grid;
+    grid-template-columns: auto 1fr 1fr;
+    grid-template-rows: auto 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    font-size: 0.88rem;
+  }
+
+  .q-corner { background: var(--bg); }
+  .q-axis-top {
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    padding: 8px 4px;
+  }
+  .q-axis-left {
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    padding: 4px 8px;
+  }
+  .q-cell {
+    background: var(--bg-raised);
+    padding: 16px 16px 14px;
+    min-height: 110px;
+  }
+  .q-cell .q-title {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    margin-bottom: 6px;
+  }
+  .q-cell .q-body { color: var(--text-dim); font-size: 0.87rem; }
+
+  /* ---------- Tables ---------- */
+
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin: 0 0 18px;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 560px;
+    font-size: 0.89rem;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  thead th {
+    background: var(--bg-sunken);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--bg-sunken); }
+
+  td:first-child, th:first-child {
+    position: sticky;
+    left: 0;
+    background: var(--bg-raised);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  thead th:first-child { background: var(--bg-sunken); }
+  tbody tr:hover td:first-child { background: var(--bg-sunken); }
+
+  .mono { font-family: var(--font-mono); font-size: 0.92em; }
+  .dim { color: var(--text-dim); }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* ---------- Callout ---------- */
+
+  .callout {
+    border-left: 3px solid var(--border-strong);
+    background: var(--bg-raised);
+    padding: 14px 18px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin: 0 0 18px;
+    font-size: 0.93rem;
+  }
+  .callout p { margin: 0; }
+  .callout.accent { border-left-color: var(--accent); }
+
+  /* ---------- Footer ---------- */
+
+  footer {
+    margin-top: 72px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--text-faint);
+    font-size: 0.82rem;
+    font-family: var(--font-mono);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { scroll-behavior: auto !important; }
+  }
+</style>
+
+<div class="page">
+
+<header class="hero">
+  <p class="eyebrow">Comparative reference — 2026-07-08</p>
+  <h1>Four ways to structure an AI coding session</h1>
+  <p class="dek">smartplan is one answer to "how should an agent plan and delegate work." feature-dev, pilotfish, and Superpowers are three others, each optimizing a different axis. This is where they agree, where they don't, and why.</p>
+</header>
+
+<div class="legend" aria-label="Project legend">
+  <span class="tag tag--smartplan">smartplan</span>
+  <span class="tag tag--featuredev">feature-dev</span>
+  <span class="tag tag--pilotfish">pilotfish</span>
+  <span class="tag tag--superpowers">Superpowers</span>
+</div>
+
+<section>
+  <h2>What each one actually is</h2>
+  <p class="section-dek">Same problem space — Claude Code, agentic coding sessions — four different shapes.</p>
+
+  <div class="id-grid">
+    <div class="id-card" style="--card-color: var(--tag-smartplan)">
+      <h4>smartplan</h4>
+      <p class="role">Policy skill · this project</p>
+      <p>A tiering <em>policy</em> laid over whatever workflow you're already running: strong model plans, cheap models implement behind a verifier, escalate on failure. No runtime engine, no bespoke agent personas — a drop-in skill directory read natively by five different harnesses.</p>
+    </div>
+    <div class="id-card" style="--card-color: var(--tag-featuredev)">
+      <h4>feature-dev</h4>
+      <p class="role">Claude Code plugin · Anthropic</p>
+      <p>A fixed 7-phase feature workflow — discover, explore, clarify, design, implement, review, summarize — run by three bespoke subagent personas (explorer, architect, reviewer), all pinned flat to Sonnet. Optimizes for thoroughness and human dialogue, not cost.</p>
+    </div>
+    <div class="id-card" style="--card-color: var(--tag-pilotfish)">
+      <h4>pilotfish</h4>
+      <p class="role">Global installer · third-party (Nanako0129)</p>
+      <p>A one-time install into <code>~/.claude/</code>: six role agents (scout, executor, mech-executor, verifier, security-executor, Explore) each pinned to a model tier, plus a model-free delegation policy in your global CLAUDE.md. Not a workflow — a standing orchestration layer under whatever you do.</p>
+    </div>
+    <div class="id-card" style="--card-color: var(--tag-superpowers)">
+      <h4>Superpowers</h4>
+      <p class="role">Skills library · third-party (obra)</p>
+      <p>Dozens of narrow, rule-heavy skills — TDD, systematic debugging, brainstorming, code-review reception, git worktrees — each an "Iron Law" enforced with red-flag tables and forbidden phrases. About <em>how to work correctly</em>, not about which model does the work.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>The two axes that actually separate them</h2>
+  <p class="section-dek">Cost-tiering and process-rigor turn out to be nearly independent — each project picked a different corner.</p>
+
+  <div class="quadrant-wrap">
+    <div class="quadrant">
+      <div class="q-corner"></div>
+      <div class="q-axis-top">Low process rigor</div>
+      <div class="q-axis-top">High process rigor</div>
+
+      <div class="q-axis-left">Tiers cost</div>
+      <div class="q-cell">
+        <div class="q-title" style="color:var(--tag-pilotfish)">pilotfish</div>
+        <div class="q-body">Six model-pinned roles, a delegation policy, an adversarial verifier. Almost no opinion on <em>how</em> the executor should work — TDD, debugging method, etc. are out of scope.</div>
+      </div>
+      <div class="q-cell">
+        <div class="q-title" style="color:var(--tag-smartplan)">smartplan</div>
+        <div class="q-body">Tiers cost <em>and</em> gates quality (brief → smartcheck → fail-twice escalation), but treats TDD/debugging discipline as the executing seat's own business — this policy stops at the leaf boundary.</div>
+      </div>
+
+      <div class="q-axis-left">Flat / untiered</div>
+      <div class="q-cell">
+        <div class="q-title" style="color:var(--tag-featuredev)">feature-dev</div>
+        <div class="q-body">Everything — explore, design, implement, review — runs on Sonnet. Real process (7 phases, confidence-scored review) with zero cost-awareness.</div>
+      </div>
+      <div class="q-cell">
+        <div class="q-title" style="color:var(--tag-superpowers)">Superpowers</div>
+        <div class="q-body">No model parameter appears anywhere in the library. Every subagent dispatch is process-first — TDD Iron Law, four-phase debugging, verification-before-completion — and silent on which model runs it.</div>
+      </div>
+    </div>
+  </div>
+
+  <p>The practical read: smartplan and Superpowers are <strong>less rivals than orthogonal</strong> — smartplan's own history backs this up. An earlier draft tried a formal interop seam between the two families and the author pulled it, on the grounds that "process skills stay inside seats" already holds without a bridge: nothing stops a smartplan executor leaf from also being a Superpowers TDD practitioner. The two just never had to agree on anything, because they're regulating different variables.</p>
+</section>
+
+<section>
+  <h2>Planning &amp; the human-in-the-loop</h2>
+  <p class="section-dek">How much of the ask gets pinned down before code gets written, and how many times the human is asked.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Project</th><th>Planning shape</th><th>Human checkpoints</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag--smartplan">smartplan</span></td>
+          <td>Single plan on the planner seat (Opus default, drops on fit). A pre-plan clarification step resolves plan-shape ambiguity before the decomposition is finalized.</td>
+          <td class="num">1 formal gate — the plan review — plus the folded-in clarification pass when the ask is ambiguous.</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag--featuredev">feature-dev</span></td>
+          <td>Explore (parallel recon) → blocking clarifying-questions phase → 3 parallel architecture proposals (minimal / clean / pragmatic) synthesized with a recommendation.</td>
+          <td class="num">4 — confirm understanding, answer all clarifying questions, pick an architecture, approve before implementation.</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag--pilotfish">pilotfish</span></td>
+          <td>None of its own — it's a standing policy, not a task flow. Whatever planning happens is the main session's normal behavior, just delegated per its role table.</td>
+          <td class="num">0 — no workflow to gate. (The <em>install</em> itself has one: show the merge plan, wait for approval.)</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag--superpowers">Superpowers</span></td>
+          <td>Explicit Socratic refinement (brainstorming skill): one question at a time, 2-3 alternatives explored with trade-offs, design presented in 200-300 word sections, each validated before continuing. Explicitly non-linear — designed to go backward.</td>
+          <td class="num">Many, by design — the whole point is continuous incremental validation, not a single gate.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <p><strong>The spectrum runs pilotfish (zero) → smartplan (one, sized to ambiguity) → feature-dev (four fixed) → Superpowers (continuous).</strong> Superpowers is optimizing for a human pairing closely with one session; smartplan is optimizing for a plan that then runs unattended across a wide fan-out — more upfront checkpoints would fight that goal.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Dispatch &amp; parallelism</h2>
+  <p class="section-dek">All four spawn subagents. What they spawn them <em>for</em> differs sharply.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Project</th><th>Default shape</th><th>Parallel implementation?</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag--smartplan">smartplan</span></td>
+          <td>Wide fan-out of disjoint-FILES plan leaves, sized 3-5 per wave, each a subagent with its own tiered model.</td>
+          <td>Yes — the default. A hotspot file serializes; everything else dispatches concurrently.</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag--featuredev">feature-dev</span></td>
+          <td>Parallel <em>perspectives</em> on the same question — 2-3 explorers, 2-3 architects, 3 reviewers, all reading or judging, not writing.</td>
+          <td>No — implementation (Phase 5) is a single serial pass.</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag--pilotfish">pilotfish</span></td>
+          <td>No fan-out sizing of its own; dispatch decisions belong to whatever session it's installed under. Its own rule is just "set <code>model</code> explicitly on any ad-hoc fan-out."</td>
+          <td>Unspecified — inherits the host session's judgment.</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag--superpowers">Superpowers</span></td>
+          <td>Two named, opposite patterns: <em>subagent-driven-development</em> (one task's subagent, then a review subagent, then the next — explicitly serial) and <em>dispatching-parallel-agents</em> (reserved for 3+ provably independent bug investigations).</td>
+          <td>Actively discouraged for implementation — "Never: dispatch multiple implementation subagents in parallel (conflicts)" is a named red flag.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>This is the sharpest philosophical fork of the four. smartplan treats independent plan leaves as the default parallel unit and trusts <code>contracts.md</code> plus post-wave Integrate to catch the seams. Superpowers treats parallel <em>writing</em> as inherently conflict-prone and reserves concurrency for read-only investigation — serial-with-a-review-gate is its default execution mode, not an exception.</p>
+</section>
+
+<section>
+  <h2>Verification &amp; review</h2>
+  <p class="section-dek">Every project has some form of "don't trust the executor's own report." The shape of that check varies a lot.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Project</th><th>Mechanism</th><th>Independence enforced by</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag--smartplan">smartplan</span></td>
+          <td>smartcheck: fresh-context verifier re-runs ACCEPTANCE, diffs FILES against scope, issues PASS or a numbered FAIL tied to brief sections. Optional 3-verifier majority panel for high-value leaves.</td>
+          <td class="dim">Prose rule ("never verify what you executed") + a hard rule against fixing.</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag--featuredev">feature-dev</span></td>
+          <td>3 parallel code-reviewer agents (simplicity/DRY, correctness, conventions), confidence-scored 0-100, reports only ≥80. One pass at the end of the whole feature, not per-leaf.</td>
+          <td class="dim">Separate subagent context; no tool restriction.</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag--pilotfish">pilotfish</span></td>
+          <td>A single <code>verifier</code> role: adversarial, tries to REFUTE the claim, returns CONFIRMED/REFUTED with its own reproduced evidence.</td>
+          <td class="dim"><strong>Tool-locked</strong> — <code>disallowedTools: Write, Edit, NotebookEdit</code> in the agent's own frontmatter. Can't fix even if it wanted to.</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag--superpowers">Superpowers</span></td>
+          <td>Two layers: <em>verification-before-completion</em> ("no completion claim without fresh command evidence, run in this message") applies to every claim anywhere, not just leaves; <em>requesting/receiving-code-review</em> defines a full reception protocol — no performative agreement, technical pushback required, YAGNI-check on reviewer suggestions.</td>
+          <td class="dim">Rule-and-vigilance, not tooling — reinforced by an explicit forbidden-phrases list ("You're absolutely right!").</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>pilotfish and smartplan converge almost exactly on independence-as-design-goal — smartplan's own reference file only recently gained an explicit tool-lockdown template for Claude Code, closing a gap pilotfish's frontmatter had closed from day one. Superpowers is the outlier in a different way: its rigor is aimed at the <em>human-facing</em> side of review (how you receive feedback, not just how you generate a verdict) — a dimension none of the other three touch at all.</p>
+</section>
+
+<section>
+  <h2>Failure handling</h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Project</th><th>What happens on failure</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag--smartplan">smartplan</span></td>
+          <td>Fail-twice → escalate exactly one tier, ESCALATION REPORT artifact (task / tier history / evidence / hypothesis / next). At the top tier, the orchestrator takes the leaf over itself — there's nowhere higher to escalate to.</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag--featuredev">feature-dev</span></td>
+          <td>No escalation ladder. Review findings go back to the human, who chooses fix-now / fix-later / proceed-as-is.</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag--pilotfish">pilotfish</span></td>
+          <td>"Two failed attempts, then escalate one tier or take over" — the same shape as smartplan's rule, stated as a policy line rather than a tracked artifact.</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag--superpowers">Superpowers</span></td>
+          <td>A different axis entirely: systematic-debugging's escalation isn't about model tier, it's about giving up on incremental fixes. Three failed fix attempts on the same bug means <strong>stop and question the architecture</strong> with the human — treated as a wrong-foundation signal, not a strength signal.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Process discipline smartplan doesn't touch</h2>
+  <p class="section-dek">smartplan deliberately stops at the leaf boundary — what happens inside an executor's own work is out of its scope. This is where that gap is most visible.</p>
+
+  <ul>
+    <li><strong>TDD as an Iron Law.</strong> Superpowers: <em>no production code without a failing test first</em>, no exceptions without the human's permission, delete-and-restart on violation. smartplan's brief format recommends TDD-shaped ACCEPTANCE as the <em>strongest</em> option, not a requirement — an executor can satisfy a brief without ever writing a test first.</li>
+    <li><strong>Root-cause debugging as a named method.</strong> Superpowers' four-phase framework (root cause → pattern → hypothesis → implementation) is the only one of the four with any debugging methodology at all. smartplan's ESCALATION REPORT has a HYPOTHESIS field, but no process for producing one.</li>
+    <li><strong>Structured code-review reception.</strong> Only Superpowers defines how to <em>receive</em> feedback — verify before implementing, ask before assuming, push back with reasoning, no performative agreement. The other three only define how to <em>produce</em> a verdict.</li>
+    <li><strong>Socratic requirements-gathering.</strong> Superpowers' brainstorming skill is a full multi-turn negotiation with defined backward-navigation rules. smartplan's newly-added clarification step is a single fold-in, not a phase of its own.</li>
+  </ul>
+
+  <div class="callout accent">
+    <p>None of this is a gap smartplan needs to close by importing Superpowers' rules wholesale — the two compose instead. A smartplan executor leaf dispatched into a Superpowers-equipped session would pick up TDD and systematic debugging for free, without either family needing to know about the other.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Persistence &amp; distribution</h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Project</th><th>Learns across runs?</th><th>How it ships</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag--smartplan">smartplan</span></td>
+          <td><code>smart-ledger.md</code> (append-only outcome log) + a zero-model digest script that drafts floor reclassifications from measured bounce rates.</td>
+          <td>Drop-in skill directory or plugin install. Zero standing footprint outside the project; portable across five harnesses.</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag--featuredev">feature-dev</span></td>
+          <td>No — every run starts cold.</td>
+          <td>Claude Code plugin via marketplace. Claude Code only.</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag--pilotfish">pilotfish</span></td>
+          <td>No outcome tracking — it's static configuration, not a run log.</td>
+          <td><strong>Global installer</strong> — rewrites <code>~/.claude/settings.json</code>, adds six agent files, patches CLAUDE.md between markers. Heaviest install of the four; also the only one with an explicit uninstall/backup/update flow.</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag--superpowers">Superpowers</span></td>
+          <td>Different kind of learning — not per-project outcomes but a community-editable skills library (<code>meta/gardening-skills-wiki</code>, <code>sharing-skills</code>): the library itself accretes technique, not any one project's run history.</td>
+          <td>Plugin that clones a large external skills repo to <code>~/.config/superpowers/skills/</code>, enforced by a mandatory session-start bootstrap skill. The most behaviorally invasive install — it actively polices phrasing and workflow adherence every session.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Where this leaves smartplan</h2>
+  <p>smartplan's actual bet is narrow and stated plainly in its own honest-scope note: tiering lowers the bill, it doesn't shrink total tokens, and it only pays off on classes that bounce below roughly 20-30%. feature-dev bets on thoroughness at a flat, premium cost. pilotfish bets on the same tiering thesis smartplan does, arrived at independently, with less process around it but a cleaner enforcement mechanism (tool-locked agents) that smartplan only just caught up to. Superpowers doesn't bet on cost at all — it bets that most failures are process failures (skipped tests, guessed root causes, unverified completion claims), and that no amount of model strength fixes a skipped step.</p>
+  <p>The four aren't really competing for the same job. A session running smartplan for cost-aware fan-out, Superpowers' skills for how each seat actually works, and pilotfish's tool-locked verifier pattern for structural enforcement would be running all three theses at once, none of them contradicting the others.</p>
+</section>
+
+<footer>
+  Sources: this repo's <span class="mono">.claude/skills/smartplan/</span> · anthropics/claude-code <span class="mono">plugins/feature-dev</span> · Nanako0129/pilotfish · obra/superpowers-skills (collaboration/, debugging/, testing/, using-skills/).
+</footer>
+
+</div>
