@@ -667,6 +667,20 @@ function coerce(t, raw, def, opts) {
   // gained an .EnableWheel(false) out of nowhere. imgui never noticed
   // because its bools all default false.
   if (t === 'bool') return typeof raw === 'boolean' ? raw : def === true;
+  // A hex colour is a string, and every branch below this point is numeric, so
+  // without this Number('#a33232ff') is NaN and the colour silently becomes its
+  // catalog default on every sanitize. That is what it did: not one colour a
+  // slate document set had survived a load, and the round trip stayed
+  // byte-identical because the document, the preview and the generated code
+  // were all consistently showing the default. Same shape as the enum and bool
+  // faults above, and the imgui catalog has no prop of this type at all, which
+  // is why only one page ever felt it.
+  if (t === 'color') {
+    const m = typeof raw === 'string' && raw.match(/^#?([0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)$/);
+    // Normalised to lowercase eight digits, because the generator reads the
+    // alpha by offset and the round trip compares text.
+    return m ? `#${(m[1].length === 6 ? `${m[1]}ff` : m[1]).toLowerCase()}` : def;
+  }
   const num = Number(raw);
   if (t === 'enum' || t === 'align') {
     // Two enum shapes share this branch: imgui's are numeric indices, the

@@ -63,7 +63,7 @@ function slateBuiltinTemplates() {
   // One blueprint node: a coloured title bar over its pins, which is all a
   // node is once the wires are somebody else's problem.
   const bpNode = (title, titleColor, icon, kids) => n('border', {
-    borderBackgroundColor: '#161a20ff', padL: 0, padT: 0, padR: 0, padB: 0,
+    borderBackgroundColor: '#20262eff', padL: 0, padT: 0, padR: 0, padB: 0,
     slotVAlign: 'Top',
   }, [
     n('verticalbox', {}, [
@@ -341,9 +341,9 @@ function slateBuiltinTemplates() {
         }, [
           n('verticalbox', {}, [
             n('horizontalbox', {}, [
-              bpNode('Event BeginPlay', '#7a1f1fff', 'GraphEditor.Event_16x', [pinExec(true)]),
+              bpNode('Event BeginPlay', '#a33232ff', 'GraphEditor.Event_16x', [pinExec(true)]),
               wire(),
-              bpNode('Print String', '#1f4a7aff', 'GraphEditor.Function_16x', [
+              bpNode('Print String', '#2f6cadff', 'GraphEditor.Function_16x', [
                 n('horizontalbox', {}, [
                   fill(n('verticalbox', {}, [
                     pinExec(false),
@@ -354,7 +354,7 @@ function slateBuiltinTemplates() {
                 ]),
               ]),
               wire(),
-              bpNode('Delay', '#1f4a7aff', 'GraphEditor.Timeline_16x', [
+              bpNode('Delay', '#2f6cadff', 'GraphEditor.Timeline_16x', [
                 n('horizontalbox', {}, [
                   fill(n('verticalbox', {}, [pinExec(false), pinIn('Duration')])),
                   n('verticalbox', { slotPadL: 24 }, [pinOut('Completed')]),
