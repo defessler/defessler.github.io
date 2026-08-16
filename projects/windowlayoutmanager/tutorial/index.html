@@ -291,6 +291,7 @@
           <li><a href="#hotkeys">Global Hotkeys</a></li>
           <li><a href="#visual">The Visual Editor</a></li>
           <li><a href="#editor">Precise Edits, Undo &amp; History</a></li>
+          <li><a href="#display">Display Zoom &amp; Resolution</a></li>
           <li><a href="#binding">Monitor Binding &amp; Auto-Activation</a></li>
           <li><a href="#hold">Hold Mode</a></li>
           <li><a href="#desktops">Virtual Desktops</a></li>
@@ -334,6 +335,31 @@
           <p>Click the hotkey chip on any profile to bind a system-wide shortcut. Press the combination you want. WLM records it live and warns about conflicts with other profiles or the auto-activation hotkey.</p>
           <div class="shot"><a href="img/04-hotkey-capture.png" target="_blank" rel="noopener" title="Open full size"><img src="img/04-hotkey-capture.png" alt="Hotkey capture modal" loading="lazy"></a></div>
           <p class="caption">Hotkeys fire from anywhere. The WLM window doesn't need to be open.</p>
+        </section>
+        <section id="display">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial display</span></p>
+          <h2>Display Zoom &amp; Resolution</h2>
+          <p>A profile can set your display scaling - the percentage in Settings &rarr; System &rarr; Display that everyone calls zoom - and your resolution, before it puts your windows back. Click the <strong>Display</strong> chip on any profile to set it up.</p>
+          <div class="shot"><a href="img/12-display-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/12-display-editor.png" alt="Display editor: per-monitor scaling and resolution, plus the zoom to resolution mapping table" loading="lazy"></a></div>
+          <p class="caption">Every dropdown is filled from what Windows actually reports for that monitor. Nothing is hardcoded.</p>
+          <ul>
+            <li><strong>Scaling</strong> - Pick a percentage, or pick <em>Step up one</em> / <em>Step down one</em>. The step options are relative: they move one rung along whatever ladder that monitor supports, worked out at the moment you press the key. That's the one you want on a hotkey.</li>
+            <li><strong>Resolution</strong> - Every mode the driver offers, with its refresh rate. Leave either dropdown on "Leave unchanged" and the profile won't touch it.</li>
+            <li>Each row shows what the monitor is set to <em>right now</em>, so you can see what you're changing from.</li>
+          </ul>
+          <h3>Mapping a zoom level to a resolution</h3>
+          <p>Pair a percentage with a resolution for a specific monitor - 150% with 2560&times;1440, say. From then on, whenever that monitor gets set to 150%, the resolution comes with it: by this profile, by a step hotkey, by any other preset.</p>
+          <p>Mappings are stored per monitor rather than per profile, because they describe the hardware. If 150% means 2560&times;1440 on your 4K panel, that's true no matter which layout you're loading.</p>
+          <h3>Zoom presets</h3>
+          <p>Tick <strong>Display-only preset</strong> and the profile stops being a window layout and becomes purely a display preset. No windows saved, no windows moved - it just applies the scaling and resolution.</p>
+          <div class="shot"><a href="img/11-display-preset.png" target="_blank" rel="noopener" title="Open full size"><img src="img/11-display-preset.png" alt="A display-only profile in the sidebar, with a hotkey and no windows" loading="lazy"></a></div>
+          <p class="caption">"Desk zoom" is a display-only preset on <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>0</kbd>. It has no windows - just a display change.</p>
+          <p>Because it's still a profile, it picks up everything profiles already have: a hotkey through the same capture dialog, a spot in the tray menu, the Jump List, the <a href="#palette">command palette</a>, <code>--load=</code>, and <code>wlm://</code> links. Display-only presets are kept out of <a href="#binding">auto-activation</a>, so binding one to a monitor setup can't make it beat the layout profile you actually wanted.</p>
+          <h3>Turning it on, and what it can't promise</h3>
+          <p>This is <strong>off by default</strong>, under Settings &rarr; Auto-activation &rarr; Display configuration. Nothing already on your machine starts changing your display after an update.</p>
+          <p>Changing resolution uses a documented, stable Windows API. Changing the <em>scaling percentage</em> does not - Windows exposes no supported way to do it, so WLM uses the same internal call the Settings app does. Microsoft could change it in any update, so it sits behind a capability check: if your build stops accepting it, the scaling controls switch off and tell you why, and resolution carries on working.</p>
+          <p>The same honesty runs through the rest. Ask for a percentage your monitor can't do and you're told it was clamped and to what. Ask for a resolution your driver doesn't offer and you're told that too. After every change WLM re-reads the display and checks the value actually landed - there's a known Windows 11 24H2 bug where a resolution change against a virtual display reports success while nothing happens, and this is what catches it.</p>
+          <p>Some virtual display adapters, Parsec's among them, report a scaling range that disagrees with what Windows is really doing. Where that happens the editor shows you both numbers and says the control may not behave, rather than printing a figure it knows is contradicted.</p>
         </section>
 
         <section id="visual">
