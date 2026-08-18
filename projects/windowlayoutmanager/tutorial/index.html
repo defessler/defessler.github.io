@@ -340,24 +340,29 @@
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial display</span></p>
           <h2>Display Zoom &amp; Resolution</h2>
           <p>A profile can set your display scaling - the percentage in Settings &rarr; System &rarr; Display that everyone calls zoom - and your resolution, before it puts your windows back. Click the <strong>Display</strong> chip on any profile to set it up.</p>
-          <div class="shot"><a href="img/12-display-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/12-display-editor.png" alt="Display editor: per-monitor scaling and resolution, plus the zoom to resolution mapping table" loading="lazy"></a></div>
+          <div class="shot"><a href="img/12-display-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/12-display-editor.png" alt="Display editor: a plain-language summary of what the profile will do, and per-monitor scaling and resolution" loading="lazy"></a></div>
           <p class="caption">Every dropdown is filled from what Windows actually reports for that monitor. Nothing is hardcoded.</p>
+          <p>Displays are named by where they are and what size they run - "Left 4K", "Right 1080p" - because Windows reports the same useless name, "Generic PnP Monitor", for nearly every monitor. A virtual display says so.</p>
           <ul>
             <li><strong>Scaling</strong> - Pick a percentage, or pick <em>Step up one</em> / <em>Step down one</em>. The step options are relative: they move one rung along whatever ladder that monitor supports, worked out at the moment you press the key. That's the one you want on a hotkey.</li>
             <li><strong>Resolution</strong> - Every mode the driver offers, with its refresh rate. Leave either dropdown on "Leave unchanged" and the profile won't touch it.</li>
             <li>Each row shows what the monitor is set to <em>right now</em>, so you can see what you're changing from.</li>
           </ul>
-          <h3>Mapping a zoom level to a resolution</h3>
-          <p>Pair a percentage with a resolution for a specific monitor - 150% with 2560&times;1440, say. From then on, whenever that monitor gets set to 150%, the resolution comes with it: by this profile, by a step hotkey, by any other preset.</p>
-          <p>Mappings are stored per monitor rather than per profile, because they describe the hardware. If 150% means 2560&times;1440 on your 4K panel, that's true no matter which layout you're loading.</p>
-          <p>They're filed against the part of the monitor's hardware identity that doesn't change between sessions, so a rule set for a Parsec virtual display still applies the next time you connect.</p>
+          <h3>What this profile will do</h3>
+          <p>The top of the editor tells you, in words, what loading the profile is going to change. It's built from the same settings the Save button writes, so it can't drift from the truth. If a resolution is coming from one of your PC-wide rules rather than from the profile, it says so.</p>
+          <h3>Zoom to resolution rules</h3>
+          <p>These live in <strong>Settings &rarr; Auto-activation &rarr; Zoom to resolution rules</strong>, not in a profile, because they describe your hardware rather than a layout. If 150% means 2560&times;1440 on your 4K panel, that's true no matter which profile you're loading.</p>
+          <p>Pair a percentage with a resolution for a display, and from then on whenever that display gets set to that zoom level the resolution comes with it: by a profile, by a step hotkey, by anything.</p>
+          <div class="shot"><a href="img/14-settings-zoom-rules.png" target="_blank" rel="noopener" title="Open full size"><img src="img/14-settings-zoom-rules.png" alt="Zoom to resolution rules in Settings, with a Matched by column" loading="lazy"></a></div>
+          <p class="caption">Every rule names its display and says how it finds it.</p>
+          <p>Each rule shows what it's <strong>matched by</strong>. Rules are filed against the part of a display's hardware identity that doesn't change between sessions, so one set for a Parsec virtual display still applies the next time you connect. Two displays of the same model stay separate, because the key includes which output each one is on.</p>
           <h3>Picking a resolution</h3>
           <p>Resolution is two dropdowns, the way Windows and NVIDIA both do it: one for size, one for refresh rate. Sizes are grouped by shape (16:9, 4:3, portrait), the size your display runs natively is marked, and the older small sizes hide behind <strong>Show every size</strong>. Nothing is removed, it's one click away. One display on the test machine offers 227 modes, which as a single list was 229 entries.</p>
           <p>Pick a size that can't do your current refresh rate and WLM keeps the rate where it can, otherwise falls back to the highest that size offers and tells you it did. It won't silently jump to whatever was first in the list.</p>
           <h3>Resolutions your display doesn't list</h3>
           <p><strong>By hand</strong> opens width, height and refresh-rate boxes. A mode your display doesn't currently offer is still saved — it's flagged as not offered yet, and applies the moment the driver starts listing it. That matters for virtual displays, whose mode lists change depending on what the driver has been told about. A saved resolution your current display can't do shows up filled in and flagged, rather than as an empty box that looks like you never set anything.</p>
           <h3>Registering resolutions with Parsec</h3>
-          <p>Parsec's virtual display only offers what its driver knows about. The <strong>Parsec virtual display</strong> section registers up to two custom resolutions directly with that driver, behind one administrator prompt. Disconnect and reconnect your Parsec session and they appear in Windows display settings and in WLM's dropdowns.</p>
+          <p>Parsec's virtual display only offers what its driver knows about. The <strong>Parsec resolutions</strong> button, which appears when a Parsec display is connected, registers up to two custom resolutions directly with that driver, behind one administrator prompt. Disconnect and reconnect your Parsec session and they appear in Windows display settings and in WLM's dropdowns.</p>
           <div class="shot"><a href="img/13-display-parsec.png" target="_blank" rel="noopener" title="Open full size"><img src="img/13-display-parsec.png" alt="Registering custom resolutions with the Parsec virtual display driver" loading="lazy"></a></div>
           <p class="caption">Slots 2 to 4 are shown read-only — Parsec rewrites those itself on every connect.</p>
           <p>Two limits worth knowing, because the obvious expectation is wrong:</p>
