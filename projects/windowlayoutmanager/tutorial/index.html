@@ -359,6 +359,10 @@
           <h3>Picking a resolution</h3>
           <p>Resolution is two dropdowns, the way Windows and NVIDIA both do it: one for size, one for refresh rate. Sizes are grouped by shape (16:9, 4:3, portrait), the size your display runs natively is marked, and the older small sizes hide behind <strong>Show every size</strong>. Nothing is removed, it's one click away. One display on the test machine offers 227 modes, which as a single list was 229 entries.</p>
           <p>Pick a size that can't do your current refresh rate and WLM keeps the rate where it can, otherwise falls back to the highest that size offers and tells you it did. It won't silently jump to whatever was first in the list.</p>
+          <h3>Landscape or portrait</h3>
+          <p>The orientation dropdown sits before the resolution, because it decides what resolutions there are. Landscape, portrait, and both of them flipped, the same four Windows offers.</p>
+          <p>Windows only ever reports the resolutions for the orientation a display is <em>currently</em> in. A rotated monitor reports 1440&times;2560, 1440&times;1920 and so on, with no landscape sizes at all. So WLM works out the list for the orientation you pick rather than asking for one that doesn't exist, and flipping between landscape and portrait keeps the same physical resolution selected instead of resetting you to the top.</p>
+          <p>Resolutions are stored the way you'll see them: pick portrait 1080&times;1920 and that is what's saved, which is also what Windows reports back once it's applied.</p>
           <h3>Resolutions your display doesn't list</h3>
           <p><strong>By hand</strong> opens width, height and refresh-rate boxes. A mode your display doesn't currently offer is still saved — it's flagged as not offered yet, and applies the moment the driver starts listing it. That matters for virtual displays, whose mode lists change depending on what the driver has been told about. A saved resolution your current display can't do shows up filled in and flagged, rather than as an empty box that looks like you never set anything.</p>
           <h3>Registering resolutions with Parsec</h3>
