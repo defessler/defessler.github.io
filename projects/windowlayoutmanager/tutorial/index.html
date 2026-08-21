@@ -412,6 +412,7 @@
           <p>The "EDIT" button (list view) or "Edit" panel (visual view) opens exact fields for any window: desktop, monitor, state, and pixel-perfect X/Y/width/height.</p>
           <div class="shot"><a href="img/03-window-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/03-window-editor.png" alt="Per-window editor, open in its own window" loading="lazy"></a></div>
           <p>Every dialog in WLM is a real window rather than a panel drawn over the app, so you can drag this one onto a second monitor, resize it, and keep looking at the layout behind it while you type. It opens a little smaller than the main window and stays wherever you leave it. The app itself is disabled while a dialog is up - that's Windows doing it, not a panel sitting on top - so a stray keystroke can't land in the window behind.</p>
+          <p>Each dialog knows the size its own layout needs and won't be dragged smaller than that, so there's no size you can resize one to where it stops making sense. The one exception is assign-hotkey, which stays a fixed panel over the app: its whole job is to catch the next key combination you press.</p>
           <ul>
             <li><kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd> - Undo/redo any edit, with a labeled trail.</li>
             <li><kbd>Ctrl+H</kbd> or "History" - Browse and restore full saved versions of the profile (every Update keeps a snapshot).</li>
