@@ -340,7 +340,7 @@
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial display</span></p>
           <h2>Display Zoom, Resolution &amp; Arrangement</h2>
           <p>A profile can set your display scaling - the percentage in Settings &rarr; System &rarr; Display that everyone calls zoom - and your resolution, before it puts your windows back. Click the <strong>Display</strong> chip on any profile to set it up.</p>
-          <div class="shot"><a href="img/12-display-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/12-display-editor.png" alt="Display editor: a plain-language summary of what the profile will do, and per-monitor scaling and resolution" loading="lazy"></a></div>
+          <div class="shot"><a href="img/12-display-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/12-display-editor.png" alt="Display editor: the monitor picker, with per-monitor scaling, orientation and resolution" loading="lazy"></a></div>
           <p class="caption">Every dropdown is filled from what Windows actually reports for that monitor. Nothing is hardcoded.</p>
           <p>Displays are named by where they are and what size they run - "Left 4K", "Right 1080p" - because Windows reports the same useless name, "Generic PnP Monitor", for nearly every monitor. A virtual display says so.</p>
           <ul>
@@ -354,8 +354,6 @@
           <p>Windows quietly enforces three things about any arrangement, and will rewrite yours if you break them - which is how monitors end up somewhere you never put them. WLM settles the layout before writing it instead: the primary display sits at the origin, nothing overlaps, and every display touches another one. If closing a gap means moving a display you weren't touching, it tells you which one.</p>
           <p>Saving the profile saves the arrangement with it, and loading the profile puts the monitors back before it restores any windows. Positions are stored for <em>every</em> display rather than only the ones you moved: "the portrait one is on the left" means nothing without knowing where the other one is, so half an arrangement would restore a different desk on any day the rest had drifted.</p>
           <p><strong>Apply now</strong> tries the whole thing on your real displays with the usual 15-second Keep-or-Revert countdown - and the revert puts the arrangement back too, not just the resolutions. Rearranging is the one change here that survives a reboot, so it's the one that most needs an undo that still works when you can't read the screen.</p>
-          <h3>What this profile will do</h3>
-          <p>The top of the editor tells you, in words, what loading the profile is going to change. It's built from the same settings the Save button writes, so it can't drift from the truth. If a resolution is coming from one of your PC-wide rules rather than from the profile, it says so.</p>
           <h3>Zoom to resolution rules</h3>
           <p>These live in <strong>Settings &rarr; Auto-activation &rarr; Zoom to resolution rules</strong>, not in a profile, because they describe your hardware rather than a layout. If 150% means 2560&times;1440 on your 4K panel, that's true no matter which profile you're loading.</p>
           <p>Pair a percentage with a resolution for a display, and from then on whenever that display gets set to that zoom level the resolution comes with it: by a profile, by a step hotkey, by anything.</p>
@@ -457,8 +455,9 @@
           <p><kbd>Ctrl+K</kbd> opens the command palette: every action and every profile, fuzzy-searchable.</p>
           <div class="shot"><a href="img/09-command-palette.png" target="_blank" rel="noopener" title="Open full size"><img src="img/09-command-palette.png" alt="Command palette" loading="lazy"></a></div>
           <ul>
-            <li>Vim-style navigation everywhere: <kbd>j</kbd>/<kbd>k</kbd>, <kbd>gg</kbd>/<kbd>G</kbd>, <kbd>/</kbd> filter, <kbd>Tab</kbd> to switch panes.</li>
+            <li>Vim-style navigation in both panes: <kbd>j</kbd>/<kbd>k</kbd>, <kbd>gg</kbd>/<kbd>G</kbd>, <kbd>/</kbd> filter, <kbd>Tab</kbd> to switch panes.</li>
             <li>Single-key actions on the focused profile: <kbd>Enter</kbd> load, <kbd>r</kbd> rename, <kbd>d</kbd> delete, <kbd>n</kbd> new.</li>
+            <li>In the windows pane, <kbd>j</kbd>/<kbd>k</kbd> move a cursor through the saved windows, <kbd>Enter</kbd> edits the one under it and <kbd>x</kbd> removes it. Tab into the pane and the cursor is already on a row.</li>
             <li><kbd>?</kbd> shows the complete keyboard reference.</li>
           </ul>
         </section>
