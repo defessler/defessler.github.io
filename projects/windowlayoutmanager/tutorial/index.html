@@ -402,6 +402,7 @@
           <ul>
             <li>Select a window to get "Edit", "Block app", and "Remove" in the panel below the canvas.</li>
             <li>Drag a window between monitors. Its target monitor and relative position will update automatically.</li>
+            <li>Every window can be given its own colour from the edit dialog, so the ones you care about stand out on the canvas.</li>
             <li>Edits auto-save after a beat. The "unsaved" badge tells you when a write is pending.</li>
           </ul>
         </section>
@@ -409,7 +410,8 @@
         <section id="editor">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial editing</span></p>
           <h2>Precise Edits, Undo &amp; History</h2>
-          <p>The "EDIT" button (list view) or "Edit" panel (visual view) opens exact fields for any window: desktop, monitor, state, and pixel-perfect X/Y/width/height.</p>
+          <p>The "EDIT" button (list view) or "Edit" panel (visual view) opens exact fields for any window: desktop, monitor, state, pixel-perfect X/Y/width/height, and the colour it's drawn in.</p>
+          <p>The list itself is a table &mdash; app and title, which monitor, which desktop &mdash; and hovering a row brings up a card with the rest: a scaled picture of where that window sits on your actual monitor layout, its resolution, its position, and whether it's normal, minimised or maximised.</p>
           <div class="shot"><a href="img/03-window-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/03-window-editor.png" alt="Per-window editor, open in its own window" loading="lazy"></a></div>
           <p>Every dialog in WLM is a real window rather than a panel drawn over the app, so you can drag this one onto a second monitor, resize it, and keep looking at the layout behind it while you type. It opens a little smaller than the main window and stays wherever you leave it. The app itself is disabled while a dialog is up - that's Windows doing it, not a panel sitting on top - so a stray keystroke can't land in the window behind.</p>
           <p>Each dialog knows the size its own layout needs and won't be dragged smaller than that, so there's no size you can resize one to where it stops making sense. The one exception is assign-hotkey, which stays a fixed panel over the app: its whole job is to catch the next key combination you press.</p>
@@ -459,6 +461,7 @@
             <li>Vim-style navigation in both panes: <kbd>j</kbd>/<kbd>k</kbd>, <kbd>gg</kbd>/<kbd>G</kbd>, <kbd>/</kbd> filter, <kbd>Tab</kbd> to switch panes.</li>
             <li>Single-key actions on the focused profile: <kbd>Enter</kbd> load, <kbd>r</kbd> rename, <kbd>d</kbd> delete, <kbd>n</kbd> new.</li>
             <li>In the windows pane, <kbd>j</kbd>/<kbd>k</kbd> move a cursor through the saved windows, <kbd>Enter</kbd> edits the one under it and <kbd>x</kbd> removes it. Tab into the pane and the cursor is already on a row.</li>
+            <li>Both lists wrap at the ends, and moving through the profile list shows that profile on the right as you go &mdash; a preview, not a load, so nothing on your desktop moves.</li>
             <li><kbd>?</kbd> shows the complete keyboard reference.</li>
           </ul>
         </section>
