@@ -300,6 +300,7 @@
           <li><a href="#blacklist">Blacklist</a></li>
           <li><a href="#companion">Companion Software</a></li>
           <li><a href="#diagnostics">Diagnostics &amp; Reporting a Bug</a></li>
+          <li><a href="#window">Window Positions &amp; About</a></li>
           <li><a href="#cli">CLI, Links &amp; Automation</a></li>
         </ul>
 
@@ -405,16 +406,38 @@
             <li>Every window can be given its own colour from the edit dialog, so the ones you care about stand out on the canvas.</li>
             <li>Edits auto-save after a beat. The "unsaved" badge tells you when a write is pending.</li>
           </ul>
+
+          <h3>Reaching a window behind another</h3>
+          <p>A window sitting on top of another hides it. The "+N" badge tells you something is under there and clicking cycles through the stack, but that doesn't help when you want to drag the one underneath. Each window has a collapse control that folds it down to its title row, and "Collapse overlapping" in the legend folds every window that's covering something.</p>
+          <div class="shot"><a href="img/15-visual-collapsed.png" target="_blank" rel="noopener" title="Open full size"><img src="img/15-visual-collapsed.png" alt="Two stacked windows collapsed to title bars" loading="lazy"></a></div>
+          <p class="caption">Collapsed windows in the same stack cascade instead of stacking, so every one of them stays clickable.</p>
+          <p>This is a viewing aid and nothing more. A collapsed window still loads at its full saved size, and the folding is forgotten when you switch profiles.</p>
+
+          <h3>FancyZones</h3>
+          <p>If you use PowerToys FancyZones, tick "FancyZones" under the canvas and WLM draws the zones it would snap a window into. Drag a window onto one and it lands on that zone exactly. The picker beside the tick box chooses which layout is drawn, and the default is whatever FancyZones itself has applied to that monitor.</p>
+          <div class="shot"><a href="img/16-visual-zones.png" target="_blank" rel="noopener" title="Open full size"><img src="img/16-visual-zones.png" alt="Visual editor showing FancyZones zones under the windows" loading="lazy"></a></div>
+          <p class="caption">Zones are drawn under the windows, so they read as the surface rather than as more windows.</p>
+          <p>WLM reads PowerToys' layouts and never writes to them. Those files are live &mdash; PowerToys keeps them in memory and rewrites them on its own schedule &mdash; so editing them from outside would race it and could lose the layouts you built. Zone authoring stays in PowerToys' own editor.</p>
+          <div class="tip">Zones are matched to monitors by hardware id, the same way FancyZones does it. Profiles saved before this release borrow that from whichever monitor is currently in the same role, and pick up their own copy the next time you hit Update.</div>
         </section>
 
         <section id="editor">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial editing</span></p>
           <h2>Precise Edits, Undo &amp; History</h2>
-          <p>The "EDIT" button (list view) or "Edit" panel (visual view) opens exact fields for any window: desktop, monitor, state, pixel-perfect X/Y/width/height, and the colour it's drawn in.</p>
+          <p>The "EDIT" button (list view) or "Edit" panel (visual view) opens exact fields for any window: desktop, monitor, state, the colour it's drawn in, and pixel-perfect position and size. X and Y sit together on one line, width and height on the next, so the pairs read as pairs.</p>
           <p>The list itself is a table &mdash; app and title, which monitor, which desktop &mdash; and hovering a row brings up a card with the rest: a scaled picture of where that window sits on your actual monitor layout, its resolution, its position, and whether it's normal, minimised or maximised.</p>
           <div class="shot"><a href="img/03-window-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/03-window-editor.png" alt="Per-window editor, open in its own window" loading="lazy"></a></div>
           <p>Every dialog in WLM is a real window rather than a panel drawn over the app, so you can drag this one onto a second monitor, resize it, and keep looking at the layout behind it while you type. It opens a little smaller than the main window and stays wherever you leave it. The app itself is disabled while a dialog is up - that's Windows doing it, not a panel sitting on top - so a stray keystroke can't land in the window behind.</p>
           <p>Each dialog knows the size its own layout needs and won't be dragged smaller than that, so there's no size you can resize one to where it stops making sense. The one exception is assign-hotkey, which stays a fixed panel over the app: its whole job is to catch the next key combination you press.</p>
+          <h3>How a window gets recognised</h3>
+          <p>Apps rewrite their titles as you work. An editor names the file you have open, a browser names the page. A window saved with an exact title stops being found the moment it says something else, and WLM falls back to a weaker test that can pick the wrong window of the same app.</p>
+          <p>"Recognise by", at the bottom of the edit dialog, lets each window choose:</p>
+          <ul>
+            <li><strong>App and its exact title</strong> - the default, and what WLM has always done.</li>
+            <li><strong>App and a title starting with...</strong> - for the part of the title that stays put. "Inbox" still finds "Inbox (3) - Gmail".</li>
+            <li><strong>App and window type, any title</strong> - for apps that rename constantly.</li>
+          </ul>
+          <p>The looser two give up the title as a way of telling windows apart, so they require the window class and type to match instead. A rule you set also applies to the last-resort match on the app alone: if you asked for "starts with Inbox" you were being selective on purpose, and handing you any window of that app would undo the rule you just wrote.</p>
           <ul>
             <li><kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd> - Undo/redo any edit, with a labeled trail.</li>
             <li><kbd>Ctrl+H</kbd> or "History" - Browse and restore full saved versions of the profile (every Update keeps a snapshot).</li>
@@ -483,8 +506,10 @@
         <section id="companion">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial companions</span></p>
           <h2>Companion Software</h2>
-          <p>The "Companion software" tab detects complementary tools (PowerToys for live drag-snap zones, virtual display drivers for headless monitors, PowerShell 7 for scripting) and offers one-click installs for whatever's missing. For the ones you already have, it can ask winget whether there's an update and run it for you.</p>
+          <p>The "Companion software" tab detects complementary tools and offers one-click installs for whatever's missing: PowerToys for live drag-snap zones, Parsec for remote desktop, virtual display drivers for headless monitors, PowerShell 7 for scripting. For the ones you already have it reports the installed version, can ask winget whether there's an update and run it, and can uninstall.</p>
           <div class="shot"><a href="img/08-settings-companion.png" target="_blank" rel="noopener" title="Open full size"><img src="img/08-settings-companion.png" alt="Companion software settings tab" loading="lazy"></a></div>
+          <p class="caption">The tab draws immediately and fills in what it found a moment later, rather than making you wait on the scan.</p>
+          <p>Some software never registers itself in the usual place, so detection also looks at installed drivers and at what's on your PATH. That's how PowerShell 7 shows up as present.</p>
         </section>
 
         <section id="diagnostics">
@@ -494,6 +519,16 @@
           <p>"Report a bug" and "Request a feature" open a short form. You'll see exactly what gets sent before anything leaves your machine, the diagnostics dump is optional, and your Windows username is stripped out of the paths. Issues are public, so anything you type there is too.</p>
           <div class="shot"><a href="img/10-settings-diagnostics.png" target="_blank" rel="noopener" title="Open full size"><img src="img/10-settings-diagnostics.png" alt="Diagnostics settings tab" loading="lazy"></a></div>
           <p class="caption">// a load that didn't restore everything also links to a per-window report from its notification</p>
+        </section>
+
+        <section id="window">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial window</span></p>
+          <h2>Window Positions &amp; About</h2>
+          <p>The app window and each kind of dialog remember the size and position you last left them at, and come back to them next launch. A size you chose by dragging always beats the size a dialog would pick for itself.</p>
+          <div class="shot"><a href="img/17-settings-window.png" target="_blank" rel="noopener" title="Open full size"><img src="img/17-settings-window.png" alt="Window settings tab with the reset control" loading="lazy"></a></div>
+          <p class="caption">"Reset window positions" forgets all of it, which is what you want when something has ended up on a monitor you no longer have.</p>
+          <p>"About" carries the running version, the licence, and where your profiles live.</p>
+          <div class="shot"><a href="img/18-settings-about.png" target="_blank" rel="noopener" title="Open full size"><img src="img/18-settings-about.png" alt="About settings tab" loading="lazy"></a></div>
         </section>
 
         <section id="cli">
