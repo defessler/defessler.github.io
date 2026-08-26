@@ -363,13 +363,16 @@
           </ul>
 
           <h3>Changing several monitors together</h3>
-          <p>The picker takes more than one monitor at a time. <kbd>Ctrl</kbd>+click adds or removes one, <kbd>Shift</kbd>+click takes the run between two, the same gesture the visual editor uses for windows. Every selected monitor still gets its own card, so nothing is hidden behind the group, and a strip above them applies one setting to all of them at once.</p>
-          <p>Scaling there is <strong>step up</strong> or <strong>step down</strong> rather than a percentage. Every display has its own ladder of supported scales, and 150% is not necessarily a rung on all of them, so a step moves one rung along whatever ladder each display actually has.</p>
+          <p>The picker takes more than one monitor at a time. <kbd>Ctrl</kbd>+click adds or removes one, <kbd>Shift</kbd>+click takes the run between two, the same gesture the visual editor uses for windows.</p>
+          <p>Pick several and you get <em>one</em> set of controls: Scaling, Orientation, Resolution and Refresh rate, listed once, applying to every display you picked.</p>
+          <p>Those controls only offer what all of them can do. Two displays rarely support the same things &mdash; one panel's scaling ladder might be 100, 125, 150 while another's is 100, 150, 200, and their resolution lists are routinely different sizes entirely. Offering everything either could do would let you pick a value one of them cannot, and the apply would half work without saying anything. Resolutions are compared long side first, so a monitor standing on its end still matches an upright one of the same shape, and each display then stores the size from its own list.</p>
+          <p>Where they disagree, the editor says so rather than picking one. Two displays at different scales read <strong>now mixed</strong>. Orientation reads <strong>Mixed, leave as they are</strong>, and only changes anything if you actually choose something &mdash; without that, a landscape and a portrait display together would have shown "Landscape" and quietly rotated the second one the moment you picked a resolution.</p>
 
           <h3>Earlier arrangements</h3>
           <p>The Keep-or-Revert countdown covers the change you just made. It doesn't cover the one from yesterday. <strong>History</strong> in the display editor does.</p>
           <p>WLM records your arrangement before every change, whatever caused it: a profile load, a hotkey, Apply now, even a restore from this list. Each row says what caused it and how long ago it was.</p>
-          <p><strong>Preview</strong> draws that arrangement in the picker at the top of the editor. Nothing is applied. Nothing on your desk moves. You can click down the list comparing them as fast as you like, because drawing costs nothing. <strong>Restore this one</strong> is the separate step that actually writes it, and it goes through the same 15-second countdown as everything else.</p>
+          <p>It opens as a dialog shaped like the History window for a profile, and every row <em>draws</em> the arrangement it describes &mdash; a small picture of your desk as it was, with the primary display picked out. That is what removes the need to preview one: you can see which you want before you choose it.</p>
+          <p><strong>Use this</strong> draws that arrangement in the editor rather than applying it. Nothing on your desk moves until you press Apply now, which goes through the same 15-second countdown as everything else.</p>
           <p>The list belongs to the monitors it describes rather than to a profile, so a layout recorded at your desk is never offered to you on a different set of displays. A row naming a monitor you no longer have is greyed out and says which one is missing, instead of vanishing and leaving you wondering where your history went.</p>
 
           <h3>Your windows come with the monitors</h3>
