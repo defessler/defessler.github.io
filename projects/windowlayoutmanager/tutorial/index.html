@@ -426,7 +426,7 @@
           <h2>The Visual Editor</h2>
           <p>Switch the view to "VISUAL" for a live minimap of your saved layout: monitors to scale, one tab per virtual desktop, every window draggable.</p>
           <div class="shot"><a href="img/02-visual-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/02-visual-editor.png" alt="Visual editor with two monitors" loading="lazy"></a></div>
-          <p class="caption">Drag to move, corner-drag to resize. Edges snap to monitors and other windows (<kbd>Alt</kbd> disables snapping).</p>
+          <p class="caption">Drag to move, corner-drag to resize. Hold <kbd>Shift</kbd> while dragging to snap edges to monitors and to other windows.</p>
           <p>Arrow keys nudge whatever is selected: 10 pixels a press, or 1 with <kbd>Shift</kbd> held, on every selected window at once. A nudged window crosses onto the next monitor exactly the way a dragged one does, and holding a key down is one undo step rather than thirty.</p>
           <ul>
             <li>Select a window to get "Edit", "Block app", and "Remove" in the panel below the canvas.</li>
@@ -457,8 +457,8 @@
           <p>The "EDIT" button (list view) or "Edit" panel (visual view) opens exact fields for any window: desktop, monitor, state, the colour it's drawn in, and pixel-perfect position and size. X and Y sit together on one line, width and height on the next, so the pairs read as pairs.</p>
           <p>The list itself is a table &mdash; app and title, which monitor, which desktop &mdash; and hovering a row brings up a card with the rest: a scaled picture of where that window sits on your actual monitor layout, its resolution, its position, and whether it's normal, minimised or maximised.</p>
           <div class="shot"><a href="img/03-window-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/03-window-editor.png" alt="Per-window editor, open in its own window" loading="lazy"></a></div>
-          <p>Every dialog in WLM is a real window rather than a panel drawn over the app, so you can drag this one onto a second monitor, resize it, and keep looking at the layout behind it while you type. It opens a little smaller than the main window and stays wherever you leave it. The app itself is disabled while a dialog is up - that's Windows doing it, not a panel sitting on top - so a stray keystroke can't land in the window behind.</p>
-          <p>Each dialog knows the size its own layout needs and won't be dragged smaller than that, so there's no size you can resize one to where it stops making sense. There are three exceptions. Assign-hotkey stays a fixed panel over the app because its whole job is to catch the next key combination you press. Custom resolutions and Earlier arrangements both open from <em>inside</em> the display editor, which is already a window of its own, and a dialog raised from a dialog is drawn in place rather than spawning a third window.</p>
+          <p>Every dialog in WLM is a real window rather than a panel drawn over the app, so you can drag this one onto a second monitor, resize it, and keep looking at the layout behind it while you type. It opens at the size its own content needs, measured before it appears so you never watch one correct itself. The app itself is disabled while a dialog is up - that’s Windows doing it, not a panel sitting on top - so a stray keystroke can’t land in the window behind. Because they’re real windows they also show up in alt-tab and on the taskbar, so you can tab away from one and back to it.</p>
+          <p>Each dialog knows the size its own layout needs and won’t be dragged smaller than that, so there’s no size you can resize one to where it stops making sense. Four are drawn in the app window instead. Settings is one: it’s the largest surface in the app and a fixed panel keeps it the same on every machine. Assign-hotkey is another, because its whole job is to catch the next key combination you press. Custom resolutions and Earlier arrangements both open from <em>inside</em> the display editor, which is already a window of its own, and a dialog raised from a dialog is drawn in place rather than spawning a third window.</p>
           <h3>How a window gets recognised</h3>
           <p>Apps rewrite their titles as you work. An editor names the file you have open, a browser names the page. A window saved with an exact title stops being found the moment it says something else, and WLM falls back to a weaker test that can pick the wrong window of the same app.</p>
           <p>"Recognise by", at the bottom of the edit dialog, lets each window choose:</p>
@@ -515,7 +515,7 @@
             <li>Single-key actions on the focused profile: <kbd>Enter</kbd> load, <kbd>r</kbd> rename, <kbd>d</kbd> delete, <kbd>n</kbd> new.</li>
             <li>In the windows pane, <kbd>j</kbd>/<kbd>k</kbd> move a cursor through the saved windows, <kbd>Enter</kbd> edits the one under it and <kbd>x</kbd> removes it. Tab into the pane and the cursor is already on a row.</li>
             <li>Both lists wrap at the ends, and moving through the profile list shows that profile on the right as you go &mdash; a preview, not a load, so nothing on your desktop moves.</li>
-            <li>Arrow keys nudge things on both canvases: selected windows in the visual editor, and a selected display in the display editor with <kbd>Shift</kbd> held.</li>
+            <li>Arrow keys nudge things on both canvases: selected windows in the visual editor, and a selected display in the display editor with <kbd>Shift</kbd> held. The display step is 10 pixels by default and you can change it in Settings &rarr; Auto-activation.</li>
             <li><kbd>?</kbd> shows the complete keyboard reference, including both of those.</li>
           </ul>
         </section>
@@ -537,7 +537,8 @@
         <section id="companion">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial companions</span></p>
           <h2>Companion Software</h2>
-          <p>The "Companion software" tab detects complementary tools and offers one-click installs for whatever's missing: PowerToys for live drag-snap zones, Parsec for remote desktop, virtual display drivers for headless monitors, PowerShell 7 for scripting. For the ones you already have it reports the installed version, can ask winget whether there's an update and run it, and can uninstall.</p>
+          <p>The "Companion software" tab detects complementary tools and offers one-click installs for whatever’s missing: PowerToys for live drag-snap zones, Parsec for remote desktop, virtual display drivers for headless monitors, PowerShell 7 for scripting. For the ones you already have it reports the installed version, asks winget whether an update is waiting, and names the version you’d get. Rows sort by what there is to do about them: updates first, then what you have, then what you don’t.</p>
+          <p>Each app can also update itself in the background, on a cadence you set in Settings &rarr; Updates. Windows won’t let an unelevated app update a system-wide package, and most of these are system-wide, so those come back saying they need administrator rights rather than failing quietly.</p>
           <div class="shot"><a href="img/08-settings-companion.png" target="_blank" rel="noopener" title="Open full size"><img src="img/08-settings-companion.png" alt="Companion software settings tab" loading="lazy"></a></div>
           <p class="caption">The tab draws immediately and fills in what it found a moment later, rather than making you wait on the scan.</p>
           <p>Some software never registers itself in the usual place, so detection also looks at installed drivers and at what's on your PATH. That's how PowerShell 7 shows up as present.</p>
@@ -555,9 +556,9 @@
         <section id="window">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial window</span></p>
           <h2>Window Positions &amp; About</h2>
-          <p>The app window and each kind of dialog remember the size and position you last left them at, and come back to them next launch. A size you chose by dragging always beats the size a dialog would pick for itself.</p>
-          <div class="shot"><a href="img/17-settings-window.png" target="_blank" rel="noopener" title="Open full size"><img src="img/17-settings-window.png" alt="Window settings tab with the reset control" loading="lazy"></a></div>
-          <p class="caption">"Reset window positions" forgets all of it, which is what you want when something has ended up on a monitor you no longer have.</p>
+          <p>The app window remembers the size and position you leave it at. Dialogs don’t: each one opens at the size its content needs and goes back to that every time, so a dialog can’t get stuck at a size that no longer fits what’s in it. They’re measured before they appear, so you see the right size rather than watching one correct itself.</p>
+          <div class="shot"><a href="img/17-settings-window.png" target="_blank" rel="noopener" title="Open full size"><img src="img/17-settings-window.png" alt="Window settings tab" loading="lazy"></a></div>
+          <p class="caption">Settings itself is a fixed panel inside the main window rather than a window of its own, so it reads the same on every machine.</p>
           <p>"About" carries the running version, the licence, and where your profiles live.</p>
           <div class="shot"><a href="img/18-settings-about.png" target="_blank" rel="noopener" title="Open full size"><img src="img/18-settings-about.png" alt="About settings tab" loading="lazy"></a></div>
         </section>
