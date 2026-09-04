@@ -290,6 +290,7 @@
           <li><a href="#profiles">Saving &amp; Loading Layouts</a></li>
           <li><a href="#hotkeys">Global Hotkeys</a></li>
           <li><a href="#visual">The Visual Editor</a></li>
+          <li><a href="#bays">Docking Bays</a></li>
           <li><a href="#editor">Precise Edits, Undo &amp; History</a></li>
           <li><a href="#display">Display Zoom, Resolution &amp; Arrangement</a></li>
           <li><a href="#binding">Monitor Binding &amp; Auto-Activation</a></li>
@@ -434,7 +435,7 @@
           <ul>
             <li>Select a window to get "Edit", "Block app", and "Remove" in the panel below the canvas.</li>
             <li><strong>Select several at once</strong> the way you select files: <kbd>Ctrl</kbd>+click adds or removes one, <kbd>Shift</kbd>+click takes everything between what you clicked and where you started, and <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+click adds a whole run to what you already had. Shift measures from where you started rather than from the last thing you touched, so a second Shift+click shrinks the same range instead of walking it along.</li>
-            <li>With more than one selected, the panel below offers what makes sense for a group: <strong>move to monitor</strong>, <strong>set state</strong>, and <strong>remove</strong>. Position and size are deliberately not there. One X applied to twelve windows stacks all twelve in the same place.</li>
+            <li>With more than one selected, the panel below offers what makes sense for a group: <strong>move to monitor</strong>, <strong>set state</strong>, <strong>remove</strong>, and <strong>Group into Docking Bay</strong> to keep them together as a <a href="#bays">Docking Bay</a>. Position and size are deliberately not there. One X applied to twelve windows stacks all twelve in the same place.</li>
             <li>Drag a window between monitors. Its target monitor and relative position will update automatically.</li>
             <li>Every window can be given its own colour from the edit dialog, so the ones you care about stand out on the canvas.</li>
             <li>Edits auto-save after a beat. The "unsaved" badge tells you when a write is pending.</li>
@@ -445,14 +446,39 @@
           <div class="shot"><a href="img/15-visual-collapsed.png" target="_blank" rel="noopener" title="Open full size"><img src="img/15-visual-collapsed.png" alt="Two stacked windows collapsed to title bars" loading="lazy"></a></div>
           <p class="caption">Collapsed windows in the same stack cascade instead of stacking, so every one of them stays clickable.</p>
           <p>This is a viewing aid and nothing more. A collapsed window still loads at its full saved size, and the folding is forgotten when you switch profiles.</p>
+        </section>
 
-          <h3>Bays</h3>
-          <p>A profile is a flat list of windows, so moving a related cluster to another monitor means dragging each one and hoping the spacing survives. A Bay is a named group of windows inside one profile. Select two or more with Ctrl-click or Shift-click, then press "Group into Bay" in the strip below the canvas. The name comes from the apps inside: two apps give you "Chrome + Code", three or more give you "Chrome + 2 more".</p>
-          <div class="shot"><a href="img/16-visual-bays.png" target="_blank" rel="noopener" title="Open full size"><img src="img/16-visual-bays.png" alt="Visual editor showing two windows grouped into a Bay, with the Bay strip below the canvas" loading="lazy"></a></div>
-          <p class="caption">The outline is drawn under its members and goes solid when the whole Bay is selected.</p>
-          <p>Drag any member and the whole Bay goes with it, with the arrangement inside preserved exactly. Hold Shift and the group snaps by its own outer edges rather than by the window under your pointer, which is what makes it land flush against a monitor edge. "Move to monitor" sends every member to one display and keeps the offsets between them, so it is also how you gather a Bay back onto one screen after a drag across a seam has left half of it on the neighbour.</p>
-          <p>Clicking any member selects the whole Bay and the strip below the canvas becomes the Bay strip: the name in a box you can type in, the window count, "Move to monitor", "Ungroup" and "Remove". To get at one member on its own, Ctrl-click it. "Ungroup" drops the grouping and leaves every window exactly where it is.</p>
-          <div class="tip">Bays save with the profile and survive an Update, so re-capturing your desk keeps the groups you set up. Every Bay action is undoable with Ctrl+Z and appears in History on its own line.</div>
+        <section id="bays">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial bays</span></p>
+          <h2>Docking Bays</h2>
+          <p>A profile is a flat list of windows. Arrange three of them the way you like, then decide the whole cluster belongs on your other monitor. Now you're dragging them one at a time and hoping the spacing survives. A Docking Bay is a named group of windows inside one profile. It's the thing you drag, rename and move from then on.</p>
+
+          <h3>Grouping windows into a bay</h3>
+          <p>Select two or more windows in the visual editor with <kbd>Ctrl</kbd>+click or <kbd>Shift</kbd>+click, then press "Group into Docking Bay" in the strip below the canvas. There's no dialog.</p>
+          <p>The name comes from the distinct apps inside rather than from how many windows you picked. One app names the bay after itself. Two get joined with a plus, which is why the one below reads "Visual Studio Code + Google Chrome". Three or more name the first and count the rest. That gives you "Google Chrome + 2 more". Group three Chrome windows and you get "Google Chrome", because that's still one app. If none of the members has an app name WLM can read, the bay is called "Docking Bay" until you rename it. The name is a starting point anyway. Click it in the strip and type over it. Every window in the group takes the new one.</p>
+          <div class="shot"><a href="img/16-visual-bays.png" target="_blank" rel="noopener" title="Open full size"><img src="img/16-visual-bays.png" alt="Visual editor showing two windows grouped into a Docking Bay, with the bay strip below the canvas" loading="lazy"></a></div>
+          <p class="caption">The outline is worked out from its members every frame, which is why it can't drift out of step with the windows inside it.</p>
+          <p>On the canvas a bay is a dashed cyan outline drawn under its members, with the name sitting just above the top left corner. It goes solid when the whole bay is selected. Clicks pass straight through it, which keeps it from ever sitting between you and the window you meant to grab.</p>
+
+          <h3>A plain click now selects the whole bay</h3>
+          <p>This is the habit that changes. Click any member and every window in the bay comes with it. The strip below the canvas becomes the bay strip. To get at one member on its own, <kbd>Ctrl</kbd>+click it. That brings back the ordinary window panel with "Edit", "Block app" and the position and size pills.</p>
+          <p>Drag any member and the whole bay goes with it, with the arrangement inside preserved exactly. Hold <kbd>Shift</kbd> and the group snaps by its own outer edges rather than by the window under your pointer, which is what lands it flush against a monitor edge. A bay drag isn't held inside the desk, exactly as a single window's drag isn't. Every one of these actions goes on the undo trail under its own name. <kbd>Ctrl</kbd>+<kbd>Z</kbd> takes back a group, a rename or a move. <a href="#editor">History</a> lists each one on its own line, like "Grouped 3 windows into Google Chrome + 2 more".</p>
+
+          <h3>Sending a bay to another monitor</h3>
+          <p>The bay strip is the group's own set of controls: a "DOCKING BAY" badge, the name box, the window count, a "Move to monitor…" dropdown listing your displays, then "Ungroup" and "Remove". Pick a monitor and every member goes to that display with the offsets between them intact. This is the case the feature exists for.</p>
+          <p>Expect the group to jump into the corner. Where a single window's move keeps the spot it held on its old screen, a bay is re-anchored at the top left of the display you send it to, inside whatever space the taskbar leaves. Its members can have come from several displays, which leaves no one spot to carry across. This is also the only bay operation that clamps. A bay too big for the display you send it to keeps its top left corner on that screen and lets the rest overhang, rather than being shrunk to a size no app asked for.</p>
+          <div class="shot"><a href="img/19-visual-bay-moved.png" target="_blank" rel="noopener" title="Open full size"><img src="img/19-visual-bay-moved.png" alt="The same Docking Bay after Move to monitor, with both windows now on the second display" loading="lazy"></a></div>
+          <p class="caption">Both members crossed together and the gap between them is unchanged. That gap is the whole point.</p>
+          <p>A bay can also span two monitors, because each member picks its own display from its own centre the way a lone window does. Drag a group across a seam and half of it can stay on the neighbour. That's allowed and it's saved that way, and "Move to monitor…" is how you gather it up again.</p>
+
+          <h3>Breaking one up, splitting it, merging two</h3>
+          <p>"Ungroup" breaks the group up and leaves every window exactly where it is. Nothing leaves the profile. "Remove" is the other one. It drops every window in the bay from the profile, the same as removing a multi-selection. The count on the button is the warning. To take one member out instead, <kbd>Ctrl</kbd>+click it first and the bay carries on with the rest. When the last member goes the bay goes with it, because there's nothing left to hold the name.</p>
+          <p>Two moves aren't signposted anywhere in the app at time of writing. Select only some of a bay's members and the ordinary multi-select strip comes back with "Group into Docking Bay" on it. Pressing it there splits those windows off into a new bay of their own and leaves the rest in the original, still under the old name. Select members of two different bays and press it to merge them into one. Split all but one off and what's left is a bay of a single window, which is legal. Its strip picks up an "Edit window" button, because otherwise the window editor would be stuck behind an Ungroup.</p>
+
+          <h3>What a bay doesn't do</h3>
+          <p>Resizing isn't group aware. Drag a member's corner and that one window changes size while the rest stay where they are. The outline just follows. The list view doesn't know about bays at all. Members show there as ordinary rows with no name and no sign they belong together. Bays live in the visual editor for now.</p>
+          <p>A window belongs to at most one bay. Bays don't nest. A bay belongs to its profile, with no path to copy one into another. A window you drag by hand while <a href="#hold">Hold mode</a> is on keeps its bay, because the watcher only reports geometry. What the editor sets survives a live move: the colour, the match rule, and the group the window is in.</p>
+          <div class="tip">Docking Bays save with the profile and survive an Update. Re-capturing your desk keeps the groups you set up. They cost nothing at load, because members go back the way any window does and nothing about a bay reaches Windows. In the JSON it's two fields on each window, <code>bayId</code> and <code>bayTitle</code>, repaired on the next save if a hand edit leaves them disagreeing.</div>
         </section>
 
         <section id="editor">
