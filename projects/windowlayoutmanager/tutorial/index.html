@@ -446,12 +446,13 @@
           <p class="caption">Collapsed windows in the same stack cascade instead of stacking, so every one of them stays clickable.</p>
           <p>This is a viewing aid and nothing more. A collapsed window still loads at its full saved size, and the folding is forgotten when you switch profiles.</p>
 
-          <h3>FancyZones</h3>
-          <p>If you use PowerToys FancyZones, tick "FancyZones" under the canvas and WLM draws the zones it would snap a window into. Drag a window onto one and it lands on that zone exactly. The picker beside the tick box chooses which layout is drawn, and the default is whatever FancyZones itself has applied to that monitor.</p>
-          <div class="shot"><a href="img/16-visual-zones.png" target="_blank" rel="noopener" title="Open full size"><img src="img/16-visual-zones.png" alt="Visual editor showing FancyZones zones under the windows" loading="lazy"></a></div>
-          <p class="caption">Zones are drawn under the windows, so they read as the surface rather than as more windows.</p>
-          <p>WLM reads PowerToys' layouts and never writes to them. Those files are live &mdash; PowerToys keeps them in memory and rewrites them on its own schedule &mdash; so editing them from outside would race it and could lose the layouts you built. Zone authoring stays in PowerToys' own editor.</p>
-          <div class="tip">Zones are matched to monitors by hardware id, the same way FancyZones does it. Profiles saved before this release borrow that from whichever monitor is currently in the same role, and pick up their own copy the next time you hit Update.</div>
+          <h3>Bays</h3>
+          <p>A profile is a flat list of windows, so moving a related cluster to another monitor means dragging each one and hoping the spacing survives. A Bay is a named group of windows inside one profile. Select two or more with Ctrl-click or Shift-click, then press "Group into Bay" in the strip below the canvas. The name comes from the apps inside: two apps give you "Chrome + Code", three or more give you "Chrome + 2 more".</p>
+          <div class="shot"><a href="img/16-visual-bays.png" target="_blank" rel="noopener" title="Open full size"><img src="img/16-visual-bays.png" alt="Visual editor showing two windows grouped into a Bay, with the Bay strip below the canvas" loading="lazy"></a></div>
+          <p class="caption">The outline is drawn under its members and goes solid when the whole Bay is selected.</p>
+          <p>Drag any member and the whole Bay goes with it, with the arrangement inside preserved exactly. Hold Shift and the group snaps by its own outer edges rather than by the window under your pointer, which is what makes it land flush against a monitor edge. "Move to monitor" sends every member to one display and keeps the offsets between them, so it is also how you gather a Bay back onto one screen after a drag across a seam has left half of it on the neighbour.</p>
+          <p>Clicking any member selects the whole Bay and the strip below the canvas becomes the Bay strip: the name in a box you can type in, the window count, "Move to monitor", "Ungroup" and "Remove". To get at one member on its own, Ctrl-click it. "Ungroup" drops the grouping and leaves every window exactly where it is.</p>
+          <div class="tip">Bays save with the profile and survive an Update, so re-capturing your desk keeps the groups you set up. Every Bay action is undoable with Ctrl+Z and appears in History on its own line.</div>
         </section>
 
         <section id="editor">
