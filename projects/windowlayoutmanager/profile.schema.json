@@ -183,7 +183,7 @@
       "type": "object",
       "required": ["bounds", "workArea"],
       "additionalProperties": true,
-      "description": "One monitor of a bound or learned set, as profiles.monitorFingerprint() records it: the monitorRecord fields minus role, which is assigned at save time and is not part of a set's identity.",
+      "description": "One monitor of a bound or learned set, as profiles.monitorFingerprint() records it. No role (assigned at save time, not part of a set's identity) and no hardwareId; deviceString is recorded here and not on monitors[].",
       "properties": {
         "isPrimary": { "type": "boolean" },
         "bounds":   { "$ref": "#/$defs/rect" },
@@ -208,7 +208,6 @@
         "workArea": { "$ref": "#/$defs/rect", "description": "Work area = bounds minus reserved space (taskbars, etc.)." },
         "dpi":      { "type": "integer", "minimum": 1, "description": "Effective DPI at save time. 96 = 100% scale." },
         "deviceId":     { "type": ["string", "null"], "description": "Hardware identifier from EnumDisplayDevicesW (stable across reboots for physical monitors; regenerates per session on virtual displays)." },
-        "deviceString": { "type": ["string", "null"], "description": "Driver/model name. Usually the constant 'Generic PnP Monitor', so matching never relies on it." },
         "hardwareId":   { "type": ["string", "null"], "description": "The EDID hardware id inside deviceId (e.g. PSCCDD0). Stable across virtual-display sessions where deviceId is not." }
       }
     },
