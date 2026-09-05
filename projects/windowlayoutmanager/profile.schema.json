@@ -1,0 +1,286 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dougfessler.com/projects/windowlayoutmanager/profile.schema.json",
+  "title": "WLM profile",
+  "description": "Schema for Window Layout Manager profile JSON files stored under %APPDATA%/window-layout-manager/profiles/. Profiles are human-editable but most users should let WLM write them. See https://dougfessler.com/projects/windowlayoutmanager/ for the app and its tutorial.",
+  "type": "object",
+  "required": ["name", "savedAt", "windows"],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Display name of the profile. Used as the file name (with forbidden characters substituted)."
+    },
+    "savedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when this profile was last saved."
+    },
+    "hotkey": {
+      "type": "string",
+      "description": "Optional Electron accelerator string (e.g. 'Ctrl+Alt+1'). Empty string disables the hotkey."
+    },
+    "$schema": {
+      "type": "string",
+      "description": "Pointer back to this schema so editors offer autocomplete on a hand-edited profile. WLM writes it on every save and otherwise ignores it."
+    },
+    "live": {
+      "type": "boolean",
+      "description": "When true, WLM holds this layout — user moves are recorded into the profile, other moves are reverted. Only one profile can be live at a time."
+    },
+    "bindPromptDismissed": {
+      "type": "boolean",
+      "description": "When true, suppresses the in-app prompt asking the user to bind this profile to a monitor set."
+    },
+    "monitorSet": {
+      "type": ["array", "null"],
+      "description": "Snapshot of the physical monitor configuration this profile is bound to, for auto-activation. Optional.",
+      "items": { "$ref": "#/$defs/monitorFingerprint" }
+    },
+    "knownMonitorSets": {
+      "type": "array",
+      "description": "Monitor configurations this profile has previously been applied to, each with the role remap used at the time, so auto-activation can silently re-apply a recurring setup instead of re-prompting.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "monitors": { "type": "array", "items": { "$ref": "#/$defs/monitorFingerprint" } },
+          "remapByRole": { "type": ["object", "null"] },
+          "savedAt": { "type": "string", "format": "date-time", "description": "When this set was learned or last refreshed." }
+        }
+      }
+    },
+    "displayMode": { "$ref": "#/$defs/displayMode" },
+    "postLoad": {
+      "description": "Optional shell command fired by WLM after the profile finishes restoring. Useful for switching audio, opening tabs, starting OBS, etc. Either a string command line or an object with explicit cwd/env.",
+      "oneOf": [
+        { "type": "string", "description": "Shell command line. Goes through cmd.exe (Windows) so you can chain with && / |." },
+        {
+          "type": "object",
+          "required": ["command"],
+          "additionalProperties": false,
+          "properties": {
+            "command": { "type": "string" },
+            "cwd": { "type": "string", "description": "Working directory for the spawned command." },
+            "env": {
+              "type": "object",
+              "description": "Extra environment variables. Merged onto process.env; values must be strings.",
+              "additionalProperties": { "type": "string" }
+            }
+          }
+        }
+      ]
+    },
+    "monitors": {
+      "type": "array",
+      "description": "The monitor layout at save time. Used to derive saved coordinates and DPI on restore.",
+      "items": { "$ref": "#/$defs/monitorRecord" }
+    },
+    "virtualDesktops": {
+      "type": ["object", "null"],
+      "description": "Virtual desktop snapshot. null on hosts where WLM couldn't read the COM bridge.",
+      "required": ["count", "currentIndex"],
+      "additionalProperties": false,
+      "properties": {
+        "count": { "type": "integer", "minimum": 0 },
+        "currentIndex": { "type": "integer", "description": "Active desktop index at save time. -1 when unknown." }
+      }
+    },
+    "windows": {
+      "type": "array",
+      "description": "Saved windows. Each entry is matched against live windows at restore time by process+title and friends.",
+      "items": { "$ref": "#/$defs/window" }
+    }
+  },
+  "$defs": {
+    "displayMode": {
+      "type": "object",
+      "description": "Optional display configuration applied before this profile restores its windows: per-monitor scaling (the Windows 'zoom' percentage) and/or resolution. Setting the scaling percentage uses an undocumented Windows call, so it can report unavailable on some builds; resolution uses the documented ChangeDisplaySettingsEx path.",
+      "required": ["targets"],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Defaults to true when the block is present. Read as 'enabled !== false', so omitting it leaves the block active."
+        },
+        "displayOnly": {
+          "type": "boolean",
+          "description": "When true this profile is purely a zoom/resolution preset: window restore is skipped, and it is excluded from auto-activation so it cannot outrank a real layout profile."
+        },
+        "applyOn": {
+          "type": "array",
+          "description": "Which load sources apply this block. 'load' covers the Load button, tray, hotkey and CLI. 'auto-activation' is opt-in.",
+          "items": { "type": "string", "enum": ["load", "auto-activation"] }
+        },
+        "appliedAt": { "type": "string", "description": "ISO timestamp of the last successful apply." },
+        "targets": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/displayModeTarget" }
+        }
+      }
+    },
+    "displayModeTarget": {
+      "type": "object",
+      "description": "One monitor's desired display state. At least one of scalePercent, scaleStep, mode or position must be set, and scalePercent/scaleStep are mutually exclusive.",
+      "required": ["role"],
+      "properties": {
+        "role": {
+          "type": "string",
+          "description": "Either a saved monitor role ('primary', 'secondary', …) or a virtual role resolved live: '@focused' (the monitor holding the foreground window), '@primary', or '@all'."
+        },
+        "deviceId": {
+          "type": ["string", "null"],
+          "description": "Stable hardware path for physical monitors. Virtual displays (Parsec, Apollo, spacedesk, any IddCx driver) regenerate it each time the display is created, so matching falls back to the EDID hardware id and then to deviceString."
+        },
+        "deviceString": { "type": ["string", "null"], "description": "Driver/model name, e.g. 'ParsecVDA'. Stable where deviceId is not, though most displays report the useless constant 'Generic PnP Monitor'." },
+        "deviceName": { "type": ["string", "null"], "description": "GDI adapter name (\\\\.\\DISPLAY1). A hint only — it renumbers when displays attach, and is always re-resolved at apply time." },
+        "scalePercent": {
+          "type": ["integer", "null"],
+          "description": "Absolute scaling percentage. Must be one of the fixed Windows steps (100, 125, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500)."
+        },
+        "scaleStep": {
+          "type": ["integer", "null"],
+          "description": "Relative move along the scaling ladder (+1 / -1), resolved against the live value at apply time. Mutually exclusive with scalePercent."
+        },
+        "position": {
+          "type": ["object", "null"],
+          "description": "Where this monitor sits on the desktop, in physical pixels, relative to the primary at (0,0). Negative values are normal — a monitor above or left of the primary has them. An arrangement is only meaningful as a whole, so the editor writes a position onto EVERY target when it writes any. Not allowed on the virtual roles: '@all' names several monitors, '@focused' names a different one each time, and '@primary' is the origin by definition. Applied after resolution and orientation, because those change the very sizes an arrangement is made of, and applied to all monitors in one atomic commit.",
+          "required": ["x", "y"],
+          "additionalProperties": false,
+          "properties": {
+            "x": { "type": "integer", "description": "Left edge, in physical pixels, relative to the primary monitor's top-left." },
+            "y": { "type": "integer", "description": "Top edge, in physical pixels, relative to the primary monitor's top-left." }
+          }
+        },
+        "mode": {
+          "type": ["object", "null"],
+          "description": "Target resolution. Width and height must match a mode the driver offers; refresh rate is a preference and falls back to the nearest available.",
+          "required": ["width", "height"],
+          "properties": {
+            "width": { "type": "integer", "minimum": 1, "description": "Desktop width AFTER any rotation, matching what Windows reports once applied." },
+            "height": { "type": "integer", "minimum": 1, "description": "Desktop height AFTER any rotation." },
+            "refreshHz": { "type": ["integer", "null"], "minimum": 1 },
+            "orientation": {
+              "type": "string",
+              "enum": ["landscape", "portrait", "landscape-flipped", "portrait-flipped"],
+              "description": "Display rotation, mapping to DEVMODEW.dmDisplayOrientation DMDO_DEFAULT/90/180/270. Defaults to landscape. Width and height above are expressed in this orientation's space, so a portrait 1080x1920 is stored as width 1080."
+            }
+          }
+        }
+      }
+    },
+    "rect": {
+      "type": "object",
+      "required": ["left", "top", "right", "bottom"],
+      "additionalProperties": false,
+      "properties": {
+        "left":   { "type": "integer" },
+        "top":    { "type": "integer" },
+        "right":  { "type": "integer" },
+        "bottom": { "type": "integer" }
+      }
+    },
+    "monitorFingerprint": {
+      "type": "object",
+      "required": ["bounds", "workArea"],
+      "additionalProperties": true,
+      "description": "One monitor of a bound or learned set, as profiles.monitorFingerprint() records it: the monitorRecord fields minus role, which is assigned at save time and is not part of a set's identity.",
+      "properties": {
+        "isPrimary": { "type": "boolean" },
+        "bounds":   { "$ref": "#/$defs/rect" },
+        "workArea": { "$ref": "#/$defs/rect" },
+        "dpi":      { "type": "integer", "minimum": 1 },
+        "deviceId":     { "type": ["string", "null"] },
+        "deviceString": { "type": ["string", "null"] }
+      }
+    },
+    "monitorRecord": {
+      "type": "object",
+      "required": ["role", "bounds", "workArea"],
+      "additionalProperties": true,
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": ["primary", "secondary", "tertiary", "quaternary", "quinary", "senary"],
+          "description": "Stable role assigned by WLM. Primary is always first; the rest are ordered left-to-right, top-to-bottom."
+        },
+        "isPrimary": { "type": "boolean" },
+        "bounds":   { "$ref": "#/$defs/rect", "description": "Monitor pixel bounds in virtual-screen coordinates." },
+        "workArea": { "$ref": "#/$defs/rect", "description": "Work area = bounds minus reserved space (taskbars, etc.)." },
+        "dpi":      { "type": "integer", "minimum": 1, "description": "Effective DPI at save time. 96 = 100% scale." },
+        "deviceId":     { "type": ["string", "null"], "description": "Hardware identifier from EnumDisplayDevicesW (stable across reboots for physical monitors; regenerates per session on virtual displays)." },
+        "deviceString": { "type": ["string", "null"], "description": "Driver/model name. Usually the constant 'Generic PnP Monitor', so matching never relies on it." },
+        "hardwareId":   { "type": ["string", "null"], "description": "The EDID hardware id inside deviceId (e.g. PSCCDD0). Stable across virtual-display sessions where deviceId is not." }
+      }
+    },
+    "ownerInfo": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "processName": { "type": "string" },
+        "className":   { "type": "string" },
+        "title":       { "type": "string" }
+      }
+    },
+    "window": {
+      "type": "object",
+      "required": ["processName", "title", "className", "monitorRole", "relX", "relY", "width", "height", "showCmd"],
+      "additionalProperties": true,
+      "properties": {
+        "processName": { "type": "string", "description": "Process basename (e.g. 'chrome.exe')." },
+        "displayName": { "type": "string", "description": "Pretty name from the exe's FileDescription resource (e.g. 'Google Chrome')." },
+        "exePath":     { "type": "string", "description": "Absolute path to the exe at save time." },
+        "title":       { "type": "string", "description": "Full window title at save time." },
+        "className":   { "type": "string", "description": "Win32 window class name (e.g. 'Chrome_WidgetWin_1')." },
+        "isOwned":        { "type": "boolean" },
+        "isToolWindow":   { "type": "boolean" },
+        "onOtherDesktop": { "type": "boolean", "description": "True when this window lived on a non-current virtual desktop at save time." },
+        "desktopIndex":   { "type": "integer", "description": "Virtual desktop index. -1 when unknown." },
+        "ownerInfo":      { "$ref": "#/$defs/ownerInfo", "description": "Identity of the owner top-level window, when this is an owned/tool window." },
+        "monitorRole":    { "type": "string", "enum": ["primary", "secondary", "tertiary", "quaternary", "quinary", "senary"] },
+        "windowDpi":      { "type": "integer", "minimum": 0, "description": "Per-window effective DPI at save time, from GetDpiForWindow. 0 = unknown." },
+        "dpiAwareness": {
+          "type": "integer",
+          "enum": [-1, 0, 1, 2],
+          "description": "-1 = unknown, 0 = unaware, 1 = system-aware, 2 = per-monitor-aware (PMA / PMv2)."
+        },
+        "relX":   { "type": "integer", "description": "Window left edge relative to the saved monitor's work area." },
+        "relY":   { "type": "integer", "description": "Window top edge relative to the saved monitor's work area." },
+        "width":  { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "color": {
+          "type": ["string", "null"],
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Optional per-window colour override, as #rrggbb. Set from the window editor's Colour control. Absent means the colour is generated from the process name, which is what the Visual tab and the windows list have always done. Validated on write because it is applied as an inline style."
+        },
+        "showCmd": {
+          "type": "integer",
+          "enum": [1, 2, 3],
+          "description": "Restore-state from WINDOWPLACEMENT.showCmd. 1 = SW_SHOWNORMAL, 2 = SW_SHOWMINIMIZED, 3 = SW_SHOWMAXIMIZED."
+        },
+        "bayId": {
+          "type": ["string", "null"],
+          "pattern": "^bay-[0-9a-f]{8}$",
+          "description": "Bay membership. Windows sharing a bayId are one Bay: a named group that moves, saves and restores as a unit. Absent or null means ungrouped. The Bay itself has no record of its own -- membership, bounds and monitor are all derived from the windows carrying this id. See docs/bay-spec.md."
+        },
+        "bayTitle": {
+          "type": "string",
+          "description": "The Bay name, carried identically on every member. Only meaningful alongside a valid bayId. Deliberately denormalised so Bays ride the existing per-window save and undo paths; profiles.js rewrites disagreeing copies from the first member on every write."
+        },
+        "match": {
+          "type": ["object", "null"],
+          "description": "How this window is recognised on the next load. Absent means the title must match exactly. Set from the window editor's 'Recognise by' control.",
+          "additionalProperties": false,
+          "properties": {
+            "title": { "type": "string", "enum": ["prefix", "ignore"], "description": "'prefix' accepts a live title that starts with pattern; 'ignore' does not consult the title at all. Both still require the window class and kind to match." },
+            "pattern": { "type": "string", "maxLength": 200, "description": "The title prefix, for 'prefix'. An empty prefix is stored as 'ignore'." }
+          }
+        },
+        "liveHistory": {
+          "type": "array",
+          "description": "Hold-mode rollback trail, newest first, capped at 20. Each entry is a prior monitorRole / relX / relY / width / height / showCmd / desktopIndex of this window, stamped savedAt.",
+          "items": { "type": "object" }
+        }
+      }
+    }
+  }
+}

@@ -324,7 +324,7 @@
           <p>Arrange your windows the way you like, hit "+ new profile", name it, done. WLM captures every visible window's position, size, state (normal / minimized / maximized), monitor, and virtual desktop.</p>
           <ul>
             <li>Load - Puts every captured window back, even after apps restarted, titles changed, or Windows shoved everything onto one screen. The matcher tries to re-find windows by process, class, title signature, owner identity, and position.</li>
-            <li>Update - Re-captures the current arrangement into the selected profile (your hotkey, binding, and history are preserved).</li>
+            <li>Update - Re-captures the current arrangement into the selected profile. Your hotkey, binding, history, per-window colours and "recognise by" rules, and Docking Bays are all preserved.</li>
             <li>Load details - Shows a per-window report of the last load: what matched, what moved, what was missing.</li>
             <li>A Load is one pass and it's finished when it returns. There used to be a retry chain that kept re-applying the layout for about two minutes to catch windows that open late (IDEs re-floating tool panels, Electron apps), and it was removed: for two minutes after a hotkey the app would keep moving windows, and a retry happily claimed windows you'd opened <em>since</em> the load and dragged into a saved slot they were never part of. If an app is slow to open its windows, press the hotkey again.</li>
           </ul>
