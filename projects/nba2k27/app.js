@@ -37,6 +37,7 @@
     forced: new Set(), limited: new Set(),
     tab: "badges", animOpen: {}, animSearch: "", animOnly: true, badgeOnly: false,
     cbPlan: Array(21).fill(0),   // cap breakers planned per attribute (0-5)
+    currentOvr: null,            // where the MyPLAYER actually is now; null means already maxed
   };
   const CB_TOTAL_NOW = 20, CB_TOTAL_YEAR = 28, CB_MAX_PER_ATTR = 5;
 
@@ -141,30 +142,71 @@
         row.innerHTML = `
           <div class="name">${ATTRS[i]}<small data-forced="${i}"></small></div>
           <div class="track"><input type="range" min="25" max="99" step="1" data-range="${i}" aria-label="${ATTRS[i]}"><div class="ticks" data-ticks="${i}"></div><div class="capline" data-capline="${i}"></div></div>
-          <input type="number" min="25" max="99" step="1" data-num="${i}" aria-label="${ATTRS[i]} value">
+          <div class="stepper">
+            <button type="button" class="step" data-down="${i}" aria-label="Lower ${ATTRS[i]}">&minus;</button>
+            <input type="number" min="25" max="99" step="1" data-num="${i}" aria-label="${ATTRS[i]} value">
+            <button type="button" class="step" data-up="${i}" aria-label="Raise ${ATTRS[i]}">+</button>
+          </div>
           <div class="cap num">cap <b data-cap="${i}">--</b></div>
           <div class="next num" data-next="${i}"></div>`;
         rows.appendChild(row);
         attrEls[i] = {
           row, range: row.querySelector("input[type=range]"), num: row.querySelector("input[type=number]"),
           cap: row.querySelector("[data-cap]"), forced: row.querySelector("[data-forced]"), ticks: row.querySelector("[data-ticks]"),
-          capline: row.querySelector("[data-capline]"), next: row.querySelector("[data-next]")
+          capline: row.querySelector("[data-capline]"), next: row.querySelector("[data-next]"),
+          up: row.querySelector("[data-up]"), down: row.querySelector("[data-down]")
         };
         attrEls[i].range.addEventListener("input", e => setWant(i, +e.target.value));
         attrEls[i].num.addEventListener("change", e => setWant(i, +e.target.value));
         attrEls[i].num.addEventListener("keydown", e => {
-          if (e.key === "ArrowUp") { e.preventDefault(); setWant(i, state.want[i] + 1); }
-          if (e.key === "ArrowDown") { e.preventDefault(); setWant(i, state.want[i] - 1); }
+          if (e.key === "ArrowUp") { e.preventDefault(); step(i, +1); }
+          if (e.key === "ArrowDown") { e.preventDefault(); step(i, -1); }
         });
+        bindStep(attrEls[i].up, i, +1);
+        bindStep(attrEls[i].down, i, -1);
       });
       col.appendChild(panel);
     });
   }
 
-  function setWant(i, v) {
+  // The single place a rating is set. Everything routes through here so an attribute can never be
+  // pushed past what this body allows: the cap for that body, and 99, which nothing exceeds.
+  const HARD_CAP = 99, FLOOR = 25;
+  function ceilingFor(i) {
     const caps = state.caps || [];
-    state.want[i] = clamp(Math.round(v) || 25, 25, caps[i] || 99);
+    return Math.min(HARD_CAP, caps[i] || HARD_CAP);
+  }
+  function setWant(i, v) {
+    const n = Math.round(Number(v));
+    state.want[i] = clamp(Number.isFinite(n) ? n : FLOOR, FLOOR, ceilingFor(i));
     recompute();
+  }
+  function step(i, delta) {
+    // Step from the value on screen, not from the stored request, so the buttons always move the
+    // number the user can see even when a linked minimum has raised it above what they asked for.
+    const from = state.values[i];
+    const next = clamp(from + delta, FLOOR, ceilingFor(i));
+    if (next !== from) setWant(i, next);
+  }
+  // Click steps once; press and hold repeats. Pointer capture keeps the repeat tied to this button
+  // so releasing anywhere, or the button going disabled at the cap, always stops it.
+  function bindStep(btn, i, delta) {
+    let hold = null, repeat = null;
+    const stop = () => { clearTimeout(hold); clearInterval(repeat); hold = repeat = null; };
+    const fire = () => {
+      if (state.values[i] === clamp(state.values[i] + delta, FLOOR, ceilingFor(i))) { stop(); return; }
+      step(i, delta);
+    };
+    btn.addEventListener("pointerdown", e => {
+      if (btn.disabled) return;
+      e.preventDefault();
+      step(i, delta);
+      hold = setTimeout(() => { repeat = setInterval(fire, 70); }, 400);
+    });
+    ["pointerup", "pointercancel", "pointerleave", "blur"].forEach(ev => btn.addEventListener(ev, stop));
+    btn.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); step(i, delta); }
+    });
   }
 
   // ---------- recompute everything ----------
@@ -187,9 +229,13 @@
   function renderAttrs(caps, tok) {
     const ladders = MODEL.tokenLadders(state.h);
     for (let i = 0; i < 21; i++) {
-      const el = attrEls[i], cap = caps[i], v = state.values[i];
-      el.range.max = 99; el.range.value = v; el.num.value = v; el.num.max = cap;
+      const el = attrEls[i], cap = Math.min(99, caps[i]), v = state.values[i];
+      el.range.max = 99; el.range.value = v; el.num.value = v; el.num.max = cap; el.num.min = 25;
       el.cap.textContent = cap;
+      // The buttons are the affordance for the cap: once an attribute is there, raising is off.
+      el.up.disabled = v >= cap;
+      el.down.disabled = v <= 25;
+      el.row.classList.toggle("atcap", v >= cap);
       const p = ((v - 25) / 74 * 100).toFixed(2) + "%", cp = ((cap - 25) / 74 * 100).toFixed(2) + "%";
       el.range.style.setProperty("--p", p); el.range.style.setProperty("--cp", cp);
       el.capline.style.left = `calc(7px + (100% - 14px) * ${(cap - 25) / 74})`;
@@ -264,6 +310,17 @@
     } else {
       const left = 99 - ovr.raw;
       hint.innerHTML = `<span class="pill ${left < 0.6 ? "good" : "warn"}">${left < 0.6 ? "Budget filled" : "Budget left"}</span> about <b class="num">${left.toFixed(1)}</b> overall still to spend. Estimated, so confirm the last point or two in game.`;
+    }
+    // The overall above is what this build can reach. If the player has told us where they are now,
+    // say how far that leaves them from the build and from the 99 that unlocks Cap Breakers.
+    if (state.currentOvr !== null) {
+      const toBuild = Math.max(0, ovr.display - state.currentOvr);
+      const toNinety = Math.max(0, 99 - state.currentOvr);
+      hint.innerHTML += `<br><span class="pill">Now ${state.currentOvr}</span> ` + (
+        toBuild > 0
+          ? `<b class="num">${toBuild}</b> overall from this build's ceiling`
+          : `already at this build's ceiling`) +
+        (toNinety > 0 ? ` &middot; <b class="num">${toNinety}</b> from the 99 that unlocks Cap Breakers` : ` &middot; Cap Breakers unlocked`);
     }
   }
 
@@ -445,7 +502,10 @@
       <div><div class="v num">+${gained}</div><div class="l">Attribute points gained</div></div>
       <div><div class="v num">${CB_TOTAL_NOW}<small style="font-size:14px;color:var(--muted)"> / ${CB_TOTAL_YEAR}</small></div><div class="l">Earnable now / this year</div></div>
     </div>
-    <p class="note" style="margin:0 0 6px">Cap Breakers unlock once a build reaches 99 overall. Each chip is one breaker on that attribute, up to five, showing the points it adds from where the attribute sits now. Click a chip to plan that many. Gains stop at the body cap and never earn badge tokens.</p>`;
+    <p class="note" style="margin:0 0 6px">Cap Breakers unlock once a build reaches 99 overall. Each chip is one breaker on that attribute, up to five, showing the points it adds from where the attribute sits now. Click a chip to plan that many. Gains stop at the body cap and at 99, and never earn badge tokens.</p>`;
+    if (state.currentOvr !== null && state.currentOvr < 99) {
+      html += `<p class="note" style="color:var(--warn-ink)"><b>Not unlocked yet.</b> Your MyPLAYER is ${state.currentOvr} overall and Cap Breakers open at 99, ${99 - state.currentOvr} away. Everything below is what you would get once you are there.</p>`;
+    }
     if (!haveRule) {
       html += `<p class="note">The gain rule is still being fitted from engine captures. Ladders will appear here once it lands.</p>`;
       el.innerHTML = html; return;
@@ -547,6 +607,7 @@
     </div>
     <dl class="kv">
       <dt>Body</dt><dd>${POS_NAME[state.pos]} · ${ft(state.h)} · ${state.w} lb · ${ft(state.ws)} wingspan</dd>
+      <dt>Current OVR</dt><dd>${state.currentOvr === null ? "not set" : `${state.currentOvr}, ${Math.max(0, state.ovr.display - state.currentOvr)} short of this build and ${Math.max(0, 99 - state.currentOvr)} from Cap Breakers`}</dd>
       <dt>Archetype</dt><dd title="Inferred by matching this build against stored engine samples. A wrong guess shifts both the overall estimate and the cap breaker ladders.">${MODEL.typeName(state.ovr.type)} <span style="color:var(--muted)">(inferred)</span></dd>
       <dt>Raw potential</dt><dd class="num">about ${state.ovr.raw.toFixed(1)} (the game rounds a finished build up to 99 once nothing can be raised)</dd>
       <dt>Tokens</dt><dd>${tok.known ? DISCS.map((d, i) => `${d.key} ${tok.perDisc[i]}`).join(" · ") : "no ladder data for this height yet"}</dd>
@@ -589,6 +650,8 @@
     fillWings();
     state.ws = clamp(state.ws, r.ws[0], r.ws[1]);
     $("wing").value = state.ws;
+    const cur = $("curOvr");
+    if (cur && document.activeElement !== cur) cur.value = state.currentOvr === null ? "" : state.currentOvr;
   }
   function bindBodyForm() {
     const posSel = $("pos");
@@ -597,6 +660,12 @@
     $("height").addEventListener("change", () => { state.h = +$("height").value; syncBodyForm(); recompute(); });
     $("weight").addEventListener("change", () => { state.w = +$("weight").value; syncBodyForm(); recompute(); });
     $("wing").addEventListener("change", () => { state.ws = +$("wing").value; recompute(); });
+    $("curOvr").addEventListener("input", e => {
+      const raw = e.target.value.trim();
+      const n = Math.round(Number(raw));
+      state.currentOvr = raw === "" || !Number.isFinite(n) ? null : clamp(n, 25, 99);
+      recompute();
+    });
     $("resetBtn").addEventListener("click", () => { state.want = Array(21).fill(25); state.cbPlan = Array(21).fill(0); recompute(); });
     const tabs = [...document.querySelectorAll("#tabs button")];
     tabs.forEach((b, k) => {
@@ -618,15 +687,20 @@
   const A36 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_!*'()~.:;=+@$,";
   function encodeBuild() {
     const attrs = state.want.map(v => A36[v - 25]).join("");
-    return `${state.pos}-${state.h}-${state.w}-${state.ws}-${attrs}`;
+    // The current-OVR suffix is optional, so codes shared before it existed still load.
+    return `${state.pos}-${state.h}-${state.w}-${state.ws}-${attrs}` +
+      (state.currentOvr === null ? "" : `-c${state.currentOvr}`);
   }
   function decodeBuild(code) {
-    const m = /^(PG|SG|SF|PF|C)-(\d+)-(\d+)-(\d+)-(.{21})$/.exec(code || "");
+    // The attribute block is exactly 21 characters, so the optional suffix can never be mistaken
+    // for part of it even though '-' is a legal attribute character.
+    const m = /^(PG|SG|SF|PF|C)-(\d+)-(\d+)-(\d+)-([\s\S]{21})(?:-c(\d+))?$/.exec(code || "");
     if (!m) return false;
     const pos = m[1], h = +m[2], w = +m[3], ws = +m[4];
     if (!BODIES[pos] || !BODIES[pos][String(h)]) return false;
     const want = Array.from(m[5], ch => { const k = A36.indexOf(ch); return k < 0 ? 25 : 25 + k; });
     state.pos = pos; state.h = h; state.w = w; state.ws = ws; state.want = want;
+    state.currentOvr = m[6] === undefined ? null : clamp(+m[6], 25, 99);
     return true;
   }
   let hashTimer = null;
