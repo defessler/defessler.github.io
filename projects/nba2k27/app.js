@@ -34,7 +34,9 @@
     values: Array(21).fill(25), // after caps + linked minimums
     forced: new Set(), limited: new Set(),
     tab: "badges", animOpen: {}, animSearch: "", animOnly: true, badgeOnly: false,
+    cbPlan: Array(21).fill(0),   // cap breakers planned per attribute (0-5)
   };
+  const CB_TOTAL_NOW = 20, CB_TOTAL_YEAR = 28, CB_MAX_PER_ATTR = 5;
 
   // ---------- caps ----------
   function capsFor(h, ws, w) {
@@ -245,6 +247,7 @@
     if (t === "badges") renderBadges();
     if (t === "takeovers") renderTakeovers();
     if (t === "anims") renderAnims();
+    if (t === "capbreakers") renderCapBreakers();
     if (t === "blueprints") renderBlueprints();
     if (t === "summary") renderSummary();
   }
@@ -338,6 +341,95 @@
     $("animSearch").addEventListener("input", e => { state.animSearch = e.target.value; renderAnims(); });
     $("animOnly").addEventListener("change", e => { state.animOnly = e.target.checked; renderAnims(); });
     el.querySelectorAll("h3[data-group]").forEach(h => h.addEventListener("click", () => { const g = h.dataset.group; state.animOpen[g] = !(state.animOpen[g] ?? !!q); renderAnims(); }));
+  }
+
+  // ---------- cap breakers ----------
+  // Where the archetype/height pair was never measured, fall back to f = 1 - w/max(w):
+  // the engine gives the attributes an archetype values least the biggest jumps.
+  function fallbackF(i) {
+    if (!MODEL.weightsFor) return null;
+    const w = MODEL.weightsFor(state.ovr.type, state.h);
+    if (!w) return null;
+    const mx = Math.max.apply(null, w);
+    return mx > 0 ? clamp(1 - w[i] / mx, 0, 1) : null;
+  }
+  function ladderFor(i) {
+    if (!window.CAPBREAKERS) return null;
+    return CAPBREAKERS.ladderFor(state.ovr.type, state.h, i, state.values[i], state.caps[i], fallbackF(i));
+  }
+  function plannedValues() {
+    const out = state.values.slice();
+    for (let i = 0; i < 21; i++) {
+      const n = state.cbPlan[i]; if (!n) continue;
+      const lad = ladderFor(i); if (!lad) continue;
+      for (let k = 0; k < n; k++) out[i] += lad.gains[k];
+      out[i] = Math.min(out[i], state.caps[i]);
+    }
+    return out;
+  }
+  function renderCapBreakers() {
+    const el = $("tab-capbreakers");
+    const v = state.values, caps = state.caps;
+    const used = state.cbPlan.reduce((a, b) => a + b, 0);
+    const after = plannedValues();
+    const haveRule = !!window.CAPBREAKERS;
+    const gained = after.reduce((s, x, i) => s + (x - v[i]), 0);
+    let html = `<div class="cbsum">
+      <div><div class="v num ${used > CB_TOTAL_NOW ? "over" : ""}">${used}</div><div class="l">Breakers planned</div></div>
+      <div><div class="v num">+${gained}</div><div class="l">Attribute points gained</div></div>
+      <div><div class="v num">${CB_TOTAL_NOW}<small style="font-size:14px;color:var(--muted)"> / ${CB_TOTAL_YEAR}</small></div><div class="l">Earnable now / this year</div></div>
+    </div>
+    <p class="note" style="margin:0 0 6px">Cap Breakers unlock once a build reaches 99 overall. Each chip is one breaker on that attribute, up to five, showing the points it adds from where the attribute sits now. Click a chip to plan that many. Gains stop at the body cap and never earn badge tokens.</p>`;
+    if (!haveRule) {
+      html += `<p class="note">The gain rule is still being fitted from engine captures. Ladders will appear here once it lands.</p>`;
+      el.innerHTML = html; return;
+    }
+    const srcs = new Set();
+    DISCS.forEach((d) => {
+      html += `<div class="bcat" style="--c:${d.color}"><h3>${d.key}</h3>`;
+      d.idx.forEach(i => {
+        const res = ladderFor(i) || { gains: [0, 0, 0, 0, 0], src: "no data" };
+        const lad = res.gains; srcs.add(res.src);
+        const n = state.cbPlan[i];
+        let cur = v[i]; const chips = [];
+        for (let k = 0; k < 5; k++) {
+          const g = lad[k]; const cls = ["chip"];
+          if (g <= 0) cls.push("locked"); else if (k < n) cls.push("on"); else if (k === n) cls.push("next");
+          chips.push(`<span class="${cls.join(" ")}" data-cb="${i}" data-k="${k}" title="${g > 0 ? `+${g} (${cur} → ${cur + g})` : "Nothing left to gain"}">${g > 0 ? "+" + g : "–"}</span>`);
+          cur += Math.max(0, g);
+        }
+        const maxed = v[i] >= caps[i];
+        html += `<div class="cbrow ${maxed ? "maxed" : ""}"><div class="cn">${SHORT[i]}<small>now ${v[i]} · cap ${caps[i]}</small></div><div class="chips">${chips.join("")}</div><div class="after"><b>${after[i]}</b><small>${n ? `after ${n} breaker${n > 1 ? "s" : ""}` : (maxed ? "at cap" : "no breakers")}</small></div></div>`;
+      });
+      html += `</div>`;
+    });
+    // what the plan changes: badges and takeovers
+    if (used) {
+      const before = BADGES.list.map(b => badgeTier(b, v, state.h).tier);
+      const post = BADGES.list.map(b => badgeTier(b, after, state.h).tier);
+      const changes = BADGES.list.map((b, k) => ({ b, from: before[k], to: post[k] })).filter(x => x.to > x.from);
+      const tk = TAKEOVERS.list.filter(t => t.logic !== "ALWAYS").map(t => {
+        const met = (r) => t.logic === "OR" ? t.reqs.some(([a, m]) => r[a] >= m) : t.reqs.every(([a, m]) => r[a] >= m);
+        return { t, from: met(v), to: met(after) };
+      }).filter(x => x.to && !x.from);
+      html += `<h3 style="margin:12px 0 4px;font-size:16px">What this plan unlocks</h3>`;
+      if (!changes.length && !tk.length) html += `<p class="note" style="margin:0">No new badge tiers or takeovers. The points still raise the attributes themselves.</p>`;
+      html += `<div class="gainlist">${changes.map(x => `<div class="g"><span>${x.b.name}</span><span>${TIER_NAMES[x.from] || "Locked"} → <b>${TIER_NAMES[x.to]}</b></span></div>`).join("")}${tk.map(x => `<div class="g"><span>${x.t.name} takeover</span><span>Locked → <b>Unlocked</b></span></div>`).join("")}</div>`;
+    }
+    const measured = [...srcs].every(s => s === "measured");
+    html += `<p class="note">${measured
+      ? "Every ladder here is measured: this archetype and height were sampled directly from the engine."
+      : "Some ladders are read across from the nearest sampled heights for this archetype, so treat those as close estimates."}
+      The rule behind them, recovered from ${(CAPBREAKERS.captures || "hundreds of")} builds captured from the engine, is that one breaker adds
+      <b>max(1, round(f &times; E))</b> points, where E falls from 15 at rating 25 to 2 near 99 and f is how little this archetype
+      values that attribute. Confirm a final build in the NBA 2K HQ app before spending one.</p>`;
+    el.innerHTML = html;
+    el.querySelectorAll("[data-cb]").forEach(chip => chip.addEventListener("click", () => {
+      if (chip.classList.contains("locked")) return;
+      const i = +chip.dataset.cb, k = +chip.dataset.k;
+      state.cbPlan[i] = (state.cbPlan[i] === k + 1) ? k : k + 1;
+      renderCapBreakers();
+    }));
   }
 
   function renderBlueprints() {

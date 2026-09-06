@@ -177,6 +177,26 @@ textarea{width:100%;min-height:60px;background:var(--surface-2);border:1px solid
 .stat div{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .stat .v{font-family:var(--display);font-size:26px;font-weight:700;line-height:1}
 .stat .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+/* ----- cap breakers ----- */
+.cbrow{display:grid;grid-template-columns:118px 1fr 92px;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--line);font-size:12px}
+.cbrow .cn{font-weight:600}
+.cbrow .cn small{display:block;font-weight:400;color:var(--muted)}
+.chips{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.chip{min-width:34px;height:26px;border-radius:5px;border:1px solid var(--line);background:var(--surface-2);display:inline-flex;align-items:center;justify-content:center;font-weight:600;cursor:pointer;font-variant-numeric:tabular-nums}
+.chip.on{background:var(--c);border-color:var(--c);color:#fff}
+.chip.locked{opacity:.35;cursor:default}
+.chip.next{border-style:dashed}
+.cbrow .after{text-align:right;font-variant-numeric:tabular-nums}
+.cbrow .after b{font-family:var(--display);font-size:18px}
+.cbrow .after small{display:block;color:var(--muted)}
+.cbrow.maxed .after b{color:var(--muted)}
+.cbsum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 10px}
+.cbsum div{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.cbsum .v{font-family:var(--display);font-size:24px;font-weight:700;line-height:1}
+.cbsum .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.cbsum .v.over{color:var(--bad)}
+.gainlist{font-size:12px;display:grid;grid-template-columns:1fr;gap:3px;margin-top:6px}
+.gainlist .g{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-top:1px solid var(--line)}
 .foot{max-width:1480px;margin:0 auto;padding:0 20px 40px;font-size:12px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between}
 .foot a{color:var(--muted)}
 .foot a:hover{color:var(--accent)}
@@ -211,12 +231,14 @@ textarea{width:100%;min-height:60px;background:var(--surface-2);border:1px solid
       <button role="tab" aria-selected="true" data-tab="badges">Badges</button>
       <button role="tab" aria-selected="false" data-tab="takeovers">Takeovers</button>
       <button role="tab" aria-selected="false" data-tab="anims">Animations</button>
+      <button role="tab" aria-selected="false" data-tab="capbreakers">Cap Breakers</button>
       <button role="tab" aria-selected="false" data-tab="blueprints">Blueprints</button>
       <button role="tab" aria-selected="false" data-tab="summary">Build</button>
     </div>
     <div class="tabpanel" id="tab-badges"></div>
     <div class="tabpanel" id="tab-takeovers" hidden></div>
     <div class="tabpanel" id="tab-anims" hidden></div>
+    <div class="tabpanel" id="tab-capbreakers" hidden></div>
     <div class="tabpanel" id="tab-blueprints" hidden></div>
     <div class="tabpanel" id="tab-summary" hidden></div>
   </aside>
@@ -233,6 +255,7 @@ textarea{width:100%;min-height:60px;background:var(--surface-2);border:1px solid
 <script src="data/animations.js"></script>
 <script src="data/blueprints.js"></script>
 <script src="data/model.js"></script>
+<script src="data/capbreakers.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
