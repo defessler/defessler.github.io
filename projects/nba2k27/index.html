@@ -127,6 +127,12 @@ a{color:var(--accent)}
 .attr input[type=number]::-webkit-outer-spin-button,.attr input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .attr.forced input[type=number]{border-color:var(--forced);color:var(--forced)}
 .attr.atcap .cap b{color:var(--good)}
+.attr.atbudget .step[data-up]{border-color:var(--warn);color:var(--warn);opacity:.55}
+.attr.atbudget [data-forced]{color:var(--warn)}
+.field .lock{display:flex;align-items:center;gap:7px;height:38px;padding:0 11px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2);cursor:pointer;white-space:nowrap;font-size:13px;color:var(--ink)}
+.field .lock:hover{border-color:var(--c)}
+.field .lock input{width:15px;height:15px;margin:0;accent-color:var(--c);cursor:pointer}
+.field .lock span{user-select:none}
 .attr .cap{font-size:12px;color:var(--muted);text-align:right}
 .attr .cap b{color:var(--ink)}
 .attr .next{grid-column:2/5;font-size:11px;color:var(--muted);margin-top:-4px;display:flex;gap:10px;flex-wrap:wrap}
@@ -244,6 +250,7 @@ textarea{width:100%;min-height:60px;background:var(--surface-2);border:1px solid
       <div class="field"><label for="weight">Weight (lb)</label><input id="weight" type="number" min="140" max="300" step="1"></div>
       <div class="field"><label for="wing">Wingspan</label><select id="wing"></select></div>
       <div class="field"><label for="curOvr">Current OVR</label><input id="curOvr" type="number" min="25" max="99" step="1" placeholder="--" title="Your MyPLAYER's overall right now. Leave blank if the build is already maxed."></div>
+      <div class="field"><label for="lockBudget">Budget</label><label class="lock" title="Stops any attribute raise that would spend past 99 overall. The overall is an estimate, so this holds you to our number, not a promise about the game."><input id="lockBudget" type="checkbox" checked><span>Stay under 99</span></label></div>
       <div class="field"><label>&nbsp;</label><button class="btn" id="resetBtn" type="button" title="Set every attribute back to 25">Reset attributes</button></div>
     </form>
     <div class="ovr">

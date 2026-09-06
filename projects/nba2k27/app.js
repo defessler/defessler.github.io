@@ -38,6 +38,7 @@
     tab: "badges", animOpen: {}, animSearch: "", animOnly: true, badgeOnly: false,
     cbPlan: Array(21).fill(0),   // cap breakers planned per attribute (0-5)
     currentOvr: null,            // where the MyPLAYER actually is now; null means already maxed
+    lockBudget: true,            // refuse any raise that would spend past the 99 ceiling
   };
   const CB_TOTAL_NOW = 20, CB_TOTAL_YEAR = 28, CB_MAX_PER_ATTR = 5;
 
@@ -176,9 +177,51 @@
     const caps = state.caps || [];
     return Math.min(HARD_CAP, caps[i] || HARD_CAP);
   }
+  // ---------- the budget lock ----------
+  // A build's real limit is not the per-attribute cap, it is the 99 overall the attributes add up
+  // to, and it is easy to spend past that one point at a time without noticing. With the lock on,
+  // no raise is allowed to cross it.
+  //
+  // The line is 99, the same number the header counts down to, and deliberately NOT the
+  // 99 + OVER_TOLERANCE that renderOverall uses before it will call a build over budget. Those two
+  // do different jobs: the lock stops you at the ceiling, the accusation waits until you are past
+  // it by more than the model's own error. Stopping at 99 and then saying "not over budget yet"
+  // would be the page arguing with itself.
+  //
+  // Honest limit: the overall is an estimate (held out, within a point about three quarters of the
+  // time), so this cannot be a guarantee about the game, only about our own number. That is what
+  // the unlock is for, and why the label says what it says.
+  const BUDGET = 99;
+  function rawIf(i, v) {
+    const want = state.want.slice();
+    want[i] = v;
+    const n = normalize(want, state.caps, state.h);
+    return MODEL.overall(state.h, n.values).raw;
+  }
+  function affordable(i, v) { return rawIf(i, v) <= BUDGET + 1e-9; }
+  // Largest value at or below `want` that stays inside the budget. Never returns less than what the
+  // attribute already shows, so a build that is already over (loaded from a share code, or left
+  // over after a body change) freezes where it is rather than being silently cut down.
+  //
+  // This walks down from the request rather than bisecting. Not because bisection is wrong here: it
+  // was checked against this scan on 3,646 random build-and-attribute cases and agreed on every one.
+  // The estimate does jump when a raise flips which archetype the build reads as (on a 6'5" build
+  // Close Shot 96 estimates 98.6 and 97 estimates 101.5), but the jump goes UP, so the function
+  // stays monotonic and bisection holds. The scan is kept anyway because it does not depend on that
+  // property being true, only on the probe, and a future change to the classifier could break it
+  // silently. At most 74 probes, on a raise only, which is nothing next to a render.
+  function budgetMaxFor(i, want) {
+    const now = Math.min(state.values[i], want);
+    for (let v = want; v > now; v--) if (affordable(i, v)) return v;
+    return now;
+  }
   function setWant(i, v) {
     const n = Math.round(Number(v));
-    state.want[i] = clamp(Number.isFinite(n) ? n : FLOOR, FLOOR, ceilingFor(i));
+    let want = clamp(Number.isFinite(n) ? n : FLOOR, FLOOR, ceilingFor(i));
+    // Only raises are checked. Lowering is always allowed, which is what lets you dig out of an
+    // over-budget build.
+    if (state.lockBudget && state.caps && want > state.values[i]) want = budgetMaxFor(i, want);
+    state.want[i] = want;
     recompute();
   }
   function step(i, delta) {
@@ -194,8 +237,13 @@
     let hold = null, repeat = null;
     const stop = () => { clearTimeout(hold); clearInterval(repeat); hold = repeat = null; };
     const fire = () => {
-      if (state.values[i] === clamp(state.values[i] + delta, FLOOR, ceilingFor(i))) { stop(); return; }
+      // Stop the repeat when the value stops moving, whether that is the cap, the floor, or the
+      // budget lock refusing the next point. Without the budget case the repeat spins on forever
+      // against a value that cannot change.
+      const before = state.values[i];
+      if (before === clamp(before + delta, FLOOR, ceilingFor(i))) { stop(); return; }
       step(i, delta);
+      if (state.values[i] === before) stop();
     };
     btn.addEventListener("pointerdown", e => {
       if (btn.disabled) return;
@@ -228,25 +276,39 @@
 
   function renderAttrs(caps, tok) {
     const ladders = MODEL.tokenLadders(state.h);
+    // Whether ANY attribute can still take a point. The overall jumps when the archetype flips, so
+    // a build can show "0.4 left" and still have nothing it can spend that 0.4 on. Saying "budget
+    // left" there would be dangling a point the build cannot actually buy.
+    let roomLeft = false;
     for (let i = 0; i < 21; i++) {
       const el = attrEls[i], cap = Math.min(99, caps[i]), v = state.values[i];
       el.range.max = 99; el.range.value = v; el.num.value = v; el.num.max = cap; el.num.min = 25;
       el.cap.textContent = cap;
-      // The buttons are the affordance for the cap: once an attribute is there, raising is off.
-      el.up.disabled = v >= cap;
+      // Two different limits can stop a raise, and the user needs to be able to tell them apart:
+      // the cap is a property of the body and will not move, the budget is a property of the rest
+      // of the build and moves the moment something else comes down. One probe per attribute, not
+      // a full search, since all we need to know here is whether the next point is affordable.
+      const atCap = v >= cap;
+      const atBudget = !atCap && state.lockBudget && !affordable(i, v + 1);
+      el.up.disabled = atCap || atBudget;
       el.down.disabled = v <= 25;
-      el.row.classList.toggle("atcap", v >= cap);
+      el.row.classList.toggle("atcap", atCap);
+      el.row.classList.toggle("atbudget", atBudget);
+      if (!atCap && !atBudget) roomLeft = true;
       const p = ((v - 25) / 74 * 100).toFixed(2) + "%", cp = ((cap - 25) / 74 * 100).toFixed(2) + "%";
       el.range.style.setProperty("--p", p); el.range.style.setProperty("--cp", cp);
       el.capline.style.left = `calc(7px + (100% - 14px) * ${(cap - 25) / 74})`;
       el.row.classList.toggle("forced", state.forced.has(i));
-      el.forced.textContent = state.forced.has(i) ? `raised to ${v} by a linked attribute` : (state.limited.has(i) ? `held at ${v} by a linked cap` : "");
+      el.forced.textContent = state.forced.has(i) ? `raised to ${v} by a linked attribute`
+        : state.limited.has(i) ? `held at ${v} by a linked cap`
+        : atBudget ? "no budget left for the next point" : "";
       // ticks: token thresholds for this attribute
       const lad = ladders && ladders[i];
       el.ticks.innerHTML = lad && lad.d !== null ? lad.t.filter(t => t <= cap).map(t => `<i class="tok" style="left:${((t - 25) / 74 * 100).toFixed(2)}%" title="token at ${t}"></i>`).join("") : "";
       // next unlock text
       el.next.innerHTML = nextUnlockText(i, v, cap, lad);
     }
+    state.roomLeft = roomLeft;
     DISCS.forEach((d, di) => {
       const totalPossible = ladders ? d.idx.reduce((s, i) => s + ((ladders[i] && ladders[i].d !== null) ? ladders[i].t.length : 0), 0) : 0;
       const have = tok.known ? tok.perDisc[di] : null;
@@ -309,7 +371,11 @@
       hint.innerHTML = `<span class="pill good">At the ceiling</span> this build fills the budget. It may sit a point either side of 99, so check the last upgrade in game.`;
     } else {
       const left = 99 - ovr.raw;
-      hint.innerHTML = `<span class="pill ${left < 0.6 ? "good" : "warn"}">${left < 0.6 ? "Budget filled" : "Budget left"}</span> about <b class="num">${left.toFixed(1)}</b> overall still to spend. Estimated, so confirm the last point or two in game.`;
+      if (state.lockBudget && state.roomLeft === false) {
+        hint.innerHTML = `<span class="pill good">Budget spent</span> about <b class="num">${left.toFixed(1)}</b> is left on paper, but every attribute is at its cap or one point away from breaking 99, so there is nothing left to buy.`;
+      } else {
+        hint.innerHTML = `<span class="pill ${left < 0.6 ? "good" : "warn"}">${left < 0.6 ? "Budget filled" : "Budget left"}</span> about <b class="num">${left.toFixed(1)}</b> overall still to spend. Estimated, so confirm the last point or two in game.`;
+      }
     }
     // The overall above is what this build can reach. If the player has told us where they are now,
     // say how far that leaves them from the build and from the 99 that unlocks Cap Breakers.
@@ -664,6 +730,20 @@
       const raw = e.target.value.trim();
       const n = Math.round(Number(raw));
       state.currentOvr = raw === "" || !Number.isFinite(n) ? null : clamp(n, 25, 99);
+      recompute();
+    });
+    // The lock is a preference about how you work, not a property of the build, so it is remembered
+    // per browser and deliberately kept out of the share code: a link should describe a build, not
+    // reach into how the person opening it likes to edit.
+    const lock = $("lockBudget");
+    try {
+      const saved = localStorage.getItem("buildlab.lockBudget");
+      if (saved !== null) state.lockBudget = saved === "1";
+    } catch (e) { /* private window, or site data blocked: the default stands */ }
+    lock.checked = state.lockBudget;
+    lock.addEventListener("change", e => {
+      state.lockBudget = e.target.checked;
+      try { localStorage.setItem("buildlab.lockBudget", state.lockBudget ? "1" : "0"); } catch (e2) { /* nothing to do */ }
       recompute();
     });
     $("resetBtn").addEventListener("click", () => { state.want = Array(21).fill(25); state.cbPlan = Array(21).fill(0); recompute(); });
