@@ -441,7 +441,11 @@
     const out = [];
     // next badge threshold that involves this attribute
     let bestBadge = null;
-    for (const b of BADGES.list) {
+    // Guarded because this runs on every recompute, not only on the Badges tab. Unguarded, a
+    // blocked data/badges.js threw on every edit anywhere on the page, which stopped saveToHash and
+    // quietly discarded the build on refresh. The tab itself explains the missing file; the
+    // attribute rows simply go without their next-badge hint.
+    for (const b of (window.BADGES ? BADGES.list : [])) {
       if (state.h < b.minH || state.h > b.maxH) continue;
       // What the build already has. An OR badge can be at Gold on a different attribute entirely,
       // and the hint used to offer Bronze on this one, which contradicted the Badges panel on the
@@ -576,6 +580,23 @@
     } catch (e) { /* an element that will not take focus is not worth throwing over */ }
   }
 
+  // A tab whose dataset did not load says so, instead of throwing.
+  //
+  // Only the Cap Breakers tab used to handle this. If data/animations.js failed, and it is the
+  // largest request the page makes at 194KB, the page looked healthy until the user opened the
+  // Animations tab. From then on EVERY edit threw inside renderTab, which meant saveToHash never
+  // ran: the URL and localStorage silently stopped updating and a refresh discarded the build. The
+  // user gets told, and the rest of the page keeps working.
+  function withData(name, obj, el, render) {
+    if (obj) {
+      try { return render(); }
+      catch (e) {
+        setPanel(el, `<p class="note" style="color:var(--warn-ink)">This tab could not be drawn: ${String(e && e.message || e)}. Everything else on the page still works, and your build is safe.</p>`);
+        return;
+      }
+    }
+    setPanel(el, `<p class="note" style="color:var(--warn-ink)"><b>${name} did not load.</b> That file is fetched separately, so a blocked or interrupted request leaves this tab empty while the rest of the page works normally. Reload to try again; your build is kept in the address bar either way.</p>`);
+  }
   function renderTab() {
     const t = state.tab;
     document.querySelectorAll("#tabs button").forEach(b => {
@@ -584,12 +605,12 @@
       b.setAttribute("tabindex", on ? "0" : "-1");   // roving tabindex: one stop for the whole strip
     });
     document.querySelectorAll(".tabpanel").forEach(p => p.hidden = p.id !== `tab-${t}`);
-    if (t === "badges") renderBadges();
-    if (t === "takeovers") renderTakeovers();
-    if (t === "anims") renderAnims();
-    if (t === "capbreakers") renderCapBreakers();
-    if (t === "blueprints") renderBlueprints();
-    if (t === "summary") renderSummary();
+    if (t === "badges") withData("The badge data", window.BADGES, $("tab-badges"), renderBadges);
+    if (t === "takeovers") withData("The takeover data", window.TAKEOVERS, $("tab-takeovers"), renderTakeovers);
+    if (t === "anims") withData("The animation data", window.ANIMATIONS, $("tab-anims"), renderAnims);
+    if (t === "capbreakers") withData("The cap breaker data", window.CAPBREAKERS, $("tab-capbreakers"), renderCapBreakers);
+    if (t === "blueprints") withData("The blueprint data", window.BLUEPRINTS, $("tab-blueprints"), renderBlueprints);
+    if (t === "summary") withData("The build data", window.MODEL, $("tab-summary"), renderSummary);
   }
 
   function renderBadges() {
@@ -927,10 +948,11 @@
     });
     // what the plan changes: badges and takeovers
     if (used) {
-      const before = BADGES.list.map(b => badgeTier(b, v, state.h).tier);
-      const post = BADGES.list.map(b => badgeTier(b, after, state.h).tier);
-      const changes = BADGES.list.map((b, k) => ({ b, from: before[k], to: post[k] })).filter(x => x.to > x.from);
-      const tk = TAKEOVERS.list.filter(t => t.logic !== "ALWAYS").map(t => {
+      const badgeList = window.BADGES ? BADGES.list : [];
+      const before = badgeList.map(b => badgeTier(b, v, state.h).tier);
+      const post = badgeList.map(b => badgeTier(b, after, state.h).tier);
+      const changes = badgeList.map((b, k) => ({ b, from: before[k], to: post[k] })).filter(x => x.to > x.from);
+      const tk = (window.TAKEOVERS ? TAKEOVERS.list : []).filter(t => t.logic !== "ALWAYS").map(t => {
         const met = (r) => t.logic === "OR" ? t.reqs.some(([a, m]) => r[a] >= m) : t.reqs.every(([a, m]) => r[a] >= m);
         return { t, from: met(v), to: met(after) };
       }).filter(x => x.to && !x.from);
