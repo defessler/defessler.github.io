@@ -64,8 +64,10 @@
   // values satisfying the rules, whatever order they are visited in. Interleaving the clamp with the
   // raises instead would let a raise read a source that a later rule pulls back down, stranding a
   // target above anything the rules actually demand and charging the user budget for it.
-  function normalize(want, caps, h) {
-    const rules = MODEL.linkedRules(h);
+  // `rules` is optional and exists only so the page can compare its own rule set against a
+  // neighbouring height's. Everything else calls this with three arguments and gets this height's.
+  function normalize(want, caps, h, rules) {
+    rules = rules || MODEL.linkedRules(h);
     const ceiling = caps.slice();
     for (const [s, t, d] of rules) ceiling[s] = Math.max(25, Math.min(ceiling[s], caps[t] + d));
 
@@ -273,18 +275,37 @@
   // What the slider and the number field go through. Named so the audit can drive the same path the
   // page does rather than re-implementing the guard and testing its own copy.
   function setWantFromControl(i, v) {
-    if (Number(v) !== state.values[i]) setWant(i, Number(v));
+    // An empty or unparseable field is not a request for anything. Number("") is 0, which is finite
+    // and clamps up to the floor, so a select-all-delete used to read as "set this to 25" and take
+    // the carried request with it.
+    const raw = String(v).trim();
+    if (raw === "") return;
+    const asked = Math.round(Number(raw));
+    if (!Number.isFinite(asked)) return;
+    // The guard has to test where the value LANDS, not what was typed. Comparing the raw input
+    // against the display let anything above the cap through: it differs from the display, passes,
+    // then clamps straight back onto it, overwriting a much larger carried request with the number
+    // already on screen. Same silent destruction the guard was added to stop, one clamp later.
+    const landed = clamp(asked, FLOOR, ceilingFor(i));
+    // A value that lands on the number already displayed leaves the row looking exactly as it did,
+    // so it asked for nothing visible and must not change the hidden request either. That cuts both
+    // ways: a cap can hold the display BELOW the request, and a linked minimum can hold it ABOVE,
+    // and writing the display back destroys points in the first case and commits points the user
+    // never asked for in the second.
+    if (landed === state.values[i]) return;
+    setWant(i, asked);
   }
   // Click steps once; press and hold repeats. Pointer capture keeps the repeat tied to this button
   // so releasing anywhere, or the button going disabled at the cap, always stops it.
   function bindStep(btn, i, delta) {
     let hold = null, repeat = null, touchPending = false;
-    const stop = () => { clearTimeout(hold); clearInterval(repeat); hold = repeat = null; };
+    const stop = () => { clearTimeout(hold); clearInterval(repeat); hold = repeat = null; touchPending = false; };
     const fire = () => {
       // Stop the repeat when the value stops moving, whether that is the cap, the floor, or the
       // budget lock refusing the next point. Without the budget case the repeat spins on forever
       // against a value that cannot change.
       const before = state.values[i];
+      touchPending = false;   // the hold has taken over, so the release must not add one more
       if (before === clamp(before + delta, FLOOR, ceilingFor(i))) { stop(); return; }
       step(i, delta);
       if (state.values[i] === before) stop();
@@ -299,9 +320,21 @@
       // On a mouse the value commits on press, which is what makes press-and-hold work. On touch
       // that means a finger landing on the button commits before it is a tap at all, so a page
       // scroll started with a thumb over a stepper both scrolled and changed the build. Touch waits
-      // for a real tap instead; the hold repeat still arms, so press-and-hold is unaffected.
-      if (e.pointerType !== "touch") step(i, delta);
+      // for the release instead; the hold repeat still arms, so press-and-hold is unaffected.
+      //
+      // The flag has to be SET here. It was added with the release path but never assigned, so on
+      // touch pointerdown skipped the step, the release found the flag false, and every tap on the
+      // page's primary control did nothing at all. Phones are a supported width and nobody noticed,
+      // because nothing automated presses a button with a finger.
+      if (e.pointerType === "touch") touchPending = true;
+      else step(i, delta);
       hold = setTimeout(() => { repeat = setInterval(fire, 70); }, 400);
+    });
+    // Registered before stop, which clears the flag: a completed tap is down then up on the same
+    // button, and that is the point at which touch commits.
+    btn.addEventListener("pointerup", () => {
+      if (touchPending && !btn.disabled) step(i, delta);
+      touchPending = false;
     });
     ["pointerup", "pointercancel", "pointerleave", "blur"].forEach(ev => btn.addEventListener(ev, stop));
     // Everything that is not a pointer press arrives here. e.detail is the click count, and it is 0
@@ -313,12 +346,9 @@
     btn.addEventListener("click", e => {
       if (btn.disabled) return;
       // detail is 0 exactly when nothing pointed at the button: keyboard Enter and Space on a
-      // native button, screen-reader browse-mode activation, voice control. A mouse click reports
-      // detail 1 and already stepped on pointerdown. A touch tap also reports detail 1 but did NOT
-      // step on pointerdown, so it steps here, which is what makes a tap commit on the tap rather
-      // than on contact.
-      if (e.detail !== 0 && !touchPending) return;
-      touchPending = false;
+      // native button, screen-reader browse-mode activation, voice control. Mouse and touch both
+      // report detail 1 and have already stepped, on press and on release respectively.
+      if (e.detail !== 0) return;
       step(i, delta);
     });
   }
@@ -729,24 +759,91 @@
   }
   // A tie only matters if the types in it disagree about something.
   function tieMatters() { return tiedList().length > 1; }
+  // Which attributes the tied types actually weigh differently, biggest gap first. This is what
+  // makes the warning actionable: the old copy told the reader to move "any attribute the two value
+  // differently by as little as a point", which is usually too small a move to break a tie decided
+  // at a hundredth of a point.
+  function tieSplitAttrs() {
+    const t = tiedList();
+    if (t.length < 2 || !MODEL.weightRow) return [];
+    const rows = t.map(x => MODEL.weightRow(x, state.h)).filter(Boolean);
+    if (rows.length < 2) return [];
+    const spread = [];
+    for (let a = 0; a < 21; a++) {
+      let lo = Infinity, hi = -Infinity;
+      for (const r of rows) { if (r[a] < lo) lo = r[a]; if (r[a] > hi) hi = r[a]; }
+      spread.push([hi - lo, a]);
+    }
+    return spread.sort((x, y) => y[0] - x[0]).filter(x => x[0] > 0).slice(0, 3).map(([, a]) => ATTRS[a]);
+  }
   function tiedNames() {
     const t = tiedList();
-    if (t.length >= 15) return "all 15 player types";
+    // Against the RAW tie list, not the deduplicated one. Nine of the twenty heights have fewer
+    // than fifteen distinct weight rows, so a flat build there ties every type while the dedup
+    // collapses them to thirteen or fourteen, the >= 15 test never fired, and the page answered
+    // "what archetype is this" with a thousand-character run-on list of names.
+    const raw = ((state.ovr && state.ovr.tiedWith) || []).length;
+    if (raw >= 15 || t.length >= 15) return "all 15 player types";
+    if (t.length > 4) return `${t.length} of the 15 player types`;
     const names = t.map(x => typeLabel(x, state.h));
     return names.length === 1 ? names[0]
       : names.slice(0, -1).join(", ") + " and " + names[names.length - 1];
   }
   function tieText() {
     const t = tiedList();
-    if (t.length >= 15) {
+    const raw = ((state.ovr && state.ovr.tiedWith) || []).length;
+    if (raw >= 15 || t.length >= 15) {
       return "on a build where every attribute is level all 15 score the same, so there is no way to "
         + "tell which one you would get. Vary the attributes and this resolves.";
     }
     const n = tiedList().length;
+    // No instruction to move "any attribute by a point", because that is usually not enough: the
+    // types are within a hundredth of each other and a single point often separates them by less
+    // than that, so the reader does the thing and the warning does not go away. Saying which
+    // attributes they disagree about is the part that actually helps.
+    const disagree = tieSplitAttrs();
     return `${tiedNames()} score within a hundredth of a point here, so the game could assign `
-      + `${n === 2 ? "either" : "any of them"} and the ladders below would change with it. Moving `
-      + `any attribute ${n === 2 ? "the two" : "they"} value differently, by as little as a point, `
-      + `settles it.`;
+      + `${n === 2 ? "either" : "any of them"} and the ladders below would change with it. `
+      + (disagree.length
+          ? `They differ most on ${disagree.join(", ")}: moving those is what separates them, though it can take several points.`
+          : `Varying the attributes separates them.`);
+  }
+  // How far apart the two candidate rule sets are AT THIS HEIGHT. The caveat used to quote an
+  // eleven-height median at every borrowed height, which overstated it several times over at 5'10"
+  // and 5'11" - the same class of error as the reassurance it replaced, pointing the other way.
+  // Cheap enough to measure live: one normalise per sample against each rule set.
+  let readAcrossCache = null;
+  function readAcrossCost() {
+    const h = state.h;
+    if (readAcrossCache && readAcrossCache.h === h) return readAcrossCache;
+    const measured = [];
+    for (let k = 69; k <= 88; k++) if (MODEL.linkedMeasured(k)) measured.push(k);
+    const src = MODEL.linkedSource(h);
+    const others = measured.filter(m => m !== src);
+    if (!others.length || !state.caps) return (readAcrossCache = { h, n: 0 });
+    const other = others.reduce((b, m) => Math.abs(m - h) < Math.abs(b - h) ? m : b, others[0]);
+    const A = MODEL.linkedRules(h), B = MODEL.linkedRules(other);
+    // A deterministic sample, so the sentence does not change between two renders of one build.
+    let seed = 1013904223 ^ h;
+    const rnd = () => { seed = (Math.imul(seed ^ seed >>> 15, 1 | seed) + 0x6D2B79F5) >>> 0; return seed / 4294967296; };
+    let diff = 0, n = 0, worstAttr = 0, worstOvr = 0;
+    for (let k = 0; k < 160; k++) {
+      const want = [];
+      for (let i = 0; i < 21; i++) want.push(25 + Math.floor(rnd() * (Math.min(99, state.caps[i]) - 24)));
+      const a = normalize(want, state.caps, h).values;
+      const bRules = normalize(want, state.caps, h, B);
+      const b = bRules.values;
+      let d = 0;
+      for (let i = 0; i < 21; i++) d = Math.max(d, Math.abs(a[i] - b[i]));
+      n++;
+      if (d) {
+        diff++;
+        if (d > worstAttr) worstAttr = d;
+        const od = Math.abs(MODEL.overall(h, a).raw - MODEL.overall(h, b).raw);
+        if (od > worstOvr) worstOvr = od;
+      }
+    }
+    return (readAcrossCache = { h, src, other, n, share: n ? diff / n : 0, worstAttr, worstOvr });
   }
   function renderCapBreakers() {
     const el = $("tab-capbreakers");
@@ -869,7 +966,10 @@
     </div>
     <dl class="kv">
       <dt>Body</dt><dd>${POS_NAME[state.pos]} · ${ft(state.h)} · ${state.w} lb · ${ft(state.ws)} wingspan</dd>
-      <dt>Current OVR</dt><dd>${state.currentOvr === null ? "not set" : `${state.currentOvr}, ${Math.max(0, state.ovr.display - state.currentOvr)} short of this build and ${Math.max(0, 99 - state.currentOvr)} from Cap Breakers`}</dd>
+      <dt>Current OVR</dt><dd>${state.currentOvr === null ? "not set"
+        : state.ovr.raw > 99 + OVER_TOLERANCE
+          ? `${state.currentOvr}, and this build is over the 99 ceiling, so there is nothing to be short of yet`
+          : `${state.currentOvr}, ${Math.max(0, state.ovr.display - state.currentOvr)} short of this build and ${Math.max(0, 99 - state.currentOvr)} from Cap Breakers`}</dd>
       <dt>Archetype</dt><dd title="The game scores this build under all 15 player types and keeps the highest, and so does this page. On builds where the attributes actually vary it matches the engine 99.9% of the time.">${state.ovr.tied && tieMatters() ? `<span style="color:var(--warn)">too close to call</span> <span style="color:var(--muted)">(${tiedNames()} score the same here, so the game could pick any of them, and the ladders on the Cap Breakers tab would change with it)</span>` : `${typeLabel(state.ovr.type, state.h)} <span style="color:var(--muted)">(highest scoring of the 15)</span>`}</dd>
       <dt>Raw potential</dt><dd class="num">about ${floor1(state.ovr.raw)} (the game rounds a finished build up to 99 once nothing can be raised)</dd>
       <dt>Tokens</dt><dd>${tok.known ? DISCS.map((d, i) => `${d.key} ${tok.perDisc[i]}`).join(" · ") : "no ladder data for this height yet"}</dd>
@@ -882,7 +982,14 @@
     <div class="ctl" style="margin-top:6px"><button class="btn" id="copyCode">Copy code</button><input type="text" id="pasteCode" aria-label="Paste a build code" placeholder="Paste a build code" style="flex:1;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:6px 8px"><button class="btn" id="loadCode">Load</button></div>
     <h3 style="margin:14px 0 4px;font-size:16px">How the numbers are built</h3>
     <p class="note" style="margin:0">Caps are the game engine's values for this exact height, weight and wingspan, from NBA2KLab's caps data and spot-checked against Locker Codes on a dozen bodies across ten heights. Linked minimums and badge-token ladders come from Locker Codes engine captures. ${MODEL.notes}</p>
-    ${MODEL.linkedMeasured && !MODEL.linkedMeasured(state.h) ? `<p class="note" style="margin:6px 0 0;color:var(--warn-ink)"><b>Linked minimums at ${ft(state.h)} are borrowed.</b> They were captured at ${ft(MODEL.linkedSource(state.h))}, the nearest of the nine heights that were. These rules change fast with height rather than slowly: using the next captured height in the other direction instead moves the finished build on nearly every attempt, by as much as 35 attribute points and 5.6 overall across the eleven borrowed heights. Which way the real rules fall at ${ft(state.h)} is unknown, because ${ft(state.h)} was never captured. Every other number on this page is unaffected; treat the values a link forces up here as approximate.</p>` : ""}
+    ${MODEL.linkedMeasured && !MODEL.linkedMeasured(state.h) ? (() => {
+      const c = readAcrossCost();
+      const pct = Math.round(c.share * 100);
+      const size = c.worstAttr >= 10 ? `by as much as ${c.worstAttr} attribute points and ${(Math.floor(c.worstOvr * 10) / 10).toFixed(1)} overall`
+        : c.worstAttr > 0 ? `though by at most ${c.worstAttr} attribute points and ${(Math.floor(c.worstOvr * 10) / 10).toFixed(1)} overall`
+        : `though never by more than rounding`;
+      return `<p class="note" style="margin:6px 0 0;color:var(--warn-ink)"><b>Linked minimums at ${ft(state.h)} are borrowed.</b> They were captured at ${ft(c.src)}, the nearest of the nine heights that were. Measured at this height: using ${ft(c.other)}'s rules instead changes the finished build on <b>${pct}%</b> of random builds, ${size}. Which way the real rules fall at ${ft(state.h)} is unknown, because ${ft(state.h)} was never captured. Every other number on this page is unaffected; treat the values a link forces up here as approximate.</p>`;
+    })() : ""}
     <p class="note" style="margin:6px 0 0"><b>Where these numbers come from.</b> The overall rating, the archetype and the Cap Breaker gains use 2K's own tuning tables, extracted from the NBA 2K HQ companion app and published by souledxxout. Against 1,553 builds captured from a third-party builder they reproduce the reported overall to within a hundredth of a point on every one, which is why they are trusted here. The caps, badge tiers and token budgets around them come from NBA2KLab and Locker Codes, and Locker Codes says of its own builder that it is \"still being tested, and its numbers have not yet been verified for accuracy\". None of it has been checked against the retail game. Once a build reaches 99 overall the in-game Builder Glossary, and the NBA 2K HQ app, show the real Cap Breaker gain per attribute: that is first-party and worth checking before you spend.</p>`;
     setPanel(el, html);
     $("copyCode").addEventListener("click", () => { navigator.clipboard && navigator.clipboard.writeText(code); $("copyCode").textContent = "Copied"; setTimeout(() => $("copyCode").textContent = "Copy code", 1200); });

@@ -10,7 +10,7 @@
 //                                                   cap and at 99
 //
 // So an attribute your archetype values most moves a single point and one it does not care about
-// moves the most, which is what 2K describes in words. Checked against 1320 captured ladders: 99.96%
+// moves the most, which is what 2K describes in words. Checked against 27720 captured ladders: 99.97%
 // exact, against 99.97% for the 4,775-number fitted table this replaced. Banker's rounding is not
 // optional; half-up scores 99.47%.
 window.CAPBREAKERS = (function () {
