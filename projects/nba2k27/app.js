@@ -467,13 +467,18 @@
     return out.join("");
   }
 
-  // The overall is a fitted estimate, not a reading. Held out against engine captures its median
-  // error is about a tenth of a point, but a minority of builds land a few points off, so the
-  // display says "est." and rounds to one decimal rather than implying a precision it doesn't have.
-  // Calling a build "over budget" is an accusation, so it needs to clear the model's own error
-  // rather than a bare 99.00. Inside this band the honest answer is "right at the ceiling" - six of
-  // 2K's own Signature Blueprints land there, and they are legal builds by definition.
-  const OVER_TOLERANCE = 1.5;
+  // How far past 99 a build has to land before the page calls it over budget.
+  //
+  // This was 1.5, sized to absorb a fitted model's error, and its comment justified the width on
+  // two grounds that are both now false. The first was that the overall is an estimate carrying a
+  // median error of about a tenth of a point: it is not an estimate any more, it is the game's own
+  // formula, and held out against 360 engine captures it reproduces the reported overall exactly,
+  // RMSE 0.000 and worst 0.00. The second was checkable and wrong even as written: it claimed six
+  // of 2K's Signature Blueprints land inside the band, and not one of the forty exceeds 99.00.
+  //
+  // So the band absorbs nothing except float noise now, and while it stood the page told anyone who
+  // turned the lock off that a build 1.4 points past the ceiling "fills the budget".
+  const OVER_TOLERANCE = 0.01;
   // One decimal, always floored. Rounding a raw overall up next to a big number that floors it is
   // how "98" ended up beside "est. 99.0"; every place the same quantity is shown uses this.
   function floor1(x) { return (Math.floor(x * 10) / 10).toFixed(1); }
@@ -648,6 +653,12 @@
     setPanel(el, html);
   }
 
+  // Escaping only the quote left every other character reference intact, so the browser decoded it
+  // on the way in: type "&amp; pro" and the box came back reading "& pro" while the filter kept
+  // running on what was actually typed. The ampersand has to go first or it re-escapes the others.
+  function esc(t) {
+    return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
   function animMeets(a) {
     const v = state.values, h = state.h;
     if (h < a.h[0] || h > a.h[1]) return { ok: false, why: `height ${ft(a.h[0])}–${ft(a.h[1])}` };
@@ -673,7 +684,7 @@
     const el = $("tab-anims");
     const sections = [["Dunks & layups", ANIMATIONS.finishing], ["Dribble moves & styles", ANIMATIONS.dribbling],
       ["Jump shots & post shots", ANIMATIONS.shooting], ["Jumper bases", ANIMATIONS.jumpers], ["Motion styles", ANIMATIONS.motion]];
-    let html = `<div class="ctl"><input type="search" id="animSearch" aria-label="Search animations or players" placeholder="Search animations or players" value="${state.animSearch.replace(/"/g, "&quot;")}"><label><input type="checkbox" id="animOnly" ${state.animOnly ? "checked" : ""}> Only what this build unlocks</label></div>`;
+    let html = `<div class="ctl"><input type="search" id="animSearch" aria-label="Search animations or players" placeholder="Search animations or players" value="${esc(state.animSearch)}"><label><input type="checkbox" id="animOnly" ${state.animOnly ? "checked" : ""}> Only what this build unlocks</label></div>`;
     const q = state.animSearch.trim().toLowerCase();
     sections.forEach(([title, list]) => {
       const groups = {};
