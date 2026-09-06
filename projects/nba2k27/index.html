@@ -71,7 +71,15 @@ a{color:var(--accent)}
 .field select,.field input{background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:6px 8px;min-width:96px}
 .field input[type=number]{width:88px}
 .ovr{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;min-width:280px}
-.ovr .hint{line-height:1.35}
+/* Reserved, not measured. This box says four different things as you edit - budget left, budget
+   filled, budget spent, over budget - and they are one, two or three lines long. Letting it size to
+   its content moved the entire attribute column 16px up and down while you dragged a slider, which
+   is the same complaint the fixed-height line under each bar exists to answer. min-height rather
+   than height so nothing can ever be clipped, and tools/check_layout.js asserts it never grows past
+   this at any width from 320px up. Where the player currently is sits in its own box below, because
+   that appears on a deliberate action rather than while editing. */
+.ovr .hint{line-height:1.35;min-height:74px}
+.ovr .hint-now{min-height:0;margin-top:2px}
 .ovr .big{font-family:var(--display);font-size:44px;font-weight:700;line-height:1;grid-row:span 2}
 .ovr .big small{font-size:16px;color:var(--muted);font-weight:600;margin-left:4px}
 .ovr .bar{height:10px;border-radius:5px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden;width:100%;max-width:240px;position:relative}
@@ -131,8 +139,11 @@ a{color:var(--accent)}
 .attr.atbudget .step[data-up]{border-color:var(--warn);color:var(--warn);opacity:.55}
 
 .field .lock{display:flex;align-items:center;gap:7px;height:38px;padding:0 11px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2);cursor:pointer;white-space:nowrap;font-size:13px;color:var(--ink)}
-.field .lock:hover{border-color:var(--c)}
-.field .lock input{width:15px;height:15px;margin:0;accent-color:var(--c);cursor:pointer}
+/* --c is a per-discipline colour set on the attribute panels. It was never defined up here, so
+   these two declarations resolved to nothing and the control had no hover and no checkbox tint.
+   The accent is what the rest of the header uses. */
+.field .lock:hover{border-color:var(--accent)}
+.field .lock input{width:15px;height:15px;margin:0;accent-color:var(--accent);cursor:pointer}
 .field .lock span{user-select:none}
 .attr .cap{font-size:12px;color:var(--muted);text-align:right}
 .attr .cap b{color:var(--ink)}
@@ -174,12 +185,18 @@ a{color:var(--accent)}
   .attr .stepper{grid-area:step}
   .attr .step{width:40px;height:40px}
   .attr .cap{grid-area:cap;text-align:left}
-  .attr .meta{grid-column:1/3;height:32px;white-space:normal}   /* two fixed lines on a narrow screen */
+  /* Three lines, not two. At 320px the badge and token line wrapped past 32px on most rows and was
+     clipped outright, and the documented recovery was a title tooltip, which a touchscreen cannot
+     open. Fixed height is still the point: the box must not change size as the text changes. */
+  .attr .meta{grid-column:1/3;height:48px;white-space:normal;align-items:flex-start}
   /* The badge-token dot strip needs 273px and pinned the whole column to a 434px minimum, so
      every phone scrolled sideways and the steppers sat off-screen. The count next to it says
      the same thing in words, so the dots go rather than the layout. */
   .disc .panel-h .tok{display:none}
   .disc .panel-h{padding:8px 12px}
+  /* The same sentences wrap to more lines on a narrow screen, so the reserved height has to
+     grow with the breakpoint. Measured at 320px, where the tallest state is 85.6px. */
+  .ovr .hint{min-height:88px}
   .wrap{padding:12px 10px 40px}
 }
 
@@ -300,6 +317,7 @@ textarea{width:100%;min-height:60px;background:var(--surface-2);border:1px solid
       <div class="big num"><span id="ovrDisplay">--</span><small id="ovrDetail"></small></div>
       <div class="bar" id="ovrBar"><i></i></div>
       <div class="hint" id="ovrHint">Overall potential</div>
+      <div class="hint hint-now" id="ovrNow"></div>
     </div>
   </div>
 </header>

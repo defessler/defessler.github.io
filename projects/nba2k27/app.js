@@ -206,8 +206,8 @@
   // This walks down from the request rather than bisecting. Not because bisection is wrong here: it
   // was checked against this scan on 3,646 random build-and-attribute cases and agreed on every one.
   // The estimate does jump when a raise flips which archetype the build reads as (on a 6'5" build
-  // Close Shot 96 estimates 98.6 and 97 estimates 101.5), but the jump goes UP, so the function
-  // stays monotonic and bisection holds. The scan is kept anyway because it does not depend on that
+  // Steal 98 -> 99 moves it 2.72, the largest such jump at that height), but the jump goes UP, so the
+  // function stays monotonic and bisection holds. The scan is kept anyway because it does not depend on that
   // property being true, only on the probe, and a future change to the classifier could break it
   // silently. At most 74 probes, on a raise only, which is nothing next to a render.
   function budgetMaxFor(i, want) {
@@ -243,21 +243,32 @@
   function stepFrom(i, delta) {
     return delta < 0 ? Math.min(state.values[i], state.want[i]) : Math.max(state.values[i], state.want[i]);
   }
-  // Whether a press can move anything at all. A button that cannot is disabled rather than left
-  // looking live: on random builds the minus was dead on about two rows in five.
-  function stepMoves(i, delta) {
-    const from = stepFrom(i, delta);
-    return clamp(from + delta, FLOOR, ceilingFor(i)) !== from;
-  }
-  function step(i, delta) {
+  // What a press would land on, or null when it would not move the request in the direction
+  // pressed. That last part is the whole point, and getting it wrong cost real points.
+  //
+  // The guard used to be `next !== from`, which is not the same thing. Change the body and the caps
+  // drop, but the stored request does not: a row can sit with a request of 99 under a cap of 25.
+  // stepFrom takes the higher of request and display on a raise, so `from` is 99, and clamping
+  // 100 to the cap gives 25. That is different from 99, so the old guard wrote it, and one press of
+  // "+" destroyed 74 points with the row, the note, the cap text and the header hint all unchanged,
+  // then committed it to the share code and localStorage 150ms later. Up to 74 points, no feedback,
+  // no undo. A press must only ever move the request the way it was pressed.
+  function stepTarget(i, delta) {
     const from = stepFrom(i, delta);
     const next = clamp(from + delta, FLOOR, ceilingFor(i));
-    if (next !== from) setWant(i, next);
+    return (delta > 0 ? next > from : next < from) ? next : null;
+  }
+  // Whether a press can move anything at all. A button that cannot is disabled rather than left
+  // looking live: on random builds the minus was dead on about two rows in five.
+  function stepMoves(i, delta) { return stepTarget(i, delta) !== null; }
+  function step(i, delta) {
+    const next = stepTarget(i, delta);
+    if (next !== null) setWant(i, next);
   }
   // Click steps once; press and hold repeats. Pointer capture keeps the repeat tied to this button
   // so releasing anywhere, or the button going disabled at the cap, always stops it.
   function bindStep(btn, i, delta) {
-    let hold = null, repeat = null;
+    let hold = null, repeat = null, touchPending = false;
     const stop = () => { clearTimeout(hold); clearInterval(repeat); hold = repeat = null; };
     const fire = () => {
       // Stop the repeat when the value stops moving, whether that is the cap, the floor, or the
@@ -269,9 +280,17 @@
       if (state.values[i] === before) stop();
     };
     btn.addEventListener("pointerdown", e => {
-      if (btn.disabled) return;
+      // Primary button only. A right or middle press used to step the attribute, and the click
+      // listener below could not undo it, because a non-primary press fires auxclick and
+      // contextmenu rather than click. Touch and pen report button 0 too, so this does not
+      // exclude them.
+      if (btn.disabled || (e.button !== undefined && e.button !== 0)) return;
       e.preventDefault();
-      step(i, delta);
+      // On a mouse the value commits on press, which is what makes press-and-hold work. On touch
+      // that means a finger landing on the button commits before it is a tap at all, so a page
+      // scroll started with a thumb over a stepper both scrolled and changed the build. Touch waits
+      // for a real tap instead; the hold repeat still arms, so press-and-hold is unaffected.
+      if (e.pointerType !== "touch") step(i, delta);
       hold = setTimeout(() => { repeat = setInterval(fire, 70); }, 400);
     });
     ["pointerup", "pointercancel", "pointerleave", "blur"].forEach(ev => btn.addEventListener(ev, stop));
@@ -282,7 +301,14 @@
     // primary control of this page unusable on them. A real mouse or touch click reports detail 1
     // and has already stepped on pointerdown, so it is ignored here rather than counted twice.
     btn.addEventListener("click", e => {
-      if (btn.disabled || e.detail !== 0) return;
+      if (btn.disabled) return;
+      // detail is 0 exactly when nothing pointed at the button: keyboard Enter and Space on a
+      // native button, screen-reader browse-mode activation, voice control. A mouse click reports
+      // detail 1 and already stepped on pointerdown. A touch tap also reports detail 1 but did NOT
+      // step on pointerdown, so it steps here, which is what makes a tap commit on the tap rather
+      // than on contact.
+      if (e.detail !== 0 && !touchPending) return;
+      touchPending = false;
       step(i, delta);
     });
   }
@@ -371,11 +397,15 @@
     let bestBadge = null;
     for (const b of BADGES.list) {
       if (state.h < b.minH || state.h > b.maxH) continue;
+      // What the build already has. An OR badge can be at Gold on a different attribute entirely,
+      // and the hint used to offer Bronze on this one, which contradicted the Badges panel on the
+      // same screen. Only a tier ABOVE what is already held is news.
+      const held = badgeTier(b, state.values, state.h).tier;
       for (const r of b.reqs) {
         if (r.attr !== i) continue;
         for (let t = 0; t < 4; t++) {
           const th = r.tiers[t];
-          if (th === null || th <= v || th > cap) continue;
+          if (th === null || th <= v || th > cap || t + 1 <= held) continue;
           // for AND badges the other requirements have to be met already, or the hint is noise
           const othersOk = b.logic !== "AND" || b.reqs.every(q => q.attr === i || (q.tiers[t] !== null && state.values[q.attr] >= q.tiers[t]));
           if (othersOk && (!bestBadge || th < bestBadge.th)) bestBadge = { th, name: b.name, tier: TIER_NAMES[t + 1] };
@@ -398,6 +428,9 @@
   // rather than a bare 99.00. Inside this band the honest answer is "right at the ceiling" - six of
   // 2K's own Signature Blueprints land there, and they are legal builds by definition.
   const OVER_TOLERANCE = 1.5;
+  // One decimal, always floored. Rounding a raw overall up next to a big number that floors it is
+  // how "98" ended up beside "est. 99.0"; every place the same quantity is shown uses this.
+  function floor1(x) { return (Math.floor(x * 10) / 10).toFixed(1); }
   function renderOverall(ovr) {
     const disp = $("ovrDisplay"), det = $("ovrDetail"), bar = $("ovrBar"), hint = $("ovrHint");
     const over = ovr.raw > 99 + OVER_TOLERANCE;
@@ -407,13 +440,15 @@
     // raw of 98.96 was showing "98" beside "est. 99.0", which reads as a contradiction and is the
     // first thing anyone notices. The budget lock parks builds just under 99, right in that window,
     // so it happened on every maxed-out build.
-    det.textContent = ovr.raw >= 99 ? "" : "est. " + (Math.floor(ovr.raw * 10) / 10).toFixed(1);
+    det.textContent = ovr.raw >= 99 ? "" : "est. " + floor1(ovr.raw);
     const pct = clamp((ovr.raw - 25) / 74 * 100, 0, 100);
     bar.querySelector("i").style.width = pct + "%";
     bar.classList.toggle("over", over);
     bar.classList.toggle("done", !over && ovr.display >= 99);
     if (over) {
-      hint.innerHTML = `<span class="pill bad">Over budget</span> this build lands near <b class="num">${ovr.raw.toFixed(1)}</b>, past the 99 ceiling. Lower something by roughly <b>${(ovr.raw - 99).toFixed(1)}</b> overall.`;
+      // Floored, like the Summary tab and like the big number. Rounding here put two different
+      // values for the same quantity on the same screen.
+      hint.innerHTML = `<span class="pill bad">Over budget</span> this build lands near <b class="num">${floor1(ovr.raw)}</b>, past the 99 ceiling. Lower something by roughly <b>${floor1(ovr.raw - 99)}</b> overall.`;
     } else if (atCeiling) {
       hint.innerHTML = `<span class="pill good">At the ceiling</span> this build fills the budget. It may sit a point either side of 99, so check the last upgrade in game.`;
     } else {
@@ -425,15 +460,22 @@
       }
     }
     // The overall above is what this build can reach. If the player has told us where they are now,
-    // say how far that leaves them from the build and from the 99 that unlocks Cap Breakers.
-    if (state.currentOvr !== null) {
-      const toBuild = Math.max(0, ovr.display - state.currentOvr);
-      const toNinety = Math.max(0, 99 - state.currentOvr);
-      hint.innerHTML += `<br><span class="pill">Now ${state.currentOvr}</span> ` + (
-        toBuild > 0
-          ? `<b class="num">${toBuild}</b> overall from this build's ceiling`
-          : `already at this build's ceiling`) +
-        (toNinety > 0 ? ` &middot; <b class="num">${toNinety}</b> from the 99 that unlocks Cap Breakers` : ` &middot; Cap Breakers unlocked`);
+    // say how far that leaves them from the build and from the 99 that unlocks Cap Breakers. This
+    // lives in its own box rather than being appended to the hint, so the hint's height depends
+    // only on the build. Appending it made the hint three lines tall and pushed every attribute row
+    // down, and it would have done that on a redraw triggered by something else entirely.
+    const now = $("ovrNow");
+    if (now) {
+      if (state.currentOvr === null) now.innerHTML = "";
+      else {
+        const toBuild = Math.max(0, ovr.display - state.currentOvr);
+        const toNinety = Math.max(0, 99 - state.currentOvr);
+        now.innerHTML = `<span class="pill">Now ${state.currentOvr}</span> ` + (
+          toBuild > 0
+            ? `<b class="num">${toBuild}</b> overall from this build's ceiling`
+            : `already at this build's ceiling`) +
+          (toNinety > 0 ? ` &middot; <b class="num">${toNinety}</b> from the 99 that unlocks Cap Breakers` : ` &middot; Cap Breakers unlocked`);
+      }
     }
   }
 
@@ -445,14 +487,29 @@
   // generalised, so every panel keeps the caret and the focus ring where they were.
   function setPanel(el, html) {
     const a = document.activeElement;
-    const inside = a && a.id && el && typeof el.contains === "function" && el.contains(a);
-    const id = inside ? a.id : null;
+    const inside = a && el && typeof el.contains === "function" && el.contains(a);
+    const id = inside && a.id ? a.id : null;
+    // Most of the controls in these panels have no id: cap-breaker chips, the animation accordion
+    // toggles, the blueprint Load buttons. Matching on id alone meant every one of them dropped
+    // focus to <body> on activation, which is the exact bug setPanel was added to fix. Their data
+    // attributes identify them just as well, so a selector is built from those instead.
+    let sel = null;
+    if (inside && !id) {
+      const d = a.dataset || {};
+      const parts = ["cb", "k", "group", "bp", "tab"].filter(k => d[k] !== undefined)
+        .map(k => `[data-${k}="${String(d[k]).replace(/"/g, '\\"')}"]`);
+      if (parts.length) sel = a.tagName.toLowerCase() + parts.join("");
+    }
     let caret = null;
     // selectionStart throws on a number input in some browsers, so it never gets to be a hard error.
     if (id) { try { caret = a.selectionStart; } catch (e) { caret = null; } }
     el.innerHTML = html;
-    if (!id || typeof document.getElementById !== "function") return;
-    const back = document.getElementById(id);
+    if (!id && !sel) return;
+    let back = null;
+    try {
+      back = id ? (typeof document.getElementById === "function" ? document.getElementById(id) : null)
+                : (typeof el.querySelector === "function" ? el.querySelector(sel) : null);
+    } catch (e) { back = null; }
     if (!back || back === document.activeElement || typeof back.focus !== "function") return;
     try {
       back.focus({ preventScroll: true });
@@ -622,10 +679,24 @@
   // which is only true on a build where every attribute is level. On a real blueprint it is usually
   // two, and being told fifteen is both wrong and useless: with two named, you can see what they
   // disagree about.
+  // Which of the tied types would actually give a different answer. At several heights two or three
+  // player types carry byte-identical weight rows (12, 13 and 14 from 6'11" up; 13 and 14 at 5'9" to
+  // 5'11"), so the engine picking one or another changes nothing: same overall, same cap-breaker
+  // ladder. Warning about those was warning about a distinction that does not exist.
   function tiedList() {
     const t = (state.ovr && state.ovr.tiedWith) || [];
-    return t.length ? t : [state.ovr ? state.ovr.type : 0];
+    const all = t.length ? t : [state.ovr ? state.ovr.type : 0];
+    if (all.length < 2 || !MODEL.weightRow) return all;
+    const seen = new Map();
+    for (const ty of all) {
+      const row = MODEL.weightRow(ty, state.h);
+      const key = row ? row.join(",") : "?" + ty;
+      if (!seen.has(key)) seen.set(key, ty);
+    }
+    return [...seen.values()];
   }
+  // A tie only matters if the types in it disagree about something.
+  function tieMatters() { return tiedList().length > 1; }
   function tiedNames() {
     const t = tiedList();
     if (t.length >= 15) return "all 15 player types";
@@ -639,9 +710,11 @@
       return "on a build where every attribute is level all 15 score the same, so there is no way to "
         + "tell which one you would get. Vary the attributes and this resolves.";
     }
+    const n = tiedList().length;
     return `${tiedNames()} score within a hundredth of a point here, so the game could assign `
-      + `either and the ladders below would change with it. Moving any attribute the two value `
-      + `differently, by as little as a point, settles it.`;
+      + `${n === 2 ? "either" : "any of them"} and the ladders below would change with it. Moving `
+      + `any attribute ${n === 2 ? "the two" : "they"} value differently, by as little as a point, `
+      + `settles it.`;
   }
   function renderCapBreakers() {
     const el = $("tab-capbreakers");
@@ -656,7 +729,7 @@
       <div><div class="v num">${CB_TOTAL_NOW}<small style="font-size:14px;color:var(--muted)"> / ${CB_TOTAL_YEAR}</small></div><div class="l">Earnable now / this year</div></div>
     </div>
     <p class="note" style="margin:0 0 6px">Cap Breakers unlock once a build reaches 99 overall. Each chip is one breaker on that attribute, up to five, showing the points it adds from where the attribute sits now. Click a chip to plan that many. Gains stop at the body cap and at 99, and never earn badge tokens.</p>` +
-      (state.ovr.tied ? `<p class="note" style="margin:0 0 6px;color:var(--warn)"><b>These ladders are a guess on this build.</b> The gain depends on which of the 15 player types the game assigns, and ${tieText()}</p>` : "");
+      (state.ovr.tied && tieMatters() ? `<p class="note" style="margin:0 0 6px;color:var(--warn)"><b>These ladders are a guess on this build.</b> The gain depends on which of the 15 player types the game assigns, and ${tieText()}</p>` : "");
     if (state.currentOvr !== null && state.currentOvr < 99) {
       html += `<p class="note" style="color:var(--warn-ink)"><b>Not unlocked yet.</b> Your MyPLAYER is ${state.currentOvr} overall and Cap Breakers open at 99, ${99 - state.currentOvr} away. Everything below is what you would get once you are there.</p>`;
     }
@@ -765,8 +838,8 @@
     <dl class="kv">
       <dt>Body</dt><dd>${POS_NAME[state.pos]} · ${ft(state.h)} · ${state.w} lb · ${ft(state.ws)} wingspan</dd>
       <dt>Current OVR</dt><dd>${state.currentOvr === null ? "not set" : `${state.currentOvr}, ${Math.max(0, state.ovr.display - state.currentOvr)} short of this build and ${Math.max(0, 99 - state.currentOvr)} from Cap Breakers`}</dd>
-      <dt>Archetype</dt><dd title="The game scores this build under all 15 player types and keeps the highest, and so does this page. On builds where the attributes actually vary it matches the engine 99.9% of the time.">${state.ovr.tied ? `<span style="color:var(--warn)">too close to call</span> <span style="color:var(--muted)">(${tiedNames()} score the same here, so the game could pick any of them, and the Cap Breakers below would change with it)</span>` : `${MODEL.typeName(state.ovr.type)} <span style="color:var(--muted)">(highest scoring of the 15)</span>`}</dd>
-      <dt>Raw potential</dt><dd class="num">about ${(Math.floor(state.ovr.raw * 10) / 10).toFixed(1)} (the game rounds a finished build up to 99 once nothing can be raised)</dd>
+      <dt>Archetype</dt><dd title="The game scores this build under all 15 player types and keeps the highest, and so does this page. On builds where the attributes actually vary it matches the engine 99.9% of the time.">${state.ovr.tied && tieMatters() ? `<span style="color:var(--warn)">too close to call</span> <span style="color:var(--muted)">(${tiedNames()} score the same here, so the game could pick any of them, and the ladders on the Cap Breakers tab would change with it)</span>` : `${MODEL.typeName(state.ovr.type)} <span style="color:var(--muted)">(highest scoring of the 15)</span>`}</dd>
+      <dt>Raw potential</dt><dd class="num">about ${floor1(state.ovr.raw)} (the game rounds a finished build up to 99 once nothing can be raised)</dd>
       <dt>Tokens</dt><dd>${tok.known ? DISCS.map((d, i) => `${d.key} ${tok.perDisc[i]}`).join(" · ") : "no ladder data for this height yet"}</dd>
     </dl>
     <h3 style="margin:12px 0 4px;font-size:16px">Attribute sheet</h3>
@@ -777,7 +850,7 @@
     <div class="ctl" style="margin-top:6px"><button class="btn" id="copyCode">Copy code</button><input type="text" id="pasteCode" aria-label="Paste a build code" placeholder="Paste a build code" style="flex:1;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:6px 8px"><button class="btn" id="loadCode">Load</button></div>
     <h3 style="margin:14px 0 4px;font-size:16px">How the numbers are built</h3>
     <p class="note" style="margin:0">Caps are the game engine's values for this exact height, weight and wingspan, from NBA2KLab's caps data and spot-checked against Locker Codes on a dozen bodies across ten heights. Linked minimums and badge-token ladders come from Locker Codes engine captures. ${MODEL.notes}</p>
-    ${MODEL.linkedMeasured && !MODEL.linkedMeasured(state.h) ? `<p class="note" style="margin:6px 0 0">One caveat for ${ft(state.h)}: the linked minimums shown here were captured at ${ft(MODEL.linkedSource(state.h))}, the nearest height that was. Nine of the twenty heights were captured directly. The rules move slowly with height, so this is usually right, but it is read across rather than measured at yours.</p>` : ""}
+    ${MODEL.linkedMeasured && !MODEL.linkedMeasured(state.h) ? `<p class="note" style="margin:6px 0 0;color:var(--warn-ink)"><b>Linked minimums at ${ft(state.h)} are borrowed.</b> They were captured at ${ft(MODEL.linkedSource(state.h))}, the nearest of the nine heights that were. These rules change fast with height rather than slowly: using the next captured height in the other direction instead moves the finished build on nearly every attempt, by as much as 35 attribute points and 5.7 overall across the eleven borrowed heights. Which way the real rules fall at ${ft(state.h)} is unknown, because ${ft(state.h)} was never captured. Every other number on this page is unaffected; treat the values a link forces up here as approximate.</p>` : ""}
     <p class="note" style="margin:6px 0 0"><b>Where these numbers come from.</b> The overall rating, the archetype and the Cap Breaker gains use 2K's own tuning tables, extracted from the NBA 2K HQ companion app and published by souledxxout. Against 1,553 builds captured from a third-party builder they reproduce the reported overall to within a hundredth of a point on every one, which is why they are trusted here. The caps, badge tiers and token budgets around them come from NBA2KLab and Locker Codes, and Locker Codes says of its own builder that it is \"still being tested, and its numbers have not yet been verified for accuracy\". None of it has been checked against the retail game. Once a build reaches 99 overall the in-game Builder Glossary, and the NBA 2K HQ app, show the real Cap Breaker gain per attribute: that is first-party and worth checking before you spend.</p>`;
     setPanel(el, html);
     $("copyCode").addEventListener("click", () => { navigator.clipboard && navigator.clipboard.writeText(code); $("copyCode").textContent = "Copied"; setTimeout(() => $("copyCode").textContent = "Copy code", 1200); });
