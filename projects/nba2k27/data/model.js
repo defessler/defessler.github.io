@@ -51,5 +51,5 @@ window.MODEL = (function () {
   function typeName(t) { return D.names[String(t)] || ("Profile " + t); }
   return { S, phiOf, overall, linkedRules, tokenLadders, typeName, quality: D.quality,
     weightsFor: (type, h) => weightsFor(type, h).w,
-    notes: "Archetype weights are fitted per archetype from " + D.classifier.length + " engine samples; typical error is a few tenths of an overall point, larger for rare archetypes and heights with few samples. Token ladders exist for 5'9\" to 6'9\"; taller builds show no token counts yet." };
+    notes: "The archetype weights behind it are fitted from " + D.classifier.length + " engine samples. Held out, the median error is about a point and the worst measured was 21, concentrated where the archetype is misread. Token ladders exist for 5'9\" to 6'9\"; taller builds show no token counts yet." };
 })();

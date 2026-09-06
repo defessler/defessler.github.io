@@ -56,18 +56,33 @@
 
   // ---------- linked minimums ----------
   // rules: [source, target, distance] meaning target >= source - distance, and source <= cap[target] + distance.
+  //
+  // The source ceiling depends only on the caps, never on the current values, so it is computed once
+  // up front. Everything after that only ever raises, which converges to the single lowest set of
+  // values satisfying the rules, whatever order they are visited in. Interleaving the clamp with the
+  // raises instead would let a raise read a source that a later rule pulls back down, stranding a
+  // target above anything the rules actually demand and charging the user budget for it.
   function normalize(want, caps, h) {
     const rules = MODEL.linkedRules(h);
-    const v = want.map((x, i) => clamp(x, 25, caps[i]));
+    const ceiling = caps.slice();
+    for (const [s, t, d] of rules) ceiling[s] = Math.max(25, Math.min(ceiling[s], caps[t] + d));
+
     const forced = new Set(), limited = new Set();
+    const v = want.map((x, i) => {
+      const asked = clamp(x, 25, caps[i]);
+      if (asked > ceiling[i]) limited.add(i);
+      return Math.min(asked, ceiling[i]);
+    });
     let changed = true, guard = 0;
     while (changed && guard++ < 60) {
       changed = false;
       for (const [s, t, d] of rules) {
-        const maxSource = caps[t] + d;
-        if (v[s] > maxSource) { v[s] = Math.max(25, maxSource); limited.add(s); changed = true; }
-        const need = v[s] - d;
-        if (v[t] < need) { v[t] = Math.min(caps[t], need); if (v[t] > want[t]) forced.add(t); changed = true; }
+        const need = Math.min(ceiling[t], v[s] - d);
+        if (v[t] < need) {
+          v[t] = need;
+          if (v[t] > want[t]) forced.add(t);
+          changed = true;
+        }
       }
     }
     return { values: v, forced, limited };
@@ -325,7 +340,8 @@
     const multi = TAKEOVERS.list.filter(t => t.reqs.length > 1).length;
     html += `<p class="note">Each discipline has a Default takeover that needs nothing, and Hydration Hero fits any of the five slots.
       The ${multi} takeovers with more than one requirement need <b>all</b> of them, not one or the other. Requirements come from
-      the table NBA2KLab ships with its takeover page.</p>`;
+      the table NBA2KLab ships with its takeover page. Hydration Hero carries no attribute requirement there, though some other
+      write-ups say it unlocks through Takeover Progression rather than at build time.</p>`;
     el.innerHTML = html;
   }
 
@@ -469,7 +485,7 @@
     }
     const measured = [...srcs].every(s => s === "measured");
     html += `<p class="note">${measured
-      ? "Every ladder here is measured: this archetype and height were sampled directly from the engine."
+      ? "These ladders come from a body sampled at this height for this archetype. Other weights and wingspans at the same height are assumed to match, which the captures could not test."
       : "Some ladders are read across from the nearest sampled heights for this archetype, so treat those as close estimates."}
       The rule behind them, recovered from ${(CAPBREAKERS.captures || "hundreds of")} builds captured from the engine, is that one breaker adds
       <b>max(1, round(f &times; E))</b> points, where E falls from 15 at rating 25 to 2 near 99 and f is how little this archetype
@@ -531,8 +547,8 @@
     </div>
     <dl class="kv">
       <dt>Body</dt><dd>${POS_NAME[state.pos]} · ${ft(state.h)} · ${state.w} lb · ${ft(state.ws)} wingspan</dd>
-      <dt>Archetype</dt><dd>${MODEL.typeName(state.ovr.type)}</dd>
-      <dt>Raw potential</dt><dd class="num">${state.ovr.raw.toFixed(3)} (the game rounds a finished build up to 99 once nothing can be raised)</dd>
+      <dt>Archetype</dt><dd title="Inferred by matching this build against stored engine samples. A wrong guess shifts both the overall estimate and the cap breaker ladders.">${MODEL.typeName(state.ovr.type)} <span style="color:var(--muted)">(inferred)</span></dd>
+      <dt>Raw potential</dt><dd class="num">about ${state.ovr.raw.toFixed(1)} (the game rounds a finished build up to 99 once nothing can be raised)</dd>
       <dt>Tokens</dt><dd>${tok.known ? DISCS.map((d, i) => `${d.key} ${tok.perDisc[i]}`).join(" · ") : "no ladder data for this height yet"}</dd>
     </dl>
     <h3 style="margin:12px 0 4px;font-size:16px">Attribute sheet</h3>
@@ -542,7 +558,7 @@
     <textarea readonly id="buildCode" aria-label="Build share code">${code}</textarea>
     <div class="ctl" style="margin-top:6px"><button class="btn" id="copyCode">Copy code</button><input type="text" id="pasteCode" aria-label="Paste a build code" placeholder="Paste a build code" style="flex:1;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:6px 8px"><button class="btn" id="loadCode">Load</button></div>
     <h3 style="margin:14px 0 4px;font-size:16px">How the numbers are built</h3>
-    <p class="note" style="margin:0">Caps are the game engine's values for this exact height, weight, and wingspan (NBA2KLab dataset, cross-checked against two other builders). Linked minimums and token ladders come from Locker Codes' engine captures. The overall potential is a fitted model of the same engine data. ${MODEL.notes}</p>`;
+    <p class="note" style="margin:0">Caps are the game engine's values for this exact height, weight, and wingspan, from NBA2KLab's caps data and spot-checked against Locker Codes on a dozen bodies across ten heights. Linked minimums and token ladders come from Locker Codes' engine captures. The overall potential is a fitted estimate of the same engine, not a reading. ${MODEL.notes}</p>`;
     el.innerHTML = html;
     $("copyCode").addEventListener("click", () => { navigator.clipboard && navigator.clipboard.writeText(code); $("copyCode").textContent = "Copied"; setTimeout(() => $("copyCode").textContent = "Copy code", 1200); });
     $("loadCode").addEventListener("click", () => { if (decodeBuild($("pasteCode").value.trim())) { syncBodyForm(); recompute(); } });
