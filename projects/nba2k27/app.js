@@ -326,6 +326,12 @@
       // touch pointerdown skipped the step, the release found the flag false, and every tap on the
       // page's primary control did nothing at all. Phones are a supported width and nobody noticed,
       // because nothing automated presses a button with a finger.
+      // Cancel whatever is already armed before arming again. Assigning over `hold` left the
+      // previous timeout running with nothing holding a reference to it, so a second finger on the
+      // same button orphaned the first one: it fired 400ms later, started the 70ms repeat, and
+      // walked the attribute towards its cap with every finger long since off the screen. Measured
+      // at 61 to 90 in two and a half seconds, untouched.
+      stop();
       if (e.pointerType === "touch") touchPending = true;
       else step(i, delta);
       hold = setTimeout(() => { repeat = setInterval(fire, 70); }, 400);
@@ -793,8 +799,18 @@
     const t = tiedList();
     const raw = ((state.ovr && state.ovr.tiedWith) || []).length;
     if (raw >= 15 || t.length >= 15) {
-      return "on a build where every attribute is level all 15 score the same, so there is no way to "
-        + "tell which one you would get. Vary the attributes and this resolves.";
+      // Only claim the build is level when it actually is. All fifteen types tying does not imply a
+      // flat build, and at the nine heights where several types share a weight row it routinely
+      // happens on builds whose attributes plainly vary, where "vary the attributes" is advice the
+      // reader has already taken.
+      const v = state.values || [];
+      const level = v.length === 21 && Math.max.apply(null, v) - Math.min.apply(null, v) <= 1;
+      return level
+        ? "on a build where every attribute is level all 15 score the same, so there is no way to "
+          + "tell which one you would get. Vary the attributes and this resolves."
+        : "all 15 player types score within a hundredth of a point here, so the game could assign "
+          + "any of them. Several of them weigh this height's attributes identically, so the choice "
+          + "often makes no difference to the ladders; where it does, only a large change separates them.";
     }
     const n = tiedList().length;
     // No instruction to move "any attribute by a point", because that is usually not enough: the
@@ -815,12 +831,16 @@
   let readAcrossCache = null;
   function readAcrossCost() {
     const h = state.h;
-    if (readAcrossCache && readAcrossCache.h === h) return readAcrossCache;
+    // Keyed on the caps, not just the height. Every number below is computed from state.caps, which
+    // is a function of height AND weight AND wingspan, so caching on height alone meant changing
+    // the weight left the warning quoting the previous body's measurement as if it were this one's.
+    const key = h + ":" + (state.caps ? state.caps.join(",") : "");
+    if (readAcrossCache && readAcrossCache.key === key) return readAcrossCache;
     const measured = [];
     for (let k = 69; k <= 88; k++) if (MODEL.linkedMeasured(k)) measured.push(k);
     const src = MODEL.linkedSource(h);
     const others = measured.filter(m => m !== src);
-    if (!others.length || !state.caps) return (readAcrossCache = { h, n: 0 });
+    if (!others.length || !state.caps) return (readAcrossCache = { key, h, n: 0 });
     const other = others.reduce((b, m) => Math.abs(m - h) < Math.abs(b - h) ? m : b, others[0]);
     const A = MODEL.linkedRules(h), B = MODEL.linkedRules(other);
     // A deterministic sample, so the sentence does not change between two renders of one build.
@@ -843,7 +863,7 @@
         if (od > worstOvr) worstOvr = od;
       }
     }
-    return (readAcrossCache = { h, src, other, n, share: n ? diff / n : 0, worstAttr, worstOvr });
+    return (readAcrossCache = { key, h, src, other, n, share: n ? diff / n : 0, worstAttr, worstOvr });
   }
   function renderCapBreakers() {
     const el = $("tab-capbreakers");
@@ -985,9 +1005,14 @@
     ${MODEL.linkedMeasured && !MODEL.linkedMeasured(state.h) ? (() => {
       const c = readAcrossCost();
       const pct = Math.round(c.share * 100);
-      const size = c.worstAttr >= 10 ? `by as much as ${c.worstAttr} attribute points and ${(Math.floor(c.worstOvr * 10) / 10).toFixed(1)} overall`
-        : c.worstAttr > 0 ? `though by at most ${c.worstAttr} attribute points and ${(Math.floor(c.worstOvr * 10) / 10).toFixed(1)} overall`
-        : `though never by more than rounding`;
+      // The framing has to consider both numbers it is about to print. Choosing "as much as" or
+      // "at most" from the attribute gap alone wrapped reassuring words around a large overall gap
+      // whenever the two disagreed, which is the combination that matters most to a reader.
+      const ovrTxt = (Math.floor(c.worstOvr * 10) / 10).toFixed(1);
+      const big = c.worstAttr >= 10 || c.worstOvr >= 1.0;
+      const size = c.worstAttr === 0 ? `though never by more than rounding`
+        : big ? `by as much as ${c.worstAttr} attribute points and ${ovrTxt} overall`
+        : `though by at most ${c.worstAttr} attribute points and ${ovrTxt} overall`;
       return `<p class="note" style="margin:6px 0 0;color:var(--warn-ink)"><b>Linked minimums at ${ft(state.h)} are borrowed.</b> They were captured at ${ft(c.src)}, the nearest of the nine heights that were. Measured at this height: using ${ft(c.other)}'s rules instead changes the finished build on <b>${pct}%</b> of random builds, ${size}. Which way the real rules fall at ${ft(state.h)} is unknown, because ${ft(state.h)} was never captured. Every other number on this page is unaffected; treat the values a link forces up here as approximate.</p>`;
     })() : ""}
     <p class="note" style="margin:6px 0 0"><b>Where these numbers come from.</b> The overall rating, the archetype and the Cap Breaker gains use 2K's own tuning tables, extracted from the NBA 2K HQ companion app and published by souledxxout. Against 1,553 builds captured from a third-party builder they reproduce the reported overall to within a hundredth of a point on every one, which is why they are trusted here. The caps, badge tiers and token budgets around them come from NBA2KLab and Locker Codes, and Locker Codes says of its own builder that it is \"still being tested, and its numbers have not yet been verified for accuracy\". None of it has been checked against the retail game. Once a build reaches 99 overall the in-game Builder Glossary, and the NBA 2K HQ app, show the real Cap Breaker gain per attribute: that is first-party and worth checking before you spend.</p>`;
@@ -1165,7 +1190,7 @@
   // Read-only surface for testing; the page itself never touches it.
   window.BuildLab = {
     state, capsFor, normalize, tokenCounts, badgeTier, plannedValues, ladderFor, fallbackF,
-    encodeBuild, decodeBuild, recompute, setWant, step, setWantFromControl, typeLabel,
+    encodeBuild, decodeBuild, recompute, setWant, step, setWantFromControl, stepMoves, typeLabel,
     ATTRS, DISCS, TIER_NAMES,
   };
 })();
