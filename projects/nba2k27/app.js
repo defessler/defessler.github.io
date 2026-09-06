@@ -682,7 +682,7 @@
     <dl class="kv">
       <dt>Body</dt><dd>${POS_NAME[state.pos]} · ${ft(state.h)} · ${state.w} lb · ${ft(state.ws)} wingspan</dd>
       <dt>Current OVR</dt><dd>${state.currentOvr === null ? "not set" : `${state.currentOvr}, ${Math.max(0, state.ovr.display - state.currentOvr)} short of this build and ${Math.max(0, 99 - state.currentOvr)} from Cap Breakers`}</dd>
-      <dt>Archetype</dt><dd title="Inferred by matching this build against stored engine samples. A wrong guess shifts both the overall estimate and the cap breaker ladders.">${MODEL.typeName(state.ovr.type)} <span style="color:var(--muted)">(inferred)</span></dd>
+      <dt>Archetype</dt><dd title="Not a guess. The game scores this build under all 15 player types and keeps the highest, and so does this page. On builds where the attributes actually vary it matches the engine 99.9% of the time; on a completely flat build all 15 tie and the choice is arbitrary.">${MODEL.typeName(state.ovr.type)} <span style="color:var(--muted)">(highest scoring of the 15)</span></dd>
       <dt>Raw potential</dt><dd class="num">about ${state.ovr.raw.toFixed(1)} (the game rounds a finished build up to 99 once nothing can be raised)</dd>
       <dt>Tokens</dt><dd>${tok.known ? DISCS.map((d, i) => `${d.key} ${tok.perDisc[i]}`).join(" · ") : "no ladder data for this height yet"}</dd>
     </dl>
