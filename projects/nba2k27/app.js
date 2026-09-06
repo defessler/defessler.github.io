@@ -658,6 +658,13 @@
       return { ok: best >= need, why: `shooting ${need}` };
     }
     const checks = a.r.map(([i, m]) => ({ i, m, ok: v[i] >= m }));
+    // An animation with no requirements has nothing to fail, whichever way its requirements would
+    // have combined. This used to run through some/every, and [].some() is false while [].every()
+    // is true, so the same empty list read LOCKED on an OR animation and UNLOCKED on an AND one:
+    // 79 animations across Post Fade and Post Hop Shot were reported locked on every build at every
+    // height, and the default "only what this build unlocks" filter hid both groups entirely, while
+    // Post Hook next to them showed 13 of 13 on identical data.
+    if (!checks.length) return { ok: true, why: "no requirement" };
     const ok = a.or ? checks.some(c => c.ok) : checks.every(c => c.ok);
     return { ok, why: checks.map(c => `${SHORT[c.i]} ${c.m}`).join(a.or ? " / " : " + ") };
   }
@@ -1190,7 +1197,7 @@
   // Read-only surface for testing; the page itself never touches it.
   window.BuildLab = {
     state, capsFor, normalize, tokenCounts, badgeTier, plannedValues, ladderFor, fallbackF,
-    encodeBuild, decodeBuild, recompute, setWant, step, setWantFromControl, stepMoves, typeLabel,
+    encodeBuild, decodeBuild, recompute, setWant, step, setWantFromControl, stepMoves, typeLabel, animMeets,
     ATTRS, DISCS, TIER_NAMES,
   };
 })();
