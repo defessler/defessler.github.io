@@ -39,6 +39,7 @@ window.MODEL = (function () {
     const p = new Array(21);
     for (let a = 0; a < 21; a++) p[a] = phiOfAttr(a, ratings[a]);
     let raw = -Infinity, second = -Infinity, type = 0;
+    const scores = new Array(W.length).fill(-Infinity);
     for (let t = 0; t < W.length; t++) {
       const w = W[t];
       let num = 0, den = 0;
@@ -48,6 +49,7 @@ window.MODEL = (function () {
       }
       if (!den) continue;
       const o = 25 + (num / den - 25) * 74 / (hi - 25);
+      scores[t] = o;
       if (o > raw) { second = raw; raw = o; type = t; }
       else if (o > second) { second = o; }
     }
@@ -56,9 +58,14 @@ window.MODEL = (function () {
     // choice is a fact about the build. The page says so rather than naming a profile it cannot
     // know, because the archetype also decides the Cap Breaker ladder.
     const margin = second > -Infinity ? raw - second : Infinity;
+    // Which types are close enough that the engine could pick any of them, not merely that some
+    // tie exists. The page used to say "all 15 score the same" whenever margin was small, which is
+    // true on a flat build and false on every other one: a real blueprint usually ties exactly two.
+    const tiedWith = [];
+    for (let t = 0; t < scores.length; t++) if (raw - scores[t] < 0.01) tiedWith.push(t);
     const display = Math.min(99, Math.floor(raw + 1e-6));
     // The game rounds a finished build up to 99; a build whose raw potential lands above 99 is over budget.
-    return { raw, display, type, margin, tied: margin < 0.01, over: raw > 99.0, overBy: Math.max(0, raw - 99), source: "engine tables" };
+    return { raw, display, type, margin, tied: margin < 0.01, tiedWith, over: raw > 99.0, overBy: Math.max(0, raw - 99), source: "engine tables" };
   }
   // The raw weight row for a type and height, which is what the cap-breaker rule needs.
   function weightRow(type, h) {
@@ -67,9 +74,14 @@ window.MODEL = (function () {
     return (W[type] || W[0]).map(x => x / 100);
   }
   function linkedRules(h) { return D.linked[String(nearest(heightsWithLinked, h))] || []; }
+  // Whether these rules were captured at this exact height or borrowed from the nearest one that
+  // was. Nine of the twenty heights were captured. The page says which it is looking at rather than
+  // presenting a borrowed rule as a measurement.
+  function linkedMeasured(h) { return D.linked[String(h)] !== undefined; }
+  function linkedSource(h) { return nearest(heightsWithLinked, h); }
   function tokenLadders(h) { return D.ladders[String(h)] || null; }
   function typeName(t) { return D.names[String(t)] || ("Profile " + t); }
-  return { S, slopeFor, phiOfAttr, m99For, weightRow, overall, linkedRules, tokenLadders, typeName, quality: D.quality,
+  return { S, slopeFor, phiOfAttr, m99For, weightRow, overall, linkedRules, linkedMeasured, linkedSource, tokenLadders, typeName, quality: D.quality,
     phiOf: (v) => phiOfAttr(0, v),
     weightsFor: (type, h) => weightRow(type, h),
     notes: "The overall is the game's own formula, using tuning tables datamined from the NBA 2K HQ companion app rather than anything fitted here. Against 1,553 builds captured from the engine it reproduces the reported overall within a hundredth of a point on every one, and the archetype is no longer guessed: the game scores all 15 player types and keeps the highest. Token ladders exist for 5'9\" to 6'9\"; taller builds show no token counts yet." };

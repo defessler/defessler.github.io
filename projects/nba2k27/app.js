@@ -142,13 +142,13 @@
         row.className = "attr";
         row.innerHTML = `
           <div class="name">${ATTRS[i]}</div>
-          <div class="track"><input type="range" min="25" max="99" step="1" data-range="${i}" aria-label="${ATTRS[i]}"><div class="ticks" data-ticks="${i}"></div><div class="capline" data-capline="${i}"></div></div>
+          <div class="track"><input type="range" min="25" max="99" step="1" data-range="${i}" aria-label="${ATTRS[i]}" aria-describedby="capdesc-${i}"><div class="ticks" data-ticks="${i}"></div><div class="capline" data-capline="${i}"></div></div>
           <div class="stepper">
             <button type="button" class="step" data-down="${i}" aria-label="Lower ${ATTRS[i]}">&minus;</button>
-            <input type="number" min="25" max="99" step="1" data-num="${i}" aria-label="${ATTRS[i]} value">
+            <input type="number" min="25" max="99" step="1" data-num="${i}" aria-label="${ATTRS[i]} value" aria-describedby="capdesc-${i}">
             <button type="button" class="step" data-up="${i}" aria-label="Raise ${ATTRS[i]}">+</button>
           </div>
-          <div class="cap num">cap <b data-cap="${i}">--</b></div>
+          <div class="cap num" id="capdesc-${i}">cap <b data-cap="${i}">--</b></div>
           <div class="meta"><small class="note" data-forced="${i}"></small><span class="unlocks num" data-next="${i}"></span></div>`;
         rows.appendChild(row);
         attrEls[i] = {
@@ -211,9 +211,15 @@
   // property being true, only on the probe, and a future change to the classifier could break it
   // silently. At most 74 probes, on a raise only, which is nothing next to a render.
   function budgetMaxFor(i, want) {
-    const now = Math.min(state.values[i], want);
-    for (let v = want; v > now; v--) if (affordable(i, v)) return v;
-    return now;
+    // Only a value above what the row already shows can change anything, so the scan stops there.
+    const shown = Math.min(state.values[i], want);
+    for (let v = want; v > shown; v--) if (affordable(i, v)) return v;
+    // Nothing was grantable. Leave the stored request where it was rather than adopting the number
+    // on screen. On a row a linked minimum is holding up, the request can sit forty points under
+    // the display, and returning the display committed every one of those points: the screen did
+    // not move, so there was no feedback, and the build stayed inflated once the linked attribute
+    // came back down. Same failure the minus button had, from the other side.
+    return Math.min(state.want[i], want);
   }
   function setWant(i, v) {
     const n = Math.round(Number(v));
@@ -224,17 +230,27 @@
     state.want[i] = want;
     recompute();
   }
+  // What a stepper press starts counting from. A link can push the two apart in either direction:
+  // a linked MINIMUM holds the display above the request, a linked CAP holds it below. Taking the
+  // lower of the pair for a decrement and the higher for an increment is what keeps a press moving
+  // the request only in the direction pressed.
+  //
+  // Both of the wrong choices here were real bugs. Stepping down from the display on a
+  // linked-minimum row wrote a request of 33 under a display of 34: nothing moved on screen, so
+  // there was no feedback, and the build had quietly gained eight points that resurfaced as spent
+  // budget once the linked attribute came down. Stepping up from the display on a linked-cap row
+  // did the mirror image, rewriting a standing request of 99 down to 96 because 95 was showing.
+  function stepFrom(i, delta) {
+    return delta < 0 ? Math.min(state.values[i], state.want[i]) : Math.max(state.values[i], state.want[i]);
+  }
+  // Whether a press can move anything at all. A button that cannot is disabled rather than left
+  // looking live: on random builds the minus was dead on about two rows in five.
+  function stepMoves(i, delta) {
+    const from = stepFrom(i, delta);
+    return clamp(from + delta, FLOOR, ceilingFor(i)) !== from;
+  }
   function step(i, delta) {
-    // Raising steps from the value on screen, so the button always moves the number the user can
-    // see even when a linked minimum has pushed it above what they asked for.
-    //
-    // Lowering cannot do that. On an attribute a linked minimum is holding up, the screen shows
-    // 34 while the request is 25, and stepping down from 34 would write a request of 33: the
-    // display would not move, the user would get no feedback at all, and the build would have
-    // quietly gained eight points that resurface later as spent budget once the linked attribute
-    // comes back down. So a decrement steps from whichever is lower, the request or the display,
-    // and can only ever reduce the request.
-    const from = delta < 0 ? Math.min(state.values[i], state.want[i]) : state.values[i];
+    const from = stepFrom(i, delta);
     const next = clamp(from + delta, FLOOR, ceilingFor(i));
     if (next !== from) setWant(i, next);
   }
@@ -259,8 +275,15 @@
       hold = setTimeout(() => { repeat = setInterval(fire, 70); }, 400);
     });
     ["pointerup", "pointercancel", "pointerleave", "blur"].forEach(ev => btn.addEventListener(ev, stop));
-    btn.addEventListener("keydown", e => {
-      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); step(i, delta); }
+    // Everything that is not a pointer press arrives here. e.detail is the click count, and it is 0
+    // exactly when nothing pointed at the button: keyboard Enter and Space on a native button,
+    // screen-reader browse-mode activation, and voice control ("click Raise Close Shot"). Those
+    // paths used to reach nothing at all, because pointerdown was the only listener, which left the
+    // primary control of this page unusable on them. A real mouse or touch click reports detail 1
+    // and has already stepped on pointerdown, so it is ignored here rather than counted twice.
+    btn.addEventListener("click", e => {
+      if (btn.disabled || e.detail !== 0) return;
+      step(i, delta);
     });
   }
 
@@ -297,8 +320,8 @@
       // a full search, since all we need to know here is whether the next point is affordable.
       const atCap = v >= cap;
       const atBudget = !atCap && state.lockBudget && !affordable(i, v + 1);
-      el.up.disabled = atCap || atBudget;
-      el.down.disabled = v <= 25;
+      el.up.disabled = atCap || atBudget || !stepMoves(i, +1);
+      el.down.disabled = !stepMoves(i, -1);
       el.row.classList.toggle("atcap", atCap);
       el.row.classList.toggle("atbudget", atBudget);
       if (!atCap && !atBudget) roomLeft = true;
@@ -321,7 +344,16 @@
     }
     state.roomLeft = roomLeft;
     DISCS.forEach((d, di) => {
-      const totalPossible = ladders ? d.idx.reduce((s, i) => s + ((ladders[i] && ladders[i].d !== null) ? ladders[i].t.length : 0), 0) : 0;
+      // Count only the thresholds this body can actually reach. The tick marks under each slider
+      // already stop at the cap, so counting every threshold in the ladder put a denominator on the
+      // panel that disagreed with the marks right below it, and promised tokens no build at this
+      // height could ever collect.
+      const totalPossible = ladders ? d.idx.reduce((s, i) => {
+        const lad = ladders[i];
+        if (!lad || lad.d === null) return s;
+        const cap = Math.min(99, caps[i]);
+        return s + lad.t.filter(t => t <= cap).length;
+      }, 0) : 0;
       const have = tok.known ? tok.perDisc[di] : null;
       const tokEl = document.querySelector(`[data-tok="${di}"]`), txt = document.querySelector(`[data-disc-tokens="${di}"]`);
       if (tok.known) {
@@ -406,6 +438,28 @@
   }
 
   // ---------- side tabs ----------
+  // Every side tab rebuilds its whole panel with innerHTML, which throws away whatever had focus.
+  // With a mouse that is invisible. With a keyboard it is not: tick "only badges this build
+  // qualifies for" and focus lands back on <body>, so the next Tab restarts from the top of the
+  // page. The animation search box carried a bespoke restore for exactly this. This is that restore,
+  // generalised, so every panel keeps the caret and the focus ring where they were.
+  function setPanel(el, html) {
+    const a = document.activeElement;
+    const inside = a && a.id && el && typeof el.contains === "function" && el.contains(a);
+    const id = inside ? a.id : null;
+    let caret = null;
+    // selectionStart throws on a number input in some browsers, so it never gets to be a hard error.
+    if (id) { try { caret = a.selectionStart; } catch (e) { caret = null; } }
+    el.innerHTML = html;
+    if (!id || typeof document.getElementById !== "function") return;
+    const back = document.getElementById(id);
+    if (!back || back === document.activeElement || typeof back.focus !== "function") return;
+    try {
+      back.focus({ preventScroll: true });
+      if (caret !== null && typeof back.setSelectionRange === "function") back.setSelectionRange(caret, caret);
+    } catch (e) { /* an element that will not take focus is not worth throwing over */ }
+  }
+
   function renderTab() {
     const t = state.tab;
     document.querySelectorAll("#tabs button").forEach(b => {
@@ -456,7 +510,7 @@
     const ineligible = rows.filter(r => !r.eligible).map(r => r.b.name);
     if (ineligible.length) html += `<p class="note">Not available at ${ft(h)}: ${ineligible.join(", ")}.</p>`;
     html += `<p class="note">Legend tier can't be bought with tokens in 2K27. It comes from the +1 / +2 Synergy boosts on top of Hall of Fame. Token costs are NBA2KLab's current table and may shift with patches.</p>`;
-    el.innerHTML = html;
+    setPanel(el, html);
     $("badgeOnly").addEventListener("change", e => { state.badgeOnly = e.target.checked; renderBadges(); });
   }
 
@@ -480,7 +534,7 @@
       The ${multi} takeovers with more than one requirement need <b>all</b> of them, not one or the other. Requirements come from
       the table NBA2KLab ships with its takeover page. Hydration Hero carries no attribute requirement there, though some other
       write-ups say it unlocks through Takeover Progression rather than at build time.</p>`;
-    el.innerHTML = html;
+    setPanel(el, html);
   }
 
   function animMeets(a) {
@@ -521,17 +575,10 @@
       whichever of your Mid-Range and Three-Point is higher, since the base carries one shooting rating rather than a
       named attribute. NBA2KLab's own caveat applies: a finished jump shot is a base plus an upper release, and the
       release you pair with it changes the requirement.</p>`;
-    // Re-rendering replaces the search box itself, so focus and caret are restored afterwards.
-    // Without this the field drops focus after every keystroke and becomes unusable.
-    const active = document.activeElement;
-    const keepFocus = active && active.id === "animSearch";
-    const caret = keepFocus ? active.selectionStart : null;
-    el.innerHTML = html;
+    // Re-rendering replaces the search box itself. setPanel is what puts focus and the caret back,
+    // which is what keeps the field usable while you are typing into it.
+    setPanel(el, html);
     const search = $("animSearch");
-    if (keepFocus && search) {
-      search.focus();
-      try { search.setSelectionRange(caret, caret); } catch (e) { /* not all inputs support it */ }
-    }
     search.addEventListener("input", e => { state.animSearch = e.target.value; renderAnims(); });
     $("animOnly").addEventListener("change", e => { state.animOnly = e.target.checked; renderAnims(); });
     el.querySelectorAll("button.agtoggle").forEach(h => h.addEventListener("click", () => { const g = h.dataset.group; state.animOpen[g] = !(state.animOpen[g] ?? !!q); renderAnims(); }));
@@ -571,6 +618,31 @@
     for (let k = 0; k < n; k++) if (lad.gains[k] > 0) count++;
     return count;
   }
+  // How many player types actually tie, and which. The old copy asserted all fifteen every time,
+  // which is only true on a build where every attribute is level. On a real blueprint it is usually
+  // two, and being told fifteen is both wrong and useless: with two named, you can see what they
+  // disagree about.
+  function tiedList() {
+    const t = (state.ovr && state.ovr.tiedWith) || [];
+    return t.length ? t : [state.ovr ? state.ovr.type : 0];
+  }
+  function tiedNames() {
+    const t = tiedList();
+    if (t.length >= 15) return "all 15 player types";
+    const names = t.map(x => MODEL.typeName(x));
+    return names.length === 1 ? names[0]
+      : names.slice(0, -1).join(", ") + " and " + names[names.length - 1];
+  }
+  function tieText() {
+    const t = tiedList();
+    if (t.length >= 15) {
+      return "on a build where every attribute is level all 15 score the same, so there is no way to "
+        + "tell which one you would get. Vary the attributes and this resolves.";
+    }
+    return `${tiedNames()} score within a hundredth of a point here, so the game could assign `
+      + `either and the ladders below would change with it. Moving any attribute the two value `
+      + `differently, by as little as a point, settles it.`;
+  }
   function renderCapBreakers() {
     const el = $("tab-capbreakers");
     const v = state.values, caps = state.caps;
@@ -584,20 +656,22 @@
       <div><div class="v num">${CB_TOTAL_NOW}<small style="font-size:14px;color:var(--muted)"> / ${CB_TOTAL_YEAR}</small></div><div class="l">Earnable now / this year</div></div>
     </div>
     <p class="note" style="margin:0 0 6px">Cap Breakers unlock once a build reaches 99 overall. Each chip is one breaker on that attribute, up to five, showing the points it adds from where the attribute sits now. Click a chip to plan that many. Gains stop at the body cap and at 99, and never earn badge tokens.</p>` +
-      (state.ovr.tied ? `<p class="note" style="margin:0 0 6px;color:var(--warn)"><b>These ladders are a guess on this build.</b> The gain depends on which of the 15 player types the game assigns, and on a build where every attribute is level all 15 score the same, so there is no way to tell which one you would get. Vary the attributes and this resolves.</p>` : "");
+      (state.ovr.tied ? `<p class="note" style="margin:0 0 6px;color:var(--warn)"><b>These ladders are a guess on this build.</b> The gain depends on which of the 15 player types the game assigns, and ${tieText()}</p>` : "");
     if (state.currentOvr !== null && state.currentOvr < 99) {
       html += `<p class="note" style="color:var(--warn-ink)"><b>Not unlocked yet.</b> Your MyPLAYER is ${state.currentOvr} overall and Cap Breakers open at 99, ${99 - state.currentOvr} away. Everything below is what you would get once you are there.</p>`;
     }
     if (!haveRule) {
-      html += `<p class="note">The gain rule is still being fitted from engine captures. Ladders will appear here once it lands.</p>`;
-      el.innerHTML = html; return;
+      html += `<p class="note">The cap-breaker data file did not load, so there are no ladders to show. Reload the page; if it persists, the deploy is incomplete.</p>`;
+      setPanel(el, html); return;
     }
     DISCS.forEach((d) => {
       html += `<div class="bcat" style="--c:${d.color};--ci:${d.ink}"><h3>${d.key}</h3>`;
       d.idx.forEach(i => {
         const res = ladderFor(i) || { gains: [0, 0, 0, 0, 0], src: "no data" };
         const lad = res.gains;
-        const n = state.cbPlan[i];
+        // The header counts only breakers that actually move the attribute, so the row has to as
+        // well, or the same plan reads as two different numbers on the same screen.
+        const n = state.cbPlan[i], prod = productivePlan(i);
         let cur = v[i]; const chips = [];
         for (let k = 0; k < 5; k++) {
           const g = lad[k]; const cls = ["chip"];
@@ -607,7 +681,7 @@
           cur += Math.max(0, g);
         }
         const maxed = v[i] >= caps[i];
-        html += `<div class="cbrow ${maxed ? "maxed" : ""}"><div class="cn">${SHORT[i]}<small>now ${v[i]} · cap ${caps[i]}</small></div><div class="chips">${chips.join("")}</div><div class="after"><b>${after[i]}</b><small>${n ? `after ${n} breaker${n > 1 ? "s" : ""}` : (maxed ? "at cap" : "no breakers")}</small></div></div>`;
+        html += `<div class="cbrow ${maxed ? "maxed" : ""}"><div class="cn">${SHORT[i]}<small>now ${v[i]} · cap ${caps[i]}</small></div><div class="chips">${chips.join("")}</div><div class="after"><b>${after[i]}</b><small>${prod ? `after ${prod} breaker${prod > 1 ? "s" : ""}` : (maxed ? "at cap" : "no breakers")}</small></div></div>`;
       });
       html += `</div>`;
     });
@@ -633,7 +707,7 @@
       weakest move the most, which is how 2K describes it. Against 30,932 ladders captured from
       the engine this is exact 99.96% of the time. Confirm a final build in the NBA 2K HQ app
       before spending one: at 99 overall the in-game Builder Glossary shows the real numbers.</p>`;
-    el.innerHTML = html;
+    setPanel(el, html);
     el.querySelectorAll("[data-cb]").forEach(chip => {
       const toggle = () => {
         const i = +chip.dataset.cb, k = +chip.dataset.k;
@@ -663,7 +737,7 @@
         <div class="bp"><div><b>${b.name}</b> <span class="d">${ft(b.h)} · ${b.w} lb · ${ft(b.ws)} wingspan · best at ${b.skill}</span><div class="d">${b.desc}</div><div class="d">Compares to ${b.comps.join(", ")}</div></div>
         <button class="btn" data-bp="${b.id}">Load</button></div>`).join("") + `</div>`;
     });
-    el.innerHTML = html;
+    setPanel(el, html);
     el.querySelectorAll("[data-bp]").forEach(btn => btn.addEventListener("click", () => loadBlueprint(btn.dataset.bp)));
   }
 
@@ -691,8 +765,8 @@
     <dl class="kv">
       <dt>Body</dt><dd>${POS_NAME[state.pos]} · ${ft(state.h)} · ${state.w} lb · ${ft(state.ws)} wingspan</dd>
       <dt>Current OVR</dt><dd>${state.currentOvr === null ? "not set" : `${state.currentOvr}, ${Math.max(0, state.ovr.display - state.currentOvr)} short of this build and ${Math.max(0, 99 - state.currentOvr)} from Cap Breakers`}</dd>
-      <dt>Archetype</dt><dd title="The game scores this build under all 15 player types and keeps the highest, and so does this page. On builds where the attributes actually vary it matches the engine 99.9% of the time.">${state.ovr.tied ? `<span style="color:var(--warn)">too close to call</span> <span style="color:var(--muted)">(all 15 score the same here, so the game could pick any of them, and the Cap Breakers below would change with it)</span>` : `${MODEL.typeName(state.ovr.type)} <span style="color:var(--muted)">(highest scoring of the 15)</span>`}</dd>
-      <dt>Raw potential</dt><dd class="num">about ${state.ovr.raw.toFixed(1)} (the game rounds a finished build up to 99 once nothing can be raised)</dd>
+      <dt>Archetype</dt><dd title="The game scores this build under all 15 player types and keeps the highest, and so does this page. On builds where the attributes actually vary it matches the engine 99.9% of the time.">${state.ovr.tied ? `<span style="color:var(--warn)">too close to call</span> <span style="color:var(--muted)">(${tiedNames()} score the same here, so the game could pick any of them, and the Cap Breakers below would change with it)</span>` : `${MODEL.typeName(state.ovr.type)} <span style="color:var(--muted)">(highest scoring of the 15)</span>`}</dd>
+      <dt>Raw potential</dt><dd class="num">about ${(Math.floor(state.ovr.raw * 10) / 10).toFixed(1)} (the game rounds a finished build up to 99 once nothing can be raised)</dd>
       <dt>Tokens</dt><dd>${tok.known ? DISCS.map((d, i) => `${d.key} ${tok.perDisc[i]}`).join(" · ") : "no ladder data for this height yet"}</dd>
     </dl>
     <h3 style="margin:12px 0 4px;font-size:16px">Attribute sheet</h3>
@@ -702,8 +776,10 @@
     <textarea readonly id="buildCode" aria-label="Build share code">${code}</textarea>
     <div class="ctl" style="margin-top:6px"><button class="btn" id="copyCode">Copy code</button><input type="text" id="pasteCode" aria-label="Paste a build code" placeholder="Paste a build code" style="flex:1;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:6px 8px"><button class="btn" id="loadCode">Load</button></div>
     <h3 style="margin:14px 0 4px;font-size:16px">How the numbers are built</h3>
+    <p class="note" style="margin:0">Caps are the game engine's values for this exact height, weight and wingspan, from NBA2KLab's caps data and spot-checked against Locker Codes on a dozen bodies across ten heights. Linked minimums and badge-token ladders come from Locker Codes engine captures. ${MODEL.notes}</p>
+    ${MODEL.linkedMeasured && !MODEL.linkedMeasured(state.h) ? `<p class="note" style="margin:6px 0 0">One caveat for ${ft(state.h)}: the linked minimums shown here were captured at ${ft(MODEL.linkedSource(state.h))}, the nearest height that was. Nine of the twenty heights were captured directly. The rules move slowly with height, so this is usually right, but it is read across rather than measured at yours.</p>` : ""}
     <p class="note" style="margin:6px 0 0"><b>Where these numbers come from.</b> The overall rating, the archetype and the Cap Breaker gains use 2K's own tuning tables, extracted from the NBA 2K HQ companion app and published by souledxxout. Against 1,553 builds captured from a third-party builder they reproduce the reported overall to within a hundredth of a point on every one, which is why they are trusted here. The caps, badge tiers and token budgets around them come from NBA2KLab and Locker Codes, and Locker Codes says of its own builder that it is \"still being tested, and its numbers have not yet been verified for accuracy\". None of it has been checked against the retail game. Once a build reaches 99 overall the in-game Builder Glossary, and the NBA 2K HQ app, show the real Cap Breaker gain per attribute: that is first-party and worth checking before you spend.</p>`;
-    el.innerHTML = html;
+    setPanel(el, html);
     $("copyCode").addEventListener("click", () => { navigator.clipboard && navigator.clipboard.writeText(code); $("copyCode").textContent = "Copied"; setTimeout(() => $("copyCode").textContent = "Copy code", 1200); });
     $("loadCode").addEventListener("click", () => { if (decodeBuild($("pasteCode").value.trim())) { syncBodyForm(); recompute(); } });
   }
@@ -747,11 +823,21 @@
       const raw = e.target.value.trim();
       const n = Math.round(Number(raw));
       state.currentOvr = raw === "" || !Number.isFinite(n) ? null : clamp(n, 25, 99);
+      try {
+        if (state.currentOvr === null) localStorage.removeItem("buildlab.currentOvr");
+        else localStorage.setItem("buildlab.currentOvr", String(state.currentOvr));
+      } catch (e2) { /* private window, or site data blocked: it just will not persist */ }
       recompute();
     });
     // The lock is a preference about how you work, not a property of the build, so it is remembered
     // per browser and deliberately kept out of the share code: a link should describe a build, not
     // reach into how the person opening it likes to edit.
+    // Same reasoning for where the player is now: remembered per browser, never in the code.
+    try {
+      const cov = localStorage.getItem("buildlab.currentOvr");
+      const covN = cov === null ? NaN : Math.round(Number(cov));
+      if (Number.isFinite(covN)) state.currentOvr = clamp(covN, 25, 99);
+    } catch (e) { /* nothing saved, or storage is unavailable */ }
     const lock = $("lockBudget");
     try {
       const saved = localStorage.getItem("buildlab.lockBudget");
@@ -792,9 +878,11 @@
   const A36 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_!*'()~.:;=+@$,";
   function encodeBuild() {
     const attrs = state.want.map(v => A36[v - 25]).join("");
-    // The current-OVR suffix is optional, so codes shared before it existed still load.
-    return `${state.pos}-${state.h}-${state.w}-${state.ws}-${attrs}` +
-      (state.currentOvr === null ? "" : `-c${state.currentOvr}`);
+    // Where your MyPLAYER is right now is a fact about you, not about the build, so it stays out of
+    // the code for the same reason the budget lock does. It used to ride along as a -cNN suffix,
+    // which meant handing someone a link told them, in the second person, how far along the sharer
+    // was. Old codes carrying the suffix still parse, and the number in them is now ignored.
+    return `${state.pos}-${state.h}-${state.w}-${state.ws}-${attrs}`;
   }
   function decodeBuild(code) {
     // The attribute block is exactly 21 characters, so the optional suffix can never be mistaken
@@ -805,7 +893,11 @@
     if (!BODIES[pos] || !BODIES[pos][String(h)]) return false;
     const want = Array.from(m[5], ch => { const k = A36.indexOf(ch); return k < 0 ? 25 : 25 + k; });
     state.pos = pos; state.h = h; state.w = w; state.ws = ws; state.want = want;
-    state.currentOvr = m[6] === undefined ? null : clamp(+m[6], 25, 99);
+    // A cap-breaker plan is about one specific build: same chip, different gain, different ladder
+    // length. Loading a code used to carry the old plan onto the new build, which inflated both
+    // "Breakers planned" and "Attribute points gained" for a plan the user never made here. The
+    // blueprint loader already cleared it; this is the other way in.
+    state.cbPlan = Array(21).fill(0);
     return true;
   }
   let hashTimer = null;
