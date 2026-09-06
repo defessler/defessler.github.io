@@ -78,8 +78,13 @@ a{color:var(--accent)}
    than height so nothing can ever be clipped, and tools/check_layout.js asserts it never grows past
    this at any width from 320px up. Where the player currently is sits in its own box below, because
    that appears on a deliberate action rather than while editing. */
-.ovr .hint{line-height:1.35;min-height:74px}
-.ovr .hint-now{min-height:0;margin-top:2px}
+.ovr .hint:not(.hint-now){line-height:1.35;min-height:74px}
+.ovr .hint{line-height:1.35}
+/* Spans both columns, on its own row. Auto-placement dropped it into column 1, the narrow one
+   sized to the big overall number, so the moment anyone filled in their current OVR its text
+   blew that column out to 292px, the big number and the hint swapped places, and the sticky
+   header more than doubled in height. Adding a fourth child to a two-column grid is not free. */
+.ovr .hint-now{min-height:0;margin-top:2px;grid-column:1/-1}
 .ovr .big{font-family:var(--display);font-size:44px;font-weight:700;line-height:1;grid-row:span 2}
 .ovr .big small{font-size:16px;color:var(--muted);font-weight:600;margin-left:4px}
 .ovr .bar{height:10px;border-radius:5px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden;width:100%;max-width:240px;position:relative}
@@ -188,7 +193,10 @@ a{color:var(--accent)}
   /* Three lines, not two. At 320px the badge and token line wrapped past 32px on most rows and was
      clipped outright, and the documented recovery was a title tooltip, which a touchscreen cannot
      open. Fixed height is still the point: the box must not change size as the text changes. */
-  .attr .meta{grid-column:1/3;height:48px;white-space:normal;align-items:flex-start}
+  /* Four lines. Three was still one short: a linked note that wraps ("raised to 93 by a linked
+     attribute") plus a long badge name ("Hall of Fame Handles for Days") overflows 48px on
+     about one row in a thousand at 320px, and an overflow here is text clipped outright. */
+  .attr .meta{grid-column:1/3;height:64px;white-space:normal;align-items:flex-start}
   /* The badge-token dot strip needs 273px and pinned the whole column to a 434px minimum, so
      every phone scrolled sideways and the steppers sat off-screen. The count next to it says
      the same thing in words, so the dots go rather than the layout. */
@@ -196,7 +204,10 @@ a{color:var(--accent)}
   .disc .panel-h{padding:8px 12px}
   /* The same sentences wrap to more lines on a narrow screen, so the reserved height has to
      grow with the breakpoint. Measured at 320px, where the tallest state is 85.6px. */
-  .ovr .hint{min-height:88px}
+  /* Measured at 320px, where the longest sentence ("budget spent ... nothing left to buy")
+     reaches 101.8px. It grew when .hint-now started spanning both columns, which narrowed the
+     column this box sits in. tools/check_layout.js is what catches it if it grows again. */
+  .ovr .hint:not(.hint-now){min-height:104px}
   .wrap{padding:12px 10px 40px}
 }
 

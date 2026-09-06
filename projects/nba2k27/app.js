@@ -157,8 +157,13 @@
           capline: row.querySelector("[data-capline]"), next: row.querySelector("[data-next]"),
           up: row.querySelector("[data-up]"), down: row.querySelector("[data-down]")
         };
-        attrEls[i].range.addEventListener("input", e => setWant(i, +e.target.value));
-        attrEls[i].num.addEventListener("change", e => setWant(i, +e.target.value));
+        // Both of these carry the DISPLAY, not the request. A linked cap or a body change can leave
+        // the request far above what the row shows, and an event that lands on the value already
+        // shown is asking for nothing: writing it back destroyed the carried request silently, the
+        // same loss the "+" button used to cause. Only a value that actually differs from the
+        // display is a request to change anything.
+        attrEls[i].range.addEventListener("input", e => setWantFromControl(i, e.target.value));
+        attrEls[i].num.addEventListener("change", e => setWantFromControl(i, e.target.value));
         attrEls[i].num.addEventListener("keydown", e => {
           if (e.key === "ArrowUp") { e.preventDefault(); step(i, +1); }
           if (e.key === "ArrowDown") { e.preventDefault(); step(i, -1); }
@@ -264,6 +269,11 @@
   function step(i, delta) {
     const next = stepTarget(i, delta);
     if (next !== null) setWant(i, next);
+  }
+  // What the slider and the number field go through. Named so the audit can drive the same path the
+  // page does rather than re-implementing the guard and testing its own copy.
+  function setWantFromControl(i, v) {
+    if (Number(v) !== state.values[i]) setWant(i, Number(v));
   }
   // Click steps once; press and hold repeats. Pointer capture keeps the repeat tied to this button
   // so releasing anywhere, or the button going disabled at the cap, always stops it.
@@ -467,6 +477,14 @@
     const now = $("ovrNow");
     if (now) {
       if (state.currentOvr === null) now.innerHTML = "";
+      else if (over) {
+        // The displayed overall is clamped at 99, so on an over-budget build "how far from this
+        // build" reads as zero and the box announced you were already at its ceiling, directly
+        // under a header saying the build is 14 points past the limit. There is no distance to a
+        // build that cannot exist.
+        now.innerHTML = `<span class="pill">Now ${state.currentOvr}</span> this build is over the ` +
+          `99 ceiling, so there is nothing to be short of yet. Bring it under first.`;
+      }
       else {
         const toBuild = Math.max(0, ovr.display - state.currentOvr);
         const toNinety = Math.max(0, 99 - state.currentOvr);
@@ -675,6 +693,20 @@
     for (let k = 0; k < n; k++) if (lad.gains[k] > 0) count++;
     return count;
   }
+  // The shipped name for a player type carries a parenthetical listing the three attributes it
+  // weights most: "Profile 9 (Three-Point, Ball Handle, Speed With Ball weighted)". That list is one
+  // fixed string per type, but the weight table has a separate row for every height, and the top
+  // three change with it. Scored against the table, the shipped parenthetical names the wrong three
+  // at 203 of the 300 type/height pairs. So the profile number comes from the data and the three
+  // attributes are read off the row that actually applies to this build.
+  function typeLabel(t, h) {
+    const base = MODEL.typeName(t);
+    const stem = base.replace(/\s*\(.*\)\s*$/, "");
+    const w = MODEL.weightRow ? MODEL.weightRow(t, h) : null;
+    if (!w) return base;
+    const top = w.map((v, i) => [v, i]).sort((a, b) => b[0] - a[0]).slice(0, 3).map(([, i]) => ATTRS[i]);
+    return `${stem} (${top.join(", ")} weighted)`;
+  }
   // How many player types actually tie, and which. The old copy asserted all fifteen every time,
   // which is only true on a build where every attribute is level. On a real blueprint it is usually
   // two, and being told fifteen is both wrong and useless: with two named, you can see what they
@@ -700,7 +732,7 @@
   function tiedNames() {
     const t = tiedList();
     if (t.length >= 15) return "all 15 player types";
-    const names = t.map(x => MODEL.typeName(x));
+    const names = t.map(x => typeLabel(x, state.h));
     return names.length === 1 ? names[0]
       : names.slice(0, -1).join(", ") + " and " + names[names.length - 1];
   }
@@ -838,7 +870,7 @@
     <dl class="kv">
       <dt>Body</dt><dd>${POS_NAME[state.pos]} · ${ft(state.h)} · ${state.w} lb · ${ft(state.ws)} wingspan</dd>
       <dt>Current OVR</dt><dd>${state.currentOvr === null ? "not set" : `${state.currentOvr}, ${Math.max(0, state.ovr.display - state.currentOvr)} short of this build and ${Math.max(0, 99 - state.currentOvr)} from Cap Breakers`}</dd>
-      <dt>Archetype</dt><dd title="The game scores this build under all 15 player types and keeps the highest, and so does this page. On builds where the attributes actually vary it matches the engine 99.9% of the time.">${state.ovr.tied && tieMatters() ? `<span style="color:var(--warn)">too close to call</span> <span style="color:var(--muted)">(${tiedNames()} score the same here, so the game could pick any of them, and the ladders on the Cap Breakers tab would change with it)</span>` : `${MODEL.typeName(state.ovr.type)} <span style="color:var(--muted)">(highest scoring of the 15)</span>`}</dd>
+      <dt>Archetype</dt><dd title="The game scores this build under all 15 player types and keeps the highest, and so does this page. On builds where the attributes actually vary it matches the engine 99.9% of the time.">${state.ovr.tied && tieMatters() ? `<span style="color:var(--warn)">too close to call</span> <span style="color:var(--muted)">(${tiedNames()} score the same here, so the game could pick any of them, and the ladders on the Cap Breakers tab would change with it)</span>` : `${typeLabel(state.ovr.type, state.h)} <span style="color:var(--muted)">(highest scoring of the 15)</span>`}</dd>
       <dt>Raw potential</dt><dd class="num">about ${floor1(state.ovr.raw)} (the game rounds a finished build up to 99 once nothing can be raised)</dd>
       <dt>Tokens</dt><dd>${tok.known ? DISCS.map((d, i) => `${d.key} ${tok.perDisc[i]}`).join(" · ") : "no ladder data for this height yet"}</dd>
     </dl>
@@ -850,7 +882,7 @@
     <div class="ctl" style="margin-top:6px"><button class="btn" id="copyCode">Copy code</button><input type="text" id="pasteCode" aria-label="Paste a build code" placeholder="Paste a build code" style="flex:1;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:6px 8px"><button class="btn" id="loadCode">Load</button></div>
     <h3 style="margin:14px 0 4px;font-size:16px">How the numbers are built</h3>
     <p class="note" style="margin:0">Caps are the game engine's values for this exact height, weight and wingspan, from NBA2KLab's caps data and spot-checked against Locker Codes on a dozen bodies across ten heights. Linked minimums and badge-token ladders come from Locker Codes engine captures. ${MODEL.notes}</p>
-    ${MODEL.linkedMeasured && !MODEL.linkedMeasured(state.h) ? `<p class="note" style="margin:6px 0 0;color:var(--warn-ink)"><b>Linked minimums at ${ft(state.h)} are borrowed.</b> They were captured at ${ft(MODEL.linkedSource(state.h))}, the nearest of the nine heights that were. These rules change fast with height rather than slowly: using the next captured height in the other direction instead moves the finished build on nearly every attempt, by as much as 35 attribute points and 5.7 overall across the eleven borrowed heights. Which way the real rules fall at ${ft(state.h)} is unknown, because ${ft(state.h)} was never captured. Every other number on this page is unaffected; treat the values a link forces up here as approximate.</p>` : ""}
+    ${MODEL.linkedMeasured && !MODEL.linkedMeasured(state.h) ? `<p class="note" style="margin:6px 0 0;color:var(--warn-ink)"><b>Linked minimums at ${ft(state.h)} are borrowed.</b> They were captured at ${ft(MODEL.linkedSource(state.h))}, the nearest of the nine heights that were. These rules change fast with height rather than slowly: using the next captured height in the other direction instead moves the finished build on nearly every attempt, by as much as 35 attribute points and 5.6 overall across the eleven borrowed heights. Which way the real rules fall at ${ft(state.h)} is unknown, because ${ft(state.h)} was never captured. Every other number on this page is unaffected; treat the values a link forces up here as approximate.</p>` : ""}
     <p class="note" style="margin:6px 0 0"><b>Where these numbers come from.</b> The overall rating, the archetype and the Cap Breaker gains use 2K's own tuning tables, extracted from the NBA 2K HQ companion app and published by souledxxout. Against 1,553 builds captured from a third-party builder they reproduce the reported overall to within a hundredth of a point on every one, which is why they are trusted here. The caps, badge tiers and token budgets around them come from NBA2KLab and Locker Codes, and Locker Codes says of its own builder that it is \"still being tested, and its numbers have not yet been verified for accuracy\". None of it has been checked against the retail game. Once a build reaches 99 overall the in-game Builder Glossary, and the NBA 2K HQ app, show the real Cap Breaker gain per attribute: that is first-party and worth checking before you spend.</p>`;
     setPanel(el, html);
     $("copyCode").addEventListener("click", () => { navigator.clipboard && navigator.clipboard.writeText(code); $("copyCode").textContent = "Copied"; setTimeout(() => $("copyCode").textContent = "Copy code", 1200); });
@@ -1026,7 +1058,7 @@
   // Read-only surface for testing; the page itself never touches it.
   window.BuildLab = {
     state, capsFor, normalize, tokenCounts, badgeTier, plannedValues, ladderFor, fallbackF,
-    encodeBuild, decodeBuild, recompute, setWant, step,
+    encodeBuild, decodeBuild, recompute, setWant, step, setWantFromControl, typeLabel,
     ATTRS, DISCS, TIER_NAMES,
   };
 })();
