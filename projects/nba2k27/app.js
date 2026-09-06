@@ -225,9 +225,16 @@
     recompute();
   }
   function step(i, delta) {
-    // Step from the value on screen, not from the stored request, so the buttons always move the
-    // number the user can see even when a linked minimum has raised it above what they asked for.
-    const from = state.values[i];
+    // Raising steps from the value on screen, so the button always moves the number the user can
+    // see even when a linked minimum has pushed it above what they asked for.
+    //
+    // Lowering cannot do that. On an attribute a linked minimum is holding up, the screen shows
+    // 34 while the request is 25, and stepping down from 34 would write a request of 33: the
+    // display would not move, the user would get no feedback at all, and the build would have
+    // quietly gained eight points that resurface later as spent budget once the linked attribute
+    // comes back down. So a decrement steps from whichever is lower, the request or the display,
+    // and can only ever reduce the request.
+    const from = delta < 0 ? Math.min(state.values[i], state.want[i]) : state.values[i];
     const next = clamp(from + delta, FLOOR, ceilingFor(i));
     if (next !== from) setWant(i, next);
   }
@@ -576,7 +583,8 @@
       <div><div class="v num">+${gained}</div><div class="l">Attribute points gained</div></div>
       <div><div class="v num">${CB_TOTAL_NOW}<small style="font-size:14px;color:var(--muted)"> / ${CB_TOTAL_YEAR}</small></div><div class="l">Earnable now / this year</div></div>
     </div>
-    <p class="note" style="margin:0 0 6px">Cap Breakers unlock once a build reaches 99 overall. Each chip is one breaker on that attribute, up to five, showing the points it adds from where the attribute sits now. Click a chip to plan that many. Gains stop at the body cap and at 99, and never earn badge tokens.</p>`;
+    <p class="note" style="margin:0 0 6px">Cap Breakers unlock once a build reaches 99 overall. Each chip is one breaker on that attribute, up to five, showing the points it adds from where the attribute sits now. Click a chip to plan that many. Gains stop at the body cap and at 99, and never earn badge tokens.</p>` +
+      (state.ovr.tied ? `<p class="note" style="margin:0 0 6px;color:var(--warn)"><b>These ladders are a guess on this build.</b> The gain depends on which of the 15 player types the game assigns, and on a build where every attribute is level all 15 score the same, so there is no way to tell which one you would get. Vary the attributes and this resolves.</p>` : "");
     if (state.currentOvr !== null && state.currentOvr < 99) {
       html += `<p class="note" style="color:var(--warn-ink)"><b>Not unlocked yet.</b> Your MyPLAYER is ${state.currentOvr} overall and Cap Breakers open at 99, ${99 - state.currentOvr} away. Everything below is what you would get once you are there.</p>`;
     }
@@ -682,7 +690,7 @@
     <dl class="kv">
       <dt>Body</dt><dd>${POS_NAME[state.pos]} · ${ft(state.h)} · ${state.w} lb · ${ft(state.ws)} wingspan</dd>
       <dt>Current OVR</dt><dd>${state.currentOvr === null ? "not set" : `${state.currentOvr}, ${Math.max(0, state.ovr.display - state.currentOvr)} short of this build and ${Math.max(0, 99 - state.currentOvr)} from Cap Breakers`}</dd>
-      <dt>Archetype</dt><dd title="Not a guess. The game scores this build under all 15 player types and keeps the highest, and so does this page. On builds where the attributes actually vary it matches the engine 99.9% of the time; on a completely flat build all 15 tie and the choice is arbitrary.">${MODEL.typeName(state.ovr.type)} <span style="color:var(--muted)">(highest scoring of the 15)</span></dd>
+      <dt>Archetype</dt><dd title="The game scores this build under all 15 player types and keeps the highest, and so does this page. On builds where the attributes actually vary it matches the engine 99.9% of the time.">${state.ovr.tied ? `<span style="color:var(--warn)">too close to call</span> <span style="color:var(--muted)">(all 15 score the same here, so the game could pick any of them, and the Cap Breakers below would change with it)</span>` : `${MODEL.typeName(state.ovr.type)} <span style="color:var(--muted)">(highest scoring of the 15)</span>`}</dd>
       <dt>Raw potential</dt><dd class="num">about ${state.ovr.raw.toFixed(1)} (the game rounds a finished build up to 99 once nothing can be raised)</dd>
       <dt>Tokens</dt><dd>${tok.known ? DISCS.map((d, i) => `${d.key} ${tok.perDisc[i]}`).join(" · ") : "no ladder data for this height yet"}</dd>
     </dl>
@@ -853,7 +861,7 @@
   // Read-only surface for testing; the page itself never touches it.
   window.BuildLab = {
     state, capsFor, normalize, tokenCounts, badgeTier, plannedValues, ladderFor, fallbackF,
-    encodeBuild, decodeBuild, recompute, setWant,
+    encodeBuild, decodeBuild, recompute, setWant, step,
     ATTRS, DISCS, TIER_NAMES,
   };
 })();
