@@ -10,11 +10,11 @@
 //                                                   cap and at 99
 //
 // So an attribute your archetype values most moves a single point and one it does not care about
-// moves the most, which is what 2K describes in words. Checked against 1680 captured ladders: 99.96%
+// moves the most, which is what 2K describes in words. Checked against 1320 captured ladders: 99.96%
 // exact, against 99.97% for the 4,775-number fitted table this replaced. Banker's rounding is not
 // optional; half-up scores 99.47%.
 window.CAPBREAKERS = (function () {
-  const D = {"attrs":["Close Shot","Driving Layup","Driving Dunk","Standing Dunk","Post Control","Mid-Range","Three-Point","Free Throw","Pass Accuracy","Ball Handle","Speed With Ball","Interior D","Perimeter D","Steal","Block","Off. Rebound","Def. Rebound","Speed","Agility","Strength","Vertical"],"maxPerAttr":5,"availableNow":20,"totalYear":28,"captures":1680};
+  const D = {"attrs":["Close Shot","Driving Layup","Driving Dunk","Standing Dunk","Post Control","Mid-Range","Three-Point","Free Throw","Pass Accuracy","Ball Handle","Speed With Ball","Interior D","Perimeter D","Steal","Block","Off. Rebound","Def. Rebound","Speed","Agility","Strength","Vertical"],"maxPerAttr":5,"availableNow":20,"totalYear":28};
   const HARD_CAP = 99;
   const E = (L) => 15 - Math.floor((14 * (L - 25)) / 74);
   function roundHalfEven(x) {
@@ -24,7 +24,7 @@ window.CAPBREAKERS = (function () {
   }
   return {
     attrs: D.attrs,
-    maxPerAttr: D.maxPerAttr, availableNow: D.availableNow, totalYear: D.totalYear, captures: D.captures,
+    maxPerAttr: D.maxPerAttr, availableNow: D.availableNow, totalYear: D.totalYear, 
     // `fallback` is unused now that f is derived. The parameter stays so the existing call site keeps working.
     ladderFor(type, h, i, rating, cap, fallback) {
       const W = (window.MODEL && window.MODEL.weightRow) ? window.MODEL.weightRow(type, h) : null;

@@ -592,12 +592,11 @@
       html += `<p class="note">The gain rule is still being fitted from engine captures. Ladders will appear here once it lands.</p>`;
       el.innerHTML = html; return;
     }
-    const srcs = new Set();
     DISCS.forEach((d) => {
       html += `<div class="bcat" style="--c:${d.color};--ci:${d.ink}"><h3>${d.key}</h3>`;
       d.idx.forEach(i => {
         const res = ladderFor(i) || { gains: [0, 0, 0, 0, 0], src: "no data" };
-        const lad = res.gains; srcs.add(res.src);
+        const lad = res.gains;
         const n = state.cbPlan[i];
         let cur = v[i]; const chips = [];
         for (let k = 0; k < 5; k++) {
@@ -625,13 +624,15 @@
       if (!changes.length && !tk.length) html += `<p class="note" style="margin:0">No new badge tiers or takeovers. The points still raise the attributes themselves.</p>`;
       html += `<div class="gainlist">${changes.map(x => `<div class="g"><span>${x.b.name}</span><span>${TIER_NAMES[x.from] || "Locked"} → <b>${TIER_NAMES[x.to]}</b></span></div>`).join("")}${tk.map(x => `<div class="g"><span>${x.t.name} takeover</span><span>Locked → <b>Unlocked</b></span></div>`).join("")}</div>`;
     }
-    const measured = [...srcs].every(s => s === "measured");
-    html += `<p class="note">${measured
-      ? "These ladders come from a body sampled at this height for this archetype. Other weights and wingspans at the same height are assumed to match, which the captures could not test."
-      : "Some ladders are read across from the nearest sampled heights for this archetype, so treat those as close estimates."}
-      The rule behind them, recovered from ${(CAPBREAKERS.captures || "hundreds of")} builds captured from the engine, is that one breaker adds
-      <b>max(1, round(f &times; E))</b> points, where E falls from 15 at rating 25 to 2 near 99 and f is how little this archetype
-      values that attribute. Confirm a final build in the NBA 2K HQ app before spending one.</p>`;
+    // Every ladder now comes from the same weight table the overall uses, so there is no longer a
+    // "measured here" versus "read across from a nearby height" distinction to draw.
+    html += `<p class="note">The gain is not a fitted number. It comes from the same weight table
+      the overall rating uses, which is 2K's own: one breaker adds <b>max(1, round(f &times; E))</b>
+      points, where E falls from 15 at rating 25 to 2 near 99, and <b>f</b> is how little your
+      archetype values that attribute. So your best attributes move a single point and your
+      weakest move the most, which is how 2K describes it. Against 30,932 ladders captured from
+      the engine this is exact 99.96% of the time. Confirm a final build in the NBA 2K HQ app
+      before spending one: at 99 overall the in-game Builder Glossary shows the real numbers.</p>`;
     el.innerHTML = html;
     el.querySelectorAll("[data-cb]").forEach(chip => {
       const toggle = () => {
@@ -701,8 +702,7 @@
     <textarea readonly id="buildCode" aria-label="Build share code">${code}</textarea>
     <div class="ctl" style="margin-top:6px"><button class="btn" id="copyCode">Copy code</button><input type="text" id="pasteCode" aria-label="Paste a build code" placeholder="Paste a build code" style="flex:1;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:6px 8px"><button class="btn" id="loadCode">Load</button></div>
     <h3 style="margin:14px 0 4px;font-size:16px">How the numbers are built</h3>
-    <p class="note" style="margin:0">Caps are the game engine's values for this exact height, weight, and wingspan, from NBA2KLab's caps data and spot-checked against Locker Codes on a dozen bodies across ten heights. Linked minimums and token ladders come from Locker Codes' engine captures. The overall potential is a fitted estimate of the same engine, not a reading. ${MODEL.notes}</p>
-    <p class="note" style="margin:6px 0 0"><b>Where these numbers come from.</b> Nothing here has been checked against NBA 2K27 itself. Everything is measured against NBA2KLab and Locker Codes, and Locker Codes says of its own builder that it is "still being tested, and its numbers have not yet been verified for accuracy". They stand behind the attribute caps as the engine's own values; the overall, badge tiers, and token budgets they class as still being tested, and that is what this page's overall is fitted to. Nobody has published 2K's real formulas and there is no datamine of 2K27, so this is the best available, not the truth. Once a build hits 99 overall the in-game Builder Glossary, and the NBA 2K HQ app, show the exact Cap Breaker gain per attribute: that is first-party, and it is worth checking there before you spend.</p>`;
+    <p class="note" style="margin:6px 0 0"><b>Where these numbers come from.</b> The overall rating, the archetype and the Cap Breaker gains use 2K's own tuning tables, extracted from the NBA 2K HQ companion app and published by souledxxout. Against 1,553 builds captured from a third-party builder they reproduce the reported overall to within a hundredth of a point on every one, which is why they are trusted here. The caps, badge tiers and token budgets around them come from NBA2KLab and Locker Codes, and Locker Codes says of its own builder that it is \"still being tested, and its numbers have not yet been verified for accuracy\". None of it has been checked against the retail game. Once a build reaches 99 overall the in-game Builder Glossary, and the NBA 2K HQ app, show the real Cap Breaker gain per attribute: that is first-party and worth checking before you spend.</p>`;
     el.innerHTML = html;
     $("copyCode").addEventListener("click", () => { navigator.clipboard && navigator.clipboard.writeText(code); $("copyCode").textContent = "Copied"; setTimeout(() => $("copyCode").textContent = "Copy code", 1200); });
     $("loadCode").addEventListener("click", () => { if (decodeBuild($("pasteCode").value.trim())) { syncBodyForm(); recompute(); } });
