@@ -141,7 +141,7 @@
         const row = document.createElement("div");
         row.className = "attr";
         row.innerHTML = `
-          <div class="name">${ATTRS[i]}<small data-forced="${i}"></small></div>
+          <div class="name">${ATTRS[i]}</div>
           <div class="track"><input type="range" min="25" max="99" step="1" data-range="${i}" aria-label="${ATTRS[i]}"><div class="ticks" data-ticks="${i}"></div><div class="capline" data-capline="${i}"></div></div>
           <div class="stepper">
             <button type="button" class="step" data-down="${i}" aria-label="Lower ${ATTRS[i]}">&minus;</button>
@@ -149,7 +149,7 @@
             <button type="button" class="step" data-up="${i}" aria-label="Raise ${ATTRS[i]}">+</button>
           </div>
           <div class="cap num">cap <b data-cap="${i}">--</b></div>
-          <div class="next num" data-next="${i}"></div>`;
+          <div class="meta"><small class="note" data-forced="${i}"></small><span class="unlocks num" data-next="${i}"></span></div>`;
         rows.appendChild(row);
         attrEls[i] = {
           row, range: row.querySelector("input[type=range]"), num: row.querySelector("input[type=number]"),
@@ -307,6 +307,10 @@
       el.ticks.innerHTML = lad && lad.d !== null ? lad.t.filter(t => t <= cap).map(t => `<i class="tok" style="left:${((t - 25) / 74 * 100).toFixed(2)}%" title="token at ${t}"></i>`).join("") : "";
       // next unlock text
       el.next.innerHTML = nextUnlockText(i, v, cap, lad);
+      // The meta line is a fixed height so the row cannot move, which means very narrow screens can
+      // clip it. Carrying the same text in the tooltip keeps it recoverable rather than lost.
+      const meta = el.next.parentElement;
+      if (meta) meta.title = meta.textContent.replace(/\s+/g, " ").trim();
     }
     state.roomLeft = roomLeft;
     DISCS.forEach((d, di) => {
@@ -750,6 +754,14 @@
       try { localStorage.setItem("buildlab.lockBudget", state.lockBudget ? "1" : "0"); } catch (e2) { /* nothing to do */ }
       recompute();
     });
+    // Which build this is. The data fingerprint matters more than the version number: it moves
+    // whenever caps, the model or the cap-breaker table change, so a stale cache showing old
+    // numbers under a current version number cannot hide.
+    const stampEl = $("buildStamp");
+    if (stampEl && window.BUILD) {
+      stampEl.innerHTML = `v<b>${BUILD.version}</b> \u00b7 built ${BUILD.built} \u00b7 data ${BUILD.data}`;
+      stampEl.title = "Page version, build date, and a fingerprint of the shipped data files.";
+    }
     $("resetBtn").addEventListener("click", () => { state.want = Array(21).fill(25); state.cbPlan = Array(21).fill(0); recompute(); });
     const tabs = [...document.querySelectorAll("#tabs button")];
     tabs.forEach((b, k) => {
