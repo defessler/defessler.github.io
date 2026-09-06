@@ -360,7 +360,11 @@
     const over = ovr.raw > 99 + OVER_TOLERANCE;
     const atCeiling = !over && ovr.raw >= 99;
     disp.textContent = ovr.display;
-    det.textContent = ovr.raw >= 99 ? "" : "est. " + ovr.raw.toFixed(1);
+    // Floor the estimate to one decimal rather than rounding it. The big number is floor(raw), so a
+    // raw of 98.96 was showing "98" beside "est. 99.0", which reads as a contradiction and is the
+    // first thing anyone notices. The budget lock parks builds just under 99, right in that window,
+    // so it happened on every maxed-out build.
+    det.textContent = ovr.raw >= 99 ? "" : "est. " + (Math.floor(ovr.raw * 10) / 10).toFixed(1);
     const pct = clamp((ovr.raw - 25) / 74 * 100, 0, 100);
     bar.querySelector("i").style.width = pct + "%";
     bar.classList.toggle("over", over);
