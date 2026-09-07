@@ -275,13 +275,26 @@
   // What the slider and the number field go through. Named so the audit can drive the same path the
   // page does rather than re-implementing the guard and testing its own copy.
   function setWantFromControl(i, v) {
+    // Whenever this refuses to change anything, the CONTROL still has to be put back to what the row
+    // actually shows. The refusals below all return before setWant, so nothing recomputes and
+    // nothing re-renders, and re-rendering is what used to drag the slider knob back to the cap.
+    // Without this, dragging the knob past the cap line left it sitting out there: the build was
+    // never wrong, but the control stopped agreeing with the bar it sits on.
+    const el = attrEls[i];
+    const resync = () => {
+      if (!el) return;
+      el.range.value = state.values[i];
+      // The number field is left alone while it has focus, so a resync cannot eat a half-typed
+      // value out from under the cursor.
+      if (document.activeElement !== el.num) el.num.value = state.values[i];
+    };
     // An empty or unparseable field is not a request for anything. Number("") is 0, which is finite
     // and clamps up to the floor, so a select-all-delete used to read as "set this to 25" and take
     // the carried request with it.
     const raw = String(v).trim();
-    if (raw === "") return;
+    if (raw === "") { resync(); return; }
     const asked = Math.round(Number(raw));
-    if (!Number.isFinite(asked)) return;
+    if (!Number.isFinite(asked)) { resync(); return; }
     // The guard has to test where the value LANDS, not what was typed. Comparing the raw input
     // against the display let anything above the cap through: it differs from the display, passes,
     // then clamps straight back onto it, overwriting a much larger carried request with the number
@@ -292,7 +305,7 @@
     // ways: a cap can hold the display BELOW the request, and a linked minimum can hold it ABOVE,
     // and writing the display back destroys points in the first case and commits points the user
     // never asked for in the second.
-    if (landed === state.values[i]) return;
+    if (landed === state.values[i]) { resync(); return; }
     setWant(i, asked);
   }
   // Click steps once; press and hold repeats. Pointer capture keeps the repeat tied to this button
