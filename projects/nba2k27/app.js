@@ -921,6 +921,10 @@
     const el = $("tab-capbreakers");
     const v = state.values, caps = state.caps;
     const used = state.cbPlan.reduce((a, b, i) => a + productivePlan(i), 0);
+    // What the button offers to clear. This counts every chip that is actually selected, not just
+    // the productive ones the header totals: a breaker the ladder has since made worthless is still
+    // a selection the user made, and still something they need a way to drop.
+    const planned = state.cbPlan.reduce((a, n) => a + n, 0);
     const after = plannedValues();
     const haveRule = !!window.CAPBREAKERS;
     const gained = after.reduce((s, x, i) => s + (x - v[i]), 0);
@@ -929,6 +933,7 @@
       <div><div class="v num">+${gained}</div><div class="l">Attribute points gained</div></div>
       <div><div class="v num">${CB_TOTAL_NOW}<small style="font-size:14px;color:var(--muted)"> / ${CB_TOTAL_YEAR}</small></div><div class="l">Earnable now / this year</div></div>
     </div>
+    <div class="ctl" style="margin:0 0 6px"><button class="btn" id="clearPlan" type="button"${planned ? "" : " disabled"} title="${planned ? `Unplan all ${planned} breaker${planned > 1 ? "s" : ""}. Your attributes and the rest of the build are left alone.` : "Nothing planned yet"}">Clear plan${planned ? ` (${planned})` : ""}</button></div>
     <p class="note" style="margin:0 0 6px">Cap Breakers unlock once a build reaches 99 overall. Each chip is one breaker on that attribute, up to five, showing the points it adds from where the attribute sits now. Click a chip to plan that many. Gains stop at the body cap and at 99, and never earn badge tokens.</p>` +
       (state.ovr.tied && tieMatters() ? `<p class="note" style="margin:0 0 6px;color:var(--warn)"><b>These ladders are a guess on this build.</b> The gain depends on which of the 15 player types the game assigns, and ${tieText()}</p>` : "");
     if (state.currentOvr !== null && state.currentOvr < 99) {
@@ -983,6 +988,15 @@
       the engine this is exact 99.96% of the time. Confirm a final build in the NBA 2K HQ app
       before spending one: at 99 overall the in-game Builder Glossary shows the real numbers.</p>`;
     setPanel(el, html);
+    const clearBtn = $("clearPlan");
+    if (clearBtn) {
+      clearBtn.addEventListener("click", () => {
+        if (!state.cbPlan.some(n => n)) return;
+        state.cbPlan = Array(21).fill(0);
+        // recompute rather than renderCapBreakers, because the plan feeds the summary tab too.
+        recompute();
+      });
+    }
     el.querySelectorAll("[data-cb]").forEach(chip => {
       const toggle = () => {
         const i = +chip.dataset.cb, k = +chip.dataset.k;
