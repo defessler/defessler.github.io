@@ -275,6 +275,10 @@ textarea{width:100%;min-height:60px;background:var(--surface-2);border:1px solid
 .chip.on{background:var(--c);border-color:var(--c);color:var(--chip-ink)}
 .chip.locked{opacity:.55;cursor:default}
 .chip.next{border-style:dashed}
+/* The per-row clear. Deliberately quiet next to the gain chips, since it is an escape hatch rather
+   than part of the plan, but the same height so the row does not change shape when it appears. */
+.chip.clear{min-width:26px;font-weight:400;font-size:15px;color:var(--muted);background:transparent;border-style:dashed}
+.chip.clear:hover{color:var(--bad);border-color:var(--bad);background:var(--surface-2)}
 .cbrow .after{text-align:right;font-variant-numeric:tabular-nums}
 .cbrow .after b{font-family:var(--display);font-size:18px}
 .cbrow .after small{display:block;color:var(--muted)}

@@ -572,7 +572,7 @@
     let sel = null;
     if (inside && !id) {
       const d = a.dataset || {};
-      const parts = ["cb", "k", "group", "bp", "tab"].filter(k => d[k] !== undefined)
+      const parts = ["cb", "k", "cbclear", "group", "bp", "tab"].filter(k => d[k] !== undefined)
         .map(k => `[data-${k}="${String(d[k]).replace(/"/g, '\\"')}"]`);
       if (parts.length) sel = a.tagName.toLowerCase() + parts.join("");
     }
@@ -959,6 +959,14 @@
           chips.push(`<span class="${cls.join(" ")}" data-cb="${i}" data-k="${k}"${g > 0 ? ' role="button" tabindex="0"' : ' aria-disabled="true"'} aria-pressed="${k < n}" title="${label}" aria-label="${label}">${g > 0 ? "+" + g : "–"}</span>`);
           cur += Math.max(0, g);
         }
+        // One click to drop everything planned on THIS attribute. Clicking the last selected chip
+        // only steps the count down by one, so clearing three planned breakers took three clicks,
+        // and the only one-click escape was the global Clear plan, which drops every attribute.
+        // Rendered only when there is something to clear, so it never sits there doing nothing.
+        if (n > 0) {
+          const lbl = `Clear the ${n} breaker${n > 1 ? "s" : ""} planned on ${SHORT[i]}`;
+          chips.push(`<span class="chip clear" data-cbclear="${i}" role="button" tabindex="0" title="${lbl}" aria-label="${lbl}">&times;</span>`);
+        }
         const maxed = v[i] >= caps[i];
         html += `<div class="cbrow ${maxed ? "maxed" : ""}"><div class="cn">${SHORT[i]}<small>now ${v[i]} · cap ${caps[i]}</small></div><div class="chips">${chips.join("")}</div><div class="after"><b>${after[i]}</b><small>${prod ? `after ${prod} breaker${prod > 1 ? "s" : ""}` : (maxed ? "at cap" : "no breakers")}</small></div></div>`;
       });
@@ -997,6 +1005,19 @@
         recompute();
       });
     }
+    el.querySelectorAll("[data-cbclear]").forEach(btn => {
+      const clearOne = () => {
+        const i = +btn.dataset.cbclear;
+        if (!state.cbPlan[i]) return;
+        state.cbPlan[i] = 0;
+        // recompute, not renderCapBreakers: the plan feeds the Summary tab as well.
+        recompute();
+      };
+      btn.addEventListener("click", clearOne);
+      btn.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); clearOne(); }
+      });
+    });
     el.querySelectorAll("[data-cb]").forEach(chip => {
       const toggle = () => {
         const i = +chip.dataset.cb, k = +chip.dataset.k;
