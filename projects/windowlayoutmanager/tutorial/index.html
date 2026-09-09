@@ -301,7 +301,7 @@
           <li><a href="#blacklist">Blacklist</a></li>
           <li><a href="#companion">Companion Software</a></li>
           <li><a href="#diagnostics">Diagnostics &amp; Reporting a Bug</a></li>
-          <li><a href="#window">Window Positions &amp; About</a></li>
+          <li><a href="#window">Startup, Window Positions &amp; About</a></li>
           <li><a href="#cli">CLI, Links &amp; Automation</a></li>
         </ul>
 
@@ -382,6 +382,7 @@
 
           <h3>Picking a Resolution</h3>
           <p>Resolution is two dropdowns, one for size and one for refresh rate, the way Windows and NVIDIA both do it. Sizes are grouped by shape (16:9, 4:3, 21:9) and the largest one is marked. Some displays offer a lot of them (one test machine reports 227 modes). The size list has a search box at the top. Type <code>1440</code> for every mode with 1440 on either side, <code>2560 1440</code>, <code>2560x1440</code>, or just <code>25 14</code> for that one, or a word to search the labels. Arrow keys, <kbd>Home</kbd>, <kbd>End</kbd>, <kbd>Enter</kbd>, and <kbd>Esc</kbd> all work in the list. Pick a size that can't do your current refresh rate and WLM keeps the rate where it can, otherwise falls back to the highest that size offers and tells you it did.</p>
+          <p>The rate dropdown opens on <strong>Highest this size offers</strong>, which is a request rather than a blank. It means "whatever the fastest rate is here", worked out on the display the profile lands on rather than fixed when you save it, so one profile asks for the best each of your displays can do. Leave it there and that's what you get. Pick a number instead and WLM asks for exactly that.</p>
           <p>The orientation dropdown sits before the resolution, because it decides what resolutions there are. Windows only reports sizes for the orientation a display is currently in. WLM works out the list for the one you pick. Flipping between landscape and portrait keeps the same physical resolution selected. Sizes are written long side first whichever way the panel faces. A rotated monitor reads 2560&times;1440. What's sent to Windows stays in the orientation Windows is speaking.</p>
           <p>A mode your display doesn't currently offer is still saved, flagged <em>not offered yet</em>, and applies the moment the driver starts listing it. That matters for virtual displays, whose mode lists change with what the driver has been told about.</p>
 
@@ -559,10 +560,20 @@
 
         <section id="window">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial window</span></p>
-          <h2>Window Positions &amp; About</h2>
-          <p>The app window remembers the size and position you leave it at. Dialogs don't: each one opens at the size its content needs, every time.</p>
-          <div class="shot"><a href="img/17-settings-window.png" target="_blank" rel="noopener" title="Open full size"><img src="img/17-settings-window.png" alt="Window settings tab" loading="lazy"></a></div>
+          <h2>Startup, Window Positions &amp; About</h2>
+
+          <h3>Starting with Windows</h3>
+          <p>Tick <strong>Start Window Layout Manager when I sign in to Windows</strong> and it does. It starts in the tray, where WLM lives anyway, so nothing opens over whatever you signed in to do. Your hotkeys, Hold mode, and auto-activation are all running from the moment you land on the desktop. There's a second box under the first if you'd rather see the window as well. Both are off until you turn them on.</p>
+          <p>WLM ships as a portable zip with no installer, so it writes its own startup entry, for the folder you're running from, under your own user account. Nothing elevated, nothing machine-wide. Move the folder and it re-points itself the next time you run it. Install an update and it follows that too.</p>
+          <div class="tip">No installer means no uninstaller, so clear the box before you delete the folder. Windows keeps reaching for an entry you leave behind. If you switch the entry off in Task Manager's Startup tab instead, that wins, and the panel says so rather than quietly writing over you.</div>
+          <div class="shot"><a href="img/17-settings-window.png" target="_blank" rel="noopener" title="Open full size"><img src="img/17-settings-window.png" alt="Startup &amp; Window settings tab" loading="lazy"></a></div>
           <p class="caption">Settings is a fixed panel inside the main window. It reads the same on every machine.</p>
+
+          <h3>Window Positions</h3>
+          <p>The app window remembers the size and position you leave it at. Dialogs don't: each one opens at the size its content needs, every time.</p>
+          <p>The <strong>Appearance</strong> box below tints the window with the Windows 11 desktop backdrop. Windows also draws that backdrop into the alt-tab and taskbar previews, where a blurred sample of your wallpaper can read as a blurry picture of the app. Turn it off if those previews look wrong.</p>
+
+          <h3>About</h3>
           <p>"About" carries the running version, the licence, and where your profiles live.</p>
           <div class="shot"><a href="img/18-settings-about.png" target="_blank" rel="noopener" title="Open full size"><img src="img/18-settings-about.png" alt="About settings tab" loading="lazy"></a></div>
         </section>
