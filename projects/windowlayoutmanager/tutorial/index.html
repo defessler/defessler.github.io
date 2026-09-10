@@ -290,7 +290,7 @@
           <li><a href="#profiles">Saving &amp; Loading Layouts</a></li>
           <li><a href="#hotkeys">Global Hotkeys</a></li>
           <li><a href="#visual">The Visual Editor</a></li>
-          <li><a href="#bays">Docking Bays</a></li>
+          <li><a href="#vw">Virtual Windows</a></li>
           <li><a href="#editor">Precise Edits, Undo &amp; History</a></li>
           <li><a href="#display">Display Zoom, Resolution &amp; Arrangement</a></li>
           <li><a href="#binding">Monitor Binding &amp; Auto-Activation</a></li>
@@ -324,7 +324,7 @@
           <p>Arrange your windows the way you like, hit "+ new profile", name it, done. WLM captures every visible window's position, size, state (normal, minimised, or maximised), monitor, and virtual desktop.</p>
           <ul>
             <li>Load - Puts every captured window back, even after apps restarted, titles changed, or Windows shoved everything onto one screen. The matcher re-finds windows by process, class, title, owner, and position.</li>
-            <li>Update - Re-captures the current arrangement into the selected profile. Your hotkey, binding, history, per-window colours and "recognise by" rules, and Docking Bays all survive.</li>
+            <li>Update - Re-captures the current arrangement into the selected profile. Your hotkey, binding, history, per-window colours and "recognise by" rules, and Virtual Windows all survive.</li>
             <li>Load details - A per-window report of the last load: what matched, what moved, what was missing.</li>
             <li>A Load is one pass. It's finished when it returns. Nothing keeps moving windows afterwards. If an app is slow to open its windows, press the hotkey again.</li>
           </ul>
@@ -418,7 +418,7 @@
             <li>Arrow keys nudge whatever is selected: 10 pixels a press, or 1 with <kbd>Shift</kbd>. A nudged window crosses onto the next monitor the way a dragged one does. Holding a key down is one undo step.</li>
             <li>Select a window to get "Edit", "Block app", and "Remove" in the panel below the canvas. <kbd>Enter</kbd> edits it, <kbd>x</kbd> or <kbd>Delete</kbd> removes it.</li>
             <li><strong>Select several at once</strong> the way you select files: <kbd>Ctrl</kbd>+click adds or removes one, <kbd>Shift</kbd>+click takes everything between what you clicked and where you started, and <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+click adds a run to what you already had.</li>
-            <li>With more than one selected, the panel offers <strong>move to monitor</strong>, <strong>set state</strong>, <strong>remove</strong>, and <strong>Group into Docking Bay</strong>. Position and size are deliberately left out, because one X applied to twelve windows stacks all twelve.</li>
+            <li>With more than one selected, the panel offers <strong>move to monitor</strong>, <strong>set state</strong>, <strong>remove</strong>, and <strong>Dock into…</strong>. Position and size are deliberately left out, because one X applied to twelve windows stacks all twelve.</li>
             <li>Drag a window between monitors and its target monitor and relative position update on their own.</li>
             <li>Every window can be given its own colour from the edit dialog, so that the ones you care about stand out.</li>
             <li>Edits auto-save after a beat. The "unsaved" badge tells you when a write is pending.</li>
@@ -431,33 +431,32 @@
           <p>This is a viewing aid only. A collapsed window still loads at its full size. The folding is forgotten when you switch profiles.</p>
         </section>
 
-        <section id="bays">
-          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial bays</span></p>
-          <h2>Docking Bays</h2>
-          <p>A Docking Bay is a named group of windows inside one profile. Arrange three windows the way you like and group them. From then on you drag, rename, and move the group as one thing, with the spacing inside it intact.</p>
+        <section id="vw">
+          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial virtual-windows</span></p>
+          <h2>Virtual Windows</h2>
+          <p>A Virtual Window is a real window WLM opens and owns, not a shape drawn in the editor. Give it a name and a monitor, then dock other windows into it. They sit on top of it and move with it, keeping the spacing you left between them. Close the container and they stay exactly where they were. Nothing you dock into it is ever altered, only moved.</p>
 
-          <h3>Grouping Windows into a Bay</h3>
-          <p>Select two or more windows in the visual editor, then press "Group into Docking Bay" in the strip below the canvas. The name comes from the apps inside: one app names the bay after itself, two get joined with a plus ("Visual Studio Code + Google Chrome"), three or more name the first and count the rest ("Google Chrome + 2 more"). If no member has a readable app name it's called "Docking Bay" until you rename it. Click the name in the strip and type over it to rename.</p>
-          <div class="shot"><a href="img/16-visual-bays.png" target="_blank" rel="noopener" title="Open full size"><img src="img/16-visual-bays.png" alt="Visual editor showing two windows grouped into a Docking Bay, with the bay strip below the canvas" loading="lazy"></a></div>
-          <p class="caption">The outline is worked out from its members every frame. It can't drift out of step with the windows inside it.</p>
-          <p>On the canvas a bay is a dashed cyan outline under its members, solid when the whole bay is selected. Clicks pass straight through it. In the list view a member row carries the bay's name as a chip and a mark down its left edge.</p>
+          <h3>Creating a Virtual Window</h3>
+          <p>The new Virtual Windows tab sits beside List and Visual. Open it and press "+ New virtual window" to add an empty container. Give it a name and a monitor from the row that appears. Then switch to List or Visual, select one or more windows, and pick that container from the "Dock into…" menu in the strip below the canvas. Pick "New virtual window" from that same menu instead and WLM builds a container for you on the spot, sized and placed around whatever you had selected. Its name follows the rule Docking Bays used: one app names it after itself, two get joined with a plus ("Visual Studio Code + Google Chrome"), three or more name the first and count the rest ("Google Chrome + 2 more"). An empty container made from the tab just starts out called "Virtual Window" until you type over its name field.</p>
+          <div class="shot"><a href="img/16-visual-virtual-window.png" target="_blank" rel="noopener" title="Open full size"><img src="img/16-visual-virtual-window.png" alt="Visual editor showing two windows docked into a Virtual Window container, selected and showing its name and docked count" loading="lazy"></a></div>
+          <p class="caption">The container's box is worked out from where the docked windows already sat. It can't drift out of step with them, because they're the same entry now.</p>
+          <p>On the canvas a container is a single box carrying its name and a count of what's docked inside, solid when it's selected. The windows themselves stop appearing on the canvas once you dock them, because the container is what represents them there now. In the list view a container gets its own row, with a docked count and a "Manage" button that jumps straight to its card on the Virtual Windows tab.</p>
 
-          <h3>Working with a Bay</h3>
+          <h3>Working with a Virtual Window</h3>
           <ul>
-            <li>A plain click on any member selects the whole bay and the strip below the canvas becomes the bay strip. <kbd>Ctrl</kbd>+click a member to get at it on its own.</li>
-            <li>Drag any member and the whole bay goes with it. Hold <kbd>Shift</kbd> and the group snaps by its own outer edges, which is what lands it flush against a monitor edge.</li>
-            <li>"Move to monitor…" in the strip sends every member to that display with the offsets between them intact. The group is re-anchored at the top left of the new display, inside whatever space the taskbar leaves, because members may have come from several displays and there's no one spot to carry across. A bay too big for the display keeps its top left on screen and overhangs.</li>
-            <li>A bay can span two monitors, since each member picks its display from its own centre. "Move to monitor…" is how you gather it up again.</li>
-            <li>"Ungroup" leaves every window where it is. "Remove" drops every member from the profile. To take one member out, <kbd>Ctrl</kbd>+click it and remove it alone. When the last member goes the bay goes with it.</li>
-            <li>Select some of a bay's members and "Group into Docking Bay" splits them into a new bay. Select members of two bays and it merges them. A bay of one window is legal. Its strip gains an "Edit window" button.</li>
+            <li>Drag the container anywhere on the canvas and every docked window goes with it, keeping the offset it had when it was docked.</li>
+            <li>"Move to monitor…" in the strip sends the container to another display. Its members catch up because they follow it, the same as any drag.</li>
+            <li>Docked windows leave the List and Visual views entirely while they're docked. The Virtual Windows tab is the only place you'll still see them, one row per container with an "Undock" button beside each member.</li>
+            <li>"Remove" on a container drops the container and puts every member back into the ordinary layout, undocked, right where it was sitting.</li>
+            <li>A container's own title bar can be switched off from its card with a "Title bar" checkbox. Hide it and the container becomes a plain backdrop with a small handle in the corner to bring the bar back. It's still draggable either way. The toggle never touches anything docked inside it.</li>
             <li>Every one of these goes on the undo trail under its own name. <a href="#editor">History</a> lists each on its own line.</li>
           </ul>
 
-          <h3>What a Bay Doesn't Do</h3>
-          <p>Resizing isn't group aware: drag a member's corner and that one window changes size. A window belongs to at most one bay. Bays don't nest. A bay belongs to its profile. A window you drag by hand while <a href="#hold">Hold mode</a> is on keeps its bay, its colour, and its match rule.</p>
-          <div class="shot"><a href="img/19-visual-bay-moved.png" target="_blank" rel="noopener" title="Open full size"><img src="img/19-visual-bay-moved.png" alt="The same Docking Bay after Move to monitor, with both windows now on the second display" loading="lazy"></a></div>
-          <p class="caption">Both members crossed together and the gap between them is unchanged. That gap is the whole point.</p>
-          <div class="tip">Docking Bays save with the profile and survive an Update. They cost nothing at load, because members go back the way any window does. In the JSON it's two fields on each window, <code>bayId</code> and <code>bayTitle</code>, repaired on the next save if a hand edit leaves them disagreeing.</div>
+          <h3>What a Virtual Window Doesn't Do</h3>
+          <p>Docked windows keep their own taskbar button and their own alt-tab entry. They still show up separately in both. Another app raising itself can still land on top of one. Members catch up when you let go of the container, not while you're dragging it, because firing a reposition at every docked app many times a second is the kind of thing that makes other apps stutter. Rearranging your monitors in the <a href="#display">Display editor</a> moves ordinary windows but not yet containers. Move the container to its new monitor from its own card afterwards.</p>
+          <div class="shot"><a href="img/19-visual-vw-moved.png" target="_blank" rel="noopener" title="Open full size"><img src="img/19-visual-vw-moved.png" alt="The same Virtual Window container after Move to monitor, with both docked windows now on the second display" loading="lazy"></a></div>
+          <p class="caption">Both docked windows crossed together and the gap between them is unchanged. That gap is the whole point.</p>
+          <div class="tip">Virtual Windows save with the profile and survive an Update, the same way a Docking Bay used to. If you're coming from an older build, Docking Bays are gone and this update does not convert them. The windows that were in a bay are still there and still load, just as ordinary ungrouped windows, with the bay's own name not kept. Write down which windows were in which before you update if you want to rebuild them as Virtual Windows afterwards.</div>
         </section>
 
         <section id="editor">

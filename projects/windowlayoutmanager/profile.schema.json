@@ -89,6 +89,11 @@
       "type": "array",
       "description": "Saved windows. Each entry is matched against live windows at restore time by process+title and friends.",
       "items": { "$ref": "#/$defs/window" }
+    },
+    "virtualWindows": {
+      "type": "array",
+      "description": "WLM-owned containers other windows can dock into. A container is a real window WLM creates, positions and moves on the desk; nothing about docking reparents a member or touches its styles or title bar, so a member stays an ordinary top-level window that WLM happens to move alongside its container. Absent means this profile has never used one.",
+      "items": { "$ref": "#/$defs/virtualWindow" }
     }
   },
   "$defs": {
@@ -211,6 +216,33 @@
         "hardwareId":   { "type": ["string", "null"], "description": "The EDID hardware id inside deviceId (e.g. PSCCDD0). Stable across virtual-display sessions where deviceId is not." }
       }
     },
+    "virtualWindow": {
+      "type": "object",
+      "required": ["id", "title", "monitorRole", "relX", "relY", "width", "height"],
+      "additionalProperties": false,
+      "description": "One WLM-owned container. Its geometry speaks the same vocabulary a saved window does -- a monitorRole plus a position relative to that monitor -- so restore does the same arithmetic for both, and a profile lands correctly on a desk whose monitors sit at different offsets.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^vw-[0-9a-f]{8}$",
+          "description": "Identifies this container so a window's dockedInto can name it. Same shape as the bayId this collection replaces: short enough to read in a profile file, wide enough that a collision inside one profile is not a real concern."
+        },
+        "title": { "type": "string", "description": "Shown in the container's own title bar (when chromeHidden is not set) and used to label it in the editor." },
+        "monitorRole": {
+          "type": ["string", "null"],
+          "enum": ["primary", "secondary", "tertiary", "quaternary", "quinary", "senary", null],
+          "description": "Which monitor relX/relY are measured from, in the same vocabulary a saved window's monitorRole uses. Null when the container hasn't been placed on one yet."
+        },
+        "relX": { "type": "integer", "description": "Container left edge relative to the named monitor's work area." },
+        "relY": { "type": "integer", "description": "Container top edge relative to the named monitor's work area." },
+        "width":  { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "chromeHidden": {
+          "type": "boolean",
+          "description": "When true, this container's own title bar and border are hidden. Absent means the title bar shows. Only ever affects the container's own chrome -- a docked window's styles and title bar are never touched, on this or any other setting."
+        }
+      }
+    },
     "ownerInfo": {
       "type": ["object", "null"],
       "additionalProperties": false,
@@ -256,14 +288,10 @@
           "enum": [1, 2, 3],
           "description": "Restore-state from WINDOWPLACEMENT.showCmd. 1 = SW_SHOWNORMAL, 2 = SW_SHOWMINIMIZED, 3 = SW_SHOWMAXIMIZED."
         },
-        "bayId": {
-          "type": ["string", "null"],
-          "pattern": "^bay-[0-9a-f]{8}$",
-          "description": "Bay membership. Windows sharing a bayId are one Bay: a named group that moves, saves and restores as a unit. Absent or null means ungrouped. The Bay itself has no record of its own -- membership, bounds and monitor are all derived from the windows carrying this id. See docs/bay-spec.md."
-        },
-        "bayTitle": {
+        "dockedInto": {
           "type": "string",
-          "description": "The Bay name, carried identically on every member. Only meaningful alongside a valid bayId. Deliberately denormalised so Bays ride the existing per-window save and undo paths; profiles.js rewrites disagreeing copies from the first member on every write."
+          "pattern": "^vw-[0-9a-f]{8}$",
+          "description": "Which virtualWindows entry this window is docked into. Absent means not docked. A docked window is still saved and restored exactly like any other window -- docking only changes what the layout view shows, hiding it there in favour of its container so the two are never drawn twice. A dockedInto naming a container that no longer exists is cleared on the next write rather than left dangling."
         },
         "match": {
           "type": ["object", "null"],
