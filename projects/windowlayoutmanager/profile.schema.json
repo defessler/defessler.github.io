@@ -240,8 +240,56 @@
         "chromeHidden": {
           "type": "boolean",
           "description": "When true, this container's own title bar and border are hidden. Absent means the title bar shows. Only ever affects the container's own chrome -- a docked window's styles and title bar are never touched, on this or any other setting."
+        },
+        "layout": {
+          "$ref": "#/$defs/layoutNode",
+          "description": "The container's split tree. A docked window names its leaf in its own dockSlot rather than the tree naming the window, which keeps the tree pure geometry. Absent means the container is empty. It's reconciled against the docked windows on every write. A pane with no window, or a dockSlot naming no pane, never sits on disk for long."
         }
       }
+    },
+    "layoutNode": {
+      "description": "One node of a Virtual Window's split tree, either a 'split' (its two children side by side or stacked) or a 'pane' (a leaf a window can dock into by naming this id in its own dockSlot). A split's a and b are each a layoutNode in turn, which is how the tree nests to more than one level.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind", "id", "dir", "ratio", "a", "b"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "split" },
+            "id": {
+              "type": "string",
+              "pattern": "^sp-[0-9a-f]{8}$",
+              "description": "Identifies this split so a drag on its splitter can find and resize it without walking the whole tree."
+            },
+            "dir": {
+              "type": "string",
+              "enum": ["row", "col"],
+              "description": "'row' lays a beside b. 'col' stacks a above b."
+            },
+            "ratio": {
+              "type": "number",
+              "minimum": 0.05,
+              "maximum": 0.95,
+              "description": "Child a's share of the space left after the gutter. Clamped well short of 0 or 1 so a dragged splitter can never strand a pane at zero size, which would be a pane the user has no way back to."
+            },
+            "a": { "$ref": "#/$defs/layoutNode" },
+            "b": { "$ref": "#/$defs/layoutNode" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "id"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "pane" },
+            "id": {
+              "type": "string",
+              "pattern": "^pn-[0-9a-f]{8}$",
+              "description": "Named so a docked window's dockSlot can point at exactly this leaf rather than just at the container."
+            }
+          }
+        }
+      ]
     },
     "ownerInfo": {
       "type": ["object", "null"],
@@ -292,6 +340,21 @@
           "type": "string",
           "pattern": "^vw-[0-9a-f]{8}$",
           "description": "Which virtualWindows entry this window is docked into. Absent means not docked. A docked window is still saved and restored exactly like any other window -- docking only changes what the layout view shows, hiding it there in favour of its container so the two are never drawn twice. A dockedInto naming a container that no longer exists is cleared on the next write rather than left dangling."
+        },
+        "dockSlot": {
+          "type": "string",
+          "pattern": "^pn-[0-9a-f]{8}$",
+          "description": "Which pane of dockedInto's layout this window fills. Absent means not docked, or docked into a container with no split tree yet. A dockSlot naming no pane in the tree is repaired on the next write with a fresh pane rather than left unreachable, the same way a dangling dockedInto is cleared."
+        },
+        "preDock": {
+          "type": "object",
+          "required": ["width", "height"],
+          "additionalProperties": false,
+          "description": "This window's size from just before docking imposed one, so undocking can hand it back instead of leaving it at whatever size its pane happened to be. Absent means never docked, or already handed back by an undock.",
+          "properties": {
+            "width":  { "type": "integer", "minimum": 1 },
+            "height": { "type": "integer", "minimum": 1 }
+          }
         },
         "match": {
           "type": ["object", "null"],
