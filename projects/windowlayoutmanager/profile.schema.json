@@ -92,7 +92,7 @@
     },
     "virtualWindows": {
       "type": "array",
-      "description": "WLM-owned containers other windows can dock into. A container is a real window WLM creates, positions and moves on the desk; nothing about docking reparents a member or touches its styles or title bar, so a member stays an ordinary top-level window that WLM happens to move alongside its container. Absent means this profile has never used one.",
+      "description": "WLM-owned containers other windows can dock into. A container is a real window WLM creates, positions and moves on the desk. Docking never reparents a member, so a member stays a top-level window that WLM moves alongside its container. A container with fullDock also hides its members' title bars and borders, and puts them back when it lets go. Containers shared across profiles are not stored here; they live in virtual-windows.json beside the profiles folder. Absent means this profile has never used one.",
       "items": { "$ref": "#/$defs/virtualWindow" }
     }
   },
@@ -239,7 +239,11 @@
         "height": { "type": "integer", "minimum": 1 },
         "chromeHidden": {
           "type": "boolean",
-          "description": "When true, this container's own title bar and border are hidden. Absent means the title bar shows. Only ever affects the container's own chrome -- a docked window's styles and title bar are never touched, on this or any other setting."
+          "description": "When true, this container's own title bar and border are hidden. Absent means the title bar shows. Only ever affects the container's own chrome. Hiding a docked window's title bar is fullDock's job, not this one's."
+        },
+        "fullDock": {
+          "type": "boolean",
+          "description": "When true, members are fully docked: each window's client area is sized to exactly its pane and shown through this container, with its own title bar and borders hidden. The real window stays on top, made transparent, so it keeps its input, and everything is put back on undock, on closing the container and on quit. Absent means members dock as ordinary windows over their panes. Experimental."
         },
         "layout": {
           "$ref": "#/$defs/layoutNode",
