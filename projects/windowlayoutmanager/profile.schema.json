@@ -369,6 +369,21 @@
             "pattern": { "type": "string", "maxLength": 200, "description": "The title prefix, for 'prefix'. An empty prefix is stored as 'ignore'." }
           }
         },
+        "launch": {
+          "type": "object",
+          "description": "How to start this window again when a profile loads without it. Written by the capture for Explorer folder windows and PowerShell, pwsh and cmd consoles, never by the editor. It is validated before anything is run: a console only ever starts as one of those three shells, and an Explorer target must be a shell folder or an existing directory.",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": { "type": "string", "enum": ["explorer", "console"] },
+            "path": { "type": "string", "maxLength": 2000, "description": "For 'explorer', the folder. A '::{GUID}' path is a shell folder such as Home." },
+            "cwd": { "type": "string", "maxLength": 2000, "description": "For 'console', the working directory it was started in. For PowerShell that is where the window started, since Set-Location doesn't change it." }
+          }
+        },
+        "recreate": {
+          "type": "boolean",
+          "description": "Whether to start this window again when a profile loads without it. Absent means the default, which is on for Explorer folders and PowerShell, pwsh and cmd consoles, and off for everything else. Set from the window editor."
+        },
         "liveHistory": {
           "type": "array",
           "description": "Hold-mode rollback trail, newest first, capped at 20. Each entry is a prior monitorRole / relX / relY / width / height / showCmd / desktopIndex of this window, stamped savedAt.",
