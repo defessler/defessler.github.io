@@ -1,14 +1,14 @@
 {
   "product": "WindowLayoutManager",
   "latest": {
-    "version": "1.1.0-dev.106",
-    "tag": "v1.1.0-dev.106",
-    "publishedAt": "2026-09-17T01:22:31Z",
-    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.106/WindowLayoutManager-v1.1.0-dev.106-win-x64.zip",
-    "sizeBytes": 115267757,
-    "sha256": "1c81aeeb4e21a05f6656540e6c9938b3c4b4d99838cb804341c99f3d2f8804a2",
+    "version": "1.1.0-dev.107",
+    "tag": "v1.1.0-dev.107",
+    "publishedAt": "2026-09-17T03:33:42Z",
+    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.107/WindowLayoutManager-v1.1.0-dev.107-win-x64.zip",
+    "sizeBytes": 115269224,
+    "sha256": "6f3704751fd8170ccbda5eeab6a57300aef10be4a0c6a76e7b13180db6b70b19",
     "prerelease": true,
     "pageUrl": "https://dougfessler.com/projects/windowlayoutmanager/",
-    "notes": "# v1.1.0-dev.106: Virtual Windows that look the part\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.105`.\n\n## Docked windows leave the taskbar\n\nA docked window's taskbar button now goes away while it's docked. The virtual\nwindow's own button brings it and everything in it forward, so the taskbar shows\none button for the lot. Docked windows stay in alt-tab.\n\nThe buttons come back when you undock a window, close or delete its virtual\nwindow, or turn this off in Settings, under Virtual Windows. If WLM stops\nunexpectedly, the same watcher that puts fully docked windows back gives the\nbuttons back too.\n\n## An icon of their own\n\nVirtual windows have their own icon: the WLM panes inside a window frame. It's on\ntheir taskbar button, in alt-tab and on their title bar, and it marks them in the\napp. They also share a taskbar group of their own instead of joining WLM's.\n\n## Start fresh, or use the window that's open\n\nThe window editor's \"start it again\" box is now a choice:\n\n- Use the window that's open.\n- Use the open window, or start it if none is.\n- Always start a new one, even when one is already open.\n\nThis works for any app now, not only Explorer folders and consoles. WLM starts it\nfrom the program the window was saved from, and only when that program still\nexists and has the app's name. A window started fresh never takes over the one\nthat was already open.\n\n## The Virtual Windows page, like a profile\n\nThe page shows one virtual window at a time, picked from tabs, with the same List\nand Visual views a profile has. The virtual window is the monitor.\n\n- List has a row for each docked window, with its pane, how it starts when a\n  profile loads, and a button to undock it.\n- Visual draws the virtual window and its panes. Drag a window onto another to\n  swap them, or onto an edge to put it beside.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
+    "notes": "# v1.1.0-dev.107: Minimize, maximize, and clicks that land\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.106`.\n\n## Minimize and maximize on the title bar\n\nA virtual window's title bar now has its own minimize and maximize buttons.\nMinimizing takes its docked windows with it. While it's maximized, the maximize\nbutton turns into restore.\n\n## Maximized without clipping\n\nA maximized virtual window used to push the edges of its docked windows off the\nscreen, by as much as 29 pixels. Windows maximizes a window with its resize\nborder hanging past the screen edge, and the panes were laid out on that larger\narea. They now stay inside what you can see, and so does the virtual window's own\ntitle bar.\n\n## Clicking a virtual window while WLM is in front\n\nWith WLM's main window selected, a click on a virtual window could go nowhere:\nits buttons didn't respond, and dragging it could stick. Pressing a virtual\nwindow hands focus to the window docked in it, and doing that in the middle of\nthe click took the mouse away from the virtual window. When WLM is the active\napp, the handoff now waits until you let go.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
   }
 }
