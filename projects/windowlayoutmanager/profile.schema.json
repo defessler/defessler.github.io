@@ -381,8 +381,8 @@
           }
         },
         "recreate": {
-          "type": "boolean",
-          "description": "Whether to start this window again when a profile loads without it. Absent means the default, which is on for Explorer folders and PowerShell, pwsh and cmd consoles, and off for everything else. Set from the window editor."
+          "enum": [true, false, "fresh"],
+          "description": "What a Load does about this window. false uses the open window only. true uses the open window and starts it when none is open. \"fresh\" always starts a new one and places that. Absent means the default, which is true for Explorer folders and PowerShell, pwsh and cmd consoles, and false for everything else. An app other than those starts from exePath, which must be an absolute .exe named for processName. Set from the window editor."
         },
         "liveHistory": {
           "type": "array",
