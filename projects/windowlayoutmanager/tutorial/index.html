@@ -171,7 +171,10 @@
     .toc li::before { content: '▸'; position: absolute; left: 0; color: var(--mk-pink); }
     @media (max-width: 620px) { .toc { column-count: 1; } }
 
-    /* Anchor jumps must clear the sticky nav, or it covers the heading. */
+    /* Anchor jumps must clear the sticky nav, or it covers the heading. The
+       width/height attributes on every <img> are the other half of landing
+       exactly right: they reserve each screenshot's box before it loads, so
+       a jump's target offset stops shifting as lazy images stream in. */
     section { scroll-margin-top: 4.5rem; }
     @media (max-width: 560px) {
       /* Brand on its own row, links spread across a full row beneath.
@@ -204,6 +207,34 @@
        the UI text. */
     .shot a { display: block; cursor: zoom-in; }
     .caption { color: var(--mk-comment); font-size: 0.78rem; margin-bottom: 0.4rem; }
+
+    /* --- Hover-to-play clips -------------------------------------------------
+       Each part carries a short looping clip of the interaction, played
+       only on hover and only on pointers that can hover: the <img> stays
+       in flow as the poster and the fallback, the <video> covers it while
+       playing, and its src is not even SET until the first hover, so a
+       clip costs nothing until someone asks for it. */
+    .shot.video img { display: block; }
+    .shot.video video {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; pointer-events: none; background: var(--mk-gutter);
+      opacity: 0; transition: opacity 0.15s;
+    }
+    .shot.video.playing video { opacity: 1; }
+    .vid-hint {
+      position: absolute; top: 0.5rem; right: 0.5rem; z-index: 1;
+      background: rgba(20, 20, 20, 0.85); border: 1px solid var(--mk-cyan);
+      border-radius: 3px; color: var(--mk-cyan);
+      font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em;
+      padding: 0.14rem 0.45rem; pointer-events: none;
+      transition: opacity 0.15s;
+    }
+    .shot.video.playing .vid-hint { opacity: 0; }
+    @media (hover: none), (prefers-reduced-motion: reduce) {
+      /* Nothing to hover: the poster is the whole story, and reduced
+         motion asked first. */
+      .vid-hint { display: none; }
+    }
 
     .tip {
       background: var(--mk-gutter); border: 1px solid var(--mk-border);
@@ -282,7 +313,7 @@
         <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial</span></p>
         <h1>Window Layout Manager Feature Walkthrough</h1>
         <p class="lede">Everything the app does, in the order you'll meet it. Ten minutes, start to finish. Need the app first? <a href="../">Grab it on the download page</a>.</p>
-        <p class="caption">// updated alongside each release · screenshots are from the current build</p>
+        <p class="caption">// updated alongside each release · screenshots and clips are from the current build · clips play on hover</p>
 
         <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">ls topics/</span></p>
         <ul class="toc">
@@ -309,8 +340,8 @@
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial basics</span></p>
           <h2>The Main Window</h2>
           <p>Profiles live in the left sidebar. The selected profile's windows fill the right pane, one row per window: the app, its title at save time, and where it goes back to.</p>
-          <div class="shot"><a href="img/01-main-list.png" target="_blank" rel="noopener" title="Open full size"><img src="img/01-main-list.png" alt="Main window: profile sidebar and window list" loading="lazy"></a></div>
-          <p class="caption">The Coding profile: six windows across two monitors and two virtual desktops.</p>
+          <div class="shot video" data-v="img/v/basics.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/01-main-list.png" target="_blank" rel="noopener" title="Open full size"><img src="img/01-main-list.png" alt="Main window: profile sidebar and window list" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/01-main-list.png"></video></div>
+          <p class="caption">The Coding profile: six windows across two monitors and two virtual desktops. Hover the picture to watch switching profiles swap the layout in.</p>
           <ul>
             <li>⌨ chip - The profile has a global hotkey.</li>
             <li>● / ○ dot - Bound / not bound to a monitor setup (see <a href="#binding">auto-activation</a>).</li>
@@ -321,189 +352,182 @@
         <section id="profiles">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial profiles</span></p>
           <h2>Saving &amp; Loading Layouts</h2>
-          <p>Arrange your windows the way you like, hit "+ new profile", name it, done. WLM captures every visible window's position, size, state (normal, minimised, or maximised), monitor, and virtual desktop.</p>
+          <p>Arrange your windows the way you like, hit "+ new profile", name it, done. WLM captures every visible window's position, size, state, monitor, and virtual desktop.</p>
+          <div class="shot video" data-v="img/v/profiles.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/01-main-list.png" target="_blank" rel="noopener" title="Open full size"><img src="img/01-main-list.png" alt="Hovering a profile row shows a card with a scaled picture of where its windows go" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/01-main-list.png"></video></div>
+          <p class="caption">Hovering a profile shows a card with a scaled map of where its windows land, before you commit to anything.</p>
           <ul>
             <li>Load - Puts every captured window back, even after apps restarted, titles changed, or Windows shoved everything onto one screen. The matcher re-finds windows by process, class, title, owner, and position.</li>
-            <li>Update - Re-captures the current arrangement into the selected profile. Your hotkey, binding, history, per-window colours and "recognise by" rules, and Virtual Windows all survive.</li>
-            <li>Starting windows - The window editor's "When this profile loads" choice says what a Load does about a window: use the window that's open, use it or start one if none is, or always start a new one. File Explorer folders, PowerShell, pwsh and Command Prompt windows usually don't survive a restart, so they start when missing by default: Explorer in the same folder, a console in the folder it was working in. Any other app can be set to start too, from the program its window was saved from. A window started fresh never takes over the one that was already open. The folder is recorded when you save the profile or dock the window.</li>
+            <li>Update - Re-captures the current arrangement into the selected profile. Hotkey, binding, history, per-window colours, "recognise by" rules, and Virtual Windows all survive.</li>
+            <li>Starting windows - The window editor's "When this profile loads" choice says what a Load does about a window: use the one that's open, use it or start one if none is, or always start a new one. Explorer folders and consoles don't survive a restart, so they start when missing by default: Explorer in the same folder, a console where it was working. Any app can be set to start too, from the program its window was saved from. Tick "Default for &lt;app&gt;" beside the choice and every window of that app inherits it, unless a window says otherwise. A window started fresh never takes over one that was already open.</li>
             <li>Load details - A per-window report of the last load: what matched, what moved, what was missing.</li>
-            <li>A Load is one pass. It's finished when it returns. Nothing keeps moving windows afterwards. If an app is slow to open its windows, press the hotkey again.</li>
+            <li>A Load is one pass. It's finished when it returns, and nothing keeps moving windows afterwards. An app that opens slowly? Press the hotkey again once it settles.</li>
           </ul>
-          <div class="tip">Profiles are plain JSON in <code>%APPDATA%\window-layout-manager\profiles</code> (the "FOLDER" button opens it). They're hand-editable, with schema autocomplete in most editors.</div>
+          <div class="tip">Profiles are plain JSON in <code>%APPDATA%\window-layout-manager\profiles</code> (the "FOLDER" button opens it). Hand-editable, with schema autocomplete in most editors.</div>
         </section>
 
         <section id="hotkeys">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial hotkeys</span></p>
           <h2>Global Hotkeys</h2>
           <p>Click the hotkey chip on any profile and press the combination you want. WLM records it live and warns about conflicts with other profiles or the auto-activation hotkey.</p>
-          <div class="shot"><a href="img/04-hotkey-capture.png" target="_blank" rel="noopener" title="Open full size"><img src="img/04-hotkey-capture.png" alt="Hotkey capture modal" loading="lazy"></a></div>
+          <div class="shot video" data-v="img/v/hotkeys.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/04-hotkey-capture.png" target="_blank" rel="noopener" title="Open full size"><img src="img/04-hotkey-capture.png" alt="Hotkey capture modal" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/04-hotkey-capture.png"></video></div>
           <p class="caption">Hotkeys fire from anywhere. The WLM window doesn't need to be open.</p>
         </section>
 
         <section id="display">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial display</span></p>
           <h2>Display Zoom, Resolution &amp; Arrangement</h2>
-          <p>A profile can set your display scaling (the percentage in Settings &rarr; System &rarr; Display that everyone calls zoom), your resolution, and where your monitors sit, before it puts your windows back. Click the <strong>Display</strong> chip on any profile to set it up.</p>
-          <div class="shot"><a href="img/12-display-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/12-display-editor.png" alt="Display editor: the monitor picker, with per-monitor scaling, orientation, resolution and position" loading="lazy"></a></div>
+          <p>A profile can set your display scaling (the percentage in Settings &rarr; System &rarr; Display that everyone calls zoom), your resolution, and where your monitors sit, before it puts your windows back. Click the <strong>Display</strong> chip on any profile.</p>
+          <div class="shot video" data-v="img/v/display.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/12-display-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/12-display-editor.png" alt="Display editor: the monitor picker, with per-monitor scaling, orientation, resolution and position" width="900" height="720" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/12-display-editor.png"></video></div>
           <p class="caption">Every dropdown is filled from what Windows reports for that monitor. Nothing is hardcoded.</p>
           <p>Displays are named by where they are and what size they run ("Left 4K", "Right 1080p"), because Windows reports the same "Generic PnP Monitor" for nearly every one. A virtual display says so.</p>
           <ul>
             <li><strong>Scaling</strong> - Pick a percentage, or <em>Step up one</em> / <em>Step down one</em>. The steps move one rung along whatever ladder that monitor supports, worked out when you press the key, which makes them the ones to put on a hotkey.</li>
-            <li><strong>Resolution</strong> - Every mode the driver offers, with its refresh rate. Leave a dropdown on "Leave unchanged" and the profile won't touch it.</li>
+            <li><strong>Resolution</strong> - Every mode the driver offers, with its refresh rate. "Leave unchanged" means the profile won't touch it.</li>
             <li>Each row shows what the monitor is set to right now, which is what you're changing from.</li>
           </ul>
 
           <h3>Arranging Your Monitors</h3>
           <p>Drag a monitor in the picture at the top and it moves, the way the numbered boxes move in Windows' own Display Settings. A monitor dropped onto another gets pushed back out. One dropped in empty space gets pulled back into contact. A short drag still just selects.</p>
-          <p>Hold <kbd>Shift</kbd> while dragging to snap to the nearest edge, with a line marking what the two displays now line up on. Without <kbd>Shift</kbd> the monitor lands exactly where you dropped it. From the keyboard, select a display and press <kbd>Shift</kbd> plus an arrow to nudge it 10 pixels (the step is set in Settings &rarr; Auto-activation), or <kbd>Ctrl</kbd>+<kbd>Shift</kbd> plus an arrow for a tenth of that. The presses add up. The <strong>Position</strong> fields under the picture take an exact offset. A value that would leave a display touching nothing is refused. The editor says so. Along an axis two displays already share an edge on, neither can move. The editor names the axis that's free. The primary display's fields are switched off, since it's the origin everything else is measured from. Moving the primary shifts everything else the opposite way, because Windows pins it to 0, 0.</p>
-          <p>Windows enforces three things about any arrangement and rewrites yours if you break them: the primary sits at the origin, nothing overlaps, and every display touches another. WLM settles the layout before writing it, and tells you if closing a gap means moving a display you weren't touching.</p>
-          <p>Saving the profile saves the arrangement with it. Positions are stored for every display, not just the ones you moved, because "the portrait one is on the left" means nothing without the rest. <strong>Apply now</strong> tries the whole thing on your real displays with the usual 15-second Keep-or-Revert countdown. The revert puts the arrangement back too.</p>
-          <p><kbd>Ctrl</kbd>+<kbd>Z</kbd> and <kbd>Ctrl</kbd>+<kbd>Y</kbd> work inside the editor before anything reaches your displays. The editor names what it took back: <em>Undid: moved a display.</em> Holding an arrow key down is one step. Two things start the trail over, because both leave it describing a desk that's gone: a monitor arriving or leaving, and <strong>Apply now</strong>.</p>
-          <p>A chip under the picker says which of three things is true. The button beside it does the matching thing:</p>
+          <p>Hold <kbd>Shift</kbd> to snap to the nearest edge, with a line marking what the two displays line up on. From the keyboard, <kbd>Shift</kbd>+arrow nudges a selected display 10 pixels (the step is a setting), <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+arrow a tenth of that, and the presses add up. The <strong>Position</strong> fields take an exact offset. An arrangement that would leave a display touching nothing is refused, and the editor says so; along an axis two displays already share, neither can move, and the editor names the axis that's free. The primary's fields are off, since it's the origin: moving it shifts everything else the opposite way.</p>
+          <p>Windows enforces three things about any arrangement and rewrites yours if you break them: the primary sits at the origin, nothing overlaps, and every display touches another. WLM settles the layout before writing it and tells you if closing a gap moved a display you weren't touching.</p>
+          <p>Saving the profile saves the arrangement with it, positions for every display, because "the portrait one is on the left" means nothing without the rest. <strong>Apply now</strong> tries the whole thing on your real displays with the usual 15-second Keep-or-Revert countdown, and the revert puts the arrangement back too. <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd> work inside the editor before anything reaches your displays, and the editor names what it took back. A monitor arriving or leaving, or an Apply now, starts the undo trail over, because both leave it describing a desk that's gone.</p>
+          <p>A chip under the picker says which of three things is true, and the button beside it does the matching thing:</p>
           <ul>
-            <li><strong>Not saved with this profile</strong> &rarr; <strong>Save this arrangement</strong>. Pins your monitors where they sit right now. This works without dragging anything, which is how you capture a desk that's already right.</li>
-            <li><strong>Changed from your current arrangement</strong> &rarr; <strong>Revert</strong>. Puts the boxes back where your monitors physically are. It leaves a saved arrangement alone.</li>
-            <li><strong>Saved with this profile</strong> &rarr; <strong>Remove arrangement</strong>. Drops the arrangement without touching the rest of the display step.</li>
+            <li><strong>Not saved with this profile</strong> &rarr; <strong>Save this arrangement</strong>. Pins your monitors where they sit right now, no dragging needed.</li>
+            <li><strong>Changed from your current arrangement</strong> &rarr; <strong>Revert</strong>. Puts the boxes back where your monitors physically are, leaving a saved arrangement alone.</li>
+            <li><strong>Saved with this profile</strong> &rarr; <strong>Remove arrangement</strong>. Drops the arrangement, keeps the rest of the display step.</li>
           </ul>
 
           <h3>Changing Several Monitors Together</h3>
-          <p><kbd>Ctrl</kbd>+click adds or removes a monitor, <kbd>Shift</kbd>+click takes the run between two, the same gestures the visual editor uses for windows. Pick several and you get one set of controls that applies to all of them, offering only what every one of them can do. Where they disagree, the editor says so. Scaling reads <strong>now mixed</strong>. The control offers a "Multiple values" option that leaves each display as it is, in place of "Leave unchanged". Orientation only changes if you actually choose one. A landscape and a portrait display together don't get the second one rotated by accident.</p>
+          <p><kbd>Ctrl</kbd>+click adds or removes a monitor, <kbd>Shift</kbd>+click takes the run between two, the same gestures the visual editor uses for windows. Several selected get one set of controls offering only what every one of them can do, and where they disagree the editor says so: scaling reads <strong>now mixed</strong>, with a "Multiple values" option that leaves each display as it is. Orientation only changes if you choose one, so a landscape and a portrait display together don't get the second one rotated by accident.</p>
 
           <h3>Earlier Arrangements</h3>
-          <p>The countdown covers the change you just made. <strong>History</strong> in the display editor covers the one from yesterday. WLM records your arrangement before each change it applies, whatever triggered it. Each row draws the desk as it was, with the primary picked out. <strong>Use this</strong> draws that arrangement in the editor. Nothing moves until you press Apply now. The list belongs to the monitors it describes. A layout from your desk is never offered on a different set of displays. A row naming a monitor you no longer have is greyed out and says which.</p>
+          <p>The countdown covers the change you just made. <strong>History</strong> covers the one from yesterday: WLM records your arrangement before each change it applies, whatever triggered it. Each row draws the desk as it was, with the primary picked out. <strong>Use this</strong> draws it in the editor; nothing moves until Apply now. The list belongs to the monitors it describes, so a row naming a monitor you no longer have is greyed out and says which.</p>
 
           <h3>Your Windows Come with the Monitors</h3>
-          <p>Swap your left and right monitors and the windows come with them, keeping the same spot on the same panel. Minimised and maximised windows are left alone. A maximised window already follows its monitor. A minimised one has no position worth keeping.</p>
+          <p>Swap your left and right monitors and the windows come with them, keeping the same spot on the same panel. Minimised windows are left alone: a maximised one already follows its monitor, and a minimised one has no position worth keeping.</p>
 
           <h3>Zoom to Resolution Rules</h3>
-          <p>These live in <strong>Settings &rarr; Auto-activation &rarr; Zoom to resolution rules</strong>, because they describe your hardware, not a layout. Pair a percentage with a resolution for a display. From then on, whenever that display is set to that zoom, the resolution comes with it, by a profile, a step hotkey, or anything else.</p>
-          <div class="shot"><a href="img/14-settings-zoom-rules.png" target="_blank" rel="noopener" title="Open full size"><img src="img/14-settings-zoom-rules.png" alt="Zoom to resolution rules in Settings, with a Matched by column" loading="lazy"></a></div>
+          <p>These live in <strong>Settings &rarr; Auto-activation &rarr; Zoom to resolution rules</strong>, because they describe your hardware, not a layout. Pair a percentage with a resolution for a display, and whenever that display is set to that zoom, the resolution comes with it, from a profile, a step hotkey, or anything else.</p>
+          <div class="shot video" data-v="img/v/binding.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/14-settings-zoom-rules.png" target="_blank" rel="noopener" title="Open full size"><img src="img/14-settings-zoom-rules.png" alt="Zoom to resolution rules in Settings, with a Matched by column" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/14-settings-zoom-rules.png"></video></div>
           <p class="caption">Every rule names its display and says how it finds it.</p>
           <p>Rules are filed against the part of a display's hardware identity that doesn't change between sessions. One set for a Parsec virtual display still applies next time you connect. Two displays of the same model stay separate, because the key includes which output each one is on.</p>
 
           <h3>Picking a Resolution</h3>
-          <p>Resolution is two dropdowns, one for size and one for refresh rate, the way Windows and NVIDIA both do it. Sizes are grouped by shape (16:9, 4:3, 21:9) and the largest one is marked. Some displays offer a lot of them (one test machine reports 227 modes). The size list has a search box at the top. Type <code>1440</code> for every mode with 1440 on either side, <code>2560 1440</code>, <code>2560x1440</code>, or just <code>25 14</code> for that one, or a word to search the labels. Arrow keys, <kbd>Home</kbd>, <kbd>End</kbd>, <kbd>Enter</kbd>, and <kbd>Esc</kbd> all work in the list. Pick a size that can't do your current refresh rate and WLM keeps the rate where it can, otherwise falls back to the highest that size offers and tells you it did.</p>
-          <p>The rate dropdown opens on <strong>Highest this size offers</strong>, which is a request rather than a blank. It means "whatever the fastest rate is here", worked out on the display the profile lands on rather than fixed when you save it, so one profile asks for the best each of your displays can do. Leave it there and that's what you get. Pick a number instead and WLM asks for exactly that.</p>
-          <p>The orientation dropdown sits before the resolution, because it decides what resolutions there are. Windows only reports sizes for the orientation a display is currently in. WLM works out the list for the one you pick. Flipping between landscape and portrait keeps the same physical resolution selected. Sizes are written long side first whichever way the panel faces. A rotated monitor reads 2560&times;1440. What's sent to Windows stays in the orientation Windows is speaking.</p>
+          <p>Resolution is two dropdowns, size then refresh rate, the way Windows and NVIDIA both do it. Sizes are grouped by shape (16:9, 4:3, 21:9), the largest is marked, and the list has a search box: <code>1440</code> finds every mode with 1440 on either side, <code>2560 1440</code> or <code>25 14</code> narrow it, and a word searches the labels. Arrow keys, <kbd>Home</kbd>, <kbd>End</kbd>, <kbd>Enter</kbd> and <kbd>Esc</kbd> all work. Pick a size that can't do your current rate and WLM keeps the rate where it can, or falls back to the highest that size offers and says it did.</p>
+          <p>The rate dropdown opens on <strong>Highest this size offers</strong>, which is a request rather than a blank: worked out on the display the profile lands on, not fixed at save time, so one profile asks for the best each display can do. Pick a number instead and WLM asks for exactly that.</p>
+          <p>Orientation sits before resolution because it decides what resolutions there are; Windows only reports sizes for the orientation a display is in. Flipping between landscape and portrait keeps the same physical resolution selected, sizes are written long side first whichever way the panel faces, and what goes to Windows stays in the orientation Windows is speaking.</p>
           <p>A mode your display doesn't currently offer is still saved, flagged <em>not offered yet</em>, and applies the moment the driver starts listing it. That matters for virtual displays, whose mode lists change with what the driver has been told about.</p>
 
           <h3>Custom Resolutions</h3>
-          <p>A virtual display only offers what its driver knows about. WLM names the driver behind yours: Parsec, Apollo, spacedesk, the community Virtual Display Driver, a Remote Desktop session, a virtual machine's adapter. Parsec is the only one that publishes a way for another app to add resolutions. On a Parsec display the <strong>Custom resolutions</strong> button under the resolution list registers two of them behind one administrator prompt. Disconnect and reconnect the session and they show up in Windows and in WLM's dropdowns. On any other virtual display the same button reads <strong>About this display</strong> and says who can change the list: spacedesk takes it from the client device, Apollo builds its display to match each stream, the community driver reads a settings file of its own.</p>
-          <p>Select that one display on its own and the button is there. Where one driver runs several displays it's on any of them, because the sizes are registered with the driver. With none of that driver's displays up it appears only where a profile asks for a size the driver doesn't list, which is how you register a size before the next session.</p>
-          <div class="shot"><a href="img/13-display-virtual.png" target="_blank" rel="noopener" title="Open full size"><img src="img/13-display-virtual.png" alt="The Custom resolutions dialog, with the sizes WLM registered and the ones the driver owns" loading="lazy"></a></div>
+          <p>A virtual display only offers what its driver knows about. WLM names the driver behind yours: Parsec, Apollo, spacedesk, the community Virtual Display Driver, a Remote Desktop session, a VM's adapter. Parsec is the only one that publishes a way for another app to add resolutions: on a Parsec display, <strong>Custom resolutions</strong> under the list registers two of them behind one administrator prompt, and they show up after a disconnect and reconnect. On any other virtual display the same button reads <strong>About this display</strong> and says who can change the list: spacedesk takes it from the client device, Apollo builds its display to match each stream, the community driver reads a settings file of its own.</p>
+          <p>Select that one display on its own and the button is there; where one driver runs several displays it's on any of them. With none of that driver's displays up it appears only where a profile asks for a size the driver doesn't list, which is how you register a size before the next session.</p>
+          <div class="shot"><a href="img/13-display-virtual.png" target="_blank" rel="noopener" title="Open full size"><img src="img/13-display-virtual.png" alt="The Custom resolutions dialog, with the sizes WLM registered and the ones the driver owns" width="900" height="720" loading="lazy"></a></div>
           <p class="caption">The rows WLM didn't write are read-only, marked with a dash instead of a slot number. Parsec rewrites those itself on every connect.</p>
           <p>Two limits worth knowing:</p>
           <ul>
-            <li><strong>They won't appear in Parsec's own resolution picker.</strong> That list is fixed. Apply the resolution from WLM instead. Setting Parsec's host Resolution to "Keep Host Resolution" also works, since it stops Parsec overriding what WLM sets.</li>
-            <li><strong>Parsec owns three of the five slots.</strong> It rewrites slots 2, 3, and 4 on every connect with your client's screen sizes. WLM only touches slots 0 and 1.</li>
+            <li><strong>They won't appear in Parsec's own resolution picker.</strong> That list is fixed. Apply the resolution from WLM, or set Parsec's host Resolution to "Keep Host Resolution" so it stops overriding what WLM sets.</li>
+            <li><strong>Parsec owns three of the five slots.</strong> It rewrites slots 2, 3 and 4 on every connect with your client's screen sizes. WLM only touches 0 and 1.</li>
           </ul>
 
           <h3>Zoom Presets</h3>
-          <p>Tick <strong>Display-only preset</strong> and the profile stops being a window layout. No windows saved, no windows moved, just the scaling and resolution.</p>
-          <div class="shot"><a href="img/11-display-preset.png" target="_blank" rel="noopener" title="Open full size"><img src="img/11-display-preset.png" alt="A display-only profile in the sidebar, with a hotkey and no windows" loading="lazy"></a></div>
+          <p>Tick <strong>Display-only preset</strong> and the profile stops being a window layout: no windows saved, no windows moved, just scaling and resolution.</p>
+          <div class="shot"><a href="img/11-display-preset.png" target="_blank" rel="noopener" title="Open full size"><img src="img/11-display-preset.png" alt="A display-only profile in the sidebar, with a hotkey and no windows" width="1240" height="820" loading="lazy"></a></div>
           <p class="caption">"Desk zoom" is a display-only preset on <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>0</kbd>.</p>
-          <p>It's still a profile. It gets a hotkey, a spot in the tray menu, the Jump List, the <a href="#palette">command palette</a>, <code>--load=</code>, and <code>wlm://</code> links. Display-only presets are kept out of <a href="#binding">auto-activation</a>. One can't beat the layout profile you actually wanted.</p>
+          <p>It's still a profile: hotkey, tray menu, Jump List, the <a href="#palette">command palette</a>, <code>--load=</code>, <code>wlm://</code> links. Display-only presets are kept out of <a href="#binding">auto-activation</a>, so one can't beat the layout profile you actually wanted.</p>
 
           <h3>Turning It On, and What It Can't Promise</h3>
-          <p>The kill switch is under Settings &rarr; Auto-activation &rarr; Display configuration, on by default. Turn it off and a profile's display step is skipped on load. WLM says that's why.</p>
-          <p>Changing resolution uses a documented Windows API. Changing the scaling percentage doesn't, because Windows exposes none. WLM uses the same internal call the Settings app does, behind a capability check. If your build stops accepting it, the scaling controls switch off and say why. Resolution carries on working. Ask for a percentage your monitor can't do and you're told it was clamped, and to what. After every change WLM re-reads the display to check the value landed, which catches a Windows 11 24H2 bug where a resolution change on a virtual display reports success while nothing happens. Some virtual adapters, Parsec's among them, report a scaling range that disagrees with what Windows is doing. Where that happens the editor shows both numbers and says the control may not behave.</p>
+          <p>The kill switch is under Settings &rarr; Auto-activation &rarr; Display configuration, on by default; turn it off and a profile's display step is skipped, with WLM saying that's why. Resolution uses a documented Windows API. Scaling doesn't, because Windows exposes none: WLM uses the same internal call the Settings app does, behind a capability check, and if your build stops accepting it the scaling controls switch off and say why while resolution carries on. A percentage your monitor can't do is clamped, and you're told to what. After every change WLM re-reads the display to check the value landed, which catches a Windows 11 24H2 bug where a resolution change on a virtual display reports success while nothing happens. Some virtual adapters, Parsec's among them, report a scaling range that disagrees with what Windows is doing; there the editor shows both numbers and says the control may not behave.</p>
         </section>
 
         <section id="visual">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial visual</span></p>
           <h2>The Visual Editor</h2>
           <p>Switch the view to "VISUAL" for a minimap of your saved layout: monitors to scale, one tab per virtual desktop, every window draggable.</p>
-          <div class="shot"><a href="img/02-visual-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/02-visual-editor.png" alt="Visual editor with two monitors" loading="lazy"></a></div>
-          <p class="caption">Drag to move, corner-drag to resize. Hold <kbd>Shift</kbd> while dragging to snap to monitor edges and to other windows.</p>
+          <div class="shot video" data-v="img/v/visual.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/02-visual-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/02-visual-editor.png" alt="Visual editor with two monitors" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/02-visual-editor.png"></video></div>
+          <p class="caption">Drag to move, corner-drag to resize, <kbd>Shift</kbd> while dragging to snap to monitor edges and other windows.</p>
           <ul>
-            <li>Arrow keys nudge whatever is selected: 10 pixels a press, or 1 with <kbd>Shift</kbd>. A nudged window crosses onto the next monitor the way a dragged one does. Holding a key down is one undo step.</li>
-            <li>Select a window to get "Edit", "Block app", and "Remove" in the panel below the canvas. <kbd>Enter</kbd> edits it, <kbd>x</kbd> or <kbd>Delete</kbd> removes it.</li>
-            <li><strong>Select several at once</strong> the way you select files: <kbd>Ctrl</kbd>+click adds or removes one, <kbd>Shift</kbd>+click takes everything between what you clicked and where you started, and <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+click adds a run to what you already had.</li>
-            <li>With more than one selected, the panel offers <strong>move to monitor</strong>, <strong>set state</strong> and <strong>remove</strong>. Position and size are deliberately left out, because one X applied to twelve windows stacks all twelve. Docking isn't here either: it happens on the <a href="#vw">Virtual Window</a> itself, which is the only place one action can both move the window and record it.</li>
+            <li>Arrow keys nudge whatever is selected: 10 pixels a press, 1 with <kbd>Shift</kbd>, crossing onto the next monitor the way a drag does. Holding a key down is one undo step.</li>
+            <li>Select a window for "Edit", "Block app" and "Remove" below the canvas. <kbd>Enter</kbd> edits, <kbd>x</kbd> or <kbd>Delete</kbd> removes.</li>
+            <li><strong>Select several at once</strong> the way you select files: <kbd>Ctrl</kbd>+click adds or removes, <kbd>Shift</kbd>+click takes the run between, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+click adds a run to what you had. With more than one selected the panel offers <strong>move to monitor</strong>, <strong>set state</strong> and <strong>remove</strong>; position and size are deliberately absent, because one X applied to twelve windows stacks all twelve. Docking isn't here either: it happens on the <a href="#vw">Virtual Window</a> itself, the only place one action can both move the window and record it.</li>
             <li>Drag a window between monitors and its target monitor and relative position update on their own.</li>
-            <li>Every window can be given its own colour from the edit dialog, so that the ones you care about stand out.</li>
-            <li>Edits auto-save after a beat. The "unsaved" badge tells you when a write is pending.</li>
+            <li>Every window can be given its own colour from the edit dialog, so the ones you care about stand out.</li>
+            <li>Edits auto-save after a beat. The "unsaved" badge says when a write is pending.</li>
           </ul>
 
           <h3>Reaching a Window Behind Another</h3>
-          <p>The "+N" badge says something is under a window and clicking cycles through the stack. To drag the one underneath, fold the one on top: each window has a collapse control that shrinks it to its title row. "Collapse overlapping" in the legend folds every window that's covering something.</p>
-          <div class="shot"><a href="img/15-visual-collapsed.png" target="_blank" rel="noopener" title="Open full size"><img src="img/15-visual-collapsed.png" alt="Two stacked windows collapsed to title bars" loading="lazy"></a></div>
-          <p class="caption">Collapsed windows in the same stack cascade instead of stacking. Every one stays clickable.</p>
-          <p>This is a viewing aid only. A collapsed window still loads at its full size. The folding is forgotten when you switch profiles.</p>
+          <p>The "+N" badge says something is under a window, and clicking cycles through the stack. To drag the one underneath, fold the one on top: each window has a collapse control that shrinks it to its title row, and "Collapse overlapping" in the legend folds everything covering something.</p>
+          <div class="shot"><a href="img/15-visual-collapsed.png" target="_blank" rel="noopener" title="Open full size"><img src="img/15-visual-collapsed.png" alt="Two stacked windows collapsed to title bars" width="1240" height="820" loading="lazy"></a></div>
+          <p class="caption">Collapsed windows in the same stack cascade instead of stacking, so every one stays clickable.</p>
+          <p>This is a viewing aid only: a collapsed window still loads at full size, and the folding is forgotten when you switch profiles.</p>
         </section>
 
         <section id="vw">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial virtual-windows</span></p>
           <h2>Virtual Windows</h2>
-          <p>A Virtual Window is a real window WLM opens and owns, not a shape drawn in the editor. Give it a name and a monitor, then drag other windows onto it to dock them, the way you'd dock a tool window in Visual Studio or Rider. Close the container and its members stay exactly where they were. Everything about what's inside a container is done on the container, from a panel it carries itself. The app shows you what's docked. The container is where you change it.</p>
+          <p>A Virtual Window is a real window WLM opens and owns, not a shape drawn in the editor. Give it a name and a monitor, then drag other windows onto it to dock them, the way you'd dock a tool window in Visual Studio or Rider. Everything about what's inside a container is done on the container, from a panel it carries itself. The app shows you what's docked; the container is where you change it.</p>
 
           <h3>Dragging a Window In</h3>
-          <p>Pick up any window by its title bar and drag it over a Virtual Window. Guides appear: four edge targets around the pane under your cursor, plus a shaded rectangle showing exactly the shape the window is about to take. Drop on one of the targets and the window fills that half of the pane you aimed at.</p>
-          <p>The shaded rectangle isn't a guess. It's the same rectangle the drop uses, worked out the same way. What you see under the cursor is what you get when you let go.</p>
-          <p>Aim at the edge two panes share and the targets offer the pair as well as the single pane, so a third window can go under both rather than under just one of them. The group is outlined with a dashed frame, so which of the two it means is clear before you let go.</p>
-          <p>Two windows of the same application dock independently, including two File Explorer windows, which used to be told apart by name and end up fighting over one pane.</p>
-          <p>Hold <kbd>Ctrl</kbd> while you drag and nothing docks, the same as <kbd>Ctrl</kbd> in Visual Studio. Drop somewhere that isn't a container and the window just lands there, the same as it always has.</p>
-          <p>Drop in the middle of a pane that's already occupied and nothing happens. WLM won't stack windows into a tabbed group the way Visual Studio and Rider do. A tabbed group has to hide every window in it but the one on top. Hiding a window nobody asked to hide is the same kind of thing as taking it over. This feature doesn't do that.</p>
+          <p>Pick up any window by its title bar and drag it over a Virtual Window. Guides appear: four edge targets around the pane under your cursor, plus a shaded rectangle showing exactly the shape the window is about to take. The rectangle isn't a guess; it's the same rectangle the drop uses, so what you see under the cursor is what you get when you let go.</p>
+          <p>Aim at the edge two panes share and the targets offer the pair as well as the single pane, so a third window can go under both. The group is outlined with a dashed frame, so which of the two it means is clear before you let go.</p>
+          <p>Two windows of the same application dock independently, including two File Explorer windows. Hold <kbd>Ctrl</kbd> while you drag and nothing docks, the same as <kbd>Ctrl</kbd> in Visual Studio. Drop in the middle of an occupied pane and nothing happens: WLM won't stack windows into a tabbed group, because a tabbed group has to hide every window in it but the one on top, and hiding a window nobody asked to hide is the same kind of thing as taking it over.</p>
 
           <h3>Creating a Virtual Window</h3>
-          <p>Virtual Windows have their own page. Press the Virtual Windows button in the sidebar to see every one you've made, whichever profiles use it. "+ New virtual window" adds an empty container. The page shows one at a time, picked from the tabs across the top. From there you can rename it, open it, delete it (press Delete twice), and choose who uses it: All profiles, or a tick per profile. Its docked windows have the same List and Visual views a profile has, with the virtual window as the monitor. List shows each window's pane, how it starts when a profile loads, and a button to undock it. A profile's own Virtual Windows tab, beside List and Visual, is a picker. Tick the ones that profile should load, or make a new one there and it starts out ticked. Browsing to another profile doesn't close a container that's on screen. Give it a monitor from its card on the profile's tab. If you've lost track of one, "Show container" on that card, or Open on the page, brings the real window forward with its panel already open.</p>
-          <div class="shot"><a href="img/16-visual-virtual-window.png" target="_blank" rel="noopener" title="Open full size"><img src="img/16-visual-virtual-window.png" alt="Visual editor showing two windows docked into a Virtual Window container, selected and showing its name and docked count" loading="lazy"></a></div>
-          <p class="caption">The container has its own size and position now, and the panes inside it are worked out from that. It's the other way round from how it started.</p>
-          <p>On the canvas a container is drawn the same way an ordinary window is. A dashed frame and a small badge with the docked count are the only things marking it out. It drags, resizes, and moves between monitors just like a window does. The windows themselves stop having a box of their own once you dock them, because the container is what represents them there now, and their names are drawn on the container's box instead. In the list view a container gets its own row with a docked count, its members listed underneath it, and a "Manage" button that jumps to its card on the Virtual Windows tab.</p>
+          <p>Virtual Windows have their own page: press the Virtual Windows button in the sidebar to see every one you've made, whichever profiles use it. "+ New virtual window" adds an empty container; the tabs across the top pick which one you're looking at. Rename it, open it, delete it (press Delete twice), and choose who uses it: All profiles, or a tick per profile. Its docked windows have the same List and Visual views a profile has, with the virtual window as the monitor. A profile's own Virtual Windows tab is a picker: tick the ones that profile should load, or make a new one there and it starts out ticked. Lost track of one? "Show container" on its card, or Open on the page, brings the real window forward with its panel already open.</p>
+          <div class="shot video" data-v="img/v/vw.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/16-visual-virtual-window.png" target="_blank" rel="noopener" title="Open full size"><img src="img/16-visual-virtual-window.png" alt="Visual editor showing two windows docked into a Virtual Window container, selected and showing its name and docked count" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/16-visual-virtual-window.png"></video></div>
+          <p class="caption">On the canvas a container is drawn the way an ordinary window is. A dashed frame and the docked-count badge are the only things marking it out.</p>
+          <p>It drags, resizes, and moves between monitors just like a window. The docked windows stop having a box of their own once they're in one: the container represents them, with their names drawn on its box and a row of its own in the list view, members listed underneath, and a "Manage" button that jumps to its card.</p>
 
           <h3>The Container's Own Panel</h3>
-          <p>Every container has a button beside its title bar that opens a panel listing what's inside it. Each row has an <strong>Undock</strong> button, which takes that window out and hands it back the size it walked in with, right there and then.</p>
-          <p><strong>Add window</strong> is the way to dock something without dragging it. It offers every window you have open, plus any window this profile saved that isn't running at the moment. That second group is how you build a layout around an app you haven't started yet: there's nothing on screen to move, so it just goes into the saved layout and lands there on the next Load.</p>
-          <p>A row with a filled dot is a window the container is holding right now. A hollow one is a window this profile says belongs here that isn't running. Either can be undocked.</p>
-          <p>The panel takes its height out of the space the panes use, rather than floating over them. That's deliberate, and it's the reason it works at all: a docked window covers its whole pane, so anything drawn inside that area would be hidden behind a real window the moment you docked anything. Opening the panel shrinks the panes and everything inside shuffles down to match. Close it and they go back.</p>
+          <p>Every container has a button beside its title bar that opens a panel listing what's inside. Each row can <strong>Undock</strong> (the window leaves and gets the size it walked in with, right there and then) or <strong>Collapse</strong> (the window stays open but hides; its pane is labelled and it waits in a flyout of restore buttons at the container's top right, one press away).</p>
+          <p><strong>Add window</strong> is the way to dock something without dragging it: every window you have open, plus every window this profile saved that isn't running. That second group is how you build a layout around an app you haven't started yet; it goes into the saved layout and lands there on the next Load.</p>
+          <p>A filled dot is a window the container is holding now; a hollow one is saved for this container but not running. Either can be undocked.</p>
+          <p>The panel takes its height out of the space the panes use rather than floating over them, which is the only way it can work at all: a docked window covers its whole pane, so anything drawn inside that area would be hidden behind a real window. Opening the panel shrinks the panes, everything shuffles down to match, and closing it gives the space back.</p>
 
           <h3>Resizing While Docked</h3>
-          <p>Two docked windows that share an edge have a splitter in the gap between them. Drag it and both windows resize together, live. Let go and the position is remembered with the profile.</p>
-          <p>Docking now resizes the window you drop, because a pane decides how big its member is. That's the change. The size the window arrived with is remembered and handed back the moment you undock it, even if you resized it while it was docked. Docking borrows a size. It doesn't replace one.</p>
-          <p>Some windows won't take the size a pane hands them. An app with a minimum size lands at its minimum instead. Windows reports the resize as successful either way. WLM checks afterwards and says so on the container's own title bar. You won't be left wondering why one window looks wrong.</p>
+          <p>Two docked windows that share an edge have a splitter in the gap between them. Drag it and both resize together, live; let go and the position is saved with the profile. Docking resizes the window you drop, because a pane decides how big its member is. The size the window arrived with is remembered and handed back the moment you undock it. Docking borrows a size; it doesn't replace one.</p>
+          <p>Some windows won't take the size a pane hands them and land at their own minimum instead, while Windows reports the resize as successful. WLM checks afterwards and says so on the container's title bar, so you're not left wondering why one window looks wrong.</p>
 
           <h3>Fully Docked</h3>
-          <p>The toggle on the container's own title bar takes the frames off. Every window inside loses its title bar and its borders and fills its pane exactly, edge to edge, so a container holding three windows reads as one surface with three panels rather than three windows parked next to each other. The gaps between them belong to the container.</p>
+          <p>The toggle on the container's title bar takes the frames off. Every window inside loses its title bar and borders and fills its pane exactly, edge to edge, so a container holding three windows reads as one surface with three panels. The gaps between them belong to the container.</p>
           <p>Nothing is redrawn and nothing is re-hosted. Each window is still the real application, still running, still in alt-tab, still taking your clicks and your typing. WLM hides the real window and draws it on the container at its pane's size, which is why video keeps playing and a text box still takes the caret.</p>
-          <p>Apps that draw their own title bar inside their window, which File Explorer and most browsers do, are measured and cropped rather than left with a strip of chrome showing. A window WLM can't take over stays an ordinary docked window, and the container's bar says so instead of leaving you to work out which one looks wrong.</p>
-          <p>The same toggle puts every title bar and border back. It carries a tint while it's on, and the controls brighten as your pointer reaches them, because the bar it lives on is deliberately small.</p>
-          <p>A window that's hidden with no WLM left to unhide it would be a window you can't get back, so none of this depends on a clean exit. A separate watcher puts everything back if WLM's process dies, and WLM restores anything still on that list the next time it starts. Undocking, closing the container, removing it and quitting all do the same.</p>
+          <p>Apps that draw their own title bar inside their window, which File Explorer and most browsers do, are measured and cropped rather than left with a strip of chrome showing. A window WLM can't take over stays an ordinary docked window, and the container's bar says so instead of leaving you to work out which one looks wrong. The same toggle puts every title bar and border back, and none of this depends on a clean exit: a separate watcher puts everything back if WLM's process dies, and WLM restores anything still on that list at its next start.</p>
+
+          <h3>Out of the Way, Not Gone</h3>
+          <p>The container's close button doesn't close anything: it hides the whole group, everything still docked, and the tray icon grows a badge saying something is hidden. Right-click the tray and each hidden virtual window has its own "Show" entry. A profile Load does the same to the virtual windows the profile doesn't use, and loading a profile that names one brings it straight back. Deleting a container from its page is the real removal: its members are released, undocked at the size they came in with, and anything WLM started fresh for it is closed with it.</p>
 
           <h3>Working with a Virtual Window</h3>
           <ul>
-            <li>Drag the container anywhere on the canvas and every docked window goes with it. What's docked where inside it doesn't change, only where the whole container sits.</li>
-            <li>"Move to monitor…" in the strip sends the container to another display. Its members catch up because they follow it, the same as any drag.</li>
-            <li>A docked window is listed under its container in the List view and named on the container's box in Visual, read-only in both. It no longer has a row of its own in the ordinary layout, because the container is what represents it there.</li>
-            <li>The Virtual Windows page's Visual view draws the container and its panes. Drag a docked window onto another to swap them, or onto an edge to give it a new pane on that side. If the container is open, the real windows move right away. Adding windows is on the container's own panel.</li>
-            <li>"Remove" on a container drops the container and puts every member back into the ordinary layout, undocked, right where it was sitting and back at the size it had before it was docked.</li>
-            <li>A container's own title bar can be switched off from its card with a "Title bar" checkbox. Hide it and the container becomes a plain backdrop with a small handle in the corner to bring the bar back. It's still draggable either way. That toggle never touches anything docked inside it. Hiding a docked window's own title bar is what Fully docked does, which is a separate toggle on the container's bar.</li>
-            <li>A container's title bar has its own minimize and maximize buttons. Minimizing takes the docked windows with it, and a maximized container keeps them all on screen.</li>
-            <li>A container has its own taskbar button and its own icon, a window holding panes, and all containers share a taskbar group apart from WLM's. Clicking the container, or that button, brings it and everything docked in it forward together. The windows docked in it leave the taskbar while they're docked, and come back when they're undocked or the container closes. Settings, under Virtual Windows, turns that off.</li>
+            <li>Drag the container anywhere and every docked window goes with it; what's docked where inside doesn't change, only where the whole thing sits. The members follow frame by frame as you drag, not with a catch-up jump at the end.</li>
+            <li>"Move to monitor&hellip;" in the strip sends the container to another display; its members follow, the same as any drag.</li>
+            <li>A container's own title bar can be switched off from its card. Hidden, the container becomes a plain backdrop, and sweeping your mouse to the top edge is what brings the controls back, along with the small handle in the corner. It's still draggable either way, and the toggle never touches anything docked inside it.</li>
+            <li>The title bar has its own minimize and maximize. Minimizing takes the docked windows with it; maximizing keeps every one of them on screen, title bar included, flush to the edges.</li>
+            <li>A container has its own taskbar button and icon, a window holding panes, and all containers share a taskbar group apart from WLM's. Clicking the container, or that button, brings it and everything docked in it forward together. Docked windows leave the taskbar while they're docked and come back when they're undocked or the container is deleted. Settings, under Virtual Windows, turns that off.</li>
             <li>Every one of these goes on the undo trail under its own name. <a href="#editor">History</a> lists each on its own line.</li>
           </ul>
 
           <h3>What a Virtual Window Doesn't Do</h3>
-          <p>Docked windows keep their own alt-tab entry, so they still show up separately there. Another app raising itself can still land on top of one, though clicking the container brings it and everything in it back to the front together. Some windows refuse the size a pane hands them and settle for their own minimum instead, which the container's title bar will tell you about. Dragging the container carries its members with it as you go now, rather than catching them up when you let go. Rearranging your monitors in the <a href="#display">Display editor</a> moves ordinary windows but not yet containers. Move the container to its new monitor from its own card afterwards.</p>
-          <div class="shot"><a href="img/19-visual-vw-moved.png" target="_blank" rel="noopener" title="Open full size"><img src="img/19-visual-vw-moved.png" alt="The same Virtual Window container after Move to monitor, with both docked windows now on the second display" loading="lazy"></a></div>
+          <p>Docked windows keep their own alt-tab entry, so they still show up separately there. Another app raising itself can still land on top of one, though clicking the container brings it and everything in it back to the front together. Rearranging your monitors in the <a href="#display">Display editor</a> moves ordinary windows but not yet containers; move the container to its new monitor from its own card afterwards.</p>
+          <div class="shot"><a href="img/19-visual-vw-moved.png" target="_blank" rel="noopener" title="Open full size"><img src="img/19-visual-vw-moved.png" alt="The same Virtual Window container after Move to monitor, with both docked windows now on the second display" width="1240" height="820" loading="lazy"></a></div>
           <p class="caption">Both docked windows crossed together and the gap between them is unchanged. That gap is the whole point.</p>
-          <div class="tip">Virtual Windows live in their own list, <code>virtual-windows.json</code>, beside the profiles folder, and survive an Update. From dev.105, the first start moves any container still inside a profile onto that list, used by the profile it came from, after taking a version of the profile. If you're coming from an older build, Docking Bays are gone and this update does not convert them. The windows that were in a bay are still there and still load, just as ordinary ungrouped windows, with the bay's own name not kept. Write down which windows were in which before you update if you want to rebuild them as Virtual Windows afterwards.</div>
+          <div class="tip">Virtual Windows live in their own list, <code>virtual-windows.json</code>, beside the profiles folder, and survive an Update. From dev.105, the first start moves any container still inside a profile onto that list. If you're coming from an older build, Docking Bays are gone and this update does not convert them: their windows are still there and still load, just as ordinary ungrouped windows. Write down which windows were in which before you update if you want to rebuild them as Virtual Windows afterwards.</div>
         </section>
 
         <section id="editor">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial editing</span></p>
           <h2>Precise Edits, Undo &amp; History</h2>
-          <p>"EDIT" on a list row or "Edit" under the canvas opens exact fields for any window: desktop, monitor, state, the colour it's drawn in, and pixel-perfect position and size. Hovering a list row brings up a card with a scaled picture of where that window sits, its size, its position, and its state.</p>
-          <div class="shot"><a href="img/03-window-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/03-window-editor.png" alt="Per-window editor, open in its own window" loading="lazy"></a></div>
-          <p>Every dialog in WLM is a real window. You can drag it onto a second monitor, resize it, and find it in alt-tab. It opens at the size its content needs and won't shrink below that. The app is disabled while a dialog is up. A stray keystroke can't land behind it. Two things stay inside the app window instead: Settings and the hotkey capture. Two more, Custom resolutions and Earlier arrangements, open from inside the display editor and are drawn in its window rather than as a third one.</p>
+          <p>"EDIT" on a list row or "Edit" under the canvas opens exact fields for any window: desktop, monitor, state, colour, and pixel-perfect position and size.</p>
+          <div class="shot video" data-v="img/v/editor.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/03-window-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/03-window-editor.png" alt="Per-window editor, open in its own window" width="560" height="624" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/03-window-editor.png"></video></div>
+          <p>Every dialog in WLM is a real window: drag it onto a second monitor, resize it, find it in alt-tab. It opens at the size its content needs and won't shrink below that, and the app is disabled while it's up, so a stray keystroke can't land behind it. Settings and the hotkey capture stay inside the app window; Custom resolutions and Earlier arrangements draw inside the display editor's window rather than opening a third.</p>
 
           <h3>How a Window Gets Recognised</h3>
-          <p>Apps rewrite their titles as you work. A window saved with an exact title stops being found the moment it says something else. "Recognise by" at the bottom of the edit dialog lets each window choose:</p>
+          <p>Apps rewrite their titles as you work, and a window saved with an exact title stops being found the moment it says something else. "Recognise by" at the bottom of the edit dialog lets each window choose:</p>
           <ul>
             <li><strong>App and its exact title</strong> - the default.</li>
             <li><strong>App and a title starting with...</strong> - for the part that stays put. "Inbox" still finds "Inbox (3) - Gmail".</li>
             <li><strong>App and window type, any title</strong> - for apps that rename constantly.</li>
           </ul>
-          <p>The looser two require the window class and type to match instead. The rule you set also applies to the last-resort match on the app alone.</p>
+          <p>The looser two require the window class and type to match instead, and the rule also applies to the last-resort match on the app alone.</p>
           <ul>
             <li><kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd> - Undo and redo any edit, with a labelled trail.</li>
             <li><kbd>Ctrl+H</kbd> or "History" - Browse and restore full saved versions of the profile. Every Update keeps a snapshot.</li>
@@ -515,11 +539,11 @@
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial auto-activation</span></p>
           <h2>Monitor Binding &amp; Auto-Activation</h2>
           <p>Bind a profile to your current monitor setup and WLM can restore it by itself whenever that setup reappears: docking the laptop, starting a Parsec session with a virtual display, plugging into the projector.</p>
-          <div class="shot"><a href="img/06-settings-autoactivation.png" target="_blank" rel="noopener" title="Open full size"><img src="img/06-settings-autoactivation.png" alt="Auto-activation settings tab" loading="lazy"></a></div>
+          <div class="shot video" data-v="img/v/binding.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/06-settings-autoactivation.png" target="_blank" rel="noopener" title="Open full size"><img src="img/06-settings-autoactivation.png" alt="Auto-activation settings tab" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/06-settings-autoactivation.png"></video></div>
           <ul>
             <li>Triggers - On monitor change, at app launch, and a dedicated hotkey. All off by default.</li>
             <li>Best-guess remap - When your monitors almost match a saved setup, WLM picks the closest mapping, applies it, and remembers the decision so it never asks twice.</li>
-            <li>The "Status" panel logs every decision. You can always see why a profile did or didn't fire.</li>
+            <li>The "Status" panel logs every decision, so you can always see why a profile did or didn't fire.</li>
           </ul>
         </section>
 
@@ -528,8 +552,8 @@
           <h2>Hold Mode</h2>
           <p>The "Hold layout" toggle (next to the hotkey chip) pins a profile as the live layout. While holding, WLM watches your windows a few times a second:</p>
           <ul>
-            <li>If an app moves or resizes its own window, it gets put straight back.</li>
-            <li>If you drag a window yourself, WLM records the move into the profile instead of fighting you.</li>
+            <li>An app moves or resizes its own window? It gets put straight back.</li>
+            <li>You drag a window yourself? WLM records the move into the profile instead of fighting you.</li>
             <li>Loading a different profile releases the hold. Explicit action always wins.</li>
           </ul>
           <div class="tip">Hold is ideal for apps that "helpfully" reposition themselves after fullscreen games, RDP sessions, or monitor sleep.</div>
@@ -538,19 +562,21 @@
         <section id="desktops">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial desktops</span></p>
           <h2>Virtual Desktops</h2>
-          <p>On Windows 11, profiles capture which virtual desktop each window lives on. Load sends every window back to its desktop and creates missing desktops if the profile needs more than exist. The visual editor shows one tab per desktop. The per-window editor can reassign a window to any desktop, or leave it "Unmapped" to stay where it is.</p>
+          <p>On Windows 11, profiles capture which virtual desktop each window lives on. Load sends every window back to its desktop and creates missing desktops if the profile needs more than exist. The visual editor shows one tab per desktop, and the per-window editor can reassign a window to any desktop, or leave it "Unmapped" to stay where it is.</p>
+          <div class="shot video" data-v="img/v/desktops.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/02-visual-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/02-visual-editor.png" alt="The visual editor's desktop tabs" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/02-visual-editor.png"></video></div>
+          <p class="caption">One tab per virtual desktop; each shows only the windows that live on it.</p>
         </section>
 
         <section id="palette">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial keyboard</span></p>
           <h2>Command Palette &amp; Keyboard</h2>
-          <p><kbd>Ctrl+K</kbd> opens the command palette: every action and every profile, fuzzy-searchable.</p>
-          <div class="shot"><a href="img/09-command-palette.png" target="_blank" rel="noopener" title="Open full size"><img src="img/09-command-palette.png" alt="Command palette" loading="lazy"></a></div>
+          <p><kbd>Ctrl</kbd>+<kbd>K</kbd> opens the command palette: every action and every profile, fuzzy-searchable.</p>
+          <div class="shot video" data-v="img/v/palette.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/09-command-palette.png" target="_blank" rel="noopener" title="Open full size"><img src="img/09-command-palette.png" alt="Command palette" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/09-command-palette.png"></video></div>
           <ul>
             <li>Vim-style navigation in both panes: <kbd>j</kbd>/<kbd>k</kbd>, <kbd>gg</kbd>/<kbd>G</kbd>, <kbd>/</kbd> filter, <kbd>Tab</kbd> to switch panes. Both lists wrap at the ends.</li>
-            <li>On the focused profile: <kbd>Enter</kbd> load, <kbd>r</kbd> rename, <kbd>d</kbd> delete, <kbd>n</kbd> new. Moving through the profile list previews each one on the right, without loading it.</li>
-            <li>In the windows pane: <kbd>Enter</kbd> edits the window under the cursor and <kbd>x</kbd> removes it. The keyboard follows the mouse. A click on the canvas puts the next key there.</li>
-            <li>Arrow keys nudge selected windows in the visual editor, and a selected display in the display editor with <kbd>Shift</kbd> held. The display step is 10 pixels by default, changeable in Settings &rarr; Auto-activation.</li>
+            <li>On the focused profile: <kbd>Enter</kbd> load, <kbd>r</kbd> rename, <kbd>d</kbd> delete, <kbd>n</kbd> new. Moving through the list previews each profile on the right without loading it.</li>
+            <li>In the windows pane: <kbd>Enter</kbd> edits the window under the cursor, <kbd>x</kbd> removes it. The keyboard follows the mouse; a click on the canvas puts the next key there.</li>
+            <li>Arrow keys nudge selected windows in the visual editor, and a selected display in the display editor with <kbd>Shift</kbd> held, 10 pixels by default (a setting).</li>
             <li><kbd>?</kbd> shows the complete keyboard reference.</li>
           </ul>
         </section>
@@ -559,31 +585,30 @@
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial updates</span></p>
           <h2>Updates</h2>
           <p>WLM checks <a href="../">this site's update feed</a> on launch and on a schedule you control. When a new build is out, a badge appears in the title bar. One click downloads, verifies the file against its published size and sha256, and swaps the new build in place.</p>
-          <div class="shot"><a href="img/05-settings-updates.png" target="_blank" rel="noopener" title="Open full size"><img src="img/05-settings-updates.png" alt="Updates settings tab" loading="lazy"></a></div>
+          <div class="shot video" data-v="img/v/updates.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/05-settings-updates.png" target="_blank" rel="noopener" title="Open full size"><img src="img/05-settings-updates.png" alt="Updates settings tab" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/05-settings-updates.png"></video></div>
         </section>
 
         <section id="blacklist">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial blacklist</span></p>
           <h2>Blacklist</h2>
-          <p>Keep noise out of your captures. Rules match on process name, window class, or title. "Block app" in the visual editor adds one in a click. Blacklisted windows are ignored at save and at load.</p>
-          <div class="shot"><a href="img/07-settings-blacklist.png" target="_blank" rel="noopener" title="Open full size"><img src="img/07-settings-blacklist.png" alt="Blacklist settings tab" loading="lazy"></a></div>
+          <p>Keep noise out of your captures. Rules match on process name, window class, or title. "Block app" in the visual editor adds one in a click, and blacklisted windows are ignored at save and at load.</p>
+          <div class="shot video" data-v="img/v/blacklist.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/07-settings-blacklist.png" target="_blank" rel="noopener" title="Open full size"><img src="img/07-settings-blacklist.png" alt="Blacklist settings tab" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/07-settings-blacklist.png"></video></div>
         </section>
 
         <section id="companion">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial companions</span></p>
           <h2>Companion Software</h2>
-          <p>The "Companion software" tab detects complementary tools and offers one-click installs for whatever's missing: PowerToys for drag-snap zones, Parsec for remote desktop, virtual display drivers for headless monitors, PowerShell 7 for scripting. For the ones you have it reports the installed version and asks winget whether an update is waiting. Each app can also update itself in the background on a cadence you set in Settings &rarr; Updates. Most of these are system-wide packages, which Windows won't let an unelevated app update. Those come back saying they need administrator rights.</p>
-          <div class="shot"><a href="img/08-settings-companion.png" target="_blank" rel="noopener" title="Open full size"><img src="img/08-settings-companion.png" alt="Companion software settings tab" loading="lazy"></a></div>
-          <p class="caption">The tab draws immediately and fills in what it found a moment later.</p>
-          <p>Detection also looks at installed drivers and at what's on your PATH, since some software never registers itself in the usual place. That's how PowerShell 7 shows up.</p>
+          <p>The "Companion software" tab detects complementary tools and offers one-click installs for whatever's missing: PowerToys for drag-snap zones, Parsec for remote desktop, virtual display drivers for headless monitors, PowerShell 7 for scripting. For the ones you have it reports the version and asks winget whether an update is waiting, and each app can update itself in the background on a cadence you set in Settings &rarr; Updates. Most are system-wide packages, which Windows won't let an unelevated app update; those come back saying they need administrator rights.</p>
+          <div class="shot video" data-v="img/v/companion.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/08-settings-companion.png" target="_blank" rel="noopener" title="Open full size"><img src="img/08-settings-companion.png" alt="Companion software settings tab" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/08-settings-companion.png"></video></div>
+          <p class="caption">The tab draws immediately and fills in what it found a moment later. Detection also looks at drivers and PATH, which is how PowerShell 7 shows up.</p>
         </section>
 
         <section id="diagnostics">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial diagnostics</span></p>
           <h2>Diagnostics &amp; Reporting a Bug</h2>
-          <p>The "Diagnostics" tab shows the app version and the exact paths WLM reads and writes. "Copy to clipboard" grabs the whole dump. "Open profiles folder" and "Open crash log" take you straight to the files.</p>
-          <p>"Report a bug" and "Request a feature" open a short form. You see exactly what gets sent before anything leaves your machine. The diagnostics dump is optional. Your Windows username is stripped out of the paths. Issues are public. Anything you type there is too.</p>
-          <div class="shot"><a href="img/10-settings-diagnostics.png" target="_blank" rel="noopener" title="Open full size"><img src="img/10-settings-diagnostics.png" alt="Diagnostics settings tab" loading="lazy"></a></div>
+          <p>The "Diagnostics" tab shows the app version and the exact paths WLM reads and writes. "Copy to clipboard" grabs the whole dump; "Open profiles folder" and "Open crash log" take you straight to the files.</p>
+          <p>"Report a bug" and "Request a feature" open a short form. You see exactly what gets sent before anything leaves your machine, the diagnostics dump is optional, and your Windows username is stripped out of the paths. Issues are public; anything you type there is too.</p>
+          <div class="shot video" data-v="img/v/diagnostics.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/10-settings-diagnostics.png" target="_blank" rel="noopener" title="Open full size"><img src="img/10-settings-diagnostics.png" alt="Diagnostics settings tab" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/10-settings-diagnostics.png"></video></div>
           <p class="caption">// a load that didn't restore everything also links to a per-window report from its notification</p>
         </section>
 
@@ -592,29 +617,28 @@
           <h2>Startup, Window Positions &amp; About</h2>
 
           <h3>Starting with Windows</h3>
-          <p>Tick <strong>Start Window Layout Manager when I sign in to Windows</strong> and it does. It starts in the tray, where WLM lives anyway, so nothing opens over whatever you signed in to do. Your hotkeys, Hold mode, and auto-activation are all running from the moment you land on the desktop. There's a second box under the first if you'd rather see the window as well. Both are off until you turn them on.</p>
-          <p>WLM ships as a portable zip with no installer, so it writes its own startup entry, for the folder you're running from, under your own user account. Nothing elevated, nothing machine-wide. Move the folder and it re-points itself the next time you run it. Install an update and it follows that too.</p>
-          <div class="tip">No installer means no uninstaller, so clear the box before you delete the folder. Windows keeps reaching for an entry you leave behind. If you switch the entry off in Task Manager's Startup tab instead, that wins, and the panel says so rather than quietly writing over you.</div>
-          <div class="shot"><a href="img/17-settings-window.png" target="_blank" rel="noopener" title="Open full size"><img src="img/17-settings-window.png" alt="Startup &amp; Window settings tab" loading="lazy"></a></div>
-          <p class="caption">Settings is a fixed panel inside the main window. It reads the same on every machine.</p>
+          <p>Tick <strong>Start Window Layout Manager when I sign in to Windows</strong> and it does, in the tray, where WLM lives anyway, so nothing opens over whatever you signed in to do. Hotkeys, Hold mode, and auto-activation run from the moment you land on the desktop. A second box under the first shows the window as well. Both are off until you turn them on.</p>
+          <p>WLM ships as a portable zip with no installer, so it writes its own startup entry, for the folder you're running from, under your own user account: nothing elevated, nothing machine-wide. Move the folder and it re-points itself next run; install an update and it follows that too.</p>
+          <div class="tip">No installer means no uninstaller, so clear the box before you delete the folder; Windows keeps reaching for an entry you leave behind. If you switch the entry off in Task Manager's Startup tab instead, that wins, and the panel says so rather than quietly writing over you.</div>
+          <div class="shot video" data-v="img/v/window.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/17-settings-window.png" target="_blank" rel="noopener" title="Open full size"><img src="img/17-settings-window.png" alt="Startup &amp; Window settings tab" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/17-settings-window.png"></video></div>
+          <p class="caption">Settings is a fixed panel inside the main window; it reads the same on every machine.</p>
 
           <h3>Window Positions</h3>
-          <p>The app window remembers the size and position you leave it at. Dialogs don't: each one opens at the size its content needs, every time.</p>
-          <p>The <strong>Appearance</strong> box below tints the window with the Windows 11 desktop backdrop. Windows also draws that backdrop into the alt-tab and taskbar previews, where a blurred sample of your wallpaper can read as a blurry picture of the app. Turn it off if those previews look wrong.</p>
+          <p>The app window remembers the size and position you leave it at. Dialogs don't: each opens at the size its content needs, every time. The <strong>Appearance</strong> box tints the window with the Windows 11 desktop backdrop; Windows also draws that backdrop into the alt-tab and taskbar previews, where a blurred sample of your wallpaper can read as a blurry picture of the app. Turn it off if those previews look wrong.</p>
 
           <h3>About</h3>
           <p>"About" carries the running version, the licence, and where your profiles live.</p>
-          <div class="shot"><a href="img/18-settings-about.png" target="_blank" rel="noopener" title="Open full size"><img src="img/18-settings-about.png" alt="About settings tab" loading="lazy"></a></div>
+          <div class="shot"><a href="img/18-settings-about.png" target="_blank" rel="noopener" title="Open full size"><img src="img/18-settings-about.png" alt="About settings tab" width="1240" height="820" loading="lazy"></a></div>
         </section>
 
         <section id="cli">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial cli</span></p>
           <h2>CLI, Links &amp; Automation</h2>
           <ul>
-            <li><code>WindowLayoutManager.exe --load="Coding"</code> - Load a profile from a script, a Task Scheduler job, or a Stream Deck button. Works whether or not WLM is already running. Add <code>--show</code> to raise the window as well.</li>
-            <li><code>wlm://load/Coding</code> - The same, as a clickable link, except that a link never runs the profile's post-load command. <code>wlm://show</code> raises the window.</li>
+            <li><code>WindowLayoutManager.exe --load="Coding"</code> - Load a profile from a script, a Task Scheduler job, or a Stream Deck button, whether or not WLM is running. Add <code>--show</code> to raise the window too.</li>
+            <li><code>wlm://load/Coding</code> - The same as a clickable link, except a link never runs the profile's post-load command. <code>wlm://show</code> raises the window.</li>
             <li>Taskbar Jump List - Right-click the WLM taskbar icon for one-click profile loads.</li>
-            <li>Post-load hook - A profile's JSON can carry a <code>postLoad</code> command (e.g., switch an OBS scene) that runs after a successful load from the app, a hotkey, or <code>--load</code>.</li>
+            <li>Post-load hook - A profile's JSON can carry a <code>postLoad</code> command (switch an OBS scene, say) that runs after a successful load from the app, a hotkey, or <code>--load</code>.</li>
             <li>WLM lives in the tray. Closing the window keeps hotkeys, Hold mode, and auto-activation running.</li>
           </ul>
         </section>
@@ -633,6 +657,32 @@
     const btt = document.getElementById('backtotop');
     addEventListener('scroll', () => btt.classList.toggle('show', scrollY > 400), { passive: true });
     btt.addEventListener('click', () => scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // Hover-to-play clips. The video element carries no src until the first
+    // hover, so a clip costs zero bytes until someone asks for it; leaving
+    // pauses and rewinds, so re-entering starts from the poster again and the
+    // loop's first and last frames match. Pointers that cannot hover (phones)
+    // and reduced-motion preferences keep the poster, full stop.
+    (() => {
+      if (!window.matchMedia) return;
+      if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      for (const shot of document.querySelectorAll('.shot.video')) {
+        const video = shot.querySelector('video');
+        const src = shot.getAttribute('data-v');
+        if (!video || !src) continue;
+        shot.addEventListener('pointerenter', () => {
+          if (!video.getAttribute('src')) video.setAttribute('src', src);
+          video.play().catch(() => {});
+          shot.classList.add('playing');
+        });
+        shot.addEventListener('pointerleave', () => {
+          video.pause();
+          try { video.currentTime = 0; } catch (_) {}
+          shot.classList.remove('playing');
+        });
+      }
+    })();
 
     // Random glitch burst on the donate chip — see the splash page for
     // why the interval is randomised rather than a fixed CSS animation.
