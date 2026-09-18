@@ -1,14 +1,14 @@
 {
   "product": "WindowLayoutManager",
   "latest": {
-    "version": "1.1.0-dev.111",
-    "tag": "v1.1.0-dev.111",
-    "publishedAt": "2026-09-18T20:54:28Z",
-    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.111/WindowLayoutManager-v1.1.0-dev.111-win-x64.zip",
-    "sizeBytes": 111829401,
-    "sha256": "bcce2f01f492ee81761e89a34591a7585fab2e75a78ac04adf542c716a490403",
+    "version": "1.1.0-dev.112",
+    "tag": "v1.1.0-dev.112",
+    "publishedAt": "2026-09-18T23:43:17Z",
+    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.112/WindowLayoutManager-v1.1.0-dev.112-win-x64.zip",
+    "sizeBytes": 111829335,
+    "sha256": "1a9a288551c618d3f72ac5f22939395fc0d0f6b3692c5ea12f12f345522219f1",
     "prerelease": true,
     "pageUrl": "https://dougfessler.com/projects/windowlayoutmanager/",
-    "notes": "# v1.1.0-dev.111: A docked window's start choice arrives with it\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.110`.\n\n## The smaller fixes\n\n- Docking an Explorer folder or a console records how to start it again,\n  but the write landed after the dock's own update and nothing announced\n  it, so the window editor's \"when a profile loads\" row kept showing the\n  default until an unrelated refresh. The record announces itself now.\n- A new diagnostic probe pins down a Windows glitch we chased by\n  mistake: after display changes, Explorer can leave an invisible \"Input\n  Occlusion Window\" covering a whole monitor, and anything stacked under\n  it stops taking clicks. If a region of a monitor ever stops responding\n  to clicks, restarting Explorer clears it. The probe names the window so\n  a future failure reads as the desktop's doing, not the app's.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
+    "notes": "# v1.1.0-dev.112: Clicks that land, and start defaults you can see\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.111`.\n\n## Clicking a virtual window works again\n\nThe container's own buttons could stop responding to clicks while hovers\nkept working, a divider could stay lit as if being dragged while the\ncursor was nowhere near it, and clicking the frame often failed to bring\nthe group in front of other windows. One cause with all three faces:\nthe moment you pressed anything on the container, WLM handed the\nforeground to the last-used docked window, which steals the mouse\ncapture mid-press. The button never saw its release, the divider drag\nnever saw its pointer-up, and the fallback raise is ignored by Windows\nfor a background process anyway. The handover now happens when the click\ncompletes, not while it is held, and a drag orphaned by a stolen capture\ncleans itself up when the window loses focus.\n\nReported over Parsec, where a rejoin also partially cleared it: if any\ninteraction oddness survives this fix on a Parsec session, quitting and\nrejoining Parsec is still worth trying, and worth reporting.\n\n## App-wide \"when it loads\" defaults are listed in Settings\n\nIf loading a profile opens terminals you did not ask for, the cause is an\napp-wide \"always start new\" default, set once by the \"Default for app\"\ncheckbox beside a window's start choice, and until now invisible from\nevery other screen. Loads already name what they started; Settings →\nStartup & Window now lists every default that is set, with a Clear\nbutton for each.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
   }
 }
