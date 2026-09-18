@@ -1,14 +1,14 @@
 {
   "product": "WindowLayoutManager",
   "latest": {
-    "version": "1.1.0-dev.110",
-    "tag": "v1.1.0-dev.110",
-    "publishedAt": "2026-09-18T18:36:34Z",
-    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.110/WindowLayoutManager-v1.1.0-dev.110-win-x64.zip",
-    "sizeBytes": 111827817,
-    "sha256": "b5d04f06c30c9f444a3c89b5098729f9b3175e74a2cb172794b0d57a2ed74bc8",
+    "version": "1.1.0-dev.111",
+    "tag": "v1.1.0-dev.111",
+    "publishedAt": "2026-09-18T20:54:28Z",
+    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.111/WindowLayoutManager-v1.1.0-dev.111-win-x64.zip",
+    "sizeBytes": 111829401,
+    "sha256": "bcce2f01f492ee81761e89a34591a7585fab2e75a78ac04adf542c716a490403",
     "prerelease": true,
     "pageUrl": "https://dougfessler.com/projects/windowlayoutmanager/",
-    "notes": "# v1.1.0-dev.110: The app window stays honest\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.109`.\n\n## Deleting a virtual window asks properly\n\nDeleting a virtual window used to need a second press of Delete within five\nseconds. It asks with a proper confirmation modal now, from every surface\nthat can delete one, and declining leaves everything exactly as it was.\n\n## Dialogs no longer leave the main window behind\n\nAn audit that traced every mutation to the interface update it should cause\nfound a family of bugs where a change made inside a dialog never reached\nthe main window:\n\n- A profile duplicated from its dialog never appeared in the sidebar.\n- Restoring a saved version from the History dialog left the window on the\n  old copy, and the next edit quietly saved that old copy back over the\n  restore.\n- Saving or clearing display settings, saving a remap-as-new from the\n  auto-activation chooser, and setting or clearing a hotkey had the same\n  problem.\n- Renaming or duplicating a profile silently dropped its virtual-window\n  assignments out of the window's view until an unrelated refresh.\n- Hiding a container to the tray left its title bar tab floating on screen.\n- Renaming a shared container from the page didn't reach a container that\n  was open. Releasing a splitter on one didn't reach the page's diagram.\n- Auto-activation's best-guess left the details pane's saved time stale.\n\nAll fixed. The sidebar's own add/delete/re-add logic was verified honest\nthrough the real flows and is pinned by a new probe.\n\n## A Load says what it started\n\nWhen a Load starts windows (an app-wide \"always start new\" default, say),\nthe status line names them and the toast counts them, instead of folding\nthem into \"restored\". If terminals have been opening on every Load, look\nfor \"started N new\" here: the cause is a start default set in a window\neditor row, under \"When a profile loads\".\n\n## Smaller fixes\n\n- The two remaining guard-incompatible probes were re-run bare: a docked\n  window never stays maximized (14 checks green), and the caption-colour\n  probe's pixel legs were environment-blocked, not failing.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
+    "notes": "# v1.1.0-dev.111: A docked window's start choice arrives with it\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.110`.\n\n## The smaller fixes\n\n- Docking an Explorer folder or a console records how to start it again,\n  but the write landed after the dock's own update and nothing announced\n  it, so the window editor's \"when a profile loads\" row kept showing the\n  default until an unrelated refresh. The record announces itself now.\n- A new diagnostic probe pins down a Windows glitch we chased by\n  mistake: after display changes, Explorer can leave an invisible \"Input\n  Occlusion Window\" covering a whole monitor, and anything stacked under\n  it stops taking clicks. If a region of a monitor ever stops responding\n  to clicks, restarting Explorer clears it. The probe names the window so\n  a future failure reads as the desktop's doing, not the app's.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
   }
 }
