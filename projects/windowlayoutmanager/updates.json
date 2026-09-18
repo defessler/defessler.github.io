@@ -1,14 +1,14 @@
 {
   "product": "WindowLayoutManager",
   "latest": {
-    "version": "1.1.0-dev.107",
-    "tag": "v1.1.0-dev.107",
-    "publishedAt": "2026-09-17T03:33:42Z",
-    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.107/WindowLayoutManager-v1.1.0-dev.107-win-x64.zip",
-    "sizeBytes": 115269224,
-    "sha256": "6f3704751fd8170ccbda5eeab6a57300aef10be4a0c6a76e7b13180db6b70b19",
+    "version": "1.1.0-dev.108",
+    "tag": "v1.1.0-dev.108",
+    "publishedAt": "2026-09-18T00:46:26Z",
+    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.108/WindowLayoutManager-v1.1.0-dev.108-win-x64.zip",
+    "sizeBytes": 111822615,
+    "sha256": "a574cf9177edd998615a03fd6bd982d2cb926786c695b219ea43d04651d58cc1",
     "prerelease": true,
     "pageUrl": "https://dougfessler.com/projects/windowlayoutmanager/",
-    "notes": "# v1.1.0-dev.107: Minimize, maximize, and clicks that land\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.106`.\n\n## Minimize and maximize on the title bar\n\nA virtual window's title bar now has its own minimize and maximize buttons.\nMinimizing takes its docked windows with it. While it's maximized, the maximize\nbutton turns into restore.\n\n## Maximized without clipping\n\nA maximized virtual window used to push the edges of its docked windows off the\nscreen, by as much as 29 pixels. Windows maximizes a window with its resize\nborder hanging past the screen edge, and the panes were laid out on that larger\narea. They now stay inside what you can see, and so does the virtual window's own\ntitle bar.\n\n## Clicking a virtual window while WLM is in front\n\nWith WLM's main window selected, a click on a virtual window could go nowhere:\nits buttons didn't respond, and dragging it could stick. Pressing a virtual\nwindow hands focus to the window docked in it, and doing that in the middle of\nthe click took the mouse away from the virtual window. When WLM is the active\napp, the handoff now waits until you let go.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
+    "notes": "# v1.1.0-dev.108: The tray keeps what you close\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.107`.\n\n## Closing a virtual window hides it to the tray\n\nThe X on a virtual window no longer closes it. Everything stays docked and\nhidden with it; the tray icon shows how many are waiting, and its menu lists\neach one with its way back. Deleting a virtual window still closes it for real.\n\nLoading a profile now hides the virtual windows that profile doesn't name, the\nsame way. Loading a profile that names one brings it back. Nothing is closed or\nundocked in either direction.\n\n## Collapse a window out of its pane\n\nA docked window can be collapsed: hidden without closing, its pane kept in the\nlayout, listed in the manage panel with a Restore button. A flyout at the\ncontainer's top right lists what is collapsed and puts it back.\n\n## What \"always start new\" closes\n\nDeleting a virtual window now closes the windows WLM started for its \"always\nstart new\" panes, the way closing a document closes what was opened for it. A\nwindow you docked into such a pane by hand is your window: it stays, exactly as\nit was.\n\n## The maximized title bar stays whole\n\nMaximizing a virtual window no longer makes its title bar read as shrinking,\nand its docked windows stay inside the screen.\n\n## The tour moves\n\nThe tutorial's parts are now short looping clips instead of still screenshots.\n\n## Smaller fixes\n\n- A minimized virtual window hides to the tray properly; it no longer keeps a\n  taskbar button that opens an empty frame.\n- A collapsed fully-docked window no longer steals clicks over its pane.\n- The title bar tab no longer gets stuck after minimizing and restoring.\n- Opening a hidden virtual window from the page shows its windows again.\n- Per-app \"when it loads\" defaults now answer for every window of that app,\n  not just the one that set them, and an explicit choice always wins.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
   }
 }
