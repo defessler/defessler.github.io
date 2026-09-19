@@ -1,14 +1,14 @@
 {
   "product": "WindowLayoutManager",
   "latest": {
-    "version": "1.1.0-dev.117",
-    "tag": "v1.1.0-dev.117",
-    "publishedAt": "2026-09-19T07:48:43Z",
-    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.117/WindowLayoutManager-v1.1.0-dev.117-win-x64.zip",
-    "sizeBytes": 111835587,
-    "sha256": "d51b14595327c2dcc62a8388894fc99d2d49ee9123cee447d611543786cf5c9d",
+    "version": "1.1.0-dev.118",
+    "tag": "v1.1.0-dev.118",
+    "publishedAt": "2026-09-19T20:01:25Z",
+    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.118/WindowLayoutManager-v1.1.0-dev.118-win-x64.zip",
+    "sizeBytes": 111836003,
+    "sha256": "cc6715aa8184005728b4cffbba07adb54513b5f30d78fc215d7d120925621e38",
     "prerelease": true,
     "pageUrl": "https://dougfessler.com/projects/windowlayoutmanager/",
-    "notes": "# v1.1.0-dev.117: The quit choice, per application\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.116`.\n\n## What WLM does to a docked window on quit, decided per app\n\nThe \"When WLM closes\" choice is per application now. Each window docked in\na virtual window is settled by its own app's rule at quit: close its\nterminals while undocking its browser, if that is what you chose. The\nper-app choice is a \"Close on exit\" checkbox beside a window's start-mode\nchoice in the window editor and on the Virtual Windows page, and Settings\nlists every override with a Clear button. The global choice in Settings\nanswers for every app without one (undock by default).\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
+    "notes": "# v1.1.0-dev.118: Clicks that land, tab restored, rows unsquished\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.117`.\n\n## Hover-yes-click-no, the second cause\n\nA container could still react to hovers while its clicks did nothing. The\npress-time foreground handover was already gone; the second thief was the\nRELEASE-time one, which ran inside the mouse hook before the click itself\nhad been dispatched, and moving the foreground in that instant releases\nthe capture the click was still using. The handover now waits one tick\nfor the click to land first.\n\n## The title bar tab, restored\n\nThe tab above a virtual window with its title bar hidden carries its\nthree buttons again -- show the title bar, manage windows, and collapsed\nwindows (which appears only while something is collapsed) -- at its\noriginal size and position, after the one-button cut read as moving it.\n\n## The docked-windows list, unsquished\n\nThe \"when a profile loads\" cluster had grown a second checkbox and outgrew\nits column, squishing the row. The column is a proper share of the row\nnow, the two per-app checkboxes are labelled \"Default\" and \"Close\" with\nthe full sentences in their tooltips, and everything fits one line with\nthe undock button back in alignment.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
   }
 }
