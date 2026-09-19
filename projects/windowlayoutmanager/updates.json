@@ -1,14 +1,14 @@
 {
   "product": "WindowLayoutManager",
   "latest": {
-    "version": "1.1.0-dev.116",
-    "tag": "v1.1.0-dev.116",
-    "publishedAt": "2026-09-19T00:47:22Z",
-    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.116/WindowLayoutManager-v1.1.0-dev.116-win-x64.zip",
-    "sizeBytes": 111833807,
-    "sha256": "7f456991f1e1b4acc9d23fc401df7e64375f3f8ad094a21319a2fa63eb1bad15",
+    "version": "1.1.0-dev.117",
+    "tag": "v1.1.0-dev.117",
+    "publishedAt": "2026-09-19T07:48:43Z",
+    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.117/WindowLayoutManager-v1.1.0-dev.117-win-x64.zip",
+    "sizeBytes": 111835587,
+    "sha256": "d51b14595327c2dcc62a8388894fc99d2d49ee9123cee447d611543786cf5c9d",
     "prerelease": true,
     "pageUrl": "https://dougfessler.com/projects/windowlayoutmanager/",
-    "notes": "# v1.1.0-dev.116: What happens to docked windows when WLM quits\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.115`.\n\n## A setting for the way docked windows exit\n\nSettings → Startup & Window has a new \"When WLM closes\" choice. By default\nevery window docked in a virtual window is **undocked**: handed the size it\narrived with, loose on screen, and the profile stops docking it. Or you can\nchoose that each docked window is **asked to close**, the way its own close\nbutton would, so an app with unsaved work can still refuse.\n\n## The tray's right-click menu\n\nEach hidden virtual window in the tray menu now has all three of its actions:\n**Show** it, **Undock all windows** in it, or **Close** it for real. Closing\nreleases its members either way, never orphaning a hidden window. Closing a\nvirtual window itself (the X) still just hides it to the tray with its\nwindows.\n\n## The taskbar carries the badge too\n\nWhile the main window is on screen and virtual windows are hidden in the\ntray, its taskbar button wears the same badge as the tray icon, so the\nnotice does not depend on which icon you look at.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
+    "notes": "# v1.1.0-dev.117: The quit choice, per application\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.116`.\n\n## What WLM does to a docked window on quit, decided per app\n\nThe \"When WLM closes\" choice is per application now. Each window docked in\na virtual window is settled by its own app's rule at quit: close its\nterminals while undocking its browser, if that is what you chose. The\nper-app choice is a \"Close on exit\" checkbox beside a window's start-mode\nchoice in the window editor and on the Virtual Windows page, and Settings\nlists every override with a Clear button. The global choice in Settings\nanswers for every app without one (undock by default).\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
   }
 }
