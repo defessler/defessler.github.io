@@ -1,14 +1,14 @@
 {
   "product": "WindowLayoutManager",
   "latest": {
-    "version": "1.1.0-dev.114",
-    "tag": "v1.1.0-dev.114",
-    "publishedAt": "2026-09-19T00:23:11Z",
-    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.114/WindowLayoutManager-v1.1.0-dev.114-win-x64.zip",
-    "sizeBytes": 111830333,
-    "sha256": "97d2474d7e452d71864da3ac721a9eba6370c1b80b73378fb7c25eff900bf547",
+    "version": "1.1.0-dev.115",
+    "tag": "v1.1.0-dev.115",
+    "publishedAt": "2026-09-19T00:36:57Z",
+    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.115/WindowLayoutManager-v1.1.0-dev.115-win-x64.zip",
+    "sizeBytes": 111831444,
+    "sha256": "fe189e5a050c5d15d749ff7309860475eb833ef014038ba632d36a221701da3d",
     "prerelease": true,
     "pageUrl": "https://dougfessler.com/projects/windowlayoutmanager/",
-    "notes": "# v1.1.0-dev.114: One-button tab, foreground-free raises\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.113`.\n\n## The title bar tab is the way back, and only that\n\nWhen a virtual window's title bar is hidden, the little tab at the top\ncentre now carries a single button: show the title bar. The manage-panel\nand collapsed-windows buttons it also carried made it read as a second\ntitle bar; both actions live on the bar itself, one click after it\nreturns.\n\n## The group no longer depends on the main window's state\n\nBringing a virtual window forward used to quietly require the main app\nwindow to have the foreground, because the plain raise Windows ignores\nfor a background process. The raise now uses a method that works from\nany process, positions the container directly under its docked windows\nas part of the same move, and a refused focus handover (Parsec input,\na Windows denial) falls back to raising instead of doing nothing. You\nshould not need to click the main window first any more.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
+    "notes": "# v1.1.0-dev.115: The collapsed-windows modal\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.114`.\n\n## A proper modal for docked windows\n\nThe small flyout that listed collapsed windows is a modal now: a header,\na row for every docked window (clicking a visible row collapses it,\nclicking a collapsed one restores it), and a footer with **Collapse all**\nand **Restore all**. Each footer button greys itself out at its end of the\nrange: Collapse all when everything is already collapsed, Restore all when\neverything is visible. The button on the virtual window's title bar opens\nit whenever anything is docked, not only after something collapses.\n\n## Collapsed panes look empty\n\nA collapsed window's pane now draws nothing at all, as if nothing were\ndocked there. The way back is the modal, and the \"collapsed\" label the pane\nused to draw read as a second, lesser affordance beside it.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
   }
 }
