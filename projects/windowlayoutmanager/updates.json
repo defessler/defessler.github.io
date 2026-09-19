@@ -1,14 +1,14 @@
 {
   "product": "WindowLayoutManager",
   "latest": {
-    "version": "1.1.0-dev.112",
-    "tag": "v1.1.0-dev.112",
-    "publishedAt": "2026-09-18T23:43:17Z",
-    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.112/WindowLayoutManager-v1.1.0-dev.112-win-x64.zip",
-    "sizeBytes": 111829335,
-    "sha256": "1a9a288551c618d3f72ac5f22939395fc0d0f6b3692c5ea12f12f345522219f1",
+    "version": "1.1.0-dev.113",
+    "tag": "v1.1.0-dev.113",
+    "publishedAt": "2026-09-19T00:04:45Z",
+    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.113/WindowLayoutManager-v1.1.0-dev.113-win-x64.zip",
+    "sizeBytes": 111830013,
+    "sha256": "f4230c753b31cb1f4617fd8ca223bf72c888acf62ed63738d4432198e7c877e6",
     "prerelease": true,
     "pageUrl": "https://dougfessler.com/projects/windowlayoutmanager/",
-    "notes": "# v1.1.0-dev.112: Clicks that land, and start defaults you can see\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.111`.\n\n## Clicking a virtual window works again\n\nThe container's own buttons could stop responding to clicks while hovers\nkept working, a divider could stay lit as if being dragged while the\ncursor was nowhere near it, and clicking the frame often failed to bring\nthe group in front of other windows. One cause with all three faces:\nthe moment you pressed anything on the container, WLM handed the\nforeground to the last-used docked window, which steals the mouse\ncapture mid-press. The button never saw its release, the divider drag\nnever saw its pointer-up, and the fallback raise is ignored by Windows\nfor a background process anyway. The handover now happens when the click\ncompletes, not while it is held, and a drag orphaned by a stolen capture\ncleans itself up when the window loses focus.\n\nReported over Parsec, where a rejoin also partially cleared it: if any\ninteraction oddness survives this fix on a Parsec session, quitting and\nrejoining Parsec is still worth trying, and worth reporting.\n\n## App-wide \"when it loads\" defaults are listed in Settings\n\nIf loading a profile opens terminals you did not ask for, the cause is an\napp-wide \"always start new\" default, set once by the \"Default for app\"\ncheckbox beside a window's start choice, and until now invisible from\nevery other screen. Loads already name what they started; Settings →\nStartup & Window now lists every default that is set, with a Clear\nbutton for each.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
+    "notes": "# v1.1.0-dev.113: The docked-windows list lines up\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.112`.\n\n## The Virtual Windows page's docked-windows list\n\nThe rows used the profile list's column layout while filling fewer\ncolumns, so the \"when a profile loads\" select was squeezed into a narrow\ntrack and the undock button sat off the row's rhythm. The list has its\nown layout now: the undock button lines up with the select, and the\napp-wide default checkbox sits beside the select on the same line,\nlabelled \"App default\" (the app itself is named in its tooltip) instead\nof a second line of small print.\n\n## If a container stops responding to clicks\n\nThe fix for that shipped in dev.112 and needs an update to take effect:\nthe running app keeps the old code until it is restarted. If a container\never reacts to hovers but not clicks again after updating, quit and\nrejoin Parsec first (it has its own input state), then report it.\n"
   }
 }
