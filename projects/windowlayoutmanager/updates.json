@@ -1,14 +1,14 @@
 {
   "product": "WindowLayoutManager",
   "latest": {
-    "version": "1.1.0-dev.113",
-    "tag": "v1.1.0-dev.113",
-    "publishedAt": "2026-09-19T00:04:45Z",
-    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.113/WindowLayoutManager-v1.1.0-dev.113-win-x64.zip",
-    "sizeBytes": 111830013,
-    "sha256": "f4230c753b31cb1f4617fd8ca223bf72c888acf62ed63738d4432198e7c877e6",
+    "version": "1.1.0-dev.114",
+    "tag": "v1.1.0-dev.114",
+    "publishedAt": "2026-09-19T00:23:11Z",
+    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.114/WindowLayoutManager-v1.1.0-dev.114-win-x64.zip",
+    "sizeBytes": 111830333,
+    "sha256": "97d2474d7e452d71864da3ac721a9eba6370c1b80b73378fb7c25eff900bf547",
     "prerelease": true,
     "pageUrl": "https://dougfessler.com/projects/windowlayoutmanager/",
-    "notes": "# v1.1.0-dev.113: The docked-windows list lines up\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.112`.\n\n## The Virtual Windows page's docked-windows list\n\nThe rows used the profile list's column layout while filling fewer\ncolumns, so the \"when a profile loads\" select was squeezed into a narrow\ntrack and the undock button sat off the row's rhythm. The list has its\nown layout now: the undock button lines up with the select, and the\napp-wide default checkbox sits beside the select on the same line,\nlabelled \"App default\" (the app itself is named in its tooltip) instead\nof a second line of small print.\n\n## If a container stops responding to clicks\n\nThe fix for that shipped in dev.112 and needs an update to take effect:\nthe running app keeps the old code until it is restarted. If a container\never reacts to hovers but not clicks again after updating, quit and\nrejoin Parsec first (it has its own input state), then report it.\n"
+    "notes": "# v1.1.0-dev.114: One-button tab, foreground-free raises\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.113`.\n\n## The title bar tab is the way back, and only that\n\nWhen a virtual window's title bar is hidden, the little tab at the top\ncentre now carries a single button: show the title bar. The manage-panel\nand collapsed-windows buttons it also carried made it read as a second\ntitle bar; both actions live on the bar itself, one click after it\nreturns.\n\n## The group no longer depends on the main window's state\n\nBringing a virtual window forward used to quietly require the main app\nwindow to have the foreground, because the plain raise Windows ignores\nfor a background process. The raise now uses a method that works from\nany process, positions the container directly under its docked windows\nas part of the same move, and a refused focus handover (Parsec input,\na Windows denial) falls back to raising instead of doing nothing. You\nshould not need to click the main window first any more.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
   }
 }
