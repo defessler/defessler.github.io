@@ -26,28 +26,7 @@
     },
     "live": {
       "type": "boolean",
-      "description": "When true, WLM holds this layout — user moves are recorded into the profile, other moves are reverted. Only one profile can be live at a time."
-    },
-    "bindPromptDismissed": {
-      "type": "boolean",
-      "description": "When true, suppresses the in-app prompt asking the user to bind this profile to a monitor set."
-    },
-    "monitorSet": {
-      "type": ["array", "null"],
-      "description": "Snapshot of the physical monitor configuration this profile is bound to, for auto-activation. Optional.",
-      "items": { "$ref": "#/$defs/monitorFingerprint" }
-    },
-    "knownMonitorSets": {
-      "type": "array",
-      "description": "Monitor configurations this profile has previously been applied to, each with the role remap used at the time, so auto-activation can silently re-apply a recurring setup instead of re-prompting.",
-      "items": {
-        "type": "object",
-        "properties": {
-          "monitors": { "type": "array", "items": { "$ref": "#/$defs/monitorFingerprint" } },
-          "remapByRole": { "type": ["object", "null"] },
-          "savedAt": { "type": "string", "format": "date-time", "description": "When this set was learned or last refreshed." }
-        }
-      }
+      "description": "Legacy Hold-mode flag. Hold mode was removed on 2026-09-20 and WLM neither reads nor writes this; it stays declared only so pre-removal profiles with live:true still validate against this schema (the root object disallows unknown properties)."
     },
     "displayMode": { "$ref": "#/$defs/displayMode" },
     "postLoad": {
@@ -108,12 +87,12 @@
         },
         "displayOnly": {
           "type": "boolean",
-          "description": "When true this profile is purely a zoom/resolution preset: window restore is skipped, and it is excluded from auto-activation so it cannot outrank a real layout profile."
+          "description": "When true this profile is purely a zoom/resolution preset: window restore is skipped and only the display step runs."
         },
         "applyOn": {
           "type": "array",
-          "description": "Which load sources apply this block. 'load' covers the Load button, tray, hotkey and CLI. 'auto-activation' is opt-in.",
-          "items": { "type": "string", "enum": ["load", "auto-activation"] }
+          "description": "Which load sources apply this block. 'load' covers the Load button, tray, hotkey and CLI, and is the only value the editor writes.",
+          "items": { "type": "string", "enum": ["load"] }
         },
         "appliedAt": { "type": "string", "description": "ISO timestamp of the last successful apply." },
         "targets": {
@@ -182,20 +161,6 @@
         "top":    { "type": "integer" },
         "right":  { "type": "integer" },
         "bottom": { "type": "integer" }
-      }
-    },
-    "monitorFingerprint": {
-      "type": "object",
-      "required": ["bounds", "workArea"],
-      "additionalProperties": true,
-      "description": "One monitor of a bound or learned set, as profiles.monitorFingerprint() records it. No role (assigned at save time, not part of a set's identity) and no hardwareId; deviceString is recorded here and not on monitors[].",
-      "properties": {
-        "isPrimary": { "type": "boolean" },
-        "bounds":   { "$ref": "#/$defs/rect" },
-        "workArea": { "$ref": "#/$defs/rect" },
-        "dpi":      { "type": "integer", "minimum": 1 },
-        "deviceId":     { "type": ["string", "null"] },
-        "deviceString": { "type": ["string", "null"] }
       }
     },
     "monitorRecord": {
@@ -389,11 +354,6 @@
         "recreate": {
           "enum": [true, false, "fresh"],
           "description": "What a Load does about this window. false uses the open window only. true uses the open window and starts it when none is open. \"fresh\" always starts a new one and places that. Absent means the default: an app-wide default set in Settings answers first when one exists for this app, and otherwise it is true for Explorer folders and PowerShell, pwsh and cmd consoles, and false for everything else. An app other than those starts from exePath, which must be an absolute .exe named for processName. Set from the window editor."
-        },
-        "liveHistory": {
-          "type": "array",
-          "description": "Hold-mode rollback trail, newest first, capped at 20. Each entry is a prior monitorRole / relX / relY / width / height / showCmd / desktopIndex of this window, stamped savedAt.",
-          "items": { "type": "object" }
         }
       }
     }
