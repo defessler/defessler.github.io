@@ -205,8 +205,11 @@
       "properties": {
         "role": {
           "type": "string",
-          "enum": ["primary", "secondary", "tertiary", "quaternary", "quinary", "senary"],
-          "description": "Stable role assigned by WLM. Primary is always first; the rest are ordered left-to-right, top-to-bottom."
+          "anyOf": [
+            { "enum": ["primary", "secondary", "tertiary", "quaternary", "quinary", "senary"] },
+            { "type": "string", "pattern": "^monitor-[0-9]+$" }
+          ],
+          "description": "Stable role assigned by WLM. Primary is always first; the rest are ordered left-to-right, top-to-bottom. The named roles run out at six displays; from the seventh on, the role is monitor-7, monitor-8, and so on."
         },
         "isPrimary": { "type": "boolean" },
         "bounds":   { "$ref": "#/$defs/rect", "description": "Monitor pixel bounds in virtual-screen coordinates." },
@@ -230,8 +233,11 @@
         "title": { "type": "string", "description": "Shown in the container's own title bar (when chromeHidden is not set) and used to label it in the editor." },
         "monitorRole": {
           "type": ["string", "null"],
-          "enum": ["primary", "secondary", "tertiary", "quaternary", "quinary", "senary", null],
-          "description": "Which monitor relX/relY are measured from, in the same vocabulary a saved window's monitorRole uses. Null when the container hasn't been placed on one yet."
+          "anyOf": [
+            { "enum": ["primary", "secondary", "tertiary", "quaternary", "quinary", "senary", null] },
+            { "type": "string", "pattern": "^monitor-[0-9]+$" }
+          ],
+          "description": "Which monitor relX/relY are measured from, in the same vocabulary a saved window's monitorRole uses. Null when the container hasn't been placed on one yet. Desks with more than six displays use monitor-N roles."
         },
         "relX": { "type": "integer", "description": "Container left edge relative to the named monitor's work area." },
         "relY": { "type": "integer", "description": "Container top edge relative to the named monitor's work area." },
@@ -319,7 +325,7 @@
         "onOtherDesktop": { "type": "boolean", "description": "True when this window lived on a non-current virtual desktop at save time." },
         "desktopIndex":   { "type": "integer", "description": "Virtual desktop index. -1 when unknown." },
         "ownerInfo":      { "$ref": "#/$defs/ownerInfo", "description": "Identity of the owner top-level window, when this is an owned/tool window." },
-        "monitorRole":    { "type": "string", "enum": ["primary", "secondary", "tertiary", "quaternary", "quinary", "senary"] },
+        "monitorRole":    { "type": "string", "anyOf": [ { "enum": ["primary", "secondary", "tertiary", "quaternary", "quinary", "senary"] }, { "type": "string", "pattern": "^monitor-[0-9]+$" } ] },
         "windowDpi":      { "type": "integer", "minimum": 0, "description": "Per-window effective DPI at save time, from GetDpiForWindow. 0 = unknown." },
         "dpiAwareness": {
           "type": "integer",
@@ -382,7 +388,7 @@
         },
         "recreate": {
           "enum": [true, false, "fresh"],
-          "description": "What a Load does about this window. false uses the open window only. true uses the open window and starts it when none is open. \"fresh\" always starts a new one and places that. Absent means the default, which is true for Explorer folders and PowerShell, pwsh and cmd consoles, and false for everything else. An app other than those starts from exePath, which must be an absolute .exe named for processName. Set from the window editor."
+          "description": "What a Load does about this window. false uses the open window only. true uses the open window and starts it when none is open. \"fresh\" always starts a new one and places that. Absent means the default: an app-wide default set in Settings answers first when one exists for this app, and otherwise it is true for Explorer folders and PowerShell, pwsh and cmd consoles, and false for everything else. An app other than those starts from exePath, which must be an absolute .exe named for processName. Set from the window editor."
         },
         "liveHistory": {
           "type": "array",
