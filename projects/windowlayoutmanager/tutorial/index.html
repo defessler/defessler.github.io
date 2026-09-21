@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tutorial - Window Layout Manager</title>
-  <meta name="description" content="Walkthrough of every Window Layout Manager feature: profiles, the visual editor, monitor binding, auto-activation, hold mode, virtual desktops, and the CLI.">
+  <meta name="description" content="Walkthrough of every Window Layout Manager feature: profiles, the visual editor, virtual windows, display settings, virtual desktops, and the CLI.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -324,8 +324,6 @@
           <li><a href="#vw">Virtual Windows</a></li>
           <li><a href="#editor">Precise Edits, Undo &amp; History</a></li>
           <li><a href="#display">Display Zoom, Resolution &amp; Arrangement</a></li>
-          <li><a href="#binding">Monitor Binding &amp; Auto-Activation</a></li>
-          <li><a href="#hold">Hold Mode</a></li>
           <li><a href="#desktops">Virtual Desktops</a></li>
           <li><a href="#palette">Command Palette &amp; Keyboard</a></li>
           <li><a href="#updates">Updates</a></li>
@@ -344,7 +342,6 @@
           <p class="caption">The Coding profile: six windows across two monitors and two virtual desktops. Hover the picture to watch switching profiles swap the layout in.</p>
           <ul>
             <li>⌨ chip - The profile has a global hotkey.</li>
-            <li>● / ○ dot - Bound / not bound to a monitor setup (see <a href="#binding">auto-activation</a>).</li>
             <li>Footer hints - The whole app drives from the keyboard: <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>Enter</kbd> to load, <kbd>/</kbd> to filter, <kbd>?</kbd> for the full map.</li>
           </ul>
         </section>
@@ -357,8 +354,8 @@
           <p class="caption">Hovering a profile shows a card with a scaled map of where its windows land, before you commit to anything.</p>
           <ul>
             <li>Load - Puts every captured window back, even after apps restarted, titles changed, or Windows shoved everything onto one screen. The matcher re-finds windows by process, class, title, owner, and position.</li>
-            <li>Update - Re-captures the current arrangement into the selected profile. Hotkey, binding, history, per-window colours, "recognise by" rules, and Virtual Windows all survive.</li>
-            <li>Starting windows - The window editor's "When this profile loads" choice says what a Load does about a window: use the one that's open, use it or start one if none is, or always start a new one. Explorer folders and consoles don't survive a restart, so they start when missing by default: Explorer in the same folder, a console where it was working. Any app can be set to start too, from the program its window was saved from. Tick "Default for &lt;app&gt;" beside the choice and every window of that app inherits it, unless a window says otherwise. A window started fresh never takes over one that was already open.</li>
+            <li>Update - Re-captures the current arrangement into the selected profile. Hotkey, history, per-window colours, "recognise by" rules, and Virtual Windows all survive.</li>
+            <li>Starting windows - Explorer folders and consoles don't survive a restart, so they start when missing by default: Explorer in the same folder, a console where it was working. The choice lives on the Virtual Windows page's member rows: use the window that's open, start one if none is, or always start a new one. Any app can be set to start too, from the program its window was saved from. Tick "App default" beside a member's choice and every window of that app inherits it, unless a window says otherwise. A window started fresh never takes over one that was already open.</li>
             <li>Load details - A per-window report of the last load: what matched, what moved, what was missing.</li>
             <li>A Load is one pass. It's finished when it returns, and nothing keeps moving windows afterwards. An app that opens slowly? Press the hotkey again once it settles.</li>
           </ul>
@@ -368,7 +365,7 @@
         <section id="hotkeys">
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial hotkeys</span></p>
           <h2>Global Hotkeys</h2>
-          <p>Click the hotkey chip on any profile and press the combination you want. WLM records it live and warns about conflicts with other profiles or the auto-activation hotkey.</p>
+          <p>Click the hotkey chip on any profile and press the combination you want. WLM records it live and warns about conflicts with other profiles.</p>
           <div class="shot video" data-v="img/v/hotkeys.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/04-hotkey-capture.png" target="_blank" rel="noopener" title="Open full size"><img src="img/04-hotkey-capture.png" alt="Hotkey capture modal" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/04-hotkey-capture.png"></video></div>
           <p class="caption">Hotkeys fire from anywhere. The WLM window doesn't need to be open.</p>
         </section>
@@ -407,12 +404,6 @@
           <h3>Your Windows Come with the Monitors</h3>
           <p>Swap your left and right monitors and the windows come with them, keeping the same spot on the same panel. Minimised windows are left alone: a maximised one already follows its monitor, and a minimised one has no position worth keeping.</p>
 
-          <h3>Zoom to Resolution Rules</h3>
-          <p>These live in <strong>Settings &rarr; Auto-activation &rarr; Zoom to resolution rules</strong>, because they describe your hardware, not a layout. Pair a percentage with a resolution for a display, and whenever that display is set to that zoom, the resolution comes with it, from a profile, a step hotkey, or anything else.</p>
-          <div class="shot video" data-v="img/v/binding.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/14-settings-zoom-rules.png" target="_blank" rel="noopener" title="Open full size"><img src="img/14-settings-zoom-rules.png" alt="Zoom to resolution rules in Settings, with a Matched by column" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/14-settings-zoom-rules.png"></video></div>
-          <p class="caption">Every rule names its display and says how it finds it.</p>
-          <p>Rules are filed against the part of a display's hardware identity that doesn't change between sessions. One set for a Parsec virtual display still applies next time you connect. Two displays of the same model stay separate, because the key includes which output each one is on.</p>
-
           <h3>Picking a Resolution</h3>
           <p>Resolution is two dropdowns, size then refresh rate, the way Windows and NVIDIA both do it. Sizes are grouped by shape (16:9, 4:3, 21:9), the largest is marked, and the list has a search box: <code>1440</code> finds every mode with 1440 on either side, <code>2560 1440</code> or <code>25 14</code> narrow it, and a word searches the labels. Arrow keys, <kbd>Home</kbd>, <kbd>End</kbd>, <kbd>Enter</kbd> and <kbd>Esc</kbd> all work. Pick a size that can't do your current rate and WLM keeps the rate where it can, or falls back to the highest that size offers and says it did.</p>
           <p>The rate dropdown opens on <strong>Highest this size offers</strong>, which is a request rather than a blank: worked out on the display the profile lands on, not fixed at save time, so one profile asks for the best each display can do. Pick a number instead and WLM asks for exactly that.</p>
@@ -434,10 +425,12 @@
           <p>Tick <strong>Display-only preset</strong> and the profile stops being a window layout: no windows saved, no windows moved, just scaling and resolution.</p>
           <div class="shot"><a href="img/11-display-preset.png" target="_blank" rel="noopener" title="Open full size"><img src="img/11-display-preset.png" alt="A display-only profile in the sidebar, with a hotkey and no windows" width="1240" height="820" loading="lazy"></a></div>
           <p class="caption">"Desk zoom" is a display-only preset on <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>0</kbd>.</p>
-          <p>It's still a profile: hotkey, tray menu, Jump List, the <a href="#palette">command palette</a>, <code>--load=</code>, <code>wlm://</code> links. Display-only presets are kept out of <a href="#binding">auto-activation</a>, so one can't beat the layout profile you actually wanted.</p>
+          <p>It's still a profile: hotkey, tray menu, Jump List, the <a href="#palette">command palette</a>, <code>--load=</code>, <code>wlm://</code> links. A display-only preset never moves a window: it exists to set your displays up, and the layout you load afterwards does the rest.</p>
 
           <h3>Turning It On, and What It Can't Promise</h3>
-          <p>The kill switch is under Settings &rarr; Auto-activation &rarr; Display configuration, on by default; turn it off and a profile's display step is skipped, with WLM saying that's why. Resolution uses a documented Windows API. Scaling doesn't, because Windows exposes none: WLM uses the same internal call the Settings app does, behind a capability check, and if your build stops accepting it the scaling controls switch off and say why while resolution carries on. A percentage your monitor can't do is clamped, and you're told to what. After every change WLM re-reads the display to check the value landed, which catches a Windows 11 24H2 bug where a resolution change on a virtual display reports success while nothing happens. Some virtual adapters, Parsec's among them, report a scaling range that disagrees with what Windows is doing; there the editor shows both numbers and says the control may not behave.</p>
+          <p>The kill switch is under Settings &rarr; Display, on by default; turn it off and a profile's display step is skipped, with WLM saying that's why. Resolution uses a documented Windows API. Scaling doesn't, because Windows exposes none: WLM uses the same internal call the Settings app does, behind a capability check, and if your build stops accepting it the scaling controls switch off and say why while resolution carries on. A percentage your monitor can't do is clamped, and you're told to what. After every change WLM re-reads the display to check the value landed, which catches a Windows 11 24H2 bug where a resolution change on a virtual display reports success while nothing happens. Some virtual adapters, Parsec's among them, report a scaling range that disagrees with what Windows is doing; there the editor shows both numbers and says the control may not behave.</p>
+          <div class="shot video" data-v="img/v/display.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/06-settings-display.png" target="_blank" rel="noopener" title="Open full size"><img src="img/06-settings-display.png" alt="The Display tab in Settings, with the kill switch" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/06-settings-display.png"></video></div>
+          <p class="caption">Settings &rarr; Display: the kill switch, the nudge step, and nothing else to go wrong.</p>
         </section>
 
         <section id="visual">
@@ -517,7 +510,7 @@
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial editing</span></p>
           <h2>Precise Edits, Undo &amp; History</h2>
           <p>"EDIT" on a list row or "Edit" under the canvas opens exact fields for any window: desktop, monitor, state, colour, and pixel-perfect position and size.</p>
-          <div class="shot video" data-v="img/v/editor.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/03-window-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/03-window-editor.png" alt="Per-window editor, open in its own window" width="560" height="624" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/03-window-editor.png"></video></div>
+          <div class="shot video" data-v="img/v/editor.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/03-window-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/03-window-editor.png" alt="Per-window editor, open in its own window" width="560" height="514" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/03-window-editor.png"></video></div>
           <p>Every dialog in WLM is a real window: drag it onto a second monitor, resize it, find it in alt-tab. It opens at the size its content needs and won't shrink below that, and the app is disabled while it's up, so a stray keystroke can't land behind it. Settings and the hotkey capture stay inside the app window; Custom resolutions and Earlier arrangements draw inside the display editor's window rather than opening a third.</p>
 
           <h3>How a Window Gets Recognised</h3>
@@ -531,32 +524,7 @@
           <ul>
             <li><kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd> - Undo and redo any edit, with a labelled trail.</li>
             <li><kbd>Ctrl+H</kbd> or "History" - Browse and restore full saved versions of the profile. Every Update keeps a snapshot.</li>
-            <li>Windows tracked live (see <a href="#hold">Hold mode</a>) also keep a per-window position history you can roll back individually.</li>
           </ul>
-        </section>
-
-        <section id="binding">
-          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial auto-activation</span></p>
-          <h2>Monitor Binding &amp; Auto-Activation</h2>
-          <p>Bind a profile to your current monitor setup and WLM can restore it by itself whenever that setup reappears: docking the laptop, starting a Parsec session with a virtual display, plugging into the projector.</p>
-          <div class="shot video" data-v="img/v/binding.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/06-settings-autoactivation.png" target="_blank" rel="noopener" title="Open full size"><img src="img/06-settings-autoactivation.png" alt="Auto-activation settings tab" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/06-settings-autoactivation.png"></video></div>
-          <ul>
-            <li>Triggers - On monitor change, at app launch, and a dedicated hotkey. All off by default.</li>
-            <li>Best-guess remap - When your monitors almost match a saved setup, WLM picks the closest mapping, applies it, and remembers the decision so it never asks twice.</li>
-            <li>The "Status" panel logs every decision, so you can always see why a profile did or didn't fire.</li>
-          </ul>
-        </section>
-
-        <section id="hold">
-          <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial hold</span></p>
-          <h2>Hold Mode</h2>
-          <p>The "Hold layout" toggle (next to the hotkey chip) pins a profile as the live layout. While holding, WLM watches your windows a few times a second:</p>
-          <ul>
-            <li>An app moves or resizes its own window? It gets put straight back.</li>
-            <li>You drag a window yourself? WLM records the move into the profile instead of fighting you.</li>
-            <li>Loading a different profile releases the hold. Explicit action always wins.</li>
-          </ul>
-          <div class="tip">Hold is ideal for apps that "helpfully" reposition themselves after fullscreen games, RDP sessions, or monitor sleep.</div>
         </section>
 
         <section id="desktops">
@@ -617,7 +585,7 @@
           <h2>Startup, Window Positions &amp; About</h2>
 
           <h3>Starting with Windows</h3>
-          <p>Tick <strong>Start Window Layout Manager when I sign in to Windows</strong> and it does, in the tray, where WLM lives anyway, so nothing opens over whatever you signed in to do. Hotkeys, Hold mode, and auto-activation run from the moment you land on the desktop. A second box under the first shows the window as well. Both are off until you turn them on.</p>
+          <p>Tick <strong>Start Window Layout Manager when I sign in to Windows</strong> and it does, in the tray, where WLM lives anyway, so nothing opens over whatever you signed in to do. Hotkeys run from the moment you land on the desktop. A second box under the first shows the window as well. Both are off until you turn them on.</p>
           <p>WLM ships as a portable zip with no installer, so it writes its own startup entry, for the folder you're running from, under your own user account: nothing elevated, nothing machine-wide. Move the folder and it re-points itself next run; install an update and it follows that too.</p>
           <div class="tip">No installer means no uninstaller, so clear the box before you delete the folder; Windows keeps reaching for an entry you leave behind. If you switch the entry off in Task Manager's Startup tab instead, that wins, and the panel says so rather than quietly writing over you.</div>
           <div class="shot video" data-v="img/v/window.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/17-settings-window.png" target="_blank" rel="noopener" title="Open full size"><img src="img/17-settings-window.png" alt="Startup &amp; Window settings tab" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/17-settings-window.png"></video></div>
@@ -639,7 +607,7 @@
             <li><code>wlm://load/Coding</code> - The same as a clickable link, except a link never runs the profile's post-load command. <code>wlm://show</code> raises the window.</li>
             <li>Taskbar Jump List - Right-click the WLM taskbar icon for one-click profile loads.</li>
             <li>Post-load hook - A profile's JSON can carry a <code>postLoad</code> command (switch an OBS scene, say) that runs after a successful load from the app, a hotkey, or <code>--load</code>.</li>
-            <li>WLM lives in the tray. Closing the window keeps hotkeys, Hold mode, and auto-activation running.</li>
+            <li>WLM lives in the tray. Closing the window keeps hotkeys running.</li>
           </ul>
         </section>
 
