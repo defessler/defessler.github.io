@@ -1,14 +1,14 @@
 {
   "product": "WindowLayoutManager",
   "latest": {
-    "version": "1.1.0-dev.122",
-    "tag": "v1.1.0-dev.122",
-    "publishedAt": "2026-09-22T16:07:53Z",
-    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.122/WindowLayoutManager-v1.1.0-dev.122-win-x64.zip",
-    "sizeBytes": 115293382,
-    "sha256": "ec8af1662ad160d043037528a6c59f643db2702e9dd7be646810c834d6aec9a9",
+    "version": "1.1.0-dev.124",
+    "tag": "v1.1.0-dev.124",
+    "publishedAt": "2026-09-22T17:13:09Z",
+    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.124/WindowLayoutManager-v1.1.0-dev.124-win-x64.zip",
+    "sizeBytes": 115259084,
+    "sha256": "c7ec2174083288e9b9d1ed5ae46ec0f0bbf6fedf871e60e0143a8c99110a3eac",
     "prerelease": true,
     "pageUrl": "https://dougfessler.com/projects/windowlayoutmanager/",
-    "notes": "# v1.1.0-dev.122: A maximized virtual window that stays put\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.121`.\n\n## Maximizing a fully docked virtual window no longer shifts it\n\nMaximizing a fully docked virtual window moved every docked window's\npicture 11 pixels right and 11 pixels down. The window on the right ran\noff the edge of the screen, the one on the left picked up a gap along its\nedges, and the divider you could actually grab sat under the left window\nwhile the gap you could see was off to its right. The pictures were being\nplaced from the corner of the window's outer frame, which Windows pushes\npast the screen's edge when it maximizes a window. They're placed from\nthe corner of the visible area now, so every docked window lands exactly\non its pane, and the divider you see is the divider you grab.\n\n## Panes reach the bottom of a maximized window\n\nThe drawn panes in a maximized virtual window stopped 2 pixels short of\nthe windows in them at the bottom. The size they were drawn from was read\na moment too early during the maximize and was never read again. They're\nnow drawn from the same measurements the docked windows are placed with,\nso the two can't disagree.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
+    "notes": "# v1.1.0-dev.124: Undocking gives a window its shape back\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.122`. There is no\ndev.123 download: it was tagged and then folded into this one, which carries\nthe same fix plus the packaging fix below.\n\n## A window that was maximized comes back maximized\n\nDock a window that was maximized, then undock it, and it came back as a\nscreen-sized window that was no longer maximized, sitting where its pane\nhad been and hanging off the edge of the screen. Its own restored size was\ngone too, so restoring it down afterwards changed nothing.\n\nThe size a window is handed back on undock is its own restored size now,\nand a window that was maximized when you docked it is maximized again when\nit leaves. That holds for undocking one window, undocking a whole virtual\nwindow from the tray, a window released because its pane went away, and\nquitting WLM with the undock setting. Profiles and the Virtual Windows\nlibrary remember it, so it survives a reload.\n\n## The download no longer carries test leftovers\n\nThe dev.122 zip had a test sandbox inside it, about 38 KB of logs and a\nthrowaway settings folder under `resources\\app`. Nothing identifying was in\nit, and nothing in it ran, but it had no business in a download. The\npackager now leaves out every working directory the tests write, and a test\nholds it to that list.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
   }
 }
