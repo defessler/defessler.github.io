@@ -1,14 +1,14 @@
 {
   "product": "WindowLayoutManager",
   "latest": {
-    "version": "1.1.0-dev.121",
-    "tag": "v1.1.0-dev.121",
-    "publishedAt": "2026-09-22T02:04:44Z",
-    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.121/WindowLayoutManager-v1.1.0-dev.121-win-x64.zip",
-    "sizeBytes": 115255642,
-    "sha256": "5c27e12eee2f87bb1e84856a604f244713a158e7b47e76330aac23f4da87ae62",
+    "version": "1.1.0-dev.122",
+    "tag": "v1.1.0-dev.122",
+    "publishedAt": "2026-09-22T16:07:53Z",
+    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.1.0-dev.122/WindowLayoutManager-v1.1.0-dev.122-win-x64.zip",
+    "sizeBytes": 115293382,
+    "sha256": "ec8af1662ad160d043037528a6c59f643db2702e9dd7be646810c834d6aec9a9",
     "prerelease": true,
     "pageUrl": "https://dougfessler.com/projects/windowlayoutmanager/",
-    "notes": "# v1.1.0-dev.121: Splitters that let go, windows that come back\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.120`.\n\n## Splitter bars unhover honestly\n\nThe drag bars between panes used to stay lit after the cursor crossed\nonto a docked window: that window takes every pointer event from there,\nso the bar never heard the mouse leave. Hover is now driven by the app\nitself and ends the moment the cursor is off the bar, docked window or\nnot.\n\n## The group that comes forward gets a working keyboard\n\nClicking a virtual window's taskbar button, or alt-tabbing onto the\ncontainer itself, brought the group forward with a dead keyboard: the\ncontainer is deliberately not focusable, and nothing handed the\nkeyboard on to the window you were last using inside it. Now one does.\n\n## No undock path can strand a window at its pane size\n\nClosing a virtual window, a Load releasing a member, a pane leaving the\nlayout, a placement that failed on a hung app, and quitting while a\nmember's app refused to close: any of these could release a docked\nwindow without handing back the size it arrived with, leaving it\npermanently reshaped. Every one of them restores it now. A quit can no\nlonger leave a fully docked window stranded at its dock rectangle, a\ncrash mid-undock now leaves a state the next Load recovers instead of a\nwindow the app can no longer see, and a hard kill of WLM no longer\nleaves the windows of a hidden container invisible with no taskbar\nbutton and no way back.\n\n## Smaller\n\nA one-time failure talking to the taskbar no longer disables taskbar\nhandling for the whole session. The repo also gained a full greenfield\ndocument series under `docs/greenfield/`: the product, user and\nplatform research, a complete technical design, a phased build plan,\nthe edge-case bible, and a build guide for an AI harness.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
+    "notes": "# v1.1.0-dev.122: A maximized virtual window that stays put\n\nPre-release off the `dev` branch. Builds on `v1.1.0-dev.121`.\n\n## Maximizing a fully docked virtual window no longer shifts it\n\nMaximizing a fully docked virtual window moved every docked window's\npicture 11 pixels right and 11 pixels down. The window on the right ran\noff the edge of the screen, the one on the left picked up a gap along its\nedges, and the divider you could actually grab sat under the left window\nwhile the gap you could see was off to its right. The pictures were being\nplaced from the corner of the window's outer frame, which Windows pushes\npast the screen's edge when it maximizes a window. They're placed from\nthe corner of the visible area now, so every docked window lands exactly\non its pane, and the divider you see is the divider you grab.\n\n## Panes reach the bottom of a maximized window\n\nThe drawn panes in a maximized virtual window stopped 2 pixels short of\nthe windows in them at the bottom. The size they were drawn from was read\na moment too early during the maximize and was never read again. They're\nnow drawn from the same measurements the docked windows are placed with,\nso the two can't disagree.\n\n## Install\n\nAuto-updates from dev.53 and later. Otherwise unzip and run.\n"
   }
 }
