@@ -7,7 +7,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=15">
+  <link rel="stylesheet" href="css/style.css?v=16">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    // Hash-routed SPA: js/site.js sends a page_view per route instead.
+    gtag('config', 'G-YQB4BCN1CH', { send_page_view: false });
+  </script>
 </head>
 <body>
   <header id="site-header">
@@ -27,6 +36,6 @@
 
   <footer id="site-footer"></footer>
 
-  <script src="js/site.js?v=15"></script>
+  <script src="js/site.js?v=16"></script>
 </body>
 </html>

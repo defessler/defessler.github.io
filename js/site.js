@@ -37,6 +37,17 @@ function slugify(str) {
   return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
+// GA4 page views. The site routes on the URL hash, so the automatic page_view in
+// index.html is turned off and each route reports its own view here. Keyed by slug,
+// so a #portfolio/<card> deep link counts as the portfolio page.
+function trackPageView(slug) {
+  if (typeof window.gtag !== 'function') return;
+  window.gtag('event', 'page_view', {
+    page_title: document.title,
+    page_location: `${location.origin}${location.pathname}#${slug}`,
+  });
+}
+
 let currentSlug = null;
 
 async function loadPage(site) {
@@ -58,6 +69,7 @@ async function loadPage(site) {
     if (!renderer) throw new Error(`Unknown page type: "${page.type}"`);
     main.innerHTML = renderer(page);
     document.title = page.title ? `${page.title} — ${site.title}` : site.title;
+    if (isNewPage) trackPageView(slug);
     if (isNewPage) {
       const imgs = [...main.querySelectorAll('img')]
         .filter(img => img.loading !== 'lazy')
