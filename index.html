@@ -14,7 +14,8 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', 'G-YQB4BCN1CH');
+    // Hash-routed SPA: js/site.js sends a page_view per route instead.
+    gtag('config', 'G-YQB4BCN1CH', { send_page_view: false });
   </script>
 </head>
 <body>
@@ -35,6 +36,6 @@
 
   <footer id="site-footer"></footer>
 
-  <script src="js/site.js?v=14"></script>
+  <script src="js/site.js?v=15"></script>
 </body>
 </html>
