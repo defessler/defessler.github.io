@@ -8,6 +8,7 @@
       "year": "2026-Present",
       "featured": true,
       "image": "./img/starcraft.jpg",
+      "tech": ["Unreal Engine 5"],
       "description": "Senior Gameplay Engineer on the Open World team for STARCRAFT, Blizzard's original open-world shooter returning players to the Koprulu Sector. Announced at the BlizzCon 2026 Opening Ceremony and launching Spring 2030.",
       "links": [
         { "label": "Official Site",              "url": "https://starcraft.blizzard.com/en-us" },
