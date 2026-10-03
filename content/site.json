@@ -15,7 +15,8 @@
     "note": "tools",
     "links": [
       { "label": "Window Layout Manager", "url": "/projects/windowlayoutmanager/" },
-      { "label": "aethyr.gg", "url": "https://aethyr.gg/" }
+      { "label": "aethyr.gg", "url": "https://aethyr.gg/" },
+      { "label": "Privacy", "url": "/privacy.html" }
     ]
   }
 }

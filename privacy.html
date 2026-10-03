@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy — Doug Fessler</title>
+  <meta name="description" content="What dougfessler.com and its project sites collect with Google Analytics, and what they don't.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=16">
+  <style>
+    .privacy-page { max-width: 760px; }
+    .privacy-page h1 { color: var(--mk-green); font-size: 1.6rem; margin-bottom: 0.4rem; }
+    .privacy-page .updated { color: var(--mk-comment); font-size: 0.85rem; margin-bottom: 2rem; }
+    .privacy-page h2 { color: var(--mk-cyan); font-size: 1.05rem; margin: 2rem 0 0.6rem; }
+    .privacy-page h2::before { content: '// '; color: var(--mk-comment); }
+    .privacy-page p, .privacy-page li { color: var(--mk-fg); font-size: 0.92rem; }
+    .privacy-page p + p { margin-top: 0.7rem; }
+    .privacy-page ul { margin: 0.5rem 0 0.7rem 1.4rem; }
+    .privacy-page li { margin: 0.25rem 0; }
+    .privacy-page code { color: var(--mk-yellow); }
+    .privacy-back { display: inline-block; margin-bottom: 1.5rem; font-size: 0.85rem; }
+  </style>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-YQB4BCN1CH');
+  </script>
+  <script src="/js/insights.js" defer></script>
+</head>
+<body>
+  <main id="page-content" class="privacy-page">
+    <a class="privacy-back" href="/">&larr; dougfessler.com</a>
+    <h1>Privacy</h1>
+    <p class="updated">Covers dougfessler.com and the project sites under it, like /DokiDex/ and /Mediarr-Installer/. Last updated October 2, 2026.</p>
+
+    <h2>What's collected</h2>
+    <p>These sites use Google Analytics 4 to see which pages get read and what gets clicked. It records:</p>
+    <ul>
+      <li>pages viewed, and the site that sent you here, if any</li>
+      <li>approximate location: country, region and city. Google estimates this from your IP address and says Google Analytics doesn't log or store IP addresses.</li>
+      <li>browser, operating system, device type and screen size</li>
+      <li>how far you scroll, clicks on links that leave the site, and file downloads</li>
+      <li>which links and buttons you click: their label and where they point, with email addresses removed</li>
+      <li>which sections of a page stay on screen for at least a second (by heading)</li>
+    </ul>
+    <p>Google Analytics sets two first-party cookies, <code>_ga</code> and <code>_ga_YQB4BCN1CH</code>, so a returning browser counts as the same visitor.</p>
+
+    <h2>What isn't</h2>
+    <ul>
+      <li>keystrokes, or anything you type into a page</li>
+      <li>form contents</li>
+      <li>mouse movement, and no session recordings</li>
+      <li>your IP address. I never see it.</li>
+    </ul>
+    <p>Analytics isn't linked to any advertising account, Google signals is off, and nothing is sold or shared.</p>
+
+    <h2>How long it's kept</h2>
+    <p>Event-level data is deleted after 2 months and visitor-level data after 14 months. Totals in the standard reports, like page views per day, are kept longer.</p>
+
+    <h2>Opting out</h2>
+    <ul>
+      <li>If your browser sends Global Privacy Control or Do Not Track, the click and section tracking doesn't run. Page views are still counted.</li>
+      <li>To block Google Analytics completely, use a content blocker or Google's <a href="https://tools.google.com/dlpage/gaoptout">opt-out browser add-on</a>.</li>
+    </ul>
+
+    <h2>Questions</h2>
+    <p>Reach me through <a href="https://github.com/defessler">GitHub</a> or <a href="https://linkedin.com/in/dougfessler">LinkedIn</a>.</p>
+  </main>
+</body>
+</html>
