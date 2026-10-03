@@ -26,6 +26,7 @@
         "projects": [
           {
             "name": "STARCRAFT",
+            "platform": "Unreal Engine 5",
             "type": "Open-World Shooter",
             "teams": [
               {
