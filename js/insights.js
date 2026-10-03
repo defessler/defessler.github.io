@@ -79,6 +79,7 @@
           if (timers.has(h)) return;
           timers.set(h, setTimeout(function () {
             timers.delete(h);
+            if (!h.isConnected) return;
             var name = clean(h.textContent, 80);
             if (!name || seen[name]) return;
             seen[name] = true;
@@ -91,18 +92,28 @@
       });
     }, { threshold: 0.5 });
 
+    // Pages that swap their content in place (the hash routes on the home page)
+    // start a fresh count once the old headings leave the DOM. In-page anchor
+    // jumps don't remove headings, so they don't reset it.
+    var tracked = [];
     var scan = function () {
+      var swapped = false;
+      tracked = tracked.filter(function (h) {
+        if (h.isConnected) return true;
+        io.unobserve(h);
+        swapped = true;
+        return false;
+      });
+      if (swapped) seen = {};
       var hs = document.getElementsByTagName('h2');
       for (var i = 0; i < hs.length; i++) {
         if (!watched.has(hs[i]) && !hs[i].closest('[data-no-track]')) {
           watched.add(hs[i]);
+          tracked.push(hs[i]);
           io.observe(hs[i]);
         }
       }
     };
-
-    // Pages that swap content in place (hash routes) count as a new page view.
-    window.addEventListener('hashchange', function () { seen = {}; });
 
     var queued = false;
     new MutationObserver(function () {
