@@ -3,6 +3,19 @@
   "title": "Portfolio",
   "projects": [
     {
+      "title": "STARCRAFT",
+      "company": "Blizzard Entertainment",
+      "year": "2026-Present",
+      "featured": true,
+      "image": "./img/starcraft.jpg",
+      "description": "Senior Gameplay Engineer on the Open World team for STARCRAFT, Blizzard's original open-world shooter returning players to the Koprulu Sector. Announced at the BlizzCon 2026 Opening Ceremony and launching Spring 2030.",
+      "links": [
+        { "label": "Official Site",              "url": "https://starcraft.blizzard.com/en-us" },
+        { "label": "Announce Cinematic",         "url": "https://www.youtube.com/watch?v=9eQUtOQXYgQ" },
+        { "label": "BlizzCon 2026 Announcement", "url": "https://news.blizzard.com/en-us/article/24301453/everything-announced-at-blizzcon-2026-opening-ceremony" }
+      ]
+    },
+    {
       "title": "Last Sentinel",
       "company": "Lightspeed LA",
       "year": "2022-2026",

@@ -25,9 +25,16 @@
         "end": "Present",
         "projects": [
           {
-            "name": "Unannounced",
-            "platform": "Unreal Engine 5",
-            "bullets": []
+            "name": "STARCRAFT",
+            "type": "Open-World Shooter",
+            "teams": [
+              {
+                "name": "Open World Team",
+                "bullets": [
+                  "Gameplay engineering on the Open World team for Blizzard's original open-world shooter set in the Koprulu Sector. Announced at BlizzCon 2026; launching Spring 2030."
+                ]
+              }
+            ]
           }
         ]
       },

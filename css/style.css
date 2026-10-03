@@ -484,6 +484,7 @@ a:hover { color: var(--mk-yellow); text-decoration: underline; }
 .project-card-featured:nth-child(2) { border-left-color: var(--mk-orange); }
 .project-card-featured:nth-child(3) { border-left-color: var(--mk-yellow); }
 .project-card-featured:nth-child(4) { border-left-color: var(--mk-green);  }
+.project-card-featured:nth-child(5) { border-left-color: var(--mk-cyan);   }
 
 .card-image {
   width: 100%;
