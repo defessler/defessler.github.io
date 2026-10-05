@@ -488,7 +488,10 @@
 
           <h3>Resizing While Docked</h3>
           <p>Two docked windows that share an edge have a splitter in the gap between them. Drag it and both resize together, live; let go and the position is saved with the profile. Docking resizes the window you drop, because a pane decides how big its member is. The size the window arrived with is remembered and handed back the moment you undock it. Docking borrows a size; it doesn't replace one.</p>
-          <p>Some windows won't take the size a pane hands them and land at their own minimum instead, while Windows reports the resize as successful. WLM checks afterwards and says so on the container's title bar, so you're not left wondering why one window looks wrong.</p>
+          <p>Some windows won't take the size a pane hands them and land at their own minimum instead, while Windows reports the resize as successful. WLM checks afterwards and says so on the container's title bar, so you're not left wondering why one window looks wrong. From dev.125 the splitter learns that minimum too: it won't drag the pane smaller than the app will go, and the panel row says "pane too small for this app".</p>
+
+          <h3>What the Container Tells You</h3>
+          <p>A docked window can end up in a state WLM can't fix on its own, and since dev.125 the container says which rather than leaving a blank pane. A window snapped with <kbd>Win</kbd>+<kbd>Arrow</kbd> or moved by its own app is put back once, and the bar says "off its pane" if it keeps leaving. A window with a dialog open is left alone until the dialog closes, and its row says "has a dialog open". An elevated window (an admin terminal, say) can't be moved by a normal WLM at all, so its pane says "elevated". Under full dock, an app that stops responding or hides its own window gets a note on its pane instead of a frozen picture. Some windows are refused at the drop, with a short notice: tool windows, dialogs that belong to another window, and windows on another virtual desktop.</p>
 
           <h3>Fully Docked</h3>
           <p>The toggle on the container's title bar takes the frames off. Every window inside loses its title bar and borders and fills its pane exactly, edge to edge, so a container holding three windows reads as one surface with three panels. The gaps between them belong to the container.</p>
