@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StableActorId: Tutorial</title>
+<meta name="description" content="Step by step: make an actor referenceable, point another actor at it, resolve it at runtime, and validate it.">
+<style>
+  :root {
+    --bg: #F4F5F2; --panel: #FFFFFF; --ink: #1B222B; --muted: #5A6472;
+    --line: #C9CFD6; --chipbg: #EAEDE8; --codebg: #F7F8F5;
+    --c1: #35855C; --c2: #2E77C9; --c3: #B26E22; --c4: #7A6BC9;
+    --broken: #C94A4A;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0F1216; --panel: #1A2026; --ink: #E8ECF1; --muted: #93A0AE;
+      --line: #2C333C; --chipbg: #232A32; --codebg: #131920;
+      --c1: #5FBF8C; --c2: #5FA3EF; --c3: #E3A25B; --c4: #9D8FE8;
+      --broken: #E36A6A;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1216; --panel: #1A2026; --ink: #E8ECF1; --muted: #93A0AE;
+    --line: #2C333C; --chipbg: #232A32; --codebg: #131920;
+    --c1: #5FBF8C; --c2: #5FA3EF; --c3: #E3A25B; --c4: #9D8FE8;
+    --broken: #E36A6A;
+  }
+  :root[data-theme="light"] {
+    --bg: #F4F5F2; --panel: #FFFFFF; --ink: #1B222B; --muted: #5A6472;
+    --line: #C9CFD6; --chipbg: #EAEDE8; --codebg: #F7F8F5;
+    --c1: #35855C; --c2: #2E77C9; --c3: #B26E22; --c4: #7A6BC9;
+    --broken: #C94A4A;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Segoe UI", -apple-system, system-ui, sans-serif;
+    font-size: 16px; line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  code, pre { font-family: "Cascadia Code", "Consolas", "SF Mono", ui-monospace, monospace; }
+
+  .mast { border-bottom: 1px solid var(--line); background: var(--panel); }
+  .mast-in {
+    max-width: 1180px; margin: 0 auto; padding: 26px 28px 22px;
+    display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 26px;
+  }
+  h1 {
+    font-family: "Bahnschrift", "Arial Narrow", "Helvetica Neue", system-ui, sans-serif;
+    font-weight: 600; font-size: 30px; letter-spacing: 0.01em; margin: 0; line-height: 1.15;
+  }
+  h1 .accent { color: var(--c2); font-family: "Cascadia Code", Consolas, monospace; font-size: 26px; }
+  .tagline { color: var(--muted); font-size: 15px; max-width: 64ch; margin: 4px 0 0; }
+  .mast-nav { margin-left: auto; display: flex; gap: 8px; }
+  .mast-nav a {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 13.5px;
+    letter-spacing: 0.04em; text-decoration: none; color: var(--ink);
+    border: 1px solid var(--line); border-radius: 3px; padding: 6px 13px; white-space: nowrap;
+  }
+  .mast-nav a:hover { border-color: var(--muted); }
+  .mast-nav a:focus-visible { outline: 2px solid var(--c2); outline-offset: 1px; }
+
+  .shell { max-width: 1180px; margin: 0 auto; padding: 0 28px 80px; display: grid; grid-template-columns: 232px 1fr; gap: 44px; }
+  @media (max-width: 900px) { .shell { grid-template-columns: 1fr; gap: 0; } }
+
+  nav.toc { position: sticky; top: 22px; align-self: start; padding-top: 34px; }
+  @media (max-width: 900px) {
+    nav.toc { position: static; padding: 26px 0 6px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+  }
+  nav.toc h2 {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px;
+  }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  @media (max-width: 900px) { nav.toc ol { flex-direction: row; flex-wrap: wrap; gap: 6px 14px; } }
+  nav.toc a {
+    display: block; text-decoration: none; color: var(--muted); font-size: 14px;
+    padding: 3px 0 3px 11px; border-left: 2px solid transparent; line-height: 1.35;
+  }
+  nav.toc a:hover { color: var(--ink); border-left-color: var(--line); }
+  nav.toc a:focus-visible { outline: 2px solid var(--c2); outline-offset: 1px; }
+  @media (max-width: 900px) { nav.toc a { border-left: 0; padding-left: 0; } }
+
+  main { padding-top: 34px; min-width: 0; }
+  section { margin-bottom: 52px; scroll-margin-top: 20px; }
+  section > *:last-child { margin-bottom: 0; }
+
+  h2.sec {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 25px; font-weight: 600;
+    margin: 0 0 4px; letter-spacing: 0.01em; text-wrap: balance;
+  }
+  .kicker {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px;
+  }
+  h3 {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 18px; font-weight: 600;
+    margin: 30px 0 6px; text-wrap: balance;
+  }
+  p { margin: 0 0 15px; max-width: 74ch; }
+  ul, ol.body { max-width: 74ch; margin: 0 0 15px; padding-left: 20px; }
+  li { margin-bottom: 9px; }
+  a { color: var(--c2); }
+
+  /* Definition list: the term plain, a " - " separator carrying the styling. */
+  dl { max-width: 74ch; margin: 0 0 18px; }
+  dl div { margin-bottom: 11px; }
+  dt { display: inline; font-family: "Cascadia Code", Consolas, monospace; font-size: 14.5px; color: var(--c2); }
+  dt::after { content: " - "; color: var(--muted); font-family: "Segoe UI", sans-serif; }
+  dd { display: inline; margin: 0; }
+
+  code {
+    font-size: 0.895em; background: var(--chipbg); padding: 1px 5px; border-radius: 3px;
+    border: 1px solid var(--line);
+  }
+  pre {
+    background: var(--codebg); border: 1px solid var(--line); border-radius: 4px;
+    padding: 14px 16px; overflow-x: auto; font-size: 13.5px; line-height: 1.6; margin: 0 0 15px;
+  }
+  pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .cmt { color: var(--muted); }
+
+  .callout {
+    border: 1px solid var(--line); border-left-width: 3px; border-left-color: var(--c3);
+    border-radius: 4px; padding: 13px 17px; margin: 0 0 16px; background: var(--panel); max-width: 74ch;
+  }
+  .callout .lbl {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 12.5px; font-weight: 600;
+    letter-spacing: 0.05em; color: var(--c3);
+  }
+  .callout.important { border-left-color: var(--broken); }
+  .callout.important .lbl { color: var(--broken); }
+  .callout p { margin: 0; display: inline; }
+  .callout p + p { display: block; margin-top: 10px; }
+
+  .status { max-width: 74ch; margin: 0 0 18px; }
+  .status div { margin-bottom: 10px; }
+  .status .what { font-weight: 600; }
+  .status .ok { color: var(--c1); font-weight: 600; }
+  .status .bad { color: var(--broken); font-weight: 600; }
+  .status .pend { color: var(--muted); font-weight: 600; }
+
+  footer {
+    border-top: 1px solid var(--line); margin-top: 20px; padding-top: 18px;
+    color: var(--muted); font-size: 14px; max-width: 74ch;
+  }
+  footer p { margin: 0 0 8px; }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="mast-in">
+    <div>
+      <h1><span class="accent">StableActorId</span>: Set Up A Reference</h1>
+      <p class="tagline">References to one specific placed actor in Unreal Engine 5.8, keyed on the engine's per-placement guid, so they survive renames and the level-instance boundary where soft object paths break.</p>
+    </div>
+    <div class="mast-nav">
+      <a href="index.html">How It Works</a>
+      <a href="diagram.html">Wiring Diagram</a>
+      <a href="tech.html">Tech Notes</a>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="toc" aria-label="Contents">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#before">Before You Start</a></li>
+      <li><a href="#step1">Step 1: Make An Actor Referenceable</a></li>
+      <li><a href="#step2">Step 2: Add A Reference</a></li>
+      <li><a href="#step3">Step 3: Pick The Target</a></li>
+      <li><a href="#step4">Step 4: Resolve It At Runtime</a></li>
+      <li><a href="#step5">Step 5: Validate</a></li>
+      <li><a href="#containers">Going Further: Containers</a></li>
+      <li><a href="#trouble">If Something Looks Wrong</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <section id="before">
+      <h2 class="sec">Before You Start</h2>
+      <p>
+        This page is meant to talk about setting up a stable actor reference from scratch: one
+        actor that can be referenced, another that points at it, and the code that finds it at
+        runtime. You'll want the StableActorId plugin in your project's <code>Plugins</code>
+        folder. It's enabled by default. There's no <code>.uproject</code> entry to add.
+      </p>
+    </section>
+
+    <section id="step1">
+      <h2 class="sec">Step 1: Make An Actor Referenceable</h2>
+      <p>
+        Add a <code>UStableActorIdComponent</code> to the actor you want to point at. In a
+        Blueprint, use "Add Component" and pick "Stable Actor Id". In C++, create it as a
+        default subobject:
+      </p>
+<pre><code>UPROPERTY()
+TObjectPtr&lt;UStableActorIdComponent&gt; StableActorId;
+
+ABeacon::ABeacon()
+{
+    StableActorId = CreateDefaultSubobject&lt;UStableActorIdComponent&gt;(TEXT("StableActorId"));
+}</code></pre>
+      <p>
+        There's nothing to fill in. The component's only field, <code>PlacementId</code>, stays
+        empty in the editor. You can also add the component to a single placed actor in the
+        details panel, which works for engine classes like a <code>StaticMeshActor</code>.
+      </p>
+    </section>
+
+    <section id="step2">
+      <h2 class="sec">Step 2: Add A Reference To Another Actor</h2>
+      <p>
+        Add an <code>FStableActorRef</code> property to the actor that needs to point at the
+        first one:
+      </p>
+<pre><code>UPROPERTY(EditAnywhere, meta = (AllowedClasses = "/Script/MyGame.Beacon"))
+FStableActorRef TargetBeacon;</code></pre>
+      <p>
+        <code>AllowedClasses</code> is optional. It limits the picker to those classes. Data Validation also flags a ref that points outside them. It only works on C++ properties,
+        since a Blueprint variable can't carry that metadata.
+      </p>
+    </section>
+
+    <section id="step3">
+      <h2 class="sec">Step 3: Pick The Target</h2>
+      <p>
+        Place both actors, select the one with the reference, and find its row in the details
+        panel:
+      </p>
+<pre><code> Target Beacon      [ None  ▾ ] [✕]</code></pre>
+      <p>
+        Open the dropdown. It's a Scene Outliner showing only actors you can point at. Level instances expand like folders. If your beacon sits inside a room you've placed three times, you'll see three entries and can pick the one you mean. Once you pick, the row
+        shows the target's label, then the level instances it sits in, in dimmer text:
+      </p>
+<pre><code>  Target Beacon      [ BP_Beacon  Wing_A.Room_3      ▾ ] [✕]</code></pre>
+      <p>
+        The ✕ clears it back to "None". If the target isn't loaded, the row still shows its label and level instances, read from the World Partition actor descriptor or from the labels saved at pick time, with "not loaded" after them.
+      </p>
+      <div class="callout"><span class="lbl">Note:</span>
+        <p>There's no eyedropper. Clicking level-instance content in the viewport selects the whole level instance. The outliner is the reliable way in.</p>
+      </div>
+    </section>
+
+    <section id="step4">
+      <h2 class="sec">Step 4: Resolve It At Runtime</h2>
+      <p>
+        Resolve the ref when you need the actor. Don't keep the pointer around:
+      </p>
+<pre><code>void AMySwitch::OnInteract()
+{
+    if (ABeacon* Beacon = UStableActorIdLibrary::ResolveStableActorRef&lt;ABeacon&gt;(this, TargetBeacon))
+    {
+        Beacon-&gt;Light();
+    }
+}</code></pre>
+      <p>
+        In Blueprint, call "Get Actor From Stable Actor Ref" and pick the class. It returns null
+        when the ref is unset, when the target's level isn't loaded, when the target is a
+        different class, or when more than one actor matches.
+      </p>
+    </section>
+
+    <section id="step5">
+      <h2 class="sec">Step 5: Validate</h2>
+      <p>
+        Right-click your level in the content browser and run "Validate Data". Saving it with validate-on-save turned on works too. The check flags refs that can't resolve, like a target that
+        lost its component or one that was moved to another level.
+      </p>
+    </section>
+
+    <section id="containers">
+      <h2 class="sec">Going Further: Containers</h2>
+      <p>
+        Refs work in a <code>TArray</code>, as a <code>TSet</code> element, and as a
+        <code>TMap</code> key or value. Each element gets the same picker row. An
+        <code>AllowedClasses</code> on the container applies to every element.
+      </p>
+<pre><code>UPROPERTY(EditAnywhere)
+TMap&lt;FStableActorRef, int32&gt; DoorKeyCodes;</code></pre>
+    </section>
+
+    <section id="trouble">
+      <h2 class="sec">If Something Looks Wrong</h2>
+      <dl>
+        <div><dt>The row says "not loaded"</dt><dd>The target's level isn't loaded, which is
+          normal under World Partition. If it still says that with the level loaded, the target
+          was probably moved to another level or into a level instance. Re-pick it.</dd></div>
+        <div><dt>The picker doesn't list my actor</dt><dd>Check it has a
+          <code>UStableActorIdComponent</code>, that it isn't a child actor, and that it matches
+          the property's <code>AllowedClasses</code>.</dd></div>
+        <div><dt>The resolve returns null</dt><dd>Check the context object is in the world you
+          expect. In PIE, pass a PIE object like <code>this</code>, not an editor
+          object.</dd></div>
+        <div><dt>It works in the editor but not in a packaged build</dt><dd>Run Data Validation
+          first. The packaged path relies on the cook bake, which hasn't been confirmed in a
+          full packaged build at time of writing.</dd></div>
+      </dl>
+    </section>
+
+    <footer>
+      <p>
+        StableActorId targets Unreal Engine 5.8. The design records, the usage reference, and
+        the verification log live in the repository alongside the source. The
+        <a href="https://github.com/defessler/StableActorId-UnrealPlugin/wiki">wiki</a> is the
+        technical reference.
+      </p>
+      <p><a href="diagram.html">Interactive wiring diagram</a></p>
+    </footer>
+
+  </main>
+</div>
+
+</body>
+</html>

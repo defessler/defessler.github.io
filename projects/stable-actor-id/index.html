@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StableActorId: How The System Works</title>
+<meta name="description" content="Reference one specific placed Unreal Engine actor by its per-placement guid, including one placement inside a level instance, in a way that survives renames and works in cooked builds.">
+<style>
+  :root {
+    --bg: #F4F5F2; --panel: #FFFFFF; --ink: #1B222B; --muted: #5A6472;
+    --line: #C9CFD6; --chipbg: #EAEDE8; --codebg: #F7F8F5;
+    --c1: #35855C; --c2: #2E77C9; --c3: #B26E22; --c4: #7A6BC9;
+    --broken: #C94A4A;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0F1216; --panel: #1A2026; --ink: #E8ECF1; --muted: #93A0AE;
+      --line: #2C333C; --chipbg: #232A32; --codebg: #131920;
+      --c1: #5FBF8C; --c2: #5FA3EF; --c3: #E3A25B; --c4: #9D8FE8;
+      --broken: #E36A6A;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1216; --panel: #1A2026; --ink: #E8ECF1; --muted: #93A0AE;
+    --line: #2C333C; --chipbg: #232A32; --codebg: #131920;
+    --c1: #5FBF8C; --c2: #5FA3EF; --c3: #E3A25B; --c4: #9D8FE8;
+    --broken: #E36A6A;
+  }
+  :root[data-theme="light"] {
+    --bg: #F4F5F2; --panel: #FFFFFF; --ink: #1B222B; --muted: #5A6472;
+    --line: #C9CFD6; --chipbg: #EAEDE8; --codebg: #F7F8F5;
+    --c1: #35855C; --c2: #2E77C9; --c3: #B26E22; --c4: #7A6BC9;
+    --broken: #C94A4A;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Segoe UI", -apple-system, system-ui, sans-serif;
+    font-size: 16px; line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  code, pre { font-family: "Cascadia Code", "Consolas", "SF Mono", ui-monospace, monospace; }
+
+  .mast { border-bottom: 1px solid var(--line); background: var(--panel); }
+  .mast-in {
+    max-width: 1180px; margin: 0 auto; padding: 26px 28px 22px;
+    display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 26px;
+  }
+  h1 {
+    font-family: "Bahnschrift", "Arial Narrow", "Helvetica Neue", system-ui, sans-serif;
+    font-weight: 600; font-size: 30px; letter-spacing: 0.01em; margin: 0; line-height: 1.15;
+  }
+  h1 .accent { color: var(--c2); font-family: "Cascadia Code", Consolas, monospace; font-size: 26px; }
+  .tagline { color: var(--muted); font-size: 15px; max-width: 64ch; margin: 4px 0 0; }
+  .mast-nav { margin-left: auto; display: flex; gap: 8px; }
+  .mast-nav a {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 13.5px;
+    letter-spacing: 0.04em; text-decoration: none; color: var(--ink);
+    border: 1px solid var(--line); border-radius: 3px; padding: 6px 13px; white-space: nowrap;
+  }
+  .mast-nav a:hover { border-color: var(--muted); }
+  .mast-nav a:focus-visible { outline: 2px solid var(--c2); outline-offset: 1px; }
+
+  .shell { max-width: 1180px; margin: 0 auto; padding: 0 28px 80px; display: grid; grid-template-columns: 232px 1fr; gap: 44px; }
+  @media (max-width: 900px) { .shell { grid-template-columns: 1fr; gap: 0; } }
+
+  nav.toc { position: sticky; top: 22px; align-self: start; padding-top: 34px; }
+  @media (max-width: 900px) {
+    nav.toc { position: static; padding: 26px 0 6px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+  }
+  nav.toc h2 {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px;
+  }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  @media (max-width: 900px) { nav.toc ol { flex-direction: row; flex-wrap: wrap; gap: 6px 14px; } }
+  nav.toc a {
+    display: block; text-decoration: none; color: var(--muted); font-size: 14px;
+    padding: 3px 0 3px 11px; border-left: 2px solid transparent; line-height: 1.35;
+  }
+  nav.toc a:hover { color: var(--ink); border-left-color: var(--line); }
+  nav.toc a:focus-visible { outline: 2px solid var(--c2); outline-offset: 1px; }
+  @media (max-width: 900px) { nav.toc a { border-left: 0; padding-left: 0; } }
+
+  main { padding-top: 34px; min-width: 0; }
+  section { margin-bottom: 52px; scroll-margin-top: 20px; }
+  section > *:last-child { margin-bottom: 0; }
+
+  h2.sec {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 25px; font-weight: 600;
+    margin: 0 0 4px; letter-spacing: 0.01em; text-wrap: balance;
+  }
+  .kicker {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px;
+  }
+  h3 {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 18px; font-weight: 600;
+    margin: 30px 0 6px; text-wrap: balance;
+  }
+  p { margin: 0 0 15px; max-width: 74ch; }
+  ul, ol.body { max-width: 74ch; margin: 0 0 15px; padding-left: 20px; }
+  li { margin-bottom: 9px; }
+  a { color: var(--c2); }
+
+  /* Definition list: the term plain, a " - " separator carrying the styling. */
+  dl { max-width: 74ch; margin: 0 0 18px; }
+  dl div { margin-bottom: 11px; }
+  dt { display: inline; font-family: "Cascadia Code", Consolas, monospace; font-size: 14.5px; color: var(--c2); }
+  dt::after { content: " - "; color: var(--muted); font-family: "Segoe UI", sans-serif; }
+  dd { display: inline; margin: 0; }
+
+  code {
+    font-size: 0.895em; background: var(--chipbg); padding: 1px 5px; border-radius: 3px;
+    border: 1px solid var(--line);
+  }
+  pre {
+    background: var(--codebg); border: 1px solid var(--line); border-radius: 4px;
+    padding: 14px 16px; overflow-x: auto; font-size: 13.5px; line-height: 1.6; margin: 0 0 15px;
+  }
+  pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .cmt { color: var(--muted); }
+
+  .callout {
+    border: 1px solid var(--line); border-left-width: 3px; border-left-color: var(--c3);
+    border-radius: 4px; padding: 13px 17px; margin: 0 0 16px; background: var(--panel); max-width: 74ch;
+  }
+  .callout .lbl {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 12.5px; font-weight: 600;
+    letter-spacing: 0.05em; color: var(--c3);
+  }
+  .callout.important { border-left-color: var(--broken); }
+  .callout.important .lbl { color: var(--broken); }
+  .callout p { margin: 0; display: inline; }
+  .callout p + p { display: block; margin-top: 10px; }
+
+  .status { max-width: 74ch; margin: 0 0 18px; }
+  .status div { margin-bottom: 10px; }
+  .status .what { font-weight: 600; }
+  .status .ok { color: var(--c1); font-weight: 600; }
+  .status .bad { color: var(--broken); font-weight: 600; }
+  .status .pend { color: var(--muted); font-weight: 600; }
+
+  footer {
+    border-top: 1px solid var(--line); margin-top: 20px; padding-top: 18px;
+    color: var(--muted); font-size: 14px; max-width: 74ch;
+  }
+  footer p { margin: 0 0 8px; }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="mast-in">
+    <div>
+      <h1><span class="accent">StableActorId</span>: How The System Works</h1>
+      <p class="tagline">References to one specific placed actor in Unreal Engine 5.8, keyed on the engine's per-placement guid, so they survive renames and the level-instance boundary where soft object paths break.</p>
+    </div>
+    <div class="mast-nav">
+      <a href="tutorial.html">Tutorial</a>
+      <a href="diagram.html">Wiring Diagram</a>
+      <a href="tech.html">Tech Notes</a>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="toc" aria-label="Contents">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="tutorial.html">Tutorial: Set It Up</a></li>
+      <li><a href="#problem">The Problem</a></li>
+      <li><a href="#shape">The Shape Of The Answer</a></li>
+      <li><a href="#types">The Two Types</a></li>
+      <li><a href="#storage">Where The Data Lives</a></li>
+      <li><a href="#resolution">Resolution</a></li>
+      <li><a href="#cooked">Surviving The Cook</a></li>
+      <li><a href="#using">Using It</a></li>
+      <li><a href="#validation">Data Validation</a></li>
+      <li><a href="#verification">What We've Verified</a></li>
+      <li><a href="#decisions">Decisions And Rejected Paths</a></li>
+      <li><a href="#roadmap">Open Questions</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <section id="problem">
+      <p class="kicker">Motivation</p>
+      <h2 class="sec">The Problem: Paths Stop Being Identity</h2>
+      <p>
+        <code>TSoftObjectPtr&lt;AActor&gt;</code> is the standard way to point one actor at
+        another across streaming boundaries. It works because an object path is normally two
+        things at once. It's stable, which lets it survive a save and load round trip. It's also unique. Exactly one object answers to it.
+      </p>
+      <p>
+        Inside a level instance you lose both properties. A level-instance asset is saved once and placed N times. Every placement's contents share one authored path. That path can't tell placement 1 from placement 2. At runtime the level loads as an instanced
+        package whose name is generated per placement.
+      </p>
+<pre><code><span class="cmt">// Engine/Private/LevelInstance/LevelInstanceLevelStreaming.cpp</span>
+FString Suffix = FString::Printf(TEXT("%s_LevelInstance_%016llx_%d"),
+    *ShortPackageName, LevelInstance-&gt;GetLevelInstanceID().GetHash(),
+    LevelInstanceActor-&gt;GetWorld()-&gt;IsGameWorld() ? 1 : 0);</code></pre>
+      <p>
+        So the path you can author in the editor isn't the path the actor has at runtime. Each
+        placement produces a different one. That trailing <code>IsGameWorld()</code> flag also
+        means the editor path and the play path differ for the same placement. The engine's own
+        actor locator concedes the point in a source comment, saying actors "should be relative
+        to their level in order to support streaming within level instances, but world
+        partition makes that impossible".
+      </p>
+      <p>
+        Renames and outliner moves break path references for the same underlying reason. The
+        reference was keyed on something the editor is free to change. That's what shapes
+        everything below. References that survive can't be paths.
+      </p>
+    </section>
+
+    <section id="shape">
+      <p class="kicker">Design</p>
+      <h2 class="sec">The Shape Of The Answer</h2>
+      <p>
+        StableActorId doesn't invent an identity. It keys every reference on the one the engine
+        already keeps for each placement: the actor instance guid, which combines the guids of
+        the level instances an actor sits in with the actor's own <code>ActorGuid</code>. Where the
+        engine stamps nothing, which is a level instance open for editing, the plugin folds that
+        value itself from the level-instance ancestors, so it holds in both modes. Three
+        placements of one room give the door inside it three different values. Renaming or moving the door between outliner folders changes none of them.
+      </p>
+      <p>
+        We call each of those copies a "placement". A placement is one copy of an actor as it
+        exists in the world, as opposed to the actor as it's saved in a level asset.
+      </p>
+      <p>
+        Nothing is minted. Nothing keys off labels or object paths.
+        <code>UStableActorIdLibrary::GetPlacementId</code> is the one place that
+        answers "which placement is this?". The resolver, the picker, the cook bake, and Data Validation all go through it.
+      </p>
+    </section>
+
+    <section id="types">
+      <p class="kicker">Building Blocks</p>
+      <h2 class="sec">The Two Types</h2>
+      <p>To use this system, you need to understand two main building blocks:</p>
+      <dl>
+        <div><dt>UStableActorIdComponent</dt><dd>The component you put on an actor. Any actor
+          that has one can be referenced. You can add it to a class in C++ or a Blueprint, or to
+          one placed actor in the level, engine classes included. It holds one field,
+          <code>PlacementId</code>, which only the cook writes.</dd></div>
+        <div><dt>FStableActorRef</dt><dd>The reference you put anywhere that points at an
+          actor. It's a plain value struct holding the target's placement id in
+          <code>TargetId</code>, and the target's label and level-instance path from when the ref was made in <code>CachedLabel</code> and <code>CachedLevelInstancePath</code>.</dd></div>
+      </dl>
+      <p>
+        The ref has the basics you'd expect from a handle, modeled on
+        <code>FMassEntityHandle</code>: <code>IsSet</code>, <code>Reset</code>,
+        <code>==</code>, <code>&lt;</code>, <code>GetTypeHash</code>, and
+        <code>ToString</code>. Two refs are equal when they point at the same actor, whatever
+        their labels say. That lets a ref work as a <code>TSet</code> element or a
+        <code>TMap</code> key in C++ and in Blueprint.
+      </p>
+    </section>
+
+    <section id="storage">
+      <p class="kicker">Data</p>
+      <h2 class="sec">Where The Data Lives</h2>
+      <p>
+        Every piece of saved data is an ordinary <code>UPROPERTY</code> that saves with whatever
+        object owns it.
+      </p>
+      <dl>
+        <div><dt>The target's identity</dt><dd>Not stored by the plugin in the editor at all.
+          It's the engine's own <code>ActorGuid</code>, saved in the actor's level package or
+          its external actor package, plus the level-instance chain the engine already
+          tracks.</dd></div>
+        <div><dt>PlacementId</dt><dd>On the component. Empty in every editor-saved package.
+          The cook fills it so a packaged build can still answer which placement an actor
+          is.</dd></div>
+        <div><dt>TargetId and the cached labels</dt><dd>On the ref, saved as tagged properties inside
+          whatever owns the ref: an actor, a component, a data asset, a Blueprint default, or a
+          save game.</dd></div>
+      </dl>
+      <p>
+        A ref never stores a pointer to its target. It can't dangle. It never stores an object
+        path either, which is what breaks under level-instance path mangling.
+      </p>
+      <p>
+        Both cached labels save in every build configuration, since a <code>UPROPERTY</code> can't be compiled out of Shipping alone and every configuration loads the same cooked data. Shipping empties them as each ref loads.
+      </p>
+    </section>
+
+    <section id="resolution">
+      <p class="kicker">Runtime</p>
+      <h2 class="sec">Resolution: Unique, Or Nothing</h2>
+      <p>
+        Each <code>UStableActorIdComponent</code> registers itself with its world's
+        <code>UStableActorIdSubsystem</code> in <code>OnRegister</code> and leaves in
+        <code>OnUnregister</code>. Components register when their level becomes visible and
+        unregister when it's hidden, unloaded, or destroyed. The subsystem holds exactly the
+        stable actors in loaded, visible levels. It mirrors what's loaded and never assigns
+        anything.
+      </p>
+      <p>
+        <code>GetActorFromStableActorRef</code> resolves a ref in a few steps:
+      </p>
+      <ol class="body">
+        <li>Refuse an unset ref. An invalid guid would match every actor that has no instance
+          guid.</li>
+        <li>Find the world from the context object.</li>
+        <li>Ask that world's subsystem for the stable actor whose placement id matches
+          <code>TargetId</code>.</li>
+        <li>Return null the moment a second actor matches.</li>
+        <li>If you passed an actor class, the match has to be that class or a subclass.</li>
+      </ol>
+      <p>
+        The resolver never picks one actor out of several. Acting on an arbitrary one of two is
+        worse than acting on nothing, since nothing would tell the caller the answer was a
+        guess. With per-placement guids a collision should be rare. Data Validation reports one as an error long before a resolve hits it.
+      </p>
+<pre><code>if (ADoorActor* Door = UStableActorIdLibrary::ResolveStableActorRef&lt;ADoorActor&gt;(this, TargetDoor))
+{
+    Door-&gt;Open();
+}</code></pre>
+      <p>
+        In Blueprint the node is "Get Actor From Stable Actor Ref". Its output pin takes the class you pick. Each world has its own subsystem. The editor world and every PIE world resolve separately. PIE copies keep the editor actor's guid, which lets a ref picked in the editor find the PIE copy of the same actor.
+      </p>
+    </section>
+
+    <section id="cooked">
+      <p class="kicker">Packaged Builds</p>
+      <h2 class="sec">Surviving The Cook</h2>
+      <p>
+        In a cooked build the engine releases each actor's instance guid in
+        <code>AActor::PostRegisterAllComponents</code>, long before gameplay can ask for it. So
+        the editor module copies the guid onto the actor while the cook can still read it. On a
+        cooking save it writes the live value into the component's <code>PlacementId</code>. It restores the editor copy after each package saves and again when the cook
+        finishes. The engine's <code>USmartObjectComponent::PreSave</code> does the same thing,
+        for the same reason.
+      </p>
+      <p>
+        In a packaged build the library reads that baked value. If the actor's level has a
+        level-instance guid, it folds that guid back in first. A Standalone level instance cooks as its own asset. Nothing stamps an instance guid when that happens. The bake only captures the actor's own half. Embedded and Partitioned content bakes an absolute
+        value instead.
+      </p>
+      <div class="callout important"><span class="lbl">IMPORTANT:</span>
+        <p>Don't simplify the fold to a plain read. It breaks cooked Standalone level instances and nothing else. That makes it easy to miss. <code>StableActorId.Cooked.BakedRead</code>
+        catches a plain read at time of writing.</p>
+      </div>
+    </section>
+
+    <section id="using">
+      <p class="kicker">Workflow</p>
+      <h2 class="sec">Using It</h2>
+      <h3>Make An Actor Referenceable</h3>
+      <p>
+        Add a <code>UStableActorIdComponent</code>. In a Blueprint, use "Add Component" and pick
+        "Stable Actor Id". There's nothing to fill in.
+      </p>
+      <h3>Point At One</h3>
+      <p>
+        An <code>FStableActorRef</code> property shows up as one row with a picker and a clear
+        button. The picker is a Scene Outliner filtered to actors a ref can point at. Level instances expand like folders, which lets you pick one placement. Add
+        <code>AllowedClasses</code> metadata to limit what it offers.
+      </p>
+<pre><code>  Target Door      [ BP_Door  Wing_A.Room_3      ▾ ] [✕]</code></pre>
+      <h3>Resolve At The Moment Of Use</h3>
+      <p>
+        Call the resolver on events, like an overlap or an interaction. Don't cache the pointer it returns. An unresolved ref keeps its guid and starts resolving the moment
+        the target's level streams in.
+      </p>
+      <p>
+        Check out the <a href="tutorial.html">tutorial</a> for the full walkthrough.
+      </p>
+    </section>
+
+    <section id="validation">
+      <p class="kicker">Content Checks</p>
+      <h2 class="sec">Data Validation</h2>
+      <p>
+        <code>UStableActorIdValidator</code> plugs into the engine's Data Validation. "Validate Data", validate-on-save, and the commandlet all run it. It indexes every
+        loaded actor by placement id, then checks each stable actor and each ref against that
+        index, including refs inside containers, nested structs, and components.
+      </p>
+      <ul>
+        <li>Errors: a <code>PlacementId</code> a cook left in editor data, a placement id two
+          stable actors share, a ref that matches several actors, a ref to an actor with no
+          component, a ref to a child actor, and a ref outside its <code>AllowedClasses</code>.</li>
+        <li>Under World Partition, a ref whose target exists nowhere in the world, loaded or
+          not. It rebuilds every placement id from the actor descriptors and only reports when
+          that rebuilt set agrees with the loaded actors.</li>
+        <li>Warnings: two components on one actor, a stable actor with no instance guid, and
+          outside World Partition, a ref that matches nothing loaded.</li>
+      </ul>
+    </section>
+
+    <section id="verification">
+      <p class="kicker">Status</p>
+      <h2 class="sec">What We've Verified</h2>
+      <div class="status">
+        <div><span class="what">Editor and PIE resolution</span> - <span class="ok">covered</span>
+          by <code>StableActorId.Resolve</code>, including the class filter, two components on
+          one actor, and a destroyed actor dropping out.</div>
+        <div><span class="what">Containers</span> - <span class="ok">covered</span> by
+          <code>StableActorId.Containers</code>, native and reflected sets and maps.</div>
+        <div><span class="what">The cook bake</span> - <span class="ok">covered</span> by
+          <code>StableActorId.Cooked.Bake</code> and <code>StableActorId.Cooked.BakedRead</code>,
+          which drive the save hook with a synthesized cooking context.</div>
+        <div><span class="what">Data Validation</span> - <span class="ok">covered</span> by
+          <code>StableActorId.Validation</code> outside World Partition.</div>
+        <div><span class="what">A packaged build resolving a baked ref</span> -
+          <span class="pend">not yet run</span>. It needs a host with stable actors inside a
+          level instance and a full cook.</div>
+        <div><span class="what">The World Partition broken-ref check</span> -
+          <span class="pend">untested</span>. It needs a saved World Partition map with
+          stable actors in it.</div>
+      </div>
+    </section>
+
+    <section id="decisions">
+      <p class="kicker">History</p>
+      <h2 class="sec">Decisions And Rejected Paths</h2>
+      <p>
+        The plugin started as NamedIds, a larger system with minted 8-byte handles, display
+        names, and a Universal Object Locator fragment for crossing level instances. All
+        placements of a level instance shared one authored handle. Ambiguity was the normal case. In October 2026 we cut it to keying on the engine's instance guid, which already
+        tells placements apart. That took it from about 4,300 lines to under 1,000.
+      </p>
+      <dl>
+        <div><dt>A struct property as the opt-in</dt><dd>Replaced by the component, which can
+          register itself. A struct can't run code when its actor loads. Every resolve used to walk every actor in the world as a result.</dd></div>
+        <div><dt>A registry that assigns ids</dt><dd>Rejected early on. The subsystem only
+          mirrors what's loaded and assigns nothing.</dd></div>
+        <div><dt>Our own guid plus FActorContainerID</dt><dd>Rejected for now. A component
+          can't read its container id in a cooked build for Embedded and Partitioned content. It only removes the bake where we've already handled things without one.</dd></div>
+        <div><dt>Reading the guid at load instead of baking it</dt><dd>Backlogged. The
+          component's <code>OnRegister</code> runs before the engine releases the value, which means it could capture it directly. That needs a cooked run to prove.</dd></div>
+      </dl>
+    </section>
+
+    <section id="roadmap">
+      <p class="kicker">Next</p>
+      <h2 class="sec">Open Questions</h2>
+      <ul>
+        <li>A cooked acceptance run, which would also show whether the load-time capture can
+          replace the bake.</li>
+        <li>A saved World Partition test map, so the broken-ref check gets a real test.</li>
+        <li>"Move to Level", "Create Level Instance", and "Break" give an actor a new guid and
+          break refs to it. Data Validation now reports that under World Partition. An
+          in-editor warning at the moment it happens would be friendlier.</li>
+      </ul>
+    </section>
+
+    <footer>
+      <p>
+        StableActorId targets Unreal Engine 5.8. The design records, the usage reference, and
+        the verification log live in the repository alongside the source. The
+        <a href="https://github.com/defessler/StableActorId-UnrealPlugin/wiki">wiki</a> is the
+        technical reference.
+      </p>
+      <p><a href="diagram.html">Interactive wiring diagram</a></p>
+    </footer>
+
+  </main>
+</div>
+
+</body>
+</html>
