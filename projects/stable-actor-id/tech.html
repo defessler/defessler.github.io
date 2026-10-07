@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>StableActorId: The Tech, And What It Costs</title>
-<meta name="description" content="The pieces StableActorId is built from, why each was picked, what it costs, and the honest risks.">
+<title>StableActorId: How It Works</title>
+<meta name="description" content="The plain-language explanation of how StableActorId keeps a reference valid, then the engineering details: identity, resolution, packaged builds, and validation.">
 <style>
   :root {
     --bg: #F4F5F2; --panel: #FFFFFF; --ink: #1B222B; --muted: #5A6472;
@@ -150,6 +150,18 @@
     color: var(--muted); font-size: 14px; max-width: 74ch;
   }
   footer p { margin: 0 0 8px; }
+
+  .lead { font-size: 19px; line-height: 1.5; max-width: 60ch; margin: 0 0 18px; }
+  figure { margin: 18px 0 24px; max-width: 920px; }
+  figure img {
+    display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px;
+    background: #14181D;
+  }
+  figcaption { color: var(--muted); font-size: 14px; margin-top: 8px; max-width: 74ch; }
+  dl.steps dt { font-family: "Segoe UI", -apple-system, system-ui, sans-serif; font-size: 16px; font-weight: 600; color: var(--ink); }
+  dl.steps dt::after { content: " "; }
+  dl.steps div { margin-bottom: 14px; }
+  b { font-weight: 600; }
 </style>
 </head>
 <body>
@@ -157,12 +169,12 @@
 <header class="mast">
   <div class="mast-in">
     <div>
-      <h1><span class="accent">StableActorId</span>: The Tech, And What It Costs</h1>
-      <p class="tagline">References to one specific placed actor in Unreal Engine 5.8, keyed on the engine's per-placement guid, so they survive renames and the level-instance boundary where soft object paths break.</p>
+      <h1><span class="accent">StableActorId</span>: How It Works</h1>
+      <p class="tagline">A plugin for Unreal Engine 5.8 that lets one thing in your level point at another, and keeps pointing at it through renames, reorganizing, and copies of the same room.</p>
     </div>
     <div class="mast-nav">
-      <a href="index.html">How It Works</a>
-      <a href="tutorial.html">Tutorial</a>
+      <a href="index.html">Overview</a>
+      <a href="tutorial.html">Getting Started</a>
       <a href="diagram.html">Wiring Diagram</a>
     </div>
   </div>
@@ -172,159 +184,116 @@
   <nav class="toc" aria-label="Contents">
     <h2>Contents</h2>
     <ol>
-      <li><a href="#why">Why This Page Exists</a></li>
-      <li><a href="#stack">The Stack</a></li>
-      <li><a href="#gets">What You Get</a></li>
-      <li><a href="#risks">Risks, Honestly</a></li>
-      <li><a href="#when">When To Use It</a></li>
+      <li><a href="#plain">Without The Jargon</a></li>
+      <li><a href="#pieces">What's In The Box</a></li>
+      <li><a href="#engineers">The Technical Version</a></li>
+      <li><a href="#limits">What It Doesn't Do</a></li>
     </ol>
   </nav>
 
   <main>
 
-    <section id="why">
-      <h2 class="sec">Why This Page Exists</h2>
+    <section id="plain">
+      <p class="kicker">Plain Language</p>
+      <h2 class="sec">How It Works, Without The Jargon</h2>
       <p>
-        This page is meant as a quick reference on the pieces StableActorId is built from, why
-        each one was picked, and what it costs. Check out <a href="index.html">How It Works</a>
-        for the design and <a href="tutorial.html">the tutorial</a> for setup.
+        Every actor placed in an Unreal level carries a hidden ID that the engine made up when
+        the actor was placed. Think of it as a serial number. It's unique, it never changes, and
+        when you place a room three times, each copy of the door inside gets its own.
+      </p>
+      <p>
+        A "Stable Actor Ref" is a small note that holds one of those serial numbers, plus the
+        door's name so the note still reads sensibly when the door isn't around. When the game
+        needs the door, the plugin looks through the actors that have the tag and hands back the
+        one whose serial number matches.
+      </p>
+      <p>
+        If two actors ever had the same serial number, the plugin refuses to guess and gives
+        back nothing. Opening the wrong door silently would be worse than opening no door, and
+        the editor's checks tell you about the clash long before that.
       </p>
     </section>
 
-    <section id="stack">
-      <h2 class="sec">The Stack, And Why Each Piece</h2>
+    <section id="pieces">
+      <p class="kicker">The Pieces</p>
+      <h2 class="sec">What's In The Box</h2>
+      <dl>
+        <div><dt>Stable Actor Id (a component)</dt><dd>The tag. Put it on anything that needs to be
+          pointed at.</dd></div>
+        <div><dt>Stable Actor Ref (a property type)</dt><dd>The note. Put it on anything that needs
+          to point.</dd></div>
+        <div><dt>The Details row</dt><dd>The dropdown and the name display you use to pick.</dd></div>
+        <div><dt>The checks</dt><dd>Part of "Validate Assets". They look for pointers that can't
+          work.</dd></div>
+      </dl>
+    </section>
 
-      <h3>The Engine's Instance Guid As Identity</h3>
+    <section id="engineers">
+      <p class="kicker">For Engineers</p>
+      <h2 class="sec">The Technical Version</h2>
       <p>
-        <code>FActorInstanceGuid</code> already tells apart every placement of a level-instance
-        asset, survives renames, and survives outliner moves. Reusing it means there's nothing
-        to mint, heal, or keep unique. The cost is that the engine owns it. When the engine
-        changes an actor's guid, as it does on "Move to Level", refs to that actor break.
+        The identity is the engine's per-placement actor instance guid: the actor's
+        <code>ActorGuid</code>, combined with the guids of the level instances above it. In the
+        editor the plugin takes the engine's stamp where one exists and folds that chain itself
+        where it doesn't, which is a level instance open for editing. Nothing is minted.
       </p>
+      <pre><code>UPROPERTY(EditAnywhere, meta = (AllowedClasses = "/Script/MyGame.Door"))
+FStableActorRef TargetDoor;
 
-      <h3>A Plain Value Struct For The Ref</h3>
+if (ADoor* Door = UStableActorIdLibrary::ResolveStableActorRef&lt;ADoor&gt;(this, TargetDoor))
+{
+    Door-&gt;Open();
+}</code></pre>
+      <h3>Resolution</h3>
       <p>
-        <code>FStableActorRef</code> is a <code>USTRUCT</code> with a guid and a label. It works anywhere a property does, in containers too. It serializes as tagged properties.
-        Equality and hashing go by target only. <code>WithIdenticalViaEquality</code> makes
-        reflection agree with C++. That keeps the details panel's duplicate check for sets and
-        map keys in line with the hash.
+        Each <code>UStableActorIdComponent</code> registers with a world subsystem as its level
+        becomes visible and leaves when it's hidden or destroyed. A resolve walks that set, not
+        the world, and returns one actor or null. Refs are equal when their guids are. That lets
+        them work as <code>TSet</code> elements and <code>TMap</code> keys.
       </p>
-
-      <h3>A Component That Registers Itself</h3>
+      <h3 id="packaged">Packaged builds</h3>
       <p>
-        <code>UStableActorIdComponent</code> is the opt-in. It adds itself to a world subsystem
-        in <code>OnRegister</code> and removes itself in <code>OnUnregister</code>. That ties
-        the subsystem's contents to component registration, which follows level visibility. A resolve only looks at stable actors in loaded, visible levels. It costs a
-        <code>UObject</code> per stable actor. A designer can also remove it from one placed
-        instance without anything else noticing.
+        A cooked build releases the engine's instance guid before gameplay runs. So during a
+        cooking save, the editor module writes the live guid into the component, and restores
+        the editor copy afterwards. At runtime the plugin reads that baked value, folding the
+        level-instance guid back in for Standalone level instances. At time of writing this path
+        is covered by tests that drive the cook hooks directly, and hasn't been confirmed in a
+        full packaged build.
       </p>
-
-      <h3>A Cook-Time Bake</h3>
+      <h3>Validation</h3>
       <p>
-        <code>FCoreUObjectDelegates::OnObjectPreSave</code> writes the live guid into the
-        component during a cooking save. <code>UPackage::PackageSavedWithContextEvent</code> and
-        <code>UE::Cook::FDelegates::CookFinished</code> restore the editor copy. It runs in the
-        editor module, since the cook commandlet runs the editor. It's the only part that can't
-        be tested end to end without a cook.
+        <code>UStableActorIdValidator</code> runs under Data Validation. It indexes every loaded
+        actor by placement id and checks each tag and each ref, including refs inside containers
+        and components. Under World Partition it also reads the actor descriptors. That lets it
+        tell "not loaded" apart from "gone".
       </p>
-
-      <h3>Writes Through The Property Handle</h3>
       <p>
-        The details row writes a pick with <code>SetValueFromFormattedString</code>, never into
-        raw memory. Only the handle path rehashes a <code>TSet</code> or <code>TMap</code> after
-        a key changes and refuses a duplicate.
-      </p>
-
-      <h3>Engine Data Validation</h3>
-      <p>
-        <code>UStableActorIdValidator</code> derives from <code>UEditorValidatorBase</code>. The engine registers it and runs it on save, on demand, and from the commandlet. Under
-        World Partition it reads actor descriptors, which list every actor whether it's loaded
-        or not.
-      </p>
-
-      <h3>Headless Automation</h3>
-      <p>
-        Five <code>StableActorId.*</code> tests run through <code>UnrealEditor-Cmd</code> with
-        no window. They spawn actors into scratch worlds. They need no content.
+        The <a href="https://github.com/defessler/StableActorId-UnrealPlugin/wiki">wiki</a> has
+        the full reference. The <a href="diagram.html">wiring diagram</a> shows how the
+        pieces connect.
       </p>
     </section>
 
-    <section id="gets">
-      <h2 class="sec">What You Get</h2>
+    <section id="limits">
+      <p class="kicker">Honest Limits</p>
+      <h2 class="sec">What It Doesn't Do</h2>
       <ul>
-        <li>References to one specific placement, including one placement out of several of the
-          same level-instance asset.</li>
-        <li>No change when an actor is renamed or moved between outliner folders.</li>
-        <li>A details row with an outliner picker, an <code>AllowedClasses</code> filter, and a
-          readable label even when the target isn't loaded.</li>
-        <li>Refs that work as array elements, set elements, and map keys.</li>
-        <li>Validation that catches leaked bakes, shared ids, and broken refs.</li>
+        <li>It points at things placed in a level, not things spawned while the game runs.</li>
+        <li>"Move to Level", "Create Level Instance", and "Break" give an actor a new ID. Refs to
+          it need re-picking. Validation flags them.</li>
+        <li>Two placements of one room share nothing, which is the point. A ref picks one copy
+          and never "all copies of this door".</li>
+        <li>Finding a door walks the tagged actors in the level. Call it when something happens,
+          not every frame, if you have thousands of tags.</li>
       </ul>
-    </section>
-
-    <section id="risks">
-      <h2 class="sec">Risks, Honestly</h2>
-
-      <h3>The Cooked Path Hasn't Run In A Packaged Build</h3>
-      <p>
-        The bake and the baked read are covered by tests that drive them directly. A full
-        packaged build resolving a baked ref hasn't been run at time of writing. A cook in July
-        2026, against the older design, did show the hooks firing inside a World Partition
-        cook.
-      </p>
-
-      <h3>Some Editor Operations Break Refs</h3>
-      <p>
-        "Move to Level", "Create Level Instance", and "Break" all copy the actor under the hood.
-        The copy gets a new guid. Refs to the old one stop resolving. Data Validation reports
-        these under World Partition. The editor row shows the old label with "not loaded",
-        which looks the same as a target that just hasn't streamed in.
-      </p>
-
-      <h3>Runtime-Spawned Actors Can't Be Saved Targets</h3>
-      <p>
-        An actor spawned in a packaged build has no baked guid. Nothing can point at it across sessions. Refs are for placed actors.
-      </p>
-
-      <h3>Resolve Cost Grows With Stable Actors</h3>
-      <p>
-        A resolve walks the registered stable actors in the world. That's far cheaper than the world scan it replaced. It isn't a map lookup, though. You'll want to call it on events
-        rather than every frame when there are thousands of stable actors.
-      </p>
-
-      <h3>The World Partition Broken-Ref Check Is Untested</h3>
-      <p>
-        It needs a saved World Partition map with stable actors in it. It refuses to report
-        unless its rebuilt ids agree with every loaded stable actor. A mistake should make it quiet rather than wrong.
-      </p>
-
-      <h3>The Label Ships</h3>
-      <p>
-        <code>CachedLabel</code> and <code>CachedLevelInstancePath</code> cook into every configuration's data. Shipping empties them on load. They're still on disk.
-      </p>
-    </section>
-
-    <section id="when">
-      <h2 class="sec">When To Use This, And When Not To</h2>
-      <p>
-        Use it when one placed actor needs to point at another specific placed actor, especially
-        across level instances, and the reference has to survive renames and reorganizing. A
-        switch that opens one door, a spawner that targets one waypoint, and a trigger that
-        wakes one encounter are the cases it's built for.
-      </p>
-      <p>
-        Skip it for references to assets, which <code>TSoftObjectPtr</code> already handles
-        well, and for actors spawned at runtime. If you're only referencing actors in the same
-        level that never move between levels, a plain actor reference may be all you need.
-      </p>
     </section>
 
     <footer>
       <p>
-        StableActorId targets Unreal Engine 5.8. The design records, the usage reference, and
-        the verification log live in the repository alongside the source. The
+        StableActorId is open source. The code, the usage reference, and the engineering records
+        live in the repository. The
         <a href="https://github.com/defessler/StableActorId-UnrealPlugin/wiki">wiki</a> is the
-        technical reference.
+        deep technical reference.
       </p>
       <p><a href="diagram.html">Interactive wiring diagram</a></p>
     </footer>
