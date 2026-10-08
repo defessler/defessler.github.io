@@ -272,6 +272,11 @@
         <img src="img/06-validation.png" alt="The Message Log showing a Data Validation warning: the Switch has a ref to Door (Wing_A), which matches no actor in the loaded levels.">
         <figcaption>Validation says what's wrong and which actor it's on. Here the door's room was deleted after the switch was pointed at it. Click the actor name to jump to it.</figcaption>
       </figure>
+      <p>
+        It also speaks up before the damage. Deleting a door that a switch points at opens a
+        dialog naming the switch and asking whether to go ahead. And right-clicking a door
+        offers "Find Stable Actor Refs To This", which lists every switch pointing at it.
+      </p>
     </section>
 
     <section id="more">

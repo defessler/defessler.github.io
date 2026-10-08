@@ -267,7 +267,9 @@
         <figcaption>Picked. Rename the door later and this row updates by itself.</figcaption>
       </figure>
       <p>
-        The ✕ button clears it back to "None".
+        The ✕ button clears it back to "None". The magnifier button next to it selects the door
+        in the Outliner and points the camera at it. That way you can check you picked the right one.
+        In a big world it loads the door's room first if it has to.
       </p>
     </section>
 
@@ -297,6 +299,17 @@
         <img src="img/06-validation.png" alt="The Message Log with a Data Validation warning: Switch_0 has a ref to Door (Wing_A), which matches no actor in the loaded levels.">
         <figcaption>What a broken pointer looks like when validation finds it. This one's room was deleted. Click "Switch_0" to jump to the switch.</figcaption>
       </figure>
+      <p>
+        You also hear about it sooner than that. If you delete or cut a door that a switch points
+        at, a dialog lists the switches and asks "Delete anyway?". Answer No and the door
+        stays while anything else you had selected still goes. Deleting a whole room counts
+        every door inside it.
+      </p>
+      <p>
+        To see who points at a door before you touch it, right-click the door and choose "Find
+        Stable Actor Refs To This". The list opens in the Message Log. Each entry is a link to
+        the switch.
+      </p>
     </section>
 
     <section id="notloaded">
