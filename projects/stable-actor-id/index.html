@@ -83,6 +83,8 @@
     padding: 3px 0 3px 11px; border-left: 2px solid transparent; line-height: 1.35;
   }
   nav.toc a:hover { color: var(--ink); border-left-color: var(--line); }
+  nav.toc a.current { color: var(--ink); border-left-color: var(--c2); font-weight: 600; }
+  @media (max-width: 900px) { nav.toc a.current { color: var(--c2); } }
   nav.toc a:focus-visible { outline: 2px solid var(--c2); outline-offset: 1px; }
   @media (max-width: 900px) { nav.toc a { border-left: 0; padding-left: 0; } }
 
@@ -307,5 +309,31 @@
   </main>
 </div>
 
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a[href^="#"]'));
+  var sections = links.map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); });
+  if (!links.length) { return; }
+  var ticking = false;
+  function update() {
+    ticking = false;
+    var line = window.innerHeight * 0.3;
+    var current = 0;
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i] && sections[i].getBoundingClientRect().top <= line) { current = i; }
+    }
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) { current = sections.length - 1; }
+    links.forEach(function (a, i) {
+      if (i === current) { a.classList.add('current'); a.setAttribute('aria-current', 'true'); }
+      else { a.classList.remove('current'); a.removeAttribute('aria-current'); }
+    });
+  }
+  function onScroll() { if (!ticking) { ticking = true; window.requestAnimationFrame(update); } }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  window.addEventListener('hashchange', onScroll);
+  update();
+})();
+</script>
 </body>
 </html>
