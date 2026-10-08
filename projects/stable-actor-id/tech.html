@@ -47,23 +47,28 @@
 
   .mast { border-bottom: 1px solid var(--line); background: var(--panel); }
   .mast-in {
-    max-width: 1180px; margin: 0 auto; padding: 26px 28px 22px;
-    display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 26px;
+    max-width: 1180px; margin: 0 auto; padding: 12px 28px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px;
   }
-  h1 {
-    font-family: "Bahnschrift", "Arial Narrow", "Helvetica Neue", system-ui, sans-serif;
-    font-weight: 600; font-size: 30px; letter-spacing: 0.01em; margin: 0; line-height: 1.15;
+  .mast-in.wide { max-width: 1520px; padding-left: 24px; padding-right: 24px; }
+  .brand { text-decoration: none; color: var(--ink); display: flex; align-items: baseline; gap: 10px; }
+  .brand .accent {
+    color: var(--c2); font-family: "Cascadia Code", Consolas, monospace; font-size: 22px; font-weight: 600;
   }
-  h1 .accent { color: var(--c2); font-family: "Cascadia Code", Consolas, monospace; font-size: 26px; }
-  .tagline { color: var(--muted); font-size: 15px; max-width: 64ch; margin: 4px 0 0; }
-  .mast-nav { margin-left: auto; display: flex; gap: 8px; }
+  .brand .brand-sub {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 12.5px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .mast-nav { margin-left: auto; display: flex; flex-wrap: wrap; gap: 6px; }
   .mast-nav a {
     font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 13.5px;
     letter-spacing: 0.04em; text-decoration: none; color: var(--ink);
     border: 1px solid var(--line); border-radius: 3px; padding: 6px 13px; white-space: nowrap;
   }
   .mast-nav a:hover { border-color: var(--muted); }
+  .mast-nav a[aria-current="page"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
   .mast-nav a:focus-visible { outline: 2px solid var(--c2); outline-offset: 1px; }
+  @media (max-width: 640px) { .mast-nav { margin-left: 0; } }
 
   .shell { max-width: 1180px; margin: 0 auto; padding: 0 28px 80px; display: grid; grid-template-columns: 232px 1fr; gap: 44px; }
   @media (max-width: 900px) { .shell { grid-template-columns: 1fr; gap: 0; } }
@@ -170,15 +175,13 @@
 
 <header class="mast">
   <div class="mast-in">
-    <div>
-      <h1><span class="accent">StableActorId</span>: How It Works</h1>
-      <p class="tagline">A plugin for Unreal Engine 5.8 that lets one thing in your level point at another, and keeps pointing at it through renames, reorganizing, and copies of the same room.</p>
-    </div>
-    <div class="mast-nav">
+    <a class="brand" href="index.html"><span class="accent">StableActorId</span><span class="brand-sub">for Unreal Engine 5.8</span></a>
+    <nav class="mast-nav" aria-label="Site">
       <a href="index.html">Overview</a>
       <a href="tutorial.html">Getting Started</a>
+      <a href="tech.html" aria-current="page">How It Works</a>
       <a href="diagram.html">Wiring Diagram</a>
-    </div>
+    </nav>
   </div>
 </header>
 

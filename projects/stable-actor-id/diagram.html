@@ -1,3 +1,7 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>StableActorId — System Wiring</title>
 <style>
   :root {
@@ -105,8 +109,48 @@
   footer b { color: var(--ink); font-weight: 600; }
   .ok { color: var(--c1); font-weight: 600; }
   .bad { color: var(--broken); font-weight: 600; }
+
+
+
+  /* shared mast */
+  .mast { border-bottom: 1px solid var(--line); background: var(--panel); }
+  .mast-in {
+    max-width: 1180px; margin: 0 auto; padding: 12px 28px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px;
+  }
+  .mast-in.wide { max-width: 1520px; padding-left: 24px; padding-right: 24px; }
+  .brand { text-decoration: none; color: var(--ink); display: flex; align-items: baseline; gap: 10px; }
+  .brand .accent {
+    color: var(--c2); font-family: "Cascadia Code", Consolas, monospace; font-size: 22px; font-weight: 600;
+  }
+  .brand .brand-sub {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 12.5px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .mast-nav { margin-left: auto; display: flex; flex-wrap: wrap; gap: 6px; }
+  .mast-nav a {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 13.5px;
+    letter-spacing: 0.04em; text-decoration: none; color: var(--ink);
+    border: 1px solid var(--line); border-radius: 3px; padding: 6px 13px; white-space: nowrap;
+  }
+  .mast-nav a:hover { border-color: var(--muted); }
+  .mast-nav a[aria-current="page"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .mast-nav a:focus-visible { outline: 2px solid var(--c2); outline-offset: 1px; }
+  @media (max-width: 640px) { .mast-nav { margin-left: 0; } }
+  /* end shared mast */
 </style>
 
+<header class="mast">
+  <div class="mast-in wide">
+    <a class="brand" href="index.html"><span class="accent">StableActorId</span><span class="brand-sub">for Unreal Engine 5.8</span></a>
+    <nav class="mast-nav" aria-label="Site">
+      <a href="index.html">Overview</a>
+      <a href="tutorial.html">Getting Started</a>
+      <a href="tech.html">How It Works</a>
+      <a href="diagram.html" aria-current="page">Wiring Diagram</a>
+    </nav>
+  </div>
+</header>
 <div class="wrap">
   <header>
     <h1><span class="mono" id="ttl-main"></span> <span id="ttl-suffix"></span></h1>
