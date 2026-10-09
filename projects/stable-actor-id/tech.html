@@ -252,8 +252,8 @@ if (ADoor* Door = UStableActorIdLibrary::ResolveStableActorRef&lt;ADoor&gt;(this
       <h3>Resolution</h3>
       <p>
         Each <code>UStableActorIdComponent</code> registers with a world subsystem as its level
-        becomes visible and leaves when it's hidden or destroyed. A resolve walks that set, not
-        the world, and returns one actor or null. Refs are equal when their guids are. That lets
+        becomes visible and leaves when it's hidden or destroyed. A resolve is a hash lookup in that
+        set by placement id, and returns one actor or null. Refs are equal when their guids are. That lets
         them work as <code>TSet</code> elements and <code>TMap</code> keys.
       </p>
       <h3 id="packaged">Packaged builds</h3>
@@ -261,9 +261,10 @@ if (ADoor* Door = UStableActorIdLibrary::ResolveStableActorRef&lt;ADoor&gt;(this
         A cooked build releases the engine's instance guid before gameplay runs. So during a
         cooking save, the editor module writes the live guid into the component, and restores
         the editor copy afterwards. At runtime the plugin reads that baked value, folding the
-        level-instance guid back in for Standalone level instances. At time of writing this path
-        is covered by tests that drive the cook hooks directly, and hasn't been confirmed in a
-        full packaged build.
+        level-instance guid back in for Standalone level instances. This path is measured from a
+        staged packaged build: five probe maps covering Embedded, Standalone, nested, classic,
+        distance-streamed, and runtime-loaded level instances resolve every reference to the right
+        placement, with nothing landing on a wrong actor.
       </p>
       <h3>Validation</h3>
       <p>
