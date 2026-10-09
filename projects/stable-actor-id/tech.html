@@ -165,8 +165,19 @@
   figure { margin: 18px 0 24px; max-width: 920px; }
   figure img {
     display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px;
-    background: #14181D;
+    background: #14181D; cursor: zoom-in;
   }
+  .lightbox {
+    position: fixed; inset: 0; z-index: 50; display: none; align-items: center; justify-content: center;
+    padding: 24px; background: rgba(0, 0, 0, 0.82); cursor: zoom-out;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 100%; width: auto; height: auto; border: 1px solid var(--line); border-radius: 6px; }
+  .lightbox button {
+    position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border: 0; border-radius: 20px;
+    background: rgba(255, 255, 255, 0.12); color: #fff; font-size: 22px; line-height: 40px; cursor: pointer;
+  }
+  .lightbox button:hover { background: rgba(255, 255, 255, 0.24); }
   figcaption { color: var(--muted); font-size: 14px; margin-top: 8px; max-width: 920px; }
   dl.steps dt { font-family: "Segoe UI", -apple-system, system-ui, sans-serif; font-size: 16px; font-weight: 600; color: var(--ink); }
   dl.steps dt::after { content: " "; }
@@ -444,6 +455,20 @@ if (ADoor* Door = UStableActorIdLibrary::ResolveStableActorRef&lt;ADoor&gt;(this
   </main>
 </div>
 
+<div class="lightbox" id="lightbox" role="dialog" aria-label="Full-size image"><button type="button" aria-label="Close">&#x2715;</button><img alt=""></div>
+<script>
+(function () {
+  var box = document.getElementById('lightbox');
+  var big = box.querySelector('img');
+  function open(img) { big.src = img.src; big.alt = img.alt; box.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function close() { box.classList.remove('open'); big.src = ''; document.body.style.overflow = ''; }
+  Array.prototype.forEach.call(document.querySelectorAll('figure img'), function (img) {
+    img.addEventListener('click', function () { open(img); });
+  });
+  box.addEventListener('click', close);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && box.classList.contains('open')) { close(); } });
+})();
+</script>
 <script>
 (function () {
   var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a[href^="#"]'));
