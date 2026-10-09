@@ -209,7 +209,6 @@
   <nav class="toc" aria-label="Contents">
     <h2>Contents</h2>
     <ol>
-      <li><a href="#before">Before You Start</a></li>
       <li><a href="#step1">Step 1: Tag An Actor</a></li>
       <li><a href="#step2">Step 2: Pick One Door</a></li>
       <li><a href="#step3">Step 3: Rename, Move, And Duplicate</a></li>
@@ -225,42 +224,13 @@
 
   <main>
 
-    <section id="before">
-      <p class="kicker">Video Tutorial</p>
-      <h2 class="sec">Before You Start</h2>
-      <p>
-        This page is meant to walk you through Tether with short videos, one task each. Watch
-        them in order. You'll go from an empty pointer to a switch that opens the right door, then
-        through the three ways a pointer breaks and the fix for each.
-      </p>
-      <p>
-        Every video uses the same small demo level. One room is built once and placed three
-        times, as Wing_A, Wing_B, and Wing_C. Each room has an orange door. A blue switch stands
-        in front of them. The goal is to point the switch at one specific door.
-      </p>
-      <p>
-        You need the plugin in your project's <code>Plugins</code> folder. It turns itself on,
-        along with the engine's Data Validation plugin it uses for its checks. The demo uses two
-        small classes. If you're on the engineering side, the door carries the tag from its
-        constructor and the switch holds two refs:
-      </p>
-      <pre><code>// The door: every placed door can be pointed at.
-Tether = CreateDefaultSubobject&lt;UTetherComponent&gt;(TEXT("Tether"));
-
-// The switch: one door, limited to door actors, plus a list that takes any tagged actor.
-UPROPERTY(EditAnywhere, meta = (AllowedClasses = "/Script/MyGame.Door"))
-FTetherRef TargetDoor;
-
-UPROPERTY(EditAnywhere)
-TArray&lt;FTetherRef&gt; ExtraDoors;</code></pre>
-      <p>
-        You don't need C++ to follow along. A Blueprint can add the component and the variables
-        the same way. Step 4 shows the Blueprint side.
-      </p>
-    </section>
-
     <section id="step1">
+      <p class="kicker">Video Tutorial</p>
       <h2 class="sec">Step 1: Tag An Actor</h2>
+      <p>
+        Every video uses the same demo level: one room placed three times, as Wing_A, Wing_B,
+        and Wing_C, each with an orange door, and a blue switch in front of them.
+      </p>
       <p>
         An actor can only be pointed at once it carries a Tether component. The doors in the
         demo already have one from their class. This video adds one to the ground, which is a
@@ -303,8 +273,8 @@ TArray&lt;FTetherRef&gt; ExtraDoors;</code></pre>
         target. The other two copies are untouched.
       </p>
       <div class="callout"><span class="lbl">Note:</span>
-        <p>The <code>AllowedClasses</code> metadata in the snippet above is what limits this
-        dropdown to doors. It only works on C++ properties, since a Blueprint variable can't
+        <p>The <code>AllowedClasses</code> metadata on the switch's C++ property is what limits
+        this dropdown to doors. It only works on C++ properties, since a Blueprint variable can't
         carry that metadata. The "Extra Doors" list has no filter. It offers every tagged actor,
         the ground from step 1 included.</p>
       </div>
