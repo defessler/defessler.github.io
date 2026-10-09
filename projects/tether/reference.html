@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tether: Reference</title>
+<meta name="description" content="The full technical reference: identity, where the data lives, how a ref resolves, the details row and picker, Data Validation, and the cook bake.">
+<style>
+  :root {
+    --bg: #F4F5F2; --panel: #FFFFFF; --ink: #1B222B; --muted: #5A6472;
+    --line: #C9CFD6; --chipbg: #EAEDE8; --codebg: #F7F8F5;
+    --c1: #35855C; --c2: #2E77C9; --c3: #B26E22; --c4: #7A6BC9;
+    --broken: #C94A4A;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0F1216; --panel: #1A2026; --ink: #E8ECF1; --muted: #93A0AE;
+      --line: #2C333C; --chipbg: #232A32; --codebg: #131920;
+      --c1: #5FBF8C; --c2: #5FA3EF; --c3: #E3A25B; --c4: #9D8FE8;
+      --broken: #E36A6A;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1216; --panel: #1A2026; --ink: #E8ECF1; --muted: #93A0AE;
+    --line: #2C333C; --chipbg: #232A32; --codebg: #131920;
+    --c1: #5FBF8C; --c2: #5FA3EF; --c3: #E3A25B; --c4: #9D8FE8;
+    --broken: #E36A6A;
+  }
+  :root[data-theme="light"] {
+    --bg: #F4F5F2; --panel: #FFFFFF; --ink: #1B222B; --muted: #5A6472;
+    --line: #C9CFD6; --chipbg: #EAEDE8; --codebg: #F7F8F5;
+    --c1: #35855C; --c2: #2E77C9; --c3: #B26E22; --c4: #7A6BC9;
+    --broken: #C94A4A;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Segoe UI", -apple-system, system-ui, sans-serif;
+    font-size: 16px; line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  code, pre { font-family: "Cascadia Code", "Consolas", "SF Mono", ui-monospace, monospace; }
+
+  .mast { border-bottom: 1px solid var(--line); background: var(--panel); }
+  .mast-in {
+    max-width: 1180px; margin: 0 auto; padding: 12px 28px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px;
+  }
+  .mast-in.wide { max-width: 1520px; padding-left: 24px; padding-right: 24px; }
+  .brand { text-decoration: none; color: var(--ink); display: flex; align-items: baseline; gap: 10px; }
+  .brand .accent {
+    color: var(--c2); font-family: "Cascadia Code", Consolas, monospace; font-size: 22px; font-weight: 600;
+  }
+  .brand .brand-sub {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 12.5px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .mast-nav { margin-left: auto; display: flex; flex-wrap: wrap; gap: 6px; }
+  .mast-nav a {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 13.5px;
+    letter-spacing: 0.04em; text-decoration: none; color: var(--ink);
+    border: 1px solid var(--line); border-radius: 3px; padding: 6px 13px; white-space: nowrap;
+  }
+  .mast-nav a:hover { border-color: var(--muted); }
+  .mast-nav a[aria-current="page"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .mast-nav a:focus-visible { outline: 2px solid var(--c2); outline-offset: 1px; }
+  @media (max-width: 640px) { .mast-nav { margin-left: 0; } }
+
+  .shell { max-width: 1180px; margin: 0 auto; padding: 0 28px 80px; display: grid; grid-template-columns: 232px 1fr; gap: 44px; }
+  @media (max-width: 900px) { .shell { grid-template-columns: 1fr; gap: 0; } }
+
+  nav.toc { position: sticky; top: 22px; align-self: start; padding-top: 34px; }
+  @media (max-width: 900px) {
+    nav.toc { position: static; padding: 26px 0 6px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+  }
+  nav.toc h2 {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px;
+  }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  @media (max-width: 900px) { nav.toc ol { flex-direction: row; flex-wrap: wrap; gap: 6px 14px; } }
+  nav.toc a {
+    display: block; text-decoration: none; color: var(--muted); font-size: 14px;
+    padding: 3px 0 3px 11px; border-left: 2px solid transparent; line-height: 1.35;
+  }
+  nav.toc a:hover { color: var(--ink); border-left-color: var(--line); }
+  nav.toc a.current { color: var(--ink); border-left-color: var(--c2); font-weight: 600; }
+  @media (max-width: 900px) { nav.toc a.current { color: var(--c2); } }
+  nav.toc a:focus-visible { outline: 2px solid var(--c2); outline-offset: 1px; }
+  @media (max-width: 900px) { nav.toc a { border-left: 0; padding-left: 0; } }
+
+  main { padding-top: 34px; min-width: 0; }
+  section { margin-bottom: 52px; scroll-margin-top: 20px; }
+  section > *:last-child { margin-bottom: 0; }
+
+  h2.sec {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 25px; font-weight: 600;
+    margin: 0 0 4px; letter-spacing: 0.01em; text-wrap: balance; color: var(--c1);
+  }
+  section:nth-of-type(4n+2) h2.sec { color: var(--c2); }
+  section:nth-of-type(4n+3) h2.sec { color: var(--c3); }
+  section:nth-of-type(4n+4) h2.sec { color: var(--c4); }
+  .kicker {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px;
+  }
+  h3 {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 18px; font-weight: 600;
+    margin: 30px 0 6px; text-wrap: balance;
+  }
+  p { margin: 0 0 15px; max-width: 920px; }
+  ul, ol.body { max-width: 920px; margin: 0 0 15px; padding-left: 20px; }
+  li { margin-bottom: 9px; }
+  a { color: var(--c2); }
+
+  /* Definition list: the term plain, a " - " separator carrying the styling. */
+  dl { max-width: 920px; margin: 0 0 18px; }
+  dl div { margin-bottom: 11px; }
+  dt { display: inline; font-family: "Cascadia Code", Consolas, monospace; font-size: 14.5px; color: var(--c2); }
+  dt::after { content: " - "; color: var(--muted); font-family: "Segoe UI", sans-serif; }
+  dd { display: inline; margin: 0; }
+
+  code {
+    font-size: 0.895em; background: var(--chipbg); padding: 1px 5px; border-radius: 3px;
+    border: 1px solid var(--line);
+  }
+  pre {
+    background: var(--codebg); border: 1px solid var(--line); border-radius: 4px;
+    padding: 14px 16px; overflow-x: auto; font-size: 13.5px; line-height: 1.6; margin: 0 0 15px;
+  }
+  pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .cmt { color: var(--muted); }
+
+  .callout {
+    border: 1px solid var(--line); border-left-width: 3px; border-left-color: var(--c3);
+    border-radius: 4px; padding: 13px 17px; margin: 0 0 16px; background: var(--panel); max-width: 920px;
+  }
+  .callout .lbl {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 12.5px; font-weight: 600;
+    letter-spacing: 0.05em; color: var(--c3);
+  }
+  .callout.important { border-left-color: var(--broken); }
+  .callout.important .lbl { color: var(--broken); }
+  .callout p { margin: 0; display: inline; }
+  .callout p + p { display: block; margin-top: 10px; }
+
+  .status { max-width: 920px; margin: 0 0 18px; }
+  .status div { margin-bottom: 10px; }
+  .status .what { font-weight: 600; }
+  .status .ok { color: var(--c1); font-weight: 600; }
+  .status .bad { color: var(--broken); font-weight: 600; }
+  .status .pend { color: var(--muted); font-weight: 600; }
+
+  footer {
+    border-top: 1px solid var(--line); margin-top: 20px; padding-top: 18px;
+    color: var(--muted); font-size: 14px; max-width: 920px;
+  }
+  footer p { margin: 0 0 8px; }
+
+  .lead { font-size: 19px; line-height: 1.5; max-width: 920px; margin: 0 0 18px; }
+  figure { margin: 18px 0 24px; max-width: 920px; }
+  figure img {
+    display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px;
+    background: #14181D; cursor: zoom-in;
+  }
+  .lightbox {
+    position: fixed; inset: 0; z-index: 50; display: none; align-items: center; justify-content: center;
+    padding: 24px; background: rgba(0, 0, 0, 0.82); cursor: zoom-out;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 100%; width: auto; height: auto; border: 1px solid var(--line); border-radius: 6px; }
+  .lightbox button {
+    position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border: 0; border-radius: 20px;
+    background: rgba(255, 255, 255, 0.12); color: #fff; font-size: 22px; line-height: 40px; cursor: pointer;
+  }
+  .lightbox button:hover { background: rgba(255, 255, 255, 0.24); }
+  figcaption { color: var(--muted); font-size: 14px; margin-top: 8px; max-width: 920px; }
+  dl.steps dt { font-family: "Segoe UI", -apple-system, system-ui, sans-serif; font-size: 16px; font-weight: 600; color: var(--ink); }
+  dl.steps dt::after { content: " "; }
+  dl.steps div { margin-bottom: 14px; }
+  b { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="mast-in">
+    <a class="brand" href="index.html"><span class="accent">Tether</span><span class="brand-sub">for Unreal Engine 5.8</span></a>
+    <nav class="mast-nav" aria-label="Site">
+      <a href="index.html">Overview</a>
+      <a href="tutorial.html">Getting Started</a>
+      <a href="tech.html">How It Works</a>
+      <a href="reference.html" aria-current="page">Reference</a>
+      <a href="diagram.html">Wiring Diagram</a>
+    </nav>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="toc" aria-label="Contents">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#intro">The Technical Reference</a></li>
+      <li><a href="#identity">Identity</a></li>
+      <li><a href="#data">Where The Data Lives</a></li>
+      <li><a href="#resolve">How A Ref Resolves</a></li>
+      <li><a href="#equality">Equality And Containers</a></li>
+      <li><a href="#row">The Details Row</a></li>
+      <li><a href="#picker">The Picker</a></li>
+      <li><a href="#validation">Data Validation</a></li>
+      <li><a href="#cooked">The Cook Bake</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <section id="intro">
+      <p class="kicker">Reference</p>
+      <h2 class="sec">The Technical Reference</h2>
+      <p>
+        This page is meant as a quick reference on how the plugin works under the hood: what a
+        reference keys on, where every piece of data lives, how a ref resolves, what the editor
+        adds, what Data Validation checks, and what the cook does for a packaged build. For
+        day-to-day use, <a href="tutorial.html">Getting Started</a> is the shorter read.
+      </p>
+      <p>
+        To use this system, you need to understand two main building blocks:
+      </p>
+      <dl>
+        <div><dt><code>UTetherComponent</code></dt><dd>The component you put on an actor. Any
+          actor that has one can be referenced. It registers itself with a world subsystem while
+          its actor is loaded.</dd></div>
+        <div><dt><code>FTetherRef</code></dt><dd>The reference you put anywhere that points at an
+          actor. It stores the target's per-placement guid, or its bare guid and the level
+          instances in between when the ref is relative, plus the target's label and
+          level-instance path from when the ref was made.</dd></div>
+      </dl>
+      <p>
+        The plugin has two modules. <code>Tether</code> is the runtime module: the
+        component, the ref struct, the world subsystem, and <code>UTetherLibrary</code>,
+        which makes and resolves refs. It loads at <code>PreDefault</code>.
+        <code>TetherEditor</code> holds the details row, the cook bake, and the Data
+        Validation check. The plugin targets UE 5.8 and sets <code>EnabledByDefault</code>, so a
+        host project needs no <code>.uproject</code> entry. It depends on the engine's
+        DataValidation plugin, which ships enabled.
+      </p>
+    </section>
+
+    <section id="identity">
+      <p class="kicker">How It Works</p>
+      <h2 class="sec">Identity: The Per-Placement Guid</h2>
+      <p>
+        A reference doesn't key on a name, a label, or an object path. It keys on the engine's
+        per-placement actor instance guid.
+      </p>
+      <p>
+        Every actor has an <code>ActorGuid</code> that's saved with it. That's enough to identify an
+        actor placed directly in a level. It isn't enough for level instances. When you build a
+        room as its own level and place it three times, the room's asset stores each actor once.
+        All three copies of a door inside it share one <code>ActorGuid</code>.
+      </p>
+      <p>
+        The engine solves that with an instance guid. It combines the guids of the level instances
+        an actor sits in with the actor's own <code>ActorGuid</code>, which gives each of the three
+        doors a different value. We call each of those copies a "placement". A placement is one
+        copy of an actor as it exists in the world, as opposed to the actor as it's saved in a
+        level asset.
+      </p>
+      <p>
+        <code>UTetherLibrary::GetPlacementId</code> is the one place that answers "which
+        placement is this?". The resolver, the picker, the cook bake, and Data Validation all go
+        through it.
+      </p>
+      <ul>
+        <li>In the editor and PIE it folds the level's container and the actor's
+          <code>ActorGuid</code>, which is the same arithmetic as the engine's instance guid and
+          also covers a level instance open for editing, where the engine has no value yet.
+          Outside any level instance it takes the engine's instance guid as is, which is what a
+          World Partition cell carries.</li>
+        <li>In a cooked build the engine has released that value by the time gameplay runs. It
+          falls back to the value the cook baked into the actor. Check out Cooked Builds below.</li>
+      </ul>
+      <p>
+        A level's container follows one rule in both builds. If the level instance actor that owns
+        the level is itself placed inside something, the container is that actor's own placement.
+        That's what keeps three Standalone rooms under three Embedded wings apart, since the engine
+        gives all three the same inner guid. Otherwise it's the engine's level-instance guid. A
+        level loaded at runtime as a renamed copy of its package, through
+        <code>ULevelStreamingDynamic::LoadLevelInstance</code>, takes a guid from its unique
+        package name instead, so two runtime copies never share ids. Otherwise there's no
+        container, which is the main level.
+      </p>
+    </section>
+
+    <section id="data">
+      <h2 class="sec">Where The Data Lives</h2>
+      <p>
+        Every piece of saved data lives on an ordinary <code>UPROPERTY</code> and saves with
+        whatever object owns it. The one runtime structure is a per-world index of loaded tethered
+        actors, covered under resolving below. It's rebuilt as levels load and is never saved.
+      </p>
+      <h3>On the referenced actor</h3>
+      <p>
+        An actor opts in by having a <code>UTetherComponent</code>. You can add it to a class
+        in C++ or a Blueprint, or to one placed actor in the level, engine classes included.
+        <code>UTetherLibrary::GetTetherComponent</code> finds it with
+        <code>FindComponentByClass</code>. If an actor has more than one, the first one wins.
+      </p>
+      <p>The component holds one field:</p>
+      <ul>
+        <li><code>PlacementId</code> - An <code>FGuid</code> that stays empty in every editor-saved
+          package. Only the cook writes it, which lets a cooked build still answer which placement
+          an actor is.</li>
+      </ul>
+      <p>
+        The actor's identity in the editor isn't stored by the plugin at all. It's the engine's own
+        <code>ActorGuid</code>, saved in the actor's level package (or its external actor package
+        under One File Per Actor), plus the level-instance chain the engine already tracks.
+      </p>
+      <h3>On the reference</h3>
+      <p>
+        <code>FTetherRef</code> is a plain value struct. It saves as tagged properties inside
+        whatever owns it: an actor, a component, a data asset, a Blueprint default, a save game, or
+        anything else that serializes a <code>USTRUCT</code>.
+      </p>
+      <ul>
+        <li><code>TargetId</code> - The target's per-placement guid. When the ref is relative, the
+          target's bare <code>ActorGuid</code> instead.</li>
+        <li><code>bRelative</code> - Set when the ref was picked at an actor in the owner's own
+          level, or a level instance nested in it. A relative ref folds onto the owner's placement
+          when it resolves. It means the same thing in every copy of the level it was authored
+          in, placed or loaded at runtime.</li>
+        <li><code>RelativePath</code> - For a relative ref, the guids of the level instances
+          between the owner's level and the target, outermost first. Empty when they share a
+          level.</li>
+        <li><code>CachedLabel</code> - The target's label when the ref was made. The details row
+          shows it when the target isn't loaded and has no descriptor. <code>ToDebugString()</code>
+          prints it next to the guid.</li>
+        <li><code>CachedLevelInstancePath</code> - The labels of the level instances the target
+          sat in when the ref was made, outermost first (<code>Wing_A.Room_3</code>). A relative
+          ref keeps only the part below the owner's level.</li>
+      </ul>
+      <p>
+        Both labels save in every build configuration, since a <code>UPROPERTY</code> can't be
+        compiled out of Shipping alone and every configuration loads the same cooked packages. In
+        Shipping, <code>PostSerialize</code> empties both as each ref loads. They hold no
+        memory at runtime. They're still on disk.
+      </p>
+      <h3>What isn't stored</h3>
+      <ul>
+        <li>No pointer to the target. A ref never caches the actor it resolved to. It can't
+          dangle.</li>
+        <li>No object path. That's what breaks under level-instance path mangling.</li>
+        <li>No class. The ref doesn't know what kind of actor it points at until it resolves. The
+          class filter on the resolver covers typed lookups.</li>
+      </ul>
+    </section>
+
+    <section id="resolve">
+      <h2 class="sec">How A Ref Resolves</h2>
+      <p>
+        Resolution is a lookup against the loaded tethered actors, done at the moment you ask. Call
+        <code>UTetherLibrary::GetActorFromTetherRef</code>, or the typed C++ helper
+        <code>ResolveTetherRef&lt;TActor&gt;</code>, which passes
+        <code>TActor::StaticClass()</code> and casts the result.
+      </p>
+      <pre><code>if (ADoorActor* Door = UTetherLibrary::ResolveTetherRef&lt;ADoorActor&gt;(this, TargetDoor))
+{
+    Door-&gt;Open();
+}</code></pre>
+      <p>
+        In Blueprint, the node is "Get Actor From Tether Ref". Its output pin takes the type
+        of the class you pick. The first argument, hidden on the node and filled with
+        <code>self</code>, is the owner: the actor or component that holds the ref. A relative ref
+        folds onto the owner's placement. Pass the holder.
+        Outside Shipping, resolving a relative ref from something that isn't inside an actor at
+        all logs a warning once per target.
+      </p>
+      <figure>
+        <img src="img/10-bp-node.png" alt="The Get Actor from Tether Ref Blueprint node with its Tether Ref, Actor Class, and Return Value pins.">
+        <figcaption>The Blueprint node. The owner pin is hidden and filled with self.</figcaption>
+      </figure>
+      <h3>The resolve steps</h3>
+      <ol>
+        <li>Refuse an unset ref. An invalid guid would match every actor that has no instance
+          guid. An unset ref returns null before anything else runs.</li>
+        <li>Work out the placement id. An absolute ref's is its <code>TargetId</code>. A relative
+          ref folds the owner's container, then its path, then its <code>TargetId</code>.</li>
+        <li>Look it up. The owner's world has a <code>UTetherSubsystem</code> that indexes
+          every registered tethered actor by placement id. The lookup is one hash find.</li>
+        <li>Stop on a second match. If two live actors share the id, the resolve returns null.</li>
+        <li>Filter by class. If you passed an actor class, the match has to be that class or a
+          subclass. A null class accepts any actor.</li>
+      </ol>
+      <h3>Unique or null</h3>
+      <p>
+        The resolver never picks one actor out of several. If two tethered actors share a placement
+        id, every ref to them returns null. Acting on an arbitrary one of two is worse than acting
+        on nothing, since nothing tells the caller the answer was a guess.
+      </p>
+      <p>
+        With per-placement guids a collision should be rare. The check is a safety net for things
+        like a cooked value that slipped past the bake, or a corrupted value. Data Validation
+        reports shared placement ids as errors. You'll usually hear about one long before a
+        resolve hits it.
+      </p>
+      <h3>What the index sees</h3>
+      <p>
+        Each <code>UTetherComponent</code> registers itself with its world's subsystem in
+        <code>OnRegister</code> and removes itself in <code>OnUnregister</code>. Components
+        register when their level becomes visible and unregister when it's hidden or unloaded, or
+        when the actor is destroyed. The subsystem files each actor by placement id on the first
+        resolve after it registers, since at registration its level instance may still be loading.
+        An actor whose id isn't ready yet stays pending for the next resolve.
+      </p>
+      <p>
+        Each world has its own subsystem. The editor world and every PIE world keep separate
+        indexes.
+      </p>
+      <ul>
+        <li>An unresolved ref keeps its guid. It starts resolving the moment the target's level
+          streams in, which is common under World Partition.</li>
+        <li>If two actors share a guid but only one of them is in a visible level, the resolver
+          can't see the conflict and returns the visible one. Data Validation scans hidden levels
+          too. It does catch this case.</li>
+      </ul>
+      <h3>Cost</h3>
+      <p>
+        A resolve is a hash find. The first resolve after a level streams in pays once for the
+        actors it brought, to work out their placement ids. After that the number of tethered actors
+        in the world doesn't change the cost.
+      </p>
+      <h3>Making a ref at runtime</h3>
+      <p>
+        <code>UTetherLibrary::MakeTetherRef</code> builds a ref from an actor in C++.
+        It returns an unset ref unless the actor is a tethered actor with a valid placement id. Pass
+        the owner as the second argument to get the relative form when it applies. Blueprints
+        can't call it. Refs are meant to be picked in the editor. An actor spawned in a
+        packaged build has no baked guid to make one from anyway.
+      </p>
+    </section>
+
+    <section id="equality">
+      <h2 class="sec">Equality, Hashing, And Containers</h2>
+      <p>
+        Two refs are equal when they point at the same actor the same way: the same
+        <code>TargetId</code>, the same form, and the same path. The label doesn't count.
+        Re-picking the same actor under a new label still finds the same <code>TSet</code> element
+        or <code>TMap</code> key. A relative and an absolute ref to one actor are two different
+        keys.
+      </p>
+      <p>The struct has the same basics as <code>FMassEntityHandle</code>:</p>
+      <ul>
+        <li><code>IsSet()</code> and <code>IsValid()</code> - True when a target is set. Neither
+          checks that the actor is loaded.</li>
+        <li><code>Reset()</code> - Clears the target, the form, and the labels.</li>
+        <li><code>==</code>, <code>!=</code>, and <code>GetTypeHash</code> - By target and
+          form.</li>
+        <li><code>&lt;</code> - Has meaning only for sorting.</li>
+        <li><code>ToString()</code> and <code>LexToString</code> - The target guid as text.</li>
+        <li><code>ToDebugString()</code> - The label and the guid, plus "relative" when it is,
+          outside Shipping.</li>
+      </ul>
+      <p>
+        The struct sets <code>WithIdenticalViaEquality</code>, which makes reflection compare refs
+        with the same <code>==</code> the hash uses. That keeps the details panel's duplicate check
+        for sets and map keys in line with C++.
+      </p>
+      <p>
+        Note: One side effect of comparing by target is delta serialization. If a ref matches its
+        archetype's target but carries a different label, the engine treats it as unchanged and
+        won't save the label.
+      </p>
+    </section>
+
+    <section id="row">
+      <p class="kicker">Editor Integration</p>
+      <h2 class="sec">The Details Row</h2>
+      <p>
+        <code>FTetherRefCustomization</code> replaces the default struct layout for every
+        <code>FTetherRef</code> property with one row:
+      </p>
+      <pre><code>  Target Door      [ BP_Door  Wing_A.Room_3      ▾ ] [✕]</code></pre>
+      <ul>
+        <li>The label - What the ref points at. Check out the next section for where it comes
+          from.</li>
+        <li>▾ - Opens the actor picker.</li>
+        <li>✕ - Clears the ref back to "None".</li>
+      </ul>
+      <p>
+        The row has no child rows. <code>TargetId</code> and the cached labels never show up for
+        hand editing.
+      </p>
+      <figure>
+        <img src="img/04-ref-row-picked.png" alt="The Target Door row in the Details panel reading Door, then Wing_A in dimmer text, with a dropdown arrow and a clear button.">
+        <figcaption>The row after a pick. The door's name, then the room it's in.</figcaption>
+      </figure>
+      <h3>The label</h3>
+      <p>
+        The row resolves the ref from the object that owns it and shows the target's actor label
+        first, then the labels of the level instances it sits in, outermost first, in dimmer
+        text. Several placements of one room share a label. Without the chain you couldn't tell
+        which one you picked. It's looked up live. A rename shows through right away.
+      </p>
+      <p>
+        When the target isn't loaded, the row tries two more sources before giving up. Under World
+        Partition an unloaded actor still has an actor descriptor, which carries its label and
+        sits in its level instance's container. The row reads the label and the chain from
+        there and adds "not loaded". Outside World Partition there's no descriptor. The row
+        shows the labels saved when the ref was made, with "not loaded" after the path. If there's
+        no saved label either, it shows the guid.
+      </p>
+      <figure>
+        <img src="img/05-not-loaded.png" alt="The Target Door row reading Door, then Wing_A (not loaded) in dimmer text.">
+        <figcaption>An unloaded target. The row still knows what it is and where it was.</figcaption>
+      </figure>
+      <p>
+        Slate asks for the label every frame, and each ask would be a resolve. The row caches
+        the text for half a second. A new pick changes the key and recomputes right away. The
+        descriptor lookup walks every descriptor in the world. That result is kept for five
+        seconds.
+      </p>
+    </section>
+
+    <section id="picker">
+      <h2 class="sec">The Picker</h2>
+      <p>
+        The picker is a Scene Outliner filtered to actors a ref can point at. It uses the
+        resolver's test (a valid tethered actor) and also drops child actors, which the cook won't
+        bake. So what you can pick is what can resolve, in the editor and in a packaged build.
+      </p>
+      <p>
+        Level instances expand like folders. You can drill in and pick one placement. Two
+        placements of the same room show up as two separate entries.
+      </p>
+      <figure>
+        <img src="img/03-picker.png" alt="The picker dropdown open under the Target Door row. It lists Wing_A, Wing_B, and Wing_C expanded, each with a Door inside, and a search box at the top.">
+        <figcaption>Three placements of one room, each with its own door to pick.</figcaption>
+      </figure>
+      <p>
+        Note: There's no eyedropper. Clicking level-instance content in the viewport selects the
+        whole level instance. The outliner is the reliable way in.
+      </p>
+      <h3>Relative or absolute</h3>
+      <p>
+        The pick decides the form. The row compares the level-instance chain of the object that
+        owns the ref with the target's. When the owner's chain is a prefix of the target's, which
+        means the same level or a level instance nested in it, the ref is stored relative.
+        Otherwise it's absolute. Open a room level and point a switch at the room's door, and
+        every placement of that room gets its own door. Point at that door from a map that places
+        the room. That ref is absolute to the one placement. When the row edits several objects
+        at once, the ref is relative only if it reads the same from each of them.
+      </p>
+      <h3>Limiting the picker with AllowedClasses</h3>
+      <p>
+        Add <code>AllowedClasses</code> to the property's metadata, as a comma-separated list of
+        class paths, to limit what the picker offers. It works like it does on the engine's own
+        object pickers.
+      </p>
+      <pre><code>UPROPERTY(EditAnywhere, meta = (AllowedClasses = "/Script/MyGame.DoorActor, /Game/BP_Gate.BP_Gate_C"))
+FTetherRef TargetDoor;</code></pre>
+      <p>
+        Note: This only works on C++ properties, since a Blueprint variable can't carry that
+        metadata. It limits the picker and Data Validation checks it. Resolving doesn't enforce
+        it. Pass an actor class to the resolver when you need a typed result.
+      </p>
+      <h3>Writing a pick</h3>
+      <p>
+        A pick builds the new ref with <code>MakeTetherRef</code>, records the qualified label,
+        and writes the result through the property handle. The write exports the struct as text
+        and calls <code>SetValueFromFormattedString</code>, inside a "Set Tether Reference"
+        transaction. It undoes like any other edit and applies to every selected object at once.
+      </p>
+      <p>
+        It goes through the handle, never into raw memory, because of containers. When the ref is
+        a <code>TSet</code> element or a <code>TMap</code> key, only the handle path rehashes the
+        container afterwards and refuses a duplicate.
+      </p>
+      <h3>Refs inside containers</h3>
+      <p>
+        <code>FTetherRef</code> works in a <code>TArray</code>, as a <code>TSet</code>
+        element, and as a <code>TMap</code> key or value, in C++ and in Blueprint. Each element
+        gets the same row.
+      </p>
+      <ul>
+        <li>Metadata - An element reads <code>AllowedClasses</code> from its container property.
+          One <code>meta</code> on a <code>TArray&lt;FTetherRef&gt;</code> limits every
+          element.</li>
+        <li>Duplicates - Picking an actor that's already in a set, or already a key in a map,
+          fails with the engine's usual duplicate warning. Two refs to one actor are equal even
+          when their labels differ.</li>
+        <li>Clearing - Clearing two set elements would make two unset refs, which are equal. The
+          second clear is refused the same way.</li>
+      </ul>
+      <pre><code>UPROPERTY(EditAnywhere)
+TMap&lt;FTetherRef, int32&gt; DoorKeyCodes;
+
+UPROPERTY(EditAnywhere)
+TSet&lt;FTetherRef&gt; LockedDoors;</code></pre>
+    </section>
+
+    <section id="validation">
+      <p class="kicker">Data Validation</p>
+      <h2 class="sec">What The Check Looks For</h2>
+      <p>
+        <code>UTetherValidator</code> is an engine Data Validation validator in the editor
+        module. The engine registers it automatically. "Validate Data" in the content browser,
+        validate-on-save, and the <code>DataValidation</code> commandlet all run it. Its messages
+        land in the Message Log with a link to each actor it reports.
+      </p>
+      <figure>
+        <img src="img/06-validation.png" alt="The Message Log showing a Data Validation warning: the Switch has a ref to Door (Wing_A), which matches no actor in the loaded levels.">
+        <figcaption>A warning from the check. Click the actor name to jump to it.</figcaption>
+      </figure>
+      <figure>
+        <img src="img/08-validate-menu.png" alt="The Content Browser context menu filtered to Validate Assets and Validate Assets and Dependencies.">
+        <figcaption>Where to run it by hand: the level's context menu in the Content Browser.</figcaption>
+      </figure>
+      <h3>How it runs</h3>
+      <p>It accepts a world, or a single actor that's in a world.</p>
+      <ul>
+        <li>A world with named actors - Under One File Per Actor, a validation run usually names
+          the external actor packages that changed. The check covers just those actors.</li>
+        <li>A world on its own - The check covers every loaded actor in the world.</li>
+        <li>A single actor - The check covers that actor.</li>
+      </ul>
+      <p>
+        For every actor it covers, it also looks at the actor's components, and at refs nested
+        anywhere in their properties: in a <code>TArray</code>, a <code>TSet</code>, a
+        <code>TMap</code> key or value, or a nested struct. Each run starts by indexing every
+        loaded actor in the world by placement id. It includes plain actors, which lets the check
+        tell "no such actor" apart from "not a tethered actor". It also includes actors in hidden
+        levels, which aren't registered with the resolver's subsystem. A relative ref is looked up
+        by the id it resolves to from its owner.
+      </p>
+      <h3>Tethered actors</h3>
+      <ul>
+        <li>A <code>PlacementId</code> saved in editor data (error) - Only the cook writes that
+          field. It restores the editor copy afterwards. A saved value means a cook left it
+          behind.</li>
+        <li>A placement id shared with another loaded tethered actor (error) - Every ref to either
+          actor resolves to null.</li>
+        <li>More than one <code>UTetherComponent</code> on the actor (warning) - Only the
+          first one counts. The others do nothing.</li>
+        <li>No instance guid (warning) - Nothing can reference this actor.</li>
+      </ul>
+      <h3>Refs</h3>
+      <p>An unset ref is skipped. A set ref gets one of these:</p>
+      <ul>
+        <li>Matches more than one tethered actor (error) - It resolves to null.</li>
+        <li>Points at an actor with no <code>UTetherComponent</code> (error) - The resolver
+          only matches tethered actors. It never resolves. This usually means someone removed the
+          component from the target, from its class or from that one placed instance.</li>
+        <li>Points at a child actor (error) - The cook doesn't bake child actors. It resolves in
+          the editor but won't in a packaged build.</li>
+        <li>Points at an actor its <code>AllowedClasses</code> metadata doesn't allow (error) - The
+          picker would never have offered that actor. An element in a container uses the
+          container's metadata.</li>
+        <li>Matches no actor in a World Partition world, loaded or not (error) - The target is
+          gone. "Move to Level", "Create Level Instance", and "Break" all give an actor a new id.
+          This is usually one of those. Re-pick the target.</li>
+        <li>Matches no actor in the loaded levels (warning) - Outside World Partition this is the
+          whole story. Inside it, this fires only while the descriptors can't be checked, which
+          happens while a level instance is mid-load or mid-unload. Re-run once the world has
+          settled.</li>
+      </ul>
+      <p>
+        The message names the ref by <code>ToDebugString()</code>, the saved label and
+        level-instance path plus the guid. That tells you what it used to point at, even when the
+        target is gone.
+      </p>
+      <h3>Finding broken refs under World Partition</h3>
+      <p>
+        Most actors in a partitioned world are unloaded. "Not loaded" can't mean "broken" on its
+        own. The check asks the world's actor descriptors instead. Every container has one for each
+        actor, loaded or not. Level instances have child containers of their own. The check
+        rebuilds each placement id as <code>ContainerID.GetActorGuid(ActorGuid)</code>, which is how
+        the engine builds instance guids. It only reports when it can trust that set: every level
+        instance has a child container, and every loaded tethered actor's live id is in the set.
+        Otherwise it falls back to the warning above rather than saying nothing.
+      </p>
+      <h3>Why some issues only warn</h3>
+      <p>
+        Outside World Partition, a dangling ref only warns. There's no descriptor list to check
+        against. A sublevel can still be unloaded in the editor. A missing target is suspicious
+        but not proof. The component warnings don't break anything on their own. An extra
+        component is ignored. An actor without an instance guid just can't be referenced.
+      </p>
+    </section>
+
+    <section id="cooked">
+      <p class="kicker">Cooked Builds</p>
+      <h2 class="sec">The Cook Bake</h2>
+      <h3>The problem</h3>
+      <p>
+        In the editor and PIE the per-placement guid is live. A cooked build is different. The
+        engine serializes the value at cook and re-annotates actors with it on load. Then
+        <code>AActor::PostRegisterAllComponents</code> releases that annotation, long before any
+        gameplay code can ask for it. In a cooked build the accessors don't exist at all. So the
+        identity a ref keys on is gone at runtime. Without help, every resolve in a packaged game
+        would return null.
+      </p>
+      <h3>The bake</h3>
+      <p>
+        The fix is to copy the guid onto the actor while the cook can still read it. Each tethered
+        actor's <code>UTetherComponent::PlacementId</code> is empty in the editor. During a
+        cook save, the editor module writes the live instance guid into it. The cooked package for
+        that actor then carries the value. The engine does the same thing in
+        <code>USmartObjectComponent::PreSave</code>, for the same reason. The bake lives in the
+        editor module, which works because the cook commandlet runs the editor and loads its
+        modules.
+      </p>
+      <p>The editor module registers three hooks at startup:</p>
+      <ul>
+        <li><code>FCoreUObjectDelegates::OnObjectPreSave</code> - Writes the value. It only acts
+          when the save context reports cooking, which means a target platform is set. An ordinary
+          editor save bakes nothing.</li>
+        <li><code>UPackage::PackageSavedWithContextEvent</code> - After each cooked package saves,
+          restores every value the bake wrote.</li>
+        <li><code>UE::Cook::FDelegates::CookFinished</code> - Logs
+          <code>Cook bake: baked N actor(s). Folded M relative ref(s).</code> and restores
+          again.</li>
+      </ul>
+      <h3>Which actors it bakes</h3>
+      <p>An actor gets baked when all of these hold:</p>
+      <ul>
+        <li>It's not a template. Writing to a class default or archetype during
+          <code>PreSave</code> trips the cooker's non-deterministic cook check.</li>
+        <li>It's not a child actor. A child actor's <code>ActorGuid</code> is random per session,
+          so a baked value would be dead the next time you cook. That's also why the picker won't
+          offer child actors.</li>
+        <li>It's a tethered actor, meaning it has a <code>UTetherComponent</code>.</li>
+        <li>It has a valid instance guid. If it doesn't, the bake logs a warning and skips it,
+          since nothing will be able to reference it.</li>
+      </ul>
+      <h3>Relative refs at cook</h3>
+      <p>
+        The same save hook looks at every <code>FTetherRef</code> on every object it saves.
+        On an actor the cook has flattened into a World Partition cell, a relative ref is folded
+        to its absolute form, since the game has no container for a cell to fold onto. A ref whose
+        owner is in the main container stays relative, because a level cooking on its own learns
+        its placement only when it loads. These edits are restored the same way the bake is.
+      </p>
+      <h3>Restoring the editor copy</h3>
+      <p>
+        The cook saves live editor objects. Left alone, the bake's writes would stick to the actors
+        in your open level. Before writing, the bake records each actor's previous value. The
+        restore puts it back. Two details in that bookkeeping matter. It records the previous value
+        only the first time it sees an actor, because if a cooking save fails no restore runs, and
+        a retry would otherwise record the baked value as the original. And it restores at
+        <code>CookFinished</code> as well as after each package, because the post-save event never
+        fires for a failed save. If a cook does leave a value behind and someone saves the level,
+        Data Validation reports it as an error.
+      </p>
+      <h3>Reading the baked value</h3>
+      <p>
+        <code>GetPlacementId</code> reads the live value in the editor and PIE. In a cooked build it
+        can't, since <code>ActorGuid</code> is editor-only data. It calls
+        <code>GetBakedPlacementId</code> instead, which reads <code>PlacementId</code> and folds the
+        level's container onto it first.
+      </p>
+      <p>
+        That looks like a double combine. It isn't. A level instance in Standalone mode cooks as
+        its own asset. Nothing writes an instance guid when that happens, which leaves the bake
+        with only the actor's own half. The read folds the level's container back in at runtime.
+        Embedded content bakes an absolute value and sits in a level with no container. The fold
+        adds nothing there. The two cases don't overlap.
+      </p>
+      <h3>The level instance actor's own placement</h3>
+      <p>
+        A Standalone level instance inside an Embedded one needs its owning level instance actor's
+        placement at runtime, and the engine throws that away with everything else. The subsystem
+        reads it in the window between load and release: when a streamed level begins making
+        visible, and at world initialization for the persistent level, since subsystems come up
+        before the persistent level registers anything and a cooked World Partition map keeps its
+        flattened content there. It only captures from a level nothing owns, where the engine
+        wrote the value. Nothing to add, nothing to configure.
+      </p>
+      <h3>What's verified</h3>
+      <p>
+        We verify the whole path from a packaged build. Embedded, Standalone, nested three deep,
+        Standalone under Embedded, classic sublevels, a partitioned room placed Embedded,
+        placements spread across distance-streamed cells, and a room loaded twice at runtime all
+        resolve every reference to the right placement, in the editor and in the packaged build.
+        Nothing resolves to a wrong actor. Editor edits behave too: removing and re-adding the
+        component, duplicating and deleting the door or the room, undo, redo, commit, swapping the
+        world asset, and break each give null or the original, never a copy.
+      </p>
+    </section>
+
+    <footer>
+      <p>
+        The <a href="reference.html">Reference</a> page is the full technical reference, and the
+        <a href="diagram.html">wiring diagram</a> shows how the pieces connect.
+      </p>
+    </footer>
+
+  </main>
+</div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-label="Full-size image"><button type="button" aria-label="Close">&#x2715;</button><img alt=""></div>
+<script>
+(function () {
+  var box = document.getElementById('lightbox');
+  var big = box.querySelector('img');
+  function open(img) { big.src = img.src; big.alt = img.alt; box.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function close() { box.classList.remove('open'); big.src = ''; document.body.style.overflow = ''; }
+  Array.prototype.forEach.call(document.querySelectorAll('figure img'), function (img) {
+    img.addEventListener('click', function () { open(img); });
+  });
+  box.addEventListener('click', close);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && box.classList.contains('open')) { close(); } });
+})();
+</script>
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a[href^="#"]'));
+  var sections = links.map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); });
+  if (!links.length) { return; }
+  var ticking = false;
+  function update() {
+    ticking = false;
+    var line = window.innerHeight * 0.3;
+    var current = 0;
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i] && sections[i].getBoundingClientRect().top <= line) { current = i; }
+    }
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) { current = sections.length - 1; }
+    links.forEach(function (a, i) {
+      if (i === current) { a.classList.add('current'); a.setAttribute('aria-current', 'true'); }
+      else { a.classList.remove('current'); a.removeAttribute('aria-current'); }
+    });
+  }
+  function onScroll() { if (!ticking) { ticking = true; window.requestAnimationFrame(update); } }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  window.addEventListener('hashchange', onScroll);
+  update();
+})();
+</script>
+</body>
+</html>

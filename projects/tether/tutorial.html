@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tether: Getting Started</title>
+<meta name="description" content="Step by step with screenshots: tag the door, give the switch a ref, pick the door, use it in the game, and let the editor check your work.">
+<style>
+  :root {
+    --bg: #F4F5F2; --panel: #FFFFFF; --ink: #1B222B; --muted: #5A6472;
+    --line: #C9CFD6; --chipbg: #EAEDE8; --codebg: #F7F8F5;
+    --c1: #35855C; --c2: #2E77C9; --c3: #B26E22; --c4: #7A6BC9;
+    --broken: #C94A4A;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0F1216; --panel: #1A2026; --ink: #E8ECF1; --muted: #93A0AE;
+      --line: #2C333C; --chipbg: #232A32; --codebg: #131920;
+      --c1: #5FBF8C; --c2: #5FA3EF; --c3: #E3A25B; --c4: #9D8FE8;
+      --broken: #E36A6A;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1216; --panel: #1A2026; --ink: #E8ECF1; --muted: #93A0AE;
+    --line: #2C333C; --chipbg: #232A32; --codebg: #131920;
+    --c1: #5FBF8C; --c2: #5FA3EF; --c3: #E3A25B; --c4: #9D8FE8;
+    --broken: #E36A6A;
+  }
+  :root[data-theme="light"] {
+    --bg: #F4F5F2; --panel: #FFFFFF; --ink: #1B222B; --muted: #5A6472;
+    --line: #C9CFD6; --chipbg: #EAEDE8; --codebg: #F7F8F5;
+    --c1: #35855C; --c2: #2E77C9; --c3: #B26E22; --c4: #7A6BC9;
+    --broken: #C94A4A;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Segoe UI", -apple-system, system-ui, sans-serif;
+    font-size: 16px; line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  code, pre { font-family: "Cascadia Code", "Consolas", "SF Mono", ui-monospace, monospace; }
+
+  .mast { border-bottom: 1px solid var(--line); background: var(--panel); }
+  .mast-in {
+    max-width: 1180px; margin: 0 auto; padding: 12px 28px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px;
+  }
+  .mast-in.wide { max-width: 1520px; padding-left: 24px; padding-right: 24px; }
+  .brand { text-decoration: none; color: var(--ink); display: flex; align-items: baseline; gap: 10px; }
+  .brand .accent {
+    color: var(--c2); font-family: "Cascadia Code", Consolas, monospace; font-size: 22px; font-weight: 600;
+  }
+  .brand .brand-sub {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 12.5px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .mast-nav { margin-left: auto; display: flex; flex-wrap: wrap; gap: 6px; }
+  .mast-nav a {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 13.5px;
+    letter-spacing: 0.04em; text-decoration: none; color: var(--ink);
+    border: 1px solid var(--line); border-radius: 3px; padding: 6px 13px; white-space: nowrap;
+  }
+  .mast-nav a:hover { border-color: var(--muted); }
+  .mast-nav a[aria-current="page"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .mast-nav a:focus-visible { outline: 2px solid var(--c2); outline-offset: 1px; }
+  @media (max-width: 640px) { .mast-nav { margin-left: 0; } }
+
+  .shell { max-width: 1180px; margin: 0 auto; padding: 0 28px 80px; display: grid; grid-template-columns: 232px 1fr; gap: 44px; }
+  @media (max-width: 900px) { .shell { grid-template-columns: 1fr; gap: 0; } }
+
+  nav.toc { position: sticky; top: 22px; align-self: start; padding-top: 34px; }
+  @media (max-width: 900px) {
+    nav.toc { position: static; padding: 26px 0 6px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+  }
+  nav.toc h2 {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px;
+  }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  @media (max-width: 900px) { nav.toc ol { flex-direction: row; flex-wrap: wrap; gap: 6px 14px; } }
+  nav.toc a {
+    display: block; text-decoration: none; color: var(--muted); font-size: 14px;
+    padding: 3px 0 3px 11px; border-left: 2px solid transparent; line-height: 1.35;
+  }
+  nav.toc a:hover { color: var(--ink); border-left-color: var(--line); }
+  nav.toc a.current { color: var(--ink); border-left-color: var(--c2); font-weight: 600; }
+  @media (max-width: 900px) { nav.toc a.current { color: var(--c2); } }
+  nav.toc a:focus-visible { outline: 2px solid var(--c2); outline-offset: 1px; }
+  @media (max-width: 900px) { nav.toc a { border-left: 0; padding-left: 0; } }
+
+  main { padding-top: 34px; min-width: 0; }
+  section { margin-bottom: 52px; scroll-margin-top: 20px; }
+  section > *:last-child { margin-bottom: 0; }
+
+  h2.sec {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 25px; font-weight: 600;
+    margin: 0 0 4px; letter-spacing: 0.01em; text-wrap: balance; color: var(--c1);
+  }
+  section:nth-of-type(4n+2) h2.sec { color: var(--c2); }
+  section:nth-of-type(4n+3) h2.sec { color: var(--c3); }
+  section:nth-of-type(4n+4) h2.sec { color: var(--c4); }
+  .kicker {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px;
+  }
+  h3 {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 18px; font-weight: 600;
+    margin: 30px 0 6px; text-wrap: balance;
+  }
+  p { margin: 0 0 15px; max-width: 920px; }
+  ul, ol.body { max-width: 920px; margin: 0 0 15px; padding-left: 20px; }
+  li { margin-bottom: 9px; }
+  a { color: var(--c2); }
+
+  /* Definition list: the term plain, a " - " separator carrying the styling. */
+  dl { max-width: 920px; margin: 0 0 18px; }
+  dl div { margin-bottom: 11px; }
+  dt { display: inline; font-family: "Cascadia Code", Consolas, monospace; font-size: 14.5px; color: var(--c2); }
+  dt::after { content: " - "; color: var(--muted); font-family: "Segoe UI", sans-serif; }
+  dd { display: inline; margin: 0; }
+
+  code {
+    font-size: 0.895em; background: var(--chipbg); padding: 1px 5px; border-radius: 3px;
+    border: 1px solid var(--line);
+  }
+  pre {
+    background: var(--codebg); border: 1px solid var(--line); border-radius: 4px;
+    padding: 14px 16px; overflow-x: auto; font-size: 13.5px; line-height: 1.6; margin: 0 0 15px;
+  }
+  pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .cmt { color: var(--muted); }
+
+  .callout {
+    border: 1px solid var(--line); border-left-width: 3px; border-left-color: var(--c3);
+    border-radius: 4px; padding: 13px 17px; margin: 0 0 16px; background: var(--panel); max-width: 920px;
+  }
+  .callout .lbl {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 12.5px; font-weight: 600;
+    letter-spacing: 0.05em; color: var(--c3);
+  }
+  .callout.important { border-left-color: var(--broken); }
+  .callout.important .lbl { color: var(--broken); }
+  .callout p { margin: 0; display: inline; }
+  .callout p + p { display: block; margin-top: 10px; }
+
+  .status { max-width: 920px; margin: 0 0 18px; }
+  .status div { margin-bottom: 10px; }
+  .status .what { font-weight: 600; }
+  .status .ok { color: var(--c1); font-weight: 600; }
+  .status .bad { color: var(--broken); font-weight: 600; }
+  .status .pend { color: var(--muted); font-weight: 600; }
+
+  footer {
+    border-top: 1px solid var(--line); margin-top: 20px; padding-top: 18px;
+    color: var(--muted); font-size: 14px; max-width: 920px;
+  }
+  footer p { margin: 0 0 8px; }
+
+  .lead { font-size: 19px; line-height: 1.5; max-width: 920px; margin: 0 0 18px; }
+  figure { margin: 18px 0 24px; max-width: 920px; }
+  figure img {
+    display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px;
+    background: #14181D; cursor: zoom-in;
+  }
+  .lightbox {
+    position: fixed; inset: 0; z-index: 50; display: none; align-items: center; justify-content: center;
+    padding: 24px; background: rgba(0, 0, 0, 0.82); cursor: zoom-out;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 100%; width: auto; height: auto; border: 1px solid var(--line); border-radius: 6px; }
+  .lightbox button {
+    position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border: 0; border-radius: 20px;
+    background: rgba(255, 255, 255, 0.12); color: #fff; font-size: 22px; line-height: 40px; cursor: pointer;
+  }
+  .lightbox button:hover { background: rgba(255, 255, 255, 0.24); }
+  figcaption { color: var(--muted); font-size: 14px; margin-top: 8px; max-width: 920px; }
+  dl.steps dt { font-family: "Segoe UI", -apple-system, system-ui, sans-serif; font-size: 16px; font-weight: 600; color: var(--ink); }
+  dl.steps dt::after { content: " "; }
+  dl.steps div { margin-bottom: 14px; }
+  b { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="mast-in">
+    <a class="brand" href="index.html"><span class="accent">Tether</span><span class="brand-sub">for Unreal Engine 5.8</span></a>
+    <nav class="mast-nav" aria-label="Site">
+      <a href="index.html">Overview</a>
+      <a href="tutorial.html" aria-current="page">Getting Started</a>
+      <a href="tech.html">How It Works</a>
+      <a href="reference.html">Reference</a>
+      <a href="diagram.html">Wiring Diagram</a>
+    </nav>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="toc" aria-label="Contents">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#before">Before You Start</a></li>
+      <li><a href="#step1">Step 1: Tag The Door</a></li>
+      <li><a href="#step2">Step 2: Somewhere To Remember It</a></li>
+      <li><a href="#step3">Step 3: Pick The Door</a></li>
+      <li><a href="#step4">Step 4: Make The Switch Do Something</a></li>
+      <li><a href="#step5">Step 5: Let The Editor Check</a></li>
+      <li><a href="#notloaded">What Not Loaded Means</a></li>
+      <li><a href="#trouble">If Something Looks Wrong</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <section id="before">
+      <h2 class="sec">Before You Start</h2>
+      <p>
+        You need the plugin in your project's <code>Plugins</code> folder. It turns itself on.
+        There's nothing to enable. Everything below happens in the Unreal editor. The
+        screenshots come from a small demo level: a room with a door, placed three times, and a
+        switch in front.
+      </p>
+      <p>
+        One term comes up a lot. A <b>level instance</b> is a piece of a level you build once
+        and place as many times as you like, the way you'd place a prop. Three copies of one
+        room is three level instances of the same room.
+      </p>
+      <figure>
+        <img src="img/00-editor.jpg" alt="The whole Unreal editor: the viewport on the left shows three rooms and a switch, the Outliner at the top right lists Wing_A, Wing_B, and Wing_C with a Door inside each, and the Details panel below it shows the selected Switch.">
+        <figcaption>The demo level. The Outliner (top right) lists the three rooms, each with its own Door. The Details panel (bottom right) is where the pointing happens.</figcaption>
+      </figure>
+    </section>
+
+    <section id="step1">
+      <h2 class="sec">Step 1: Tag The Door</h2>
+      <p>
+        Select the door and look at the Details panel. Click "Add" at the top and pick
+        "Tether". That's it. The door can now be pointed at.
+      </p>
+      <figure>
+        <img src="img/01-add-component.png" alt="The Details panel for the Door with the Add dropdown open and Tether highlighted in the list of components.">
+        <figcaption>Adding the tag. You do this once per kind of thing, on the Blueprint, or once per placed actor.</figcaption>
+      </figure>
+      <p>
+        If the door is a Blueprint, add the component there instead and every door you place
+        gets it. If you're on the engineering side, the component is
+        <code>UTetherComponent</code>. The <a href="tech.html">How It Works</a> page
+        has the C++.
+      </p>
+    </section>
+
+    <section id="step2">
+      <h2 class="sec">Step 2: Give The Switch Somewhere To Remember It</h2>
+      <p>
+        The switch needs a property of type "Tether Ref". In a Blueprint, add a variable
+        and choose that type. In C++ it's one line. Either way, the switch's Details panel gets a
+        new row that starts out saying "None".
+      </p>
+      <figure>
+        <img src="img/02-ref-row-none.png" alt="The Details panel of the Switch. A row labelled Target Door reads None, with a dropdown arrow and a clear button beside it.">
+        <figcaption>An empty ref. The dropdown is where you pick the door.</figcaption>
+      </figure>
+    </section>
+
+    <section id="step3">
+      <h2 class="sec">Step 3: Pick The Door</h2>
+      <p>
+        Click the dropdown. You get a list of everything in the level that has the tag, laid out
+        the same way as the Outliner. Rooms you placed open up like folders. When the same
+        room is placed three times you see three doors and can pick the one you mean.
+      </p>
+      <figure>
+        <img src="img/03-picker.png" alt="The picker dropdown open under the Target Door row. It lists Wing_A, Wing_B, and Wing_C expanded, each with a Door inside, and a search box at the top.">
+        <figcaption>The picker. Type in the search box to narrow it down.</figcaption>
+      </figure>
+      <p>
+        Click a door and the row fills in. It shows the door's name first, and then, in dimmer
+        text, the room it's in. If the switch and the door live in the same room, the ref is
+        stored relative to that room. Every copy of the room then gets its own door.
+      </p>
+      <figure>
+        <img src="img/04-ref-row-picked.png" alt="The Target Door row now reads Door, then Wing_A in dimmer text.">
+        <figcaption>Picked. Rename the door later and this row updates by itself.</figcaption>
+      </figure>
+      <p>
+        The ✕ button clears it back to "None".
+      </p>
+    </section>
+
+    <section id="step4">
+      <h2 class="sec">Step 4: Make The Switch Do Something</h2>
+      <p>
+        When the game runs, the switch asks the plugin for its door and gets the actual door
+        actor back. In Blueprint that's the "Get Actor From Tether Ref" node: feed it the
+        ref, tell it what kind of actor you expect, and use what comes out. If the door isn't
+        around yet, because its part of the world hasn't loaded, the node gives you nothing. Try
+        again later.
+      </p>
+      <figure>
+        <img src="img/09-bp-search.png" alt="The Blueprint node search box with Get Actor From Tether typed in, and the Get Actor from Tether Ref node listed under Tether.">
+        <figcaption>Right-click in the graph and search for it. It sits under "Tether".</figcaption>
+      </figure>
+      <figure>
+        <img src="img/10-bp-node.png" alt="The Get Actor from Tether Ref node with a Tether Ref input, an Actor Class input set to Actor, and a Return Value output.">
+        <figcaption>The node. Plug the ref into "Tether Ref", pick the class, and use "Return Value".</figcaption>
+      </figure>
+      <p>
+        In C++ it's <code>UTetherLibrary::ResolveTetherRef&lt;ADoor&gt;(this, TargetDoor)</code>.
+      </p>
+    </section>
+
+    <section id="step5">
+      <h2 class="sec">Step 5: Let The Editor Check Your Work</h2>
+      <p>
+        Right-click the level in the Content Browser and choose "Validate Assets". Anything that
+        can't work gets listed in the Message Log, with the actor it's on. The common one is a
+        switch whose door was moved to another level or deleted. The fix is the same every time.
+        Open the dropdown and pick again.
+      </p>
+      <figure>
+        <img src="img/08-validate-menu.png" alt="The Content Browser context menu on the Demo level, filtered to Validate Assets and Validate Assets and Dependencies.">
+        <figcaption>Right-click the level in the Content Browser. Typing "Validate" in the menu's search box narrows it to the two entries.</figcaption>
+      </figure>
+      <figure>
+        <img src="img/06-validation.png" alt="The Message Log with a Data Validation warning: Switch_0 has a ref to Door (Wing_A), which matches no actor in the loaded levels.">
+        <figcaption>What a broken pointer looks like when validation finds it. This one's room was deleted. Click "Switch_0" to jump to the switch.</figcaption>
+      </figure>
+    </section>
+
+    <section id="notloaded">
+      <h2 class="sec">What "Not Loaded" Means</h2>
+      <p>
+        In a big world, Unreal only keeps nearby parts loaded. When the door's part isn't
+        loaded, the row still shows the door's name and room, and adds "not loaded" so you know
+        the door exists but isn't in memory right now. That's normal.
+      </p>
+      <figure>
+        <img src="img/05-not-loaded.png" alt="The Target Door row reading Door, then Wing_A (not loaded) in dimmer text.">
+        <figcaption>The door is fine. It's just not loaded at the moment.</figcaption>
+      </figure>
+    </section>
+
+    <section id="trouble">
+      <h2 class="sec">If Something Looks Wrong</h2>
+      <dl>
+        <div><dt>The dropdown doesn't list my door</dt><dd>The door is missing its tag. Go back to
+          Step 1. If the property limits what kind of actor it accepts, the door has to be that
+          kind.</dd></div>
+        <div><dt>The row shows a long code instead of a name</dt><dd>The ref points at something
+          that no longer exists. Pick again.</dd></div>
+        <div><dt>It worked in the editor but not in the packaged game</dt><dd>Run Validate Assets first.
+          If that's clean, check out the <a href="tech.html#packaged">packaged builds</a> section
+          on the How It Works page.</dd></div>
+      </dl>
+    </section>
+
+    <footer>
+      <p>
+        The <a href="reference.html">Reference</a> page is the full technical reference, and the
+        <a href="diagram.html">wiring diagram</a> shows how the pieces connect.
+      </p>
+    </footer>
+
+  </main>
+</div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-label="Full-size image"><button type="button" aria-label="Close">&#x2715;</button><img alt=""></div>
+<script>
+(function () {
+  var box = document.getElementById('lightbox');
+  var big = box.querySelector('img');
+  function open(img) { big.src = img.src; big.alt = img.alt; box.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function close() { box.classList.remove('open'); big.src = ''; document.body.style.overflow = ''; }
+  Array.prototype.forEach.call(document.querySelectorAll('figure img'), function (img) {
+    img.addEventListener('click', function () { open(img); });
+  });
+  box.addEventListener('click', close);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && box.classList.contains('open')) { close(); } });
+})();
+</script>
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a[href^="#"]'));
+  var sections = links.map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); });
+  if (!links.length) { return; }
+  var ticking = false;
+  function update() {
+    ticking = false;
+    var line = window.innerHeight * 0.3;
+    var current = 0;
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i] && sections[i].getBoundingClientRect().top <= line) { current = i; }
+    }
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) { current = sections.length - 1; }
+    links.forEach(function (a, i) {
+      if (i === current) { a.classList.add('current'); a.setAttribute('aria-current', 'true'); }
+      else { a.classList.remove('current'); a.removeAttribute('aria-current'); }
+    });
+  }
+  function onScroll() { if (!ticking) { ticking = true; window.requestAnimationFrame(update); } }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  window.addEventListener('hashchange', onScroll);
+  update();
+})();
+</script>
+</body>
+</html>

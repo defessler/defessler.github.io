@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tether — System Wiring</title>
+<style>
+  :root {
+    --bg: #F4F5F2; --panel: #FFFFFF; --ink: #1B222B; --muted: #5A6472;
+    --line: #C9CFD6; --chipbg: #EAEDE8; --dim: 0.14;
+    --c1: #35855C; --c2: #2E77C9; --c3: #B26E22; --c4: #7A6BC9; --c5: #3E8F8F;
+    --broken: #C94A4A;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0F1216; --panel: #1A2026; --ink: #E8ECF1; --muted: #93A0AE;
+      --line: #2C333C; --chipbg: #232A32;
+      --c1: #5FBF8C; --c2: #5FA3EF; --c3: #E3A25B; --c4: #9D8FE8; --c5: #5FBFBF;
+      --broken: #E36A6A;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1216; --panel: #1A2026; --ink: #E8ECF1; --muted: #93A0AE;
+    --line: #2C333C; --chipbg: #232A32;
+    --c1: #5FBF8C; --c2: #5FA3EF; --c3: #E3A25B; --c4: #9D8FE8; --c5: #5FBFBF;
+    --broken: #E36A6A;
+  }
+  :root[data-theme="light"] {
+    --bg: #F4F5F2; --panel: #FFFFFF; --ink: #1B222B; --muted: #5A6472;
+    --line: #C9CFD6; --chipbg: #EAEDE8;
+    --c1: #35855C; --c2: #2E77C9; --c3: #B26E22; --c4: #7A6BC9; --c5: #3E8F8F;
+    --broken: #C94A4A;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Segoe UI", system-ui, sans-serif; font-size: 15px; line-height: 1.45;
+  }
+  .wrap { max-width: 1520px; margin: 0 auto; padding: 20px 24px 48px; }
+
+  header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 18px; margin-bottom: 6px; }
+  h1 { font-family: "Bahnschrift", "Arial Narrow", "Segoe UI", sans-serif; font-weight: 600; font-size: 26px; letter-spacing: 0.02em; margin: 0; }
+  h1 .mono { font-family: "Cascadia Code", Consolas, monospace; font-size: 22px; color: var(--c2); }
+  .sub { color: var(--muted); font-size: 14px; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 14px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 12.5px;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+    background: var(--chipbg); border-radius: 3px; padding: 4px 10px;
+  }
+  .chip i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 14px; }
+  .tab {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 13.5px; letter-spacing: 0.05em;
+    padding: 7px 14px; border: 1px solid var(--line); border-radius: 3px;
+    background: var(--panel); color: var(--ink); cursor: pointer;
+  }
+  .tab:hover { border-color: var(--muted); }
+  .tab:focus-visible { outline: 2px solid var(--c2); outline-offset: 1px; }
+  .tab[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  .stage { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; overflow-x: auto; padding: 6px 2px; }
+  svg { display: block; min-width: 1100px; width: 100%; height: auto; }
+
+  .node rect { fill: var(--bg); stroke-width: 1.4; cursor: pointer; }
+  .node text { pointer-events: none; }
+  .node .t { font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 14.5px; font-weight: 600; fill: var(--ink); }
+  .node .s { font-family: "Cascadia Code", Consolas, monospace; font-size: 10.5px; fill: var(--muted); }
+  .node:focus { outline: none; }
+  .node:focus rect, .node:hover rect { stroke-width: 2.4; }
+  .node.selected rect { stroke-width: 2.6; }
+
+  .colhead { font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.14em; }
+  .colsub { font-family: "Cascadia Code", Consolas, monospace; font-size: 10px; fill: var(--muted); }
+  .container-box { fill: none; stroke: var(--line); stroke-dasharray: 5 4; }
+  .container-label { font-family: "Cascadia Code", Consolas, monospace; font-size: 11px; fill: var(--muted); }
+
+  .edge { fill: none; stroke-width: 1.7; }
+  .edge.ret { stroke-dasharray: 5 4; }
+  .edge.broken { stroke-dasharray: 3 4; stroke-width: 2.1; }
+  .elbl {
+    font-family: "Cascadia Code", Consolas, monospace; font-size: 10.5px; fill: var(--muted);
+    paint-order: stroke; stroke: var(--panel); stroke-width: 3px;
+  }
+  .badge { font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 10px; letter-spacing: 0.08em; }
+
+  .dimmed { opacity: var(--dim); }
+  @media (prefers-reduced-motion: no-preference) {
+    .edge, .node rect, .node text, .elbl { transition: opacity 0.25s ease, stroke-width 0.15s ease; }
+  }
+
+  .info { display: grid; grid-template-columns: 3fr 2fr; gap: 14px; margin-top: 14px; }
+  @media (max-width: 900px) { .info { grid-template-columns: 1fr; } }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 14px 18px; }
+  .card h2 {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 13px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 600;
+  }
+  .card p { margin: 0 0 8px; max-width: 70ch; }
+  .card p:last-child { margin-bottom: 0; }
+  .card code { font-family: "Cascadia Code", Consolas, monospace; font-size: 13px; color: var(--c2); }
+  #inspect .hint { color: var(--muted); font-style: italic; }
+  #inspect h3 { font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 16px; margin: 0 0 6px; }
+
+  footer { margin-top: 16px; color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 22px; }
+  footer b { color: var(--ink); font-weight: 600; }
+  .ok { color: var(--c1); font-weight: 600; }
+  .bad { color: var(--broken); font-weight: 600; }
+
+  /* shared mast */
+  .mast { border-bottom: 1px solid var(--line); background: var(--panel); }
+  .mast-in {
+    max-width: 1180px; margin: 0 auto; padding: 12px 28px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px;
+  }
+  .mast-in.wide { max-width: 1520px; padding-left: 24px; padding-right: 24px; }
+  .brand { text-decoration: none; color: var(--ink); display: flex; align-items: baseline; gap: 10px; }
+  .brand .accent {
+    color: var(--c2); font-family: "Cascadia Code", Consolas, monospace; font-size: 22px; font-weight: 600;
+  }
+  .brand .brand-sub {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 12.5px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .mast-nav { margin-left: auto; display: flex; flex-wrap: wrap; gap: 6px; }
+  .mast-nav a {
+    font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 13.5px;
+    letter-spacing: 0.04em; text-decoration: none; color: var(--ink);
+    border: 1px solid var(--line); border-radius: 3px; padding: 6px 13px; white-space: nowrap;
+  }
+  .mast-nav a:hover { border-color: var(--muted); }
+  .mast-nav a[aria-current="page"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .mast-nav a:focus-visible { outline: 2px solid var(--c2); outline-offset: 1px; }
+  @media (max-width: 640px) { .mast-nav { margin-left: 0; } }
+  /* end shared mast */
+</style>
+
+<header class="mast">
+  <div class="mast-in wide">
+    <a class="brand" href="index.html"><span class="accent">Tether</span><span class="brand-sub">for Unreal Engine 5.8</span></a>
+    <nav class="mast-nav" aria-label="Site">
+      <a href="index.html">Overview</a>
+      <a href="tutorial.html">Getting Started</a>
+      <a href="tech.html">How It Works</a>
+      <a href="reference.html">Reference</a>
+      <a href="diagram.html" aria-current="page">Wiring Diagram</a>
+    </nav>
+  </div>
+</header>
+<div class="wrap">
+  <header>
+    <h1><span class="mono" id="ttl-main"></span> <span id="ttl-suffix"></span></h1>
+    <span class="sub" id="ttl-sub"></span>
+  </header>
+  <div class="legend" id="legend"></div>
+  <div class="tabs" id="tabs" role="group" aria-label="Flow selector"></div>
+  <div class="stage"><svg id="d" role="group" aria-label="System wiring diagram"></svg></div>
+  <div class="info">
+    <div class="card"><h2 id="flowtitle"></h2><div id="flowtext"></div></div>
+    <div class="card" id="inspect"><h2>Inspect</h2><div class="hint">Click any box to see its contract and invariants.</div></div>
+  </div>
+  <footer id="foot"></footer>
+</div>
+
+<script>
+(function () {
+  const SPEC = {"title": "Tether", "titleSuffix": "System Wiring", "subtitle": "references to one placed actor · keyed on the engine's per-placement guid · UE 5.8", "columns": [{"title": "GAME CONTENT", "sub": "your actors + code", "legend": "Game content", "slot": 1}, {"title": "RUNTIME MODULE", "sub": "Tether", "legend": "Runtime · Tether", "slot": 2}, {"title": "EDITOR MODULE", "sub": "TetherEditor", "legend": "Editor · TetherEditor", "slot": 3}, {"title": "ENGINE", "sub": "UE 5.8 systems", "legend": "Engine · UE 5.8", "slot": 4}], "nodes": [{"id": "component", "col": 0, "title": "UTetherComponent", "sub": "the opt-in · class or one placed instance", "desc": "Any actor with one can be referenced. Add it to a class in C++ or a Blueprint, or to one placed actor, engine classes included. It holds PlacementId, empty in every editor package and written only by the cook. It registers itself with its world's subsystem in OnRegister and leaves in OnUnregister."}, {"id": "ref", "col": 0, "title": "FTetherRef", "sub": "TargetId · relative form · two cached labels", "desc": "The reference you put anywhere: an actor, a component, a data asset, a save game. TargetId is the target's per-placement guid. A ref picked inside the owner's own level is relative instead: TargetId holds the bare guid and RelativePath the level instances in between, folded onto the owner at resolve time. CachedLabel and CachedLevelInstancePath hold the target's labels from when the ref was made, for when it isn't loaded. Equality and hashing go by TargetId and the relative form, so it works as a TSet element or TMap key. It never stores a pointer or an object path."}, {"id": "consumer", "col": 0, "title": "ResolveTetherRef<TActor>", "sub": "gameplay code · resolve at use", "desc": "Consumer code holds the ref and resolves it at the moment of use, on an event rather than every frame. It never caches the returned pointer, so nothing can dangle. The first argument is the owner holding the ref, which a relative ref folds onto."}, {"id": "subsystem", "col": 1, "title": "UTetherSubsystem", "sub": "placement index · loaded + visible", "desc": "A world subsystem indexing every registered tethered actor by placement id, filed on the first resolve after it registers. An actor with two components is still one entry. Components register as their level becomes visible, so it holds exactly the tethered actors in loaded, visible levels. It mirrors what is loaded and assigns nothing. FindActor is unique-or-null."}, {"id": "resolve", "col": 1, "title": "GetActorFromTetherRef", "sub": "unique-or-null · optional class filter", "desc": "Refuses an unset ref first, since an invalid guid would match every actor without an instance guid. Folds a relative ref onto the owner's placement, asks the owner's world subsystem for the one actor with that placement id, and returns null on a second match. A non-null ActorClass must match. In Blueprint it is Get Actor From Tether Ref.", "group": "UTetherLibrary · stateless"}, {"id": "make", "col": 1, "title": "MakeTetherRef", "sub": "C++ only · absolute, or relative to an owner", "desc": "Builds a ref from an actor, relative when an owner is given whose level-instance chain prefixes the target's. Returns an unset ref unless the actor is a tethered actor with a valid placement id. The picker uses it. Blueprints cannot call it, since refs are meant to be picked in the editor.", "group": "UTetherLibrary · stateless"}, {"id": "placement", "col": 1, "title": "GetPlacementId", "sub": "THE identity read", "desc": "The one place that answers which placement an actor is. In the editor and PIE it folds the level's container and the ActorGuid, which equals the engine's instance guid and also covers a level instance open for editing. A level's container is its owning level instance actor's placement when that actor is itself placed inside something. In a cooked build it falls back to GetBakedPlacementId.", "group": "UTetherLibrary · stateless"}, {"id": "fold", "col": 1, "title": "GetBakedPlacementId", "sub": "cooked read · container fold", "desc": "Reads the component's baked PlacementId and folds the level's container in first: the owning level instance actor's placement, else the engine's level-instance guid, else a guid from a runtime copy's unique package name. A Standalone level instance cooks as its own asset, so the bake only holds the actor's own half. Embedded and Partitioned content bakes an absolute value. Looks like a double-combine and isn't.", "group": "UTetherLibrary · stateless"}, {"id": "picker", "col": 2, "title": "FTetherRefCustomization", "sub": "details row · outliner picker · clear", "desc": "Shows a ref as one row: the target's label, its level-instance path in subdued text, a picker, and a clear button. An unloaded target's label comes from its World Partition descriptor, else from the ref's saved labels, and the row marks it as not loaded. The picker lists tethered actors that aren't child actors, filtered by AllowedClasses metadata. A pick writes through the property handle with SetValueFromFormattedString, which is what rehashes a TSet or TMap key."}, {"id": "bake", "col": 2, "title": "Tether::CookBake", "sub": "OnObjectPreSave · cook only · restores after", "desc": "On a cooking save, writes each tethered actor's live instance guid into its component's PlacementId while the engine can still read it. Skips templates and child actors. Folds relative refs to absolute on actors flattened into World Partition cells. Records the old value and restores it after each package saves and again at CookFinished, since the post-save event never fires for a failed save."}, {"id": "validator", "col": 2, "title": "UTetherValidator", "sub": "Data Validation · world or actors", "desc": "Indexes every loaded actor by placement id, then checks each tethered actor and every ref, including refs in containers, nested structs, and components. Errors on a leaked bake, a shared placement id, an ambiguous ref, a ref to a untethered or child actor, and an AllowedClasses miss. Under World Partition it also finds refs whose target exists nowhere."}, {"id": "aiguid", "col": 3, "title": "FActorInstanceGuid", "sub": "Combine(level-instance chain, ActorGuid)", "desc": "The engine's per-placement identity. Three placements of one room give the door inside three different values. The engine writes it when a level instance streams in as an instance or a World Partition cell streams, never in edit mode, so the plugin folds it itself there. In a cooked build the engine serializes it, then releases it in AActor::PostRegisterAllComponents before any gameplay query, which is why the cook bake exists.", "badge": "RELEASED BEFORE GAMEPLAY IN COOKED BUILDS"}, {"id": "outliner", "col": 3, "title": "CreateActorPicker", "sub": "Scene Outliner · level instances expand", "desc": "The engine's outliner picker, mounted with the level-instance hierarchy shown, so one placement inside a level instance can be picked."}, {"id": "presave", "col": 3, "title": "FCoreUObjectDelegates::OnObjectPreSave", "sub": "the cook's save hook", "desc": "Fires for every object a save writes. The cook bake only acts when the save context reports cooking, meaning a target platform is set. USmartObjectComponent::PreSave bakes for the same reason."}, {"id": "wpdescs", "col": 3, "title": "UActorDescContainerInstance", "sub": "World Partition descriptors · loaded or not", "desc": "One descriptor per actor in every container, level-instance child containers included. The validator rebuilds every placement id as ContainerID.GetActorGuid(ActorGuid) and only trusts the set when every loaded tethered actor's live id is in it."}], "edges": [{"from": "component", "to": "subsystem", "label": "OnRegister / OnUnregister"}, {"from": "consumer", "to": "resolve", "label": "resolve at use"}, {"from": "ref", "to": "resolve", "label": "TargetId"}, {"from": "resolve", "to": "subsystem", "label": "FindActor"}, {"from": "subsystem", "to": "placement", "label": "id on first use"}, {"from": "placement", "to": "aiguid", "label": "editor + PIE: live"}, {"from": "placement", "to": "fold", "label": "cooked: baked"}, {"from": "fold", "to": "component", "label": "reads PlacementId"}, {"from": "resolve", "to": "consumer", "label": "actor or null", "ret": true}, {"from": "picker", "to": "outliner", "label": "CreateActorPicker"}, {"from": "picker", "to": "make", "label": "on pick"}, {"from": "make", "to": "placement"}, {"from": "picker", "to": "ref", "label": "writes via property handle"}, {"from": "presave", "to": "bake", "label": "cooking save"}, {"from": "bake", "to": "aiguid", "label": "reads live guid"}, {"from": "bake", "to": "component", "label": "writes PlacementId, restores after"}, {"from": "validator", "to": "ref", "label": "checks every ref"}, {"from": "validator", "to": "placement", "label": "live ids"}, {"from": "validator", "to": "wpdescs", "label": "rebuilds ids under WP"}], "flows": [{"id": "over", "title": "Overview", "html": "<p>One identity, read in one place. Every reference keys on the engine's per-placement guid through <code>GetPlacementId<\/code>, every tethered actor registers itself through its component, and every resolve is unique-or-null against what is loaded. The editor module owns the picker, the cook bake, and validation.<\/p><p>Select a flow above to trace it, and click any box for its contract.<\/p>"}, {"id": "register", "title": "Opt in & register", "caption": "Opt in: the component registers itself", "html": "<p>An actor opts in with a <code>UTetherComponent<\/code>. When its level becomes visible, the component registers with the world's <code>UTetherSubsystem<\/code>. It leaves when the level hides or the actor is destroyed. The subsystem fills each entry's placement id the first time a resolve needs it.<\/p>", "edges": ["component>subsystem", "subsystem>placement", "placement>aiguid"], "nodes": ["component", "subsystem", "placement", "aiguid"]}, {"id": "resolve", "title": "Resolve", "caption": "Resolve: unique, or nothing", "html": "<p>Gameplay code passes a ref and the object holding it. <code>GetActorFromTetherRef<\/code> refuses an unset ref, folds a relative ref onto the owner's placement, asks the owner's world subsystem for the one actor with that placement id, and returns null on a second match. Nothing is cached, so nothing can dangle.<\/p>", "edges": ["consumer>resolve", "ref>resolve", "resolve>subsystem", "subsystem>placement", "placement>aiguid", "resolve>consumer"], "nodes": ["consumer", "ref", "resolve", "subsystem", "placement", "aiguid"]}, {"id": "pick", "title": "Pick a target", "caption": "Pick: one placement, through the outliner", "html": "<p>The details row opens the engine's outliner picker with level instances expanded, so a designer can pick one placement out of several. <code>MakeTetherRef<\/code> captures its placement id. The row writes the ref through the property handle, which is what makes sets and maps rehash.<\/p>", "edges": ["picker>outliner", "picker>make", "make>placement", "placement>aiguid", "picker>ref"], "nodes": ["picker", "outliner", "make", "placement", "aiguid", "ref"]}, {"id": "cook", "title": "Cook & cooked read", "caption": "Cook: bake it while the engine still has it", "html": "<p>A cooked build releases the engine's instance guid before gameplay. On a cooking save, <code>CookBake<\/code> writes the live value into the component and restores the editor copy afterwards. At runtime <code>GetBakedPlacementId<\/code> reads it back, folding in the level's container. Relative refs on flattened actors are folded to absolute at cook. Verified from a packaged build.<\/p>", "edges": ["presave>bake", "bake>aiguid", "bake>component", "placement>fold", "fold>component"], "nodes": ["presave", "bake", "aiguid", "component", "placement", "fold"]}, {"id": "validate", "title": "Validate", "caption": "Validate: catch what resolution assumes", "html": "<p><code>UTetherValidator<\/code> runs under the engine's Data Validation. It checks every ref against the live placement ids. Under World Partition it also rebuilds every id from the actor descriptors, to find refs whose target no longer exists anywhere.<\/p>", "edges": ["validator>ref", "validator>placement", "validator>wpdescs", "placement>aiguid"], "nodes": ["validator", "ref", "placement", "wpdescs", "aiguid"]}], "footer": [{"label": "Engine", "value": "UE 5.8", "tone": "plain"}, {"label": "Packaged builds", "value": "verified: every placement resolves, nothing resolves wrong", "tone": "ok"}]};
+  if (!SPEC) { document.body.textContent = "wiring spec missing"; return; }
+
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("d");
+  const slotVar = s => s === "broken" ? "var(--broken)" : `var(--c${s})`;
+  const el = (tag, attrs, parent) => {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    (parent || svg).appendChild(e); return e;
+  };
+  const hel = (tag, cls, parent) => {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    parent.appendChild(e); return e;
+  };
+
+  // ---- header / legend / footer ----
+  document.getElementById("ttl-main").textContent = SPEC.title;
+  document.getElementById("ttl-suffix").textContent = SPEC.titleSuffix || "";
+  document.getElementById("ttl-sub").textContent = SPEC.subtitle || "";
+  document.title = SPEC.title + (SPEC.titleSuffix ? " — " + SPEC.titleSuffix : "");
+
+  const legend = document.getElementById("legend");
+  SPEC.columns.forEach(c => {
+    const chip = hel("span", "chip", legend);
+    const i = hel("i", "", chip); i.style.background = slotVar(c.slot);
+    chip.appendChild(document.createTextNode(" " + c.legend));
+  });
+  (SPEC.legendExtra || []).forEach(x => {
+    const chip = hel("span", "chip", legend);
+    const i = hel("i", "", chip); i.style.background = slotVar(x.slot);
+    chip.appendChild(document.createTextNode(" " + x.label));
+  });
+
+  const foot = document.getElementById("foot");
+  (SPEC.footer || []).forEach(f => {
+    const s = hel("span", "", foot);
+    const b = hel("b", "", s); b.textContent = f.label + " ";
+    const v = hel("span", f.tone === "ok" ? "ok" : f.tone === "bad" ? "bad" : "", s);
+    v.textContent = f.value;
+  });
+
+  // ---- layout: columns of stacked nodes, groups boxed ----
+  const COLW = 312, CGAP = 72, MX = 40, Y0 = 112, VGAP = 16, BASE_H = 56, BADGE_H = 18;
+  const ncols = SPEC.columns.length;
+  const W = MX * 2 + ncols * COLW + (ncols - 1) * CGAP;
+  const colX = i => MX + i * (COLW + CGAP);
+
+  const byId = {};
+  const colStacks = SPEC.columns.map(() => []);
+  SPEC.nodes.forEach(n => { byId[n.id] = n; colStacks[n.col].push(n); });
+
+  const groupBoxes = [];
+  let maxY = 0;
+  colStacks.forEach((stack, ci) => {
+    let y = Y0, curGroup = null, gStart = 0;
+    stack.forEach((n, idx) => {
+      const g = n.group || null;
+      if (g !== curGroup) {
+        if (curGroup) { groupBoxes.push({ col: ci, label: curGroup, y0: gStart, y1: y - VGAP + 8 }); y += 10; }
+        if (g) { y += 30; gStart = y - 22; }
+        curGroup = g;
+      }
+      n._x = colX(ci) + (g ? 14 : 0);
+      n._w = COLW - (g ? 28 : 0);
+      n._h = BASE_H + (n.badge ? BADGE_H : 0);
+      n._y = y;
+      y += n._h + VGAP;
+    });
+    if (curGroup) groupBoxes.push({ col: ci, label: curGroup, y0: gStart, y1: y - VGAP + 8 });
+    maxY = Math.max(maxY, y);
+  });
+  const H = maxY + 28;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+
+  // ---- defs: arrow markers ----
+  const defs = el("defs", {});
+  const usedSlots = new Set(SPEC.columns.map(c => String(c.slot))); usedSlots.add("broken");
+  usedSlots.forEach(s => {
+    const m = el("marker", { id: "m-" + s, viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" }, defs);
+    el("path", { d: "M0,0 L10,5 L0,10 z", fill: slotVar(s) }, m);
+  });
+
+  // ---- column headers ----
+  SPEC.columns.forEach((c, i) => {
+    const x = colX(i);
+    const t = el("text", { x, y: 60, class: "colhead", fill: slotVar(c.slot) }); t.textContent = c.title;
+    const s = el("text", { x, y: 78, class: "colsub" }); s.textContent = c.sub || "";
+    el("line", { x1: x, y1: 88, x2: x + COLW, y2: 88, stroke: slotVar(c.slot), "stroke-width": 2 });
+  });
+
+  // ---- group boxes ----
+  groupBoxes.forEach(g => {
+    el("rect", { x: colX(g.col) + 2, y: g.y0, width: COLW - 4, height: g.y1 - g.y0, rx: 6, class: "container-box" });
+    const t = el("text", { x: colX(g.col) + 12, y: g.y0 + 16, class: "container-label" });
+    t.textContent = g.label;
+  });
+
+  // ---- edges ----
+  function anchor(a, b) {
+    if (b._x >= a._x + a._w - 4) return { sx: a._x + a._w, sy: a._y + a._h / 2, tx: b._x, ty: b._y + b._h / 2 };
+    if (b._x + b._w <= a._x + 4) return { sx: a._x, sy: a._y + a._h / 2, tx: b._x + b._w, ty: b._y + b._h / 2 };
+    const acx = a._x + a._w / 2, bcx = b._x + b._w / 2;
+    if (b._y > a._y) return { sx: acx - a._w / 4, sy: a._y + a._h, tx: bcx - b._w / 4, ty: b._y, vert: true };
+    return { sx: acx - a._w / 4, sy: a._y, tx: bcx - b._w / 4, ty: b._y + b._h, vert: true };
+  }
+  const edgeEls = {}, lblEls = {};
+  SPEC.edges.forEach(ed => {
+    ed._key = ed.from + ">" + ed.to;
+    const a = byId[ed.from], b = byId[ed.to];
+    const { sx, sy, tx, ty, vert } = anchor(a, b);
+    let d;
+    if (vert) {
+      d = `M ${sx} ${sy} C ${sx - 34} ${sy + (ty > sy ? 18 : -18)}, ${tx - 34} ${ty - (ty > sy ? 18 : -18)}, ${tx} ${ty}`;
+    } else {
+      const dx = Math.max(46, Math.min(120, Math.abs(tx - sx) / 2)) * (tx > sx ? 1 : -1);
+      d = `M ${sx} ${sy} C ${sx + dx} ${sy}, ${tx - dx} ${ty}, ${tx} ${ty}`;
+    }
+    const slot = ed.broken ? "broken" : String(SPEC.columns[a.col].slot);
+    const p = el("path", {
+      d, class: "edge" + (ed.ret ? " ret" : "") + (ed.broken ? " broken" : ""),
+      stroke: slotVar(slot), "marker-end": `url(#m-${slot})`
+    });
+    edgeEls[ed._key] = p;
+    if (ed.label) {
+      const t = el("text", { x: (sx + tx) / 2, y: (sy + ty) / 2 - 7, class: "elbl", "text-anchor": "middle" });
+      t.textContent = ed.label;
+      t.style.display = "none";
+      lblEls[ed._key] = t;
+    }
+  });
+
+  // ---- nodes ----
+  const nodeEls = {};
+  SPEC.nodes.forEach(n => {
+    const slot = SPEC.columns[n.col].slot;
+    const g = el("g", { class: "node", tabindex: 0, role: "button", "aria-label": n.title });
+    el("rect", { x: n._x, y: n._y, width: n._w, height: n._h, rx: 5, stroke: slotVar(slot) }, g);
+    const t1 = el("text", { x: n._x + 12, y: n._y + 24, class: "t" }, g); t1.textContent = n.title;
+    const t2 = el("text", { x: n._x + 12, y: n._y + 42, class: "s" }, g); t2.textContent = n.sub || "";
+    if (n.badge) {
+      const bt = el("text", { x: n._x + 12, y: n._y + 62, class: "badge", fill: "var(--broken)" }, g);
+      bt.textContent = n.badge;
+    }
+    nodeEls[n.id] = g;
+    const select = () => {
+      document.querySelectorAll(".node.selected").forEach(x => x.classList.remove("selected"));
+      g.classList.add("selected");
+      const box = document.getElementById("inspect");
+      box.innerHTML = "<h2>Inspect</h2>";
+      const h3 = document.createElement("h3"); h3.style.color = slotVar(slot); h3.textContent = n.title; box.appendChild(h3);
+      const sub = document.createElement("p");
+      sub.style.cssText = "font-family:'Cascadia Code',Consolas,monospace;font-size:12px;color:var(--muted);margin-bottom:8px";
+      sub.textContent = n.sub || ""; box.appendChild(sub);
+      const p = document.createElement("p"); p.textContent = n.desc || ""; box.appendChild(p);
+    };
+    g.addEventListener("click", select);
+    g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(); } });
+  });
+
+  // ---- flows ----
+  const tabs = document.getElementById("tabs");
+  SPEC.flows.forEach(fl => {
+    const b = document.createElement("button");
+    b.className = "tab"; b.dataset.flow = fl.id; b.setAttribute("aria-pressed", "false");
+    b.textContent = fl.title;
+    b.addEventListener("click", () => setFlow(fl.id));
+    tabs.appendChild(b);
+  });
+  function setFlow(id) {
+    const fl = SPEC.flows.find(f => f.id === id);
+    document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.flow === id)));
+    document.getElementById("flowtitle").textContent = fl.caption || fl.title;
+    document.getElementById("flowtext").innerHTML = fl.html || "";
+    const over = id === "over";
+    SPEC.edges.forEach(ed => {
+      const on = over || (fl.edges || []).includes(ed._key);
+      edgeEls[ed._key].classList.toggle("dimmed", !on);
+      if (lblEls[ed._key]) lblEls[ed._key].style.display = (!over && on) ? "" : "none";
+    });
+    SPEC.nodes.forEach(n => {
+      const on = over || (fl.nodes || []).includes(n.id);
+      nodeEls[n.id].classList.toggle("dimmed", !on);
+    });
+  }
+  setFlow(SPEC.flows[0].id);
+})();
+</script>
