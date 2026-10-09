@@ -99,8 +99,11 @@
 
   h2.sec {
     font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 25px; font-weight: 600;
-    margin: 0 0 4px; letter-spacing: 0.01em; text-wrap: balance;
+    margin: 0 0 4px; letter-spacing: 0.01em; text-wrap: balance; color: var(--c1);
   }
+  section:nth-of-type(4n+2) h2.sec { color: var(--c2); }
+  section:nth-of-type(4n+3) h2.sec { color: var(--c3); }
+  section:nth-of-type(4n+4) h2.sec { color: var(--c4); }
   .kicker {
     font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 11.5px; font-weight: 600;
     letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px;
@@ -214,8 +217,8 @@
       </p>
       <p>
         If two actors ever had the same serial number, the plugin refuses to guess and gives
-        back nothing. Opening the wrong door silently would be worse than opening no door, and
-        the editor's checks tell you about the clash long before that.
+        back nothing. Opening the wrong door would be worse than opening no door. The editor's
+        checks tell you about the clash long before that.
       </p>
     </section>
 
@@ -239,8 +242,11 @@
       <p>
         The identity is the engine's per-placement actor instance guid: the actor's
         <code>ActorGuid</code>, combined with the guids of the level instances above it. In the
-        editor the plugin takes the engine's stamp where one exists and folds that chain itself
-        where it doesn't, which is a level instance open for editing. Nothing is minted.
+        editor the plugin takes the engine's instance guid where one exists and folds that chain
+        itself where it doesn't, which is a level instance open for editing. Nothing is minted. A
+        ref picked at an actor in the owner's own level is stored relative. It holds the target's
+        bare guid plus the level instances in between, and folds onto the owner's placement at
+        resolve time.
       </p>
       <pre><code>UPROPERTY(EditAnywhere, meta = (AllowedClasses = "/Script/MyGame.Door"))
 FStableActorRef TargetDoor;
@@ -253,18 +259,19 @@ if (ADoor* Door = UStableActorIdLibrary::ResolveStableActorRef&lt;ADoor&gt;(this
       <p>
         Each <code>UStableActorIdComponent</code> registers with a world subsystem as its level
         becomes visible and leaves when it's hidden or destroyed. A resolve is a hash lookup in that
-        set by placement id, and returns one actor or null. Refs are equal when their guids are. That lets
-        them work as <code>TSet</code> elements and <code>TMap</code> keys.
+        set by placement id, and returns one actor or null. Refs are equal when they point at the
+        same actor the same way. That lets them work as <code>TSet</code> elements and
+        <code>TMap</code> keys.
       </p>
       <h3 id="packaged">Packaged builds</h3>
       <p>
         A cooked build releases the engine's instance guid before gameplay runs. So during a
         cooking save, the editor module writes the live guid into the component, and restores
         the editor copy afterwards. At runtime the plugin reads that baked value, folding the
-        level-instance guid back in for Standalone level instances. This path is measured from a
-        staged packaged build: five probe maps covering Embedded, Standalone, nested, classic,
+        level-instance guid back in for Standalone level instances. We measure this path from a
+        staged packaged build. Five probe maps covering Embedded, Standalone, nested, classic,
         distance-streamed, and runtime-loaded level instances resolve every reference to the right
-        placement, with nothing landing on a wrong actor.
+        placement, and nothing lands on a wrong actor.
       </p>
       <h3>Validation</h3>
       <p>
@@ -287,10 +294,10 @@ if (ADoor* Door = UStableActorIdLibrary::ResolveStableActorRef&lt;ADoor&gt;(this
         <li>It points at things placed in a level, not things spawned while the game runs.</li>
         <li>"Move to Level", "Create Level Instance", and "Break" give an actor a new ID. Refs to
           it need re-picking. Validation flags them.</li>
-        <li>Two placements of one room share nothing, which is the point. A ref picks one copy
-          and never "all copies of this door".</li>
-        <li>Finding a door walks the tagged actors in the level. Call it when something happens,
-          not every frame, if you have thousands of tags.</li>
+        <li>Two placements of one room are two different targets. A ref picks one copy, never
+          all copies of the door.</li>
+        <li>Resolve a ref from the thing that holds it. A relative ref folds onto its owner's
+          placement. Resolving it from an actor in another level gives nothing.</li>
       </ul>
     </section>
 

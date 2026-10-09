@@ -99,8 +99,11 @@
 
   h2.sec {
     font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 25px; font-weight: 600;
-    margin: 0 0 4px; letter-spacing: 0.01em; text-wrap: balance;
+    margin: 0 0 4px; letter-spacing: 0.01em; text-wrap: balance; color: var(--c1);
   }
+  section:nth-of-type(4n+2) h2.sec { color: var(--c2); }
+  section:nth-of-type(4n+3) h2.sec { color: var(--c3); }
+  section:nth-of-type(4n+4) h2.sec { color: var(--c4); }
   .kicker {
     font-family: "Bahnschrift", "Arial Narrow", sans-serif; font-size: 11.5px; font-weight: 600;
     letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px;
@@ -205,13 +208,13 @@
     <section id="before">
       <h2 class="sec">Before You Start</h2>
       <p>
-        You need the plugin in your project's <code>Plugins</code> folder. It turns itself on,
-        so there's nothing to enable. Everything below happens in the Unreal editor. The
+        You need the plugin in your project's <code>Plugins</code> folder. It turns itself on.
+        There's nothing to enable. Everything below happens in the Unreal editor. The
         screenshots come from a small demo level: a room with a door, placed three times, and a
         switch in front.
       </p>
       <p>
-        One word you'll see a lot: a <b>level instance</b> is a piece of a level you build once
+        One term comes up a lot. A <b>level instance</b> is a piece of a level you build once
         and place as many times as you like, the way you'd place a prop. Three copies of one
         room is three level instances of the same room.
       </p>
@@ -265,7 +268,8 @@
       </figure>
       <p>
         Click a door and the row fills in. It shows the door's name first, and then, in dimmer
-        text, the room it's in.
+        text, the room it's in. If the switch and the door live in the same room, the ref is
+        stored relative to that room. Every copy of the room then gets its own door.
       </p>
       <figure>
         <img src="img/04-ref-row-picked.png" alt="The Target Door row now reads Door, then Wing_A in dimmer text.">
@@ -282,8 +286,8 @@
         When the game runs, the switch asks the plugin for its door and gets the actual door
         actor back. In Blueprint that's the "Get Actor From Stable Actor Ref" node: feed it the
         ref, tell it what kind of actor you expect, and use what comes out. If the door isn't
-        around yet, because its part of the world hasn't loaded, the node gives you nothing and
-        you can try again later.
+        around yet, because its part of the world hasn't loaded, the node gives you nothing. Try
+        again later.
       </p>
       <p>
         In C++ it's <code>UStableActorIdLibrary::ResolveStableActorRef&lt;ADoor&gt;(this, TargetDoor)</code>.
@@ -295,8 +299,8 @@
       <p>
         Right-click the level in the Content Browser and choose "Validate Assets". Anything that
         can't work gets listed in the Message Log, with the actor it's on. The common one is a
-        switch whose door was moved to another level or deleted. The fix is always the same:
-        open the dropdown and pick again.
+        switch whose door was moved to another level or deleted. The fix is the same every time.
+        Open the dropdown and pick again.
       </p>
       <figure>
         <img src="img/06-validation.png" alt="The Message Log with a Data Validation warning: Switch_0 has a ref to Door (Wing_A), which matches no actor in the loaded levels.">
@@ -309,7 +313,7 @@
       <p>
         In a big world, Unreal only keeps nearby parts loaded. When the door's part isn't
         loaded, the row still shows the door's name and room, and adds "not loaded" so you know
-        the door exists but isn't in memory right now. That's normal, not a problem.
+        the door exists but isn't in memory right now. That's normal.
       </p>
       <figure>
         <img src="img/05-not-loaded.png" alt="The Target Door row reading Door, then Wing_A (not loaded) in dimmer text.">
@@ -325,9 +329,6 @@
           kind.</dd></div>
         <div><dt>The row shows a long code instead of a name</dt><dd>The ref points at something
           that no longer exists. Pick again.</dd></div>
-        <div><dt>It says "not loaded" even though I can see the door</dt><dd>The level instance the
-          door is in is probably open for editing. Close the edit or pick again. Then it
-          resolves.</dd></div>
         <div><dt>It worked in the editor but not in the packaged game</dt><dd>Run Validate Assets first.
           If that's clean, check out the <a href="tech.html#packaged">packaged builds</a> section
           on the How It Works page.</dd></div>
