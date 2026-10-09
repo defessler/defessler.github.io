@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tether: Videos</title>
-<meta name="description" content="Short tutorial videos recorded in the Unreal editor: tagging an actor, picking a target, what a ref survives, Blueprint, relative refs, and three ways a ref breaks and how to fix them.">
+<title>Tether: Video Tutorial</title>
+<meta name="description" content="A step-by-step video tutorial recorded in the Unreal editor: tag an actor, pick one door, rename and move and duplicate safely, read the ref in Blueprint, and build the switch into the room. Then the three ways a ref breaks, with the fix for each.">
 <style>
   :root {
     --bg: #F4F5F2; --panel: #FFFFFF; --ink: #1B222B; --muted: #5A6472;
@@ -197,7 +197,7 @@
     <nav class="mast-nav" aria-label="Site">
       <a href="index.html">Overview</a>
       <a href="tutorial.html">Getting Started</a>
-      <a href="tech.html">How It Works</a>
+      <a href="tech.html">Inside Tether</a>
       <a href="videos.html" aria-current="page">Videos</a>
       <a href="reference.html">Reference</a>
       <a href="diagram.html">Wiring Diagram</a>
@@ -209,67 +209,257 @@
   <nav class="toc" aria-label="Contents">
     <h2>Contents</h2>
     <ol>
-      <li><a href="#tutorials">See It Work</a></li>
-      <li><a href="#troubleshooting">When A Ref Breaks</a></li>
+      <li><a href="#before">Before You Start</a></li>
+      <li><a href="#step1">Step 1: Tag An Actor</a></li>
+      <li><a href="#step2">Step 2: Pick One Door</a></li>
+      <li><a href="#step3">Step 3: Rename, Move, And Duplicate</a></li>
+      <li><a href="#step4">Step 4: Read The Ref In Blueprint</a></li>
+      <li><a href="#step5">Step 5: Build The Switch Into The Room</a></li>
+      <li><a href="#trouble">Fixing Broken Refs</a></li>
+      <li><a href="#deleted">A Deleted Target</a></li>
+      <li><a href="#component">A Removed Tether Component</a></li>
+      <li><a href="#newid">An Actor With A New ID</a></li>
+      <li><a href="#more">Keep Reading</a></li>
     </ol>
   </nav>
 
   <main>
 
-    <section id="tutorials">
-      <p class="kicker">Tutorials</p>
-      <h2 class="sec">See It Work</h2>
+    <section id="before">
+      <p class="kicker">Video Tutorial</p>
+      <h2 class="sec">Before You Start</h2>
       <p>
-        Short videos recorded in the Unreal editor, each one a single task from start to finish.
-        They use the same demo level as the screenshots: one room placed three times, with a switch
-        in front.
+        This page is meant to walk you through Tether with short videos, one task each. Watch
+        them in order. You'll go from an empty pointer to a switch that opens the right door, then
+        through the three ways a pointer breaks and the fix for each.
       </p>
-      <div class="video-grid">
-        <figure class="video">
-          <video controls preload="none" playsinline poster="video/01-tag-an-actor.jpg" src="video/01-tag-an-actor.mp4"></video>
-          <figcaption><b>Tag an actor.</b> Add a Tether component to anything you want to point at, engine actors included.</figcaption>
-        </figure>
-        <figure class="video">
-          <video controls preload="none" playsinline poster="video/02-pick-a-target.jpg" src="video/02-pick-a-target.mp4"></video>
-          <figcaption><b>Pick a target.</b> Point a switch at one specific door, even when the room is placed three times.</figcaption>
-        </figure>
-        <figure class="video">
-          <video controls preload="none" playsinline poster="video/03-what-a-ref-survives.jpg" src="video/03-what-a-ref-survives.mp4"></video>
-          <figcaption><b>What a ref survives.</b> Rename the room, move it, and duplicate it. The switch keeps its door.</figcaption>
-        </figure>
-        <figure class="video">
-          <video controls preload="none" playsinline poster="video/04-use-it-in-blueprint.jpg" src="video/04-use-it-in-blueprint.mp4"></video>
-          <figcaption><b>Use it in Blueprint.</b> Add a Tether Ref variable and turn it into the actor.</figcaption>
-        </figure>
-        <figure class="video">
-          <video controls preload="none" playsinline poster="video/05-a-switch-inside-the-room.jpg" src="video/05-a-switch-inside-the-room.mp4"></video>
-          <figcaption><b>A switch inside the room.</b> Build the switch into the room itself, and every copy opens its own door.</figcaption>
-        </figure>
+      <p>
+        Every video uses the same small demo level. One room is built once and placed three
+        times, as Wing_A, Wing_B, and Wing_C. Each room has an orange door. A blue switch stands
+        in front of them. The goal is to point the switch at one specific door.
+      </p>
+      <p>
+        You need the plugin in your project's <code>Plugins</code> folder. It turns itself on,
+        along with the engine's Data Validation plugin it uses for its checks. The demo uses two
+        small classes. If you're on the engineering side, the door carries the tag from its
+        constructor and the switch holds two refs:
+      </p>
+      <pre><code>// The door: every placed door can be pointed at.
+Tether = CreateDefaultSubobject&lt;UTetherComponent&gt;(TEXT("Tether"));
+
+// The switch: one door, limited to door actors, plus a list that takes any tagged actor.
+UPROPERTY(EditAnywhere, meta = (AllowedClasses = "/Script/MyGame.Door"))
+FTetherRef TargetDoor;
+
+UPROPERTY(EditAnywhere)
+TArray&lt;FTetherRef&gt; ExtraDoors;</code></pre>
+      <p>
+        You don't need C++ to follow along. A Blueprint can add the component and the variables
+        the same way. Step 4 shows the Blueprint side.
+      </p>
+    </section>
+
+    <section id="step1">
+      <h2 class="sec">Step 1: Tag An Actor</h2>
+      <p>
+        An actor can only be pointed at once it carries a Tether component. The doors in the
+        demo already have one from their class. This video adds one to the ground, which is a
+        plain engine <code>StaticMeshActor</code>, to show that any placed actor can take it.
+      </p>
+      <figure>
+        <video controls preload="none" playsinline poster="video/01-tag-an-actor.jpg" src="video/01-tag-an-actor.mp4"></video>
+        <figcaption>Adding a Tether component to the ground, then finding the ground in a ref's picker.</figcaption>
+      </figure>
+      <ol>
+        <li>Select it: click the actor in the Outliner, so the Details panel shows it.</li>
+        <li>Add the component: click "Add" at the top of the Details panel, type "Tether", and pick it.</li>
+        <li>Leave it as it is: the component has nothing to fill in. The ID it relies on is one the engine already gives placed actors.</li>
+      </ol>
+      <p>
+        Adding the component to a class or a Blueprint tags every actor you place from it. Adding
+        it to one placed actor tags only that one.
+      </p>
+    </section>
+
+    <section id="step2">
+      <h2 class="sec">Step 2: Pick One Door</h2>
+      <p>
+        A Tether Ref property shows up in the Details panel as a single row with a dropdown. The
+        dropdown lists everything tagged in the level, laid out like the Outliner, with each
+        room opening like a folder. Three copies of one room give you three doors to choose
+        from.
+      </p>
+      <figure>
+        <video controls preload="none" playsinline poster="video/02-pick-a-target.jpg" src="video/02-pick-a-target.mp4"></video>
+        <figcaption>Pointing the switch at the door in Wing_A, out of three copies of the same room.</figcaption>
+      </figure>
+      <ol>
+        <li>Select the switch: its "Target Door" row reads "None" to start with.</li>
+        <li>Open the dropdown: each copy of the room lists its own door.</li>
+        <li>Pick the door: the row now reads the door's name, then, in dimmer text, the room it's in.</li>
+      </ol>
+      <p>
+        The ✕ button next to the row clears it back to "None". Only the door you picked is the
+        target. The other two copies are untouched.
+      </p>
+      <div class="callout"><span class="lbl">Note:</span>
+        <p>The <code>AllowedClasses</code> metadata in the snippet above is what limits this
+        dropdown to doors. It only works on C++ properties, since a Blueprint variable can't
+        carry that metadata. The "Extra Doors" list has no filter. It offers every tagged actor,
+        the ground from step 1 included.</p>
       </div>
     </section>
 
-    <section id="troubleshooting">
-      <p class="kicker">Troubleshooting</p>
-      <h2 class="sec">When A Ref Breaks</h2>
+    <section id="step3">
+      <h2 class="sec">Step 3: Rename, Move, And Duplicate</h2>
       <p>
-        A ref can stop resolving for three reasons: its target is gone, its target lost its Tether
-        component, or its target was copied and got a new ID. Each video shows what the editor
-        tells you, and the fix.
+        The ref points at the door's placement, not at its name or its spot in the level. This
+        video changes all of those and checks the switch after each one.
       </p>
-      <div class="video-grid">
-        <figure class="video">
-          <video controls preload="none" playsinline poster="video/06-when-a-target-is-deleted.jpg" src="video/06-when-a-target-is-deleted.mp4"></video>
-          <figcaption><b>When a target is deleted.</b> What "not loaded" means, how Validate Assets reports it, and the fix.</figcaption>
-        </figure>
-        <figure class="video">
-          <video controls preload="none" playsinline poster="video/07-when-a-target-loses-its-tag.jpg" src="video/07-when-a-target-loses-its-tag.mp4"></video>
-          <figcaption><b>When a target loses its tag.</b> Remove the Tether component and the ref stops resolving. Add it back and it works again.</figcaption>
-        </figure>
-        <figure class="video">
-          <video controls preload="none" playsinline poster="video/08-when-an-actor-gets-a-new-id.jpg" src="video/08-when-an-actor-gets-a-new-id.mp4"></video>
-          <figcaption><b>When an actor gets a new ID.</b> Break, Move to Level, and Create Level Instance copy actors. Refs to them need picking again.</figcaption>
-        </figure>
-      </div>
+      <figure>
+        <video controls preload="none" playsinline poster="video/03-rename-move-duplicate.jpg" src="video/03-rename-move-duplicate.mp4"></video>
+        <figcaption>Renaming the room, moving it, and duplicating it while the switch's row stays in view.</figcaption>
+      </figure>
+      <ol>
+        <li>Lock the Details panel: the lock icon at its top right keeps the switch on screen while you select other things.</li>
+        <li>Rename the room: select Wing_A, press F2, and type "North Wing". The row picks up the new name by itself.</li>
+        <li>Move the room: the row doesn't change, since position was never part of the link.</li>
+        <li>Duplicate the room: Ctrl+D makes a copy with a door of its own. The dropdown now lists both. The ref stays on the original.</li>
+      </ol>
+      <p>
+        Moving actors between Outliner folders is safe too. A handful of editor actions do
+        change an actor's ID, and the last section of this page covers them.
+      </p>
+    </section>
+
+    <section id="step4">
+      <h2 class="sec">Step 4: Read The Ref In Blueprint</h2>
+      <p>
+        A ref on its own just remembers a door. To do something with the door in game, turn the
+        ref into the actor with the "Get Actor From Tether Ref" node.
+      </p>
+      <figure>
+        <video controls preload="none" playsinline poster="video/04-use-it-in-blueprint.jpg" src="video/04-use-it-in-blueprint.mp4"></video>
+        <figcaption>A Tether Ref variable in a Blueprint, and the node that turns it into the actor.</figcaption>
+      </figure>
+      <ol>
+        <li>Add a variable: under "My Blueprint", add one and set its type to "Tether Ref".</li>
+        <li>Add the node: right-click the "Event Graph" and search for "Get Actor From Tether Ref".</li>
+        <li>Wire it up: feed it the ref, pick the class you expect in "Actor Class", and use the return value.</li>
+      </ol>
+      <p>
+        The node returns the actor, or None when it can't, for example when the ref is empty,
+        its target isn't loaded, or the target isn't the class you asked for. Its owner pin is hidden and set to self, since
+        a ref is resolved from the actor that holds it. In C++ the same call reads:
+      </p>
+      <pre><code>if (ADoor* Door = UTetherLibrary::ResolveTetherRef&lt;ADoor&gt;(this, TargetDoor))
+{
+    // Open it, highlight it, and so on.
+}</code></pre>
+      <p>
+        Tether Refs also work in arrays, sets, and maps, in C++ and in Blueprint.
+      </p>
+    </section>
+
+    <section id="step5">
+      <h2 class="sec">Step 5: Build The Switch Into The Room</h2>
+      <p>
+        So far the switch sits in the main level and points at one copy. When the switch is part
+        of the room itself, you want every copy of the room to open its own door. Tether handles
+        that by storing the ref relative to the room.
+      </p>
+      <figure>
+        <video controls preload="none" playsinline poster="video/05-a-switch-inside-the-room.jpg" src="video/05-a-switch-inside-the-room.mp4"></video>
+        <figcaption>A switch placed inside the room's own level, pointed at the room's door, then seen in all three copies.</figcaption>
+      </figure>
+      <ol>
+        <li>Open the room's level: every copy in the demo comes from this one asset.</li>
+        <li>Place a switch inside the room and pick the room's door, the same way as in step 2.</li>
+        <li>Save the room: back in the main level, each copy of the room has its own switch.</li>
+      </ol>
+      <p>
+        Both actors live in the same level. The ref is stored relative to that level. Each
+        copy's switch resolves to the door in its own copy, including copies you load at runtime.
+        Picking a door from outside the room makes a ref to that one placement.
+      </p>
+    </section>
+
+    <section id="trouble">
+      <p class="kicker">Troubleshooting</p>
+      <h2 class="sec">Fixing Broken Refs</h2>
+      <p>
+        A ref usually stops resolving for one of three reasons: its target is gone, its target lost its
+        Tether component, or its target got a new ID. In all three the row in the Details panel
+        changes. The plugin's checks report it too.
+      </p>
+      <p>
+        To run the checks by hand, right-click the level in the Content Browser and choose "Asset
+        Actions" -> "Validate Assets", or type "Validate" into the menu's search box. Results land in the Message Log. Each one names the actor that holds
+        the ref. Click the name to jump to it. The same checks run when you save, if your
+        project validates on save.
+      </p>
+    </section>
+
+    <section id="deleted">
+      <h2 class="sec">A Deleted Target</h2>
+      <figure>
+        <video controls preload="none" playsinline poster="video/06-a-deleted-target.jpg" src="video/06-a-deleted-target.mp4"></video>
+        <figcaption>Deleting the room the door lives in, reading the report, and undoing it.</figcaption>
+      </figure>
+      <ul>
+        <li>The row - It keeps the door's saved name and room, and adds "not loaded".</li>
+        <li>The report - In a map without World Partition, like the demo, a warning that the ref "matches no actor in the loaded levels". In a World Partition map it's an error, since the editor can check unloaded actors too.</li>
+        <li>The fix - Undo the delete with Ctrl+Z, or open the dropdown and pick a door again.</li>
+      </ul>
+      <p>
+        "Not loaded" doesn't always mean deleted. In a big World Partition world the door's
+        part of the map may just be streamed out. The ref starts resolving again as soon as it
+        streams back in.
+      </p>
+    </section>
+
+    <section id="component">
+      <h2 class="sec">A Removed Tether Component</h2>
+      <figure>
+        <video controls preload="none" playsinline poster="video/07-a-removed-component.jpg" src="video/07-a-removed-component.mp4"></video>
+        <figcaption>Removing the ground's Tether component, reading the report, and adding it back.</figcaption>
+      </figure>
+      <ul>
+        <li>The row - The entry can't resolve any more.</li>
+        <li>The report - An error that the actor "has no UTetherComponent, so it never resolves".</li>
+        <li>The fix - Add the component back. The ID belongs to the actor. Every ref to it works again.</li>
+      </ul>
+      <p>
+        Removing the component from one placed actor only affects that actor. Its siblings from
+        the same class still work.
+      </p>
+    </section>
+
+    <section id="newid">
+      <h2 class="sec">An Actor With A New ID</h2>
+      <figure>
+        <video controls preload="none" playsinline poster="video/08-an-actor-with-a-new-id.jpg" src="video/08-an-actor-with-a-new-id.mp4"></video>
+        <figcaption>Breaking the room into the level, reading the report, and picking the copied door.</figcaption>
+      </figure>
+      <ul>
+        <li>The row - It shows "not loaded", even though a door is still standing there.</li>
+        <li>The report - The same "matches no actor" message as a deleted target. In a World Partition map it's an error that names these three actions and asks you to re-pick the target.</li>
+        <li>The fix - Open the dropdown and pick the door again. It's listed on its own now, outside any room.</li>
+      </ul>
+      <p>
+        Three editor actions copy actors under the hood, which gives the copies new IDs: "Move to
+        Level", "Create Level Instance" from a selection, and "Break" on a level instance. Refs
+        to those actors need picking again. Moving things between Outliner folders doesn't count.
+      </p>
+    </section>
+
+    <section id="more">
+      <h2 class="sec">Keep Reading</h2>
+      <ul>
+        <li><a href="tutorial.html">Getting Started</a> - The same steps as screenshots, if you'd rather read than watch.</li>
+        <li><a href="tech.html">Inside Tether</a> - The plain-language explanation of the ID, then the engineering details.</li>
+        <li><a href="reference.html">Reference</a> - Every option, check, and message in one place.</li>
+      </ul>
     </section>
 
     <footer>

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tether: How It Works</title>
-<meta name="description" content="The plain-language explanation of how Tether keeps a reference valid, then the engineering details: identity, resolution, packaged builds, validation, and a deep dive into the arithmetic, the cook, and what's measured.">
+<title>Tether: Inside Tether</title>
+<meta name="description" content="A plain-language explanation of Tether first, then the engineering details: identity, resolution, packaged builds, validation, and a deep dive into the arithmetic, the cook, and the measurements.">
 <style>
   :root {
     --bg: #F4F5F2; --panel: #FFFFFF; --ink: #1B222B; --muted: #5A6472;
@@ -197,7 +197,7 @@
     <nav class="mast-nav" aria-label="Site">
       <a href="index.html">Overview</a>
       <a href="tutorial.html">Getting Started</a>
-      <a href="tech.html" aria-current="page">How It Works</a>
+      <a href="tech.html" aria-current="page">Inside Tether</a>
       <a href="videos.html">Videos</a>
       <a href="reference.html">Reference</a>
       <a href="diagram.html">Wiring Diagram</a>
@@ -210,10 +210,10 @@
     <h2>Contents</h2>
     <ol>
       <li><a href="#plain">Without The Jargon</a></li>
-      <li><a href="#pieces">What's In The Box</a></li>
+      <li><a href="#pieces">The Pieces</a></li>
       <li><a href="#engineers">The Technical Version</a></li>
       <li><a href="#deep">The Details Under The Details</a></li>
-      <li><a href="#limits">What It Doesn't Do</a></li>
+      <li><a href="#limits">Limits</a></li>
     </ol>
   </nav>
 
@@ -221,7 +221,7 @@
 
     <section id="plain">
       <p class="kicker">Plain Language</p>
-      <h2 class="sec">How It Works, Without The Jargon</h2>
+      <h2 class="sec">Tether In Plain Words</h2>
       <p>
         Every actor placed in an Unreal level carries a hidden ID that the engine made up when
         the actor was placed. Think of it as a serial number. It's unique, it never changes, and
@@ -246,7 +246,7 @@
 
     <section id="pieces">
       <p class="kicker">The Pieces</p>
-      <h2 class="sec">What's In The Box</h2>
+      <h2 class="sec">The Pieces</h2>
       <dl>
         <div><dt>Tether (a component)</dt><dd>The tag. Put it on anything that needs to be
           pointed at.</dd></div>
@@ -320,8 +320,8 @@ if (ADoor* Door = UTetherLibrary::ResolveTetherRef&lt;ADoor&gt;(this, TargetDoor
       <p class="kicker">Deep Dive</p>
       <h2 class="sec">The Details Under The Details</h2>
       <p>
-        This section is for the engineer who wants to know exactly what number a ref holds, how it
-        gets there in a cooked build, and what the tests have measured. Everything here is as of
+        This section is for the engineer who wants the exact number a ref holds, the path it takes
+        into a cooked build, and the test measurements. Everything here is as of
         UE 5.8 and will drift as the engine does. The code is the final word.
       </p>
       <h3>The identity arithmetic</h3>
@@ -359,7 +359,7 @@ if (ADoor* Door = UTetherLibrary::ResolveTetherRef&lt;ADoor&gt;(this, TargetDoor
         guid. Equality and hashing include the form. A relative and an absolute ref to one actor
         are two keys.
       </p>
-      <h3>What the cook does</h3>
+      <h3>The cook step</h3>
       <p>
         The engine serializes <code>ActorInstanceGuid</code> into every cooked actor and releases it
         in <code>PostRegisterAllComponents</code>, before any gameplay code runs. During a cooking
@@ -414,7 +414,7 @@ if (ADoor* Door = UTetherLibrary::ResolveTetherRef&lt;ADoor&gt;(this, TargetDoor
         <img src="img/06-validation.png" alt="The Message Log showing a Data Validation warning that the Switch has a ref to Door (Wing_A), which matches no actor in the loaded levels.">
         <figcaption>A warning from validation. The room the door was in has been deleted.</figcaption>
       </figure>
-      <h3>What we've verified</h3>
+      <h3>Verified so far</h3>
       <p>
         We test the plugin against the engine's own options, all aimed at the same door: a plain
         soft pointer, a hard pointer, an Editor Path, and a Universal Object Locator. The maps
@@ -438,7 +438,7 @@ if (ADoor* Door = UTetherLibrary::ResolveTetherRef&lt;ADoor&gt;(this, TargetDoor
 
     <section id="limits">
       <p class="kicker">Limits</p>
-      <h2 class="sec">What It Doesn't Do</h2>
+      <h2 class="sec">Limits</h2>
       <ul>
         <li>It points at things placed in a level, not things spawned while the game runs.</li>
         <li>"Move to Level", "Create Level Instance", and "Break" give an actor a new ID. Refs to

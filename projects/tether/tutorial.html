@@ -197,7 +197,7 @@
     <nav class="mast-nav" aria-label="Site">
       <a href="index.html">Overview</a>
       <a href="tutorial.html" aria-current="page">Getting Started</a>
-      <a href="tech.html">How It Works</a>
+      <a href="tech.html">Inside Tether</a>
       <a href="videos.html">Videos</a>
       <a href="reference.html">Reference</a>
       <a href="diagram.html">Wiring Diagram</a>
@@ -215,7 +215,7 @@
       <li><a href="#step3">Step 3: Pick The Door</a></li>
       <li><a href="#step4">Step 4: Make The Switch Do Something</a></li>
       <li><a href="#step5">Step 5: Let The Editor Check</a></li>
-      <li><a href="#notloaded">What Not Loaded Means</a></li>
+      <li><a href="#notloaded">The Not Loaded Label</a></li>
       <li><a href="#trouble">If Something Looks Wrong</a></li>
     </ol>
   </nav>
@@ -254,7 +254,7 @@
       <p>
         If the door is a Blueprint, add the component there instead and every door you place
         gets it. If you're on the engineering side, the component is
-        <code>UTetherComponent</code>. The <a href="tech.html">How It Works</a> page
+        <code>UTetherComponent</code>. The <a href="tech.html">Inside Tether</a> page
         has the C++.
       </p>
       <figure>
@@ -345,12 +345,12 @@
       </figure>
       <figure>
         <img src="img/06-validation.png" alt="The Message Log with a Data Validation warning: Switch_0 has a ref to Door (Wing_A), which matches no actor in the loaded levels.">
-        <figcaption>What a broken pointer looks like when validation finds it. This one's room was deleted. Click "Switch_0" to jump to the switch.</figcaption>
+        <figcaption>A broken pointer, as validation reports it. This one's room was deleted. Click "Switch_0" to jump to the switch.</figcaption>
       </figure>
     </section>
 
     <section id="notloaded">
-      <h2 class="sec">What "Not Loaded" Means</h2>
+      <h2 class="sec">The "Not Loaded" Label</h2>
       <p>
         In a big world, Unreal only keeps nearby parts loaded. When the door's part isn't
         loaded, the row still shows the door's name and room, and adds "not loaded" so you know
@@ -372,16 +372,16 @@
           that no longer exists. Pick again.</dd></div>
         <div><dt>It worked in the editor but not in the packaged game</dt><dd>Run Validate Assets first.
           If that's clean, check out the <a href="tech.html#packaged">packaged builds</a> section
-          on the How It Works page.</dd></div>
+          on the Inside Tether page.</dd></div>
       </dl>
       <p>
-        The <a href="videos.html#troubleshooting">troubleshooting videos</a> walk through the three
+        The <a href="videos.html#trouble">troubleshooting videos</a> walk through the three
         ways a ref breaks: a deleted target, a target that lost its Tether component, and a target
         that got a new ID.
       </p>
       <figure>
-        <video controls preload="none" playsinline poster="video/06-when-a-target-is-deleted.jpg" src="video/06-when-a-target-is-deleted.mp4"></video>
-        <figcaption>A deleted target, what Validate Assets says about it, and the fix.</figcaption>
+        <video controls preload="none" playsinline poster="video/06-a-deleted-target.jpg" src="video/06-a-deleted-target.mp4"></video>
+        <figcaption>A deleted target, the Validate Assets report, and the fix.</figcaption>
       </figure>
     </section>
 

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tether: Reference</title>
-<meta name="description" content="The full technical reference: identity, where the data lives, how a ref resolves, the details row and picker, Data Validation, and the cook bake.">
+<meta name="description" content="The full technical reference: identity, stored data, ref resolution, the details row and picker, Data Validation, and the cook bake.">
 <style>
   :root {
     --bg: #F4F5F2; --panel: #FFFFFF; --ink: #1B222B; --muted: #5A6472;
@@ -197,7 +197,7 @@
     <nav class="mast-nav" aria-label="Site">
       <a href="index.html">Overview</a>
       <a href="tutorial.html">Getting Started</a>
-      <a href="tech.html">How It Works</a>
+      <a href="tech.html">Inside Tether</a>
       <a href="videos.html">Videos</a>
       <a href="reference.html" aria-current="page">Reference</a>
       <a href="diagram.html">Wiring Diagram</a>
@@ -211,8 +211,8 @@
     <ol>
       <li><a href="#intro">The Technical Reference</a></li>
       <li><a href="#identity">Identity</a></li>
-      <li><a href="#data">Where The Data Lives</a></li>
-      <li><a href="#resolve">How A Ref Resolves</a></li>
+      <li><a href="#data">Stored Data</a></li>
+      <li><a href="#resolve">Resolving A Ref</a></li>
       <li><a href="#equality">Equality And Containers</a></li>
       <li><a href="#row">The Details Row</a></li>
       <li><a href="#picker">The Picker</a></li>
@@ -227,9 +227,9 @@
       <p class="kicker">Reference</p>
       <h2 class="sec">The Technical Reference</h2>
       <p>
-        This page is meant as a quick reference on how the plugin works under the hood: what a
-        reference keys on, where every piece of data lives, how a ref resolves, what the editor
-        adds, what Data Validation checks, and what the cook does for a packaged build. For
+        This page is meant as a quick reference on the plugin under the hood: the ID a reference
+        keys on, every piece of stored data, ref resolution, the editor's row and picker, the Data
+        Validation checks, and the cook step for a packaged build. For
         day-to-day use, <a href="tutorial.html">Getting Started</a> is the shorter read.
       </p>
       <p>
@@ -256,7 +256,7 @@
     </section>
 
     <section id="identity">
-      <p class="kicker">How It Works</p>
+      <p class="kicker">Mechanics</p>
       <h2 class="sec">Identity: The Per-Placement Guid</h2>
       <p>
         A reference doesn't key on a name, a label, or an object path. It keys on the engine's
@@ -302,7 +302,7 @@
     </section>
 
     <section id="data">
-      <h2 class="sec">Where The Data Lives</h2>
+      <h2 class="sec">Stored Data</h2>
       <p>
         Every piece of saved data lives on an ordinary <code>UPROPERTY</code> and saves with
         whatever object owns it. The one runtime structure is a per-world index of loaded tethered
@@ -355,7 +355,7 @@
         Shipping, <code>PostSerialize</code> empties both as each ref loads. They hold no
         memory at runtime. They're still on disk.
       </p>
-      <h3>What isn't stored</h3>
+      <h3>Left out on purpose</h3>
       <ul>
         <li>No pointer to the target. A ref never caches the actor it resolved to. It can't
           dangle.</li>
@@ -366,7 +366,7 @@
     </section>
 
     <section id="resolve">
-      <h2 class="sec">How A Ref Resolves</h2>
+      <h2 class="sec">Resolving A Ref</h2>
       <p>
         Resolution is a lookup against the loaded tethered actors, done at the moment you ask. Call
         <code>UTetherLibrary::GetActorFromTetherRef</code>, or the typed C++ helper
@@ -413,7 +413,7 @@
         reports shared placement ids as errors. You'll usually hear about one long before a
         resolve hits it.
       </p>
-      <h3>What the index sees</h3>
+      <h3>The index's view</h3>
       <p>
         Each <code>UTetherComponent</code> registers itself with its world's subsystem in
         <code>OnRegister</code> and removes itself in <code>OnUnregister</code>. Components
@@ -491,7 +491,7 @@
       </p>
       <pre><code>  Target Door      [ BP_Door  Wing_A.Room_3      ▾ ] [✕]</code></pre>
       <ul>
-        <li>The label - What the ref points at. Check out the next section for where it comes
+        <li>The label - The actor the ref points at. Check out the next section for where it comes
           from.</li>
         <li>▾ - Opens the actor picker.</li>
         <li>✕ - Clears the ref back to "None".</li>
@@ -610,7 +610,7 @@ TSet&lt;FTetherRef&gt; LockedDoors;</code></pre>
 
     <section id="validation">
       <p class="kicker">Data Validation</p>
-      <h2 class="sec">What The Check Looks For</h2>
+      <h2 class="sec">The Checks</h2>
       <p>
         <code>UTetherValidator</code> is an engine Data Validation validator in the editor
         module. The engine registers it automatically. "Validate Data" in the content browser,
@@ -623,9 +623,9 @@ TSet&lt;FTetherRef&gt; LockedDoors;</code></pre>
       </figure>
       <figure>
         <img src="img/08-validate-menu.png" alt="The Content Browser context menu filtered to Validate Assets and Validate Assets and Dependencies.">
-        <figcaption>Where to run it by hand: the level's context menu in the Content Browser.</figcaption>
+        <figcaption>Running it by hand: the level's context menu in the Content Browser.</figcaption>
       </figure>
-      <h3>How it runs</h3>
+      <h3>Inputs</h3>
       <p>It accepts a world, or a single actor that's in a world.</p>
       <ul>
         <li>A world with named actors - Under One File Per Actor, a validation run usually names
@@ -688,7 +688,7 @@ TSet&lt;FTetherRef&gt; LockedDoors;</code></pre>
         instance has a child container, and every loaded tethered actor's live id is in the set.
         Otherwise it falls back to the warning above rather than saying nothing.
       </p>
-      <h3>Why some issues only warn</h3>
+      <h3>Warnings, not errors</h3>
       <p>
         Outside World Partition, a dangling ref only warns. There's no descriptor list to check
         against. A sublevel can still be unloaded in the editor. A missing target is suspicious
@@ -730,7 +730,7 @@ TSet&lt;FTetherRef&gt; LockedDoors;</code></pre>
           <code>Cook bake: baked N actor(s). Folded M relative ref(s).</code> and restores
           again.</li>
       </ul>
-      <h3>Which actors it bakes</h3>
+      <h3>Baked actors</h3>
       <p>An actor gets baked when all of these hold:</p>
       <ul>
         <li>It's not a template. Writing to a class default or archetype during
@@ -785,7 +785,7 @@ TSet&lt;FTetherRef&gt; LockedDoors;</code></pre>
         flattened content there. It only captures from a level nothing owns, where the engine
         wrote the value. Nothing to add, nothing to configure.
       </p>
-      <h3>What's verified</h3>
+      <h3>Verified so far</h3>
       <p>
         We verify the whole path from a packaged build. Embedded, Standalone, nested three deep,
         Standalone under Embedded, classic sublevels, a partitioned room placed Embedded,
