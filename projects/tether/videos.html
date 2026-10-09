@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tether: Point At The Right Thing</title>
-<meta name="description" content="Reference one specific placed actor in Unreal Engine in a way that survives renames, folder moves, and copies of the same room.">
+<title>Tether: Videos</title>
+<meta name="description" content="Short tutorial videos recorded in the Unreal editor: tagging an actor, picking a target, what a ref survives, Blueprint, relative refs, and three ways a ref breaks and how to fix them.">
 <style>
   :root {
     --bg: #F4F5F2; --panel: #FFFFFF; --ink: #1B222B; --muted: #5A6472;
@@ -195,10 +195,10 @@
   <div class="mast-in">
     <a class="brand" href="index.html"><span class="accent">Tether</span><span class="brand-sub">for Unreal Engine 5.8</span></a>
     <nav class="mast-nav" aria-label="Site">
-      <a href="index.html" aria-current="page">Overview</a>
+      <a href="index.html">Overview</a>
       <a href="tutorial.html">Getting Started</a>
       <a href="tech.html">How It Works</a>
-      <a href="videos.html">Videos</a>
+      <a href="videos.html" aria-current="page">Videos</a>
       <a href="reference.html">Reference</a>
       <a href="diagram.html">Wiring Diagram</a>
     </nav>
@@ -209,111 +209,67 @@
   <nav class="toc" aria-label="Contents">
     <h2>Contents</h2>
     <ol>
-      <li><a href="#what">What This Plugin Does</a></li>
-      <li><a href="#use">Three Steps</a></li>
-      <li><a href="#why">Why The Pointer Doesn't Break</a></li>
-      <li><a href="#trust">When Something Is Off</a></li>
-      <li><a href="#more">Where To Go Next</a></li>
+      <li><a href="#tutorials">See It Work</a></li>
+      <li><a href="#troubleshooting">When A Ref Breaks</a></li>
     </ol>
   </nav>
 
   <main>
 
-    <section id="what">
-      <p class="kicker">In One Minute</p>
-      <h2 class="sec">What This Plugin Does</h2>
-      <p class="lead">
-        It lets one thing in your level point at another thing, and keeps pointing at it no
-        matter what happens to it.
-      </p>
+    <section id="tutorials">
+      <p class="kicker">Tutorials</p>
+      <h2 class="sec">See It Work</h2>
       <p>
-        Say you have a switch and a door. You want the switch to know which door it opens. In
-        Unreal, the usual way of pointing at the door breaks the moment someone renames the door,
-        moves it into a folder, or builds the room around it into a reusable piece. Suddenly the
-        switch points at nothing. Nobody finds out until the door doesn't open in a playtest.
+        Short videos recorded in the Unreal editor, each one a single task from start to finish.
+        They use the same demo level as the screenshots: one room placed three times, with a switch
+        in front.
       </p>
-      <p>
-        Tether gives the door a permanent ID tag and lets the switch remember that tag
-        instead of the door's name. Rename the door, reorganize the level, or copy the room three
-        times. The switch still opens the door you picked. Build the switch into the room itself
-        and each copy's switch opens its own copy's door.
-      </p>
-      <figure>
-        <img src="img/07-viewport.jpg" alt="The editor viewport showing three copies of the same room side by side, each with an orange door, and one blue switch in front of them.">
-        <figcaption>The demo level used on this site: one room placed three times, and a switch that needs to know which door is its door.</figcaption>
-      </figure>
-    </section>
-
-    <section id="use">
-      <p class="kicker">How You Use It</p>
-      <h2 class="sec">Three Steps</h2>
-      <dl class="steps">
-        <div><dt>1. Tag the thing you want to point at.</dt><dd>Add the "Tether" component to
-          the door. That's all. There's nothing to fill in.</dd></div>
-        <div><dt>2. Give the switch a place to remember it.</dt><dd>The switch gets a "Tether Ref"
-          property. It shows up in the Details panel as one row with a dropdown.</dd></div>
-        <div><dt>3. Pick the door.</dt><dd>Open the dropdown, find the door, click it. The row shows the
-          door's name and which room it's in. It stays correct from then on.</dd></div>
-      </dl>
-      <figure>
-        <img src="img/04-ref-row-picked.png" alt="The Details panel of the switch. The Target Door row reads Door, then Wing_A in dimmer text, with a dropdown arrow and a clear button.">
-        <figcaption>After picking: the switch points at the door in Wing_A. The dimmer text tells you which copy of the room it's in.</figcaption>
-      </figure>
-      <p>
-        Check out <a href="tutorial.html">Getting Started</a> for the walkthrough with every
-        screen.
-      </p>
-    </section>
-
-    <section id="why">
-      <p class="kicker">The Hidden ID</p>
-      <h2 class="sec">Why The Pointer Doesn't Break</h2>
-      <p>
-        Every actor you place in a level already has a hidden ID that Unreal keeps for it. It's
-        a long random number that never changes. Every copy gets its own, even three copies of
-        the same room. Nobody ever has to see it. The plugin just uses it as the thing
-        the switch remembers.
-      </p>
-      <p>
-        Names and folders are things people change all the time. The hidden ID isn't.
-      </p>
-      <div class="callout"><span class="lbl">Note:</span>
-        <p>A few editor actions do give an actor a brand-new ID: "Move to Level", "Create Level
-        Instance" from a selection, and "Break" on a level instance. After one of those, the
-        switch would be pointing at an ID that no longer exists. The plugin's checks catch that.
-        The fix is to open the dropdown and pick the door again.</p>
+      <div class="video-grid">
+        <figure class="video">
+          <video controls preload="none" playsinline poster="video/01-tag-an-actor.jpg" src="video/01-tag-an-actor.mp4"></video>
+          <figcaption><b>Tag an actor.</b> Add a Tether component to anything you want to point at, engine actors included.</figcaption>
+        </figure>
+        <figure class="video">
+          <video controls preload="none" playsinline poster="video/02-pick-a-target.jpg" src="video/02-pick-a-target.mp4"></video>
+          <figcaption><b>Pick a target.</b> Point a switch at one specific door, even when the room is placed three times.</figcaption>
+        </figure>
+        <figure class="video">
+          <video controls preload="none" playsinline poster="video/03-what-a-ref-survives.jpg" src="video/03-what-a-ref-survives.mp4"></video>
+          <figcaption><b>What a ref survives.</b> Rename the room, move it, and duplicate it. The switch keeps its door.</figcaption>
+        </figure>
+        <figure class="video">
+          <video controls preload="none" playsinline poster="video/04-use-it-in-blueprint.jpg" src="video/04-use-it-in-blueprint.mp4"></video>
+          <figcaption><b>Use it in Blueprint.</b> Add a Tether Ref variable and turn it into the actor.</figcaption>
+        </figure>
+        <figure class="video">
+          <video controls preload="none" playsinline poster="video/05-a-switch-inside-the-room.jpg" src="video/05-a-switch-inside-the-room.mp4"></video>
+          <figcaption><b>A switch inside the room.</b> Build the switch into the room itself, and every copy opens its own door.</figcaption>
+        </figure>
       </div>
     </section>
 
-    <section id="trust">
-      <p class="kicker">Validation</p>
-      <h2 class="sec">The Editor Tells You When A Pointer Breaks</h2>
+    <section id="troubleshooting">
+      <p class="kicker">Troubleshooting</p>
+      <h2 class="sec">When A Ref Breaks</h2>
       <p>
-        The plugin plugs into Unreal's own "Validate Assets" check. Run it on a level, or turn on
-        validate-on-save. It reports anything that can't work: a switch pointing at something
-        that was deleted, a door that lost its tag, or a pointer at the wrong kind of thing.
+        A ref can stop resolving for three reasons: its target is gone, its target lost its Tether
+        component, or its target was copied and got a new ID. Each video shows what the editor
+        tells you, and the fix.
       </p>
-      <figure>
-        <img src="img/06-validation.png" alt="The Message Log showing a Data Validation warning: the Switch has a ref to Door (Wing_A), which matches no actor in the loaded levels.">
-        <figcaption>Validation says what's wrong and which actor it's on. Here the door's room was deleted after the switch was pointed at it. Click the actor name to jump to it.</figcaption>
-      </figure>
-    </section>
-
-    <section id="more">
-      <p class="kicker">Going Further</p>
-      <h2 class="sec">Where To Go Next</h2>
-      <ul>
-        <li><a href="tutorial.html">Getting Started</a>: every step with a screenshot, plus what to
-          do when something looks wrong.</li>
-        <li><a href="videos.html">Videos</a>: short tutorials recorded in the editor, and what to do
-          when a ref breaks.</li>
-        <li><a href="tech.html">How It Works</a>: the plain-language version first, then the
-          engineering details for anyone who wants them.</li>
-        <li><a href="diagram.html">Wiring Diagram</a>: an interactive map of the pieces, for
-          engineers.</li>
-        <li><a href="reference.html">Reference</a>: the full technical reference, from the identity
-          arithmetic to the cook.</li>
-      </ul>
+      <div class="video-grid">
+        <figure class="video">
+          <video controls preload="none" playsinline poster="video/06-when-a-target-is-deleted.jpg" src="video/06-when-a-target-is-deleted.mp4"></video>
+          <figcaption><b>When a target is deleted.</b> What "not loaded" means, how Validate Assets reports it, and the fix.</figcaption>
+        </figure>
+        <figure class="video">
+          <video controls preload="none" playsinline poster="video/07-when-a-target-loses-its-tag.jpg" src="video/07-when-a-target-loses-its-tag.mp4"></video>
+          <figcaption><b>When a target loses its tag.</b> Remove the Tether component and the ref stops resolving. Add it back and it works again.</figcaption>
+        </figure>
+        <figure class="video">
+          <video controls preload="none" playsinline poster="video/08-when-an-actor-gets-a-new-id.jpg" src="video/08-when-an-actor-gets-a-new-id.mp4"></video>
+          <figcaption><b>When an actor gets a new ID.</b> Break, Move to Level, and Create Level Instance copy actors. Refs to them need picking again.</figcaption>
+        </figure>
+      </div>
     </section>
 
     <footer>
