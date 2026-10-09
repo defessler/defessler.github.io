@@ -183,6 +183,7 @@
       <a href="index.html">Overview</a>
       <a href="tutorial.html" aria-current="page">Getting Started</a>
       <a href="tech.html">How It Works</a>
+      <a href="reference.html">Reference</a>
       <a href="diagram.html">Wiring Diagram</a>
     </nav>
   </div>
@@ -237,7 +238,7 @@
       <p>
         If the door is a Blueprint, add the component there instead and every door you place
         gets it. If you're on the engineering side, the component is
-        <code>UStableActorIdComponent</code>, and the <a href="tech.html">How It Works</a> page
+        <code>UStableActorIdComponent</code>. The <a href="tech.html">How It Works</a> page
         has the C++.
       </p>
     </section>
@@ -289,6 +290,14 @@
         around yet, because its part of the world hasn't loaded, the node gives you nothing. Try
         again later.
       </p>
+      <figure>
+        <img src="img/09-bp-search.png" alt="The Blueprint node search box with Get Actor From Stable typed in, and the Get Actor from Stable Actor Ref node listed under Stable Actor ID.">
+        <figcaption>Right-click in the graph and search for it. It sits under "Stable Actor ID".</figcaption>
+      </figure>
+      <figure>
+        <img src="img/10-bp-node.png" alt="The Get Actor from Stable Actor Ref node with a Stable Ref input, an Actor Class input set to Actor, and a Return Value output.">
+        <figcaption>The node. Plug the ref into "Stable Ref", pick the class, and use "Return Value".</figcaption>
+      </figure>
       <p>
         In C++ it's <code>UStableActorIdLibrary::ResolveStableActorRef&lt;ADoor&gt;(this, TargetDoor)</code>.
       </p>
@@ -302,6 +311,10 @@
         switch whose door was moved to another level or deleted. The fix is the same every time.
         Open the dropdown and pick again.
       </p>
+      <figure>
+        <img src="img/08-validate-menu.png" alt="The Content Browser context menu on the Demo level, filtered to Validate Assets and Validate Assets and Dependencies.">
+        <figcaption>Right-click the level in the Content Browser. Typing "Validate" in the menu's search box narrows it to the two entries.</figcaption>
+      </figure>
       <figure>
         <img src="img/06-validation.png" alt="The Message Log with a Data Validation warning: Switch_0 has a ref to Door (Wing_A), which matches no actor in the loaded levels.">
         <figcaption>What a broken pointer looks like when validation finds it. This one's room was deleted. Click "Switch_0" to jump to the switch.</figcaption>
@@ -337,12 +350,9 @@
 
     <footer>
       <p>
-        StableActorId is open source. The code, the usage reference, and the engineering records
-        live in the repository. The
-        <a href="https://github.com/defessler/StableActorId-UnrealPlugin/wiki">wiki</a> is the
-        deep technical reference.
+        The <a href="reference.html">Reference</a> page is the full technical reference, and the
+        <a href="diagram.html">wiring diagram</a> shows how the pieces connect.
       </p>
-      <p><a href="diagram.html">Interactive wiring diagram</a></p>
     </footer>
 
   </main>
