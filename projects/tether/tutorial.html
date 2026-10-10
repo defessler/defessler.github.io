@@ -249,7 +249,7 @@
         room is three level instances of the same room.
       </p>
       <figure>
-        <img src="img/00-editor.jpg" alt="The whole Unreal editor: the viewport on the left shows three rooms and a switch, the Outliner at the top right lists Wing_A, Wing_B, and Wing_C with a Door inside each, and the Details panel below it shows the selected Switch.">
+        <img src="img/00-editor.jpg" alt="The whole Unreal editor: the viewport on the left shows three rooms and a switch, the Outliner at the top right lists the level's actors, and the Details panel below it shows the selected Switch with its Target Door row.">
         <figcaption>The demo level. The Outliner (top right) lists the three rooms, each with its own Door. The Details panel (bottom right) is where the pointing happens.</figcaption>
       </figure>
     </section>
@@ -291,7 +291,7 @@
         row that starts out saying "None".
       </p>
       <figure>
-        <img src="img/02-ref-row-none.png" alt="The Details panel of the Switch. A row labelled Target Door reads None, with a dropdown arrow and a clear button beside it.">
+        <img src="img/02-ref-row-none.png" alt="The Details panel of the Switch. A row labelled Target Door reads None, with a dropdown arrow, an eyedropper, a select button, and a clear button beside it.">
         <figcaption>An empty ref. The dropdown is where you pick the door.</figcaption>
       </figure>
       <p>
@@ -324,6 +324,12 @@ TArray&lt;FTetherRef&gt; ExtraDoors;</code></pre>
         Click a door and the row fills in. It shows the door's name first, and then, in dimmer
         text, the room it's in. Only the door you picked is the target. The other two copies are
         untouched. The ✕ button clears it back to "None".
+      </p>
+      <p>
+        You can also pick straight from the level. Click the eyedropper beside the dropdown, then
+        click the door in the viewport. It takes the door itself, even inside a placed room, where
+        a normal click would select the whole room. Escape cancels it. The button next to the
+        eyedropper does the reverse: it selects the door you picked and moves the camera to it.
       </p>
       <figure>
         <img src="img/04-ref-row-picked.png" alt="The Target Door row now reads Door, then Wing_A in dimmer text.">
@@ -426,7 +432,7 @@ TArray&lt;FTetherRef&gt; ExtraDoors;</code></pre>
         same checks run when you save, if your project validates on save.
       </p>
       <figure>
-        <img src="img/08-validate-menu.png" alt="The Content Browser context menu on the Demo level, filtered to Validate Assets and Validate Assets and Dependencies.">
+        <img src="img/08-validate-menu.png" alt="The Content Browser context menu with Validate typed in its search box, narrowed to Validate Assets and Validate Assets and Dependencies.">
         <figcaption>Right-click the level in the Content Browser. Typing "Validate" in the menu's search box narrows it to the two entries.</figcaption>
       </figure>
       <figure>

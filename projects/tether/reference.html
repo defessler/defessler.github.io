@@ -491,11 +491,18 @@
         <code>FTetherRefCustomization</code> replaces the default struct layout for every
         <code>FTetherRef</code> property with one row:
       </p>
-      <pre><code>  Target Door      [ BP_Door  Wing_A.Room_3      ▾ ] [✕]</code></pre>
+      <pre><code>  Target Door      [ BP_Door  Wing_A.Room_3      ▾ ] [eyedropper] [select] [✕]</code></pre>
       <ul>
         <li>The label - The actor the ref points at. Check out the next section for where it comes
           from.</li>
         <li>▾ - Opens the actor picker.</li>
+        <li>The eyedropper - Click it, then click an actor in a level viewport. It picks the actor
+          right under the cursor, so it reaches a door inside a placed room, where an ordinary
+          viewport click selects the whole room. A click on an actor the property won't take is
+          ignored. Escape, or a click outside the viewport, cancels it.</li>
+        <li>Select - Selects the target in the level and moves the viewport camera to it. A target
+          inside a level instance selects the level instance. It's greyed out when the target isn't
+          loaded.</li>
         <li>✕ - Clears the ref back to "None".</li>
       </ul>
       <p>
@@ -503,7 +510,7 @@
         hand editing.
       </p>
       <figure>
-        <img src="img/04-ref-row-picked.png" alt="The Target Door row in the Details panel reading Door, then Wing_A in dimmer text, with a dropdown arrow and a clear button.">
+        <img src="img/04-ref-row-picked.png" alt="The Target Door row in the Details panel reading Door, then Wing_A in dimmer text, with a dropdown arrow, an eyedropper, a select button, and a clear button.">
         <figcaption>The row after a pick. The door's name, then the room it's in.</figcaption>
       </figure>
       <h3>The label</h3>
@@ -549,8 +556,9 @@
         <figcaption>Three placements of one room, each with its own door to pick.</figcaption>
       </figure>
       <p>
-        Note: There's no eyedropper. Clicking level-instance content in the viewport selects the
-        whole level instance. The outliner is the reliable way in.
+        Note: The eyedropper and the picker apply the same test, so both offer the same actors.
+        The eyedropper only sees what the viewport draws. For a target that's hidden or behind
+        something else, the picker is the easier way in.
       </p>
       <h3>Relative or absolute</h3>
       <p>
