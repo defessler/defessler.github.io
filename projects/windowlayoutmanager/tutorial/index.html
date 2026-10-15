@@ -363,7 +363,7 @@
           <p class="caption">Hovering a profile shows a card with a scaled map of where its windows land, before you commit to anything.</p>
           <ul>
             <li>Load - Puts every captured window back, even after apps restarted, titles changed, or Windows shoved everything onto one screen. The matcher re-finds windows by process, class, title, owner, and position.</li>
-            <li>Update - Re-captures the current arrangement into the selected profile. Hotkey, history, per-window colours, "recognise by" rules, and Virtual Windows all survive.</li>
+            <li>Re-capture - Replaces the selected profile's saved windows with the ones open now. Hotkey, history, per-window colours, "recognise by" rules, and Virtual Windows all survive. (It was called Update before dev.127; the <kbd>u</kbd> key is the same.)</li>
             <li>Starting windows - Explorer folders and consoles don't survive a restart, so they start when missing by default: Explorer in the same folder, a console where it was working. The choice lives on the Virtual Windows page's member rows: use the window that's open, start one if none is, or always start a new one. Any app can be set to start too, from the program its window was saved from. Tick "App default" beside a member's choice and every window of that app inherits it, unless a window says otherwise. A window started fresh never takes over one that was already open.</li>
             <li>Load details - A per-window report of the last load: what matched, what moved, what was missing.</li>
             <li>A Load is one pass. It's finished when it returns, and nothing keeps moving windows afterwards. An app that opens slowly? Press the hotkey again once it settles.</li>
@@ -383,7 +383,7 @@
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial display</span></p>
           <h2>Display Zoom, Resolution &amp; Arrangement</h2>
           <p>A profile can set your display scaling (the percentage in Settings &rarr; System &rarr; Display that everyone calls zoom), your resolution, and where your monitors sit, before it puts your windows back. Click the <strong>Display</strong> chip on any profile.</p>
-          <div class="shot video" data-v="img/v/display.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/12-display-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/12-display-editor.png" alt="Display editor: the monitor picker, with per-monitor scaling, orientation, resolution and position" width="900" height="720" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/12-display-editor.png"></video></div>
+          <div class="shot video" data-v="img/v/display.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/12-display-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/12-display-editor.png" alt="Display editor: the monitor picker, with per-monitor scaling, orientation, resolution and position" width="760" height="720" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/12-display-editor.png"></video></div>
           <p class="caption">Every dropdown is filled from what Windows reports for that monitor. Nothing is hardcoded.</p>
           <p>Displays are named by where they are and what size they run ("Left 4K", "Right 1080p"), because Windows reports the same "Generic PnP Monitor" for nearly every one. A virtual display says so.</p>
           <ul>
@@ -420,13 +420,13 @@
           <p>A mode your display doesn't currently offer is still saved, flagged <em>not offered yet</em>, and applies the moment the driver starts listing it. That matters for virtual displays, whose mode lists change with what the driver has been told about.</p>
 
           <h3>Custom Resolutions</h3>
-          <p>A virtual display only offers what its driver knows about. WLM names the driver behind yours: Parsec, Apollo, spacedesk, the community Virtual Display Driver, a Remote Desktop session, a VM's adapter. Parsec is the only one that publishes a way for another app to add resolutions: on a Parsec display, <strong>Custom resolutions</strong> under the list registers two of them behind one administrator prompt, and they show up after a disconnect and reconnect. On any other virtual display the same button reads <strong>About this display</strong> and says who can change the list: spacedesk takes it from the client device, Apollo builds its display to match each stream, the community driver reads a settings file of its own.</p>
-          <p>Select that one display on its own and the button is there; where one driver runs several displays it's on any of them. With none of that driver's displays up it appears only where a profile asks for a size the driver doesn't list, which is how you register a size before the next session.</p>
-          <div class="shot"><a href="img/13-display-virtual.png" target="_blank" rel="noopener" title="Open full size"><img src="img/13-display-virtual.png" alt="The Custom resolutions dialog, with the sizes WLM registered and the ones the driver owns" width="900" height="720" loading="lazy"></a></div>
-          <p class="caption">The rows WLM didn't write are read-only, marked with a dash instead of a slot number. Parsec rewrites those itself on every connect.</p>
+          <p><strong>Custom resolutions</strong> under the list is a list of sizes of your own. Add one and it is in every display's resolution picker straight away, marked <em>custom</em>, so a profile can ask for it. A display only switches to a size its driver offers, so until the driver lists it the profile keeps the choice, flags it <em>not offered yet</em>, and applies it the moment it can. That works on an ordinary monitor as well as a virtual one.</p>
+          <p>Registering a size with the driver is a second, optional step in the same dialog. WLM names the driver behind a virtual display: Parsec, Apollo, spacedesk, the community Virtual Display Driver, a Remote Desktop session, a VM's adapter. Parsec is the only one that publishes a way for another app to add resolutions, so with one Parsec display selected each row gets a <strong>register</strong> tick, capped at the two slots Parsec leaves free, and <strong>Register</strong> writes the ticked ones behind one administrator prompt. They show up after a disconnect and reconnect. The dialog says who owns the list on the other drivers: spacedesk takes it from the client device, Apollo builds its display to match each stream, the community driver reads a settings file of its own.</p>
+          <div class="shot"><a href="img/13-display-virtual.png" target="_blank" rel="noopener" title="Open full size"><img src="img/13-display-virtual.png" alt="The Custom resolutions dialog: a size of your own with its register tick, and the sizes Parsec sets itself" width="760" height="720" loading="lazy"></a></div>
+          <p class="caption">The rows Parsec writes itself are read-only, marked with a dash instead of a number. It rewrites those on every connect.</p>
           <p>Two limits worth knowing:</p>
           <ul>
-            <li><strong>They won't appear in Parsec's own resolution picker.</strong> That list is fixed. Apply the resolution from WLM, or set Parsec's host Resolution to "Keep Host Resolution" so it stops overriding what WLM sets.</li>
+            <li><strong>Registered sizes won't appear in Parsec's own resolution picker.</strong> That list is fixed. Apply the resolution from WLM, or set Parsec's host Resolution to "Keep Host Resolution" so it stops overriding what WLM sets. The dialog has a "Why" line that says the same.</li>
             <li><strong>Parsec owns three of the five slots.</strong> It rewrites slots 2, 3 and 4 on every connect with your client's screen sizes. WLM only touches 0 and 1.</li>
           </ul>
 
@@ -439,7 +439,7 @@
           <h3>Turning It On, and What It Can't Promise</h3>
           <p>The kill switch is under Settings &rarr; Display, on by default; turn it off and a profile's display step is skipped, with WLM saying that's why. Resolution uses a documented Windows API. Scaling doesn't, because Windows exposes none: WLM uses the same internal call the Settings app does, behind a capability check, and if your build stops accepting it the scaling controls switch off and say why while resolution carries on. A percentage your monitor can't do is clamped, and you're told to what. After every change WLM re-reads the display to check the value landed, which catches a Windows 11 24H2 bug where a resolution change on a virtual display reports success while nothing happens. Some virtual adapters, Parsec's among them, report a scaling range that disagrees with what Windows is doing; there the editor shows both numbers and says the control may not behave.</p>
           <div class="shot video" data-v="img/v/display.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/06-settings-display.png" target="_blank" rel="noopener" title="Open full size"><img src="img/06-settings-display.png" alt="The Display tab in Settings, with the kill switch" width="1240" height="820" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/06-settings-display.png"></video></div>
-          <p class="caption">Settings &rarr; Display: the kill switch, the nudge step, and nothing else to go wrong.</p>
+          <p class="caption">Settings &rarr; Display: the kill switch, the nudge step, and the button that resets the window to its default size.</p>
         </section>
 
         <section id="visual">
@@ -522,8 +522,8 @@
           <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial editing</span></p>
           <h2>Precise Edits, Undo &amp; History</h2>
           <p>"EDIT" on a list row or "Edit" under the canvas opens exact fields for any window: desktop, monitor, state, colour, and pixel-perfect position and size.</p>
-          <div class="shot video" data-v="img/v/editor.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/03-window-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/03-window-editor.png" alt="Per-window editor, open in its own window" width="560" height="514" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/03-window-editor.png"></video></div>
-          <p>Every dialog in WLM is a real window: drag it onto a second monitor, resize it, find it in alt-tab. It opens at the size its content needs and won't shrink below that, and the app is disabled while it's up, so a stray keystroke can't land behind it. Settings and the hotkey capture stay inside the app window; Custom resolutions and Earlier arrangements draw inside the display editor's window rather than opening a third.</p>
+          <div class="shot video" data-v="img/v/editor.mp4"><span class="vid-hint">▶ hover to play</span><a href="img/03-window-editor.png" target="_blank" rel="noopener" title="Open full size"><img src="img/03-window-editor.png" alt="Per-window editor, open in its own window" width="560" height="522" loading="lazy"></a><video muted loop playsinline preload="none" poster="img/03-window-editor.png"></video></div>
+          <p>Every dialog in WLM is a real window: drag it onto a second monitor, find it in alt-tab. It opens at the size its content needs, capped at 90% of the app window, and is not resizable. The app window opens at 1280 by 720, which every dialog is laid out to fit, and Settings &rarr; Display has a button that puts it back there. The app is disabled while a dialog is up, so a stray keystroke can't land behind it. Settings and the hotkey capture stay inside the app window; Custom resolutions and Earlier arrangements draw inside the display editor's window rather than opening a third.</p>
 
           <h3>How a Window Gets Recognised</h3>
           <p>Apps rewrite their titles as you work, and a window saved with an exact title stops being found the moment it says something else. "Recognise by" at the bottom of the edit dialog lets each window choose:</p>
@@ -535,7 +535,7 @@
           <p>The looser two require the window class and type to match instead, and the rule also applies to the last-resort match on the app alone.</p>
           <ul>
             <li><kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd> - Undo and redo any edit, with a labelled trail.</li>
-            <li><kbd>Ctrl+H</kbd> or "History" - Browse and restore full saved versions of the profile. Every Update keeps a snapshot.</li>
+            <li><kbd>Ctrl+H</kbd> or "History" - Browse and restore full saved versions of the profile. Every Re-capture keeps a snapshot.</li>
             <li>A profile file that can't be read is named in a row under the list rather than left out. Saving its name again carries the hotkey, display settings and window edits over from its newest snapshot, so the History is where to look if a profile ever comes back blank.</li>
           </ul>
         </section>
