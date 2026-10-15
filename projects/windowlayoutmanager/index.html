@@ -627,7 +627,7 @@
         <p class="prompt-line"><span class="u">wlm</span><span class="p">:~</span>$ <span class="cmd">wlm --tutorial</span></p>
         <div class="tutorial-card">
           <div class="tut-text">
-            <div>New here? The tutorial walks through every feature (profiles, the visual editor, auto-activation, hold mode) in about ten minutes.</div>
+            <div>New here? The tutorial walks through every feature (profiles, the visual editor, virtual windows, display settings) in about ten minutes.</div>
             <div class="tut-fine">// 17 topics · real screenshots · no fluff</div>
           </div>
           <a class="btn-tutorial" href="tutorial/">open the tutorial</a>
@@ -652,12 +652,11 @@
         <span class="mn">───┴───</span>              <span class="mn">──┴──</span></pre>
           <ul>
             <li><strong>Layout profiles</strong> - Capture every window's position, size, and state. Restore with one click, a global hotkey, or the CLI.</li>
-            <li><strong>Monitor-aware</strong> - Profiles bind to monitor sets and auto-activate when your displays change: docking, streaming with a virtual display, plugging into a projector.</li>
+            <li><strong>Monitor-aware</strong> - Profiles remember the monitor set they were saved on, so a layout for the docked desk and one for the laptop alone each put windows back on the right screen. A profile can also set each monitor's zoom, resolution and arrangement before it places anything.</li>
             <li><strong>Smart re-matching</strong> - Tries to find the right windows again even after apps restart, titles change, or Windows shoves everything onto one screen.</li>
             <li><strong>Virtual desktops</strong> - Windows go back to the desktop they were saved on.</li>
-            <li><strong>Hold mode</strong> - Pin a layout live. If an app moves its window, it gets put back.</li>
             <li><strong>Visual editor</strong> - Drag windows around a minimap of your monitors, with snapping, undo/redo, and per-window history.</li>
-            <li><strong>Virtual Windows</strong> - Drag a window onto a container and dock guides show exactly where it'll land, the way an IDE docks a tool window, or add one from the container's own panel. Undock is on that panel too, and hands the window back the size it walked in with. Move the container and every docked window goes with it.</li>
+            <li><strong>Virtual Windows (beta)</strong> - Drag a window onto a container and dock guides show exactly where it'll land, the way an IDE docks a tool window, or add one from the container's own panel. Undock is on that panel too, and hands the window back the size it walked in with. Move the container and every docked window goes with it.</li>
             <li><strong>Scriptable</strong> - <code>--load="Profile"</code> from the command line, <code>wlm://</code> links, and the taskbar jump list.</li>
             <li><strong>Self-updating</strong> - Checks this page's feed, verifies the download by size + sha256, and swaps itself in place.</li>
           </ul>
