@@ -337,7 +337,7 @@
           <ul>
             <li>Load - Puts every captured window back, even after apps restarted, titles changed, or Windows shoved everything onto one screen. The matcher re-finds windows by process, class, title, owner, and position.</li>
             <li>Re-capture - Replaces the selected profile's saved windows with the ones open now. Hotkey, history, per-window colours, "recognise by" rules, and Virtual Windows all survive. (It was called Update before dev.127; the <kbd>u</kbd> key is the same.)</li>
-            <li>Windows that aren't running - A Load places what's open and reports the rest as missing in Load details. Starting an app that isn't running (Explorer in the same folder, a console where it was working) is parked while docking is being hardened; the option left the Virtual Windows page after dev.127 and comes back once that settles.</li>
+            <li>Windows that aren't running - A Load places what's open and reports the rest as missing in Load details. Starting an app that isn't running (Explorer in the same folder, a console where it was working) is parked while docking is being hardened; the option left the Virtual Windows page in v1.2.0-474 and comes back once that settles.</li>
             <li>Load details - A per-window report of the last load: what matched, what moved, what was missing.</li>
             <li>A Load is one pass. It's finished when it returns, and nothing keeps moving windows afterwards. An app that opens slowly? Press the hotkey again once it settles.</li>
           </ul>
