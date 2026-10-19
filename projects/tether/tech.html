@@ -601,6 +601,44 @@ if (ADoor* Door = UTetherLibrary::ResolveTetherRef&lt;ADoor&gt;(this, TargetDoor
           </tbody>
         </table>
       </div>
+      <h3>Refused, or flagged, before it can bite</h3>
+      <p>
+        The rule underneath is that anything you can pick has to resolve in the game. A bug hunt on
+        2026-10-18 ran eighteen rounds of fresh testers against that rule, each writing narrow tests
+        for real editor and gameplay situations. These are the edges it turned up, and what Tether
+        does about each one now.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Case</th><th>What Tether does</th><th>Why</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>The level instance actor of an Embedded room in a World Partition map</td>
+              <td>Not pickable. <code>SetPlacementId</code> on it warns and sets nothing. A saved id on one is ignored, and the checks say to clear it.</td>
+              <td>World Partition flattens an Embedded room into cells, so that actor isn't in the game at all. The room's doors are still pickable.</td></tr>
+            <tr><td>An actor with "Is Editor Only Actor" ticked, or whose only Tether component is editor only</td>
+              <td>Not pickable. A ref already pointing at one is an error in the checks.</td>
+              <td>The cook strips both. The component case worked in Play In Editor and failed only in the packaged game.</td></tr>
+            <tr><td>An actor with "Net Load on Client" off</td>
+              <td>Pickable, with a warning in the checks.</td>
+              <td>Each client throws its own copy away, so a ref resolves on the server only.</td></tr>
+            <tr><td>An absolute ref inside a level you reuse as a room</td>
+              <td>A warning in the map that places the room, saying to re-pick it.</td>
+              <td>It names one placement, so it can't follow the room into each copy. A pick made the ordinary way is relative and follows every copy.</td></tr>
+            <tr><td>An id game code gave one actor, copied or placed twice</td>
+              <td>A copy made in the editor gets its own id. Two placements sharing one are an error in the checks, and both resolve to nothing.</td>
+              <td>An id names one placement. Copies that share it can't be told apart.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Building a room with the room open as the map, then placing it five times, works the way
+        you'd hope: each copy's switch drives its own door. The one thing to watch is a ref picked
+        with several actors selected, which comes out absolute and fits only the room as you
+        authored it. The room itself checks clean while it's open as the map, so the warning shows
+        up once you place it and check the map it's in.
+      </p>
     </section>
 
     <section id="limits">
