@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tether: Inside Tether</title>
-<meta name="description" content="A plain-language explanation of Tether first, then the engineering details: identity, resolution, packaged builds, validation, and a deep dive into the arithmetic, the cook, and the measurements.">
+<meta name="description" content="A plain-language explanation of Tether first, then the engineering details: identity, resolution, packaged builds, validation, and a deep dive into the arithmetic, the cook, and the measurements, and a comparison with every other way Unreal can point at an actor.">
 <style>
   :root {
     --bg: #F4F5F2; --panel: #FFFFFF; --ink: #1B222B; --muted: #5A6472;
@@ -138,6 +138,16 @@
   pre code { background: none; border: 0; padding: 0; font-size: inherit; }
   .cmt { color: var(--muted); }
 
+  .table-wrap { overflow-x: auto; margin: 0 0 18px; max-width: 100%; }
+  table { border-collapse: collapse; font-size: 14px; line-height: 1.45; min-width: 100%; }
+  th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--chipbg); font-weight: 600; }
+  td { background: var(--panel); }
+  td.hit { color: var(--c1); font-weight: 600; }
+  td.miss { color: var(--broken); font-weight: 600; }
+  td.skip { color: var(--muted); }
+  tr.total td { background: var(--chipbg); font-weight: 600; }
+
   .callout {
     border: 1px solid var(--line); border-left-width: 3px; border-left-color: var(--c3);
     border-radius: 4px; padding: 13px 17px; margin: 0 0 16px; background: var(--panel); max-width: 920px;
@@ -215,6 +225,7 @@
       <li><a href="#pieces">The Pieces</a></li>
       <li><a href="#engineers">The Technical Version</a></li>
       <li><a href="#deep">The Details Under The Details</a></li>
+      <li><a href="#compare">Compared With The Rest</a></li>
       <li><a href="#limits">Limits</a></li>
     </ol>
   </nav>
@@ -341,7 +352,8 @@ if (ADoor* Door = UTetherLibrary::ResolveTetherRef&lt;ADoor&gt;(this, TargetDoor
         Otherwise it's the engine's level-instance guid, which the editor folds from the actors
         instead of reading, since reading it registers the level. A level loaded as a renamed copy
         of its package, which is what <code>ULevelStreamingDynamic::LoadLevelInstance</code> makes,
-        takes a guid from its unique package name instead. Otherwise there is no container.
+        takes a guid from the name the game gave it instead. Without one, it takes a guid from its
+        source level and the spot it was loaded at. Otherwise there is no container.
       </p>
       <p>
         The owner rule exists for one shape: a Standalone level instance inside an Embedded one.
@@ -435,7 +447,160 @@ if (ADoor* Door = UTetherLibrary::ResolveTetherRef&lt;ADoor&gt;(this, TargetDoor
         <li>Editor edits behave: removing and re-adding the component, duplicating and deleting
           the door or the room, undo, redo, commit, swapping the world asset, and break. Every one
           gives null or the original, never a copy.</li>
+        <li>Saved and loaded: every door a ref hit on all five maps, saved to a slot, then loaded
+          by a new process, in the editor and from a packaged build. Each build made 330 lookups,
+          and all 330 hit. The first run had 4 wrong, in the runtime-copy case below, and the
+          same day's fix closed them.</li>
       </ul>
+    </section>
+
+    <section id="compare">
+      <p class="kicker">Compared</p>
+      <h2 class="sec">Tether And The Other Ways To Point At An Actor</h2>
+      <p>
+        Unreal has plenty of ways to point at an actor. Most were built for something else, and
+        they hold up until the target sits inside a level instance or the game gets packaged. The
+        ones that can name a single placement went on the same probe actor as a tether ref, all
+        aimed at the same door, across five test maps. Each ran in the editor and from a packaged
+        Win64 build, judged by where the resolved actor actually was. The rest we read from the
+        5.8 engine source and didn't probe.
+      </p>
+      <h3>Measured, in a packaged build</h3>
+      <p>
+        An Embedded level instance gets flattened into World Partition cells when it cooks. A
+        Standalone one, and a classic sublevel, cook as levels of their own. That split is where
+        every path-based option stops working.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Case</th><th>Tether ref</th><th>Editor Path</th><th>Universal Object Locator</th><th>Soft pointer</th><th>Hard pointer</th><th><code>FActorContainerID</code> by hand</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Control, same level</td><td class="hit">Hit</td><td class="hit">Hit</td><td class="hit">Hit</td><td class="hit">Hit</td><td class="hit">Hit</td><td class="hit">Hit</td></tr>
+            <tr><td>World Partition Embedded room</td><td class="hit">Hit</td><td class="hit">Hit</td><td class="hit">Hit</td><td class="miss">Miss</td><td class="miss">Miss</td><td class="hit">Hit</td></tr>
+            <tr><td>World Partition Standalone room</td><td class="hit">Hit</td><td class="miss">Miss</td><td class="miss">Miss</td><td class="miss">Miss</td><td class="miss">Miss</td><td class="miss">Miss</td></tr>
+            <tr><td>Embedded room in an Embedded wing</td><td class="hit">Hit</td><td class="hit">Hit</td><td class="hit">Hit</td><td class="miss">Miss</td><td class="miss">Miss</td><td class="hit">Hit</td></tr>
+            <tr><td>Standalone room in an Embedded wing</td><td class="hit">Hit</td><td class="miss">Miss</td><td class="miss">Miss</td><td class="miss">Miss</td><td class="miss">Miss</td><td class="miss">Miss</td></tr>
+            <tr><td>Three deep, all Embedded</td><td class="hit">Hit</td><td class="hit">Hit</td><td class="hit">Hit</td><td class="miss">Miss</td><td class="miss">Miss</td><td class="hit">Hit</td></tr>
+            <tr><td>Three deep, Standalone wing in the middle</td><td class="hit">Hit</td><td class="miss">Miss</td><td class="miss">Miss</td><td class="miss">Miss</td><td class="miss">Miss</td><td class="miss">Miss</td></tr>
+            <tr><td>Classic room, wing, and tower</td><td class="hit">Hit</td><td class="miss">Miss</td><td class="miss">Miss</td><td class="miss">Miss</td><td class="miss">Miss</td><td class="miss">Miss</td></tr>
+            <tr><td>A referencer inside the room, at its own door, 18 placements</td><td class="hit">Hit</td><td class="hit">Hit</td><td class="hit">Hit</td><td class="hit">Hit</td><td class="hit">Hit</td><td class="skip">Not tried</td></tr>
+            <tr class="total"><td>Hits in the packaged build</td><td>9 of 9</td><td>5 of 9</td><td>5 of 9</td><td>2 of 9</td><td>2 of 9</td><td>4 of 8</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Nothing in any of those runs resolved to the wrong actor. A miss is always null. Editor
+        Paths and the locator also need <code>EditorPaths.Enabled</code> set while you author and
+        cook, and the locator has to be built in code.
+      </p>
+      <h3>What Tether adds over each one</h3>
+      <p>
+        The first five rows are the measured ones above. The rest come from reading engine source.
+        The last column is the honest version: where an option already does the job, it says so.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Option</th><th>What it holds</th><th>Where it falls short</th><th>What Tether adds</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Soft pointer (<code>TSoftObjectPtr</code>)</td><td>An object path</td>
+              <td>Misses everything inside a level instance in a packaged build, Embedded included, since the cook rewrites the path.</td>
+              <td>Every level-instance case, 7 more of the 9 rows. For an actor in the same level that never gets instanced, a soft pointer is already fine and needs no component.</td></tr>
+            <tr><td>Hard pointer (<code>TObjectPtr</code>, a Level Blueprint reference)</td><td>A direct reference</td>
+              <td>Can't cross from one level to another at all, so it never reaches into a level instance from outside.</td>
+              <td>The same 7 rows, plus refs across levels. Inside one level, a hard pointer is simpler.</td></tr>
+            <tr><td>Editor Path</td><td>A path with the level-instance chain in it, cooked to a resolver</td>
+              <td>The resolver is editor-only. World Partition cooks a replacement for Embedded placements and nothing else.</td>
+              <td>The 4 Standalone and classic rows, and no engine flag. On Embedded content the two are level.</td></tr>
+            <tr><td>Universal Object Locator</td><td>A path fragment with the same chain</td>
+              <td>Same resolver, same line. Needs the flag and code to build.</td>
+              <td>Same 4 rows, plus a picker in the Details panel.</td></tr>
+            <tr><td><code>FActorContainerID</code> by hand</td><td>The engine's container fold, resolved through the world</td>
+              <td>The chain it folds isn't there for Standalone and classic content once cooked.</td>
+              <td>Tether uses the same fold, so the 4 Embedded rows match. It adds the bake and the capture for the other 4, and the relative form for the in-room case.</td></tr>
+            <tr><td><code>ActorGuid</code> or <code>ActorInstanceGuid</code>, read directly</td><td>The engine's own ids</td>
+              <td><code>ActorGuid</code> is editor-only data. The instance guid is released when components register, so a packaged game can't read it.</td>
+              <td>This is the gap Tether exists for, and it closes it fully. The cook bakes the instance guid into the actor, and the read folds back what the bake can't see.</td></tr>
+            <tr><td>Save-system keys: the actor's name, or a guid property you add (the Savior and Enhanced Save System pattern)</td><td>A name, or a guid minted once per actor</td>
+              <td>A minted guid lives in the level asset, so every placement of a room loads the same one. This project shipped that design first and measured exactly that. A name is the same in each copy's own level and changes on rename.</td>
+              <td>A per-placement id the engine already writes, so copies differ with nothing to mint. A tether ref makes a good save key. See the note on runtime copies below.</td></tr>
+            <tr><td>Lazy pointer (<code>TLazyObjectPtr</code>)</td><td>A guid stored with the object in its package</td>
+              <td>One guid per object in its package, so placements of a room share it. Not probed.</td>
+              <td>Copies told apart, a picker, and validation.</td></tr>
+            <tr><td>Name or label lookup</td><td>The actor's object name or editor label</td>
+              <td>Breaks on rename. Labels don't exist in Shipping builds. Copies share names in their own levels.</td>
+              <td>Rename-proof, copies told apart, works in Shipping. Tether keeps the label only for display.</td></tr>
+            <tr><td>Actor tags and Gameplay Tags</td><td>Names on the actor</td>
+              <td>Every copy of a room carries the tags it was saved with, so a tag finds a group, never one placement.</td>
+              <td>Nothing to replace. Use tags for "all the doors" and a tether ref for "this door". They sit fine on the same actor.</td></tr>
+            <tr><td>Get All Actors Of Class, first result</td><td>Nothing</td>
+              <td>Hands back whichever actor comes first.</td>
+              <td>A specific placement, and null rather than a guess.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>In a save game</h3>
+      <p>
+        A tether ref saves like any struct. <code>Tether.SaveGame</code> writes refs to a real slot
+        file, to memory, and through a game's actor-state archive, then loads them into a fresh
+        world. They come back whole and resolve to the same placements. That test also found the
+        one real gap: an actor-state save writes only fields flagged <code>SaveGame</code>, and the
+        ref's fields weren't. They are now.
+      </p>
+      <p>
+        The probe then did it for real. On every map it saved a ref to each door it found three ways,
+        quit, and loaded the slot in a new process, uncooked and packaged. The three ways are a ref
+        made at runtime from the found door, a copy of the authored ref, and the owner's actor state.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Read launch</th><th>Saved records</th><th>Lookups</th><th>Hit</th><th>Miss</th><th>Wrong</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Five maps, same load order</td><td>96</td><td>288</td><td class="hit">288</td><td>0</td><td>0</td></tr>
+            <tr><td><code>WP_Dynamic</code>, copies loaded in reverse, engine-generated names, first run</td><td>7</td><td>21</td><td class="hit">17</td><td>0</td><td class="miss">4</td></tr>
+            <tr><td><code>WP_Dynamic</code>, copies loaded in reverse, engine-generated names, after the fix</td><td>7</td><td>21</td><td class="hit">21</td><td>0</td><td>0</td></tr>
+            <tr><td><code>WP_Dynamic</code>, copies loaded in reverse, fixed names</td><td>7</td><td>21</td><td class="hit">21</td><td>0</td><td>0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Each row is the same in the editor and in the packaged build. The 4 wrong results in the
+        first run were the two doors inside the runtime copies, saved as absolute refs, directly and
+        through actor state. Each came back as the other copy's door. The authored refs in those
+        copies are relative, so they still hit.
+      </p>
+      <div class="callout"><span class="lbl">Note:</span>
+        <p>A level loaded at runtime with <code>LoadLevelInstance</code> gets a package name with a
+        load counter in it, unless you pass <code>OptionalLevelNameOverride</code>. The first run keyed
+        copies on that name, so they traded ids when they loaded in a different order. A saved ref
+        gave the wrong copy's actor rather than null. That's the one wrong result any of these tests has
+        produced. A copy with a generated name now keys on its source level and the spot it was loaded
+        at, which the game picks again next session. A name you pass yourself still wins.</p>
+      </div>
+      <p>
+        Two runtime cases can't be keyed reliably, so Tether refuses them. One is an unnamed copy
+        loaded at the same spot as another unnamed copy of the same level. The other is a World
+        Partition world loaded at runtime with <code>LoadLevelInstance</code>. Making a ref to an
+        actor in either gives an unset ref and a warning, and every resolve into them gives null.
+        The probe loads both on purpose and checks every door, authored ref and runtime ref in
+        them, plus the doors that should still work.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Build</th><th>Checks</th><th>Pass</th><th>Fail</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Editor</td><td>18</td><td class="hit">18</td><td>0</td></tr>
+            <tr><td>Packaged</td><td>18</td><td class="hit">18</td><td>0</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <section id="limits">
@@ -449,6 +614,11 @@ if (ADoor* Door = UTetherLibrary::ResolveTetherRef&lt;ADoor&gt;(this, TargetDoor
           all copies of the door.</li>
         <li>Resolve a ref from the thing that holds it. A relative ref folds onto its owner's
           placement. Resolving it from an actor in another level gives nothing.</li>
+        <li>An absolute ref saved against a level copy loaded at runtime finds it next session
+          when the copy loads at the same spot or under the same name.</li>
+        <li>Refused outright: an unnamed runtime copy sharing its spot with another unnamed copy of
+          the same level, and a World Partition world loaded at runtime. Refs into them can't be
+          made and don't resolve.</li>
       </ul>
     </section>
 

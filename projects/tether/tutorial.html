@@ -138,6 +138,16 @@
   pre code { background: none; border: 0; padding: 0; font-size: inherit; }
   .cmt { color: var(--muted); }
 
+  .table-wrap { overflow-x: auto; margin: 0 0 18px; max-width: 100%; }
+  table { border-collapse: collapse; font-size: 14px; line-height: 1.45; min-width: 100%; }
+  th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--chipbg); font-weight: 600; }
+  td { background: var(--panel); }
+  td.hit { color: var(--c1); font-weight: 600; }
+  td.miss { color: var(--broken); font-weight: 600; }
+  td.skip { color: var(--muted); }
+  tr.total td { background: var(--chipbg); font-weight: 600; }
+
   .callout {
     border: 1px solid var(--line); border-left-width: 3px; border-left-color: var(--c3);
     border-radius: 4px; padding: 13px 17px; margin: 0 0 16px; background: var(--panel); max-width: 920px;
