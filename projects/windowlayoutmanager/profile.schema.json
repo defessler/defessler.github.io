@@ -275,6 +275,11 @@
         "title":       { "type": "string" }
       }
     },
+    "signalRule": {
+      "type": "string",
+      "enum": ["require", "prefer", "ignore"],
+      "description": "'require': the live window must carry the same value, and one that can't be read counts as different. 'prefer': narrows a tie between candidates, ahead of monitor and position. 'ignore': never read for this window. Ignoring document, panel and appId while the title is also ignored is refused, and those three go back to their defaults."
+    },
     "window": {
       "type": "object",
       "required": ["processName", "title", "className", "monitorRole", "relX", "relY", "width", "height", "showCmd"],
@@ -289,6 +294,26 @@
         "isToolWindow":   { "type": "boolean" },
         "onOtherDesktop": { "type": "boolean", "description": "True when this window lived on a non-current virtual desktop at save time." },
         "desktopIndex":   { "type": "integer", "description": "Virtual desktop index. -1 when unknown." },
+        "desktopId":      { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", "description": "The virtual desktop's GUID, which survives desktops being added or removed. The matcher compares this only, never desktopIndex, so a profile from before it existed pairs as it always did." },
+        "identity": {
+          "type": "object",
+          "description": "What the window showed when it was saved, read from sturdier places than its title. Written by a capture, never by the editor. The matcher recognises the window by these before its title.",
+          "additionalProperties": false,
+          "properties": {
+            "document": {
+              "type": "object",
+              "description": "The solution, project, folder or workspace the window had open. Visual Studio and Unreal Editor give it in their command line, VS Code and Rider in their own state files.",
+              "additionalProperties": false,
+              "required": ["kind", "value"],
+              "properties": {
+                "kind": { "type": "string", "enum": ["solution", "project", "folder", "workspace"] },
+                "value": { "type": "string", "maxLength": 1024 }
+              }
+            },
+            "panel": { "type": "string", "maxLength": 200, "description": "Which tool window a floating panel holds, e.g. 'Error List' in Visual Studio or 'Details' in Unreal Editor." },
+            "appId": { "type": "string", "maxLength": 200, "description": "The window's AppUserModelID, when the app set one. Chrome sets one per profile and per app window." }
+          }
+        },
         "ownerInfo":      { "$ref": "#/$defs/ownerInfo", "description": "Identity of the owner top-level window, when this is an owned/tool window." },
         "monitorRole":    { "type": "string", "anyOf": [ { "enum": ["primary", "secondary", "tertiary", "quaternary", "quinary", "senary"] }, { "type": "string", "pattern": "^monitor-[0-9]+$" } ] },
         "windowDpi":      { "type": "integer", "minimum": 0, "description": "Per-window effective DPI at save time, from GetDpiForWindow. 0 = unknown." },
@@ -333,11 +358,15 @@
         },
         "match": {
           "type": ["object", "null"],
-          "description": "How this window is recognised on the next load. Absent means the title must match exactly. Set from the window editor's 'Recognise by' control.",
+          "description": "How this window is recognised on the next load. Absent means every default: the identity signals as described on each, and the title must match exactly. Set from the window editor's 'Recognise by' controls.",
           "additionalProperties": false,
           "properties": {
             "title": { "type": "string", "enum": ["prefix", "ignore"], "description": "'prefix' accepts a live title that starts with pattern; 'ignore' does not consult the title at all. Both still require the window class and kind to match." },
-            "pattern": { "type": "string", "maxLength": 200, "description": "The title prefix, for 'prefix'. An empty prefix is stored as 'ignore'." }
+            "pattern": { "type": "string", "maxLength": 200, "description": "The title prefix, for 'prefix'. An empty prefix is stored as 'ignore'." },
+            "document": { "$ref": "#/$defs/signalRule", "description": "identity.document. Default: a window with a different known document is never taken, and the same document pairs before any title test." },
+            "panel": { "$ref": "#/$defs/signalRule", "description": "identity.panel. Default: as document, for floating panels." },
+            "appId": { "$ref": "#/$defs/signalRule", "description": "identity.appId. Default: a window with a different known app id is never taken." },
+            "desktop": { "$ref": "#/$defs/signalRule", "description": "desktopId. Default: 'prefer', since an app that restarts reopens on the current desktop." }
           }
         },
         "launch": {
