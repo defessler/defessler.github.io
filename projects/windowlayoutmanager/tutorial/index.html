@@ -336,7 +336,7 @@
           <p class="caption">Hovering a profile shows a card with a scaled map of where its windows land, before you commit to anything.</p>
           <ul>
             <li>Load - Puts every captured window back, even after apps restarted, titles changed, or Windows shoved everything onto one screen. The matcher re-finds windows by process, class, title, owner, and position.</li>
-            <li>Re-capture - Replaces the selected profile's saved windows with the ones open now. Hotkey, history, per-window colours, "recognise by" rules, and Virtual Windows all survive. (It was called Update before dev.127; the <kbd>u</kbd> key is the same.)</li>
+            <li>Re-capture - Replaces the selected profile's saved windows with the ones open now. Hotkey, history, per-window colours, "recognise by" rules, and Virtual Windows all survive. Tick "Keep saved windows that aren't open now" to merge instead: open windows take their new places, new ones are added, and saved windows you don't have open keep their entries. WLM remembers your last choice. (It was called Update before dev.127; the <kbd>u</kbd> key is the same.)</li>
             <li>Windows that aren't running - A Load places what's open and reports the rest as missing in Load details. Starting an app that isn't running (Explorer in the same folder, a console where it was working) is parked while docking is being hardened; the option left the Virtual Windows page in v1.2.0-474 and comes back once that settles.</li>
             <li>Load details - A per-window report of the last load: what matched, what moved, what was missing.</li>
             <li>A Load is one pass. It's finished when it returns, and nothing keeps moving windows afterwards. An app that opens slowly? Press the hotkey again once it settles.</li>
@@ -508,12 +508,12 @@
           <p>The looser two require the window class and type to match instead, and the rule also applies to the last-resort match on the app alone.</p>
           <p>Since v1.3.0 the title isn't the first thing WLM looks at. A capture also records what each window has open and where it lived:</p>
           <ul>
-            <li><strong>Document</strong> - the solution, folder or project open in Visual Studio, Rider, VS Code or Unreal Editor.</li>
-            <li><strong>Panel</strong> - which tool a floating IDE panel holds, such as Error List or Problems.</li>
-            <li><strong>App ID</strong> - what tells a Chrome app window or installed web app from an ordinary browser window.</li>
+            <li><strong>Document</strong> - the file, folder, solution or project the window has open. For any app that runs one window per process, WLM reads it from what the app tells Windows about restarting it, or from how it was started. File Explorer windows record their folder, VS Code and its forks their folder, and every JetBrains IDE its project.</li>
+            <li><strong>Panel</strong> - which tool a floating panel holds, such as Error List or Problems, when its title only repeats the main window's.</li>
+            <li><strong>App ID</strong> - what tells a Chrome app window or installed web app from an ordinary browser window. Packaged apps such as Windows Terminal carry one too.</li>
             <li><strong>Desktop</strong> - the virtual desktop the window was on.</li>
           </ul>
-          <p>The edit dialog has a row for each, showing what was captured. Default suits most windows. Require means only a window with the same value counts, Prefer uses it to choose between lookalikes, and Ignore turns it off. Load details says what recognised each window. A profile saved before v1.3.0 loads as it always did until you re-capture it.</p>
+          <p>The edit dialog has a row for each, showing what was captured. Default suits most windows. Require means only a window with the same value counts, Prefer uses it to choose between lookalikes, and Ignore turns it off. Load details says what recognised each window, and hovering a window's app and title in the list shows all four. A profile saved before v1.3.0 loads as it always did until you re-capture it.</p>
           <ul>
             <li><kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd> - Undo and redo any edit, with a labelled trail.</li>
             <li><kbd>Ctrl+H</kbd> or "History" - Browse and restore full saved versions of the profile. Every Re-capture keeps a snapshot.</li>

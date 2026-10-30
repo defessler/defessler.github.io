@@ -302,16 +302,16 @@
           "properties": {
             "document": {
               "type": "object",
-              "description": "The solution, project, folder or workspace the window had open. Visual Studio and Unreal Editor give it in their command line, VS Code and Rider in their own state files.",
+              "description": "What the window had open. Any app with one main window gives the file or folder on its command line ('path', or 'solution' and 'project' for .sln and .uproject). VS Code and its forks, and JetBrains IDEs, give it in their own state files, found from the install. A 'path' that differs never rules a window out, because the app may have opened something else since.",
               "additionalProperties": false,
               "required": ["kind", "value"],
               "properties": {
-                "kind": { "type": "string", "enum": ["solution", "project", "folder", "workspace"] },
+                "kind": { "type": "string", "enum": ["solution", "project", "folder", "workspace", "path"] },
                 "value": { "type": "string", "maxLength": 1024 }
               }
             },
-            "panel": { "type": "string", "maxLength": 200, "description": "Which tool window a floating panel holds, e.g. 'Error List' in Visual Studio or 'Details' in Unreal Editor." },
-            "appId": { "type": "string", "maxLength": 200, "description": "The window's AppUserModelID, when the app set one. Chrome sets one per profile and per app window." }
+            "panel": { "type": "string", "maxLength": 200, "description": "Which tool window a floating panel holds, e.g. 'Error List' in Visual Studio or 'Details' in Unreal Editor. For any app, an owned window whose title only repeats its owner's gets its UI Automation name." },
+            "appId": { "type": "string", "maxLength": 200, "description": "The window's AppUserModelID, else its package's. Chrome sets one per profile and per app window. Packaged apps such as Windows Terminal have one from their package." }
           }
         },
         "ownerInfo":      { "$ref": "#/$defs/ownerInfo", "description": "Identity of the owner top-level window, when this is an owned/tool window." },
