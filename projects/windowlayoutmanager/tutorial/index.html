@@ -508,12 +508,13 @@
           <p>The looser two require the window class and type to match instead, and the rule also applies to the last-resort match on the app alone.</p>
           <p>Since v1.3.0 the title isn't the first thing WLM looks at. A capture also records what each window has open and where it lived:</p>
           <ul>
-            <li><strong>Document</strong> - the file, folder, solution or project the window has open. For any app that runs one window per process, WLM reads it from what the app tells Windows about restarting it, or from how it was started. File Explorer windows record their folder, VS Code and its forks their folder, and every JetBrains IDE its project.</li>
+            <li><strong>Document</strong> - the file, folder, solution or project the window has open. For any app that runs one window per process, WLM reads it from what the app tells Windows about restarting it, or from how it was started. File Explorer windows record their folder, or with several tabs the folder of the tab on top. Notepad windows record the file in their tab on top, VS Code and its forks their folder, and every JetBrains IDE its project.</li>
             <li><strong>Panel</strong> - which tool a floating panel holds, such as Error List or Problems, when its title only repeats the main window's.</li>
             <li><strong>App ID</strong> - what tells a Chrome app window or installed web app from an ordinary browser window. Packaged apps such as Windows Terminal carry one too.</li>
+            <li><strong>Content</strong> - for two windows of one app that nothing else tells apart, such as two Chrome windows on the same profile: the address bar and the tab names. It only breaks ties, so a window whose page changed still finds its place. The address keeps only what identifies the page, without query strings or anything that looks like typed text, and none of it leaves your PC.</li>
             <li><strong>Desktop</strong> - the virtual desktop the window was on.</li>
           </ul>
-          <p>The edit dialog has a row for each, showing what was captured. Default suits most windows. Require means only a window with the same value counts, Prefer uses it to choose between lookalikes, and Ignore turns it off. Load details says what recognised each window, and hovering a window's app and title in the list shows all four. A profile saved before v1.3.0 loads as it always did until you re-capture it.</p>
+          <p>The edit dialog has a row for each, showing what was captured. Default suits most windows. Require means only a window with the same value counts, Prefer uses it to choose between lookalikes, and Ignore turns it off. Load details says what recognised each window, and hovering a window's app and title in the list shows all five. A profile saved before v1.3.0 loads as it always did until you re-capture it.</p>
           <ul>
             <li><kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd> - Undo and redo any edit, with a labelled trail.</li>
             <li><kbd>Ctrl+H</kbd> or "History" - Browse and restore full saved versions of the profile. Every Re-capture keeps a snapshot.</li>

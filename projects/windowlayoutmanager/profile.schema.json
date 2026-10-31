@@ -302,7 +302,7 @@
           "properties": {
             "document": {
               "type": "object",
-              "description": "What the window had open. Any app with one main window gives the file or folder on its command line ('path', or 'solution' and 'project' for .sln and .uproject). VS Code and its forks, and JetBrains IDEs, give it in their own state files, found from the install. A 'path' that differs never rules a window out, because the app may have opened something else since.",
+              "description": "What the window had open. Any app with one main window gives the file or folder on its command line ('path', or 'solution' and 'project' for .sln and .uproject). VS Code and its forks, and JetBrains IDEs, give it in their own state files, found from the install. File Explorer gives the folder of the tab on top, and Windows Notepad the file of its tab on top, from its package's state files. A 'path' that differs never rules a window out, because the app may have opened something else since.",
               "additionalProperties": false,
               "required": ["kind", "value"],
               "properties": {
@@ -311,7 +311,16 @@
               }
             },
             "panel": { "type": "string", "maxLength": 200, "description": "Which tool window a floating panel holds, e.g. 'Error List' in Visual Studio or 'Details' in Unreal Editor. For any app, an owned window whose title only repeats its owner's gets its UI Automation name." },
-            "appId": { "type": "string", "maxLength": 200, "description": "The window's AppUserModelID, else its package's. Chrome sets one per profile and per app window. Packaged apps such as Windows Terminal have one from their package." }
+            "appId": { "type": "string", "maxLength": 200, "description": "The window's AppUserModelID, else its package's. Chrome sets one per profile and per app window. Packaged apps such as Windows Terminal have one from their package." },
+            "content": {
+              "type": "object",
+              "description": "What UI Automation showed outside the page, for a main window that shares its process with others and had no document: two Chrome windows of one profile, say. The same address, or tab lists at least half the same, counts as the same window. It only breaks ties by default, because a browser's address and tabs change as it's used.",
+              "additionalProperties": false,
+              "properties": {
+                "address": { "type": "string", "maxLength": 1024, "description": "The value of the first edit box outside the page, a browser's address bar." },
+                "tabs": { "type": "array", "maxItems": 30, "items": { "type": "string", "maxLength": 200 }, "description": "The tab names, in order." }
+              }
+            }
           }
         },
         "ownerInfo":      { "$ref": "#/$defs/ownerInfo", "description": "Identity of the owner top-level window, when this is an owned/tool window." },
@@ -366,6 +375,7 @@
             "document": { "$ref": "#/$defs/signalRule", "description": "identity.document. Default: a window with a different known document is never taken, and the same document pairs before any title test." },
             "panel": { "$ref": "#/$defs/signalRule", "description": "identity.panel. Default: as document, for floating panels." },
             "appId": { "$ref": "#/$defs/signalRule", "description": "identity.appId. Default: a window with a different known app id is never taken." },
+            "content": { "$ref": "#/$defs/signalRule", "description": "identity.content. Default: 'prefer', since a browser's address and tabs change as it's used." },
             "desktop": { "$ref": "#/$defs/signalRule", "description": "desktopId. Default: 'prefer', since an app that restarts reopens on the current desktop." }
           }
         },
