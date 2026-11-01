@@ -4,7 +4,9 @@
 # folder's contents, adds the GA4 tag (G-YQB4BCN1CH) to every .html that lacks it,
 # commits as github-actions[bot] and pushes with a pull-rebase retry. No diff means
 # no commit. Any path with a "_"-prefixed segment is refused, because the root site
-# is a Jekyll build and Jekyll drops those.
+# is a Jekyll build and Jekyll drops those. Also refused: any .md, .markdown, .mkdown,
+# .mkdn, .mkd or .textile file, and any file whose first line is "---" (front matter),
+# because the root Jekyll would render them. Publish built HTML only.
 #
 # Linux runners only (needs bash, git, ssh, curl, python3).
 #

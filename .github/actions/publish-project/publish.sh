@@ -21,6 +21,20 @@ src="$(cd "$src" && pwd)"
 [[ -n "$(find "$src" -type f -name '*.html' -print -quit)" ]] || fail "path '$src' holds no .html file"
 bad="$(find "$src" -mindepth 1 -name '_*' -print -quit)"
 [[ -z "$bad" ]] || fail "'${bad#"$src"/}' starts with '_'. Jekyll on the root site drops such paths"
+bad="$(find "$src" -type f \( -iname '*.md' -o -iname '*.markdown' -o -iname '*.mkdown' -o -iname '*.mkdn' -o -iname '*.mkd' -o -iname '*.textile' \) -print -quit)"
+[[ -z "$bad" ]] || fail "'${bad#"$src"/}': the root site is a Jekyll build and would render it. Publish built HTML only"
+bad="$(python3 -I - "$src" <<'PY'
+import pathlib, sys
+for p in sorted(pathlib.Path(sys.argv[1]).rglob("*")):
+    if p.is_file() and not p.is_symlink():
+        with p.open("rb") as f:
+            first = f.readline().rstrip(b"\r\n")
+        if first.removeprefix(b"\xef\xbb\xbf") == b"---":
+            print(p.relative_to(sys.argv[1]).as_posix())
+            break
+PY
+)"
+[[ -z "$bad" ]] || fail "'$bad' starts with front matter (---): the root site is a Jekyll build and would render it. Publish built HTML only"
 bad="$(find "$src" -type l -print -quit)"
 [[ -z "$bad" ]] || fail "'${bad#"$src"/}' is a symlink. Symlinks are not published"
 bad="$(find "$src" -mindepth 1 -name '.git' -print -quit)"
