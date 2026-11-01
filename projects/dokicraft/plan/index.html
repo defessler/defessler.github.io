@@ -1,0 +1,900 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A high-fidelity voxel survival game engine built from scratch in C++ and Vulkan.">
+      
+      
+      
+        <link rel="canonical" href="https://dougfessler.com/projects/dokicraft/plan/">
+      
+      
+        <link rel="prev" href="../deep-dives/">
+      
+      
+        <link rel="next" href="../smoke-test/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Plan & Roadmap - Dokicraft</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Serif+4:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Source Serif 4";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-YQB4BCN1CH"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-YQB4BCN1CH",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#dokicraft-high-fidelity-voxel-survival-game-engine-in-c" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Dokicraft" class="md-header__button md-logo" aria-label="Dokicraft" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A.99.99 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88zM12 4.15 6.04 7.5 12 10.85l5.96-3.35zM5 15.91l6 3.38v-6.71L5 9.21zm14 0v-6.7l-6 3.37v6.71z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Dokicraft
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Plan & Roadmap
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Surface to the Overworld"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Surface to the Overworld" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Head underground"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Head underground" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.79 10.62 3.5 21.9l-1.4-1.4L13.38 9.21zm4.48-2.89.59-.59-.79-.79.64-.64-1.42-1.42-.64.64-.79-.79-.59.59c-1.74-1.42-3.7-2.56-5.8-3.36l-.83 1.79c1.75.92 3.36 2.03 4.86 3.34L14 7l3 3 .5-.5c1.31 1.5 2.42 3.11 3.34 4.86l1.79-.83c-.8-2.1-1.94-4.06-3.36-5.8"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/defessler/Dokicraft" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    defessler/Dokicraft
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Dokicraft" class="md-nav__button md-logo" aria-label="Dokicraft" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A.99.99 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88zM12 4.15 6.04 7.5 12 10.85l5.96-3.35zM5 15.91l6 3.38v-6.71L5 9.21zm14 0v-6.7l-6 3.37v6.71z"/></svg>
+
+    </a>
+    Dokicraft
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/defessler/Dokicraft" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    defessler/Dokicraft
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deep-dives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep Dives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan & Roadmap
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan & Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#locked-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Locked decisions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verified-facts-traps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verified facts &amp; traps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Roadmap
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Roadmap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-research-report-stack-decision-done-2026-07-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        §1 — Research report + stack decision — DONE 2026-07-11
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-buildable-skeleton-cmake-vcpkg-deps-next-up-expand-to-implementation-ready-on-resume" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        §2 — Buildable skeleton: CMake + vcpkg + deps (next up — expand to implementation-ready on resume)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-engine-core-window-vulkan-boot-frame-loop-medium-detail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        §3 — Engine core: window → Vulkan boot → frame loop (medium detail)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-voxel-scene-placeholder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        §4 — Voxel scene (placeholder)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-beyond-the-milestone-placeholder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        §5 — Beyond the milestone (placeholder)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-tiering-note-smartplan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model-tiering note (smartplan)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#completeness-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Completeness check
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ledger" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ledger
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resume-note" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resume note
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../smoke-test/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Smoke Test
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrospective
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="dokicraft-high-fidelity-voxel-survival-game-engine-in-c">Dokicraft — high-fidelity voxel survival game engine in C++<a class="headerlink" href="#dokicraft-high-fidelity-voxel-survival-game-engine-in-c" title="Permanent link">&para;</a></h1>
+<h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
+<p>Dokicraft is a from-scratch C++ game engine and survival game: Minecraft-like
+gameplay but at a higher fidelity level — smaller voxels, modern shaders and
+lighting, streamed worlds. Solo/small-team project targeting Windows x64 and
+high-end GPUs (primary dev/target machine has an RTX 5090). The user's stated
+tech preferences, honored unless research shows a clear winner elsewhere:
+open-source rendering API (Vulkan), open-source UI framework (Dear ImGui;
+web-tech HTML/CSS style highly preferred but only if high performance), and
+"Box3D" physics (no such library exists — read as "a 3D physics engine";
+research evaluates Jolt / Bullet / PhysX).</p>
+<p>Project root: <code>D:\Projects\Dokicraft</code>
+Started: 2026-07-11</p>
+<h2 id="locked-decisions">Locked decisions<a class="headerlink" href="#locked-decisions" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Remote</td>
+<td><code>https://github.com/defessler/Dokicraft</code> (private). Work on <code>main</code> only; legacy branches (<code>master</code>, <code>tutorial</code>, <code>first-window</code>, <code>claude/*</code>, releases) predate this project and are ignored. Old main was force-replaced at user instruction (<code>b692155</code> → <code>c92b79a</code>). Pushing changes/research docs to this remote is standing-authorized.</td>
+</tr>
+<tr>
+<td>Playbook</td>
+<td>dev-playbook v1.0.0 S0 scaffold (CLAUDE.md, memory/, Docs/SMOKE_TEST.md, Docs/RETROSPECTIVE.md, research/).</td>
+</tr>
+<tr>
+<td>Code conventions</td>
+<td>smartreview profile, Engine=<code>custom</code>: 4 spaces · 120 cols · lowerCamelCase locals · <code>// Copyright (c) defessler</code> line 1 · flat namespace <code>doki</code> · PascalCase types, camelCase functions and vars, <code>m_</code> members on classes with bare names on plain-data structs, <code>k</code>-prefixed constants · Allman braces · <code>.clang-format</code> at root. Corrected 2026-08-05 to match the tree as written. The 2026-07-11 profile called for PascalCase functions, <code>s_</code> statics, SCREAMING_CASE constants, and a nested <code>doki::&lt;Feature&gt;</code> namespace. None of those were ever written. Written style won. Full table in Docs/CONVENTIONS.md. Every changelist gets the A–J conventions walk before landing.</td>
+</tr>
+<tr>
+<td>Build system</td>
+<td>CMake ≥3.28 + Ninja + MSVC (VS 2026), vcpkg manifest mode with local clone at <code>extern/vcpkg</code> (gitignored; bootstrap per README).</td>
+</tr>
+<tr>
+<td>Vulkan without SDK</td>
+<td>The LunarG SDK is NOT installed and the build must not require it: vcpkg <code>vulkan-headers</code> + <code>volk</code> loader + runtime shader compilation (shaderc). Validation layers optional at runtime — guard their absence.</td>
+</tr>
+<tr>
+<td>Rendering API</td>
+<td><strong>Vulkan 1.3+</strong> — confirmed by research (Ascendant precedent, Dwyer's wgpu→Vulkan migration, GPU-driven "works best on Vulkan/DX12", HW-RT/mesh-shader headroom on the 5090).</td>
+</tr>
+<tr>
+<td>Language</td>
+<td>C++20, warnings-as-errors for project targets.</td>
+</tr>
+<tr>
+<td>Settled stack (research §1, 2026-07-11)</td>
+<td>Near-field: <strong>binary greedy meshing</strong> + GPU compute culling + multi-draw-indirect. Far-field (phase 2): per-voxel raycast quads / SVDAG ray march. GI: sun+AO phase 1 → <strong>DDGI</strong> phase 2. Physics: see Physics row. UI: <strong>ImGui</strong> (debug) → <strong>RmlUi</strong> (game UI, FOSS; Ultralight rejected: refuted memory claim + proprietary licensing). ECS: <strong>EnTT</strong>. Windowing: <strong>SDL3</strong> (general practice — unverified by research). Shaders: <strong>shaderc</strong> GLSL→SPIR-V runtime + cache. Support: volk + VMA + glm + FastNoise2. Full rationale + citations: <code>research/RESEARCH.md</code>.</td>
+</tr>
+<tr>
+<td>Physics (settled 2026-07-11, user-directed "use Jolt if superior")</td>
+<td><strong>Jolt Physics</strong> — primary. Superior for this project <em>now</em>: production-proven (shipped in AAA, e.g. Horizon Forbidden West), stable v5.5.0, author-documented voxel-terrain integration (StaticCompoundShape per chunk, shared BoxShapes — research §7), already in vcpkg, already linked in the build. <strong>Box3D</strong> (<a href="https://github.com/erincatto/box3d">erincatto/box3d</a>) validated as real and promising (Erin Catto/Box2D author; MIT; portable C17; data-oriented + SIMD; height fields + triangle meshes; cross-platform determinism; recording/replay; FetchContent <code>box3d::box3d</code> @ <code>v0.1.0</code>) but <strong>v0.1.0 — too early to anchor a survival engine on</strong>. Revisit Box3D as it matures (its determinism + height fields are attractive for terrain/multiplayer). Corrects the earlier research note that "Box3D doesn't exist" (true at research time). Physics integrates at §5.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="verified-facts-traps">Verified facts &amp; traps<a class="headerlink" href="#verified-facts-traps" title="Permanent link">&para;</a></h2>
+<ul>
+<li>VS Community 2026 v18.7 at <code>C:\Program Files\Microsoft Visual Studio\18\Community</code> — vswhere output.</li>
+<li>CMake at <code>C:\Program Files\CMake\bin\cmake.exe</code>; Ninja on PATH (via Python Scripts dir); git + gh present.</li>
+<li><code>gh</code> authenticated as <strong>defessler</strong> (keyring, ssh protocol, repo scope) — <code>gh auth status</code>.</li>
+<li>vcpkg bootstrapped at <code>extern/vcpkg</code> (tool version 2026-05-27) — bootstrap output.</li>
+<li><code>vulkan-1.dll</code> present in System32 (driver runtime); <code>VULKAN_SDK</code> env var empty; <code>C:\VulkanSDK</code> absent.</li>
+<li><strong>Multi-GPU trap:</strong> adapters present are RTX 5090, Intel UHD 770, and a Parsec Virtual Display Adapter — naive <code>vkEnumeratePhysicalDevices[0]</code> may pick the wrong one; score for discrete GPU. (Also: WMI under-reports the 5090's VRAM as 4 GB; it's 32 GB.)</li>
+<li>vcpkg ports RESOLVED 2026-07-11 (baseline <code>f87344cac03158cbf1467264565f1fd36b382a24</code>). Ports → CMake targets:
+  <code>volk</code>→<code>volk::volk</code>+<code>volk::volk_headers</code> · <code>vulkan-headers</code>→<code>Vulkan::Headers</code> (<code>find_package(VulkanHeaders)</code>) ·
+  <code>vulkan-memory-allocator</code>→<code>GPUOpen::VulkanMemoryAllocator</code> · <code>glm</code>→<code>glm::glm</code> · <code>entt</code>→<code>EnTT::EnTT</code> ·
+  <code>shaderc</code>→<code>unofficial::shaderc::shaderc</code> (<code>find_package(unofficial-shaderc)</code>) · <code>joltphysics</code>→<code>Jolt::Jolt</code> ·
+  <code>sdl3[vulkan]</code>→<code>SDL3::SDL3</code> · <code>imgui[docking-experimental,sdl3-binding,vulkan-binding]</code>→<code>imgui::imgui</code>.</li>
+<li><strong>FastNoise2 is NOT in vcpkg</strong> (only <code>libnoise</code>/<code>rnnoise</code>). Not needed until §4 (terrain) — defer: FetchContent <code>Auburn/FastNoise2</code> or vendor the single-header <code>FastNoiseLite</code> when §4 starts.</li>
+<li>MSVC/WX + third-party headers trap: <code>/WX</code> treats warnings in vcpkg <code>&lt;angle-bracket&gt;</code> headers as errors. Handled by <code>/external:anglebrackets /external:W0</code> on <code>doki_project_options</code> (project code uses <code>"quotes"</code>, deps use <code>&lt;&gt;</code>).</li>
+</ul>
+<h2 id="roadmap">Roadmap<a class="headerlink" href="#roadmap" title="Permanent link">&para;</a></h2>
+<h3 id="1-research-report-stack-decision-done-2026-07-11">§1 — Research report + stack decision — DONE 2026-07-11<a class="headerlink" href="#1-research-report-stack-decision-done-2026-07-11" title="Permanent link">&para;</a></h3>
+<p>Deep-research workflow <code>wf_d1d97ef4-985</code> completed (106 agents; 24 sources;
+119 claims; 25 verified → 24 confirmed / 1 refuted). Report + settled stack:
+<code>research/RESEARCH.md</code>. Locked decisions above updated. Agent journal (if
+ever needed):
+<code>C:\Users\defes\.claude\projects\D--Projects-Dokicraft\1ec3b9df-9d50-487e-a2f0-41f7b20fff79\subagents\workflows\wf_d1d97ef4-985\journal.jsonl</code></p>
+<h3 id="2-buildable-skeleton-cmake-vcpkg-deps-next-up-expand-to-implementation-ready-on-resume">§2 — Buildable skeleton: CMake + vcpkg + deps (next up — expand to implementation-ready on resume)<a class="headerlink" href="#2-buildable-skeleton-cmake-vcpkg-deps-next-up-expand-to-implementation-ready-on-resume" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>vcpkg.json</code> manifest: <code>sdl3</code>, <code>volk</code>, <code>vulkan-headers</code>,
+  <code>vulkan-memory-allocator</code>, <code>glm</code>, <code>imgui</code> (docking feature + sdl3/vulkan
+  bindings if the port exposes them; else custom backend), <code>shaderc</code>,
+  <code>entt</code>, <code>joltphysics</code>, <code>fastnoise2</code> — ⚠VERIFY exact port/feature names
+  with <code>extern\vcpkg\vcpkg.exe search</code> before writing the manifest; fallback
+  FetchContent per library. Pin a builtin-baseline.</li>
+<li><code>CMakeLists.txt</code>: <code>doki_engine</code> static lib + <code>dokicraft</code> exe;
+  <code>CMakePresets.json</code> with <code>windows-debug</code> / <code>windows-release</code> (Ninja + cl,
+  vcpkg toolchain file); <code>/W4 /WX</code> on project targets only.</li>
+<li>Source layout: <code>src/engine/&lt;subsystem&gt;/</code>, <code>src/game/</code>, <code>shaders/</code>.</li>
+<li>Acceptance: both presets configure + build green from a clean clone
+  (README two-command flow); Docs/SMOKE_TEST.md §B0/§B1/§B2 pass.</li>
+</ul>
+<h3 id="3-engine-core-window-vulkan-boot-frame-loop-medium-detail">§3 — Engine core: window → Vulkan boot → frame loop (medium detail)<a class="headerlink" href="#3-engine-core-window-vulkan-boot-frame-loop-medium-detail" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Window + input via <strong>SDL3</strong> (<code>SDL_WINDOW_VULKAN</code>, <code>SDL_Vulkan_CreateSurface</code>), fly camera.</li>
+<li>Vulkan 1.3 boot via <strong>volk</strong>: <code>volkInitialize()</code> → instance → <code>volkLoadInstance()</code>
+  → device → <code>volkLoadDevice()</code>. Instance (validation optional — absent SDK; guard
+  layer/extension absence), <strong>physical-device scoring that prefers the discrete GPU</strong>
+  (see trap), VMA, swapchain, dynamic rendering + sync2, N frames in flight.</li>
+<li>Runtime shader compile (<strong>shaderc</strong>) GLSL→SPIR-V with on-disk cache.</li>
+<li>Dear ImGui overlay (debug HUD: device name, frame time).</li>
+<li><strong>imgui + volk trap (resolve here, not §2):</strong> the vcpkg imgui Vulkan backend is
+  built <em>without</em> <code>VK_NO_PROTOTYPES</code>, but our engine uses volk (no static loader).
+  Call <code>ImGui_ImplVulkan_LoadFunctions(apiVersion, loaderFn)</code> forwarding to
+  <code>vkGetInstanceProcAddr</code>/volk so the backend resolves entry points through volk;
+  otherwise link <code>vulkan-loader</code>. §2 doesn't touch the backend so it's inert until now.</li>
+<li>Acceptance: smoke C1 (boot on RTX 5090, clean validation when layers
+  present) + C2 (smooth fly camera) pass; conventions review clean.</li>
+</ul>
+<h3 id="4-voxel-scene-placeholder">§4 — Voxel scene (placeholder)<a class="headerlink" href="#4-voxel-scene-placeholder" title="Permanent link">&para;</a></h3>
+<p>Chunk store (small voxels), FastNoise2 terrain for a fixed-seed test world,
+meshing per §1 (likely binary greedy meshing), sun + AO lighting, screenshot
+verification (smoke C3). This is the "render a small scene" milestone the
+user asked for.</p>
+<h3 id="5-beyond-the-milestone-placeholder">§5 — Beyond the milestone (placeholder)<a class="headerlink" href="#5-beyond-the-milestone-placeholder" title="Permanent link">&para;</a></h3>
+<p>Streaming + LOD, GI per §1's phase-2 pick, physics integration, survival
+gameplay loop, game UI per §1 (RmlUi vs ImGui outcome).</p>
+<h2 id="model-tiering-note-smartplan">Model-tiering note (smartplan)<a class="headerlink" href="#model-tiering-note-smartplan" title="Permanent link">&para;</a></h2>
+<p>Planning (this doc, §1 synthesis, §2/§3 expansion) sits with the strong
+planner seat. Implementation leaves in §2–§4 are Sonnet-floor fan-out
+candidates with per-call <code>model:</code> overrides once the plan sections are
+implementation-ready; escalate one tier after two BLOCKED reports. Graduate
+to a scripted workflow (ultracode) only for wide fan-outs (e.g. §4 meshing +
+worldgen + lighting in parallel worktrees).</p>
+<h2 id="completeness-check">Completeness check<a class="headerlink" href="#completeness-check" title="Permanent link">&para;</a></h2>
+<p>§1 is executable verbatim. §2/§3 are deliberately medium-detail: their
+verbatim expansion depends on §1's settled stack (graduated detail per
+P-S4-5). Expand each to implementation-ready — including exact vcpkg port
+names (resolve the ⚠VERIFY) and file-by-file layout — before fanning out.</p>
+<h2 id="ledger">Ledger<a class="headerlink" href="#ledger" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[x] S0 scaffold + force-push replacing old main — commit <code>c92b79a</code></li>
+<li>[x] Conventions profile + .clang-format — commit <code>6b54375</code></li>
+<li>[x] §1 research report + settled stack (<code>research/RESEARCH.md</code>)</li>
+<li>[x] Hazel (StudioCherno/Hazel 2024.1) cross-check — validated: corroborates Vulkan/EnTT/Jolt/ImGui/glm/shaderc; keep SDL3+CMake+vcpkg over Hazel's GLFW+premake+VulkanSDK; adopt Tracy/SPIRV-Cross/stb. NOT a voxel engine — borrow infra, not renderer.</li>
+<li>[x] §2 buildable skeleton — <code>doki_engine</code> lib + <code>dokicraft</code> exe build <strong>green</strong> under /W4 /WX (all 16 vcpkg deps compiled); exe runs, exit 0, confirms glm+entt+Vulkan-headers link. Ports resolved, FastNoise2 deferred to §4.</li>
+<li>[x] §3 engine core — SDL3 window + Vulkan 1.3 boot via volk (VMA via <code>vmaImportVulkanFunctionsFromVolk</code>), discrete-GPU scoring (picks <strong>RTX 5090</strong>), swapchain, sync2 dynamic-rendering frame loop with depth buffer, runtime GLSL→SPIR-V via shaderc, forward mesh pipeline (push-constant MVP + directional light).</li>
+<li>[x] §4 voxel scene (first cut) — deterministic heightmap terrain, colored cube-per-voxel geometry (grass/dirt/stone), orbiting perspective camera, lit + depth-tested. <strong>Verified on-screen</strong> (<code>Docs/images/first-scene.png</code>). This is placeholder geometry; real chunk store + binary greedy meshing + streaming is the next phase.</li>
+<li>[x] Box3D validated (real, Erin Catto), then Jolt confirmed as primary physics per user "use Jolt if superior" — see Physics row.</li>
+<li>[x] <code>Docs/TUTORIAL.md</code> — full onboarding tutorial for UE-background programmers (architecture, Vulkan frame walkthrough, extension recipes, references); written in the smartvoice defes register; linked from README.</li>
+<li>[x] Second research pass (deep dives, <code>wf_ff842636-3e8</code>, 113 agents): HW-RT-over-AABBs settled as far-field direction; Aokana streaming template extracted; persistence (zstd/granularity) + FastNoise2 confirmed; Jolt tile-rebuild pattern canonical. Published as <code>research/DEEP-DIVES.md</code> + site nav. GI comparison + meshed-LOD seams remain open.</li>
+<li>[x] Docs site visual identity "Field Manual / Strata" (Docs/DESIGN.md + site-theme/extra.css) — palette sampled from engine constants, Overworld/Underground schemes, strata signature; inspired by aethyrgames.github.io's design <em>method</em>, deliberately not its look.</li>
+<li>[x] GitHub Pages docs site live at https://dougfessler.com/projects/dokicraft/ — MkDocs Material, assembled from canonical repo docs by <code>Tools/BuildDocsSite.py</code>, deployed by <code>.github/workflows/docs.yml</code> on every push to main. Note: the site is public even though the repo is private.</li>
+</ul>
+<h2 id="resume-note">Resume note<a class="headerlink" href="#resume-note" title="Permanent link">&para;</a></h2>
+<p><strong>A bare "Resume" must suffice.</strong> Read Locked decisions (incl. settled
+stack) → roadmap §2 (expand to implementation-ready, resolve the ⚠VERIFY on
+vcpkg port names) → Ledger. Session task list (if still present): #1
+research (done), #2 stack decision (done), #3 scaffold (in_progress —
+repo/docs done, CMake skeleton pending §2), #4 engine core, #5 voxel scene.
+The environment facts in CLAUDE.md § Environment are current as of
+2026-07-11. Work was deliberately paused here at user request
+("pause and save off plan"); do not start §2 until asked to resume.</p>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.top", "navigation.sections", "content.code.copy", "toc.integrate"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+        <script src="https://dougfessler.com/js/insights.js"></script>
+      
+    
+  </body>
+</html>

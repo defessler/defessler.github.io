@@ -1,0 +1,218 @@
+/* Dokicraft docs — "Field Manual / Strata" identity.
+   Tokens and rules are documented in Docs/DESIGN.md. The core palette is
+   sampled from the engine's own constants (Terrain.cpp voxelColor(),
+   Main.cpp clear color). Signature element: the strata band. */
+
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Archivo+Black&family=Silkscreen&display=swap");
+
+:root {
+    /* Palette, sampled from the codebase */
+    --doki-grass: #599E47;        /* Terrain.cpp grass vec3(0.35, 0.62, 0.28) */
+    --doki-grass-deep: #3E7C2F;   /* grass, darkened for light-bg contrast */
+    --doki-grass-bright: #7CC65F; /* grass, brightened for dark-bg contrast */
+    --doki-dirt: #735433;         /* Terrain.cpp dirt vec3(0.45, 0.33, 0.20) */
+    --doki-stone: #6B6B73;        /* Terrain.cpp stone vec3(0.42, 0.42, 0.45) */
+    --doki-sky: #73A6E6;          /* Main.cpp clear color (0.45, 0.65, 0.90) */
+    --doki-torch: #F0B429;        /* the rare warm accent */
+    --doki-torch-deep: #B67F0F;
+    --doki-bedrock: #15161B;
+    --doki-bedrock-2: #1C1E24;
+
+    /* The signature: a voxel cross-section, grass over dirt over stone */
+    --doki-strata: linear-gradient(
+        to bottom,
+        var(--doki-grass) 0 2px,
+        var(--doki-dirt) 2px 4px,
+        var(--doki-stone) 4px 6px);
+
+    /* Material "custom" primary: the header is bedrock in both schemes */
+    --md-primary-fg-color: var(--doki-bedrock);
+    --md-primary-fg-color--light: var(--doki-bedrock-2);
+    --md-primary-fg-color--dark: #101116;
+    --md-primary-bg-color: #F2F4F8;
+    --md-primary-bg-color--light: #c3c9d4;
+}
+
+/* ---- Overworld (light): reading in daylight ---- */
+[data-md-color-scheme="default"] {
+    --md-default-bg-color: #F4F8FB;
+    --md-typeset-color: #20262E;
+    --md-typeset-a-color: var(--doki-grass-deep);
+    --md-accent-fg-color: var(--doki-dirt);
+    --md-accent-fg-color--transparent: rgba(115, 84, 51, 0.08);
+    --md-code-bg-color: #E9EEF3;
+    --md-code-fg-color: #26303B;
+    --md-footer-bg-color: var(--doki-bedrock);
+    --md-footer-bg-color--dark: #101116;
+}
+
+/* ---- Underground (dark): reading by torchlight ---- */
+[data-md-color-scheme="slate"] {
+    --md-default-bg-color: var(--doki-bedrock);
+    --md-default-fg-color: #E6E9EF;
+    --md-typeset-color: #E6E9EF;
+    --md-typeset-a-color: var(--doki-grass-bright);
+    --md-accent-fg-color: var(--doki-torch);
+    --md-accent-fg-color--transparent: rgba(240, 180, 41, 0.08);
+    --md-code-bg-color: var(--doki-bedrock-2);
+    --md-footer-bg-color: #101116;
+    --md-footer-bg-color--dark: #0B0C10;
+}
+
+/* ---- Type system ---- */
+
+/* Display: Archivo Black. Cubic authority for the two top heading levels. */
+.md-typeset h1,
+.md-typeset h2 {
+    font-family: "Archivo Black", "Archivo", sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+}
+
+/* Workhorse sans for subheads, nav, and chrome; body stays Source Serif 4
+   (loaded via mkdocs.yml theme.font). */
+.md-typeset h3,
+.md-typeset h4,
+.md-typeset h5,
+.md-typeset h6 {
+    font-family: "Archivo", sans-serif;
+    font-weight: 700;
+}
+
+.md-header__topic,
+.md-nav,
+.md-search__input,
+.md-typeset .md-button,
+.md-footer,
+.md-tabs {
+    font-family: "Archivo", sans-serif;
+}
+
+.md-header__topic:first-child {
+    font-family: "Archivo Black", "Archivo", sans-serif;
+    font-weight: 400;
+}
+
+/* Silkscreen: the voxel DNA. Tiny uppercase labels only (scarcity rule). */
+.md-nav__title {
+    font-family: "Silkscreen", monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* ---- The signature: strata ---- */
+
+.md-header {
+    box-shadow: none;
+    border-bottom: 6px solid;
+    border-image: var(--doki-strata) 1;
+}
+
+/* Every h2 carries the stratum in miniature: three voxel squares. */
+.md-typeset h2::after {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 8px;
+    margin-top: 0.5rem;
+    background:
+        linear-gradient(var(--doki-grass), var(--doki-grass)) 0 0 / 8px 8px no-repeat,
+        linear-gradient(var(--doki-dirt), var(--doki-dirt)) 16px 0 / 8px 8px no-repeat,
+        linear-gradient(var(--doki-stone), var(--doki-stone)) 32px 0 / 8px 8px no-repeat;
+}
+
+/* The footer closes the page deeper underground: the band, inverted dark. */
+.md-footer {
+    border-top: 6px solid;
+    border-image: linear-gradient(
+        to bottom,
+        var(--doki-stone) 0 2px,
+        #4A3A28 2px 4px,
+        #26272E 4px 6px) 1;
+}
+
+/* ---- Structure: cubes have hard edges ---- */
+
+.md-typeset .admonition,
+.md-typeset details,
+.md-typeset code,
+.md-typeset pre > code,
+.md-typeset .highlight,
+.md-typeset img,
+.md-typeset table:not([class]),
+.md-search__form,
+.md-search__input,
+.md-search__output,
+.md-typeset .md-button,
+.md-clipboard,
+.md-top,
+.md-banner {
+    border-radius: 0 !important;
+}
+
+/* Presence through 1px stone borders, never shadows. */
+.md-typeset .admonition,
+.md-typeset details {
+    border: 1px solid rgba(107, 107, 115, 0.35);
+    border-left-width: 3px;
+    border-left-color: var(--doki-sky);
+    box-shadow: none;
+}
+
+/* Semantic left edges: informational = sky, caution = torch, success = grass. */
+.md-typeset .admonition.warning,
+.md-typeset .admonition.danger,
+.md-typeset .admonition.failure,
+.md-typeset .admonition.bug {
+    border-left-color: var(--doki-torch);
+}
+
+.md-typeset .admonition.tip,
+.md-typeset .admonition.success {
+    border-left-color: var(--doki-grass);
+}
+
+/* Engine screenshots are the only imagery; frame them like specimens. */
+.md-typeset img {
+    border: 1px solid rgba(107, 107, 115, 0.45);
+}
+
+/* Tables: square, ruled, quiet. */
+.md-typeset table:not([class]) {
+    border: 1px solid rgba(107, 107, 115, 0.35);
+    box-shadow: none;
+}
+
+.md-typeset table:not([class]) th {
+    font-family: "Archivo", sans-serif;
+    font-weight: 700;
+}
+
+/* Sidebar: the active page gets a grass edge, like the selected block. */
+.md-nav__link--active,
+.md-nav__link:focus,
+.md-nav__link:hover {
+    color: var(--md-typeset-a-color);
+}
+
+.md-nav__item .md-nav__link--active {
+    box-shadow: inset 2px 0 0 var(--doki-grass);
+    padding-left: 0.4rem;
+    margin-left: -0.6rem;
+}
+
+/* Selection tint: grass, on your side. */
+::selection {
+    background: rgba(89, 158, 71, 0.28);
+}
+
+/* Keep long technical pages readable: a touch more line-height for serif. */
+.md-typeset {
+    line-height: 1.65;
+}
+
+/* Code blocks keep a stone rule so they read as embedded artifacts. */
+.md-typeset .highlight {
+    border: 1px solid rgba(107, 107, 115, 0.28);
+}

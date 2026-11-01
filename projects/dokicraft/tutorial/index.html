@@ -1,0 +1,1254 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A high-fidelity voxel survival game engine built from scratch in C++ and Vulkan.">
+      
+      
+      
+        <link rel="canonical" href="https://dougfessler.com/projects/dokicraft/tutorial/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../research/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Tutorial - Dokicraft</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Serif+4:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Source Serif 4";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-YQB4BCN1CH"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-YQB4BCN1CH",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#dokicraft-engine-tutorial-a-field-guide-for-unreal-developers" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Dokicraft" class="md-header__button md-logo" aria-label="Dokicraft" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A.99.99 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88zM12 4.15 6.04 7.5 12 10.85l5.96-3.35zM5 15.91l6 3.38v-6.71L5 9.21zm14 0v-6.7l-6 3.37v6.71z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Dokicraft
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Tutorial
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Surface to the Overworld"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Surface to the Overworld" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Head underground"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Head underground" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.79 10.62 3.5 21.9l-1.4-1.4L13.38 9.21zm4.48-2.89.59-.59-.79-.79.64-.64-1.42-1.42-.64.64-.79-.79-.59.59c-1.74-1.42-3.7-2.56-5.8-3.36l-.83 1.79c1.75.92 3.36 2.03 4.86 3.34L14 7l3 3 .5-.5c1.31 1.5 2.42 3.11 3.34 4.86l1.79-.83c-.8-2.1-1.94-4.06-3.36-5.8"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/defessler/Dokicraft" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    defessler/Dokicraft
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Dokicraft" class="md-nav__button md-logo" aria-label="Dokicraft" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A.99.99 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88zM12 4.15 6.04 7.5 12 10.85l5.96-3.35zM5 15.91l6 3.38v-6.71L5 9.21zm14 0v-6.7l-6 3.37v6.71z"/></svg>
+
+    </a>
+    Dokicraft
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/defessler/Dokicraft" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    defessler/Dokicraft
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-youll-learn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What You'll Learn
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-big-picture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Big Picture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#coming-from-unreal-a-rosetta-stone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coming From Unreal: A Rosetta Stone
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-0-get-it-building" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 0: Get It Building
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-six-building-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Six Building Blocks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Six Building Blocks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-window-sdl3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Window (SDL3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-vulkancontext-instance-device-queue-vma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. VulkanContext (Instance, Device, Queue, VMA)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-swapchain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Swapchain
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-renderer-the-frame-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Renderer (The Frame Loop)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-meshpipeline-and-shadercompiler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. MeshPipeline And ShaderCompiler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-gpumesh-terrain-and-camera" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. GpuMesh, Terrain, And Camera
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-frame-from-acquire-to-present" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A Frame, From Acquire To Present
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-the-scene-gets-assembled" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How The Scene Gets Assembled
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extending-it-recipes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extending It: Recipes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Extending It: Recipes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#recipe-a-fly-camera" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recipe: A Fly Camera
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipe-the-imgui-debug-hud" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recipe: The ImGui Debug HUD
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipe-real-chunks-and-binary-greedy-meshing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recipe: Real Chunks And Binary Greedy Meshing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipe-textures-your-first-descriptor-set" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recipe: Textures (Your First Descriptor Set)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipe-from-push-constants-to-uniform-buffers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recipe: From Push Constants To Uniform Buffers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipe-physics-with-jolt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recipe: Physics With Jolt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipe-gameplay-in-entt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recipe: Gameplay In EnTT
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipe-tracy-profiling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recipe: Tracy Profiling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conventions-and-gotchas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conventions And Gotchas
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-this-is-headed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where This Is Headed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deep-dives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep Dives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan & Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../smoke-test/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Smoke Test
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrospective
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="dokicraft-engine-tutorial-a-field-guide-for-unreal-developers">Dokicraft Engine Tutorial: A Field Guide For Unreal Developers<a class="headerlink" href="#dokicraft-engine-tutorial-a-field-guide-for-unreal-developers" title="Permanent link">&para;</a></h1>
+<p>This page is meant to teach you how the Dokicraft engine works, from the first line of <code>main()</code> to the pixels in the screenshot below, and how to approach extending it. It's written for an experienced gameplay programmer coming from Unreal Engine. You already know what a frame is, what a PSO is for, and why threading the renderer is hard. What you probably haven't done is own all of it yourself, with no RHI, no RDG, and no engine underneath you. That's the fun part.</p>
+<p><img alt="The first rendered scene: a lit 32x32 voxel terrain patch" src="../images/first-scene.png" /></p>
+<p>Everything in this doc references real code in this repo at time of writing. When the code and this page disagree, trust the code and let us know so we can fix the page.</p>
+<h2 id="what-youll-learn">What You'll Learn<a class="headerlink" href="#what-youll-learn" title="Permanent link">&para;</a></h2>
+<ul>
+<li>How the engine boots, renders, and shuts down, mapped onto the UE concepts you already have.</li>
+<li>The handful of Vulkan ideas UE's RHI has been hiding from you (and why they're less scary than their reputation).</li>
+<li>How the voxel scene gets generated and drawn.</li>
+<li>Concrete recipes for extending the engine: a fly camera, an ImGui HUD, real chunk meshing, textures, physics, and gameplay via ECS.</li>
+</ul>
+<h2 id="the-big-picture">The Big Picture<a class="headerlink" href="#the-big-picture" title="Permanent link">&para;</a></h2>
+<p>Dokicraft is a from-scratch C++20 voxel survival engine targeting Windows and high-end GPUs. Think Minecraft-like gameplay at higher fidelity: smaller voxels, modern lighting, streamed worlds. The architecture decisions came out of a research pass you can read in full, with citations, here:</p>
+<p>Research report:
+<code>research/RESEARCH.md</code></p>
+<p>The current stack, and why:</p>
+<ul>
+<li>Vulkan 1.3 - The rendering API. We use dynamic rendering and synchronization2, which cut most of the boilerplate Vulkan is infamous for. No render passes, no framebuffer objects.</li>
+<li>volk - A meta-loader for Vulkan. It loads function pointers at runtime so we don't link against a Vulkan SDK. The SDK isn't required to build or run.</li>
+<li>VMA (Vulkan Memory Allocator) - AMD's allocator library. It answers "which of the 11 memory types do I allocate this buffer in" so you mostly don't have to care.</li>
+<li>SDL3 - Windowing and input. Chosen over GLFW for the gamepad, audio, and haptics coverage a survival game will eventually want.</li>
+<li>shaderc - Runtime GLSL to SPIR-V compilation. Shaders compile when the game boots, which keeps the door open for hot reload.</li>
+<li>glm - Math. The de facto standard for Vulkan/OpenGL style projects.</li>
+<li>EnTT - ECS for gameplay code (linked, not yet used in the frame loop).</li>
+<li>Jolt - Physics (linked, integration comes with the survival gameplay phase).</li>
+<li>Dear ImGui - Debug and editor UI (in the dependency set, HUD recipe below).</li>
+</ul>
+<p>The engine is a static library, <code>doki_engine</code>, consumed by a thin game executable, <code>dokicraft</code>. Here's the module map. GitHub renders this diagram inline; if you're reading locally, any Mermaid viewer works.</p>
+<pre class="mermaid"><code>flowchart TD
+    subgraph game ["dokicraft (game exe)"]
+        Main["Main.cpp&lt;br/&gt;owns the loop"]
+    end
+    subgraph engine ["doki_engine (static lib)"]
+        Window["platform/Window&lt;br/&gt;SDL3"]
+        Context["render/VulkanContext&lt;br/&gt;instance, device, VMA"]
+        Swap["render/Swapchain"]
+        Renderer["render/Renderer&lt;br/&gt;frame loop, sync, depth"]
+        Pipeline["render/MeshPipeline&lt;br/&gt;+ ShaderCompiler"]
+        Mesh["render/GpuMesh&lt;br/&gt;vertex/index buffers"]
+        Terrain["scene/Terrain&lt;br/&gt;voxel gen"]
+        Camera["scene/Camera"]
+    end
+    Main --&gt; Window
+    Main --&gt; Context
+    Main --&gt; Swap
+    Main --&gt; Renderer
+    Main --&gt; Pipeline
+    Main --&gt; Mesh
+    Main --&gt; Terrain
+    Main --&gt; Camera
+    Context --&gt; Swap
+    Swap --&gt; Renderer
+    Pipeline --&gt; Renderer</code></pre>
+<p>Note: the dependency arrows are deliberately shallow. <code>Main.cpp</code> composes everything explicitly, so you can read the whole engine boot top to bottom in one file. There's no reflection, no module registry, and no magic startup order to reverse-engineer.</p>
+<h2 id="coming-from-unreal-a-rosetta-stone">Coming From Unreal: A Rosetta Stone<a class="headerlink" href="#coming-from-unreal-a-rosetta-stone" title="Permanent link">&para;</a></h2>
+<p>You don't need a UE-to-Vulkan dictionary memorized, but these mappings will make the rest of the page read faster.</p>
+<ul>
+<li>FEngineLoop / <code>Tick</code> - <code>Main.cpp</code> owns a plain <code>while (window.pollEvents())</code> loop. There's no engine loop object. You are the engine loop.</li>
+<li>UBT + <code>.uproject</code> - CMake presets plus a vcpkg manifest (<code>vcpkg.json</code>). <code>cmake --preset windows-release</code> is roughly "Generate Project Files" and "Build" folded together.</li>
+<li>RHI - Gone. We call Vulkan directly through volk. The closest thing to an RHI layer is <code>VulkanContext</code>. It's about 300 lines you can read in one sitting.</li>
+<li>RDG passes and resource transitions - Done by hand with synchronization2 barriers in <code>Renderer::drawFrame</code>. RDG's "declare reads/writes and let the graph schedule" becomes "you write the barrier yourself". It's the single biggest mindset shift. It's also covered in detail below.</li>
+<li>PSO - <code>VkPipeline</code>, built in <code>MeshPipeline</code>. Same idea, same immutability, same "build at load time, bind at draw time" rhythm. UE's PSO caching pain will feel familiar.</li>
+<li>Material parameters / uniform buffers - Push constants for now (a tiny, fast constant block baked into the command buffer). Descriptor sets and UBOs arrive when the data outgrows 128 bytes. Both are covered in the recipes.</li>
+<li>GameThread / RenderThread split - There isn't one yet. One thread does everything. Frames-in-flight (below) is what keeps the GPU busy anyway.</li>
+<li>FVector and friends - glm. Watch the conventions: this engine is Y-up and right-handed, and one world unit is one voxel. UE is Z-up, left-handed, in centimeters. If you port math from UE muscle memory, swap Y and Z and re-check your cross products.</li>
+<li>AActor / UActorComponent - Nothing yet. Gameplay will land in EnTT, which is closer to Mass than to Actors. There's a recipe below.</li>
+<li>Chaos - Jolt, integrated at the survival-gameplay phase. The integration pattern is already researched and documented.</li>
+<li>Slate / UMG - Dear ImGui for debug UI now, RmlUi (HTML/CSS, fully open source) as the candidate for shipping game UI later.</li>
+<li><code>check()</code> / <code>ensure()</code> - <code>VK_CHECK(expr)</code> aborts with the file, line, and failing expression on any Vulkan error. Fail fast and fix fast.</li>
+</ul>
+<p>Note: the coordinate and unit differences are the one place UE instincts will actively betray you. When something renders upside down or orbits the wrong way, check the Y-flip in <code>Camera</code> (explained below) before you suspect the matrix math.</p>
+<h2 id="step-0-get-it-building">Step 0: Get It Building<a class="headerlink" href="#step-0-get-it-building" title="Permanent link">&para;</a></h2>
+<p>You'll want a working build before reading further so the code excerpts have something to diff against.</p>
+<ol>
+<li>Prerequisites: Visual Studio 2022 or newer with the C++ workload, CMake 3.28+, Ninja, and Git. No Vulkan SDK needed, just a Vulkan-capable GPU driver.</li>
+<li>Clone and bootstrap:</li>
+</ol>
+<div class="highlight"><pre><span></span><code>git clone https://github.com/defessler/Dokicraft.git
+cd Dokicraft
+git clone --depth 1 https://github.com/microsoft/vcpkg.git extern/vcpkg
+extern\vcpkg\bootstrap-vcpkg.bat -disableMetrics
+</code></pre></div>
+<ol>
+<li>Build and run. From any shell:</li>
+</ol>
+<div class="highlight"><pre><span></span><code>pwsh -File Tools/Build.ps1 -Preset windows-release
+build\windows-release\bin\dokicraft.exe
+</code></pre></div>
+<p><code>Tools/Build.ps1</code> finds Visual Studio with vswhere and enters the VS dev shell for you, which is what makes Ninja plus <code>cl</code> work outside a Developer Command Prompt. The first configure builds all 16 dependencies from source through vcpkg and takes a few minutes. After that, builds are incremental and fast.</p>
+<p>A few build-system details worth knowing because they'll bite you if you fight them:</p>
+<ul>
+<li>vcpkg manifest mode - <code>vcpkg.json</code> at the repo root declares dependencies with a pinned baseline, so a clean clone always resolves the same versions. Think of it as the dependency half of a <code>.uproject</code>.</li>
+<li>Warnings as errors, scoped - Project targets compile with <code>/W4 /WX</code>, but vcpkg headers are included via MSVC's <code>/external:anglebrackets /external:W0</code>, so third-party warnings can't break our build. Include project headers with quotes and dependencies with angle brackets to keep that split working.</li>
+<li><code>VK_NO_PROTOTYPES</code> - Defined project-wide. It tells the Vulkan headers not to declare linkable function prototypes, because volk supplies every entry point at runtime. If you ever see "unresolved external symbol vkCreateDevice", something bypassed volk.</li>
+</ul>
+<h2 id="the-six-building-blocks">The Six Building Blocks<a class="headerlink" href="#the-six-building-blocks" title="Permanent link">&para;</a></h2>
+<p>To understand the engine, you need to understand six main building blocks. Each one is a class you can read in full in a few minutes. Each maps to something you already know from UE.</p>
+<h3 id="1-window-sdl3">1. Window (SDL3)<a class="headerlink" href="#1-window-sdl3" title="Permanent link">&para;</a></h3>
+<p>This is where the OS window and the event pump live. It's the analog of the game viewport plus the platform application layer, minus about two hundred thousand lines.</p>
+<p>You can find the implementation here:
+<code>src/engine/src/platform/Window.cpp</code></p>
+<p>The interesting part is how little there is. <code>pollEvents</code> drains SDL's queue and returns false when it's time to quit:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">bool</span><span class="w"> </span><span class="nf">Window::pollEvents</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">SDL_Event</span><span class="w"> </span><span class="n">event</span><span class="p">;</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">SDL_PollEvent</span><span class="p">(</span><span class="o">&amp;</span><span class="n">event</span><span class="p">))</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="n">type</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">SDL_EVENT_QUIT</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="p">...</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="n">type</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">SDL_EVENT_KEY_DOWN</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">event</span><span class="p">.</span><span class="n">key</span><span class="p">.</span><span class="n">key</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">SDLK_ESCAPE</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>In UE terms, this loop is where the platform message pump, the input subsystem, and <code>RequestEngineExit</code> all collapse into one function. When you add real input handling (see the fly camera recipe), this is the function that grows.</p>
+<h3 id="2-vulkancontext-instance-device-queue-vma">2. VulkanContext (Instance, Device, Queue, VMA)<a class="headerlink" href="#2-vulkancontext-instance-device-queue-vma" title="Permanent link">&para;</a></h3>
+<p>This owns everything that lives for the whole session: the <code>VkInstance</code>, the physical and logical device, the graphics queue, and the VMA allocator. It's the closest thing we have to an RHI. It's created once in <code>main()</code> and torn down at exit.</p>
+<p>You can find the implementation here:
+<code>src/engine/src/render/VulkanContext.cpp</code></p>
+<p>Three things in it deserve your attention.</p>
+<p>First, the volk boot dance. Vulkan has no import library in our build, so entry points load in three waves: <code>volkInitialize()</code> finds the loader DLL, <code>volkLoadInstance()</code> loads instance-level functions after the instance exists, and <code>volkLoadDevice()</code> loads device-level functions after the device exists. The constructor reads exactly in that order:</p>
+<div class="highlight"><pre><span></span><code><span class="n">VK_CHECK</span><span class="p">(</span><span class="n">volkInitialize</span><span class="p">());</span>
+<span class="n">createInstance</span><span class="p">();</span>
+<span class="n">volkLoadInstance</span><span class="p">(</span><span class="n">m_instance</span><span class="p">);</span>
+<span class="n">createSurface</span><span class="p">(</span><span class="n">window</span><span class="p">);</span>
+<span class="n">pickPhysicalDevice</span><span class="p">();</span>
+<span class="n">createLogicalDevice</span><span class="p">();</span>
+<span class="n">volkLoadDevice</span><span class="p">(</span><span class="n">m_device</span><span class="p">);</span>
+</code></pre></div>
+<p>Second, device selection. This machine exposes three adapters (an RTX 5090, an Intel iGPU, and a Parsec virtual display), and naive "take device zero" code will happily render your voxels on the wrong one. <code>pickPhysicalDevice</code> requires a graphics-and-present queue, the swapchain extension, and the Vulkan 1.3 features we depend on, then scores discrete GPUs a thousand points ahead of everything else. The log tells you what won:</p>
+<div class="highlight"><pre><span></span><code>[doki][INFO ] Selected GPU: NVIDIA GeForce RTX 5090 (Vulkan 1.4.341)
+</code></pre></div>
+<p>Third, the feature request. We turn on <code>dynamicRendering</code> and <code>synchronization2</code> (Vulkan 1.3 core), plus <code>bufferDeviceAddress</code> and <code>descriptorIndexing</code> from 1.2, which the GPU-driven rendering phase will want. Requesting features at device creation is Vulkan's version of checking <code>GRHISupportsX</code> flags, except you ask up front. The device simply refuses to be created if the hardware can't do it.</p>
+<p>Note: validation layers (Vulkan's equivalent of the D3D debug layer plus a very good RHI validation suite) only exist if a Vulkan SDK is installed. The engine detects their absence and runs without them rather than failing. If you install the LunarG SDK, they light up automatically on the next run. Treat any validation error as a real bug.</p>
+<h3 id="3-swapchain">3. Swapchain<a class="headerlink" href="#3-swapchain" title="Permanent link">&para;</a></h3>
+<p>The swapchain is the backbuffer chain: the set of images the OS compositor will actually put on screen. UE hides this behind the viewport; here it's about 150 lines.</p>
+<p>You can find the implementation here:
+<code>src/engine/src/render/Swapchain.cpp</code></p>
+<p>Decisions it makes, and why:</p>
+<ul>
+<li>Format - Prefers <code>VK_FORMAT_B8G8R8A8_SRGB</code>, so the hardware handles gamma on write and our fragment shaders think in linear color. Same convention UE renders with.</li>
+<li>Present mode - Prefers mailbox (low-latency triple buffering, no tearing) and falls back to FIFO, which is plain vsync and the only mode Vulkan guarantees everywhere.</li>
+<li>Image count - Asks for minimum plus one to reduce acquire stalls.</li>
+</ul>
+<p>There are no framebuffer or render pass objects anywhere in it. Dynamic rendering means we attach image views directly at draw time, which removes the most confusing third of classic Vulkan tutorials.</p>
+<h3 id="4-renderer-the-frame-loop">4. Renderer (The Frame Loop)<a class="headerlink" href="#4-renderer-the-frame-loop" title="Permanent link">&para;</a></h3>
+<p>This is the heart of the engine and the file to read most carefully. It owns per-frame command buffers, the synchronization objects, and a depth buffer. Every frame it runs acquire, record, submit, and present.</p>
+<p>You can find the implementation here:
+<code>src/engine/src/render/Renderer.cpp</code></p>
+<p>It deliberately doesn't know what a voxel is. The scene hands it a callback:</p>
+<div class="highlight"><pre><span></span><code><span class="k">using</span><span class="w"> </span><span class="n">RecordSceneFn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span><span class="p">(</span><span class="n">VkCommandBuffer</span><span class="w"> </span><span class="n">cmd</span><span class="p">,</span><span class="w"> </span><span class="n">VkExtent2D</span><span class="w"> </span><span class="n">extent</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">drawFrame</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">clearColor</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">RecordSceneFn</span><span class="o">&amp;</span><span class="w"> </span><span class="n">recordScene</span><span class="p">);</span>
+</code></pre></div>
+<p>The renderer opens the "render pass" (clears color and depth, sets up attachments), calls your callback to record draws, closes it, and handles presentation. It's a tiny, explicit version of what RDG's pass lambdas do. A full frame walkthrough gets its own section below.</p>
+<h3 id="5-meshpipeline-and-shadercompiler">5. MeshPipeline And ShaderCompiler<a class="headerlink" href="#5-meshpipeline-and-shadercompiler" title="Permanent link">&para;</a></h3>
+<p><code>MeshPipeline</code> builds the one graphics pipeline the scene currently needs: vertex color times a directional light, depth tested, no culling yet. <code>ShaderCompiler</code> wraps shaderc so the GLSL compiles when the pipeline is constructed.</p>
+<p>You can find the implementations here:
+<code>src/engine/src/render/MeshPipeline.cpp</code>
+<code>src/engine/src/render/ShaderCompiler.cpp</code></p>
+<p>The shaders are embedded GLSL string literals in <code>MeshPipeline.cpp</code> at time of writing. That's a deliberate stage-one choice: no asset paths to break while the pipeline count is one. They'll move to <code>shaders/</code> files once hot reload lands. The fragment shader is a plain diffuse with an ambient floor:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">vec3</span><span class="w"> </span><span class="n">normal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">normalize</span><span class="p">(</span><span class="n">vNormal</span><span class="p">);</span>
+<span class="kt">vec3</span><span class="w"> </span><span class="n">toLight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">normalize</span><span class="p">(</span><span class="o">-</span><span class="n">pc</span><span class="p">.</span><span class="n">lightDirection</span><span class="p">.</span><span class="n">xyz</span><span class="p">);</span>
+<span class="kt">float</span><span class="w"> </span><span class="n">diffuse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span><span class="w"> </span><span class="n">toLight</span><span class="p">),</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="kt">float</span><span class="w"> </span><span class="n">ambient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.28</span><span class="p">;</span>
+<span class="kt">float</span><span class="w"> </span><span class="n">intensity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ambient</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">ambient</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">diffuse</span><span class="p">;</span>
+<span class="n">outColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">vec4</span><span class="p">(</span><span class="n">vColor</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">intensity</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+</code></pre></div>
+<p>Camera and light data travel as push constants, which is Vulkan's fast path for small per-draw data:</p>
+<div class="highlight"><pre><span></span><code><span class="k">struct</span><span class="w"> </span><span class="nc">MeshPushConstants</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">glm</span><span class="o">::</span><span class="n">mat4</span><span class="w"> </span><span class="n">viewProj</span><span class="p">;</span><span class="w">       </span><span class="c1">// 64 bytes</span>
+<span class="w">    </span><span class="n">glm</span><span class="o">::</span><span class="n">vec4</span><span class="w"> </span><span class="n">lightDirection</span><span class="p">;</span><span class="w"> </span><span class="c1">// 16 bytes</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>That's 80 bytes against Vulkan's guaranteed minimum budget of 128. We're comfortably inside the portable limit. When per-draw data outgrows it (and it will, the moment textures arrive), the uniform buffer recipe below is the graduation path.</p>
+<p>One UE-relevant note on pipeline state: everything except viewport and scissor is baked into the <code>VkPipeline</code> at creation. Blend mode, depth test, vertex layout, and shaders are immutable per pipeline, exactly like a PSO. Viewport and scissor are declared dynamic so window resizes don't force a pipeline rebuild.</p>
+<h3 id="6-gpumesh-terrain-and-camera">6. GpuMesh, Terrain, And Camera<a class="headerlink" href="#6-gpumesh-terrain-and-camera" title="Permanent link">&para;</a></h3>
+<p><code>GpuMesh</code> uploads vertex and index data into VMA-allocated buffers and issues the indexed draw. The upload currently writes straight into host-visible mapped memory:</p>
+<div class="highlight"><pre><span></span><code><span class="n">VmaAllocationCreateInfo</span><span class="w"> </span><span class="n">allocInfo</span><span class="p">{};</span>
+<span class="n">allocInfo</span><span class="p">.</span><span class="n">usage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">VMA_MEMORY_USAGE_AUTO</span><span class="p">;</span>
+<span class="n">allocInfo</span><span class="p">.</span><span class="n">flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT</span><span class="w"> </span><span class="o">|</span>
+<span class="w">                  </span><span class="n">VMA_ALLOCATION_CREATE_MAPPED_BIT</span><span class="p">;</span>
+</code></pre></div>
+<p>On a modern card with resizable BAR this lands in memory that's both host-visible and device-local. That's fast enough for static scene geometry. Staged uploads through a transfer queue come when chunk streaming does, so treat the current path as "good enough on purpose".</p>
+<p><code>Terrain</code> generates the placeholder world: a 32x32 grid of columns, heights from deterministic value noise blended with a couple of sine waves, one colored cube per solid voxel, banded grass, dirt, and stone by depth. The same seed always produces the same terrain, which is what makes the smoke test's screenshot comparisons meaningful.</p>
+<p>You can find the generator here:
+<code>src/engine/src/scene/Terrain.cpp</code></p>
+<p><code>Camera</code> is a look-at perspective camera with the two lines that trip up everyone who comes to Vulkan from anywhere else:</p>
+<div class="highlight"><pre><span></span><code><span class="n">glm</span><span class="o">::</span><span class="n">mat4</span><span class="w"> </span><span class="n">proj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">perspective</span><span class="p">(</span><span class="n">fovYRadians</span><span class="p">,</span><span class="w"> </span><span class="n">aspect</span><span class="p">,</span><span class="w"> </span><span class="n">nearZ</span><span class="p">,</span><span class="w"> </span><span class="n">farZ</span><span class="p">);</span>
+<span class="n">proj</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="mf">-1.0F</span><span class="p">;</span><span class="w">    </span><span class="c1">// Vulkan clip-space Y points down</span>
+</code></pre></div>
+<p>We also define <code>GLM_FORCE_DEPTH_ZERO_TO_ONE</code> project-wide because Vulkan's depth range is 0 to 1, not OpenGL's -1 to 1. If you remove either of these you'll get an upside-down scene or a broken depth test. Now you know which file to check first.</p>
+<h2 id="a-frame-from-acquire-to-present">A Frame, From Acquire To Present<a class="headerlink" href="#a-frame-from-acquire-to-present" title="Permanent link">&para;</a></h2>
+<p>This is the part UE never let you touch. Here's the sequence <code>Renderer::drawFrame</code> runs, then the three ideas inside it that matter.</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant CPU as CPU (drawFrame)
+    participant GPU as GPU queue
+    participant WSI as Swapchain/Present
+    CPU-&gt;&gt;CPU: wait fence (frame N-2 done)
+    CPU-&gt;&gt;WSI: vkAcquireNextImageKHR
+    WSI--&gt;&gt;CPU: image index + imageAvailable semaphore
+    CPU-&gt;&gt;CPU: record commands&lt;br/&gt;(barrier, clear, draws, barrier)
+    CPU-&gt;&gt;GPU: vkQueueSubmit2&lt;br/&gt;wait imageAvailable, signal renderFinished, signal fence
+    GPU-&gt;&gt;GPU: execute command buffer
+    CPU-&gt;&gt;WSI: vkQueuePresentKHR (waits renderFinished)
+    WSI--&gt;&gt;WSI: image on screen</code></pre>
+<p>First idea: frames in flight. The CPU doesn't wait for the GPU to finish a frame before starting the next one. We keep two frames of command buffers and sync objects (<code>kFramesInFlight = 2</code>). The CPU records frame N+1 while the GPU draws frame N. The fence at the top of <code>drawFrame</code> is the throttle: it blocks only if the GPU is a full two frames behind. This is the same pipelining UE gets from its render thread, achieved with zero extra threads.</p>
+<p>Second idea: semaphores vs fences. Both are new if the RHI always did it for you. A fence lets the GPU signal the CPU ("that command buffer is done, you can reuse it"). A semaphore lets one GPU operation wait on another without the CPU involved ("don't start rendering until the swapchain image is actually available, don't present until rendering is done"). One detail worth copying if you ever write this yourself: the render-finished semaphores are per swapchain image, not per frame in flight, which avoids a subtle validation error when the two counts differ.</p>
+<p>Third idea: image layout transitions. Vulkan images live in explicit layouts (undefined, color attachment, present source, etc.). You insert barriers to move between them. This is what RDG transitions compile down to. Our frame does three: acquired image to color attachment, depth image to depth attachment, and rendered image to present source. The helper in <code>Renderer.cpp</code> shows the synchronization2 shape:</p>
+<div class="highlight"><pre><span></span><code><span class="n">transitionImage</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span><span class="w"> </span><span class="n">swapImage</span><span class="p">,</span>
+<span class="w">    </span><span class="n">VK_IMAGE_LAYOUT_UNDEFINED</span><span class="p">,</span><span class="w"> </span><span class="n">VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">VK_IMAGE_ASPECT_COLOR_BIT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="n">VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT</span><span class="p">);</span>
+</code></pre></div>
+<p>Read it as "everything before this point in stage X with access Y must complete before anything after it in stage Z with access W, and change the layout while you're at it". Once that sentence parses, you can read any barrier in any Vulkan codebase.</p>
+<p>Resize is handled where acquire or present return <code>VK_ERROR_OUT_OF_DATE_KHR</code>: rebuild the swapchain, the per-image semaphores, and the depth buffer, then skip the frame. Minimized windows just skip drawing entirely (see the loop in <code>Main.cpp</code>).</p>
+<h2 id="how-the-scene-gets-assembled">How The Scene Gets Assembled<a class="headerlink" href="#how-the-scene-gets-assembled" title="Permanent link">&para;</a></h2>
+<p><code>Main.cpp</code> is short enough to read whole. Here's just the shape:</p>
+<div class="highlight"><pre><span></span><code><span class="n">doki</span><span class="o">::</span><span class="n">Window</span><span class="w"> </span><span class="n">window</span><span class="p">(</span><span class="s">"Dokicraft"</span><span class="p">,</span><span class="w"> </span><span class="mi">1280</span><span class="p">,</span><span class="w"> </span><span class="mi">720</span><span class="p">);</span>
+<span class="n">doki</span><span class="o">::</span><span class="n">VulkanContext</span><span class="w"> </span><span class="nf">context</span><span class="p">(</span><span class="n">window</span><span class="p">.</span><span class="n">handle</span><span class="p">());</span>
+<span class="n">doki</span><span class="o">::</span><span class="n">Swapchain</span><span class="w"> </span><span class="nf">swapchain</span><span class="p">(</span><span class="n">context</span><span class="p">,</span><span class="w"> </span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p">);</span>
+<span class="n">doki</span><span class="o">::</span><span class="n">Renderer</span><span class="w"> </span><span class="nf">renderer</span><span class="p">(</span><span class="n">context</span><span class="p">,</span><span class="w"> </span><span class="n">swapchain</span><span class="p">,</span><span class="w"> </span><span class="n">window</span><span class="p">);</span>
+<span class="n">doki</span><span class="o">::</span><span class="n">MeshPipeline</span><span class="w"> </span><span class="nf">pipeline</span><span class="p">(</span><span class="n">context</span><span class="p">,</span><span class="w"> </span><span class="n">renderer</span><span class="p">.</span><span class="n">colorFormat</span><span class="p">(),</span><span class="w"> </span><span class="n">renderer</span><span class="p">.</span><span class="n">depthFormat</span><span class="p">());</span>
+
+<span class="k">const</span><span class="w"> </span><span class="n">doki</span><span class="o">::</span><span class="n">TerrainMesh</span><span class="w"> </span><span class="n">terrain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">doki</span><span class="o">::</span><span class="n">generateTerrain</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">1337U</span><span class="p">);</span>
+<span class="k">const</span><span class="w"> </span><span class="n">doki</span><span class="o">::</span><span class="n">GpuMesh</span><span class="w"> </span><span class="nf">mesh</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="n">allocator</span><span class="p">(),</span><span class="w"> </span><span class="n">terrain</span><span class="p">.</span><span class="n">vertices</span><span class="p">,</span><span class="w"> </span><span class="n">terrain</span><span class="p">.</span><span class="n">indices</span><span class="p">);</span>
+
+<span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">window</span><span class="p">.</span><span class="n">pollEvents</span><span class="p">())</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// orbit camera, build push constants...</span>
+<span class="w">    </span><span class="n">renderer</span><span class="p">.</span><span class="n">drawFrame</span><span class="p">(</span><span class="n">skyBlue</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="n">VkCommandBuffer</span><span class="w"> </span><span class="n">cmd</span><span class="p">,</span><span class="w"> </span><span class="n">VkExtent2D</span><span class="w"> </span><span class="n">extent</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// set viewport + scissor</span>
+<span class="w">        </span><span class="n">pipeline</span><span class="p">.</span><span class="n">bind</span><span class="p">(</span><span class="n">cmd</span><span class="p">);</span>
+<span class="w">        </span><span class="n">pipeline</span><span class="p">.</span><span class="n">pushConstants</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span><span class="w"> </span><span class="n">push</span><span class="p">);</span>
+<span class="w">        </span><span class="n">mesh</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">cmd</span><span class="p">);</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Construction order is destruction order reversed. Every object takes what it needs by reference. If you've fought UE subsystem initialization order, you'll appreciate how boring this is. The camera orbits the terrain on a timer for now so the scene reads as 3D before any input handling exists. Making it player-controlled is the first recipe below.</p>
+<h2 id="extending-it-recipes">Extending It: Recipes<a class="headerlink" href="#extending-it-recipes" title="Permanent link">&para;</a></h2>
+<p>Each recipe says why you'd do it and where it hooks in, then sketches the code. The sketches are written for this codebase but they're not in the repo yet. Treat them as a starting point and feel free to reshape them.</p>
+<h3 id="recipe-a-fly-camera">Recipe: A Fly Camera<a class="headerlink" href="#recipe-a-fly-camera" title="Permanent link">&para;</a></h3>
+<p>It's the natural first project. It touches input, per-frame state, and math all at once. Grow <code>Window</code> to expose input state instead of just a quit flag:</p>
+<div class="highlight"><pre><span></span><code><span class="k">struct</span><span class="w"> </span><span class="nc">InputState</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">glm</span><span class="o">::</span><span class="n">vec2</span><span class="w"> </span><span class="n">mouseDelta</span><span class="p">{</span><span class="mf">0.0F</span><span class="p">};</span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">keyDown</span><span class="p">[</span><span class="n">SDL_SCANCODE_COUNT</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">quit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>Fill it in <code>pollEvents</code> from <code>SDL_EVENT_MOUSE_MOTION</code> (accumulate <code>event.motion.xrel</code> and <code>yrel</code>) and <code>SDL_EVENT_KEY_DOWN</code> / <code>SDL_EVENT_KEY_UP</code>. Call <code>SDL_SetWindowRelativeMouseMode(m_window, true)</code> for FPS-style mouse capture. Then keep yaw and pitch in <code>Main.cpp</code> and rebuild the camera each frame:</p>
+<div class="highlight"><pre><span></span><code><span class="n">yaw</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">input</span><span class="p">.</span><span class="n">mouseDelta</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">kSensitivity</span><span class="p">;</span>
+<span class="n">pitch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">clamp</span><span class="p">(</span><span class="n">pitch</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">input</span><span class="p">.</span><span class="n">mouseDelta</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">kSensitivity</span><span class="p">,</span><span class="w"> </span><span class="mf">-1.5F</span><span class="p">,</span><span class="w"> </span><span class="mf">1.5F</span><span class="p">);</span>
+
+<span class="k">const</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="w"> </span><span class="n">forward</span><span class="p">{</span><span class="n">std</span><span class="o">::</span><span class="n">cos</span><span class="p">(</span><span class="n">pitch</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">cos</span><span class="p">(</span><span class="n">yaw</span><span class="p">),</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">sin</span><span class="p">(</span><span class="n">pitch</span><span class="p">),</span>
+<span class="w">                        </span><span class="n">std</span><span class="o">::</span><span class="n">cos</span><span class="p">(</span><span class="n">pitch</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">sin</span><span class="p">(</span><span class="n">yaw</span><span class="p">)};</span>
+<span class="k">const</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="w"> </span><span class="n">right</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">normalize</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">cross</span><span class="p">(</span><span class="n">forward</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mf">0.0F</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0F</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0F</span><span class="p">}));</span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">input</span><span class="p">.</span><span class="n">keyDown</span><span class="p">[</span><span class="n">SDL_SCANCODE_W</span><span class="p">])</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">position</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">forward</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">speed</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dt</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="c1">// ... A/S/D/Q/E ...</span>
+<span class="n">camera</span><span class="p">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">position</span><span class="p">;</span>
+<span class="n">camera</span><span class="p">.</span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">position</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">forward</span><span class="p">;</span>
+</code></pre></div>
+<p>Remember the handedness note from the Rosetta Stone: Y is up here and the cross product order above matters.</p>
+<h3 id="recipe-the-imgui-debug-hud">Recipe: The ImGui Debug HUD<a class="headerlink" href="#recipe-the-imgui-debug-hud" title="Permanent link">&para;</a></h3>
+<p>The <code>imgui</code> vcpkg dependency is already in the manifest with the <code>sdl3-binding</code> and <code>vulkan-binding</code> features, so the backends are compiled and waiting. Wire-up steps: initialize <code>ImGui_ImplSDL3_InitForVulkan</code> and <code>ImGui_ImplVulkan_Init</code> after the renderer exists, feed SDL events to <code>ImGui_ImplSDL3_ProcessEvent</code> inside <code>Window::pollEvents</code>, and record <code>ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd)</code> at the end of the scene callback so the HUD draws over the world.</p>
+<p>IMPORTANT: the vcpkg ImGui Vulkan backend is compiled without <code>VK_NO_PROTOTYPES</code>, while our engine loads everything through volk. Call <code>ImGui_ImplVulkan_LoadFunctions</code> before <code>ImGui_ImplVulkan_Init</code> and forward it to volk, or every ImGui Vulkan call will crash at startup:</p>
+<div class="highlight"><pre><span></span><code><span class="n">ImGui_ImplVulkan_LoadFunctions</span><span class="p">(</span><span class="n">VK_API_VERSION_1_3</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[](</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">userData</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">vkGetInstanceProcAddr</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">VkInstance</span><span class="o">&gt;</span><span class="p">(</span><span class="n">userData</span><span class="p">),</span><span class="w"> </span><span class="n">name</span><span class="p">);</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="n">context</span><span class="p">.</span><span class="n">instance</span><span class="p">());</span>
+</code></pre></div>
+<p>ImGui's Vulkan backend also wants a descriptor pool and your attachment formats (use <code>renderer.colorFormat()</code> and <code>renderer.depthFormat()</code> with its dynamic rendering path). The official example in the ImGui repo, <code>examples/example_sdl3_vulkan</code>, is the reference to crib from.</p>
+<h3 id="recipe-real-chunks-and-binary-greedy-meshing">Recipe: Real Chunks And Binary Greedy Meshing<a class="headerlink" href="#recipe-real-chunks-and-binary-greedy-meshing" title="Permanent link">&para;</a></h3>
+<p>This is the milestone that turns "a scene" into "a world". It's where the research earns its keep. The current <code>Terrain</code> emits six faces per solid voxel with no culling, which is fine for 32x32 and hopeless at scale. The plan:</p>
+<ol>
+<li>Store voxels in fixed-size chunks. The research favors small render chunks (Project Ascendant uses 8x8x8) grouped into larger streaming regions, but a straightforward first cut is a 62x62x62 payload in a 64x64x64 array, because the meshing algorithm wants a one-voxel neighbor apron.</li>
+<li>Replace cube emission with face culling: only emit a face where solid meets air. That alone cuts geometry by an order of magnitude.</li>
+<li>Then adopt binary greedy meshing. Pack solidity into 64-bit column masks so face culling becomes bit math (<code>faces = column &amp; ~(column &gt;&gt; 1)</code> and friends), then merge adjacent same-type faces into large quads with more bit scans. The reference implementation meshes a whole chunk in 50 to 200 microseconds single-threaded and outputs 8-byte packed quads. The algorithm is readable in an afternoon, check it out:
+   https://github.com/cgerikj/binary-greedy-meshing</li>
+<li>Emit packed quads instead of fat vertices. Six bits each for x, y, z, width, and height, plus a face id and a voxel type. Unpack in the vertex shader by indexing with <code>gl_VertexIndex</code>. Your <code>Vertex</code> struct shrinks from 36 bytes per vertex to 8 bytes per quad.</li>
+<li>One draw call per chunk is fine for dozens of chunks. The endgame per the research is one <code>vkCmdDrawIndexedIndirectCount</code> for everything, with a compute shader writing the draw list (GPU-driven culling). <code>bufferDeviceAddress</code> and <code>descriptorIndexing</code> are already enabled on the device for exactly this.</li>
+</ol>
+<p>Note: keep the deterministic seed discipline from <code>generateTerrain</code> when you build real worldgen. The smoke test anchors on a fixed-seed world. Future you will want screenshots that diff cleanly.</p>
+<h3 id="recipe-textures-your-first-descriptor-set">Recipe: Textures (Your First Descriptor Set)<a class="headerlink" href="#recipe-textures-your-first-descriptor-set" title="Permanent link">&para;</a></h3>
+<p>Push constants can't hold a texture. This recipe forces the remaining big Vulkan concept: descriptors. The five-step shape, using stb from the research stack (add the <code>stb</code> port to <code>vcpkg.json</code>):</p>
+<ol>
+<li>Load pixels with <code>stbi_load</code>.</li>
+<li>Create a <code>VkImage</code> through VMA, copy pixels in, and transition it to <code>VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL</code> with a one-shot command buffer.</li>
+<li>Create a <code>VkImageView</code> and a <code>VkSampler</code> (nearest-neighbor filtering is the correct look for a voxel atlas).</li>
+<li>Create a <code>VkDescriptorSetLayout</code> with one combined image sampler binding, a <code>VkDescriptorPool</code>, allocate a set, and point it at your view and sampler with <code>vkUpdateDescriptorSets</code>.</li>
+<li>Add the layout to the <code>VkPipelineLayout</code> in <code>MeshPipeline</code>, bind the set with <code>vkCmdBindDescriptorSets</code> before drawing, and sample it in the fragment shader via a <code>layout(set = 0, binding = 0) uniform sampler2D</code>.</li>
+</ol>
+<p>A descriptor set is just a bundle of shader-visible resource handles. If you think of it as "the Vulkan spelling of a material's texture parameters", you have the right intuition. UV coordinates ride in as a new <code>Vertex</code> attribute (or come along for free once you're unpacking greedy-meshed quads in the vertex shader).</p>
+<h3 id="recipe-from-push-constants-to-uniform-buffers">Recipe: From Push Constants To Uniform Buffers<a class="headerlink" href="#recipe-from-push-constants-to-uniform-buffers" title="Permanent link">&para;</a></h3>
+<p>When per-frame data outgrows 128 bytes (camera plus fog plus lighting rig plus time), move it into a UBO: one <code>VkBuffer</code> per frame in flight (host-visible, persistently mapped, just like <code>GpuMesh</code> does), written by the CPU each frame, exposed to shaders through the same descriptor machinery as the texture recipe. Per-frame duplication exists for the same reason <code>kFramesInFlight</code> does: frame N+1's CPU writes must not stomp a buffer the GPU is still reading for frame N.</p>
+<h3 id="recipe-physics-with-jolt">Recipe: Physics With Jolt<a class="headerlink" href="#recipe-physics-with-jolt" title="Permanent link">&para;</a></h3>
+<p>Jolt is already linked. The integration pattern for voxel terrain comes from Jolt's own author (the research report links the full discussion):</p>
+<ul>
+<li>One <code>Body</code> with a <code>StaticCompoundShape</code> per chunk.</li>
+<li>A small set of shared <code>BoxShape</code> instances reused across every block of the same size, not one shape allocation per block.</li>
+<li>Batch-add bodies and call <code>PhysicsSystem::OptimizeBroadPhase</code> after loading a wave of chunks.</li>
+<li>Rebuild a chunk's compound shape when it's edited, and wake sleeping bodies nearby.</li>
+</ul>
+<p>He confirms 100k static bodies is comfortable territory. A body per chunk scales well past anything we'll need for a while. Step the simulation once per frame from the main loop (<code>PhysicsSystem::Update</code> with fixed 1/60 collision steps). Then read body transforms when you build render matrices. Character movement wants Jolt's <code>CharacterVirtual</code>, which is the rough equivalent of UE's <code>CharacterMovementComponent</code> mode of interacting with the world, minus the networking.</p>
+<h3 id="recipe-gameplay-in-entt">Recipe: Gameplay In EnTT<a class="headerlink" href="#recipe-gameplay-in-entt" title="Permanent link">&para;</a></h3>
+<p>EnTT is closer to Mass than to Actors: entities are integer ids, components are plain structs, and systems are free functions iterating views. The pattern we suggest for this codebase:</p>
+<div class="highlight"><pre><span></span><code><span class="k">struct</span><span class="w"> </span><span class="nc">Transform</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="w"> </span><span class="n">position</span><span class="p">;</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">quat</span><span class="w"> </span><span class="n">rotation</span><span class="p">;</span><span class="w"> </span><span class="p">};</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">Velocity</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="w"> </span><span class="n">linear</span><span class="p">;</span><span class="w"> </span><span class="p">};</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">integrateMovement</span><span class="p">(</span><span class="n">entt</span><span class="o">::</span><span class="n">registry</span><span class="o">&amp;</span><span class="w"> </span><span class="n">world</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">dt</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="p">[</span><span class="n">entity</span><span class="p">,</span><span class="w"> </span><span class="n">transform</span><span class="p">,</span><span class="w"> </span><span class="n">velocity</span><span class="p">]</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">view</span><span class="o">&lt;</span><span class="n">Transform</span><span class="p">,</span><span class="w"> </span><span class="n">Velocity</span><span class="o">&gt;</span><span class="p">().</span><span class="n">each</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">transform</span><span class="p">.</span><span class="n">position</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">velocity</span><span class="p">.</span><span class="n">linear</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dt</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Call systems explicitly from the main loop in a fixed order. Resist the urge to build a scheduler until you have enough systems to need one. The mental shift from UE is that nothing Ticks itself: there's no <code>PrimaryActorTick</code>, just functions you call, which makes execution order a thing you read instead of a thing you debug.</p>
+<h3 id="recipe-tracy-profiling">Recipe: Tracy Profiling<a class="headerlink" href="#recipe-tracy-profiling" title="Permanent link">&para;</a></h3>
+<p>Once frame times matter (the meshing milestone), add the <code>tracy</code> vcpkg port, wrap the main loop phases in <code>ZoneScoped</code> markers, and run the Tracy server app to get UE Insights-quality flame graphs with about ten lines of integration. The research flagged this as worth adopting early. We agree.</p>
+<h2 id="conventions-and-gotchas">Conventions And Gotchas<a class="headerlink" href="#conventions-and-gotchas" title="Permanent link">&para;</a></h2>
+<p>House rules so your extensions land cleanly. The full profile lives in <code>CLAUDE.md</code>.</p>
+<ul>
+<li>Style - 4-space indent, 120-column lines, Allman braces, always brace single statements. <code>.clang-format</code> at the repo root enforces the mechanical parts. Run it on anything you touch.</li>
+<li>Naming - PascalCase types and functions, camelCase locals and parameters, <code>m_</code> members, SCREAMING_CASE constants, everything under namespace <code>doki</code>.</li>
+<li>Copyright - Every source file starts with <code>// Copyright (c) defessler</code>.</li>
+<li>Include order trap - volk before VMA, always. <code>vk_mem_alloc.h</code> binds to whatever Vulkan declarations it sees. It must see volk's. The headers that need both already do it correctly, so follow their lead.</li>
+<li>glm defines - <code>GLM_FORCE_DEPTH_ZERO_TO_ONE</code> and <code>GLM_FORCE_RADIANS</code> are set on the engine target. Don't include glm in a way that dodges them.</li>
+<li>The multi-GPU trap - Never index physical devices directly. <code>pickPhysicalDevice</code> exists because this dev machine will hand you a virtual display adapter if you let it.</li>
+<li>No per-frame allocations - The frame loop allocates nothing after startup. It should stay that way as far as practical. It's much easier to keep a loop allocation-free than to win the memory back later.</li>
+</ul>
+<h2 id="where-this-is-headed">Where This Is Headed<a class="headerlink" href="#where-this-is-headed" title="Permanent link">&para;</a></h2>
+<p>The roadmap, decisions, and their rationale live in two documents that are kept current as the engine grows:</p>
+<p>Plan and ledger:
+<code>Docs/PLAN.md</code></p>
+<p>Research report with citations:
+<code>research/RESEARCH.md</code></p>
+<p>The near-term arc: real chunked worldgen with binary greedy meshing, GPU compute culling with indirect draws, then the lighting jump (sun plus ambient occlusion first, probe-based DDGI later). The far-field plan is non-polygonal (per-voxel raycast quads, per the Ascendant writeup). Hardware ray tracing on RTX-class cards is an open question the research left explicitly unresolved. Plenty of room to leave your mark.</p>
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<p>Primary sources behind the architecture (all verified during the research pass):</p>
+<ul>
+<li>vkguide's Project Ascendant series, the closest existing blueprint for this engine - https://vkguide.dev/docs/ascendant/</li>
+<li>vkguide proper, the best practical modern-Vulkan tutorial - https://vkguide.dev/</li>
+<li>Binary greedy meshing reference implementation - https://github.com/cgerikj/binary-greedy-meshing</li>
+<li>VoxelRT, benchmarks of voxel acceleration structures - https://github.com/dubiousconst282/VoxelRT</li>
+<li>Aokana, GPU-driven SVDAG voxel framework (i3D 2025 paper) - https://arxiv.org/html/2505.02017v1</li>
+<li>Douglas Dwyer's voxel devlogs (DDGI, Vulkan migration) - https://www.youtube.com/watch?v=L1vhle74AEU</li>
+<li>Jolt author on voxel-world integration - https://github.com/jrouwe/JoltPhysics/discussions/446</li>
+<li>Grobert's survey of voxel rendering techniques - https://grobert.eu/voxel-techniques/</li>
+<li>Luanti (ex-Minetest), the most mature open-source voxel survival engine, read for architecture rather than rendering - https://github.com/luanti-org/luanti</li>
+<li>Hazel Engine, a general-purpose reference for engine infrastructure shape - https://github.com/StudioCherno/Hazel</li>
+</ul>
+<p>Library documentation you'll actually open:</p>
+<ul>
+<li>Vulkan spec and guide - https://docs.vulkan.org/</li>
+<li>volk - https://github.com/zeux/volk</li>
+<li>VMA - https://gpuopen-librariesandsdks.github.io/VulkanMemoryAllocator/html/</li>
+<li>SDL3 - https://wiki.libsdl.org/SDL3/FrontPage</li>
+<li>Dear ImGui - https://github.com/ocornut/imgui</li>
+<li>EnTT - https://github.com/skypjack/entt/wiki</li>
+<li>Jolt - https://jrouwe.github.io/JoltPhysics/</li>
+<li>glm - https://github.com/g-truc/glm</li>
+<li>shaderc - https://github.com/google/shaderc</li>
+</ul>
+<p>This page will change over time as the engine does. If a section drifted from the code, the code wins. Updating this page is a welcome first contribution.</p>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.top", "navigation.sections", "content.code.copy", "toc.integrate"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+        <script src="https://dougfessler.com/js/insights.js"></script>
+      
+    
+  </body>
+</html>

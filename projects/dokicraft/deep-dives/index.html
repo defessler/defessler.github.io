@@ -1,0 +1,787 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A high-fidelity voxel survival game engine built from scratch in C++ and Vulkan.">
+      
+      
+      
+        <link rel="canonical" href="https://dougfessler.com/projects/dokicraft/deep-dives/">
+      
+      
+        <link rel="prev" href="../research/">
+      
+      
+        <link rel="next" href="../plan/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Deep Dives - Dokicraft</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Serif+4:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Source Serif 4";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-YQB4BCN1CH"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-YQB4BCN1CH",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#dokicraft-research-deep-dives" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Dokicraft" class="md-header__button md-logo" aria-label="Dokicraft" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A.99.99 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88zM12 4.15 6.04 7.5 12 10.85l5.96-3.35zM5 15.91l6 3.38v-6.71L5 9.21zm14 0v-6.7l-6 3.37v6.71z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Dokicraft
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Deep Dives
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Surface to the Overworld"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Surface to the Overworld" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Head underground"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Head underground" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.79 10.62 3.5 21.9l-1.4-1.4L13.38 9.21zm4.48-2.89.59-.59-.79-.79.64-.64-1.42-1.42-.64.64-.79-.79-.59.59c-1.74-1.42-3.7-2.56-5.8-3.36l-.83 1.79c1.75.92 3.36 2.03 4.86 3.34L14 7l3 3 .5-.5c1.31 1.5 2.42 3.11 3.34 4.86l1.79-.83c-.8-2.1-1.94-4.06-3.36-5.8"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/defessler/Dokicraft" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    defessler/Dokicraft
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Dokicraft" class="md-nav__button md-logo" aria-label="Dokicraft" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A.99.99 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88zM12 4.15 6.04 7.5 12 10.85l5.96-3.35zM5 15.91l6 3.38v-6.71L5 9.21zm14 0v-6.7l-6 3.37v6.71z"/></svg>
+
+    </a>
+    Dokicraft
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/defessler/Dokicraft" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    defessler/Dokicraft
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep Dives
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep Dives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-hardware-ray-tracing-for-voxels-the-direction-is-settled" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Hardware Ray Tracing For Voxels: The Direction Is Settled
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-global-illumination-still-mostly-open-honestly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Global Illumination: Still Mostly Open, Honestly
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-lod-and-streaming-aokana-is-the-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. LOD And Streaming: Aokana Is The Template
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-persistence-pick-your-compression-granularity-deliberately" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Persistence: Pick Your Compression Granularity Deliberately
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-worldgen-fastnoise2-confirmed-the-rest-still-open" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Worldgen: FastNoise2 Confirmed, The Rest Still Open
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-physics-under-edits-the-rebuild-pattern-is-canonical" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Physics Under Edits: The Rebuild Pattern Is Canonical
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-changes-in-the-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What This Changes In The Plan
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#refuted-this-pass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Refuted This Pass
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remaining-open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remaining Open Questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sources
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan & Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../smoke-test/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Smoke Test
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrospective
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="dokicraft-research-deep-dives">Dokicraft — Research Deep Dives<a class="headerlink" href="#dokicraft-research-deep-dives" title="Permanent link">&para;</a></h1>
+<p>This page is meant as a quick reference on the second verified research pass and what it settled. The <a href="../research/">first report</a> ended with four open questions and a list of coverage gaps. This pass went after them directly: 6 search angles, 30 sources fetched, 147 claims extracted, 25 adversarially verified by 3-vote panels, 24 confirmed and 1 refuted, synthesized to the 12 findings below (run <code>wf_ff842636-3e8</code>, 113 agents, 2026-07-12). Anything that didn't survive verification is listed as a gap rather than asserted.</p>
+<p>One reading rule up front: every measured benchmark below predates Blackwell (the test hardware spans an integrated GPU, Turing, and Ampere), so treat absolute numbers as illustrative and carry only the relative rankings and architectural conclusions to our RTX 5090 target.</p>
+<h2 id="1-hardware-ray-tracing-for-voxels-the-direction-is-settled">1. Hardware Ray Tracing For Voxels: The Direction Is Settled<a class="headerlink" href="#1-hardware-ray-tracing-for-voxels-the-direction-is-settled" title="Permanent link">&para;</a></h2>
+<p>The first report couldn't say whether hardware RT beats software voxel traversal. It now looks settled in hardware RT's favor, on three independent lines of evidence:</p>
+<ul>
+<li>The strongest measurement - Peer-reviewed JCGT paper (Hansson-Söderlund, Evans, and Akenine-Möller of NVIDIA, 2022): on an RTX 3090, path tracing up to three bounces, a DXR BVH built over all non-empty voxels with a custom intersection shader beat pure shader-based traversal by roughly 3 to 5x on complex scenes. Their "Ladies" scene ran 16.1 ms versus 79.7 ms for grid sphere tracing and 54.8 ms for shader-traversed SVO ("Heads" is closer to 2.4 to 2.9x). A 2023 follow-up with tighter AABBs gained a further 20 to 31%. Caveat: their scenes are trilinearly interpolated SDF grids, not opaque cube voxels, so our intersection shaders would differ. HIGH confidence, 3-0.</li>
+<li>The architecture proof - A peer-reviewed ISVC 2024 paper ran custom voxel traversal <em>inside</em> the hardware RT pipeline (procedural AABB path, custom intersection and closest-hit shaders, RTX 2060 Super via Vulkan) and found hybrid hierarchical formats reach a new Pareto frontier of speed versus storage, up to 2.1x. The takeaway for us isn't the specific formats. It's the existence proof that software voxel logic inside hardware intersection shaders is a viable production architecture. HIGH confidence, 3-0.</li>
+<li>The compute-side corroboration - VoxelRT's benchmarks (integrated GPU, so rankings only): a plain binary BVH with DDA brick leaves is already competitive with specialized voxel structures on primary rays (175.0 Mrays/s on Sponza 2k versus Tree64's 182.6), and it's the one structure that gains RT-core acceleration on real hardware, which the iGPU test couldn't even exercise. It does fall behind on incoherent diffuse rays (102 versus ~125 Mrays/s). MEDIUM confidence, 3-0.</li>
+</ul>
+<p>What did <em>not</em> survive: the claim that greedy meshing only buys ~15% for ray traversal was refuted 0-3, so the "hardware BVH over greedy-meshed triangle quads versus per-voxel AABBs" question has no verified answer at all. That one needs an in-engine microbenchmark when far-field work starts. It's cheap to build both paths on our stack since <code>bufferDeviceAddress</code> and the RT extensions are one device-feature request away.</p>
+<h2 id="2-global-illumination-still-mostly-open-honestly">2. Global Illumination: Still Mostly Open, Honestly<a class="headerlink" href="#2-global-illumination-still-mostly-open-honestly" title="Permanent link">&para;</a></h2>
+<p>This is the section where verification did its job by killing false confidence. Nothing comparative survived on flood-fill lighting, voxel cone tracing, or ReSTIR-plus-denoiser pipelines. The only GI datapoint that survived is an existence proof:</p>
+<ul>
+<li>Compute-only DDGI works in voxel worlds - A Vulkan DDGI implementation for Minecraft-style scenes ran entirely on a compute-shader path tracer because the team's GPUs lacked the RT extension: 250 FPS on a Cornell-box scene with three lights, dropping to 29 FPS in a larger cave scene with four lights. It proves DDGI doesn't <em>require</em> hardware RT, and it warns that probe and light count scaling bites hard. LOW confidence on the numbers (a ~2020 student project, GPU model unstated, honest about its own unflattering results). 3-0.</li>
+</ul>
+<p>Our plan doesn't change: sun plus ambient occlusion first, DDGI phase 2 (Dwyer's devlog from the first pass remains the strongest practitioner evidence). The flood-fill versus DDGI versus ReSTIR comparison stays on the open-questions list, and given finding 1, an RT-backed probe tracer on the 5090 is now the likelier phase-2 shape than a compute one.</p>
+<h2 id="3-lod-and-streaming-aokana-is-the-template">3. LOD And Streaming: Aokana Is The Template<a class="headerlink" href="#3-lod-and-streaming-aokana-is-the-template" title="Permanent link">&para;</a></h2>
+<p>The first pass established Aokana (peer-reviewed, I3D 2025) renders ten-billion-voxel scenes. This pass extracted its architecture in enough detail to use:</p>
+<ul>
+<li>World structure - The map divides into axis-aligned cubic regions, each backed by a 256^3-voxel chunk.</li>
+<li>LOD scheme - A LOD n chunk keeps 256^3 resolution but covers 8x the volume of LOD n-1, built by aggregating each 2x2x2 group of child voxels into one (kept when at least 2 of 8 children are non-empty, color averaged) across 2x2x2 child-chunk groups.</li>
+<li>Streaming - Only ~5% of scene data stays resident in VRAM during navigation. At 64K resolution, San Miguel needs 424 MB of VRAM against 23.2 GB on disk, about 2%.</li>
+<li>Measured cost - ~6 ms average frames at 64K resolution on an RTX 3060 Ti, 2 to 4x faster than HashDAG on average above 32K (peaks of 4.8x speed and ~8 to 9x memory are peaks, not averages). HIGH confidence, 3-0, with the caveat that the numbers are the authors' own and the HashDAG baseline prioritizes editability over throughput.</li>
+</ul>
+<p>The honest limit: Aokana ray traces SVDAGs directly, so it never faces the problem our near field has. Nothing survived on LOD seam and crack handling for <em>meshed</em> chunk geometry, and nothing survived on mesh shaders for voxel quads. Both stay open. For the far field, though, region grouping plus 8-to-1 aggregation is now our working template rather than a research pointer.</p>
+<h2 id="4-persistence-pick-your-compression-granularity-deliberately">4. Persistence: Pick Your Compression Granularity Deliberately<a class="headerlink" href="#4-persistence-pick-your-compression-granularity-deliberately" title="Permanent link">&para;</a></h2>
+<p>New territory this pass, and it produced the clearest design guidance of the six topics:</p>
+<ul>
+<li>Anvil's two waste sources - Minecraft's region format pads every chunk to 4096-byte sector boundaries and compresses each chunk independently with zlib, which caps the compression context. Both are confirmed against the format spec.</li>
+<li>Whole-region compression halves disk - The Linear format compresses an entire 32x32-chunk region as a single zstd stream and saves roughly 50% on typical overworld data. The figure is corroborated twice over: the README's own worked example (227 GB to 120 GB, 47.3%) and an independent measurement on a different world (48.3%). The ~95% figure for The End is self-reported only. zstd itself is ~5x faster than zlib, consistent with Meta's published benchmarks. MEDIUM confidence, 3-0.</li>
+<li>The tradeoff is real and verified in code - One stream per region means decompressing the whole region to read any chunk. There's no per-chunk seek table, and the verifier confirmed the mechanism in the reference implementation rather than trusting the README. Successor formats (Linear v2 buckets, SectorTool, SHARD) exist specifically to fix this. MEDIUM confidence, 3-0.</li>
+</ul>
+<p>Design implication for Dokicraft, recorded for the persistence phase: compression granularity (per chunk, per region, or bucketed) is an explicit tradeoff between ratio and random-access streaming, zstd is the default codec, and the version tag plus migration path from our J5 convention applies to whatever container we pick.</p>
+<h2 id="5-worldgen-fastnoise2-confirmed-the-rest-still-open">5. Worldgen: FastNoise2 Confirmed, The Rest Still Open<a class="headerlink" href="#5-worldgen-fastnoise2-confirmed-the-rest-still-open" title="Permanent link">&para;</a></h2>
+<ul>
+<li>The architecture holds up - FastNoise2 compiles its generators for Scalar, SSE2, SSE4.1, AVX2, AVX512, NEON, and WASM SIMD and picks the fastest supported level at runtime. Its node graph (fractals, domain warps, blends composing as nodes) executes fused inside the SIMD pipeline with intermediates staying in registers, which is precisely what makes deep layered noise stacks cheap. Graphs can be authored visually in the bundled Node Editor and serialized to compact strings the runtime loads with <code>NewFromEncodedNodeTree</code>, so designers can iterate on terrain without an engine recompile. HIGH confidence, 3-0, mechanisms verified in source.</li>
+<li>The speed claim is directional but large - The author's benchmarks show ~5 to 7x over scalar FastNoise Lite (268 versus 37 million points/sec for 3D simplex on AVX2). Author-reported, on a 2020-era CPU, and the simplex row compares slightly different algorithm variants, so carry the direction rather than the ratio. MEDIUM confidence, 3-0.</li>
+<li>Two practical notes from verification - The project recommends ClangCL over MSVC on Windows for the SIMD paths, worth knowing for our toolchain. Cross-version compatibility of encoded node-tree strings isn't documented as guaranteed, so treat them like any other versioned asset.</li>
+</ul>
+<p>Biome blending, cave generation (3D noise versus worms), and structure placement produced no surviving claims. Those get decided by prototyping at the worldgen phase, not by citation.</p>
+<h2 id="6-physics-under-edits-the-rebuild-pattern-is-canonical">6. Physics Under Edits: The Rebuild Pattern Is Canonical<a class="headerlink" href="#6-physics-under-edits-the-rebuild-pattern-is-canonical" title="Permanent link">&para;</a></h2>
+<p>The first pass covered static terrain. This pass filled in what happens when the world changes, and the guidance converges from three primary sources (the Jolt author's discussions, Jolt's official docs, and a production Godot fix):</p>
+<ul>
+<li>The canonical shape strategy - A regular grid of tiles, one <code>StaticCompoundShape</code> per tile, rebuilding only the affected tile's compound on change. The author calls these "fairly cheap to create at run-time" and suggests keeping tiles small, 16^3, warning that 16x256x16 "may already be too much". HIGH confidence, 3-0.</li>
+<li>The burst-edit refinement - <code>StaticCompoundShape</code> costs more to create than <code>MutableCompoundShape</code> because it builds internal spatial partitioning at creation, trading construction time for query speed. Godot's Jolt module used to rebuild the static compound from scratch on every edit; the merged Godot 4.4 fix builds the cheaper mutable variant while edits are in flight and defers the upgrade to static until the next physics step. That's a directly reusable pattern for edit-heavy voxel play (digging, building). Sub-shapes are cached between rebuilds, so the rebuild cost is the compound container, not every block. HIGH confidence, 3-0.</li>
+<li>The hard no - <code>MeshShape</code> is not runtime-editable and never will be: "The MeshShape really wasn't made to be updated at run time", creation "was always meant to be an offline process". Runtime updates were deliberately added to <code>HeightFieldShape</code> and <code>MutableCompoundShape</code> through v5.6.0 and never to <code>MeshShape</code>. Per-tile MeshShape <em>rebuilds</em> remain acceptable. HIGH confidence, 3-0.</li>
+</ul>
+<p>The gap: no measured broadphase-churn or debris-body numbers survived for Teardown-scale destruction rates. When destruction lands, we profile Jolt's own tiled pattern under a synthetic edit storm rather than trusting anyone's forum estimate.</p>
+<h2 id="what-this-changes-in-the-plan">What This Changes In The Plan<a class="headerlink" href="#what-this-changes-in-the-plan" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Far field and RT - Hardware BVH over per-voxel AABBs with custom intersection shaders is promoted from open question to leading candidate. An in-engine microbenchmark (triangle BVH over greedy quads versus AABB plus intersection shader) gets scheduled when far-field work starts.</li>
+<li>Streaming - Aokana's region grouping and 8-to-1 LOD aggregation become the far-field template. Meshed-LOD seam handling still needs its own answer.</li>
+<li>Persistence - zstd, an explicit granularity decision, and versioned containers go into the §5 persistence design.</li>
+<li>Worldgen - FastNoise2 confirmed. Encoded node trees become the designer-facing terrain format. Evaluate ClangCL for the worldgen-heavy targets.</li>
+<li>Physics - The tile-plus-StaticCompound rebuild pattern with the mutable-during-bursts refinement is the adopted integration design.</li>
+<li>GI - Unchanged (sun plus AO, then DDGI), with the phase-2 tracer now likelier to ride hardware RT.</li>
+</ul>
+<h2 id="refuted-this-pass">Refuted This Pass<a class="headerlink" href="#refuted-this-pass" title="Permanent link">&para;</a></h2>
+<ul>
+<li>~~"Greedy meshing yields only about a 15% traversal improvement (up to 20x in special cases)"~~ - killed 0-3. Don't cite it, here or elsewhere.</li>
+</ul>
+<h2 id="remaining-open-questions">Remaining Open Questions<a class="headerlink" href="#remaining-open-questions" title="Permanent link">&para;</a></h2>
+<ol>
+<li>On Blackwell hardware, does a triangle BVH over greedy-meshed quads beat an AABB BVH with custom intersection shaders for opaque cube voxels? Needs our own microbenchmark.</li>
+<li>Flood-fill versus voxel cone tracing versus DDGI versus ReSTIR-plus-denoiser in a small-voxel survival world: no comparative measurements exist anywhere we could verify.</li>
+<li>LOD seam/crack handling for meshed voxel chunks, and whether mesh shaders help voxel quad geometry at all.</li>
+<li>Broadphase churn and debris management costs in Jolt at destruction scale: answered only by profiling.</li>
+</ol>
+<h2 id="sources">Sources<a class="headerlink" href="#sources" title="Permanent link">&para;</a></h2>
+<p>Primary and peer-reviewed sources behind the findings above:</p>
+<ul>
+<li>H. Hansson-Söderlund, A. Evans, T. Akenine-Möller, "Ray Tracing of Signed Distance Function Grids", JCGT vol. 11 no. 3 (2022) - https://jcgt.org/published/0011/03/06/paper-lowres.pdf</li>
+<li>Hybrid voxel formats for efficient ray tracing (ISVC 2024) - https://arxiv.org/abs/2410.14128</li>
+<li>VoxelRT acceleration-structure benchmarks - https://github.com/dubiousconst282/VoxelRT</li>
+<li>Aokana: a GPU-driven voxel rendering framework (I3D 2025) - https://arxiv.org/pdf/2505.02017</li>
+<li>DDGI for Minecraft-style worlds (compute-only Vulkan implementation) - https://github.com/helenl9098/Dynamic-Diffuse-Global-Illumination-Minecraft</li>
+<li>Linear region file format and tools - https://github.com/xymb-endcrystalme/LinearRegionFileFormatTools</li>
+<li>Minecraft region file format specification - https://minecraft.wiki/w/Region_file_format</li>
+<li>FastNoise2 - https://github.com/Auburn/FastNoise2</li>
+<li>Jolt: integrating into a voxel world (author discussion) - https://github.com/jrouwe/JoltPhysics/discussions/446</li>
+<li>Jolt: modifying MeshShape at runtime (author discussion) - https://github.com/jrouwe/JoltPhysics/discussions/1067</li>
+<li>Godot 4.4 Jolt compound-edit fix (PR #101189) - https://github.com/godotengine/godot/pull/101189</li>
+</ul>
+<p>This page will change over time as questions close. When one does, the finding moves up into the numbered sections and the open-questions list shrinks.</p>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.top", "navigation.sections", "content.code.copy", "toc.integrate"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+        <script src="https://dougfessler.com/js/insights.js"></script>
+      
+    
+  </body>
+</html>

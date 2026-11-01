@@ -1,0 +1,1186 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A high-fidelity voxel survival game engine built from scratch in C++ and Vulkan.">
+      
+      
+      
+        <link rel="canonical" href="https://dougfessler.com/projects/dokicraft/research/">
+      
+      
+        <link rel="prev" href="../tutorial/">
+      
+      
+        <link rel="next" href="../deep-dives/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Research - Dokicraft</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Serif+4:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Source Serif 4";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-YQB4BCN1CH"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-YQB4BCN1CH",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#dokicraft-architecture-research-report" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Dokicraft" class="md-header__button md-logo" aria-label="Dokicraft" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A.99.99 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88zM12 4.15 6.04 7.5 12 10.85l5.96-3.35zM5 15.91l6 3.38v-6.71L5 9.21zm14 0v-6.7l-6 3.37v6.71z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Dokicraft
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Research
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Surface to the Overworld"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Surface to the Overworld" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Head underground"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Head underground" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.79 10.62 3.5 21.9l-1.4-1.4L13.38 9.21zm4.48-2.89.59-.59-.79-.79.64-.64-1.42-1.42-.64.64-.79-.79-.59.59c-1.74-1.42-3.7-2.56-5.8-3.36l-.83 1.79c1.75.92 3.36 2.03 4.86 3.34L14 7l3 3 .5-.5c1.31 1.5 2.42 3.11 3.34 4.86l1.79-.83c-.8-2.1-1.94-4.06-3.36-5.8"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/defessler/Dokicraft" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    defessler/Dokicraft
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Dokicraft" class="md-nav__button md-logo" aria-label="Dokicraft" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A.99.99 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88zM12 4.15 6.04 7.5 12 10.85l5.96-3.35zM5 15.91l6 3.38v-6.71L5 9.21zm14 0v-6.7l-6 3.37v6.71z"/></svg>
+
+    </a>
+    Dokicraft
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/defessler/Dokicraft" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    defessler/Dokicraft
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#settled-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Settled stack
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verified-findings-confidence-ranked" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verified findings (confidence-ranked)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Verified findings (confidence-ranked)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-binary-greedy-meshing-is-the-cpu-meshing-best-practice-high-3-0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Binary greedy meshing is the CPU meshing best practice — HIGH (3-0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-acceleration-structures-for-ray-traced-voxels-wide-trees-svos-brickmaps-diverge-high-3-0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Acceleration structures for ray-traced voxels: wide trees &gt; SVOs; brickmaps diverge — HIGH (3-0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-gpu-driven-rendering-tiny-chunks-ascendant-pattern-high-3-0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. GPU-driven rendering + tiny chunks (Ascendant pattern) — HIGH (3-0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-vulkan-is-the-evidence-backed-api-choice-high-3-0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Vulkan is the evidence-backed API choice — HIGH (3-0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-streaminglod-many-shallow-per-chunk-svdags-not-one-deep-one-high-3-0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Streaming/LOD: many shallow per-chunk SVDAGs, not one deep one — HIGH (3-0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-gi-probe-based-ddgi-is-the-demonstrated-practical-choice-medium-3-0-single-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. GI: probe-based DDGI is the demonstrated practical choice — MEDIUM (3-0, single source)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-physics-jolt-with-author-prescribed-voxel-integration-high-3-0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Physics: Jolt with author-prescribed voxel integration — HIGH (3-0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-ui-ultralight-legitimate-but-encumbered-rmlui-is-the-foss-path-medium" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. UI: Ultralight legitimate but encumbered; RmlUi is the FOSS path — MEDIUM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-ecs-entt-vs-flecs-is-not-perf-decisive-medium-single-microbenchmark" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. ECS: EnTT vs flecs is not perf-decisive — MEDIUM (single microbenchmark)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-traversal-fundamentals-dda-over-fixed-step-for-small-voxels-medium-one-2-1-vote" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Traversal fundamentals: DDA over fixed-step for small voxels — MEDIUM (one 2-1 vote)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-reference-codebases-high-3-0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Reference codebases — HIGH (3-0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#refuted-claims" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Refuted claims
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#coverage-gaps-no-claims-survived-verification-choices-rest-on-general-practice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coverage gaps (no claims survived verification — choices rest on general practice)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions-revisit-at-the-phases-that-depend-on-them" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open questions (revisit at the phases that depend on them)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cross-check-hazel-engine-studiochernohazel-release-20241" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cross-check: Hazel Engine (StudioCherno/Hazel, release 2024.1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cross-check: Hazel Engine (StudioCherno/Hazel, release 2024.1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#independently-corroborates-our-settled-stack-same-choice-arrived-at-separately" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Independently corroborates our settled stack (same choice, arrived at separately)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#diverges-validated-keeping-our-choice-with-reason" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diverges — validated, keeping our choice with reason
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#worth-adopting-from-hazel-validated-additions-not-in-the-original-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worth adopting from Hazel (validated additions, not in the original stack)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#structural-patterns-to-borrow-apache-20-permits-adapting-code-with-attribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structural patterns to borrow (Apache-2.0 permits adapting code with attribution)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#method-stats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Method stats
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deep-dives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep Dives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plan & Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../smoke-test/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Smoke Test
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrospective
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="dokicraft-architecture-research-report">Dokicraft — Architecture Research Report<a class="headerlink" href="#dokicraft-architecture-research-report" title="Permanent link">&para;</a></h1>
+<p>Deep-research pass, 2026-07-11. Method: 5 search angles → 24 sources fetched →
+119 claims extracted → top 25 adversarially verified (3-vote panels) → 24
+confirmed, 1 refuted → synthesized to the 11 findings below. Run
+<code>wf_d1d97ef4-985</code> (106 agents). Findings are confidence-ranked; anything that
+did not survive verification is listed under <em>Coverage gaps</em> rather than
+asserted.</p>
+<h2 id="settled-stack">Settled stack<a class="headerlink" href="#settled-stack" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Choice</th>
+<th>Runner-up</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rendering API</td>
+<td><strong>Vulkan 1.3+</strong></td>
+<td>OpenGL 4.6 AZDO</td>
+<td>Most complete documented small-voxel engine (Ascendant/vkguide) is Vulkan; Dwyer migrated wgpu→Vulkan for performance; GPU-driven pipelines "work best on Vulkan or DX12"; keeps hardware-RT and mesh-shader doors open on the RTX 5090. User preference confirmed.</td>
+</tr>
+<tr>
+<td>Near-field geometry</td>
+<td><strong>Binary greedy meshing</strong> + GPU compute culling + multi-draw-indirect</td>
+<td>Plain greedy meshing</td>
+<td>50–200 µs per 64³-padded chunk single-threaded (avg 74 µs); 8-byte packed quads via vertex pulling; single indirect submission. Verified in code, independently reimplemented.</td>
+</tr>
+<tr>
+<td>Far-field geometry (phase 2)</td>
+<td><strong>Per-voxel raycast quads</strong> (Majercik/NVIDIA JCGT 2018) or SVDAG ray march</td>
+<td>Wide 4³ trees (Tree64)</td>
+<td>The exact near-mesh/far-raycast hybrid Ascendant ships; Aokana validates SVDAG streaming at 10-billion-voxel scale (~6 ms on RTX 3060 Ti). Brickmap DDA collapses on incoherent rays — avoid for path tracing.</td>
+</tr>
+<tr>
+<td>World structure</td>
+<td><strong>Small chunks</strong> (8³–16³ region of interest; 64³ mesh sections) in <strong>~256³ streaming regions</strong>, per-chunk LOD</td>
+<td>One deep SVDAG</td>
+<td>Many shallow per-chunk DAGs enable streaming + editing; ~5% of scene resident in VRAM (Aokana). Final chunk dims fixed in §4 of PLAN.md against meshing constraints (62³ meshable per 64³-padded section).</td>
+</tr>
+<tr>
+<td>Lighting/GI</td>
+<td>Phase 1: sun + ambient/AO. Phase 2: <strong>DDGI (probe-based)</strong></td>
+<td>HW-RT path tracing + denoise</td>
+<td>Dwyer replaced path tracing with DDGI: less noisy, cheaper, stable frame cost via fixed ray budget + compute-shader probe culling. HW-RT remains an open question on 5090-class GPUs (see Open questions).</td>
+</tr>
+<tr>
+<td>Physics</td>
+<td><strong>Jolt Physics</strong></td>
+<td>Bullet / PhysX</td>
+<td>"Box3D" doesn't exist (Box2D is 2D-only). Jolt has author-level voxel-terrain guidance: one StaticCompoundShape body per chunk, shared BoxShape instances, ~100K static bodies comfortable. No verified head-to-head vs Bullet/PhysX survived, but voxel-specific author guidance exists only for Jolt.</td>
+</tr>
+<tr>
+<td>Debug/editor UI</td>
+<td><strong>Dear ImGui</strong></td>
+<td>—</td>
+<td>Zero-risk default for tooling regardless of game-UI choice.</td>
+</tr>
+<tr>
+<td>Game UI (later)</td>
+<td><strong>RmlUi</strong> (FOSS HTML/CSS)</td>
+<td>Ultralight</td>
+<td>User prefers web-tech UI. Ultralight is purpose-built for game embedding <em>but</em>: its 10×-less-memory-than-Chromium claim was <strong>refuted 0-3</strong>, core is proprietary (free tier &lt; $100K revenue), not thread-safe, no WebGL/video. RmlUi is fully FOSS, bring-your-own-renderer (fits our Vulkan backend), no built-in JS. Decision finalized when game UI work starts.</td>
+</tr>
+<tr>
+<td>ECS</td>
+<td><strong>EnTT</strong></td>
+<td>flecs</td>
+<td>Benchmark differences real but not decisive (flecs 42 ms vs EnTT views 85 ms / groups 51 ms on 2M-entity test; iteration-style matters as much as library). EnTT: header-only, minimal, ideal vcpkg citizen. Choose on ergonomics.</td>
+</tr>
+<tr>
+<td>Windowing/input</td>
+<td><strong>SDL3</strong></td>
+<td>GLFW</td>
+<td><em>No claims survived verification here</em> — general-practice pick: SDL3 covers gamepad/IME/audio/haptics a survival game will need; GLFW would suffice for the render-core milestone only.</td>
+</tr>
+<tr>
+<td>Shader toolchain</td>
+<td><strong>shaderc (GLSL → SPIR-V at runtime)</strong> with on-disk cache</td>
+<td>Slang</td>
+<td>SDK-independence requirement (no LunarG SDK on dev machine); runtime compile enables hot reload. Slang re-evaluated if/when HW-RT work starts.</td>
+</tr>
+<tr>
+<td>Vulkan support libs</td>
+<td><strong>volk</strong> (loader) + <strong>VMA</strong> (allocator) + vcpkg <code>vulkan-headers</code></td>
+<td>—</td>
+<td>Standard SDK-free Vulkan setup.</td>
+</tr>
+<tr>
+<td>Math / noise</td>
+<td><strong>glm</strong> + <strong>FastNoise2</strong> (§4)</td>
+<td>—</td>
+<td>Community standard; FastNoise2 is SIMD-vectorized terrain noise. Hazel uses the older Auburns/FastNoise.</td>
+</tr>
+<tr>
+<td>Profiling</td>
+<td><strong>Tracy</strong></td>
+<td>—</td>
+<td>Adopted from the Hazel cross-check; frame/zone profiler, high value for a perf-critical voxel engine. Wire in during §3.</td>
+</tr>
+<tr>
+<td>Shader reflection</td>
+<td><strong>SPIRV-Cross</strong></td>
+<td>—</td>
+<td>Adopted from Hazel; auto descriptor-set/pipeline-layout generation once the shader system matures.</td>
+</tr>
+<tr>
+<td>Image loading</td>
+<td><strong>stb</strong> (<code>stb_image</code>)</td>
+<td>—</td>
+<td>Adopted from Hazel; block/texture atlas loading.</td>
+</tr>
+<tr>
+<td>Build</td>
+<td><strong>CMake ≥3.28 + Ninja + vcpkg manifest</strong></td>
+<td>—</td>
+<td><em>No verified claims survived</em> — general practice; already locked, bootstrapped, and <strong>green</strong> (§2 build passes). Hazel uses premake — divergence validated in favor of vcpkg dependency management.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="verified-findings-confidence-ranked">Verified findings (confidence-ranked)<a class="headerlink" href="#verified-findings-confidence-ranked" title="Permanent link">&para;</a></h2>
+<h3 id="1-binary-greedy-meshing-is-the-cpu-meshing-best-practice-high-3-0">1. Binary greedy meshing is the CPU meshing best practice — HIGH (3-0)<a class="headerlink" href="#1-binary-greedy-meshing-is-the-cpu-meshing-best-practice-high-3-0" title="Permanent link">&para;</a></h3>
+<p>Meshes a 64³-padded chunk in 50–200 µs single-threaded (avg 74 µs, Ryzen
+3800X) by culling and merging 64 faces at a time with bitwise ops on binary
+occupancy masks. Output is 8 bytes/quad (6-bit x/y/z/width/height, vertex
+pulling), drawn in a single <code>glMultiDrawElementsIndirect</code> call. Verified in
+code, not just README; independently reimplemented (omar-owis/VoxelEngine,
+multiple Rust ports — Inspirateur's is ~30× faster than block-mesh-rs).
+<em>Caveats:</em> 64³ cap includes neighbor padding (62³ meshable); merging does
+per-quad voxel-type lookups; benchmark excludes block-type data prep.
+Sources: <a href="https://github.com/cgerikj/binary-greedy-meshing">cgerikj/binary-greedy-meshing</a>,
+<a href="https://github.com/omar-owis/VoxelEngine">omar-owis/VoxelEngine</a>,
+<a href="https://grobert.eu/voxel-techniques/">grobert.eu/voxel-techniques</a></p>
+<h3 id="2-acceleration-structures-for-ray-traced-voxels-wide-trees-svos-brickmaps-diverge-high-3-0">2. Acceleration structures for ray-traced voxels: wide trees &gt; SVOs; brickmaps diverge — HIGH (3-0)<a class="headerlink" href="#2-acceleration-structures-for-ray-traced-voxels-wide-trees-svos-brickmaps-diverge-high-3-0" title="Permanent link">&para;</a></h3>
+<p>Wide 4³-branching trees (Tree64): ~209 Mrays/s primary vs ESVO's 57–137 in
+VoxelRT's benchmarks, best incoherent-ray ratio (~0.89×). Brickmap multi-level
+DDA is competitive on coherent primary rays (147.7 Mrays/s) but collapses on
+incoherent secondary rays (0.44×; plain DDA 0.10×) from SIMD divergence.
+Triangle-style BVH is among the fastest (~216 Mrays/s) and is the
+hardware-accelerated path. <em>Caveat:</em> all measured on an iGPU — author
+estimates 5–10× on discrete; rankings may shift on RTX hardware.
+Source: <a href="https://github.com/dubiousconst282/VoxelRT">dubiousconst282/VoxelRT</a></p>
+<h3 id="3-gpu-driven-rendering-tiny-chunks-ascendant-pattern-high-3-0">3. GPU-driven rendering + tiny chunks (Ascendant pattern) — HIGH (3-0)<a class="headerlink" href="#3-gpu-driven-rendering-tiny-chunks-ascendant-pattern-high-3-0" title="Permanent link">&para;</a></h3>
+<p>With 8×8×8 chunks, ~400,000 chunks can be in view — CPU culling is a
+non-starter; a compute shader frustum/occlusion-culls and writes indirect draw
+commands + count. Far field abandons meshing for one quad per voxel with
+ray/box intersection in the pixel shader (Majercik et al., JCGT 2018; costs
+MSAA). This near-mesh/far-raycast hybrid with GPU submission is the concrete
+pattern for small-voxel worlds at scale.
+Source: <a href="https://vkguide.dev/docs/ascendant/ascendant_geometry/">vkguide.dev Ascendant geometry</a></p>
+<h3 id="4-vulkan-is-the-evidence-backed-api-choice-high-3-0">4. Vulkan is the evidence-backed API choice — HIGH (3-0)<a class="headerlink" href="#4-vulkan-is-the-evidence-backed-api-choice-high-3-0" title="Permanent link">&para;</a></h3>
+<p>Ascendant (most complete documented small-voxel engine) is Vulkan; Dwyer
+implemented a new Vulkan renderer for performance after building on
+wgpu/WebGPU. A fully GPU-driven pipeline is <em>achievable</em> on OpenGL 4.6 AZDO
+(verified in code) — so the API choice is about hardware RT, mesh shaders,
+and ecosystem, not a capability wall. No verified Vulkan-vs-DX12 head-to-head
+survived.
+Sources: <a href="https://vkguide.dev/docs/ascendant/ascendant_geometry/">vkguide Ascendant</a>,
+<a href="https://www.youtube.com/watch?v=L1vhle74AEU">Dwyer devlog #23</a>,
+<a href="https://github.com/omar-owis/VoxelEngine">omar-owis/VoxelEngine</a></p>
+<h3 id="5-streaminglod-many-shallow-per-chunk-svdags-not-one-deep-one-high-3-0">5. Streaming/LOD: many shallow per-chunk SVDAGs, not one deep one — HIGH (3-0)<a class="headerlink" href="#5-streaminglod-many-shallow-per-chunk-svdags-not-one-deep-one-high-3-0" title="Permanent link">&para;</a></h3>
+<p>Aokana (peer-reviewed, i3D 2025): one SVDAG per 256³ chunk; CPU octree
+filters chunks for async load/unload; only ~5% of scene data resident in
+VRAM; per-chunk distance LOD. Renders tens of billions of voxels at ~6 ms
+average on an RTX 3060 Ti (2–4× faster than HashDAG baseline). <em>Caveats:</em>
+static scenes, opaque voxels, simple shading, screen res unstated — proves
+primary visibility at scale, not destructibility or GI.
+Source: <a href="https://arxiv.org/html/2505.02017v1">Aokana, arXiv 2505.02017</a></p>
+<h3 id="6-gi-probe-based-ddgi-is-the-demonstrated-practical-choice-medium-3-0-single-source">6. GI: probe-based DDGI is the demonstrated practical choice — MEDIUM (3-0, single source)<a class="headerlink" href="#6-gi-probe-based-ddgi-is-the-demonstrated-practical-choice-medium-3-0-single-source" title="Permanent link">&para;</a></h3>
+<p>Dwyer replaced path tracing with DDGI ("less noisy, more efficient");
+supports dark caves, bright exteriors, matte/shiny/emissive materials.
+Pattern: once-per-model probe bake (16-voxel grid cells, BFS probe placement
+toward largest empty subnode, 4 probe LODs) + per-frame compute culling
+(active-probe worklist) + fixed total ray budget → stable frame cost.
+<em>Caveat:</em> N=1 first-person devlog; no surviving comparison vs flood-fill,
+VCT, or HW-RT path tracing.
+Source: <a href="https://www.youtube.com/watch?v=L1vhle74AEU">Dwyer Voxel Devlog #23</a></p>
+<h3 id="7-physics-jolt-with-author-prescribed-voxel-integration-high-3-0">7. Physics: Jolt with author-prescribed voxel integration — HIGH (3-0)<a class="headerlink" href="#7-physics-jolt-with-author-prescribed-voxel-integration-high-3-0" title="Permanent link">&para;</a></h3>
+<p>jrouwe's own guidance: one Body + StaticCompoundShape per chunk (keep chunks
+small — 16³; 16×256×16 "may already be too much"), reuse shared BoxShapes
+per block size; "100K static bodies should not be an issue, so even if you
+have 5000 chunks loaded it should be fine." <em>Caveats:</em> edits rebuild the
+chunk's compound shape and wake sleeping bodies; batch-add + 
+<code>OptimizeBroadPhase</code>; dynamic-destruction performance is an open question.
+Source: <a href="https://github.com/jrouwe/JoltPhysics/discussions/446">JoltPhysics discussion #446</a></p>
+<h3 id="8-ui-ultralight-legitimate-but-encumbered-rmlui-is-the-foss-path-medium">8. UI: Ultralight legitimate but encumbered; RmlUi is the FOSS path — MEDIUM<a class="headerlink" href="#8-ui-ultralight-legitimate-but-encumbered-rmlui-is-the-foss-path-medium" title="Permanent link">&para;</a></h3>
+<p>Ultralight is GPU-accelerated HTML/CSS/JS purpose-built for game embedding
+(GPUDriver API). But its "~10× lower memory than Chromium" marketing claim
+was <strong>refuted 0-3</strong> in verification; core is proprietary (free only
+&lt; $100K/yr revenue), not thread-safe, no WebGL/video. RmlUi: fully FOSS,
+retained-mode, bring-your-own-renderer, no built-in JS. Dear ImGui remains
+the zero-risk debug/tooling default.
+Sources: <a href="https://ultralig.ht/">ultralig.ht</a>,
+<a href="https://github.com/mikke89/RmlUi/discussions/331">RmlUi discussion #331</a></p>
+<h3 id="9-ecs-entt-vs-flecs-is-not-perf-decisive-medium-single-microbenchmark">9. ECS: EnTT vs flecs is not perf-decisive — MEDIUM (single microbenchmark)<a class="headerlink" href="#9-ecs-entt-vs-flecs-is-not-perf-decisive-medium-single-microbenchmark" title="Permanent link">&para;</a></h3>
+<p>abeimler/ecs_benchmark complex-update (~2M entities, Linux/GCC 14.2): flecs
+4.0.1 42 ms vs EnTT 3.13.2 views 85 ms (groups 87, runtime-views 184, stable
+51; mustache fastest at 33). Iteration/storage choices matter as much as
+library. Choose on ergonomics. <em>Caveats:</em> single benchmark, not on
+Windows/MSVC, both libs have newer releases.
+Source: <a href="https://github.com/abeimler/ecs_benchmark">abeimler/ecs_benchmark</a></p>
+<h3 id="10-traversal-fundamentals-dda-over-fixed-step-for-small-voxels-medium-one-2-1-vote">10. Traversal fundamentals: DDA over fixed-step for small voxels — MEDIUM (one 2-1 vote)<a class="headerlink" href="#10-traversal-fundamentals-dda-over-fixed-step-for-small-voxels-medium-one-2-1-vote" title="Permanent link">&para;</a></h3>
+<p>Amanatides &amp; Woo DDA needed ~10.5M ray iterations vs 33.8M–130.4M for
+fixed-step marching (steps 0.2→0.05) in Grobert's thesis testbed — the
+textbook result; constants are scene-dependent.
+Sources: <a href="https://grobert.eu/voxel-techniques/">grobert.eu/voxel-techniques</a>,
+<a href="https://github.com/Notiooo/Voxel-Techniques">Notiooo/Voxel-Techniques</a></p>
+<h3 id="11-reference-codebases-high-3-0">11. Reference codebases — HIGH (3-0)<a class="headerlink" href="#11-reference-codebases-high-3-0" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><a href="https://github.com/luanti-org/luanti">Luanti</a></strong> (ex-Minetest) — most mature OSS C++ voxel survival engine (2010–2026, 5.16.1 May 2026, ~13.5K commits). Read for whole-engine architecture (chunk serialization, networking, modding) — <em>not</em> rendering (Irrlicht-era).</li>
+<li><strong><a href="https://github.com/dubiousconst282/VoxelRT">VoxelRT</a></strong> — acceleration-structure benchmarks.</li>
+<li><strong><a href="https://github.com/cgerikj/binary-greedy-meshing">cgerikj/binary-greedy-meshing</a></strong> — the meshing reference.</li>
+<li><strong><a href="https://vkguide.dev/docs/ascendant/">vkguide Ascendant series</a></strong> — production Vulkan small-voxel engine, our closest blueprint.</li>
+<li><strong><a href="https://github.com/omar-owis/VoxelEngine">omar-owis/VoxelEngine</a></strong> — GPU-driven OpenGL 4.6.</li>
+<li><strong><a href="https://arxiv.org/html/2505.02017v1">Aokana paper</a></strong> — SVDAG streaming at scale.</li>
+<li><strong><a href="https://grobert.eu/voxel-techniques/">Grobert thesis + testbed</a></strong> — technique survey.</li>
+<li><strong>Douglas Dwyer devlogs</strong> — DDGI, Vulkan migration.</li>
+</ul>
+<h2 id="refuted-claims">Refuted claims<a class="headerlink" href="#refuted-claims" title="Permanent link">&para;</a></h2>
+<ul>
+<li>~~"Ultralight's baseline memory usage is nearly 10× lower than Chromium's"~~ — <strong>0-3</strong>, vendor marketing, do not repeat.</li>
+</ul>
+<h2 id="coverage-gaps-no-claims-survived-verification-choices-rest-on-general-practice">Coverage gaps (no claims survived verification — choices rest on general practice)<a class="headerlink" href="#coverage-gaps-no-claims-survived-verification-choices-rest-on-general-practice" title="Permanent link">&para;</a></h2>
+<p>SDL3 vs GLFW · CMake+vcpkg vs alternatives · flood-fill vs VCT vs HW-RT GI
+comparisons · Jolt vs Bullet vs PhysX head-to-head · Teardown/John Lin/Gabe
+Rundlett specifics · clipmap-vs-octree LOD · mesh shaders · wgpu/bgfx/DX12
+as alternatives.</p>
+<h2 id="open-questions-revisit-at-the-phases-that-depend-on-them">Open questions (revisit at the phases that depend on them)<a class="headerlink" href="#open-questions-revisit-at-the-phases-that-depend-on-them" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p><strong>Update 2026-07-12:</strong> a second verified research pass addressed these — see
+<a href="../deep-dives/">DEEP-DIVES.md</a>. Q1 (hardware RT) now has a settled direction,
+Q2 (Jolt under edits) has a canonical integration pattern, and streaming,
+persistence, and worldgen gained verified findings. Q4 (GI comparison) and
+the meshed-LOD seam question remain open.</p>
+</blockquote>
+<ol>
+<li><strong>Does hardware RT (VK_KHR_ray_tracing over voxel AABBs or meshed quads) beat software wide-tree traversal on the RTX 5090?</strong> All surviving benchmarks were software on an iGPU. → revisit at far-field/GI phase.</li>
+<li><strong>Jolt under frequent edits / Teardown-scale destruction</strong> — compound-shape rebuild cost, broadphase churn, debris counts. Verified guidance covers static terrain only. → revisit when digging/destruction lands.</li>
+<li><strong>SDL3 vs GLFW and vcpkg-vs-FetchContent trade-offs</strong> for this exact library set — unverified; our picks are general practice. → cheap to revisit if friction appears.</li>
+<li><strong>At what voxel scale does DDGI probe density fail for emissive detail / contact GI</strong>, and would ReSTIR path tracing + denoising win on a 5090? → revisit at GI phase.</li>
+</ol>
+<h2 id="cross-check-hazel-engine-studiochernohazel-release-20241">Cross-check: Hazel Engine (StudioCherno/Hazel, release 2024.1)<a class="headerlink" href="#cross-check-hazel-engine-studiochernohazel-release-20241" title="Permanent link">&para;</a></h2>
+<p>Added at user request as a real-world reference stack, with the explicit
+instruction to <strong>validate, not blindly adopt</strong>. Hazel is TheCherno's
+general-purpose 2D/3D engine (Apache-2.0; premake build; an editor
+<em>Hazelnut</em>, a runtime, and C# scripting via Coral). Facts below are read
+directly from its <code>Dependencies.lua</code> and <code>.gitmodules</code> at commit <code>d16adf5</code>,
+not from memory.</p>
+<p><strong>The load-bearing caveat:</strong> Hazel is a <strong>traditional PBR triangle-mesh /
+scene-graph renderer, not a voxel engine.</strong> Its <em>rendering paradigm</em> (mesh
+rasterization, material system, Assimp-imported models) does <strong>not</strong> transfer
+to Dokicraft's voxel-specific pipeline (binary greedy meshing, GPU-driven
+culling, SVDAG/raycast far-field, DDGI) — findings §1–§6 above still govern
+rendering. What Hazel usefully validates is the <strong>engine-infrastructure</strong>
+layer around the renderer.</p>
+<h3 id="independently-corroborates-our-settled-stack-same-choice-arrived-at-separately">Independently corroborates our settled stack (same choice, arrived at separately)<a class="headerlink" href="#independently-corroborates-our-settled-stack-same-choice-arrived-at-separately" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Our pick</th>
+<th>Hazel uses</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Vulkan</td>
+<td>Vulkan (<code>vulkan-1</code>, requires <code>VULKAN_SDK</code>)</td>
+<td>Confirms Vulkan for a modern C++ engine. Hazel also uses <strong>DirectXCompiler (dxc)</strong> — it authors shaders in <strong>HLSL</strong>, not GLSL.</td>
+</tr>
+<tr>
+<td>EnTT</td>
+<td>EnTT</td>
+<td>Direct corroboration of the ECS choice.</td>
+</tr>
+<tr>
+<td>Jolt</td>
+<td><strong>JoltPhysics</strong> (3D) + <strong>Box2D</strong> (2D)</td>
+<td>Strong corroboration. Also empirically confirms research §7's aside: the 3D lib is Jolt and <strong>Box2D is 2D-only</strong> — there is no "Box3D."</td>
+</tr>
+<tr>
+<td>Dear ImGui</td>
+<td>ImGui (docking branch) + imgui-node-editor</td>
+<td>Confirms ImGui for editor/debug UI.</td>
+</tr>
+<tr>
+<td>glm</td>
+<td>glm</td>
+<td>Same.</td>
+</tr>
+<tr>
+<td>shaderc</td>
+<td>shaderc + shaderc_util</td>
+<td>Same compiler; Hazel pairs it with SPIRV-Cross (below).</td>
+</tr>
+</tbody>
+</table>
+<h3 id="diverges-validated-keeping-our-choice-with-reason">Diverges — validated, keeping our choice with reason<a class="headerlink" href="#diverges-validated-keeping-our-choice-with-reason" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Windowing: Hazel = GLFW; us = SDL3.</strong> Research found no verified evidence
+  either way. Keeping SDL3 for its gamepad/audio/haptics/IME breadth (a
+  survival game wants these); Hazel confirms GLFW is a perfectly viable
+  fallback if SDL3 friction appears.</li>
+<li><strong>Build: Hazel = premake; us = CMake + vcpkg.</strong> Keeping CMake+vcpkg for its
+  dependency management and tooling ecosystem; premake is lighter but hands
+  you manual vendored submodules (Hazel vendors ~25 of them).</li>
+<li><strong>Vulkan SDK: Hazel <em>requires</em> it; us deliberately SDK-free</strong> (volk + vcpkg
+  headers + runtime shaderc). Keeping the SDK-free approach — it builds on a
+  clean machine, which Hazel's <code>os.getenv("VULKAN_SDK")</code> does not.</li>
+<li><strong>Shader language: Hazel = HLSL→dxc; us = GLSL→shaderc.</strong> Noted as a real
+  alternative (HLSL+dxc is increasingly the modern default). Not switching
+  now, but reconsider if/when the shader system matures.</li>
+</ul>
+<h3 id="worth-adopting-from-hazel-validated-additions-not-in-the-original-stack">Worth adopting from Hazel (validated additions, not in the original stack)<a class="headerlink" href="#worth-adopting-from-hazel-validated-additions-not-in-the-original-stack" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Tracy profiler</strong> — adopt <strong>early</strong> (vcpkg <code>tracy</code>). A frame/zone profiler
+  is high-value infrastructure for a performance-critical voxel engine and
+  cheap to wire in. Best pulled in during §3.</li>
+<li><strong>SPIRV-Cross</strong> — adopt when the shader system needs <strong>reflection</strong>
+  (auto descriptor-set/pipeline-layout generation). vcpkg <code>spirv-cross</code>.</li>
+<li><strong>stb</strong> (<code>stb_image</code>) — texture/image loading; will be needed for block
+  atlases. vcpkg <code>stb</code>.</li>
+<li><strong>Deferred / later-phase, noted:</strong> MiniAudio (audio), Assimp (non-voxel
+  model import, if ever), yaml-cpp (scene/config serialization — voxel chunks
+  still want binary), msdf-atlas-gen + Freetype (crisp text), magic_enum
+  (reflection-lite utility), NVIDIA Aftermath (GPU crash dumps on the RTX
+  5090 — proprietary, not in vcpkg).</li>
+</ul>
+<h3 id="structural-patterns-to-borrow-apache-20-permits-adapting-code-with-attribution">Structural patterns to borrow (Apache-2.0 permits adapting code with attribution)<a class="headerlink" href="#structural-patterns-to-borrow-apache-20-permits-adapting-code-with-attribution" title="Permanent link">&para;</a></h3>
+<p>Hazel's <strong>module split</strong> is a proven shape for exactly this kind of project
+and matches Dokicraft's intended layout: a core <strong>engine library</strong>, a separate
+<strong>editor</strong> app (ImGui-based), a thin <strong>runtime/launcher</strong>, and an <strong>asset
+system</strong>. Adopt the organization; write our own voxel renderer inside it.</p>
+<h2 id="method-stats">Method stats<a class="headerlink" href="#method-stats" title="Permanent link">&para;</a></h2>
+<p>5 angles · 24 sources fetched · 119 claims extracted · 25 verified (3-vote
+adversarial panels) · 24 confirmed / 1 refuted / 0 unverified · 11 synthesized
+findings · 106 agents · full agent journal:
+<code>~/.claude/projects/D--Projects-Dokicraft/1ec3b9df-9d50-487e-a2f0-41f7b20fff79/subagents/workflows/wf_d1d97ef4-985/journal.jsonl</code></p>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.top", "navigation.sections", "content.code.copy", "toc.integrate"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+        <script src="https://dougfessler.com/js/insights.js"></script>
+      
+    
+  </body>
+</html>
