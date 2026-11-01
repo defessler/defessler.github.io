@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Requesting Movies &amp; TV · Mediarr</title>
+  <meta name="description" content="The everyday flow. Search, click Request, and wait for it to show up.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Requesting Movies &amp; TV · Mediarr">
+  <meta property="og:description" content="The everyday flow. Search, click Request, and wait for it to show up.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#what-it-is">What it is</a></li>
+<li class="toc-h2"><a href="#first-time-setup-once">First-time setup (once)</a></li>
+<li class="toc-h2"><a href="#requesting-something">Requesting something</a></li>
+<li class="toc-h2"><a href="#letting-other-people-request">Letting other people request</a></li>
+<li class="toc-h2"><a href="#tips">Tips</a></li>
+<li class="toc-h2"><a href="#where-this-fits">Where this fits</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/" class="active">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Requesting Movies &amp; TV</h1>
+<p class="doc-lede">The everyday flow. Search, click Request, and wait for it to show up.</p>
+<p>This guide covers the <strong>everyday way you actually use the stack</strong>: a Netflix-style
+request page where you (and anyone you invite) search for a movie or show, click
+<strong>Request</strong>, and the stack quietly finds it, downloads it, and adds it to Plex.</p>
+<blockquote>
+<p><strong>In one sentence:</strong> open the request portal, search a title, click Request, and
+a while later it&#39;s in Plex/Jellyfin, ready to play. You never touch Sonarr or
+Radarr directly.</p>
+</blockquote>
+<blockquote>
+<p>Using Jellyfin instead of Plex? Everything below is identical, and your portal is
+<strong>Jellyseerr</strong> (it works with both). Want to drive Sonarr/Radarr by hand for
+finer control? See <a href="../movies-and-tv/">Movies &amp; TV</a>.</p>
+</blockquote>
+<h2 id="what-it-is">What it is</h2>
+<p><strong>Seerr</strong> (Plex) / <strong>Jellyseerr</strong> (Jellyfin) is the friendly front door to the
+stack. It shows a browsable, searchable catalog of movies and shows. When
+someone requests one, it hands the job to <strong>Radarr</strong> (movies) or <strong>Sonarr</strong> (TV),
+which do the actual finding and downloading. The installer wires those connections
+for you (including the quality profile) so there&#39;s nothing to configure beyond
+signing in.</p>
+<p>Open it at <strong><code>http://&lt;your-NAS-IP&gt;:5056</code></strong> (find the exact link on your
+<a href="../dashboard/">Homepage dashboard</a>).</p>
+<h2 id="first-time-setup-once">First-time setup (once)</h2>
+<ol>
+<li>Open <code>http://&lt;your-NAS-IP&gt;:5056</code>.</li>
+<li><strong>Sign in with Plex</strong> (or your Jellyfin account). This is the same login you
+use to watch. Seerr uses it to know who you are and what&#39;s already in your library.</li>
+<li>That&#39;s it. The installer already connected Seerr to Radarr and Sonarr, so you
+land straight on the Discover page. (If you ever need to check, it&#39;s under
+<strong>Settings → Services</strong>.)</li>
+</ol>
+<h2 id="requesting-something">Requesting something</h2>
+<ol>
+<li>Search for a movie or show (or browse <strong>Discover</strong> / <strong>Trending</strong>).</li>
+<li>Open it and click <strong>Request</strong>.<ul>
+<li><strong>Movies</strong> download as a single request.</li>
+<li><strong>TV</strong> lets you pick <strong>which seasons</strong> (or all) before requesting.</li>
+</ul>
+</li>
+<li>As the owner, your own requests are <strong>auto-approved</strong> and sent straight to
+Radarr/Sonarr. You&#39;ll see the status move from <strong>Requested → Processing →
+Available</strong> as it downloads and imports.</li>
+<li>When it flips to <strong>Available</strong>, it&#39;s in Plex/Jellyfin, so just play it.</li>
+</ol>
+<h2 id="letting-other-people-request">Letting other people request</h2>
+<p>This is the point of Seerr. Friends and family request without touching anything technical:</p>
+<ol>
+<li><strong>Settings → Users → Import Plex Users</strong> (or invite by email for Jellyfin).</li>
+<li>They sign in with their own Plex/Jellyfin account and request what they want.</li>
+<li>Their requests land in your <strong>Requests</strong> list as <strong>Pending</strong>. Approve or deny
+with one click. (You can also turn on auto-approval per user under their permissions.)</li>
+</ol>
+<h2 id="tips">Tips</h2>
+<ul>
+<li><strong>Notifications:</strong> Settings → Notifications wires up Discord, Telegram, email,
+etc., so you get pinged when a request becomes available.</li>
+<li><strong>Already in your library?</strong> Seerr grays out the Request button and shows
+<strong>Available</strong> for anything Plex/Jellyfin already has, so you don&#39;t double-request.</li>
+<li><strong>Nothing downloads after requesting?</strong> The request reached Radarr/Sonarr but
+they found no release, usually an <a href="../indexers/">indexer</a> gap (too few sources, or
+a strict <a href="../quality-profiles/">quality profile</a>). Check the item in Radarr/Sonarr&#39;s
+Activity → Queue, or loosen the profile.</li>
+<li><strong>Migrating from Overseerr?</strong> Seerr is a fork and can import your old request
+history: <strong>Settings → Import</strong>.</li>
+</ul>
+<h2 id="where-this-fits">Where this fits</h2>
+<pre><code class="hljs">You (Seerr)  →  Radarr / Sonarr  →  Indexers  →  qBittorrent / SABnzbd  →  Plex
+  request          find + manage      search        download (via VPN)      watch</code></pre>
+<p>Each step has its own short guide: <a href="../movies-and-tv/">Movies &amp; TV</a> ·
+<a href="../indexers/">Indexers</a> · <a href="../downloads-and-vpn/">Downloads &amp; VPN</a> ·
+<a href="../media-server/">Media Server</a>.</p>
+
+<div class="doc-pager"><a class="pager-prev" href="../dashboard/">Dashboard</a><span class="pager-spacer"></span><a class="pager-next" href="../media-server/">Media Server</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+
+</body>
+</html>

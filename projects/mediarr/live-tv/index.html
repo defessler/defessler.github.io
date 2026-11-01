@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Live TV &amp; DVR · Mediarr</title>
+  <meta name="description" content="Dispatcharr: free live channels and a DVR tuner for Plex or Jellyfin, no Plex Pass needed for recording.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Live TV &amp; DVR · Mediarr">
+  <meta property="og:description" content="Dispatcharr: free live channels and a DVR tuner for Plex or Jellyfin, no Plex Pass needed for recording.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#what-you-get">What You Get</a></li>
+<li class="toc-h2"><a href="#recording-without-a-plex-pass">Recording Without A Plex Pass</a></li>
+<li class="toc-h2"><a href="#turning-it-on">Turning It On</a></li>
+<li class="toc-h3"><a href="#what-it-costs-you">What It Costs You</a></li>
+<li class="toc-h2"><a href="#finding-it">Finding It</a></li>
+<li class="toc-h2"><a href="#notes">Notes</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/" class="active">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Live TV &amp; DVR</h1>
+<p class="doc-lede">Free live channels and a DVR, presented to Plex or Jellyfin as a tuner.</p>
+<p>Dispatcharr manages live TV channels and presents itself to Plex or Jellyfin as an HDHomeRun tuner. It also records on its own, which is the part worth understanding, because it means DVR works without a Plex Pass.</p>
+<blockquote>
+<p><strong>In one sentence:</strong> turn on Live TV in the installer, pick some free channel packs, and you get a program guide and a DVR without buying anything.</p>
+</blockquote>
+<p>It&#39;s opt-in and off by default. Added in v0.19.0.</p>
+<h2 id="what-you-get">What You Get</h2>
+<p>Around 2,300 channels, if you seed all five packs, from free ad-supported services:</p>
+<ul>
+<li><strong>Pluto TV</strong></li>
+<li><strong>Samsung TV Plus</strong></li>
+<li><strong>Plex Live TV</strong></li>
+<li><strong>Roku</strong></li>
+<li><strong>Tubi</strong></li>
+</ul>
+<p>These are the same free streaming channels those services offer publicly. They come with a full program guide, so the result behaves like a channel lineup rather than a list of streams.</p>
+<p>You can also bring your own IPTV or Xtream sources instead of, or alongside, the free packs. Dispatcharr doesn&#39;t care where a channel comes from.</p>
+<h2 id="recording-without-a-plex-pass">Recording Without A Plex Pass</h2>
+<p>This is the bit people get wrong, so it&#39;s worth being precise.</p>
+<p>Plex&#39;s own live TV and DVR features require a Plex Pass. Dispatcharr&#39;s DVR doesn&#39;t, because Dispatcharr does the recording itself. It writes finished recordings into <code>Media/Recordings</code> as ordinary video files, and your media server then indexes them the same way it indexes anything else in your library.</p>
+<p>So the split is:</p>
+<p>Recording - Dispatcharr does it, free, on Plex or Jellyfin.</p>
+<p>Live tuning inside Plex - needs a Plex Pass, because that&#39;s Plex&#39;s own feature and Dispatcharr is just the tuner it talks to.</p>
+<p>Live tuning inside Jellyfin - free, since Jellyfin&#39;s live TV and DVR aren&#39;t paywalled.</p>
+<p>Watching in Dispatcharr&#39;s own web UI - free, always, regardless of media server.</p>
+<div class="callout callout-important"><p><span class="callout-label">IMPORTANT:</span> recordings land in <code>Media/Recordings</code> and nothing prunes them. A season pass on a daily show will fill a disk eventually. <a href="../storage/">LibrARRian</a> will show you when that&#39;s happening.</p></div>
+<h2 id="turning-it-on">Turning It On</h2>
+<p>In the installer&#39;s <strong>Configure</strong> screen, enable <strong>Live TV &amp; DVR</strong>. You&#39;ll need to set an admin username and password. The installer creates that account on Dispatcharr&#39;s first boot and then uses it to seed everything, so a blank password means the feature deploys unconfigured.</p>
+<p>Pick which channel packs to seed. All five are pre-selected, which gives you the fullest guide out of the box. Trim the list if you&#39;d rather not have 2,300 channels.</p>
+<p>Then finish the run. Step 10 of the install does the rest: it waits out Dispatcharr&#39;s slow first boot, creates the admin account, signs in, seeds the packs&#39; M3U and guide sources, turns on channel auto-sync so imported streams become real tuner channels, and, on Jellyfin, registers the tuner and guide for you.</p>
+<div class="callout callout-note"><p><span class="callout-label">Note:</span> Dispatcharr&#39;s first boot is genuinely slow. It runs database migrations before it serves anything, so a &quot;not serving HTTP yet&quot; warning at the end of an install is expected rather than a problem. Give it a few minutes and re-run the health check.</p></div>
+<h3 id="what-it-costs-you">What It Costs You</h3>
+<p>Dispatcharr is the heaviest thing in the stack by some margin, and it&#39;s worth knowing that before you turn it on. It&#39;s the only service that bundles PostgreSQL, Redis, Celery and FFmpeg into one container, which is why it&#39;s opt-in rather than always-on.</p>
+<p>Budget roughly 2 GB of RAM for it, more if you record and stream at the same time, since FFmpeg does the work for both.</p>
+<div class="callout callout-important"><p><span class="callout-label">IMPORTANT:</span> on a NAS that&#39;s already tight on memory, the usual symptom is not a helpful error. The container gets killed part-way through its first-boot migrations, Docker restarts it, and it loops forever showing &quot;restarting&quot; and never answering on 9191. If that happens, check <code>docker inspect -f &#39;{{.State.OOMKilled}}&#39; dispatcharr</code>. A <code>true</code> there means memory, not configuration, and no amount of re-running the installer will fix it.</p></div>
+<h2 id="finding-it">Finding It</h2>
+<p>The web UI is on port 9191, and there&#39;s a tile for it on your <a href="../dashboard/">dashboard</a>. Everything about the channel lineup, the guide, and recording schedules lives in that UI.</p>
+<p>On Jellyfin the tuner is registered automatically, so live TV shows up in Jellyfin without you configuring anything.</p>
+<p>On Plex you&#39;ll need to add the tuner yourself, under <strong>Settings → Live TV &amp; DVR → Set up Plex DVR</strong>. Plex should discover it on the network as an HDHomeRun. Remember this part is the Plex Pass gate, and Dispatcharr&#39;s own recording works regardless.</p>
+<h2 id="notes">Notes</h2>
+<ul>
+<li><strong>It&#39;s LAN-only and not behind the VPN.</strong> Plex and Jellyfin have to reach it on your network as a tuner, so it publishes directly. Putting it behind the VPN would make it invisible to your own media server.</li>
+<li><strong>Free channels come and go.</strong> These lineups are maintained by the streaming services, not by Mediarr. Channels appearing and disappearing over time is normal, and re-syncing the source picks up the current lineup.</li>
+<li><strong>Guide data is included.</strong> You don&#39;t need a separate XMLTV subscription for the free packs.</li>
+</ul>
+
+<div class="doc-pager"><a class="pager-prev" href="../quality-profiles/">Quality Profiles</a><span class="pager-spacer"></span><a class="pager-next" href="../storage/">Storage &amp; Re-grabbing</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+
+</body>
+</html>

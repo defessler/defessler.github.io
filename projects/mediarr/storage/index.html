@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Storage &amp; Re-grabbing · Mediarr</title>
+  <meta name="description" content="LibrARRian: find what is eating your disk, and re-grab releases at a different quality.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Storage &amp; Re-grabbing · Mediarr">
+  <meta property="og:description" content="LibrARRian: find what is eating your disk, and re-grab releases at a different quality.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#what-it-shows">What It Shows</a></li>
+<li class="toc-h3"><a href="#individual-files-not-just-titles">Individual Files, Not Just Titles</a></li>
+<li class="toc-h3"><a href="#why-bytes-per-hour">Why Bytes Per Hour</a></li>
+<li class="toc-h2"><a href="#turning-it-on">Turning It On</a></li>
+<li class="toc-h2"><a href="#finding-things">Finding Things</a></li>
+<li class="toc-h3"><a href="#sorting">Sorting</a></li>
+<li class="toc-h3"><a href="#paging">Paging</a></li>
+<li class="toc-h3"><a href="#on-the-command-line">On The Command Line</a></li>
+<li class="toc-h2"><a href="#re-grabbing-at-a-different-quality">Re-Grabbing At A Different Quality</a></li>
+<li class="toc-h3"><a href="#changing-quality">Changing Quality</a></li>
+<li class="toc-h3"><a href="#replacing-one-file">Replacing One File</a></li>
+<li class="toc-h3"><a href="#the-recycle-bin">The Recycle Bin</a></li>
+<li class="toc-h3"><a href="#turning-off-actions">Turning Off Actions</a></li>
+<li class="toc-h3"><a href="#picking-targets">Picking Targets</a></li>
+<li class="toc-h2"><a href="#notes">Notes</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/" class="active">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Storage &amp; Re-grabbing</h1>
+<p class="doc-lede">Find what&#39;s eating your array, then decide what to do about it.</p>
+<p>Every arr already knows how many bytes each movie, series, and artist takes and what quality it grabbed. Nothing ever put those on one screen, so working out where your disk went meant paging through Radarr&#39;s list view and doing the arithmetic yourself.</p>
+<p>LibrARRian is that screen. It&#39;s opt-in and off by default. Added in v0.20.0.</p>
+<blockquote>
+<p><strong>In one sentence:</strong> turn on LibrARRian, open it, and see exactly what&#39;s eating your array and whether it&#39;s worth keeping.</p>
+</blockquote>
+<h2 id="what-it-shows">What It Shows</h2>
+<p><strong>Disks</strong> - free and used per mount, read from the arr&#39;s own view so it reports the filesystem your library actually lives on.</p>
+<p><strong>Unaccounted bytes</strong> - what the filesystem says is used, minus what the arrs claim. This is your orphan detector. Failed imports, extras, other shares on the same volume, and files the arrs no longer track all land here. It&#39;s a pointer, not an accusation.</p>
+<p><strong>One results table</strong> - every title, or every file, sorted and filtered however you ask. See <a href="#finding-things">Finding things</a>.</p>
+<p><strong>Space by quality</strong> - bytes and counts grouped by tier, which is what you look at to decide whether dropping a collection from Remux to Bluray is worth the trouble.</p>
+<p><strong>Upgrade backlog</strong> - each arr&#39;s cutoff-unmet count, meaning items it already considers below your quality bar and would replace on the next search.</p>
+<p><strong>Recycle bins</strong> - what&#39;s waiting in each arr&#39;s bin, how big it is, and how long before that arr clears it. See <a href="#the-recycle-bin">The Recycle Bin</a>.</p>
+<p><strong>Which version you&#39;re on</strong> - the header line carries the Mediarr version and when the wizard last deployed to this NAS. The same pair shows up as a tile on your <a href="../dashboard/">dashboard</a>. It&#39;s the quick answer to &quot;did that update actually land?&quot;, which previously took guessing from which features the page happened to show.</p>
+<p><strong>Big and never played</strong> - last-played and play count, pulled from Tautulli on Plex or from Jellyfin&#39;s own watch data. This is the view that actually decides things.</p>
+<h3 id="individual-files-not-just-titles">Individual Files, Not Just Titles</h3>
+<p>A movie is one file, so the two are the same thing. A series isn&#39;t. Sixty episodes roll up into one row, and that row is an average, which is a good way to hide a bad file.</p>
+<p>The case worth catching: a show sitting on a 1080p profile where somebody once hand-grabbed a single episode as a 40 GB remux. The series total looks large but plausible, its dominant quality still reads WEBDL-1080p because the other fifty-nine episodes outvote the one, and nothing on the page suggests anything is wrong.</p>
+<p>That&#39;s what the <strong>Files</strong> scope is for. Every file on its own, ranked however you sort it, ignoring what owns it.</p>
+<p>Its <strong>vs siblings</strong> column is the signal that matters, because raw size on its own says nothing. 40 GB is normal for a feature film and absurd for one episode of a comedy. Six times the rest of the same show is unambiguous either way. Each file is compared against the median of its own siblings, so a series where <em>everything</em> is 30 GB is never flagged. Nothing about it is out of step.</p>
+<h3 id="why-bytes-per-hour">Why Bytes Per Hour</h3>
+<p>Sorting by raw size only ever finds long shows. A 90 GB twelve-hour series is completely normal. A 90 GB two-hour film is a remux you probably didn&#39;t mean to keep.</p>
+<p>Rate separates those two cases and raw size can&#39;t. Click the <strong>Per hour</strong> header to sort by it, or set a rate floor in the filter bar, and what&#39;s left is a list of things worth reclaiming.</p>
+<h2 id="turning-it-on">Turning It On</h2>
+<p>Enable <strong>LibrARRian</strong> on the installer&#39;s <strong>Configure</strong> screen and finish a run. It appears on port 8890 and gets a tile under Maintenance on your <a href="../dashboard/">dashboard</a>.</p>
+<p>You can also skip the container entirely and run the same report over SSH:</p>
+<pre><code class="language-bash hljs"><span class="hljs-comment"># The full report</span>
+python3 scripts/librarian.py --report
+
+<span class="hljs-comment"># Faster on a big TV library, skips the per-series quality breakdown</span>
+python3 scripts/librarian.py --report --fast
+
+<span class="hljs-comment"># Machine-readable, if you want to post-process it</span>
+python3 scripts/librarian.py --json &gt; library.json</code></pre>
+<p>Write mode is on out of the box, so the page can re-grab as well as report. If you&#39;d rather it only ever read, untick <strong>Allow re-grab actions</strong> on the same Configure screen. Set that way it issues nothing but GETs, so it can&#39;t edit a profile, trigger a search, or delete a file. See <a href="#turning-off-actions">Turning Off Actions</a> below.</p>
+<p>Either way it needs no credentials of its own, takes no docker socket, and mounts the install directory read-only.</p>
+<h2 id="finding-things">Finding Things</h2>
+<p>There&#39;s <strong>one results table</strong>, not a stack of them. It used to be five separate cards (biggest, most bloated, never played, largest files, files out of step), which meant the same title appeared three times and you had to know which card answered your question. Those orderings are now just what the sort headers and the quick views do.</p>
+<p><strong>Titles</strong> and <strong>Files</strong> are two scopes of that one table, picked with the tabs above it. They stay separate because they&#39;re different rows with different actions: a title has a runtime and a play count, a file has neither. Controls that only mean something for a title hide themselves when you switch to Files, rather than sitting there doing nothing.</p>
+<p><strong>Quick views</strong> are one-click presets. <em>Biggest</em>, <em>Most bloated</em>, <em>Never played</em>, and <em>Out of step</em> each set the scope, clear the filters, and sort the right column. They&#39;re the fastest way in, and everything they do you can also do by hand.</p>
+<p>The search box is fuzzy. Type roughly what you mean and it narrows as you go.</p>
+<p>Matching is subsequence-based with scoring, so <code>rmx 216</code> finds <code>Remux-2160p</code> and <code>sev</code> finds <code>Severance</code>. Several words all have to match, which makes <code>sonarr remux</code> a useful way to ask &quot;which of my TV shows are remuxes&quot;. It searches title, year, quality, codec and which app owns the item, so <code>x265</code> and <code>radarr</code> work as searches too.</p>
+<p>Press <code>/</code> anywhere on the page to jump to the box, and Escape to clear it.</p>
+<p>Alongside it there are plain filters for app, quality tier, minimum size, minimum rate, and never-played. Any filter that&#39;s actually narrowing the list turns cyan, so a short result set always explains itself. The rate floor is the one that catches a bloated ninety-minute film, because no size floor ever will. That film is smaller than any long series you own.</p>
+<h3 id="sorting">Sorting</h3>
+<p>Every column header sorts, which is what lets one table replace five. Click a header to sort by it, click it again to flip the direction. Numbers sort on their real value rather than on the text, so 900 MB lands below 4 TB where it belongs, and number columns open on the big end because that&#39;s the end you came for.</p>
+<p>A column you picked sticks while you type in the search box. Without one, the results re-order themselves by how well they match what you typed.</p>
+<h3 id="paging">Paging</h3>
+<p>One table with your whole library in it needs paging, so there is some. <strong>Rows per page</strong> is an input you set to whatever suits your screen, and it&#39;s remembered for next time. <strong>Show all</strong> drops the limit entirely.</p>
+<p>Every matching row stays in the page regardless, which is what lets the filters be honest: they&#39;re filtering everything you have, not just what&#39;s currently on screen. Paging only decides how much is rendered at once.</p>
+<p>Two behaviours worth knowing. Narrowing the filters or changing the sort puts you back on page one, since staying on page nine of a result set that just became three rows long shows you nothing. And <strong>a selection survives paging</strong>. Ticking something on page one and paging away doesn&#39;t quietly untick it, unlike filtering it out, which does.</p>
+<h3 id="on-the-command-line">On The Command Line</h3>
+<p>The same narrowing works there:</p>
+<pre><code class="language-bash hljs"><span class="hljs-comment"># Fuzzy, same matcher as the web UI</span>
+python3 scripts/librarian.py --report --filter <span class="hljs-string">&quot;remux&quot;</span>
+
+<span class="hljs-comment"># Combine with plain filters</span>
+python3 scripts/librarian.py --report --arr radarr --min-size 20GB --unplayed
+
+<span class="hljs-comment"># Bytes per hour of runtime, which --min-size can&#x27;t express</span>
+python3 scripts/librarian.py --report --min-rate 4GB</code></pre>
+<h2 id="re-grabbing-at-a-different-quality">Re-Grabbing At A Different Quality</h2>
+<p>Once you know what&#39;s oversized, the next question is what to do about it. Upgrading and downgrading are not symmetric, and that catches people out.</p>
+<p>An arr will happily replace a file with a better one. It will never replace a file with a worse one. So the two paths differ.</p>
+<p>LibrARRian can drive both for you, or you can do them by hand in the arr. The buttons are there by default. See <a href="#turning-off-actions">Turning Off Actions</a> if you&#39;d rather they weren&#39;t.</p>
+<h3 id="changing-quality">Changing Quality</h3>
+<p>Select the items, pick the profile you want, and press the button. There&#39;s one button, not two. Upgrade versus shrink was never really a choice you make, it&#39;s a consequence of the profile you picked compared with what each item already has, so the page works it out instead of asking.</p>
+<p>It tells you which way it went before you commit. Pick something higher and it reads <strong>Upgrade 3 items</strong>, plain, with &quot;nothing is deleted&quot; beside it. Pick something lower and it turns red and reads <strong>Shrink 3 items</strong>. Select a mix and it says so: <em>1 of them shrink, the rest just upgrade</em>.</p>
+<p>That last case is the one two buttons handled badly. A selection can be above the target for some items and below it for others, and the right answer is different per item. Only the ones actually above the target lose their files.</p>
+<p><strong>Upgrading</strong> sets the profile and triggers a search. The arr keeps your current file until something better actually imports, so nothing goes missing in the meantime. This is the safe direction, and it&#39;s why the cutoff-unmet count is a to-do list rather than a warning.</p>
+<p>By hand: Radarr or Sonarr → select → <strong>Mass Editor</strong> → set the profile → search.</p>
+<p><strong>Shrinking</strong> has to delete first, and order matters. LibrARRian does it in this order for a reason:</p>
+<ol>
+<li>Set the <strong>lower</strong> quality profile first.</li>
+<li>Delete the existing files, through the arr so the Recycle Bin catches them.</li>
+<li>Run a search.</li>
+</ol>
+<p>Do it in the other order and the search re-grabs the same oversized release you were trying to get rid of, because at that moment the old profile still says it&#39;s the best thing available.</p>
+<div class="callout callout-important"><p><span class="callout-label">IMPORTANT:</span> a shrink leaves the item unavailable until a new release lands, which might be minutes or might be never for something obscure. LibrARRian refuses to delete anything at all unless the arr has <strong>Settings → Media Management → Recycle Bin</strong> set, so deletions stay recoverable, but that safety net is only as good as the disk space you leave in the bin.</p></div>
+<p>Shrinking isn&#39;t offered for Lidarr. There it would mean deleting every track file an artist owns, which is too blunt to sit behind one button. Picking a lower profile for a Lidarr artist is refused with an explanation rather than silently doing something drastic. Upgrading works normally.</p>
+<p>One safety note on how the direction is decided: profiles are ranked by the best quality they allow, read from the arr itself. If that can&#39;t be read for some reason, the item is treated as an upgrade. Guessing wrong that way costs a re-download. Guessing wrong the other way costs the file.</p>
+<h3 id="replacing-one-file">Replacing One File</h3>
+<p>Shrink works on whole items, which is the wrong tool for a single bad episode. Shrinking a series to fix one file deletes all sixty of them.</p>
+<p>So files have their own action. Tick the files you want, press <strong>Replace file(s)</strong>, and LibrARRian deletes exactly those and searches for exactly what they covered. On Sonarr that means the affected episodes, not the series. The quality profile is left alone, because the point here is &quot;this particular file is wrong&quot;, not &quot;re-grade this show&quot;.</p>
+<p>That distinction matters for the outlier case. The show&#39;s profile is already right. One file just doesn&#39;t match it, and re-searching under the existing profile is what fixes that.</p>
+<p>Same rails as everything else: it refuses without a Recycle Bin, shows you the plan first, and logs what it deleted.</p>
+<h3 id="the-recycle-bin">The Recycle Bin</h3>
+<p>Every delete here goes through the arr, which means it lands in that arr&#39;s Recycle Bin rather than disappearing. The installer sets one up per app at <code>${DATA_ROOT}/.recycle/&lt;arr&gt;</code> and keeps things for <strong>30 days</strong>, which is more generous than the arr default of 7. After that the arr clears it on its own schedule.</p>
+<p>There&#39;s a catch worth understanding before you shrink anything: <strong>the bin is on the same filesystem as your media</strong>. Deleting doesn&#39;t free space, it moves it sideways. And since a shrink also downloads a replacement, your disk usage goes <em>up</em> until the bin is cleared. On a nearly-full array that&#39;s the difference between reclaiming space and running out of it.</p>
+<p>So LibrARRian shows you the bins directly: the path, how long each keeps things, how many files are in there, and how much space that is. A bin set to keep things forever gets called out, because an arr will never clear that one by itself.</p>
+<p><strong>Empty now</strong> deletes the contents immediately and gives the space straight back.</p>
+<div class="callout callout-important"><p><span class="callout-label">IMPORTANT:</span> this is the one action here with no undo. Everything else is recoverable <em>because</em> it goes to the recycle bin first, and this is the recycle bin. It shows you the exact size and file count and asks a second time before doing anything, and what it removed goes to the audit log, but nothing catches it afterwards.</p></div>
+<p>The bin folders themselves are always left in place. The arrs validate that the path exists and reject their entire media management config if it&#39;s missing, so removing them would break the next wizard run in a way that looks nothing like its cause.</p>
+<p>Prefer not to have the button at all? It follows the same switch as everything else, see below.</p>
+<h3 id="turning-off-actions">Turning Off Actions</h3>
+<p>Actions are on by default and have their own switch, on the installer&#39;s <strong>Configure</strong> screen under Storage report, or <code>LIBRARIAN_ALLOW_ACTIONS=false</code> in <code>.env</code>.</p>
+<p>The switch is separate from the report because LibrARRian has no login. Anyone who can reach port 8890 on your network can use whatever it exposes. On a LAN you don&#39;t fully trust, turning this off leaves you the report without the delete button.</p>
+<p>With actions on, the guard rails are:</p>
+<ul>
+<li>Every action shows you the exact plan first, listing the items and what will happen, and waits for a second confirmation. That confirmation is single-use.</li>
+<li>Deletes go through the arr&#39;s API, so the Recycle Bin applies, and refuse outright without one configured.</li>
+<li>One run touches at most 25 items by default (<code>LIBRARIAN_MAX_BATCH</code>).</li>
+<li>Everything applied is appended to <code>librarian/actions.log</code> in your install directory, including the paths of deleted files, which is what makes a Recycle Bin restore possible later.</li>
+<li>Selection is per-app. You can&#39;t mix Radarr and Sonarr items in one action.</li>
+</ul>
+<h3 id="picking-targets">Picking Targets</h3>
+<p>The report is the shortlist for both directions. Sort by bytes per hour to find what&#39;s worth shrinking, cross-reference against never-played to find what you won&#39;t miss, and read the cutoff-unmet counts to see what each arr already wants to upgrade on its own.</p>
+<h2 id="notes">Notes</h2>
+<ul>
+<li><strong>Unaccounted bytes are normal.</strong> Downloads in progress and extras live there too. A large number is worth a look, not an alarm.</li>
+<li><strong>Watch data needs Tautulli or Jellyfin.</strong> On a Plex install without Tautulli, or when neither is reachable, the report degrades to size-only rather than failing.</li>
+<li><strong>Results are cached.</strong> The page caches for ten minutes so a refresh doesn&#39;t re-scan every arr. There&#39;s a Rescan button when you want it fresh.</li>
+<li><strong>A short or empty panel means a source didn&#39;t answer.</strong> Every failure shows as a warning line on the page rather than an error, so a single unreachable arr costs you one panel, not the whole report.</li>
+</ul>
+
+<div class="doc-pager"><a class="pager-prev" href="../live-tv/">Live TV &amp; DVR</a><span class="pager-spacer"></span><a class="pager-next" href="../reading/">Comics, Manga &amp; Books</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+
+</body>
+</html>

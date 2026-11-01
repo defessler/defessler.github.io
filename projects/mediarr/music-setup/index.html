@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Music Setup · Mediarr</title>
+  <meta name="description" content="Download music automatically with Soulseek wired into Lidarr.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Music Setup · Mediarr">
+  <meta property="og:description" content="Download music automatically with Soulseek wired into Lidarr.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#what-you-get">What you get</a></li>
+<li class="toc-h2"><a href="#before-you-start">Before you start</a></li>
+<li class="toc-h2"><a href="#turn-it-on-in-the-installer">Turn it on (in the installer)</a></li>
+<li class="toc-h3"><a href="#the-slskd-api-key-you-can-ignore-it">The &quot;slskd API key&quot;: you can ignore it</a></li>
+<li class="toc-h2"><a href="#how-it-works">How it works</a></li>
+<li class="toc-h3"><a href="#where-the-music-lands">Where the music lands</a></li>
+<li class="toc-h2"><a href="#after-install-check-its-working">After install: check it&#39;s working</a></li>
+<li class="toc-h2"><a href="#vpn--what-to-expect">VPN &amp; what to expect</a></li>
+<li class="toc-h2"><a href="#troubleshooting">Troubleshooting</a></li>
+<li class="toc-h2"><a href="#turning-it-off">Turning it off</a></li>
+<li class="toc-h2"><a href="#quick-reference">Quick reference</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/" class="active">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Music Setup</h1>
+<p class="doc-lede">Download music automatically with Soulseek wired into Lidarr.</p>
+<p>This guide explains how to set up and use the <strong>music download</strong> feature in
+Mediarr: <strong>Soulseek</strong>, wired into Lidarr so your wanted albums get found and
+downloaded automatically.</p>
+<blockquote>
+<p><strong>In one sentence:</strong> turn on Soulseek in the installer, give it a free
+Soulseek account, and <code>soularr</code> will watch Lidarr&#39;s wanted list and pull
+matching music off the Soulseek network (through your VPN) for Lidarr to
+import.</p>
+</blockquote>
+<blockquote>
+<p>Want to <strong>play</strong> your music as stations/playlists? See
+<a href="../music-playback/">Play your music like stations + playlists (Plexamp)</a>.</p>
+</blockquote>
+<hr>
+<h2 id="what-you-get">What you get</h2>
+<p>Two small containers, added only when you opt in:</p>
+<ul>
+<li><strong>slskd</strong> - the Soulseek client/daemon. It connects to the Soulseek network,
+searches, and downloads. It runs <strong>inside your VPN</strong> (the same way
+qBittorrent does), and has a web UI at <strong><code>http://&lt;NAS-IP&gt;:5030</code></strong>.</li>
+<li><strong>soularr</strong> - the bridge. Every few minutes it reads Lidarr&#39;s <em>wanted</em> list,
+asks slskd to search Soulseek for each missing album, downloads the best
+match, and hands it to Lidarr to import.</li>
+</ul>
+<p>Everything is <strong>off by default</strong>, so nothing changes for existing installs unless
+you explicitly enable it.</p>
+<hr>
+<h2 id="before-you-start">Before you start</h2>
+<p>You need three things:</p>
+<ol>
+<li><strong>Lidarr enabled.</strong> Soulseek feeds Lidarr, so Lidarr must be part of your
+stack. (It&#39;s on by default.)</li>
+<li><strong>A free Soulseek account.</strong> Create one at
+<a href="https://www.slsknet.org">slsknet.org</a> or directly in the slskd web UI on
+first run. There&#39;s no cost.</li>
+<li><strong>A VPN is strongly recommended.</strong> slskd routes through gluetun just like
+qBittorrent. You can run it without a VPN, but you shouldn&#39;t share a P2P
+network connection unprotected. See
+<a href="#vpn--what-to-expect">VPN &amp; expectations</a> below.</li>
+</ol>
+<hr>
+<h2 id="turn-it-on-in-the-installer">Turn it on (in the installer)</h2>
+<p>On the <strong>Configure</strong> screen:</p>
+<ol>
+<li><p>Open the <strong>Services</strong> group and check <strong>Lidarr</strong> (if it isn&#39;t already) and
+<strong>Soulseek</strong>. Soulseek shows a small &quot;needs Lidarr&quot; hint if Lidarr is off.</p>
+</li>
+<li><p>Open the <strong>Music</strong> group and enter the <strong>one</strong> thing it needs, your free
+Soulseek account:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>What to put</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Soulseek username</strong></td>
+<td>Your Soulseek account name</td>
+</tr>
+<tr>
+<td><strong>Soulseek password</strong></td>
+<td>Your Soulseek account password</td>
+</tr>
+</tbody></table></div>
+<p>That&#39;s it. Everything else (the scan interval and the internal API key) is
+under <strong>&quot;Optional settings — you can skip these&quot;</strong> with sensible defaults.</p>
+</li>
+<li><p>Finish the wizard and install as normal. The install is idempotent, so if you
+already installed without Soulseek, just re-run <strong>Install</strong> with Soulseek
+checked. Your existing data and settings are preserved.</p>
+</li>
+</ol>
+<h3 id="the-slskd-api-key-you-can-ignore-it">The &quot;slskd API key&quot;: you can ignore it</h3>
+<p>You may notice an <em>slskd API key</em> field under Optional settings. <strong>Leave it
+blank.</strong> It is <strong>not</strong> a Soulseek login. It&#39;s just an internal secret the two
+Soulseek containers use to talk to each other, and <strong>the installer generates one
+for you</strong> automatically on first run. The only reason to ever set it yourself is
+if you want to pin a specific value.</p>
+<hr>
+<h2 id="how-it-works">How it works</h2>
+<pre><code class="hljs">   Lidarr  ──&quot;I&#39;m missing these albums&quot;──►  soularr
+                                              │
+                                              │  search + download via REST
+                                              ▼
+                                            slskd  ──► Soulseek network
+                                              │            (through your VPN)
+                                              ▼
+              ${DATA_ROOT}/Downloads/Soulseek  ◄── completed files land here
+                                              │
+                                              ▼
+   Lidarr  ◄──&quot;new music to import&quot;───────────┘</code></pre>
+<ul>
+<li><strong>soularr</strong> runs a loop every <code>SOULARR_INTERVAL</code> seconds (default 300 = 5
+minutes). It is <em>not</em> a cron job. It&#39;s a self-contained loop inside the
+container, so there&#39;s nothing to schedule.</li>
+<li><strong>slskd</strong> downloads completed files into a shared folder that Lidarr also
+sees, so Lidarr can <strong>hardlink/import</strong> them with no copying.</li>
+<li>Partial/incomplete downloads stay hidden inside slskd&#39;s own data dir, so
+Lidarr never sees a half-finished file.</li>
+</ul>
+<h3 id="where-the-music-lands">Where the music lands</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>What</th>
+<th>Path on the NAS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Downloads (shared by slskd, soularr, Lidarr)</td>
+<td><code>${DATA_ROOT}/Downloads/Soulseek</code></td>
+</tr>
+<tr>
+<td>slskd config</td>
+<td><code>${INSTALL_DIR}/slskd/config</code></td>
+</tr>
+<tr>
+<td>soularr config (<code>config.ini</code>)</td>
+<td><code>${INSTALL_DIR}/soularr/config</code></td>
+</tr>
+<tr>
+<td>Final imported music (by Lidarr)</td>
+<td><code>${DATA_ROOT}/Media/Music</code></td>
+</tr>
+</tbody></table></div>
+<hr>
+<h2 id="after-install-check-its-working">After install: check it&#39;s working</h2>
+<ol>
+<li><strong>Open the slskd web UI</strong> at <code>http://&lt;NAS-IP&gt;:5030</code>. It&#39;s also a tile in the
+<strong>Downloads</strong> section of your Homepage dashboard. <strong>Log in with the slskd
+dashboard default, username <code>slskd</code> and password <code>slskd</code>.</strong> This is the
+<em>dashboard</em> login, <strong>not</strong> your Soulseek account. Once inside, the dashboard
+should show <strong>&quot;Connected&quot;</strong> to the Soulseek network using the username/
+password you entered in the installer (give it a minute on first boot). To
+change the dashboard login, edit the <code>web.authentication</code> section of
+<code>${INSTALL_DIR}/slskd/config/slskd.yml</code> and run <code>docker restart slskd</code>.</li>
+<li><strong>Give Lidarr something to find.</strong> In Lidarr, add an artist or mark an album
+as <em>Monitored</em> + <em>Search</em> so it lands on the wanted list.</li>
+<li><strong>Watch soularr work.</strong> Within one scan interval (≤5 min by default) soularr
+will search and start a download. You can follow it:<pre><code class="language-bash hljs">docker logs -f soularr</code></pre>
+You&#39;ll see it connect to Lidarr and to slskd (<code>http://&lt;NAS-IP&gt;:5030</code>), search
+for each wanted album, and queue downloads.</li>
+<li><strong>Confirm the import.</strong> Completed downloads appear under
+<code>${DATA_ROOT}/Downloads/Soulseek</code> and Lidarr imports them into
+<code>${DATA_ROOT}/Media/Music</code>.</li>
+</ol>
+<hr>
+<h2 id="vpn--what-to-expect">VPN &amp; what to expect</h2>
+<p>slskd egresses through the same VPN container as qBittorrent. One thing to know:</p>
+<ul>
+<li><strong>If your VPN provider has no port forwarding</strong> (e.g. <strong>NordVPN</strong>), Soulseek
+runs <strong>outbound-only</strong>. Downloads still work, but <strong>search results and the
+ability to browse some users are reduced</strong>. This is a documented Soulseek
+behavior, not a bug. For the best Soulseek experience, use a
+port-forwarding-capable provider (Proton, PIA, AirVPN), the same advice that
+applies to torrent seeding.</li>
+</ul>
+<hr>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p><strong>The slskd web UI won&#39;t load at <code>:5030</code>.</strong>
+Make sure you&#39;re on <strong>v0.7.3 or newer</strong>. Earlier builds shipped slskd on the
+wrong port and the UI was unreachable. Update the installer, re-run <strong>Update</strong>
+(or <strong>Install</strong>), and try again. Also confirm the VPN container (<code>gluetun</code>) is
+healthy, because slskd lives inside its network, so if the VPN is down, so is slskd.</p>
+<p><strong>I can&#39;t log in to the slskd dashboard at <code>:5030</code>.</strong>
+The dashboard login is slskd&#39;s own default, username <code>slskd</code> and password <code>slskd</code>,
+<strong>not</strong> your Soulseek account. (Your Soulseek account goes in a field <em>inside</em>
+the dashboard, and the installer already filled it in for you.) To change the
+dashboard login, edit the <code>web.authentication</code> section of
+<code>${INSTALL_DIR}/slskd/config/slskd.yml</code>, then run <code>docker restart slskd</code>.</p>
+<p><strong>slskd says it can&#39;t log in to Soulseek.</strong>
+Double-check <code>SLSKD_USER</code>/<code>SLSKD_PASS</code> match a real Soulseek account. You can
+create/verify the account directly in the slskd web UI. (Tip: a password
+containing <code>#</code> is fine, since v0.7.4+ no longer truncates credentials at <code>#</code>.)</p>
+<p><strong>soularr runs but never downloads anything.</strong></p>
+<ul>
+<li>Confirm Lidarr actually has albums on its <strong>wanted</strong> list (Monitored +
+searched).</li>
+<li>Check <code>docker logs soularr</code> - if it can&#39;t reach slskd, confirm the web UI
+loads at <code>http://&lt;NAS-IP&gt;:5030</code>.</li>
+<li>Soulseek is a real P2P network: niche or brand-new releases may simply have no
+seeders. Popular albums in common formats (FLAC, MP3-320) find matches most
+reliably.</li>
+</ul>
+<p><strong>Downloads complete but Lidarr doesn&#39;t import them.</strong>
+This is almost always a path-mapping mismatch. With a standard install all three
+containers share <code>${DATA_ROOT}/Downloads/Soulseek</code>, so it should &quot;just work.&quot; If
+you customized paths, make sure slskd&#39;s download dir and Lidarr&#39;s view of it
+point at the <strong>same physical folder</strong>.</p>
+<p><strong>I see a one-time warning about a missing slskd API key.</strong>
+If you left the API key blank, set one in the <strong>Music</strong> group and re-run. soularr
+needs it to drive slskd.</p>
+<hr>
+<h2 id="turning-it-off">Turning it off</h2>
+<p>Uncheck <strong>Soulseek</strong> in the Configure screen and re-run <strong>Install</strong> (or
+<strong>Update</strong>). The <code>slskd</code> and <code>soularr</code> containers are stopped and removed. Your
+already-downloaded and imported music is untouched. Your Lidarr setup keeps
+working with your other download clients (qBittorrent / SABnzbd).</p>
+<hr>
+<h2 id="quick-reference">Quick reference</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>slskd web UI</td>
+<td><code>http://&lt;NAS-IP&gt;:5030</code></td>
+</tr>
+<tr>
+<td>Routed through VPN</td>
+<td>Yes (gluetun, like qBittorrent)</td>
+</tr>
+<tr>
+<td>Requires</td>
+<td>Lidarr + a free Soulseek account</td>
+</tr>
+<tr>
+<td>Default state</td>
+<td><strong>Off</strong> (opt-in)</td>
+</tr>
+<tr>
+<td>Scan interval</td>
+<td><code>SOULARR_INTERVAL</code>, default 300s</td>
+</tr>
+<tr>
+<td>Shared download dir</td>
+<td><code>${DATA_ROOT}/Downloads/Soulseek</code></td>
+</tr>
+<tr>
+<td>Env keys</td>
+<td><code>ENABLE_SOULSEEK</code>, <code>SLSKD_USER</code>, <code>SLSKD_PASS</code>, <code>SLSKD_API_KEY</code>, <code>SOULARR_INTERVAL</code></td>
+</tr>
+</tbody></table></div>
+<p>For the technical design and implementation details, see
+<a href="https://github.com/defessler/Mediarr-Installer/blob/master/docs/SOULSEEK-SPEC.md"><code>SOULSEEK-SPEC.md</code></a>.</p>
+
+<div class="doc-pager"><a class="pager-prev" href="../music/">Music</a><span class="pager-spacer"></span><a class="pager-next" href="../playlist-sync/">Playlist Sync</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+
+</body>
+</html>

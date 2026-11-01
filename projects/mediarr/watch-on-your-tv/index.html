@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Watch on Your TV · Mediarr</title>
+  <meta name="description" content="For anyone who&#39;s been invited to a Plex library. Accept the invite, sign in on your TV, and start watching, with no technical knowledge assumed.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Watch on Your TV · Mediarr">
+  <meta property="og:description" content="For anyone who&#39;s been invited to a Plex library. Accept the invite, sign in on your TV, and start watching, with no technical knowledge assumed.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#what-you-need">What You Need</a></li>
+<li class="toc-h2"><a href="#step-1-accept-the-invite">Step 1: Accept the Invite</a></li>
+<li class="toc-h2"><a href="#step-2-open-plex-on-your-tv">Step 2: Open Plex on Your TV</a></li>
+<li class="toc-h3"><a href="#samsung">Samsung</a></li>
+<li class="toc-h3"><a href="#lg">LG</a></li>
+<li class="toc-h3"><a href="#roku-sticks-and-roku-tvs">Roku Sticks and Roku TVs</a></li>
+<li class="toc-h3"><a href="#amazon-fire-tv">Amazon Fire TV</a></li>
+<li class="toc-h3"><a href="#google-tv-and-android-tv">Google TV and Android TV</a></li>
+<li class="toc-h3"><a href="#vizio">Vizio</a></li>
+<li class="toc-h3"><a href="#hisense">Hisense</a></li>
+<li class="toc-h3"><a href="#apple-tv">Apple TV</a></li>
+<li class="toc-h3"><a href="#xbox-and-playstation">Xbox and PlayStation</a></li>
+<li class="toc-h2"><a href="#step-3-sign-in-on-the-tv">Step 3: Sign In on the TV</a></li>
+<li class="toc-h2"><a href="#step-4-find-their-library">Step 4: Find Their Library</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/" class="active">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Watch on Your TV</h1>
+<p class="doc-lede">Someone shared their Plex library with you. Here&#39;s how to accept it and get it on your TV, whatever brand you own.</p>
+<p>This page is written for the person <strong>receiving</strong> the invite, not the person running
+the server. If a friend or a family member has shared their Plex library with you,
+this walks you through the whole thing, from the email to pressing play.</p>
+<p>It assumes you&#39;ve never set anything like this up before. Nothing here needs a
+computer, and nothing here needs you to understand what a server is. Set aside about
+ten minutes, and have your phone next to you for one step in the middle.</p>
+<figure>
+<img src="../assets/img/the-four-steps.svg" alt="The four steps in order: accept the invite by email, open Plex on the TV, sign in with a short code, then press play.">
+<figcaption class="figure-caption">Four steps, and only one of them involves typing.</figcaption>
+</figure>
+
+<h2 id="what-you-need">What You Need</h2>
+<ul>
+<li>Your TV, with the Plex app on it.</li>
+<li>The invite email.</li>
+<li>Your phone or a computer, just for one sign-in step.</li>
+<li>The Wi-Fi your TV is already using. There&#39;s nothing new to set up there.</li>
+</ul>
+<p>The only thing you&#39;ll ever type on the TV is a four-character code, and even that is
+optional if you&#39;d rather use your phone.</p>
+<h2 id="step-1-accept-the-invite">Step 1: Accept the Invite</h2>
+<figure>
+<img src="../assets/img/invite-email.svg" alt="An email from Plex saying a library has been shared with you, with a green Accept the invite button in the middle.">
+<figcaption class="figure-caption">The email you're looking for. The button is the whole of step one.</figcaption>
+</figure>
+
+<ol>
+<li><strong>Find the email.</strong> It comes from Plex and says someone wants to share their library with you. Check your spam or junk folder if it isn&#39;t in your inbox, because it lands there more often than it should.</li>
+<li><strong>Press the button in the email</strong> that accepts the invitation.</li>
+<li><strong>Sign in, or make an account.</strong> If you&#39;ve never used Plex before, this is where you create one. You can use &quot;Continue with Google&quot; or &quot;Continue with Apple&quot; if you&#39;d rather not invent another password.</li>
+<li>That&#39;s the invite accepted. You should be able to see their library right away in the web page that opens.</li>
+</ol>
+<div class="callout callout-note"><p><span class="callout-label">Note:</span> If the email never turns up at all, you can accept without it. Go to
+<code>app.plex.tv</code> in any web browser, sign in, then open Settings -&gt; Manage Library
+Access and look under &quot;Library Invitations Received&quot;. Accept it with the checkmark.</p></div>
+<h2 id="step-2-open-plex-on-your-tv">Step 2: Open Plex on Your TV</h2>
+<p>Every TV puts its apps in a slightly different place. Find your brand below. If you&#39;re
+not sure what you&#39;ve got, the name is usually printed on the front of the TV, and the
+remote is a giveaway too.</p>
+<figure>
+<img src="../assets/img/tv-remotes.svg" alt="Five TV remotes drawn side by side, with the Home button marked in green on each. On Roku it sits at the top right, on Fire TV, Samsung, and LG it sits below the ring or wheel, and on Apple TV the TV button does the same job.">
+<figcaption class="figure-caption">Roughly where Home sits on the common remotes. Models vary, so treat this as a hint rather than a map. It's nearly always a little house, and Apple is the one exception.</figcaption>
+</figure>
+
+<ul>
+<li><a href="#samsung">Samsung</a></li>
+<li><a href="#lg">LG</a></li>
+<li><a href="#roku-sticks-and-roku-tvs">Roku Sticks and Roku TVs</a> (TCL, Hisense, Sharp, Philips, onn)</li>
+<li><a href="#amazon-fire-tv">Amazon Fire TV</a> (Toshiba, Insignia, some Hisense)</li>
+<li><a href="#google-tv-and-android-tv">Google TV and Android TV</a> (Sony, TCL, Hisense, Philips, Nvidia Shield)</li>
+<li><a href="#vizio">Vizio</a></li>
+<li><a href="#hisense">Hisense</a></li>
+<li><a href="#apple-tv">Apple TV</a></li>
+<li><a href="#xbox-and-playstation">Xbox and PlayStation</a></li>
+</ul>
+<p>Whichever one you have, you&#39;re hunting for the same thing.</p>
+<figure>
+<img src="../assets/img/plex-on-tv-home.svg" alt="A TV home screen with a row of app tiles along the bottom, one of them the Plex app, marked in green.">
+<figcaption class="figure-caption">Press Home, then look along your row of apps. Plex is the one you want.</figcaption>
+</figure>
+
+<h3 id="samsung">Samsung</h3>
+<ol>
+<li>Press the <strong>Home</strong> button on the remote (the little house icon).</li>
+<li>Your apps run along the bottom of the screen. Look along that row for <strong>Plex</strong> and open it.</li>
+<li>If it isn&#39;t in the row, choose <strong>&quot;Apps&quot;</strong>, pick the magnifying glass, and type <code>Plex</code>.</li>
+</ol>
+<h3 id="lg">LG</h3>
+<ol>
+<li>Press the <strong>Home</strong> button (the house icon). If you have the pointer remote, aka the Magic Remote, it&#39;s the button in the middle.</li>
+<li>Your apps sit in the bar along the bottom. Scroll along it and open <strong>Plex</strong>.</li>
+<li>If it isn&#39;t in the bar, open <strong>&quot;Apps&quot;</strong> and search for <code>Plex</code>.</li>
+</ol>
+<h3 id="roku-sticks-and-roku-tvs">Roku Sticks and Roku TVs</h3>
+<p>This covers the Roku Express and Streaming Stick, plus every TV with Roku built in.
+TCL, Hisense, Sharp, Philips, and onn all make them.</p>
+<ol>
+<li>Press <strong>Home</strong> (the house icon) on the purple Roku remote.</li>
+<li>Your channels are the grid of tiles on the right. Arrow across to <strong>Plex</strong> and press OK.</li>
+<li>New channels land at the bottom of that grid, so scroll down if you don&#39;t spot it near the top.</li>
+</ol>
+<h3 id="amazon-fire-tv">Amazon Fire TV</h3>
+<p>This covers the Fire TV Stick and Cube, plus TVs with Fire TV built in. Toshiba,
+Insignia, some Hisense and Pioneer sets, and Amazon&#39;s own TVs all use it.</p>
+<ol>
+<li>Press <strong>Home</strong> on the remote.</li>
+<li>Move up to the <strong>&quot;Your Apps&quot;</strong> row and arrow along it to <strong>Plex</strong>.</li>
+<li>You can also hold the microphone button and just say &quot;Plex&quot;, which skips the hunting.</li>
+</ol>
+<h3 id="google-tv-and-android-tv">Google TV and Android TV</h3>
+<p>This is the biggest group. Most Sony, TCL, Hisense, Philips, and Sharp TVs sold in the
+last few years run one of these, and so do the Google TV Streamer, the Chromecast with
+Google TV, and the Nvidia Shield.</p>
+<ol>
+<li>Press <strong>Home</strong>.</li>
+<li>Go to the <strong>&quot;Apps&quot;</strong> tab along the top and open <strong>Plex</strong>.</li>
+<li>The microphone button works here too. Hold it and say &quot;open Plex&quot;.</li>
+</ol>
+<h3 id="vizio">Vizio</h3>
+<p>Vizio TVs run SmartCast, which keeps its apps in a row rather than in a store you
+browse.</p>
+<ol>
+<li>Press the <strong>Home</strong> button. On older remotes it&#39;s the <strong>&quot;V&quot;</strong> button.</li>
+<li>Arrow along the row of apps to <strong>Plex</strong> and press OK.</li>
+</ol>
+<h3 id="hisense">Hisense</h3>
+<p>Hisense ships two different systems, so check which one you have. Some of their sets
+run Google TV, in which case use the <a href="#google-tv-and-android-tv">Google TV and Android TV</a>
+steps above. The rest run Hisense&#39;s own system, called VIDAA.</p>
+<p>On VIDAA, press <strong>Home</strong>, then arrow along the app row at the bottom to <strong>Plex</strong>.</p>
+<h3 id="apple-tv">Apple TV</h3>
+<p>This means the little black box that plugs into your TV, not the Apple TV app.</p>
+<ol>
+<li>Press the <strong>TV</strong> button on the remote to get to the home screen.</li>
+<li>Move to the <strong>Plex</strong> icon and press the touchpad.</li>
+</ol>
+<div class="callout callout-note"><p><span class="callout-label">Note:</span> Plenty of smart TVs have an app called &quot;Apple TV&quot; built into them. That&#39;s a
+different thing, and Plex won&#39;t be inside it.</p></div>
+<h3 id="xbox-and-playstation">Xbox and PlayStation</h3>
+<p>Both have a proper Plex app, and if a console is already plugged into the TV it&#39;s
+often the quickest route.</p>
+<ul>
+<li>Xbox One, Series S, and Series X - open <strong>&quot;My games &amp; apps&quot;</strong>, then <strong>&quot;Apps&quot;</strong>, and pick Plex.</li>
+<li>PlayStation 4 and 5 - Plex sits in your library alongside your games. Open it from there.</li>
+</ul>
+<h2 id="step-3-sign-in-on-the-tv">Step 3: Sign In on the TV</h2>
+<p>This is the part people expect to be painful. It isn&#39;t, because you never type your
+password on the TV.</p>
+<figure>
+<img src="../assets/img/plex-link-code.svg" alt="A TV showing the address plex.tv/link above a four-character code, and a phone showing that same address in a browser with the code typed into a box and a Link button below it.">
+<figcaption class="figure-caption">The TV shows a code. You type it on your phone. The TV catches up on its own.</figcaption>
+</figure>
+
+<ol>
+<li>Open the <strong>Plex</strong> app on the TV.</li>
+<li>Choose <strong>&quot;Sign In&quot;</strong>.</li>
+<li>The TV shows a <strong>four-character code</strong>, something like <code>H4KP</code>. Leave it on the screen.</li>
+<li>On your phone or computer, open a web browser and go to <code>plex.tv/link</code>.</li>
+<li>Sign in with the Plex account from Step 1, if it asks you to.</li>
+<li>Type in the four characters from the TV and submit them.</li>
+<li>Within a few seconds the TV signs itself in. You don&#39;t have to press anything on it.</li>
+</ol>
+<div class="callout callout-note"><p><span class="callout-label">Note:</span> Those codes expire after a few minutes. If the site says the code is wrong or
+expired, go back to the TV, come out of the sign-in screen and into it again, and use
+the fresh code it gives you.</p></div>
+<h2 id="step-4-find-their-library">Step 4: Find Their Library</h2>
+<p>This is the step that trips most people up. When Plex opens, the home screen is mostly
+Plex&#39;s own movies and channels, which isn&#39;t what you&#39;re here for. Your friend&#39;s
+library lives somewhere else in the app.</p>
+<p>Plex has been redesigning its TV apps through 2026, so you&#39;ll see one of two layouts.</p>
+<p><strong>The newer layout</strong> puts a row of tabs along the bottom or the side, one of which is
+<strong>&quot;Libraries&quot;</strong>. Open that, and their libraries are listed under the name of their
+server, something like &quot;Doug&#39;s Media Server&quot;. Movies, TV Shows, and Music are usually
+separate entries under it.</p>
+<p><strong>The older layout</strong> has a menu that slides out from the side. Press left on the
+remote to open it, or look for the &quot;hamburger&quot; button, which is three stacked lines.
+Scroll past your own things to the bottom, and their server name is sitting there with
+its libraries underneath.</p>
+<figure>
+<img src="../assets/img/find-library.svg" alt="Two TV screens compared. In the newer layout the shared library sits behind a Libraries tab in the bottom bar. In the older layout it sits at the bottom of the slide-out side menu, under the name of the server.">
+<figcaption class="figure-caption">Where the shared library hides in each layout. The name you're hunting for is theirs, not yours.</figcaption>
+</figure>
+
+<p>Either way, once you&#39;ve found it: open a library, pick something, and press play.
+That&#39;s the whole job done.</p>
+<p>Tip: Most versions of the app let you pin or favorite a library so it turns up on the
+home screen next time. It&#39;s worth doing on the first evening, because it saves you the
+hunt every time after that.</p>
+<p>If anything on the TV doesn&#39;t match what you&#39;re reading here, tell whoever invited you
+exactly what the screen says, word for word. They can see far more from their end than
+you can from yours.</p>
+
+<div class="doc-pager"><a class="pager-prev" href="../music-playback/">Music Playback</a><span class="pager-spacer"></span><span></span></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+
+</body>
+</html>

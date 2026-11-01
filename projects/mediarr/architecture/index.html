@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Architecture · Mediarr</title>
+  <meta name="description" content="How the Mediarr stack fits together, from containers and the VPN namespace to hardlinks, the request pipeline, and what the installer actually does.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Architecture · Mediarr">
+  <meta property="og:description" content="How the Mediarr stack fits together, from containers and the VPN namespace to hardlinks, the request pipeline, and what the installer actually does.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/" class="active">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#the-shape-of-it">The Shape Of It</a></li>
+<li class="toc-h2"><a href="#one-namespace-no-leaks">One Namespace, No Leaks</a></li>
+<li class="toc-h2"><a href="#why-everything-shares-one-data">Why Everything Shares One /data</a></li>
+<li class="toc-h2"><a href="#how-a-request-becomes-a-file">How A Request Becomes A File</a></li>
+<li class="toc-h2"><a href="#what-the-installer-actually-does">What The Installer Actually Does</a></li>
+<li class="toc-h2"><a href="#the-env-contract">The .env Contract</a></li>
+<li class="toc-h2"><a href="#opt-in-services-and-compose-profiles">Opt-In Services And Compose Profiles</a></li>
+<li class="toc-h2"><a href="#where-to-look-when-it-breaks">Where To Look When It Breaks</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/" class="active">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Architecture</h1>
+<p class="doc-lede">What the wizard builds, why it&#39;s shaped this way, and where to look when something misbehaves.</p>
+<p>The <a href="../tutorial/">Tutorial</a> builds this stack by hand, one layer at a time. This page goes the other direction. It&#39;s the finished thing taken apart, so you can see how the pieces relate before you go poking at any one of them.</p>
+<p>You don&#39;t need to read it to use your stack. It helps a lot when something breaks.</p>
+<h2 id="the-shape-of-it">The Shape Of It</h2>
+<p>Everything runs as containers on one Docker network called <code>media</code>. Three of them are different, and that difference is the most important thing on this page. qBittorrent, slskd, and Playlist Sync have no network of their own. They run <em>inside</em> the VPN container&#39;s network stack.</p>
+<div class="mermaid-wrap"><pre class="mermaid">flowchart TB
+  browser[&quot;Your browser, phone, TV&quot;]
+
+  subgraph media[&quot;docker network: media&quot;]
+    direction TB
+    front[&quot;Seerr · Homepage · Plex&quot;]
+    arrs[&quot;Sonarr · Radarr · Lidarr&quot;]
+    prowlarr[&quot;Prowlarr — indexers&quot;]
+    sab[&quot;SABnzbd — usenet&quot;]
+
+    subgraph gluetun[&quot;gluetun — VPN namespace&quot;]
+      direction TB
+      qbit[&quot;qBittorrent&quot;]
+      slskd[&quot;slskd&quot;]
+      psync[&quot;Playlist Sync&quot;]
+    end
+  end
+
+  disk[(&quot;DATA_ROOT on disk&quot;)]
+
+  browser --&gt; front
+  front --&gt; arrs
+  arrs --&gt; prowlarr
+  arrs --&gt; sab
+  arrs --&gt; qbit
+  qbit -.- slskd
+  slskd -.- psync
+  arrs --&gt; disk
+  qbit --&gt; disk
+  sab --&gt; disk
+  front --&gt; disk</pre></div>
+<p>Everything published on a port binds to <code>LAN_IP</code> specifically, not to <code>0.0.0.0</code>. Your stack is reachable from your own network and nowhere else, without you configuring anything.</p>
+<p>The port numbers up in the 49150 range look arbitrary because they are. They sit high in the ephemeral range deliberately, well clear of the ports Synology&#39;s DSM claims for itself.</p>
+<h2 id="one-namespace-no-leaks">One Namespace, No Leaks</h2>
+<p>A VPN kill-switch usually means software watching the tunnel and racing to block traffic when it drops. That race is losable. We don&#39;t run one.</p>
+<p>Instead, qBittorrent has no network interface at all. Compose gives it <code>network_mode: &quot;container:gluetun&quot;</code>, so it shares gluetun&#39;s network stack the way two processes share one machine&#39;s. qBittorrent&#39;s <code>localhost</code> <em>is</em> gluetun&#39;s <code>localhost</code>.</p>
+<div class="mermaid-wrap"><pre class="mermaid">flowchart LR
+  subgraph ns[&quot;one shared network namespace&quot;]
+    direction TB
+    g[&quot;gluetun&lt;br/&gt;wireguard tunnel&quot;]
+    q[&quot;qBittorrent&quot;]
+    s[&quot;slskd&quot;]
+    p[&quot;Playlist Sync&quot;]
+  end
+
+  q --- g
+  s --- g
+  p --- g
+  g ==&gt; vpn([&quot;VPN provider&quot;])
+  vpn ==&gt; net([&quot;internet&quot;])
+  g -.-&gt; x[&quot;tunnel down:&lt;br/&gt;no route exists&quot;]</pre></div>
+<p>So when the tunnel drops there&#39;s nothing to react to. The route those containers would need simply isn&#39;t there. They lose connectivity and wait. Your real IP was never something they could fall back to, because they never had an interface that knew it.</p>
+<p>This is also why a few things about the stack look strange until you know the reason:</p>
+<ul>
+<li>qBittorrent&#39;s WebUI port is published on the <code>gluetun</code> service, not on <code>qbittorrent</code>. A container sharing another&#39;s namespace can&#39;t publish its own ports.</li>
+<li>qBittorrent can&#39;t declare <code>networks:</code> or <code>security_opt:</code> either. It inherits gluetun&#39;s.</li>
+<li>Recreating gluetun breaks the three containers welded to it, because the namespace they were attached to stops existing. The installer detects and repairs that automatically. It&#39;s the cause behind the &quot;container is marked for removal&quot; error if you ever meet it.</li>
+</ul>
+<div class="callout callout-note"><p><span class="callout-label">Note:</span> only the download clients route through the VPN. Plex, the arrs, and everything else talk to your LAN directly. Putting Plex behind the VPN would make it unreachable from your own TV.</p></div>
+<h2 id="why-everything-shares-one-data">Why Everything Shares One /data</h2>
+<p>Every arr mounts the same single volume, <code>DATA_ROOT</code> as <code>/data</code>. Not <code>/downloads</code> and <code>/media</code> as two separate mounts. One.</p>
+<p>That looks like a detail. It&#39;s the difference between your library holding one copy of every file and holding two.</p>
+<div class="mermaid-wrap"><pre class="mermaid">flowchart TB
+  subgraph vol[&quot;DATA_ROOT at /data — ONE filesystem&quot;]
+    direction TB
+    t[&quot;/data/Downloads/Torrents/&lt;br/&gt;complete/Movie.2024.mkv&quot;]
+    m[&quot;/data/Media/Movies/&lt;br/&gt;Movie (2024)/Movie.2024.mkv&quot;]
+    inode[(&quot;one inode&lt;br/&gt;8 GB on disk&quot;)]
+  end
+
+  t --&gt; inode
+  m --&gt; inode</pre></div>
+<p>When Radarr imports a download it creates a hardlink rather than copying. Two paths, two names, one set of bytes. qBittorrent keeps seeding the file it knows about, Plex reads the tidy renamed one, and your disk holds 8 GB rather than 16.</p>
+<div class="callout callout-important"><p><span class="callout-label">IMPORTANT:</span> hardlinks only work within a single filesystem. If <code>Downloads</code> and <code>Media</code> land on different volumes the arrs silently fall back to copying. Everything still works, it just costs double the space and a long copy on every import. The installer checks for this and warns you.</p></div>
+<p>There&#39;s one wrinkle. qBittorrent mounts a narrower view (<code>/downloads</code>) than the arrs do (<code>/data</code>). They&#39;re looking at the same bytes by different paths, so the arr needs a translation between qBittorrent&#39;s idea of where a file is and its own. That&#39;s a Remote Path Mapping, and the wizard configures it for you. It&#39;s also the thing people most often get wrong by hand, which is exactly why it&#39;s automated.</p>
+<h2 id="how-a-request-becomes-a-file">How A Request Becomes A File</h2>
+<p>The everyday path, end to end. None of this is invented by the installer, it&#39;s how the arr ecosystem works. What the installer does is wire every participant to the others so it happens on the first try.</p>
+<div class="mermaid-wrap"><pre class="mermaid">sequenceDiagram
+  autonumber
+  participant You
+  participant Seerr
+  participant Radarr
+  participant Prowlarr
+  participant qBit as qBittorrent via VPN
+  participant Plex
+
+  You-&gt;&gt;Seerr: search, click Request
+  Seerr-&gt;&gt;Radarr: add movie, monitor it
+  Radarr-&gt;&gt;Prowlarr: search every indexer
+  Prowlarr--&gt;&gt;Radarr: releases, scored by quality profile
+  Radarr-&gt;&gt;qBit: send the best release
+  qBit-&gt;&gt;qBit: download through the tunnel
+  qBit--&gt;&gt;Radarr: finished
+  Radarr-&gt;&gt;Radarr: rename, hardlink into /data/Media
+  Radarr-&gt;&gt;Plex: notify
+  Plex--&gt;&gt;You: it&#39;s in your library</pre></div>
+<p>A few things worth knowing about that sequence:</p>
+<ul>
+<li><strong>Prowlarr is the only place indexers live.</strong> You add an indexer once and Prowlarr pushes it into Sonarr, Radarr, and Lidarr. You never configure the same tracker three times.</li>
+<li><strong>Quality profiles decide which release wins</strong>, not download speed or seed count alone. That&#39;s the scoring Recyclarr syncs from the TRaSH guides, and you can change it any time from <a href="../quality-profiles/">Quality Profiles</a>.</li>
+<li><strong>The notify step is why your library updates immediately</strong> rather than whenever Plex next feels like scanning.</li>
+<li><strong>If step 8 never happens</strong>, the download completed but nothing imported it. That&#39;s the most common failure by a wide margin, and it&#39;s nearly always the path mapping or a permissions problem on the destination.</li>
+</ul>
+<h2 id="what-the-installer-actually-does">What The Installer Actually Does</h2>
+<p>The wizard is an Electron app on your PC. It installs nothing on your PC beyond itself. Everything it does happens over SSH on the NAS.</p>
+<div class="mermaid-wrap"><pre class="mermaid">flowchart TB
+  subgraph pc[&quot;Your PC — Electron wizard&quot;]
+    direction TB
+    w1[&quot;Welcome&quot;] --&gt; w2[&quot;Connect&lt;br/&gt;SSH credentials&quot;]
+    w2 --&gt; w3[&quot;Detect&lt;br/&gt;probe the NAS&quot;]
+    w3 --&gt; w4[&quot;Configure&lt;br/&gt;services, VPN, quality&quot;]
+    w4 --&gt; w5[&quot;Run&quot;]
+    w5 --&gt; w6[&quot;Done&lt;br/&gt;health tiles&quot;]
+  end
+
+  w4 --&gt; envf[&quot;.env&lt;br/&gt;written by env-render.ts&quot;]
+  envf --&gt; payload[&quot;scripts/ + compose&lt;br/&gt;uploaded by SFTP&quot;]
+  payload --&gt; steps
+
+  subgraph steps[&quot;setup.sh — 13 steps, on the NAS&quot;]
+    direction TB
+    s1[&quot;1-2&lt;br/&gt;permissions, directories&quot;]
+    s3[&quot;3-5&lt;br/&gt;firewall, VPN key, validate&quot;]
+    s6[&quot;6&lt;br/&gt;docker compose up -d&quot;]
+    s7[&quot;7-10&lt;br/&gt;configure every service&lt;br/&gt;via its HTTP API&quot;]
+    s11[&quot;11&lt;br/&gt;post-deploy health checks&quot;]
+    s12[&quot;12-13&lt;br/&gt;import any backlog&quot;]
+    s1 --&gt; s3 --&gt; s6 --&gt; s7 --&gt; s11 --&gt; s12
+  end
+
+  steps --&gt; w6</pre></div>
+<p>Step 7 is where most of the value sits. The wizard doesn&#39;t hand you a running stack and a list of things to go set up. It logs into each service&#39;s own HTTP API and configures it: root folders, download clients, path mappings, quality profiles, the Prowlarr-to-arr connections, subtitle providers, the Plex library and its notification hook.</p>
+<p>Everything in step 7 is idempotent. Re-running the installer over a working stack skips whatever is already correct, which makes &quot;just run it again&quot; a safe first move rather than a risky one.</p>
+<h2 id="the-env-contract">The .env Contract</h2>
+<p>One file decides what your stack is, and that&#39;s <code>.env</code> on the NAS. What makes it interesting is how many different languages have to agree about it.</p>
+<div class="mermaid-wrap"><pre class="mermaid">flowchart TB
+  ui[&quot;Configure screen&lt;br/&gt;React&quot;]
+  schema[&quot;env-schema.ts&lt;br/&gt;validates&quot;]
+  render[&quot;env-render.ts&lt;br/&gt;writes&quot;]
+  envf[&quot;.env on the NAS&quot;]
+  bash[&quot;setup.sh&lt;br/&gt;bash · is_enabled&quot;]
+  py[&quot;setup-arr-config.py&lt;br/&gt;python · read_env&quot;]
+  compose[&quot;docker-compose.yml&lt;br/&gt;COMPOSE_PROFILES&quot;]
+  tests[&quot;cross-language tests&quot;]
+
+  ui --&gt; schema --&gt; render --&gt; envf
+  envf --&gt; bash
+  envf --&gt; py
+  bash --&gt; compose
+  tests -.-&gt; render
+  tests -.-&gt; bash
+  tests -.-&gt; py</pre></div>
+<p>Four layers, three languages, one file format. Each layer has its own idea of how to parse a value and what counts as enabled, and any disagreement between them is a bug that&#39;s close to invisible. A flag the TypeScript writer treats as on and bash treats as off means a service the wizard promises and never installs, with no error anywhere.</p>
+<p>So those parsers are pinned against each other by tests that run the <em>real</em> bash and Python, not reimplementations of them. If <code>is_enabled</code> in setup.sh ever disagrees with <code>isEnabled</code> in TypeScript about a value like <code>&quot; off &quot;</code> or <code>1</code> or an empty string, CI fails.</p>
+<p>There&#39;s a second rule those tests enforce, and it&#39;s worth knowing if you ever add a service. An opt-in flag has to be <em>written</em> even when it&#39;s off. A key that renders as absent rather than <code>false</code> reads downstream as &quot;not enabled&quot;, which is the right answer for the wrong reason, and it stops being right the moment somebody changes a default.</p>
+<h2 id="opt-in-services-and-compose-profiles">Opt-In Services And Compose Profiles</h2>
+<p>Most services are on by default. A few stay off until you ask, because they&#39;re heavy, need their own account, or only suit some people.</p>
+<p>The two kinds behave differently when a key is <em>missing</em>, which matters every time you upgrade an existing install:</p>
+<p>Default-on services - a missing <code>ENABLE_</code> key counts as ON. Your <code>.env</code> predates the flag, so the service was already there and stays there.</p>
+<p>Opt-in services - a missing key counts as OFF. Upgrading never quietly installs a new heavyweight container you didn&#39;t ask for.</p>
+<div class="mermaid-wrap"><pre class="mermaid">flowchart LR
+  env[&quot;.env flags&quot;]
+  env --&gt; d1[&quot;ENABLE_SONARR&lt;br/&gt;missing = ON&quot;]
+  env --&gt; d2[&quot;ENABLE_LIBRARIAN&lt;br/&gt;missing = OFF&quot;]
+  d1 --&gt; p[&quot;COMPOSE_PROFILES&quot;]
+  d2 --&gt; p
+  p --&gt; up[&quot;docker compose up -d&quot;]
+  up --&gt; running[&quot;only the services you chose&quot;]</pre></div>
+<p>Compose profiles are what make that work. Every service carries a <code>profiles:</code> key, <code>setup.sh</code> builds <code>COMPOSE_PROFILES</code> from your flags, and <code>docker compose up -d</code> starts that set and nothing else. Turning a service off later removes its container on the next run rather than leaving it orphaned.</p>
+<p>Opt-in at time of writing: Soulseek, Playlist Sync, <a href="../live-tv/">Live TV</a>, and <a href="../storage/">LibrARRian</a>.</p>
+<h2 id="where-to-look-when-it-breaks">Where To Look When It Breaks</h2>
+<p>A rough map from symptom to layer:</p>
+<p>Nothing is reachable at all - the containers didn&#39;t start. Check <code>docker ps</code> and step 6 in the install log.</p>
+<p>One service is unreachable - that container is unhealthy. Check <code>docker logs &lt;name&gt;</code>.</p>
+<p>Downloads finish but never appear in your library - the import step. Path mapping or permissions, covered in <a href="../downloads-and-vpn/">Downloads &amp; VPN</a>.</p>
+<p>Downloads never start - indexer or download-client wiring, covered in <a href="../indexers/">Indexers</a>.</p>
+<p>Everything works but the VPN is down - qBittorrent goes quiet by design. It isn&#39;t broken, that&#39;s the kill-switch doing its job.</p>
+<p>Disk filling up - <a href="../storage/">LibrARRian</a> will tell you what&#39;s eating it.</p>
+<p>The installer&#39;s Help modal indexes these by symptom, and the diagnostics bundle it can collect gathers the logs for all of them into one file.</p>
+
+<div class="doc-pager"><a class="pager-prev" href="../tutorial/">Build It Yourself</a><span class="pager-spacer"></span><a class="pager-next" href="../dashboard/">Dashboard</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({"startOnLoad":false,"securityLevel":"strict","theme":"base","themeVariables":{"darkMode":true,"background":"#141414","fontFamily":"'JetBrains Mono', 'Fira Code', monospace","fontSize":"15px","primaryColor":"#39392f","primaryTextColor":"#FFFFFF","primaryBorderColor":"#66D9EF","secondaryColor":"#2d2d2d","secondaryTextColor":"#FFFFFF","secondaryBorderColor":"#66D9EF","tertiaryColor":"#2d2d2d","tertiaryTextColor":"#FFFFFF","tertiaryBorderColor":"#66D9EF","lineColor":"#BFBBAA","textColor":"#FFFFFF","mainBkg":"#39392f","nodeBorder":"#66D9EF","nodeTextColor":"#FFFFFF","clusterBkg":"rgba(166, 226, 46, 0.10)","clusterBorder":"#A6E22E","titleColor":"#A6E22E","edgeLabelBackground":"#141414","actorBkg":"#2d2d2d","actorBorder":"#66D9EF","actorTextColor":"#F8F8F2","actorLineColor":"#75715E","signalColor":"#F8F8F2","signalTextColor":"#F8F8F2","labelBoxBkgColor":"#2d2d2d","labelBoxBorderColor":"#49483E","labelTextColor":"#F8F8F2","loopTextColor":"#E6DB74","noteBkgColor":"#141414","noteBorderColor":"#E6DB74","noteTextColor":"#E6DB74","activationBkgColor":"#49483E","activationBorderColor":"#75715E"},"flowchart":{"curve":"basis","useMaxWidth":true,"htmlLabels":false,"padding":16,"nodeSpacing":50,"rankSpacing":65,"subGraphTitleMargin":{"top":6,"bottom":18}},"sequence":{"useMaxWidth":true,"showSequenceNumbers":true,"mirrorActors":false}});
+  await mermaid.run({ querySelector: '.mermaid' });
+</script>
+</body>
+</html>

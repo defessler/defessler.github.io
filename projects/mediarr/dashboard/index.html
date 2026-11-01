@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard · Mediarr</title>
+  <meta name="description" content="Your one bookmark: a live status tile for every service in the stack.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Dashboard · Mediarr">
+  <meta property="og:description" content="Your one bookmark: a live status tile for every service in the stack.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#what-it-is">What it is</a></li>
+<li class="toc-h2"><a href="#finding-it">Finding it</a></li>
+<li class="toc-h2"><a href="#what-the-tiles-do">What the tiles do</a></li>
+<li class="toc-h2"><a href="#keeping-it-up-to-date">Keeping it up to date</a></li>
+<li class="toc-h2"><a href="#tips">Tips</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/" class="active">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Dashboard</h1>
+<p class="doc-lede">Your one bookmark: a live status tile for every service in the stack.</p>
+<p>Homepage is a single web page that shows every service in your stack as a clickable status tile. One bookmark that gets you anywhere.</p>
+<blockquote>
+<p><strong>In one sentence:</strong> open Homepage, see all your services at a glance, and click any tile to jump straight to it.</p>
+</blockquote>
+<blockquote>
+<p>The most common day-to-day destination from here is the request portal. See <a href="../requesting/">Requesting Movies and TV</a> to start watching something new.</p>
+</blockquote>
+<h2 id="what-it-is">What it is</h2>
+<p>Homepage is the front door to your media stack. Every service you enabled during the install (Plex, Sonarr, Radarr, Prowlarr, qBittorrent, Seerr, Bazarr, and the rest) gets its own tile. Each tile shows whether the service is running and some tiles display live stats (downloads in progress, queue size, and so on). There&#39;s nothing to configure. The installer builds it for you.</p>
+<h2 id="finding-it">Finding it</h2>
+<p>The installer shows the Homepage URL on the <strong>Done</strong> screen after install. Open it in your browser and <strong>bookmark it</strong>. It&#39;s the one link you need to remember.</p>
+<p>The URL is <code>http://&lt;your-NAS-IP&gt;:&lt;Homepage-port&gt;</code> (the exact port is shown on the Done screen).</p>
+<h2 id="what-the-tiles-do">What the tiles do</h2>
+<ul>
+<li><strong>Click any tile</strong> to open that service in a new tab.</li>
+<li>The tile color tells you at a glance whether the service is <strong>up</strong> (green) or unreachable.</li>
+<li>Some tiles show live stats - for example, qBittorrent shows active downloads and speeds.</li>
+<li>The <strong>Recyclarr</strong> tile links to the sync trigger UI (port 8889) where you can kick off a manual TRaSH Guide sync. The tile description shows which quality profiles are currently applied to Sonarr and Radarr.</li>
+</ul>
+<h2 id="keeping-it-up-to-date">Keeping it up to date</h2>
+<p>Homepage is auto-generated from the services you enabled. If you add or remove a service later, the tiles won&#39;t update on their own. To regenerate it:</p>
+<ol>
+<li>Open the installer and choose <strong>Update</strong>.</li>
+<li>Select <strong>Refresh dashboard</strong>.</li>
+<li>Reload Homepage in your browser.</li>
+</ol>
+<h2 id="tips">Tips</h2>
+<ul>
+<li><strong>Start here every time.</strong> Every guide in these docs tells you to open a service. Find it on Homepage instead of remembering port numbers.</li>
+<li><strong>Seerr is your daily driver.</strong> For requesting a movie or show, click the Seerr tile. See <a href="../requesting/">Requesting Movies and TV</a> for the full walkthrough.</li>
+<li><strong>A gray tile usually means the service is still starting up</strong>, not broken, especially right after an install or NAS reboot. Give it a minute and refresh.</li>
+<li><strong>Lost the URL?</strong> Re-run the installer. The Done screen always shows it.</li>
+</ul>
+
+<div class="doc-pager"><a class="pager-prev" href="../architecture/">Architecture</a><span class="pager-spacer"></span><a class="pager-next" href="../requesting/">Requesting Movies &amp; TV</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+
+</body>
+</html>

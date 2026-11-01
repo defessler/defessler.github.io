@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Comics, Manga &amp; Books · Mediarr</title>
+  <meta name="description" content="Komga and Kavita: read comics, manga, and ebooks off your NAS on a phone, tablet, or e-ink reader.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Comics, Manga &amp; Books · Mediarr">
+  <meta property="og:description" content="Komga and Kavita: read comics, manga, and ebooks off your NAS on a phone, tablet, or e-ink reader.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#two-readers-not-one">Two Readers, Not One</a></li>
+<li class="toc-h2"><a href="#getting-files-in">Getting Files In</a></li>
+<li class="toc-h3"><a href="#comics-and-books-automated">Comics and Books: Automated</a></li>
+<li class="toc-h3"><a href="#what-you-finish-by-hand">What You Finish By Hand</a></li>
+<li class="toc-h3"><a href="#manga-not-automated-and-thats-not-an-oversight">Manga: Not Automated, and That&#39;s Not an Oversight</a></li>
+<li class="toc-h3"><a href="#or-just-drop-files-in">Or Just Drop Files In</a></li>
+<li class="toc-h3"><a href="#the-one-layout-rule-that-matters">The One Layout Rule That Matters</a></li>
+<li class="toc-h2"><a href="#where-the-metadata-comes-from">Where the Metadata Comes From</a></li>
+<li class="toc-h2"><a href="#what-you-read-on">What You Read On</a></li>
+<li class="toc-h2"><a href="#audiobooks-and-podcasts">Audiobooks and Podcasts</a></li>
+<li class="toc-h2"><a href="#turning-it-on">Turning It On</a></li>
+<li class="toc-h2"><a href="#resource-notes">Resource Notes</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/" class="active">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Comics, Manga &amp; Books</h1>
+<p class="doc-lede">Two readers for the formats Plex and Jellyfin can&#39;t touch.</p>
+<p>Your media server can&#39;t help you here, and that&#39;s the whole reason these exist.</p>
+<p>Plex has no support for CBZ, CBR, PDF, or EPUB. Jellyfin technically had a books plugin, but the Jellyfin project archived it in June 2026, and it never did online metadata anyway. So if you want to read comics, manga, or ebooks off your NAS, you need a reader built for it.</p>
+<blockquote>
+<p><strong>In one sentence:</strong> turn on Komga or Kavita, drop files into a folder, and read them in a browser or on your phone.</p>
+</blockquote>
+<p>All of this is opt-in and off by default. The readers landed in v0.27.0, the automation in v0.28.0.</p>
+<h2 id="two-readers-not-one">Two Readers, Not One</h2>
+<p>It looks like overlap. It isn&#39;t, it&#39;s a split:</p>
+<ul>
+<li><strong>Komga</strong> on <code>http://&lt;NAS-IP&gt;:49158</code> serves <strong>Comics and Manga</strong>. It has a first-party Mihon extension, which is the best way to read manga on Android.</li>
+<li><strong>Kavita</strong> on <code>http://&lt;NAS-IP&gt;:49157</code> serves <strong>Books</strong>. It has a proper EPUB reader, two-way progress sync with KOReader, and one-click send-to-Kindle.</li>
+</ul>
+<p>Komga has no ebook support at all, and Kavita only gets generic OPDS on Android where Komga gets a real extension. Each one covers the other&#39;s gap. You can run either alone if you only care about one side, and plenty of people will.</p>
+<p>Neither one downloads anything. They read files off disk, and they mount your library read-only, so nothing they do can move or delete your files.</p>
+<h2 id="getting-files-in">Getting Files In</h2>
+<p>Comics and books can be automated. Manga can&#39;t, and it&#39;s worth understanding why before you go looking for the setting.</p>
+<h3 id="comics-and-books-automated">Comics and Books: Automated</h3>
+<p>Two more opt-in services, both of which work exactly like Sonarr does:</p>
+<ul>
+<li><strong>Mylar3</strong> on <code>http://&lt;NAS-IP&gt;:49159</code> for comics. Add a series, it watches for new issues.</li>
+<li><strong>LazyLibrarian</strong> on <code>http://&lt;NAS-IP&gt;:49160</code> for books. Track an author, it grabs new releases.</li>
+</ul>
+<p>Both are real Prowlarr Applications, so the indexers you already set up get synced into them automatically. They use the same SABnzbd and qBittorrent as the rest of the stack, with no new accounts and no separate download path.</p>
+<h3 id="what-you-finish-by-hand">What You Finish By Hand</h3>
+<p>Unlike Sonarr and Radarr, these two aren&#39;t fully configured for you, and it&#39;s better you hear that here than discover it:</p>
+<ul>
+<li><p><strong>Point each one at a download client.</strong> Open Mylar3 or LazyLibrarian&#39;s own settings and add SABnzbd (<code>sabnzbd:8080</code>) or qBittorrent (<code>gluetun:49156</code>). The installer creates the matching SABnzbd <code>comics</code> and <code>books</code> categories for you, so you just pick them from the list.</p>
+</li>
+<li><p><strong>Set the library folder.</strong> <code>/comics</code> in Mylar3, <code>/books</code> in LazyLibrarian. Those are the paths the containers see.</p>
+</li>
+<li><p><strong>Mylar3 needs a ComicVine key.</strong> It&#39;s <a href="https://comicvine.gamespot.com/api/">free</a>. Put it in <code>MYLAR_COMICVINE_KEY</code> and the installer writes it straight into Mylar3 for you.</p>
+<p>Do supply it, because of how Mylar3 fails without one: <strong>the search page comes back completely blank.</strong> Mylar3 returns an empty response instead of an error, so there&#39;s nothing on screen to tell you a key is missing. If you&#39;ve already installed without one, paste it into Mylar3 → Settings → ComicVine and searching starts working.</p>
+</li>
+</ul>
+<p>One more honest caveat: comic coverage on general-purpose indexers is thinner than TV or movies, so expect a lower hit rate than Sonarr gives you. That&#39;s the cost of using your own indexers rather than a comics-specific source.</p>
+<p>On LazyLibrarian we should be straight with you: it ships with several direct-download providers built in, including Anna&#39;s Archive, Z-Library, and IRC. The installer writes those off and configures the Prowlarr-fed path instead, so it behaves like the rest of your stack out of the box. The settings are still there in its own UI. What you do with them is your call.</p>
+<p>One consequence worth knowing. With those providers off, Prowlarr is LazyLibrarian&#39;s only source. If the Prowlarr link doesn&#39;t get set up, LazyLibrarian has nothing to search and every search comes back empty with no error explaining why. The installer checks for this and warns you, and the fix is either to add the app under Prowlarr → Settings → Apps, or to turn its own providers back on.</p>
+<h3 id="manga-not-automated-and-thats-not-an-oversight">Manga: Not Automated, and That&#39;s Not an Oversight</h3>
+<p>There&#39;s no manga equivalent because there&#39;s nothing to build it on. Prowlarr supports exactly seven application types and none of them is a manga app. Manga simply isn&#39;t in the usenet or torrent indexer world the way TV, movies, and comics are, so the whole Sonarr pattern has nothing to attach to. Every real manga tool scrapes scanlation sites through Mihon extensions instead, which is a separate lane with its own source questions.</p>
+<p>Suwayomi is the tool people use, and it works well pointed at <code>Media/Manga</code>, but it ships with no extension sources at all and you&#39;d have to supply your own. That&#39;s a decision we&#39;d rather leave with you than make on your behalf, so it isn&#39;t bundled.</p>
+<h3 id="or-just-drop-files-in">Or Just Drop Files In</h3>
+<p>Every folder works as a plain drop target whether or not you enable any automation:</p>
+<pre><code class="hljs">&lt;your data root&gt;/Media/Comics/
+&lt;your data root&gt;/Media/Manga/
+&lt;your data root&gt;/Media/Books/</code></pre>
+<p>The installer creates all three regardless, so you can start filling them early.</p>
+<h3 id="the-one-layout-rule-that-matters">The One Layout Rule That Matters</h3>
+<p>Put the files <strong>flat, inside exactly one folder per series</strong>. No per-volume subfolders.</p>
+<pre><code class="hljs">Media/Comics/
+└── Amazing Spider-Man (1963)/
+    ├── Amazing Spider-Man (1963) #001.cbz
+    └── Amazing Spider-Man (1963) #002.cbz</code></pre>
+<p>This one trips people up, because most guides online show a <code>Series/Volume 01/</code> shape. Komga creates a separate series for every subfolder that has files in it, at any depth, so that layout gives you a series named literally &quot;Volume 01&quot;. Kavita separately refuses to index loose files sitting at the top of a library. Flat files in one folder per series is the shape both of them are happy with.</p>
+<h2 id="where-the-metadata-comes-from">Where the Metadata Comes From</h2>
+<p>Both readers pull metadata out of the files themselves rather than looking it up online:</p>
+<ul>
+<li><strong>Comics and manga</strong> use a <code>ComicInfo.xml</code> file stored <strong>inside</strong> the <code>.cbz</code> archive. A loose XML file sitting next to the archive is read by nobody.</li>
+<li><strong>Ebooks</strong> use the OPF metadata already inside the <code>.epub</code>. Kavita reads the Calibre series fields from it, so a series groups correctly even when the filename is a mess.</li>
+</ul>
+<p>That&#39;s worth knowing because it means a tidy download usually just works, and a messy one is best fixed by injecting a <code>ComicInfo.xml</code> rather than by renaming files.</p>
+<p>Kavita does offer online metadata lookup, but it&#39;s a paid add-on called Kavita+ at about $4 a month. The free version reads embedded metadata only. We&#39;re not routing around that, and for most libraries the embedded data is enough.</p>
+<h2 id="what-you-read-on">What You Read On</h2>
+<p>The web reader in either app covers most people, and it needs no setup at all. Komga does single page, dual page, and webtoon modes. Kavita has separate EPUB and PDF readers.</p>
+<p>Beyond the browser:</p>
+<ul>
+<li><strong>Android, manga and comics</strong> - <a href="https://mihon.app/">Mihon</a>, pointed at Komga&#39;s extension. Offline downloads, proper right-to-left and webtoon handling, and progress syncs back to the server. Mihon isn&#39;t on the Play Store, so it&#39;s an F-Droid install or a sideload.</li>
+<li><strong>iPhone and iPad</strong> - Panels, from the App Store, connected over OPDS. It reads CBR, CBZ, PDF, and comic EPUB in one app and writes your page progress back. Paperback is the free alternative.</li>
+<li><strong>Kobo, jailbroken Kindle, other e-ink</strong> - KOReader, which does two-way progress sync with Kavita. Set it to <strong>manual</strong> sync rather than automatic. Kavita&#39;s own docs warn that automatic sync can clobber your reading position, and that&#39;s not recoverable.</li>
+<li><strong>A stock Kindle</strong> - Kavita&#39;s send-to-Kindle button emails the book to your device. No jailbreak, no cables.</li>
+<li><strong>Audiobooks and podcasts</strong> - a separate app, because they&#39;re a separate thing. See below.</li>
+<li><strong>Your TV</strong> - nothing, and that&#39;s deliberate. None of these work on a TV, and nobody reads manga on one.</li>
+</ul>
+<h2 id="audiobooks-and-podcasts">Audiobooks and Podcasts</h2>
+<p><strong>Audiobookshelf</strong> on <code>http://&lt;NAS-IP&gt;:49161</code> is the odd one out here, and it&#39;s opt-in like the rest:</p>
+<pre><code class="hljs">ENABLE_AUDIOBOOKSHELF=true</code></pre>
+<p>It covers the two things nothing else in this stack touches. Drop audiobooks into <code>Media/Audiobooks</code> and it indexes them, tracks your position per user, and remembers where you were across devices. Podcasts are the one thing it fetches on its own, straight from RSS on a schedule, which needs no indexer and no account at all.</p>
+<p>The apps are the good part. Android is a normal Play Store install. On iOS the official app is TestFlight-only and the beta is usually full, but that&#39;s less of a wall than it sounds: ShelfPlayer and Plappa are both on the App Store, both talk to an Audiobookshelf server, and Plappa syncs your position back.</p>
+<p>There&#39;s no Sonarr for audiobooks in this stack, deliberately. The tools that exist are either unreleased or lean on sources that don&#39;t match the rest of the setup. If you want an audiobook tracker, MyAnonamouse is the one worth having, and you add it to Prowlarr yourself once you have an account.</p>
+<h2 id="turning-it-on">Turning It On</h2>
+<p>They&#39;re toggles on the installer&#39;s Services screen, or set them by hand in <code>.env</code>:</p>
+<pre><code class="hljs">ENABLE_KOMGA=true            # comics + manga reader
+ENABLE_KAVITA=true           # ebook reader
+ENABLE_MYLAR=true            # comic automation
+ENABLE_LAZYLIBRARIAN=true    # book automation</code></pre>
+<p>Pick whichever you want. A reader with no automation is a perfectly normal setup, and so is automation feeding a library you read somewhere else.</p>
+<p>Re-run the installer or <code>bash setup.sh</code> and they&#39;ll appear on your <a href="../dashboard/">Dashboard</a> under a Reading section.</p>
+<p>On first launch each one asks you to create an admin account, then to add a library. Point Komga&#39;s libraries at <code>/comics</code> and <code>/manga</code>, and Kavita&#39;s at <code>/books</code>. Those are the paths as the containers see them, and they map to the folders above.</p>
+<h2 id="resource-notes">Resource Notes</h2>
+<p>Kavita is light. Komga runs on Java, and we cap it at 512MB of heap inside a 1GB container, because left alone a JVM helps itself to a quarter of your NAS&#39;s total RAM. If you have a very large comic library and Komga feels sluggish during a scan, that cap is the first thing to raise in <code>docker-compose.yml</code>.</p>
+
+<div class="doc-pager"><a class="pager-prev" href="../storage/">Storage &amp; Re-grabbing</a><span class="pager-spacer"></span><a class="pager-next" href="../music/">Music</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+
+</body>
+</html>

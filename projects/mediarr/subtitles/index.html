@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Subtitles · Mediarr</title>
+  <meta name="description" content="Bazarr: automatic subtitles in the languages you pick.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Subtitles · Mediarr">
+  <meta property="og:description" content="Bazarr: automatic subtitles in the languages you pick.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#what-the-installer-already-did">What the installer already did</a></li>
+<li class="toc-h2"><a href="#pick-your-languages-do-this-first">Pick your languages (do this first)</a></li>
+<li class="toc-h2"><a href="#add-provider-accounts-for-better-coverage-optional">Add provider accounts for better coverage (optional)</a></li>
+<li class="toc-h2"><a href="#grabbing-subs-for-existing-media">Grabbing subs for existing media</a></li>
+<li class="toc-h2"><a href="#tips">Tips</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/" class="active">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Subtitles</h1>
+<p class="doc-lede">Bazarr: automatic subtitles in the languages you pick.</p>
+<p>Bazarr watches everything Sonarr and Radarr import and automatically downloads matching subtitles, so your movies and shows just have subtitles, without you lifting a finger.</p>
+<blockquote>
+<p><strong>In one sentence:</strong> set your preferred languages once, and Bazarr quietly fetches subtitles for every new import and most of your existing library.</p>
+</blockquote>
+<blockquote>
+<p>Bazarr works alongside your media apps. For the full picture of how content gets into your library, see <a href="../movies-and-tv/">Movies &amp; TV</a> and the <a href="../media-server/">Media Server</a> guide.</p>
+</blockquote>
+<h2 id="what-the-installer-already-did">What the installer already did</h2>
+<p>The installer connected Bazarr to both Sonarr and Radarr and switched on a handful of free subtitle providers. You don&#39;t need to wire anything up. Bazarr is already watching both apps and will start grabbing subs as soon as you tell it which languages you want.</p>
+<p>Open it at <strong><code>http://&lt;NAS-IP&gt;:49153</code></strong> or click the <strong>Bazarr</strong> tile on your <a href="../dashboard/">Dashboard</a>.</p>
+<h2 id="pick-your-languages-do-this-first">Pick your languages (do this first)</h2>
+<p>Bazarr uses &quot;Language profiles&quot;, a named list of languages in priority order. You create one profile and assign it to your shows and movies.</p>
+<ol>
+<li>Open Bazarr and go to <strong>Settings → Languages</strong>.</li>
+<li>Under <strong>Language Profiles</strong>, click <strong>Add Profile</strong>.</li>
+<li>Give it a name (e.g. <em>English</em>), add your language(s), and save.</li>
+<li>Still in <strong>Settings → Languages</strong>, set the default profile for <strong>Series</strong> and for <strong>Movies</strong> to the profile you just created.</li>
+<li>Save. Bazarr will start searching for subtitles on a schedule and backfill your existing library over the next few hours.</li>
+</ol>
+<h2 id="add-provider-accounts-for-better-coverage-optional">Add provider accounts for better coverage (optional)</h2>
+<p>The installer enables some free providers out of the box. For a much higher hit rate, especially for recent releases, add a free account at <strong>OpenSubtitles.com</strong>:</p>
+<ol>
+<li>Go to <strong>Settings → Providers</strong>.</li>
+<li>Find <strong>OpenSubtitles.com</strong> (not .org, they are separate) and click the pencil icon.</li>
+<li>Enter your username and password and save.</li>
+</ol>
+<p>The installer&#39;s Configure screen has a <strong>Bazarr subtitle providers</strong> section where you can enter that credential up front if you&#39;d prefer to supply it during a re-run.</p>
+<p>OpenSubtitles.org and Addic7ed used to be offered here and no longer are. OpenSubtitles shut the .org API down for third-party apps in January 2026 and Bazarr removed the provider outright, so there was nothing left to configure. Addic7ed still works but needs an anti-captcha service or hand-copied cookies, which is a lot of setup for content you already get through Gestdown with no account at all.</p>
+<h2 id="grabbing-subs-for-existing-media">Grabbing subs for existing media</h2>
+<p>Bazarr searches on a schedule and works through your library automatically. If you want subs on a specific title right now:</p>
+<ol>
+<li>Click <strong>Series</strong> or <strong>Movies</strong> in Bazarr&#39;s sidebar.</li>
+<li>Find the show or movie and open it.</li>
+<li>Click <strong>Search</strong> next to a specific episode or the whole series/movie to trigger an immediate download.</li>
+</ol>
+<h2 id="tips">Tips</h2>
+<ul>
+<li><strong>A free OpenSubtitles.com account is the single biggest improvement you can make.</strong> The unauthenticated rate limit is very low. A free account removes it and unlocks a much larger catalog.</li>
+<li><strong>Missing subs on a show or movie?</strong> The most common cause is that no Language profile is assigned to it. In Bazarr, open the item and check the <strong>Language Profile</strong> field. Set it to your profile and click Search.</li>
+<li><strong>New imports are handled automatically.</strong> Every time Sonarr or Radarr finishes importing something, it notifies Bazarr, which searches right away.</li>
+<li><strong>Wrong language downloaded?</strong> Open the episode in Bazarr, delete the bad subtitle, and click Search to try again. You can also blacklist a specific subtitle so Bazarr skips it next time.</li>
+<li>Want to know which providers Bazarr is using or how many subs it has fetched? <strong>System → Status</strong> shows provider health and download counts.</li>
+</ul>
+
+<div class="doc-pager"><a class="pager-prev" href="../downloads-and-vpn/">Downloads &amp; VPN</a><span class="pager-spacer"></span><a class="pager-next" href="../quality-profiles/">Quality Profiles</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Downloads &amp; VPN · Mediarr</title>
+  <meta name="description" content="qBittorrent, SABnzbd, and the kill-switch that has no race to lose.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Downloads &amp; VPN · Mediarr">
+  <meta property="og:description" content="qBittorrent, SABnzbd, and the kill-switch that has no race to lose.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#you-probably-dont-need-to-be-here">You probably don&#39;t need to be here</a></li>
+<li class="toc-h2"><a href="#qbittorrent-torrents-port-49156">qBittorrent: torrents (port :49156)</a></li>
+<li class="toc-h2"><a href="#sabnzbd-usenet-port-49155">SABnzbd: usenet (port :49155)</a></li>
+<li class="toc-h2"><a href="#gluetun-the-vpn-container">Gluetun: the VPN container</a></li>
+<li class="toc-h2"><a href="#where-files-go">Where files go</a></li>
+<li class="toc-h2"><a href="#tips">Tips</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/" class="active">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Downloads &amp; VPN</h1>
+<p class="doc-lede">qBittorrent, SABnzbd, and the kill-switch that has no race to lose.</p>
+<p>This guide explains how downloading actually works in the stack, and what the VPN
+is doing. You normally never need to touch any of this directly, but it&#39;s good to
+understand when something looks stuck.</p>
+<blockquote>
+<p><strong>In one sentence:</strong> Sonarr and Radarr send download jobs here automatically, and
+when the VPN is enabled, all torrent traffic travels through it. You just watch
+the queue.</p>
+</blockquote>
+<blockquote>
+<p>New to the stack? Requests flow in from <a href="../requesting/">Requesting Movies &amp; TV</a>.
+To understand what Sonarr and Radarr are doing on the other side, see
+<a href="../movies-and-tv/">Movies &amp; TV</a>. VPN credentials are entered during
+<a href="../installation/">Installation</a>.</p>
+</blockquote>
+<h2 id="you-probably-dont-need-to-be-here">You probably don&#39;t need to be here</h2>
+<p>The installer wires Sonarr, Radarr, and Lidarr directly to qBittorrent and
+SABnzbd, including category folders, import paths, and hardlink settings. Once
+the stack is running, downloads happen silently in the background. The only
+reasons to open these UIs are to check a stuck queue or confirm something is
+downloading.</p>
+<h2 id="qbittorrent-torrents-port-49156">qBittorrent: torrents (port :49156)</h2>
+<p>qBittorrent is the torrent client. Open it from its tile on your
+<a href="../dashboard/">Homepage dashboard</a> or at <strong><code>http://&lt;NAS-IP&gt;:49156</code></strong>.</p>
+<p>When the VPN is enabled, <strong>qBittorrent runs entirely inside the Gluetun VPN
+container.</strong> Every byte of torrent traffic goes through your VPN. If the VPN
+drops, the kill-switch fires and downloads stop. They do not leak your real IP.
+This also means qBittorrent has no internet connection unless Gluetun is
+connected first. The VPN is opt-in (<code>VPN_ENABLED=false</code> by default). Without it
+qBittorrent runs on the regular network and your real IP is visible to peers.</p>
+<p>When an import finishes, the original download stays in
+<code>/data/Downloads/Torrents/Completed</code> and continues seeding. Sonarr/Radarr
+hardlink the file into <code>/data/Media/...</code> so you&#39;re seeding from the same copy
+without using extra disk space.</p>
+<h2 id="sabnzbd-usenet-port-49155">SABnzbd: usenet (port :49155)</h2>
+<p>SABnzbd is the usenet client. Open it from your <a href="../dashboard/">Homepage dashboard</a>
+or at <strong><code>http://&lt;NAS-IP&gt;:49155</code></strong>. Usenet is used when you have a usenet provider
+and usenet indexers configured in <a href="../indexers/">Prowlarr</a>.</p>
+<p>Usenet is fast and <strong>does not need the VPN</strong>, so it runs outside Gluetun. To add a
+provider, enter it during the wizard&#39;s Configure screen or go directly to
+SABnzbd&#39;s <strong>Config → Servers</strong>. Completed files land in <code>/data/Downloads/Usenet/complete</code>
+and the arrs import them the same way as torrents.</p>
+<h2 id="gluetun-the-vpn-container">Gluetun: the VPN container</h2>
+<p>Gluetun is the VPN container that wraps qBittorrent (and Soulseek, if you have
+it enabled). You configure your VPN provider and credentials once in the
+installer wizard. Gluetun supports most major providers.</p>
+<p>One thing worth knowing: <strong>NordVPN does not support port forwarding through
+Gluetun.</strong> Port forwarding lets peers connect back to you, which improves seeding
+and torrent health. If you want better seeding, use a provider that supports it,
+<strong>ProtonVPN</strong>, <strong>PIA</strong>, or <strong>PrivateVPN</strong> are the common picks. This is purely
+optional, and downloading still works fine without port forwarding.</p>
+<h2 id="where-files-go">Where files go</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Path</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Torrent downloads</td>
+<td><code>/data/Downloads/Torrents/Completed</code></td>
+</tr>
+<tr>
+<td>Usenet downloads</td>
+<td><code>/data/Downloads/Usenet/complete</code></td>
+</tr>
+<tr>
+<td>Imported movies</td>
+<td><code>/data/Media/Movies</code></td>
+</tr>
+<tr>
+<td>Imported TV</td>
+<td><code>/data/Media/TV Shows</code></td>
+</tr>
+<tr>
+<td>Imported music</td>
+<td><code>/data/Media/Music</code></td>
+</tr>
+</tbody></table></div>
+<p>The <code>/data</code> folder is a single shared mount, so hardlinking between Downloads
+and Media costs no extra disk space.</p>
+<h2 id="tips">Tips</h2>
+<ul>
+<li><strong>All torrents stalled?</strong> The most common cause is Gluetun not being connected.
+Check the Gluetun tile on your <a href="../dashboard/">Homepage dashboard</a>. It should show
+a connected status and your VPN IP. You can also run <code>docker logs gluetun</code> to
+see what it&#39;s doing.</li>
+<li><strong>Restart order matters.</strong> If you restart qBittorrent by itself it loses the
+VPN network namespace and can&#39;t connect. Always restart the whole stack with
+<code>docker compose down &amp;&amp; docker compose up -d</code> (not <code>docker compose restart</code>,
+which brings containers up simultaneously and breaks the dependency order).</li>
+<li><strong>Queue looks healthy but nothing imports?</strong> Check the arrs&#39; <strong>Activity →
+Queue</strong> screens. Sonarr (:49152) and Radarr (:49151) show import errors there.
+A <a href="../quality-profiles/">quality profile</a> mismatch or a missing <a href="../indexers/">indexer</a>
+are the usual causes.</li>
+<li><strong>SABnzbd not downloading?</strong> Confirm you have at least one usenet provider
+added under SABnzbd <strong>Config → Servers</strong>, and that a usenet indexer is enabled
+in <a href="../indexers/">Prowlarr</a>.</li>
+<li>For VPN provider setup and credentials, see the <a href="../installation/">Installation</a> guide.</li>
+</ul>
+
+<div class="doc-pager"><a class="pager-prev" href="../indexers/">Indexers</a><span class="pager-spacer"></span><a class="pager-next" href="../subtitles/">Subtitles</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+
+</body>
+</html>

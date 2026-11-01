@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Music Playback · Mediarr</title>
+  <meta name="description" content="Turn your library into stations and mixtapes with Plexamp.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Music Playback · Mediarr">
+  <meta property="og:description" content="Turn your library into stations and mixtapes with Plexamp.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#what-the-installer-set-up-for-you">What the installer set up for you</a></li>
+<li class="toc-h2"><a href="#step-1-get-plexamp">Step 1: Get Plexamp</a></li>
+<li class="toc-h2"><a href="#step-2-start-a-station">Step 2: Start a station</a></li>
+<li class="toc-h2"><a href="#step-3-make-a-playlist">Step 3: Make a playlist</a></li>
+<li class="toc-h2"><a href="#troubleshooting">Troubleshooting</a></li>
+<li class="toc-h3"><a href="#turn-sonic-analysis-on-yourself-the-manual-switch">Turn Sonic Analysis on yourself (the manual switch)</a></li>
+<li class="toc-h2"><a href="#quick-reference">Quick reference</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/" class="active">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Music Playback</h1>
+<p class="doc-lede">Turn your library into stations and mixtapes with Plexamp.</p>
+<p>This guide is about <strong>listening</strong>. Once you&#39;ve got music on your NAS, this turns
+that library into your own personal radio: <strong>SiriusXM-style stations</strong> (a
+&quot;chill&quot; channel, a &quot;90s&quot; channel, an all-Tom-Petty channel) and <strong>Spotify-style
+playlists</strong>, streamed straight from your own server. Nothing is pulled from the
+internet. No subscription to anyone else. Just your music, your way, on every
+device.</p>
+<blockquote>
+<p><strong>In one sentence:</strong> the installer turned your NAS music folder into a Plex
+Music library and switched on the &quot;smarts&quot; that group songs by mood and sound.
+Now you install the free <strong>Plexamp</strong> app, sign in, and press play on a
+station or a playlist made entirely from <em>your</em> library.</p>
+</blockquote>
+<blockquote>
+<p>Looking to <strong>add</strong> music instead of play it? See
+<a href="../music-setup/">Music downloads with Soulseek</a>.</p>
+</blockquote>
+<blockquote>
+<p>Want live radio rather than your own library? Music Assistant is the usual
+pick for that, run separately from this stack. Mediarr shipped an AzuraCast
+broadcast option once and removed it in v0.18.0.</p>
+</blockquote>
+<hr>
+<h2 id="what-the-installer-set-up-for-you">What the installer set up for you</h2>
+<p>You don&#39;t have to build any of this. It&#39;s already done:</p>
+<ul>
+<li><strong>A Plex <em>Music</em> library.</strong> Your NAS music folder
+(<code>${DATA_ROOT}/Media/Music</code>) is now a proper Music library inside Plex, so
+every album you have (and every new one Lidarr grabs) shows up automatically.</li>
+<li><strong>Sonic Analysis - the magic behind stations.</strong> This is a Plex Pass feature
+that <em>listens</em> to each track and learns its &quot;sonic fingerprint&quot; (is it mellow
+or energetic, acoustic or electronic, and so on). That&#39;s what lets Plexamp
+build a smooth &quot;chill evening&quot; station or a &quot;high-energy workout&quot; mix that
+actually flows, instead of jumping around randomly.</li>
+</ul>
+<blockquote>
+<p><strong>Heads up, first run takes a while.</strong> Sonic Analysis is doing real listening
+work on every song, and on a big library that can take <strong>hours, even a day or
+two</strong>, the first time. That&#39;s normal. Your music plays fine the whole time,
+and your <strong>stations simply get smarter and richer as the analysis finishes</strong>.
+If stations look thin on day one, give it time and check back.</p>
+</blockquote>
+<hr>
+<h2 id="step-1-get-plexamp">Step 1: Get Plexamp</h2>
+<p><strong>Plexamp</strong> is Plex&#39;s dedicated music player, and it&#39;s where all the station and
+playlist goodness lives. It&#39;s free with your account. Pick whichever is easiest:</p>
+<ul>
+<li><strong>Install the app</strong> - Plexamp is on <strong>iPhone/iPad (App Store)</strong>, <strong>Android
+(Google Play)</strong>, and <strong>desktop (Mac / Windows / Linux)</strong>. Search &quot;Plexamp&quot; in
+your app store, or grab it from
+<a href="https://plexamp.plex.tv">plexamp.plex.tv</a>.</li>
+<li><strong>Or just use the web player</strong> - open
+<a href="https://plexamp.plex.tv"><strong>https://plexamp.plex.tv</strong></a> in any browser, no
+install needed. Great for trying it out on a laptop right now.</li>
+</ul>
+<p>Then <strong>sign in with your Plex account</strong>, the same login you use for your
+server. Plexamp signs you in through Plex, but it <strong>only plays <em>your</em> server&#39;s
+library</strong>. There&#39;s no outside music catalog mixed in. Everything you hear is
+what&#39;s on your NAS.</p>
+<blockquote>
+<p>The installer can&#39;t put the app on your phone for you. That part&#39;s a quick
+install you do yourself. Once you&#39;re signed in, your NAS music is right there.</p>
+</blockquote>
+<hr>
+<h2 id="step-2-start-a-station">Step 2: Start a station</h2>
+<p>Stations are auto-generated, never-ending mixes pulled from your library. This is
+the <strong>SiriusXM-like</strong> part: pick a vibe, press play, and it keeps going.</p>
+<p>In Plexamp, you&#39;ll find stations in a few places:</p>
+<ul>
+<li><strong>Mood &amp; Genre stations</strong> - this is the SiriusXM feel. Open an artist, album,
+or your library and look for <strong>Play Station</strong> / the radio icon, then choose a
+<strong>mood</strong> (Chill, Energetic, Romantic…) or a <strong>genre</strong> (Rock, Jazz, Hip-Hop…).
+Plexamp leans on Sonic Analysis to keep the mood consistent, like tuning to
+&quot;The Pulse&quot; or a &quot;Chill&quot; channel, except every song is one you own.</li>
+<li><strong>Decade stations</strong> - fancy an all-80s or all-90s run? Start a decade station
+and let it roll.</li>
+<li><strong>Artist Radio</strong> - pick an artist and start their radio. Plexamp plays that
+artist plus sonically similar music <strong>from your own library</strong>.</li>
+<li><strong>Sonic Adventures</strong> - a fun one: Plexamp builds a journey that gradually
+<em>morphs</em> from one song or mood into another across your collection. Look for
+<strong>Sonic Adventure</strong> when you&#39;ve got a track or artist open.</li>
+</ul>
+<p>Tip: the more of your library Sonic Analysis has finished, the better and more
+&quot;on-vibe&quot; every one of these gets.</p>
+<hr>
+<h2 id="step-3-make-a-playlist">Step 3: Make a playlist</h2>
+<p>Stations are automatic. <strong>Playlists</strong> are the ones you build by hand and keep,
+the Spotify-style mixtape.</p>
+<ul>
+<li><strong>A regular playlist.</strong> Find a song, album, or artist, tap the <strong><code>...</code></strong>
+(more) menu, choose <strong>Add to Playlist</strong>, and either pick an existing playlist
+or create a new one. Add as much as you like, and reorder it however you want. It
+syncs across all your Plexamp devices.</li>
+<li><strong>A <em>smart</em> playlist</strong> (the cool trick). Smart playlists fill themselves in
+using rules. In the <strong>Plex Web app</strong> go to a music library, choose <strong>New
+Playlist</strong>, and switch it to <strong>Smart Playlist</strong>, then set rules like <em>Genre is
+Jazz</em>, <em>Year is after 2010</em>, or <em>Rating is 4 stars+</em>. The playlist updates
+itself automatically as your library grows. Set it once, enjoy it forever. It
+shows up in Plexamp right alongside your regular playlists.</li>
+</ul>
+<hr>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p><strong>&quot;I don&#39;t see any stations&quot; or &quot;my stations look thin / boring.&quot;</strong></p>
+<p>Almost always one of two things:</p>
+<ol>
+<li><strong>Sonic Analysis is still running.</strong> On a large library the first pass takes
+a long time (see the heads-up above). Stations get richer as it completes,
+check the progress (below) and give it time.</li>
+<li><strong>Sonic Analysis isn&#39;t switched on for the library.</strong> The installer turns it
+on for you, but if a Plex update, an older Plex build, or a pre-existing
+music library means it didn&#39;t take, you can flip the switch yourself. It&#39;s a
+one-time toggle, so follow the steps below.</li>
+</ol>
+<blockquote>
+<p><strong>Requires Plex Pass.</strong> The station/sonic magic is a Plex Pass feature (you
+have it). It also only appears on supported x86-64 (Intel/AMD) servers, which
+your NAS is.</p>
+</blockquote>
+<h3 id="turn-sonic-analysis-on-yourself-the-manual-switch">Turn Sonic Analysis on yourself (the manual switch)</h3>
+<p><strong>Enable it for your music library</strong> (this is the real on/off switch):</p>
+<ol>
+<li>Open the <strong>Plex Web app</strong> and pick your server.</li>
+<li>Hover over the <strong>Music</strong> library in the left sidebar and click the <strong><code>...</code></strong>
+(or the pencil / <strong>Edit Library</strong>).</li>
+<li>Open the <strong>Advanced</strong> tab.</li>
+<li>Find the dropdown labeled <strong>&quot;Analyze audio tracks for sonic features&quot;</strong> (Plex
+Pass only, and only on supported x86-64 CPUs).</li>
+<li>Choose when it runs:<ul>
+<li><strong>&quot;As a scheduled task&quot;</strong> = analyze gradually during the nightly
+maintenance window.</li>
+<li><strong>&quot;As a scheduled task and when media is added&quot;</strong> = start now and run
+continuously until done (<strong>use this to kick it off immediately</strong>).</li>
+</ul>
+</li>
+<li><strong>Save Changes.</strong></li>
+</ol>
+<p><strong>Set a server-wide default (optional):</strong></p>
+<p>Go to <strong>Settings &gt; Server &gt; Library</strong> and set <strong>&quot;Analyze audio tracks for sonic
+features&quot;</strong> to the default you want. This is the default applied to libraries.
+The per-library <strong>Advanced</strong> setting above is what actually governs a given
+library.</p>
+<p><strong>Watch the progress:</strong></p>
+<p>Open the <strong>Activity</strong> menu in the top bar. It shows how many albums are left to
+analyze. Sonic analysis is very CPU-heavy and can take <strong>hours to days</strong> for a
+large library.</p>
+<blockquote>
+<p><strong>Bonus, want waveforms?</strong> In that same <strong>Advanced</strong> section there&#39;s a
+separate <strong>&quot;Analyze audio tracks for loudness&quot;</strong> setting. It powers the
+<strong>waveforms</strong> and <strong>Sweet Fades</strong> (smooth song-to-song crossfades) in Plexamp.
+Turn it on too if you&#39;d like those. It&#39;s optional and independent of the
+station smarts.</p>
+</blockquote>
+<hr>
+<h2 id="quick-reference">Quick reference</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Player app</td>
+<td><strong>Plexamp</strong> on iOS, Android, desktop, or web at <code>https://plexamp.plex.tv</code></td>
+</tr>
+<tr>
+<td>Sign in with</td>
+<td>Your <strong>Plex account</strong> (plays <strong>only</strong> your NAS library)</td>
+</tr>
+<tr>
+<td>Powers stations</td>
+<td><strong>Sonic Analysis</strong> (Plex Pass, set up by the installer)</td>
+</tr>
+<tr>
+<td>Music library path</td>
+<td><code>${DATA_ROOT}/Media/Music</code></td>
+</tr>
+<tr>
+<td>Stations</td>
+<td>Mood, Genre, Decade, Artist Radio, Sonic Adventures</td>
+</tr>
+<tr>
+<td>Playlists</td>
+<td>Regular + Smart (rule-based, self-updating)</td>
+</tr>
+<tr>
+<td>Requires</td>
+<td><strong>Plex Pass</strong> + an x86-64 server (your NAS)</td>
+</tr>
+<tr>
+<td>External sources</td>
+<td><strong>None</strong>, 100% your own library</td>
+</tr>
+</tbody></table></div>
+<p>Want to <strong>add</strong> more music to play here? See
+<a href="../music-setup/">Music downloads with Soulseek</a>.</p>
+
+<div class="doc-pager"><a class="pager-prev" href="../playlist-sync/">Playlist Sync</a><span class="pager-spacer"></span><a class="pager-next" href="../watch-on-your-tv/">Watch on Your TV</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+
+</body>
+</html>

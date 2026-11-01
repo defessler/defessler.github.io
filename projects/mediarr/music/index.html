@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Music · Mediarr</title>
+  <meta name="description" content="The map of every music feature and which guide covers it.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Music · Mediarr">
+  <meta property="og:description" content="The map of every music feature and which guide covers it.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar docs-sidebar-single" aria-label="Documentation">
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/" class="active">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Music</h1>
+<p class="doc-lede">The map of every music feature and which guide covers it.</p>
+<p>Everything music-related the installer can set up, and which guide to read for each.
+There are three things you might want here. You can <strong>get</strong> music, <strong>play</strong> it, and <strong>broadcast</strong> it:</p>
+<h2 id="get-music-into-your-library">🎵 Get music into your library</h2>
+<ul>
+<li><strong>Indexers (torrent + Usenet).</strong> Add dedicated music trackers like <strong>Redacted (RED)</strong>,
+<strong>Orpheus</strong>, and <strong>RuTracker</strong>, plus Usenet indexers (<strong>NZBFinder</strong>, <strong>NZB.su</strong>) in the
+wizard&#39;s <strong>Configure → Find indexers</strong> screen (filter by <strong>Music</strong>), or via
+<code>nas/scripts/.env.example</code>. Lidarr then searches them automatically. There&#39;s no separate guide, because
+it&#39;s part of the normal indexer setup.</li>
+<li><strong>Soulseek</strong> - peer-to-peer music for the rare things indexers can&#39;t find. Opt-in, runs
+through your VPN. → <strong><a href="../music-setup/">MUSIC-SETUP.md</a></strong></li>
+<li><strong>Playlist Sync</strong> - auto-mirror SiriusXM channels + public Spotify playlists into Plex playlists, downloaded for you on a schedule. Opt-in, runs through your VPN. Needs Plex. → <strong><a href="../playlist-sync/">Playlist Sync</a></strong></li>
+</ul>
+<h2 id="play-your-library">▶️ Play your library</h2>
+<ul>
+<li><strong>Plexamp</strong> - turn your own Plex music into SiriusXM-style smart stations and playlists.
+→ <strong><a href="../music-playback/">MUSIC-PLAYBACK.md</a></strong></li>
+</ul>
+<hr>
+<p><em>Internal planning/research (not shipped user features): <code>MUSIC-SOURCES-PLAN.md</code>,
+<code>MUSIC-SOURCES-DEEZER-RESEARCH.md</code>. The latter covers a possible future Deezer-streaming
+integration that is researched but <strong>not</strong> implemented.</em></p>
+
+<div class="doc-pager"><a class="pager-prev" href="../reading/">Comics, Manga &amp; Books</a><span class="pager-spacer"></span><a class="pager-next" href="../music-setup/">Music Setup</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quality Profiles · Mediarr</title>
+  <meta name="description" content="Choose 1080p or 4K, WEB or Bluray, and change your mind whenever you like.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Quality Profiles · Mediarr">
+  <meta property="og:description" content="Choose 1080p or 4K, WEB or Bluray, and change your mind whenever you like.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#what-a-quality-profile-is">What a quality profile is</a></li>
+<li class="toc-h2"><a href="#what-the-installer-sets-by-default">What the installer sets by default</a></li>
+<li class="toc-h2"><a href="#available-profiles">Available profiles</a></li>
+<li class="toc-h2"><a href="#changing-your-profile-after-install">Changing your profile after install</a></li>
+<li class="toc-h2"><a href="#a-note-on-4k">A note on 4K</a></li>
+<li class="toc-h2"><a href="#tips">Tips</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/" class="active">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Quality Profiles</h1>
+<p class="doc-lede">Choose 1080p or 4K, WEB or Bluray, and change your mind whenever you like.</p>
+<p>This guide explains quality profiles, what they are, what the installer sets up for you, and how to change them without reinstalling.</p>
+<blockquote>
+<p><strong>In one sentence:</strong> a quality profile tells Sonarr and Radarr which release to grab when several exist. The installer picks sensible defaults for you, and you can change them by editing one line in <code>.env</code> and re-running the wizard.</p>
+</blockquote>
+<blockquote>
+<p>For how profiles affect what actually gets downloaded day to day, see <a href="../movies-and-tv/">Movies &amp; TV</a>.
+To set your profile picks during first-time setup, see <a href="../installation/">Installation</a>.</p>
+</blockquote>
+<h2 id="what-a-quality-profile-is">What a quality profile is</h2>
+<p>When a movie or TV episode is available in multiple versions (1080p WEB-DL, 4K Bluray Remux, a bad HDTV rip) Sonarr and Radarr use a <strong>quality profile</strong> to decide which one to grab. The profile defines:</p>
+<ul>
+<li><strong>Resolution</strong> - 1080p or 4K (2160p)</li>
+<li><strong>Source</strong> - WEB (streaming encode) or Bluray (disc rip / remux)</li>
+<li><strong>Scoring</strong> - custom formats from the <a href="https://trash-guides.info">TRaSH Guides</a> rank releases by things like audio codec, HDR type, and release group quality</li>
+</ul>
+<p>You never have to hand-craft these settings. The installer uses <strong>Recyclarr</strong> to pull the TRaSH Guide profiles and load them straight into Sonarr and Radarr automatically.</p>
+<h2 id="what-the-installer-sets-by-default">What the installer sets by default</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>App</th>
+<th>Default profile</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Sonarr</td>
+<td><code>web-1080p</code></td>
+</tr>
+<tr>
+<td>Radarr</td>
+<td><code>hd-bluray-web</code></td>
+</tr>
+</tbody></table></div>
+<p>These are the TRaSH Guide community-recommended picks for a typical home server: good quality, reasonable file sizes, wide compatibility. <strong>Most setups never need to change them.</strong></p>
+<h2 id="available-profiles">Available profiles</h2>
+<p><strong>Sonarr:</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Profile key</th>
+<th>What it applies</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>web-1080p</code></td>
+<td>Default. 1080p streaming releases (WEB), with Bluray sources scored highest within this profile</td>
+</tr>
+<tr>
+<td><code>web-2160p</code></td>
+<td>4K WEB (HDR / Dolby Vision scored)</td>
+</tr>
+<tr>
+<td><code>bluray-1080p</code></td>
+<td>Alias for <code>web-1080p</code>. TRaSH has no separate Sonarr Bluray recipe, and WEB-1080p already scores Bluray sources highest</td>
+</tr>
+<tr>
+<td><code>bluray-2160p</code></td>
+<td>Alias for <code>web-2160p</code>, same reason as above</td>
+</tr>
+<tr>
+<td><code>anime</code></td>
+<td>Anime-specific scoring (sub groups, encoders)</td>
+</tr>
+</tbody></table></div>
+<p><strong>Radarr:</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Profile key</th>
+<th>What it applies</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>hd-bluray-web</code></td>
+<td>Default. 1080p Bluray + WEB, whichever scores higher</td>
+</tr>
+<tr>
+<td><code>uhd-bluray-web</code></td>
+<td>4K Bluray + WEB (HDR / Dolby Vision scored)</td>
+</tr>
+<tr>
+<td><code>remux-web-2160p</code></td>
+<td>Top-tier 4K Remux (largest files, best quality)</td>
+</tr>
+<tr>
+<td><code>anime</code></td>
+<td>Anime-specific scoring</td>
+</tr>
+</tbody></table></div>
+<h2 id="changing-your-profile-after-install">Changing your profile after install</h2>
+<p>You do not need to reinstall fully. Edit <code>.env</code> (in your install directory) and change the profile key:</p>
+<pre><code class="hljs">TRASH_SONARR_PROFILE=web-1080p
+TRASH_RADARR_PROFILE=hd-bluray-web</code></pre>
+<p>Then re-run the installer. The Configure screen lets you pick a new profile from a dropdown, and the installer re-runs <code>recyclarr sync</code> automatically to push the new scoring rules into Sonarr and Radarr. Existing downloads are not affected. Only future grabs use the new scoring.</p>
+<p>If you prefer to skip the wizard, edit <code>recyclarr.yml</code> in your install directory by hand, then run:</p>
+<pre><code class="hljs">docker exec recyclarr recyclarr sync</code></pre>
+<h2 id="a-note-on-4k">A note on 4K</h2>
+<p>The <code>web-2160p</code>, <code>uhd-bluray-web</code>, and <code>remux-web-2160p</code> profiles pull 4K files, which are significantly larger and require:</p>
+<ul>
+<li>Enough free disk space (Remux files can be 50 to 80 GB per movie)</li>
+<li>A Plex or Jellyfin client that can play 4K, and ideally direct-play it, since transcoding 4K is CPU-heavy</li>
+</ul>
+<p>Do not switch to a 4K profile unless your playback setup handles it. You can set Sonarr and Radarr to different profiles, for example 4K movies but 1080p TV.</p>
+<h2 id="tips">Tips</h2>
+<ul>
+<li><strong>Recyclarr runs on a schedule</strong> - it re-syncs profiles automatically so any upstream TRaSH Guide improvements land in your setup without any action from you.</li>
+<li><strong>Nothing is downloading?</strong> A very strict profile combined with limited indexers can mean no release scores high enough. Try loosening the profile or adding more <a href="../indexers/">Indexers</a>.</li>
+<li><strong>Profiles do not affect existing media</strong> - only future grabs. Sonarr and Radarr will upgrade an already-imported file if a better-scoring release appears and your profile has upgrades enabled.</li>
+<li>See <a href="../movies-and-tv/">Movies &amp; TV</a> for how Sonarr and Radarr use profiles when searching and importing.</li>
+</ul>
+
+<div class="doc-pager"><a class="pager-prev" href="../subtitles/">Subtitles</a><span class="pager-spacer"></span><a class="pager-next" href="../live-tv/">Live TV &amp; DVR</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+
+</body>
+</html>

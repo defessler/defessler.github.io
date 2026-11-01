@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Movies &amp; TV · Mediarr</title>
+  <meta name="description" content="Sonarr and Radarr: add titles directly and track what they are doing.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Movies &amp; TV · Mediarr">
+  <meta property="og:description" content="Sonarr and Radarr: add titles directly and track what they are doing.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#what-they-do">What they do</a></li>
+<li class="toc-h2"><a href="#adding-a-movie-or-tv-show-directly">Adding a movie or TV show directly</a></li>
+<li class="toc-h2"><a href="#checking-progress">Checking progress</a></li>
+<li class="toc-h2"><a href="#quality-and-sources">Quality and sources</a></li>
+<li class="toc-h2"><a href="#where-files-land">Where files land</a></li>
+<li class="toc-h2"><a href="#tips">Tips</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/" class="active">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Movies &amp; TV</h1>
+<p class="doc-lede">Sonarr and Radarr: add titles directly and track what they are doing.</p>
+<p>Sonarr and Radarr are the engines behind your movie and TV library. They watch for wanted content, search your indexers, hand the best release to your download client, and import it into your media server automatically.</p>
+<blockquote>
+<p><strong>In one sentence:</strong> add a show or movie, and Sonarr/Radarr take it from there, searching, downloading, and dropping it into your library with no further effort from you.</p>
+</blockquote>
+<blockquote>
+<p>The <strong>easiest way</strong> to request movies and TV is through the Seerr portal. Search, click Request, done. See <a href="../requesting/">Requesting Movies and TV</a>. This page is for adding things directly when you want finer control.</p>
+</blockquote>
+<h2 id="what-they-do">What they do</h2>
+<p><strong>Sonarr</strong> manages TV shows and <strong>Radarr</strong> manages movies. They work identically:</p>
+<ol>
+<li>You add a title and tell them to monitor it.</li>
+<li>They search your <a href="../indexers/">Indexers</a> for a release that matches your <a href="../quality-profiles/">Quality Profile</a>.</li>
+<li>The best match goes to <a href="../downloads-and-vpn/">qBittorrent or SABnzbd</a> for downloading.</li>
+<li>Once the download finishes, they <strong>import and rename</strong> the file into your media library using a hardlink, so no extra disk space is used.</li>
+</ol>
+<p>After that first add, everything is hands-off. The installer already wired up the download clients, root folders, quality profiles, and indexer connections for you.</p>
+<h2 id="adding-a-movie-or-tv-show-directly">Adding a movie or TV show directly</h2>
+<p><strong>Radarr (movies)</strong> - open <code>http://&lt;NAS-IP&gt;:49151</code> or click its tile on your <a href="../dashboard/">Dashboard</a>.</p>
+<ol>
+<li>Click <strong>Movies → Add New Movie</strong>.</li>
+<li>Search for the title and select it.</li>
+<li>The <strong>root folder</strong> (<code>/data/Media/Movies</code>) and <strong>quality profile</strong> are already set by the installer, so leave them as they are unless you have a reason to change.</li>
+<li>Click <strong>Add Movie</strong>. Radarr searches immediately, and if a release exists it starts downloading.</li>
+</ol>
+<p><strong>Sonarr (TV)</strong> - open <code>http://&lt;NAS-IP&gt;:49152</code> or click its tile on your <a href="../dashboard/">Dashboard</a>.</p>
+<ol>
+<li>Click <strong>Series → Add New Series</strong>.</li>
+<li>Search for the show and select it.</li>
+<li>The <strong>root folder</strong> (<code>/data/Media/TV Shows</code>) and <strong>quality profile</strong> are already set.</li>
+<li>Choose <strong>which seasons</strong> to monitor (all, future only, or specific seasons).</li>
+<li>Click <strong>Add Series</strong>. Sonarr searches for any monitored episodes that are already released.</li>
+</ol>
+<h2 id="checking-progress">Checking progress</h2>
+<ul>
+<li><strong>Activity → Queue</strong> - shows everything currently downloading or being imported.</li>
+<li><strong>Wanted → Missing</strong> - titles it&#39;s monitoring but hasn&#39;t found a release for yet.</li>
+<li><strong>History</strong> - a log of every grab, download, and import.</li>
+</ul>
+<h2 id="quality-and-sources">Quality and sources</h2>
+<p>Your quality profile controls which releases are acceptable (resolution, codec, source). The installer sets a sensible default: <strong>web-1080p</strong> for Sonarr and <strong>hd-bluray-web</strong> for Radarr via Recyclarr. To change it, see <a href="../quality-profiles/">Quality Profiles</a>.</p>
+<p>Releases are found through <a href="../indexers/">Indexers</a>. Prowlarr syncs them into both Sonarr and Radarr. If you need more sources, add them in Prowlarr.</p>
+<p>Downloads run through <a href="../downloads-and-vpn/">Downloads &amp; VPN</a>. qBittorrent sits entirely inside the VPN container, so your IP is never exposed.</p>
+<h2 id="where-files-land">Where files land</h2>
+<p>Your media server (Plex at <code>:32400</code> or Jellyfin at <code>:8096</code>) reads from:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Path</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Movies</td>
+<td><code>/media/Movies</code></td>
+</tr>
+<tr>
+<td>TV Shows</td>
+<td><code>/media/TV Shows</code></td>
+</tr>
+<tr>
+<td>Anime Movies</td>
+<td><code>/media/Anime/Movies</code></td>
+</tr>
+<tr>
+<td>Anime TV</td>
+<td><code>/media/Anime/TV Shows</code></td>
+</tr>
+</tbody></table></div>
+<p>See <a href="../media-server/">Media Server</a> for library setup and playback.</p>
+<h2 id="tips">Tips</h2>
+<ul>
+<li><strong>Nothing is downloading?</strong> The most common cause is that no release matched, either too few indexers (add more in Prowlarr) or a quality profile that&#39;s too strict (loosen it in <a href="../quality-profiles/">Quality Profiles</a>). Check <strong>Wanted → Missing</strong> and look at the search results icon next to the title for clues.</li>
+<li><strong>You don&#39;t need to touch settings.</strong> The installer already enabled hardlinks, connected the download client, and set root folders. Sonarr and Radarr should work out of the box.</li>
+<li><strong>For music</strong>, the equivalent is Lidarr - see <a href="../music-setup/">Music Setup</a> for how to get it running with Soulseek.</li>
+<li><strong>Prefer requesting?</strong> Go to <a href="../requesting/">Requesting Movies and TV</a>. It&#39;s faster for day-to-day use and works for your whole household without anyone touching Sonarr or Radarr directly.</li>
+</ul>
+
+<div class="doc-pager"><a class="pager-prev" href="../media-server/">Media Server</a><span class="pager-spacer"></span><a class="pager-next" href="../indexers/">Indexers</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+
+</body>
+</html>

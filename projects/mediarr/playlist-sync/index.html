@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Playlist Sync · Mediarr</title>
+  <meta name="description" content="Mirror SiriusXM channels into your library as Plex or Jellyfin playlists, refreshed on a schedule.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Playlist Sync · Mediarr">
+  <meta property="og:description" content="Mirror SiriusXM channels into your library as Plex or Jellyfin playlists, refreshed on a schedule.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#what-you-need">What You Need</a></li>
+<li class="toc-h2"><a href="#turning-it-on">Turning It On</a></li>
+<li class="toc-h3"><a href="#picking-channels">Picking Channels</a></li>
+<li class="toc-h2"><a href="#how-it-works">How It Works</a></li>
+<li class="toc-h3"><a href="#monthly-archives">Monthly Archives</a></li>
+<li class="toc-h3"><a href="#cover-art">Cover Art</a></li>
+<li class="toc-h2"><a href="#notes-and-troubleshooting">Notes And Troubleshooting</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/" class="active">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Playlist Sync</h1>
+<p class="doc-lede">Mirror SiriusXM channels into your library as Plex or Jellyfin playlists.</p>
+<p>Playlist Sync is a hands-off worker that keeps SiriusXM channels mirrored into your music library as playlists, refreshed automatically on a schedule.</p>
+<blockquote>
+<p><strong>In one sentence:</strong> pick some SiriusXM channels in the installer, and Mediarr downloads each track (Soulseek first, with a yt-dlp fallback) and turns each channel into a playlist you can play in Plexamp or Jellyfin, re-syncing on its own every day.</p>
+</blockquote>
+<blockquote>
+<p>Want Soulseek wired into <strong>Lidarr</strong> for your wanted albums instead? See <a href="../music-setup/">Music downloads with Soulseek</a>. Want to <strong>play</strong> your library as smart stations? See <a href="../music-playback/">Plexamp</a>.</p>
+</blockquote>
+<h2 id="what-you-need">What You Need</h2>
+<ul>
+<li><strong>Plex or Jellyfin.</strong> Either works. Playlist Sync uploads through whichever one you installed.</li>
+<li><strong>A second free Soulseek account.</strong> Your stack&#39;s main Soulseek session belongs to <code>slskd</code>, and Soulseek only allows one session per account, so Playlist Sync needs its own login. Creating one is free and takes a minute in the <a href="https://www.slsknet.org">Soulseek desktop client</a> or the slskd web UI.</li>
+</ul>
+<p>That&#39;s the whole list. SiriusXM channel rotations come from <a href="https://xmplaylist.com">xmplaylist.com</a>, which needs no account, no key, and no subscription. You don&#39;t need to be a SiriusXM subscriber to use this.</p>
+<div class="callout callout-note"><p><span class="callout-label">Note:</span> Playlist Sync used to offer Spotify playlists as a second source. That was removed in v0.17.0, so this feature is SiriusXM-only now. Nothing else about it changed.</p></div>
+<h2 id="turning-it-on">Turning It On</h2>
+<p>In the installer&#39;s <strong>Configure</strong> screen, open the <strong>Music</strong> group and enable <strong>Playlist Sync</strong>. It&#39;s off by default. Then fill in:</p>
+<p>Soulseek username and password - your <em>second</em> free Soulseek login, not the one slskd uses.</p>
+<p>SiriusXM channels - search and tick channels in the dropdown, which lists every SiriusXM channel by name. Anything not listed can be added as a custom slug.</p>
+<p>Schedule and format - optional. A cron schedule (default daily at 4 AM) and preferred audio format (default FLAC).</p>
+<p>You need at least one SiriusXM channel.</p>
+<h3 id="picking-channels">Picking Channels</h3>
+<p>Start typing in the <strong>SiriusXM channels</strong> box. It searches the full SiriusXM directory by name, so try &quot;octane&quot;, &quot;80s&quot;, or &quot;hip hop&quot;, and tick the ones you want. If a channel isn&#39;t listed, add it by its <a href="https://xmplaylist.com">xmplaylist.com</a> slug using the custom slug box.</p>
+<p>Playlists are named after the channel the friendly way, so you get <code>Turbo - SiriusXM</code> rather than a URL slug.</p>
+<h2 id="how-it-works">How It Works</h2>
+<p>Each scheduled run, for every channel:</p>
+<ol>
+<li>The channel&#39;s recent rotation is fetched from xmplaylist.com as a track list.</li>
+<li>Each track is downloaded Soulseek first. Anything Soulseek can&#39;t supply falls back to yt-dlp.</li>
+<li>Downloads and a per-playlist <code>.m3u</code> land under <code>Media/Music/Playlists/&lt;playlist&gt;/</code>, the same library your media server scans.</li>
+<li>The media server is told to scan the new files, and only then is the playlist uploaded, replacing the previous copy so re-runs don&#39;t pile up duplicates.</li>
+</ol>
+<p>That ordering in steps 3 and 4 matters more than it looks. Uploading a playlist before the tracks have been scanned in produces an empty playlist, which was a real bug worth fixing properly.</p>
+<p>It runs once when first enabled so you see results immediately, then on the schedule. Everything routes through your VPN, like Soulseek does.</p>
+<h3 id="monthly-archives">Monthly Archives</h3>
+<p>Alongside the rotating per-channel playlist, Playlist Sync keeps a permanent monthly archive: a Top 50 for each channel named <code>&lt;station&gt; (YYYY-MM)</code>. Those are never overwritten, so over time you build a listenable record of what a station was playing in any given month. Turn it off with <code>PLAYLIST_MONTHLY_ARCHIVE=false</code> if you&#39;d rather not.</p>
+<h3 id="cover-art">Cover Art</h3>
+<p>Playlists get real cover art where it can be found, on a best-effort basis. A playlist with no art isn&#39;t a failure, it just means no artwork was available for that channel.</p>
+<h2 id="notes-and-troubleshooting">Notes And Troubleshooting</h2>
+<ul>
+<li><strong>Nothing appears yet.</strong> Give the first run time. Downloading a whole channel&#39;s rotation off Soulseek isn&#39;t instant. Check the container logs with <code>docker logs playlistsync</code>.</li>
+<li><strong>A track is missing from a playlist.</strong> It wasn&#39;t found on Soulseek <em>or</em> via yt-dlp. Each track is independent, so this only affects that one entry.</li>
+<li><strong>Re-runs only fetch new tracks.</strong> A per-playlist index means a daily sync just adds what&#39;s new rather than re-downloading everything.</li>
+<li><strong>Playlists appear empty in Plexamp.</strong> Plexamp caches aggressively. Pull to refresh, or check the playlist in Plex&#39;s own web UI first to confirm whether it&#39;s actually empty.</li>
+<li><strong>It&#39;s opt-in and hands-off.</strong> Once configured it survives reboots and VPN changes on its own. You shouldn&#39;t need to touch it again.</li>
+</ul>
+
+<div class="doc-pager"><a class="pager-prev" href="../music-setup/">Music Setup</a><span class="pager-spacer"></span><a class="pager-next" href="../music-playback/">Music Playback</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+
+</body>
+</html>

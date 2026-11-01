@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Build It Yourself · Mediarr</title>
+  <meta name="description" content="Build the whole stack by hand to understand every layer: Docker, Compose, networks, hardlinks, the VPN, and the arr APIs.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Build It Yourself · Mediarr">
+  <meta property="og:description" content="Build the whole stack by hand to understand every layer: Docker, Compose, networks, hardlinks, the VPN, and the arr APIs.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/" class="active">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#what-youll-learn">What you&#39;ll learn</a></li>
+<li class="toc-h2"><a href="#table-of-contents">Table of contents</a></li>
+<li class="toc-h2"><a href="#chapter-0-prerequisites">Chapter 0: Prerequisites</a></li>
+<li class="toc-h2"><a href="#chapter-1-what-is-a-container">Chapter 1: What is a container?</a></li>
+<li class="toc-h3"><a href="#install-docker">Install Docker</a></li>
+<li class="toc-h2"><a href="#chapter-2-your-first-container">Chapter 2: Your first container</a></li>
+<li class="toc-h3"><a href="#inspect-whats-happening">Inspect what&#39;s happening</a></li>
+<li class="toc-h3"><a href="#clean-up">Clean up</a></li>
+<li class="toc-h2"><a href="#chapter-3-docker-compose-declaring-a-stack">Chapter 3: Docker Compose, declaring a stack</a></li>
+<li class="toc-h3"><a href="#why-yaml">Why YAML?</a></li>
+<li class="toc-h3"><a href="#two-services-with-different-roles">Two services, with different roles</a></li>
+<li class="toc-h2"><a href="#chapter-4-networks-containers-talking-to-each-other">Chapter 4: Networks, containers talking to each other</a></li>
+<li class="toc-h3"><a href="#service-name-reachability-table-mediarr-stack">Service-name reachability table (Mediarr stack)</a></li>
+<li class="toc-h2"><a href="#chapter-5-volumes-and-the-hardlink-trick">Chapter 5: Volumes and the hardlink trick</a></li>
+<li class="toc-h3"><a href="#bind-mounts">Bind mounts</a></li>
+<li class="toc-h3"><a href="#the-single-data-trick">The single-/data trick</a></li>
+<li class="toc-h3"><a href="#whats-a-hardlink">What&#39;s a hardlink?</a></li>
+<li class="toc-h3"><a href="#the-catch">The catch</a></li>
+<li class="toc-h2"><a href="#chapter-6-routing-through-a-vpn">Chapter 6: Routing through a VPN</a></li>
+<li class="toc-h3"><a href="#getting-a-wireguard-key">Getting a WireGuard key</a></li>
+<li class="toc-h2"><a href="#chapter-7-the-arr-stack">Chapter 7: The arr stack</a></li>
+<li class="toc-h2"><a href="#chapter-8-automating-it-a-setupsh">Chapter 8: Automating it, a setup.sh</a></li>
+<li class="toc-h3"><a href="#why-bash-for-this">Why bash for this?</a></li>
+<li class="toc-h2"><a href="#chapter-9-talking-to-running-services-via-their-http-apis">Chapter 9: Talking to running services via their HTTP APIs</a></li>
+<li class="toc-h3"><a href="#a-minimal-python-configurator">A minimal Python configurator</a></li>
+<li class="toc-h3"><a href="#why-python-and-not-bash-for-this">Why Python and not bash for this?</a></li>
+<li class="toc-h2"><a href="#chapter-10-wrapping-it-all-in-a-gui-installer">Chapter 10: Wrapping it all in a GUI installer</a></li>
+<li class="toc-h3"><a href="#if-you-want-to-study-the-installer-code">If you want to study the installer code</a></li>
+<li class="toc-h2"><a href="#where-to-go-next">Where to go next</a></li>
+<li class="toc-h3"><a href="#suggested-next-experiments">Suggested next experiments</a></li>
+<li class="toc-h3"><a href="#reference-docs">Reference docs</a></li>
+<li class="toc-h3"><a href="#mediarr-specific-deep-dives">Mediarr-specific deep dives</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/" class="active">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Build It Yourself</h1>
+<p class="doc-lede">Build the whole stack by hand to understand every layer: Docker, Compose, networks, hardlinks, the VPN, and the arr APIs.</p>
+<p>This tutorial teaches you how to build the Mediarr stack from scratch, even if you&#39;ve <strong>never used Docker, SSH, the command line, or any of the underlying tools</strong>. By the end, you&#39;ll understand every layer, and you&#39;ll be able to extend, customize, or rebuild any of it from memory.</p>
+<p>It&#39;s a teaching document. If you just want a working stack, download the installer from <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>. That&#39;s the eight-screen wizard described in <a href="../installation/">INSTALL.md</a>. The wizard does everything below for you in 20 minutes.</p>
+<p>But if you want to <strong>understand</strong>, read on.</p>
+<hr>
+<h2 id="what-youll-learn">What you&#39;ll learn</h2>
+<p>By the end of this tutorial you will:</p>
+<ol>
+<li>Understand what Docker is, what containers are, and why they&#39;re useful here.</li>
+<li>Write your first <code>docker-compose.yml</code> and start a one-container stack.</li>
+<li>Understand how containers talk to each other (Docker networks).</li>
+<li>Add a VPN sidecar and route a download client through it.</li>
+<li>Understand hardlinks and why they save you a terabyte of disk.</li>
+<li>Configure the *arr stack (Sonarr/Radarr/Prowlarr) via their HTTP APIs.</li>
+<li>Replace your manual setup with a single <code>setup.sh</code> script.</li>
+<li>Understand how the Mediarr Electron installer wraps all of this.</li>
+</ol>
+<hr>
+<h2 id="table-of-contents">Table of contents</h2>
+<ul>
+<li><a href="#chapter-0-prerequisites">Chapter 0: Prerequisites</a></li>
+<li><a href="#chapter-1-what-is-a-container">Chapter 1: What is a container?</a></li>
+<li><a href="#chapter-2-your-first-container">Chapter 2: Your first container</a></li>
+<li><a href="#chapter-3-docker-compose-declaring-a-stack">Chapter 3: Docker Compose, declaring a stack</a></li>
+<li><a href="#chapter-4-networks-containers-talking-to-each-other">Chapter 4: Networks, containers talking to each other</a></li>
+<li><a href="#chapter-5-volumes-and-the-hardlink-trick">Chapter 5: Volumes and the hardlink trick</a></li>
+<li><a href="#chapter-6-routing-through-a-vpn">Chapter 6: Routing through a VPN</a></li>
+<li><a href="#chapter-7-the-arr-stack">Chapter 7: The arr stack</a></li>
+<li><a href="#chapter-8-automating-it-a-setupsh">Chapter 8: Automating it, a setup.sh</a></li>
+<li><a href="#chapter-9-talking-to-running-services-via-their-http-apis">Chapter 9: Talking to running services via their HTTP APIs</a></li>
+<li><a href="#chapter-10-wrapping-it-all-in-a-gui-installer">Chapter 10: Wrapping it all in a GUI installer</a></li>
+<li><a href="#where-to-go-next">Where to go next</a></li>
+</ul>
+<hr>
+<h2 id="chapter-0-prerequisites">Chapter 0: Prerequisites</h2>
+<p>You need:</p>
+<ul>
+<li>A computer (Windows, Mac, or Linux). For Chapters 1 to 7, your own laptop works. Later chapters assume access to a Linux box, ideally a Synology NAS, but any Linux machine with Docker installed works.</li>
+<li>A web browser.</li>
+<li>Comfort with installing software via your OS&#39;s package manager (Homebrew on macOS, Chocolatey/winget on Windows, apt/dnf on Linux).</li>
+<li>About four hours total. Each chapter is 20 to 30 minutes.</li>
+</ul>
+<p>You <strong>don&#39;t</strong> need to know:</p>
+<ul>
+<li>Linux command line - we&#39;ll introduce commands as they come up.</li>
+<li>Docker - that&#39;s Chapter 1.</li>
+<li>Networking, TCP/IP, ports - we&#39;ll explain the bits that matter.</li>
+<li>TypeScript, React, Electron - only Chapter 10 touches those.</li>
+</ul>
+<hr>
+<h2 id="chapter-1-what-is-a-container">Chapter 1: What is a container?</h2>
+<p><strong>A container is a packaged, isolated chunk of software.</strong> Think of it like a zip file containing everything an app needs to run: the app itself, its libraries, its config, and a stripped-down operating system.</p>
+<p>When you &quot;run&quot; a container, your computer (specifically a thing called the <strong>Docker daemon</strong>) unpacks that zip into a virtual sandbox, gives it its own filesystem and its own network interface, and starts the app inside. The sandbox is isolated: the app inside can&#39;t see your real files, your real network, or anything else on your machine, only what you explicitly let in.</p>
+<p>Why is this useful?</p>
+<ul>
+<li><strong>No &quot;works on my machine&quot;</strong> - the container has the same files, same libraries, same OS bits everywhere it runs. If it worked when the developer built it, it works on your NAS.</li>
+<li><strong>Easy cleanup</strong> - uninstall = delete the container. No leftover system files, no registry entries, no half-removed services.</li>
+<li><strong>Isolation</strong> - Plex can&#39;t accidentally read Sonarr&#39;s database. They live in separate sandboxes.</li>
+<li><strong>Versioned</strong> - every container image has a tag (<code>linuxserver/sonarr:latest</code>, <code>linuxserver/sonarr:4.0.1</code>). You can pin a version, upgrade later, or roll back.</li>
+</ul>
+<h3 id="install-docker">Install Docker</h3>
+<ul>
+<li><strong>Windows</strong>: Download Docker Desktop from <a href="https://docker.com/products/docker-desktop">https://docker.com/products/docker-desktop</a> and run the installer. Reboot when prompted.</li>
+<li><strong>macOS</strong>: Same - Docker Desktop, dmg installer.</li>
+<li><strong>Linux</strong>: Your distro&#39;s package manager. On Ubuntu: <code>sudo apt install docker.io docker-compose-plugin</code>.</li>
+</ul>
+<p>When it&#39;s installed, open a terminal (PowerShell on Windows, Terminal on macOS, your shell on Linux) and run:</p>
+<pre><code class="language-bash hljs">docker --version</code></pre>
+<p>You should see something like <code>Docker version 25.0.3, build 4debf41</code>. If you do, Docker is installed.</p>
+<hr>
+<h2 id="chapter-2-your-first-container">Chapter 2: Your first container</h2>
+<p>Let&#39;s run a container. We&#39;ll start with the simplest possible thing: a tiny web server that says &quot;Hello, World!&quot;.</p>
+<pre><code class="language-bash hljs">docker run -d -p 8080:80 --name hello-world nginx</code></pre>
+<p>What this means, piece by piece:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>docker run</code></td>
+<td>Run a container.</td>
+</tr>
+<tr>
+<td><code>-d</code></td>
+<td>&quot;Detached&quot;, run in the background and don&#39;t tie up the terminal.</td>
+</tr>
+<tr>
+<td><code>-p 8080:80</code></td>
+<td>Publish a port. The container&#39;s port 80 (where nginx listens) becomes accessible at your computer&#39;s port 8080.</td>
+</tr>
+<tr>
+<td><code>--name hello-world</code></td>
+<td>Give the running container a friendly name (otherwise Docker generates a random one).</td>
+</tr>
+<tr>
+<td><code>nginx</code></td>
+<td>The image to run. Docker downloads it from the public registry if you don&#39;t have it yet.</td>
+</tr>
+</tbody></table></div>
+<p>Wait a few seconds for Docker to download the nginx image, then open your browser to <strong><a href="http://localhost:8080">http://localhost:8080</a></strong>. You should see &quot;Welcome to nginx!&quot;. That&#39;s a real web server, running in an isolated container, on your machine.</p>
+<h3 id="inspect-whats-happening">Inspect what&#39;s happening</h3>
+<pre><code class="language-bash hljs">docker ps                  <span class="hljs-comment"># list running containers</span>
+docker logs hello-world    <span class="hljs-comment"># see nginx&#x27;s logs</span>
+docker <span class="hljs-built_in">exec</span> -it hello-world sh   <span class="hljs-comment"># open a shell INSIDE the container</span></code></pre>
+<p>That last command is powerful: you&#39;re now inside the container&#39;s filesystem. Try <code>ls</code>, <code>whoami</code>, <code>cat /etc/os-release</code>. You&#39;ll see this is a tiny Debian-based system that has nothing on it except nginx. Type <code>exit</code> to leave.</p>
+<h3 id="clean-up">Clean up</h3>
+<pre><code class="language-bash hljs">docker stop hello-world      <span class="hljs-comment"># stop the container</span>
+docker <span class="hljs-built_in">rm</span> hello-world        <span class="hljs-comment"># delete it</span>
+docker rmi nginx             <span class="hljs-comment"># delete the downloaded image</span></code></pre>
+<p>You now know what a container is and how to run one. <strong>This is the entire foundation of the rest of this tutorial.</strong> Every service in the Mediarr stack (Plex, Sonarr, qBittorrent, all of them) is just one of these.</p>
+<hr>
+<h2 id="chapter-3-docker-compose-declaring-a-stack">Chapter 3: Docker Compose, declaring a stack</h2>
+<p>Running 14 <code>docker run</code> commands by hand would be miserable. Docker Compose lets you describe an entire stack of containers in a single text file, then start or stop the whole thing with one command.</p>
+<p>Create a folder called <code>mediarr-tutorial/</code> somewhere on your machine. Inside it, create a file called <code>docker-compose.yml</code> with this content:</p>
+<pre><code class="language-yaml hljs"><span class="hljs-attr">services:</span>
+  <span class="hljs-attr">hello:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">nginx</span>
+    <span class="hljs-attr">container_name:</span> <span class="hljs-string">hello</span>
+    <span class="hljs-attr">ports:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8080:80&quot;</span></code></pre>
+<p>That&#39;s a compose file describing one service. From inside <code>mediarr-tutorial/</code> run:</p>
+<pre><code class="language-bash hljs">docker compose up -d</code></pre>
+<p>Same nginx, same port 8080, but now declared in a file. Visit <a href="http://localhost:8080">http://localhost:8080</a> and it still works. <code>docker compose down</code> to stop everything.</p>
+<h3 id="why-yaml">Why YAML?</h3>
+<p>YAML is the &quot;indentation matters&quot; config format compose uses. Two key rules:</p>
+<ul>
+<li><strong>Use spaces, never tabs.</strong> Two spaces per indent level is the convention here.</li>
+<li><strong>Keys end with <code>:</code> and lists start with <code>- </code>.</strong> That&#39;s why <code>ports:</code> is followed by <code>- &quot;8080:80&quot;</code>.</li>
+</ul>
+<h3 id="two-services-with-different-roles">Two services, with different roles</h3>
+<p>Now make it interesting. Replace your <code>docker-compose.yml</code> with this:</p>
+<pre><code class="language-yaml hljs"><span class="hljs-attr">services:</span>
+  <span class="hljs-attr">web:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">nginx</span>
+    <span class="hljs-attr">container_name:</span> <span class="hljs-string">web</span>
+    <span class="hljs-attr">ports:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8080:80&quot;</span>
+
+  <span class="hljs-attr">database:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">postgres:16</span>
+    <span class="hljs-attr">container_name:</span> <span class="hljs-string">database</span>
+    <span class="hljs-attr">environment:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">POSTGRES_PASSWORD=demo</span></code></pre>
+<p>Run <code>docker compose up -d</code>. You now have nginx AND a Postgres database both running. <code>docker ps</code> will show both.</p>
+<p>Notice <strong><code>database</code> has no <code>ports:</code></strong>. By default, Docker Compose creates an internal network shared by all the services in your file. <code>web</code> can talk to <code>database</code> over that network on the database&#39;s default port (5432), but nothing outside Docker can. That&#39;s already a sensible security boundary: your database isn&#39;t exposed to your LAN at all.</p>
+<hr>
+<h2 id="chapter-4-networks-containers-talking-to-each-other">Chapter 4: Networks, containers talking to each other</h2>
+<p>When you put multiple services in a compose file, they share a Docker network. Each container is reachable from the others <strong>by its service name</strong>.</p>
+<p>Demo this. With your two-service compose still running:</p>
+<pre><code class="language-bash hljs">docker <span class="hljs-built_in">exec</span> web sh -c <span class="hljs-string">&quot;apk add curl &amp;&amp; curl -sS http://database:5432 -m 2; echo &#x27;&#x27;&quot;</span>
+<span class="hljs-comment"># (Will fail in a non-HTTP way because Postgres isn&#x27;t HTTP, but proves &quot;database&quot; resolves.)</span></code></pre>
+<p>The interesting bit isn&#39;t the output, it&#39;s that the DNS name <code>database</code> resolved inside the <code>web</code> container. Docker&#39;s built-in DNS lets every service reach every other service by name.</p>
+<p>This is how the Mediarr stack avoids hardcoded IPs everywhere. Sonarr connects to qBittorrent at <code>http://gluetun:49156</code>. Bazarr connects to Sonarr at <code>http://sonarr:8989</code>. None of those would survive a NAS-IP change if they were IPs. Service names are stable.</p>
+<h3 id="service-name-reachability-table-mediarr-stack">Service-name reachability table (Mediarr stack)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>From</th>
+<th>To</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Sonarr</td>
+<td>qBittorrent</td>
+<td><code>http://gluetun:49156</code> (qBit shares gluetun&#39;s net namespace)</td>
+</tr>
+<tr>
+<td>Sonarr</td>
+<td>Prowlarr</td>
+<td><code>http://prowlarr:9696</code></td>
+</tr>
+<tr>
+<td>Bazarr</td>
+<td>Sonarr</td>
+<td><code>http://sonarr:8989</code></td>
+</tr>
+<tr>
+<td>Recyclarr</td>
+<td>Sonarr</td>
+<td><code>http://sonarr:8989</code></td>
+</tr>
+<tr>
+<td>Tautulli</td>
+<td>Plex</td>
+<td><code>http://plex:32400</code></td>
+</tr>
+</tbody></table></div>
+<p>You&#39;ll see these exact URLs in the wizard&#39;s &quot;internal hostnames&quot; table and in <code>setup-arr-config.py</code>.</p>
+<hr>
+<h2 id="chapter-5-volumes-and-the-hardlink-trick">Chapter 5: Volumes and the hardlink trick</h2>
+<p>Containers have ephemeral filesystems by default. Destroy the container, lose its data. <strong>Volumes</strong> are the way to persist data: mount a host directory into the container, and writes to that directory survive container destruction.</p>
+<h3 id="bind-mounts">Bind mounts</h3>
+<p>The simplest volume is a bind mount: &quot;this directory on my host is <code>/foo</code> inside the container.&quot;</p>
+<pre><code class="language-yaml hljs"><span class="hljs-attr">services:</span>
+  <span class="hljs-attr">sonarr:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">lscr.io/linuxserver/sonarr:latest</span>
+    <span class="hljs-attr">container_name:</span> <span class="hljs-string">sonarr</span>
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./sonarr/config:/config</span>              <span class="hljs-comment"># Sonarr&#x27;s settings live here</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./data:/data</span>                         <span class="hljs-comment"># Where the media + downloads live</span>
+    <span class="hljs-attr">ports:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8989:8989&quot;</span></code></pre>
+<p><code>./sonarr/config:/config</code> means &quot;the <code>sonarr/config</code> folder under my compose file&#39;s directory shows up as <code>/config</code> inside Sonarr.&quot;</p>
+<h3 id="the-single-data-trick">The single-/data trick</h3>
+<p>Here&#39;s the thing that makes hardlinks work: <strong>every downloader and every arr mounts the same <code>/data</code> tree.</strong></p>
+<pre><code class="language-yaml hljs"><span class="hljs-attr">services:</span>
+  <span class="hljs-attr">qbittorrent:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">lscr.io/linuxserver/qbittorrent</span>
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./data:/data</span>         <span class="hljs-comment"># /data/Downloads/Torrents/...</span>
+  <span class="hljs-attr">sonarr:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">lscr.io/linuxserver/sonarr</span>
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./data:/data</span>         <span class="hljs-comment"># /data/Downloads/Torrents/...  +  /data/Media/TV Shows/...</span></code></pre>
+<p>Inside qBittorrent, a downloaded TV episode lives at <code>/data/Downloads/Torrents/Completed/tv-sonarr/MyShow.S01E01.mkv</code>.</p>
+<p>Inside Sonarr (which sees the <strong>same <code>/data</code></strong>), that file is at the same path. So when Sonarr imports it to <code>/data/Media/TV Shows/MyShow/MyShow.S01E01.mkv</code>, it can create a <strong>hardlink</strong> instead of copying.</p>
+<h3 id="whats-a-hardlink">What&#39;s a hardlink?</h3>
+<p>On Linux/Mac filesystems, a file is two things: an <strong>inode</strong> (the actual data on disk) and a <strong>name</strong> (a label pointing at the inode). A hardlink is just a second name pointing at the same inode.</p>
+<pre><code class="hljs">/data/Downloads/Torrents/Completed/tv-sonarr/MyShow.S01E01.mkv ──┐
+                                                                  ├─→ inode #123456 (the actual file bytes)
+/data/Media/TV Shows/MyShow/MyShow.S01E01.mkv ────────────────────┘</code></pre>
+<p>Two paths. One file. No copy. Delete one path and the other still works. qBittorrent keeps seeding from its path, and Plex reads from the tidier path. <strong>You save the size of every media file you have.</strong></p>
+<h3 id="the-catch">The catch</h3>
+<p>Hardlinks require <strong>both paths to be on the same filesystem</strong>. If <code>/data/Downloads/</code> lives on one drive/partition/subvolume and <code>/data/Media/</code> on another, the hardlink syscall fails (<code>EXDEV</code>) and Sonarr falls back to copying. You doubled your disk use for no reason.</p>
+<p>On a Synology NAS, every &quot;shared folder&quot; you create is its own BTRFS subvolume, which Linux treats as a separate filesystem for hardlink purposes. So putting <code>Downloads/</code> and <code>Media/</code> in separate shared folders silently breaks hardlinks. The Mediarr installer&#39;s env-detect step probes this and warns you if it&#39;s wrong.</p>
+<p><strong>Lesson:</strong> put your Downloads + Media trees under one shared folder. (<code>/volume1/Data/Downloads</code> and <code>/volume1/Data/Media</code> both inside the single <code>Data</code> shared folder.)</p>
+<hr>
+<h2 id="chapter-6-routing-through-a-vpn">Chapter 6: Routing through a VPN</h2>
+<p>For torrent users, hiding your IP from peers is non-optional. The cleanest way: route qBittorrent&#39;s network through a VPN container, with <strong>no other network path available</strong> so a VPN failure means no leak.</p>
+<p>Add this to your compose file:</p>
+<pre><code class="language-yaml hljs"><span class="hljs-attr">services:</span>
+  <span class="hljs-attr">gluetun:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">qmcgaw/gluetun:latest</span>
+    <span class="hljs-attr">container_name:</span> <span class="hljs-string">gluetun</span>
+    <span class="hljs-attr">cap_add:</span> [<span class="hljs-string">NET_ADMIN</span>]                <span class="hljs-comment"># gluetun needs this to manage tunnels</span>
+    <span class="hljs-attr">devices:</span> [<span class="hljs-string">&#x27;/dev/net/tun&#x27;</span>]           <span class="hljs-comment"># ditto</span>
+    <span class="hljs-attr">environment:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">VPN_SERVICE_PROVIDER=nordvpn</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">VPN_TYPE=wireguard</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">WIREGUARD_PRIVATE_KEY=...your</span> <span class="hljs-string">key</span> <span class="hljs-string">here...</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">SERVER_COUNTRIES=United</span> <span class="hljs-string">States</span>
+    <span class="hljs-attr">ports:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;49156:49156&quot;</span>                   <span class="hljs-comment"># qBit&#x27;s WebUI, surfaced via gluetun</span>
+
+  <span class="hljs-attr">qbittorrent:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">lscr.io/linuxserver/qbittorrent</span>
+    <span class="hljs-attr">container_name:</span> <span class="hljs-string">qbittorrent</span>
+    <span class="hljs-attr">network_mode:</span> <span class="hljs-string">&quot;container:gluetun&quot;</span>   <span class="hljs-comment"># ← the magic line</span>
+    <span class="hljs-attr">depends_on:</span> { <span class="hljs-attr">gluetun:</span> { <span class="hljs-attr">condition:</span> <span class="hljs-string">service_healthy</span> } }
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./qbittorrent/config:/config</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./data:/data</span>
+    <span class="hljs-comment"># NO ports: of its own — they&#x27;re published via gluetun</span></code></pre>
+<p><code>network_mode: &quot;container:gluetun&quot;</code> means qBittorrent <strong>has no network of its own</strong>. It uses gluetun&#39;s network namespace. Effects:</p>
+<ul>
+<li>qBittorrent has no IP, no DNS, no routing, only what gluetun provides.</li>
+<li>All qBittorrent traffic exits through gluetun&#39;s WireGuard tunnel.</li>
+<li>If gluetun&#39;s tunnel drops, qBittorrent can&#39;t reach anything. <strong>No fallback. No leak.</strong></li>
+<li>The arrs reach qBittorrent at <code>http://gluetun:49156</code> (since qBit binds inside gluetun&#39;s namespace).</li>
+</ul>
+<p>This is the &quot;VPN kill switch&quot; you want: not a configuration switch, but a structural property of the container layout.</p>
+<h3 id="getting-a-wireguard-key">Getting a WireGuard key</h3>
+<p>For NordVPN: log in at <a href="https://my.nordaccount.com">https://my.nordaccount.com</a>, go to NordVPN → Manual configuration → Generate Key, paste the result. The Mediarr installer (and <code>setup-nordvpn.sh</code>) automates this via NordVPN&#39;s API, but you can also do it by hand the first time to see what&#39;s going on.</p>
+<hr>
+<h2 id="chapter-7-the-arr-stack">Chapter 7: The arr stack</h2>
+<p>Now we&#39;re ready for the actual media stack. Here&#39;s a minimal compose with Plex + Sonarr + Radarr + Prowlarr + qBittorrent (via VPN):</p>
+<pre><code class="language-yaml hljs"><span class="hljs-attr">services:</span>
+  <span class="hljs-attr">plex:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">lscr.io/linuxserver/plex:latest</span>
+    <span class="hljs-attr">container_name:</span> <span class="hljs-string">plex</span>
+    <span class="hljs-attr">network_mode:</span> <span class="hljs-string">host</span>                  <span class="hljs-comment"># Plex really wants host networking for discovery</span>
+    <span class="hljs-attr">environment:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">PUID=1000</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">PGID=1000</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">TZ=America/New_York</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">PLEX_CLAIM=claim-XXXX</span>           <span class="hljs-comment"># from plex.tv/claim — expires in 4 minutes!</span>
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./plex/config:/config</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./data:/data</span>
+
+  <span class="hljs-attr">sonarr:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">lscr.io/linuxserver/sonarr:latest</span>
+    <span class="hljs-attr">container_name:</span> <span class="hljs-string">sonarr</span>
+    <span class="hljs-attr">environment:</span> { <span class="hljs-attr">PUID:</span> <span class="hljs-number">1000</span>, <span class="hljs-attr">PGID:</span> <span class="hljs-number">1000</span>, <span class="hljs-attr">TZ:</span> <span class="hljs-string">America/New_York</span> }
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./sonarr/config:/config</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./data:/data</span>
+    <span class="hljs-attr">ports:</span> [<span class="hljs-string">&quot;8989:8989&quot;</span>]
+
+  <span class="hljs-attr">radarr:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">lscr.io/linuxserver/radarr:latest</span>
+    <span class="hljs-attr">container_name:</span> <span class="hljs-string">radarr</span>
+    <span class="hljs-attr">environment:</span> { <span class="hljs-attr">PUID:</span> <span class="hljs-number">1000</span>, <span class="hljs-attr">PGID:</span> <span class="hljs-number">1000</span>, <span class="hljs-attr">TZ:</span> <span class="hljs-string">America/New_York</span> }
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./radarr/config:/config</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./data:/data</span>
+    <span class="hljs-attr">ports:</span> [<span class="hljs-string">&quot;7878:7878&quot;</span>]
+
+  <span class="hljs-attr">prowlarr:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">lscr.io/linuxserver/prowlarr:latest</span>
+    <span class="hljs-attr">container_name:</span> <span class="hljs-string">prowlarr</span>
+    <span class="hljs-attr">environment:</span> { <span class="hljs-attr">PUID:</span> <span class="hljs-number">1000</span>, <span class="hljs-attr">PGID:</span> <span class="hljs-number">1000</span>, <span class="hljs-attr">TZ:</span> <span class="hljs-string">America/New_York</span> }
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./prowlarr/config:/config</span>
+    <span class="hljs-attr">ports:</span> [<span class="hljs-string">&quot;9696:9696&quot;</span>]
+
+  <span class="hljs-attr">gluetun:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">qmcgaw/gluetun:latest</span>
+    <span class="hljs-attr">container_name:</span> <span class="hljs-string">gluetun</span>
+    <span class="hljs-attr">cap_add:</span> [<span class="hljs-string">NET_ADMIN</span>]
+    <span class="hljs-attr">devices:</span> [<span class="hljs-string">&#x27;/dev/net/tun&#x27;</span>]
+    <span class="hljs-attr">environment:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">VPN_SERVICE_PROVIDER=nordvpn</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">VPN_TYPE=wireguard</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">WIREGUARD_PRIVATE_KEY=YOUR_KEY_HERE</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">SERVER_COUNTRIES=United</span> <span class="hljs-string">States</span>
+    <span class="hljs-attr">ports:</span> [<span class="hljs-string">&quot;49156:49156&quot;</span>]
+
+  <span class="hljs-attr">qbittorrent:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">lscr.io/linuxserver/qbittorrent:latest</span>
+    <span class="hljs-attr">container_name:</span> <span class="hljs-string">qbittorrent</span>
+    <span class="hljs-attr">network_mode:</span> <span class="hljs-string">&quot;container:gluetun&quot;</span>
+    <span class="hljs-attr">depends_on:</span> { <span class="hljs-attr">gluetun:</span> { <span class="hljs-attr">condition:</span> <span class="hljs-string">service_healthy</span> } }
+    <span class="hljs-attr">environment:</span> { <span class="hljs-attr">PUID:</span> <span class="hljs-number">1000</span>, <span class="hljs-attr">PGID:</span> <span class="hljs-number">1000</span>, <span class="hljs-attr">TZ:</span> <span class="hljs-string">America/New_York</span>, <span class="hljs-attr">WEBUI_PORT:</span> <span class="hljs-number">49156</span> }
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./qbittorrent/config:/config</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./data:/data</span></code></pre>
+<p>Save this in your <code>mediarr-tutorial/</code> folder. Make the data directory structure:</p>
+<pre><code class="language-bash hljs"><span class="hljs-built_in">mkdir</span> -p data/Downloads/Torrents/{Incomplete,Completed}
+<span class="hljs-built_in">mkdir</span> -p data/Media/{Movies,TV\ Shows,Music}</code></pre>
+<p>Then start the stack:</p>
+<pre><code class="language-bash hljs">docker compose up -d
+docker compose logs -f       <span class="hljs-comment"># watch the logs; Ctrl-C when boot looks calm</span></code></pre>
+<p>Visit:</p>
+<ul>
+<li><a href="http://localhost:32400/web">http://localhost:32400/web</a> - Plex</li>
+<li><a href="http://localhost:8989">http://localhost:8989</a> - Sonarr</li>
+<li><a href="http://localhost:7878">http://localhost:7878</a> - Radarr</li>
+<li><a href="http://localhost:9696">http://localhost:9696</a> - Prowlarr</li>
+<li><a href="http://localhost:49156">http://localhost:49156</a> - qBittorrent (default login <code>admin</code> / <code>adminadmin</code>, change it in Settings)</li>
+</ul>
+<p>At this point everything is running but <strong>nothing is configured yet</strong>. Each service has its own first-run wizard or you need to point them at each other manually.</p>
+<p>That&#39;s what Chapter 9 will fix. First, let&#39;s automate the bring-up itself.</p>
+<hr>
+<h2 id="chapter-8-automating-it-a-setupsh">Chapter 8: Automating it, a setup.sh</h2>
+<p>Right now your install is &quot;type stuff, click stuff, hope you remember it next time.&quot; Let&#39;s wrap it in a script.</p>
+<p>Create <code>setup.sh</code> next to your <code>docker-compose.yml</code>:</p>
+<pre><code class="language-bash hljs"><span class="hljs-meta">#!/usr/bin/env bash</span>
+<span class="hljs-built_in">set</span> -euo pipefail   <span class="hljs-comment"># exit on any error, treat unset vars as errors, fail fast on pipes</span>
+
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;── Step 1: Create folders ──&quot;</span>
+<span class="hljs-built_in">mkdir</span> -p data/Downloads/Torrents/{Incomplete,Completed}
+<span class="hljs-built_in">mkdir</span> -p data/Media/{Movies,TV\ Shows,Music}
+
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;── Step 2: Start the stack ──&quot;</span>
+docker compose up -d
+
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;── Step 3: Wait for services to come up ──&quot;</span>
+<span class="hljs-keyword">for</span> url <span class="hljs-keyword">in</span> http://localhost:8989 http://localhost:7878 http://localhost:9696; <span class="hljs-keyword">do</span>
+  <span class="hljs-built_in">echo</span> -n <span class="hljs-string">&quot;Waiting for <span class="hljs-variable">$url</span>...&quot;</span>
+  <span class="hljs-keyword">until</span> curl -sf -o /dev/null <span class="hljs-string">&quot;<span class="hljs-variable">$url</span>&quot;</span>; <span class="hljs-keyword">do</span> <span class="hljs-built_in">sleep</span> 2; <span class="hljs-built_in">echo</span> -n <span class="hljs-string">&quot;.&quot;</span>; <span class="hljs-keyword">done</span>
+  <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot; ready&quot;</span>
+<span class="hljs-keyword">done</span>
+
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;✔ Stack is up. Open Plex at http://localhost:32400/web&quot;</span></code></pre>
+<p>Make it executable and run:</p>
+<pre><code class="language-bash hljs"><span class="hljs-built_in">chmod</span> +x setup.sh
+./setup.sh</code></pre>
+<p>This is the entire premise of <code>nas/setup.sh</code> in the real Mediarr stack, just bigger (12 steps instead of 3) and with more careful error handling. Look at <code>nas/setup.sh</code> in the repo to see how the real one is structured. It follows this exact pattern.</p>
+<h3 id="why-bash-for-this">Why bash for this?</h3>
+<p>Bash is right for steps that just run system commands in sequence (<code>mkdir</code>, <code>docker compose</code>, <code>curl</code>, etc.). Each command&#39;s exit code becomes the next conditional. <code>set -euo pipefail</code> makes the whole script abort on the first failure.</p>
+<p>When we need to do real logic (parse JSON, talk to an HTTP API, handle complex state), we move to Python. That&#39;s Chapter 9.</p>
+<hr>
+<h2 id="chapter-9-talking-to-running-services-via-their-http-apis">Chapter 9: Talking to running services via their HTTP APIs</h2>
+<p>Every arr exposes a REST API. The patterns are similar across Sonarr / Radarr / Lidarr / Prowlarr:</p>
+<ul>
+<li><code>GET /api/v3/system/status</code> - health check + version info</li>
+<li><code>GET /api/v3/rootfolder</code> - list configured media root folders</li>
+<li><code>POST /api/v3/rootfolder</code> - add one</li>
+<li><code>GET /api/v3/downloadclient</code> - list download clients (qBit etc.)</li>
+<li><code>POST /api/v3/downloadclient</code> - add one</li>
+</ul>
+<p>All requests need an <code>X-Api-Key</code> header. The arrs auto-generate that key on first boot. You can find it in each container&#39;s <code>config/config.xml</code> file:</p>
+<pre><code class="language-bash hljs">grep -oP <span class="hljs-string">&#x27;&lt;ApiKey&gt;\K[^&lt;]+&#x27;</span> sonarr/config/config.xml</code></pre>
+<h3 id="a-minimal-python-configurator">A minimal Python configurator</h3>
+<p>Save this as <code>configure.py</code>:</p>
+<pre><code class="language-python hljs"><span class="hljs-comment">#!/usr/bin/env python3</span>
+<span class="hljs-keyword">import</span> json
+<span class="hljs-keyword">import</span> sys
+<span class="hljs-keyword">import</span> xml.etree.ElementTree <span class="hljs-keyword">as</span> ET
+<span class="hljs-keyword">from</span> urllib.request <span class="hljs-keyword">import</span> Request, urlopen
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">read_api_key</span>(<span class="hljs-params">config_xml</span>):
+    <span class="hljs-string">&quot;&quot;&quot;Pull &lt;ApiKey&gt; from a *arr config.xml.&quot;&quot;&quot;</span>
+    <span class="hljs-keyword">return</span> ET.parse(config_xml).find(<span class="hljs-string">&#x27;ApiKey&#x27;</span>).text
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">api</span>(<span class="hljs-params">method, url, key, body=<span class="hljs-literal">None</span></span>):
+    <span class="hljs-string">&quot;&quot;&quot;Tiny REST client: sends JSON, returns JSON (or raises).&quot;&quot;&quot;</span>
+    data = json.dumps(body).encode() <span class="hljs-keyword">if</span> body <span class="hljs-keyword">else</span> <span class="hljs-literal">None</span>
+    req = Request(url, data=data, method=method, headers={
+        <span class="hljs-string">&#x27;X-Api-Key&#x27;</span>: key,
+        <span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;application/json&#x27;</span>,
+    })
+    <span class="hljs-keyword">return</span> json.loads(urlopen(req).read())
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">ensure_root_folder</span>(<span class="hljs-params">base, key, path</span>):
+    <span class="hljs-string">&quot;&quot;&quot;Idempotent: add a root folder only if it isn&#x27;t already there.&quot;&quot;&quot;</span>
+    existing = api(<span class="hljs-string">&#x27;GET&#x27;</span>, <span class="hljs-string">f&#x27;<span class="hljs-subst">{base}</span>/api/v3/rootfolder&#x27;</span>, key)
+    <span class="hljs-keyword">if</span> <span class="hljs-built_in">any</span>(r[<span class="hljs-string">&#x27;path&#x27;</span>] == path <span class="hljs-keyword">for</span> r <span class="hljs-keyword">in</span> existing):
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&#x27;  ✔ root folder already configured: <span class="hljs-subst">{path}</span>&#x27;</span>)
+        <span class="hljs-keyword">return</span>
+    api(<span class="hljs-string">&#x27;POST&#x27;</span>, <span class="hljs-string">f&#x27;<span class="hljs-subst">{base}</span>/api/v3/rootfolder&#x27;</span>, key, body={<span class="hljs-string">&#x27;path&#x27;</span>: path})
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&#x27;  ✔ added root folder: <span class="hljs-subst">{path}</span>&#x27;</span>)
+
+
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:
+    sonarr_key = read_api_key(<span class="hljs-string">&#x27;sonarr/config/config.xml&#x27;</span>)
+    radarr_key = read_api_key(<span class="hljs-string">&#x27;radarr/config/config.xml&#x27;</span>)
+
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Sonarr...&#x27;</span>)
+    ensure_root_folder(<span class="hljs-string">&#x27;http://localhost:8989&#x27;</span>, sonarr_key, <span class="hljs-string">&#x27;/data/Media/TV Shows&#x27;</span>)
+
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Radarr...&#x27;</span>)
+    ensure_root_folder(<span class="hljs-string">&#x27;http://localhost:7878&#x27;</span>, radarr_key, <span class="hljs-string">&#x27;/data/Media/Movies&#x27;</span>)
+
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;✔ Done.&#x27;</span>)</code></pre>
+<p>Run it after your stack is up:</p>
+<pre><code class="language-bash hljs">python3 configure.py</code></pre>
+<p>Re-run it. It&#39;ll print &quot;already configured&quot;, which is the <strong>idempotent</strong> property. The real <code>setup-arr-config.py</code> in the Mediarr repo is 3500 lines because it covers every service + every config knob, but every section follows this same <code>GET → compare → POST if needed</code> pattern.</p>
+<h3 id="why-python-and-not-bash-for-this">Why Python and not bash for this?</h3>
+<p>You could write this in bash + curl + jq. It would be 4x the code and 10x the fragility. JSON is awkward in bash, and any change requires multi-step state (read current config, diff against desired, write back). Python&#39;s stdlib <code>urllib.request</code> + <code>json</code> handles all of this in 20 lines.</p>
+<hr>
+<h2 id="chapter-10-wrapping-it-all-in-a-gui-installer">Chapter 10: Wrapping it all in a GUI installer</h2>
+<p>You now have:</p>
+<ul>
+<li>A <code>docker-compose.yml</code> declaring the stack.</li>
+<li>A <code>setup.sh</code> bringing it up.</li>
+<li>A <code>configure.py</code> configuring each service via API.</li>
+</ul>
+<p>To get from there to the Mediarr installer, you add:</p>
+<ol>
+<li><p><strong>A way to upload all of the above to a remote NAS over SSH.</strong>
+The installer uses <code>ssh2</code> (a Node library) to open an SSH session + <code>sftp</code> (a subsystem of SSH) to bulk-upload files. The renderer kicks off uploads, and the main process streams progress back via IPC.</p>
+</li>
+<li><p><strong>A GUI that walks the user through the inputs.</strong>
+Welcome → Connect (host, user, password) → Env Detect (probes the NAS over SSH) → Configure (a form that fills in <code>.env</code>) → Run (streaming <code>setup.sh</code> output line by line) → Done (per-service health grid).</p>
+</li>
+<li><p><strong>State management.</strong>
+Each user has one or more &quot;profiles&quot;, encrypted JSON files on their PC that store their NAS connection + their last-used config values. The wizard&#39;s Zustand store keeps the current screen + form state. The auto-save hook debounces every change and writes it back to the profile.</p>
+</li>
+<li><p><strong>Packaging.</strong>
+Electron + electron-builder turn the renderer (React + Tailwind + Motion) + the main process (TypeScript that imports <code>ssh2</code>) into one .exe / .dmg / .AppImage per platform.</p>
+</li>
+</ol>
+<p>You don&#39;t need to build the installer to use the stack. <code>setup.sh</code> and <code>configure.py</code> from the previous chapters are the whole runtime. The installer is just a friendlier wrapper.</p>
+<h3 id="if-you-want-to-study-the-installer-code">If you want to study the installer code</h3>
+<p>Start in this order:</p>
+<ol>
+<li><strong><code>installer/src/shared/ipc.ts</code></strong> - defines every IPC channel between renderer and main. Read this first. It&#39;s the contract.</li>
+<li><strong><code>installer/src/main/ssh-service.ts</code></strong> - the streaming SSH client. Shows how <code>exec()</code> + <code>data</code> events drive the wizard&#39;s live log.</li>
+<li><strong><code>installer/src/renderer/screens/RunScreen.tsx</code></strong> - the Run screen. See how it parses setup.sh&#39;s marker lines into per-step status.</li>
+<li><strong><code>installer/src/main/env-detector.ts</code></strong> - the env-detect probes. Each probe runs over SSH and returns a typed result.</li>
+<li><strong><code>installer/src/renderer/screens/ConfigureScreen.tsx</code></strong> - the form that drives <code>.env</code>. Note how it uses a shared <code>env-schema.ts</code> for validation on both sides.</li>
+</ol>
+<p>The companion <a href="https://github.com/defessler/Mediarr-Installer/blob/master/TDD.md">TDD.md</a> explains <em>why</em> each of those pieces is the shape it is.</p>
+<hr>
+<h2 id="where-to-go-next">Where to go next</h2>
+<p>You now know enough to:</p>
+<ul>
+<li><strong>Run the Mediarr stack manually</strong> with your hand-written compose file + setup.sh + configure.py.</li>
+<li><strong>Modify the real Mediarr stack</strong> - pick the service you want to add or change, find its compose entry + setup-arr-config.py section, edit, re-run.</li>
+<li><strong>Build a similar stack for a different purpose</strong> - the patterns (compose + bash orchestrator + Python API configurator + optional Electron GUI) work for any &quot;configure-once-then-run&quot; appliance stack: home automation, monitoring, dev environments, etc.</li>
+</ul>
+<h3 id="suggested-next-experiments">Suggested next experiments</h3>
+<ul>
+<li><strong>Add Bazarr to the stack you built in Chapter 7.</strong> Wire it to your Sonarr/Radarr in Bazarr&#39;s settings, watch it auto-fetch subtitles for an existing episode.</li>
+<li><strong>Add Tautulli.</strong> Point it at your Plex install, watch a video, see the play event show up in Tautulli&#39;s history.</li>
+<li><strong>Add Recyclarr.</strong> Run <code>docker exec recyclarr recyclarr sync</code>. Watch your Sonarr Custom Formats populate.</li>
+<li><strong>Read the real <code>setup-arr-config.py</code>.</strong> It&#39;s 3500 lines but every section is self-contained. Pick one (e.g., the SABnzbd block) and follow the GET-compare-POST pattern.</li>
+<li><strong>Read the real <code>nas/setup.sh</code>.</strong> Note how each step is a separate <code>setup-*.sh</code> script, and how the orchestrator prints the marker lines the installer&#39;s UI parses.</li>
+</ul>
+<h3 id="reference-docs">Reference docs</h3>
+<ul>
+<li><a href="https://docs.docker.com">Docker docs</a> - <code>docker run</code>, <code>docker compose</code>, <code>volumes</code>, <code>networks</code>.</li>
+<li><a href="https://trash-guides.info">TRaSH Guides</a> - quality profile + custom format recipes for the arrs.</li>
+<li><a href="https://recyclarr.dev">Recyclarr docs</a> - what <code>recyclarr.yml</code> can do.</li>
+<li><a href="https://wiki.servarr.com">Servarr wiki</a> - official docs for every arr.</li>
+<li><a href="https://docs.linuxserver.io">linuxserver.io docs</a> - the docker images we use, and their PUID/PGID conventions matter.</li>
+</ul>
+<h3 id="mediarr-specific-deep-dives">Mediarr-specific deep dives</h3>
+<ul>
+<li><strong><a href="https://github.com/defessler/Mediarr-Installer/blob/master/README.md">README.md</a></strong> - architecture overview + manual install path.</li>
+<li><strong><a href="../installation/">INSTALL.md</a></strong> - installer wizard walkthrough.</li>
+<li><strong><a href="https://github.com/defessler/Mediarr-Installer/blob/master/TDD.md">TDD.md</a></strong> - every design decision explained.</li>
+</ul>
+<p>Welcome to running your own stack. The terrifying part, &quot;I don&#39;t know what any of this is&quot;, is now behind you.</p>
+
+<div class="doc-pager"><a class="pager-prev" href="../installation/">Installation</a><span class="pager-spacer"></span><a class="pager-next" href="../architecture/">Architecture</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+
+</body>
+</html>

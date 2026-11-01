@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Indexers · Mediarr</title>
+  <meta name="description" content="Where your downloads actually come from, and how to add your own.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Indexers · Mediarr">
+  <meta property="og:description" content="Where your downloads actually come from, and how to add your own.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#what-an-indexer-actually-is">What an indexer actually is</a></li>
+<li class="toc-h2"><a href="#prowlarr-one-place-to-manage-them-all">Prowlarr: one place to manage them all</a></li>
+<li class="toc-h2"><a href="#what-the-installer-already-did">What the installer already did</a></li>
+<li class="toc-h2"><a href="#adding-more-indexers">Adding more indexers</a></li>
+<li class="toc-h2"><a href="#tips">Tips</a></li>
+<li class="toc-h2"><a href="#where-this-fits">Where this fits</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/" class="active">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Indexers</h1>
+<p class="doc-lede">Where your downloads actually come from, and how to add your own.</p>
+<p>Indexers are the search sources that tell Sonarr, Radarr, and Lidarr <em>where</em> to find a
+given movie, show, or album. Without them, the stack has nothing to search.</p>
+<blockquote>
+<p><strong>In one sentence:</strong> an indexer is a directory of what&#39;s available to download. Add
+your indexers once in Prowlarr and it pushes them to every *arr app automatically.</p>
+</blockquote>
+<blockquote>
+<p>New to the stack? The <a href="../downloads-and-vpn/">Downloads &amp; VPN</a> guide covers qBittorrent
+and SABnzbd (the clients that do the actual downloading once an indexer finds a release).
+To see how requests flow end-to-end, start at <a href="../requesting/">Requesting Movies &amp; TV</a>.</p>
+</blockquote>
+<h2 id="what-an-indexer-actually-is">What an indexer actually is</h2>
+<p>Think of an indexer as a catalog. When Radarr wants a movie, it asks the indexer
+&quot;do you have this?&quot; and gets back a list of releases with their sizes, qualities, and
+download links. There are two kinds:</p>
+<ul>
+<li><strong>Torrent indexers</strong> - free to use, public or private, and every torrent goes through
+your VPN (qBittorrent runs inside the Gluetun container, so if the VPN drops, downloads
+stop rather than exposing your IP).</li>
+<li><strong>Usenet indexers</strong> - very fast, typically require a paid usenet provider <em>and</em> a
+(sometimes paid) indexer membership. See <a href="../downloads-and-vpn/">Downloads &amp; VPN</a> for
+provider setup.</li>
+</ul>
+<h2 id="prowlarr-one-place-to-manage-them-all">Prowlarr: one place to manage them all</h2>
+<p><strong>Prowlarr</strong> (<code>:49150</code>) is the indexer manager for your whole stack. You add an indexer
+once in Prowlarr and it syncs automatically to Sonarr, Radarr, and Lidarr, with no
+per-app setup needed.</p>
+<p>Open it from the <a href="../dashboard/">Dashboard</a> tile, or directly at <code>http://&lt;NAS-IP&gt;:49150</code>.</p>
+<h2 id="what-the-installer-already-did">What the installer already did</h2>
+<p>The wizard added a set of free public torrent indexers for you during install. Most
+people can request content straight away without touching Prowlarr at all.</p>
+<h2 id="adding-more-indexers">Adding more indexers</h2>
+<p><strong>Option 1, re-run the installer</strong> (recommended for first-time additions):</p>
+<ol>
+<li>Open the installer and go to <strong>Configure → Advanced</strong>.</li>
+<li>The indexer browser lists the curated catalog. Filter by content type, cost, or
+signup requirement to find what you need.</li>
+<li>For free public trackers, just check the box. No account needed.</li>
+<li>For private trackers or usenet indexers, paste your API key (or username/password)
+into the field next to the indexer name.</li>
+<li>Finish the wizard. Prowlarr picks up the new indexers and pushes them to your *arr apps.</li>
+</ol>
+<p><strong>Option 2, add directly in Prowlarr:</strong></p>
+<ol>
+<li>Open Prowlarr from the <a href="../dashboard/">Dashboard</a>.</li>
+<li>Go to <strong>Indexers → Add Indexer</strong>.</li>
+<li>Search for your indexer, fill in your credentials, and click <strong>Test</strong> to confirm it
+works, then <strong>Save</strong>.</li>
+<li>Prowlarr syncs it to Sonarr, Radarr, and Lidarr within a minute.</li>
+</ol>
+<h2 id="tips">Tips</h2>
+<ul>
+<li><strong>More good indexers = more releases found.</strong> If a request sits in Sonarr/Radarr for
+hours without downloading, the most common cause is too few indexers (or indexers that
+don&#39;t carry that content category). Add a couple more and re-search.</li>
+<li><strong>Test before you trust.</strong> Hit the <strong>Test</strong> button next to any indexer in Prowlarr
+before counting on it. It confirms the connection is live and your credentials work.</li>
+<li><strong>Filter by category.</strong> If you only care about music, add indexers marked for Music.
+Adding unrelated ones just adds noise to searches.</li>
+<li><strong>Private trackers</strong> usually give better quality and availability than public ones, but
+require an invite or registration. Usenet is the fastest option when availability is
+good, see <a href="../downloads-and-vpn/">Downloads &amp; VPN</a>.</li>
+<li><strong>Quality profile affects what gets grabbed.</strong> If an indexer returns results but nothing
+downloads, check your <a href="../quality-profiles/">Quality Profiles</a>, since the release may not meet
+the minimum score. Loosening the profile or adding more indexers usually fixes it.</li>
+</ul>
+<h2 id="where-this-fits">Where this fits</h2>
+<pre><code class="hljs">Prowlarr (indexers)  →  Sonarr / Radarr / Lidarr  →  qBittorrent / SABnzbd  →  Plex / Jellyfin
+  search sources          find + manage releases        download (via VPN)         watch / listen</code></pre>
+<p>Each step has its own short guide: <a href="../requesting/">Requesting Movies &amp; TV</a> ·
+<a href="../movies-and-tv/">Movies &amp; TV</a> · <a href="../downloads-and-vpn/">Downloads &amp; VPN</a> ·
+<a href="../quality-profiles/">Quality Profiles</a> · <a href="../media-server/">Media Server</a>.</p>
+
+<div class="doc-pager"><a class="pager-prev" href="../movies-and-tv/">Movies &amp; TV</a><span class="pager-spacer"></span><a class="pager-next" href="../downloads-and-vpn/">Downloads &amp; VPN</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+
+</body>
+</html>

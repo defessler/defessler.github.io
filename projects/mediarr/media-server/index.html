@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Media Server · Mediarr</title>
+  <meta name="description" content="Plex or Jellyfin: sign in once, find your libraries, play anywhere.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Media Server · Mediarr">
+  <meta property="og:description" content="Plex or Jellyfin: sign in once, find your libraries, play anywhere.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#what-it-is">What it is</a></li>
+<li class="toc-h2"><a href="#first-time-setup-once">First-time setup (once)</a></li>
+<li class="toc-h3"><a href="#plex">Plex</a></li>
+<li class="toc-h3"><a href="#jellyfin">Jellyfin</a></li>
+<li class="toc-h2"><a href="#your-libraries">Your libraries</a></li>
+<li class="toc-h2"><a href="#playing-your-library">Playing your library</a></li>
+<li class="toc-h2"><a href="#tips">Tips</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/" class="active">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Media Server</h1>
+<p class="doc-lede">Plex or Jellyfin: sign in once, find your libraries, play anywhere.</p>
+<p>This guide covers the app that actually <strong>streams your library</strong> to TVs, phones, and browsers. That&#39;s Plex or Jellyfin, whichever you chose when you ran the installer.</p>
+<blockquote>
+<p><strong>In one sentence:</strong> open your media server, sign in once, and everything Sonarr/Radarr/Lidarr has imported is already there waiting to play.</p>
+</blockquote>
+<blockquote>
+<p>The easiest way to add new movies or shows is the request portal. See
+<a href="../requesting/">Requesting Movies &amp; TV</a>. To drive Sonarr or Radarr
+by hand, see <a href="../movies-and-tv/">Movies &amp; TV</a>.</p>
+</blockquote>
+<h2 id="what-it-is">What it is</h2>
+<p>Your installer asked you to pick one:</p>
+<ul>
+<li><strong>Plex</strong> (default) - streams to every platform via the Plex app, and needs a free Plex account. Open it at <strong><code>http://&lt;NAS-IP&gt;:32400/web</code></strong>.</li>
+<li><strong>Jellyfin</strong> - fully open-source, no account required. Open it at <strong><code>http://&lt;NAS-IP&gt;:8096</code></strong>.</li>
+</ul>
+<p>Either way, find the tile on your <a href="../dashboard/">Homepage dashboard</a> for the quickest link.</p>
+<h2 id="first-time-setup-once">First-time setup (once)</h2>
+<h3 id="plex">Plex</h3>
+<ol>
+<li>Open <strong><code>http://&lt;NAS-IP&gt;:32400/web</code></strong> directly in your browser, at the IP address rather than the cloud URL. If the server shows up with a hashed or random name and won&#39;t let you in, it hasn&#39;t been claimed yet. Opening it via the direct IP link fixes that.</li>
+<li>Sign in with your Plex account. Plex will claim this server to your account automatically.</li>
+<li>Your libraries are already created and pointed at the right folders, so click through the setup wizard and accept the defaults.</li>
+</ol>
+<h3 id="jellyfin">Jellyfin</h3>
+<ol>
+<li>Open <strong><code>http://&lt;NAS-IP&gt;:8096</code></strong>.</li>
+<li>Create your <strong>admin account</strong> on first run (you choose the username and password).</li>
+<li>The installer needs a Jellyfin API key so the arrs can trigger library scans. Go to <strong>Dashboard → API Keys</strong>, generate one, and paste it into the installer&#39;s <strong>Run screen</strong> (re-run the installer, go past Configure to the Run screen, and paste the key into the Jellyfin API key field). Then run Install.</li>
+<li>Your libraries are already set up, so click through the wizard and accept the defaults.</li>
+</ol>
+<h2 id="your-libraries">Your libraries</h2>
+<p>The installer pre-creates these libraries pointing at the right paths on your NAS:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Path</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Movies</td>
+<td><code>/media/Movies</code></td>
+</tr>
+<tr>
+<td>TV Shows</td>
+<td><code>/media/TV Shows</code></td>
+</tr>
+<tr>
+<td>Music</td>
+<td><code>/media/Music</code></td>
+</tr>
+<tr>
+<td>Anime Movies</td>
+<td><code>/media/Anime/Movies</code></td>
+</tr>
+<tr>
+<td>Anime TV Shows</td>
+<td><code>/media/Anime/TV Shows</code></td>
+</tr>
+</tbody></table></div>
+<p>You don&#39;t need to add or change anything. When Sonarr or Radarr imports a new file, it notifies the media server and the item appears automatically, usually within a minute or two.</p>
+<h2 id="playing-your-library">Playing your library</h2>
+<p>Install the <strong>Plex</strong> or <strong>Jellyfin</strong> app on your TV, phone, or tablet, sign in with the same account you set up above, and browse your library.</p>
+<p>For music, Plex users can also use <strong>Plexamp</strong>, a dedicated music player with radio-style playback. See <a href="../music-playback/">Music Playback</a>.</p>
+<h2 id="tips">Tips</h2>
+<ul>
+<li><strong>Media imported but not showing up?</strong> The import notification from Sonarr/Radarr may have failed. In Plex, go to your library, click the <strong>...</strong> menu, and choose <strong>Scan Library Files</strong> to force a refresh. For Jellyfin, go to <strong>Dashboard → Libraries</strong> and run a scan. Alternatively, re-run the installer (Update mode → Refresh dashboard) to re-sync everything.</li>
+<li><strong>Plex shows a &quot;secure connection&quot; warning or can&#39;t find your server through the app?</strong> Access it directly via <code>http://&lt;NAS-IP&gt;:32400/web</code> instead of going through app.plex.tv. Local direct access bypasses the relay and is always faster.</li>
+<li><strong>Plex &quot;Update Library Automatically&quot; is off?</strong> Check <strong>Settings → Libraries</strong> in the Plex web UI and make sure automatic library updates are enabled, so new imports appear without manual scans.</li>
+<li><strong>Want to add content?</strong> Use <a href="../requesting/">Requesting Movies &amp; TV</a>, which is the easiest path. For direct queue management, use <a href="../movies-and-tv/">Movies &amp; TV</a>.</li>
+</ul>
+
+<div class="doc-pager"><a class="pager-prev" href="../requesting/">Requesting Movies &amp; TV</a><span class="pager-spacer"></span><a class="pager-next" href="../movies-and-tv/">Movies &amp; TV</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+
+</body>
+</html>

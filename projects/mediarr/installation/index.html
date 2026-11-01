@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Installation · Mediarr</title>
+  <meta name="description" content="Step-by-step walkthrough of the wizard, from enabling SSH to your first download.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Installation · Mediarr">
+  <meta property="og:description" content="Step-by-step walkthrough of the wizard, from enabling SSH to your first download.">
+  <meta property="og:type" content="website">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="site-header">
+  <nav id="site-nav">
+    <a href="../" class="nav-brand">mediarr</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../installation/" class="active">Install</a></li>
+      <li><a href="../tutorial/">Tutorial</a></li>
+      <li><a href="../architecture/">Architecture</a></li>
+    </ul>
+    <div id="nav-social">
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer">GitHub</a>
+      <a class="social-link" href="https://github.com/defessler/Mediarr-Installer/releases/latest">Download</a>
+      <!-- data-label repeats the text so the glitch pseudo-elements have
+           something to clone. Keep the two in step. -->
+      <a class="social-link social-kofi" href="https://ko-fi.com/dougfessler"
+         target="_blank" rel="noopener" title="Opens ko-fi.com"
+         data-label="☕ buy me a coffee">☕ buy me a coffee</a>
+    </div>
+  </nav>
+</header>
+
+<div class="docs">
+<nav class="docs-sidebar" aria-label="Documentation">
+<input type="radio" name="rail" id="rail-toc" class="rail-radio" checked>
+<input type="radio" name="rail" id="rail-guides" class="rail-radio">
+<div class="rail-tabs"><label for="rail-toc">On this page</label><label for="rail-guides">All guides</label></div>
+<div class="rail-panel rail-toc docs-toc"><ol>
+<li class="toc-h2"><a href="#table-of-contents">Table of contents</a></li>
+<li class="toc-h2"><a href="#1-what-youll-end-up-with">1. What you&#39;ll end up with</a></li>
+<li class="toc-h3"><a href="#what-each-container-does-in-plain-english">What each container does (in plain English)</a></li>
+<li class="toc-h2"><a href="#2-before-you-start-the-checklist">2. Before you start: the checklist</a></li>
+<li class="toc-h2"><a href="#3-step-1-enable-ssh-on-your-nas">3. Step 1: Enable SSH on your NAS</a></li>
+<li class="toc-h2"><a href="#4-step-2-download-the-installer">4. Step 2: Download the installer</a></li>
+<li class="toc-h2"><a href="#5-step-3-run-the-installer">5. Step 3: Run the installer</a></li>
+<li class="toc-h3"><a href="#welcome-screen">Welcome screen</a></li>
+<li class="toc-h3"><a href="#connect-screen">Connect screen</a></li>
+<li class="toc-h3"><a href="#env-detect-screen">Env Detect screen</a></li>
+<li class="toc-h3"><a href="#configure-screen">Configure screen</a></li>
+<li class="toc-h3"><a href="#run-screen">Run screen</a></li>
+<li class="toc-h3"><a href="#done-screen">Done screen</a></li>
+<li class="toc-h2"><a href="#6-step-4-first-time-setup-for-each-service">6. Step 4: First-time setup for each service</a></li>
+<li class="toc-h3"><a href="#plex">Plex</a></li>
+<li class="toc-h3"><a href="#seerr-request-portal">Seerr (request portal)</a></li>
+<li class="toc-h3"><a href="#homepage-dashboard">Homepage (dashboard)</a></li>
+<li class="toc-h3"><a href="#tautulli-plex-analytics">Tautulli (Plex analytics)</a></li>
+<li class="toc-h3"><a href="#qbittorrent">qBittorrent</a></li>
+<li class="toc-h3"><a href="#sonarr-radarr-lidarr">Sonarr, Radarr, Lidarr</a></li>
+<li class="toc-h3"><a href="#prowlarr">Prowlarr</a></li>
+<li class="toc-h3"><a href="#bazarr">Bazarr</a></li>
+<li class="toc-h2"><a href="#7-step-5-add-your-first-movie-or-tv-show">7. Step 5: Add your first movie or TV show</a></li>
+<li class="toc-h3"><a href="#the-friendly-way-seerr">The friendly way: Seerr</a></li>
+<li class="toc-h3"><a href="#the-power-user-way-sonarr--radarr-directly">The power-user way: Sonarr / Radarr directly</a></li>
+<li class="toc-h2"><a href="#8-where-things-live-a-quick-map">8. Where things live (a quick map)</a></li>
+<li class="toc-h2"><a href="#9-help-something-went-wrong">9. Help: something went wrong</a></li>
+<li class="toc-h3"><a href="#first-stop-the-in-app-help-button">First stop: the in-app Help button</a></li>
+<li class="toc-h3"><a href="#the-most-common-stumbles">The most common stumbles</a></li>
+<li class="toc-h3"><a href="#diagnostic-commands">Diagnostic commands</a></li>
+<li class="toc-h3"><a href="#re-running-the-wizard">Re-running the wizard</a></li>
+<li class="toc-h3"><a href="#if-youre-really-stuck">If you&#39;re really stuck</a></li>
+<li class="toc-h2"><a href="#youre-done">You&#39;re done</a></li>
+</ol></div>
+<div class="rail-panel rail-guides"><div class="side-group"><div class="side-title">Getting started</div><ul>
+<li><a href="../installation/" class="active">Installation</a></li>
+<li><a href="../tutorial/">Build It Yourself</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Understanding it</div><ul>
+<li><a href="../architecture/">Architecture</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Using your stack</div><ul>
+<li><a href="../dashboard/">Dashboard</a></li>
+<li><a href="../requesting/">Requesting Movies &amp; TV</a></li>
+<li><a href="../media-server/">Media Server</a></li>
+<li><a href="../movies-and-tv/">Movies &amp; TV</a></li>
+<li><a href="../indexers/">Indexers</a></li>
+<li><a href="../downloads-and-vpn/">Downloads &amp; VPN</a></li>
+<li><a href="../subtitles/">Subtitles</a></li>
+<li><a href="../quality-profiles/">Quality Profiles</a></li>
+<li><a href="../live-tv/">Live TV &amp; DVR</a></li>
+<li><a href="../storage/">Storage &amp; Re-grabbing</a></li>
+<li><a href="../reading/">Comics, Manga &amp; Books</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Music</div><ul>
+<li><a href="../music/">Music</a></li>
+<li><a href="../music-setup/">Music Setup</a></li>
+<li><a href="../playlist-sync/">Playlist Sync</a></li>
+<li><a href="../music-playback/">Music Playback</a></li>
+</ul></div>
+<div class="side-group"><div class="side-title">Share with friends</div><ul>
+<li><a href="../watch-on-your-tv/">Watch on Your TV</a></li>
+</ul></div></div>
+</nav>
+<main id="main" class="doc-content">
+<h1>Installation</h1>
+<p class="doc-lede">Step-by-step walkthrough of the wizard, from enabling SSH to your first download.</p>
+<p>A step-by-step tutorial for installing the Mediarr media stack on a Synology NAS,
+written for people who have <strong>never used Docker, SSH, or the command line</strong>.</p>
+<p>You will end up with your own personal Netflix-like setup that finds, downloads,
+organizes, and streams movies/TV/music to any device on your home network, all
+hosted on your NAS.</p>
+<blockquote>
+<p>If you are comfortable with SSH and bash, the manual install path is in
+<a href="https://github.com/defessler/Mediarr-Installer/blob/master/README.md"><code>README.md</code></a>. This guide uses the GUI installer (<code>Mediarr Installer.exe</code>) which does the same thing behind the scenes.</p>
+</blockquote>
+<hr>
+<h2 id="table-of-contents">Table of contents</h2>
+<ol>
+<li><a href="#1-what-youll-end-up-with">What you&#39;ll end up with</a></li>
+<li><a href="#2-before-you-start-the-checklist">Before you start: the checklist</a></li>
+<li><a href="#3-step-1-enable-ssh-on-your-nas">Step 1: Enable SSH on your NAS</a></li>
+<li><a href="#4-step-2-download-the-installer">Step 2: Download the installer</a></li>
+<li><a href="#5-step-3-run-the-installer">Step 3: Run the installer</a><ul>
+<li><a href="#welcome-screen">Welcome screen</a></li>
+<li><a href="#connect-screen">Connect screen</a></li>
+<li><a href="#env-detect-screen">Env Detect screen</a></li>
+<li><a href="#configure-screen">Configure screen</a></li>
+<li><a href="#run-screen">Run screen</a></li>
+<li><a href="#done-screen">Done screen</a></li>
+</ul>
+</li>
+<li><a href="#6-step-4-first-time-setup-for-each-service">Step 4: First-time setup for each service</a></li>
+<li><a href="#7-step-5-add-your-first-movie-or-tv-show">Step 5: Add your first movie or TV show</a></li>
+<li><a href="#8-where-things-live-a-quick-map">Where things live (a quick map)</a></li>
+<li><a href="#9-help-something-went-wrong">Help: something went wrong</a></li>
+</ol>
+<hr>
+<h2 id="1-what-youll-end-up-with">1. What you&#39;ll end up with</h2>
+<div class="mermaid-wrap"><pre class="mermaid">flowchart LR
+    You[You&lt;br/&gt;on phone / browser] --&gt;|&quot;open a website&quot;| Homepage[Homepage&lt;br/&gt;dashboard]
+    Homepage --&gt; Seerr[Seerr&lt;br/&gt;request a movie/show]
+    Seerr --&gt;|&quot;sends to&quot;| Arr[Sonarr / Radarr / Lidarr&lt;br/&gt;monitor + download]
+    Arr --&gt;|&quot;finds via&quot;| Prowlarr[Prowlarr&lt;br/&gt;indexer hub]
+    Arr --&gt;|&quot;downloads with&quot;| QBit[qBittorrent&lt;br/&gt;+ VPN]
+    Arr --&gt;|&quot;downloads with&quot;| SAB[SABnzbd&lt;br/&gt;usenet]
+    QBit --&gt; Plex[Plex&lt;br/&gt;watch on any device]
+    SAB --&gt; Plex</pre></div>
+<p>After the installer finishes, you&#39;ll have a row of bookmarkable URLs on your home
+network (one for each &quot;service&quot;) plus a dashboard that links to all of them.
+You request something in <strong>Seerr</strong>, it gets downloaded, sorted, and shows up in
+<strong>Plex</strong> automatically a few minutes (or hours) later.</p>
+<h3 id="what-each-container-does-in-plain-english">What each container does (in plain English)</h3>
+<p>The stack is made up of a dozen-ish small services (&quot;containers&quot;). You almost
+never touch them directly, since they talk to each other behind the scenes. Here&#39;s
+the cheat sheet, sorted by which ones you&#39;ll actually open:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Container</th>
+<th>What it is</th>
+<th>What it does, plainly</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Plex</strong></td>
+<td>The TV</td>
+<td>What you actually watch on. Open it on your phone / smart TV / laptop / browser. Streams everything your library has.</td>
+</tr>
+<tr>
+<td><strong>Seerr</strong></td>
+<td>The Netflix-style request page</td>
+<td>What you (and family/friends) browse to ask for a new movie or show. Click &quot;request&quot; and the rest of the stack figures out how to get it.</td>
+</tr>
+<tr>
+<td><strong>Homepage</strong></td>
+<td>The home page</td>
+<td>One web page that links to every other service so you don&#39;t have to remember any of these URLs. Bookmark this.</td>
+</tr>
+<tr>
+<td><strong>Sonarr</strong></td>
+<td>The TV-show librarian</td>
+<td>You add a show once (&quot;I want all of Breaking Bad&quot;). Sonarr remembers every episode, watches for new ones as they release, finds them, hands them off to a downloader, and files them away when they arrive.</td>
+</tr>
+<tr>
+<td><strong>Radarr</strong></td>
+<td>Same, but for movies</td>
+<td>Identical pattern: pick a movie, Radarr handles the rest.</td>
+</tr>
+<tr>
+<td><strong>Lidarr</strong></td>
+<td>Same, but for music</td>
+<td>Pick an artist or album, Lidarr keeps the discography current.</td>
+</tr>
+<tr>
+<td><strong>Bazarr</strong></td>
+<td>The subtitle hunter</td>
+<td>After Sonarr / Radarr brings in a video, Bazarr goes looking for matching subtitles (in your language) so you don&#39;t have to search yourself.</td>
+</tr>
+<tr>
+<td><strong>Prowlarr</strong></td>
+<td>The indexer phonebook</td>
+<td>Sonarr / Radarr / Lidarr don&#39;t know where to <em>search</em> for releases. Prowlarr is the central list of &quot;search engines for releases.&quot; You add a new indexer in Prowlarr and every arr picks it up automatically.</td>
+</tr>
+<tr>
+<td><strong>qBittorrent</strong></td>
+<td>The torrent downloader</td>
+<td>Pulls files from a peer-to-peer network. Always runs <em>inside</em> Gluetun&#39;s network so your home IP is never exposed. The wizard wires this up. You just set a password.</td>
+</tr>
+<tr>
+<td><strong>Gluetun</strong></td>
+<td>The VPN wrapper</td>
+<td>Acts as a sealed envelope around qBittorrent. All torrent traffic exits through your VPN provider. If the VPN drops, qBit can&#39;t reach anything, so no IP leaks. You only see this container if you enabled VPN in the wizard.</td>
+</tr>
+<tr>
+<td><strong>SABnzbd</strong></td>
+<td>The usenet downloader</td>
+<td>Pulls files from Usenet, which is faster and more reliable than torrents, but requires a paid provider (Eweka, Newshosting, etc.). Optional.</td>
+</tr>
+<tr>
+<td><strong>Tautulli</strong></td>
+<td>The watch-stats dashboard</td>
+<td>Pretty graphs of what&#39;s been watched, by whom, for how long. Sends optional notifications. Talks only to Plex.</td>
+</tr>
+<tr>
+<td><strong>Recyclarr</strong></td>
+<td>The quality-rules keeper</td>
+<td>The TRaSH Guides community publishes &quot;use these rules for the best 1080p / 4K experience.&quot; Recyclarr automatically pushes those rules into Sonarr / Radarr so you get the right quality without having to copy-paste hundreds of settings. Has no UI of its own. The sidecar below provides one.</td>
+</tr>
+<tr>
+<td><strong>recyclarr-trigger</strong></td>
+<td>The Recyclarr web UI</td>
+<td>Tiny webhook server at <code>http://&lt;NAS&gt;:8889</code>. Recyclarr is a CLI tool with no UI of its own, so this page surfaces <strong>profile dropdowns</strong> (pick a different TRaSH bundle without re-running the installer) plus a <strong>Sync Now</strong> button. Reachable from the Homepage dashboard&#39;s Maintenance tile.</td>
+</tr>
+<tr>
+<td><strong>Unpackerr</strong></td>
+<td>The auto-unzipper</td>
+<td>Some downloads arrive as <code>.rar</code> archives split into 50 files. Unpackerr extracts them in place so Sonarr / Radarr can see the actual video file.</td>
+</tr>
+<tr>
+<td><strong>Flaresolverr</strong></td>
+<td>The CloudFlare lock-picker</td>
+<td>Some indexer sites (e.g. 1337x) hide behind a &quot;are you human?&quot; CloudFlare challenge. Flaresolverr solves the challenge so Prowlarr can still talk to them. Set-and-forget background service.</td>
+</tr>
+</tbody></table></div>
+<p><strong>The shortest version of the whole stack:</strong> <em>Seerr</em> takes requests → <em>Sonarr / Radarr / Lidarr</em> watch for what you want → <em>Prowlarr</em> tells them where to look → <em>qBittorrent + Gluetun</em> and <em>SABnzbd</em> download it → <em>Unpackerr</em> unpacks it if needed → <em>Bazarr</em> fetches subtitles → <em>Plex</em> plays it. <em>Homepage</em> is the dashboard linking to everything, <em>Tautulli</em> shows watch stats, and <em>Recyclarr</em> keeps quality settings sane.</p>
+<hr>
+<h2 id="2-before-you-start-the-checklist">2. Before you start: the checklist</h2>
+<p>You need:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Why</th>
+<th>Where to get it</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>A Synology NAS</strong> running DSM 7 or newer</td>
+<td>This is what hosts everything</td>
+<td>If you don&#39;t have one, this guide isn&#39;t for you (yet)</td>
+</tr>
+<tr>
+<td><strong>A Windows, Mac, or Linux PC</strong></td>
+<td>To run the installer from</td>
+<td>The PC you&#39;re reading this on works</td>
+</tr>
+<tr>
+<td><strong>Your NAS&#39;s IP address</strong> on your home network</td>
+<td>The installer needs to find it</td>
+<td>DSM → Control Panel → Network, where the LAN IP is shown</td>
+</tr>
+<tr>
+<td><strong>Your NAS admin password</strong></td>
+<td>To log in over SSH</td>
+<td>Same one you use to sign into DSM</td>
+</tr>
+<tr>
+<td><strong>About 30 minutes of patience</strong></td>
+<td>First-time install downloads a lot of Docker images</td>
+<td>n/a</td>
+</tr>
+</tbody></table></div>
+<p>Optional but recommended:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Why</th>
+<th>Where to get it</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>A Plex <em>or</em> Jellyfin server</strong></td>
+<td>To stream your library</td>
+<td>Plex: free login at <a href="https://plex.tv">https://plex.tv</a>. Jellyfin: nothing to sign up for, it&#39;s fully self-hosted. Just pick it in the wizard.</td>
+</tr>
+<tr>
+<td><strong>A VPN subscription</strong></td>
+<td>Privacy for torrent traffic</td>
+<td>NordVPN, Proton, Mullvad, AirVPN, or Surfshark all work</td>
+</tr>
+<tr>
+<td><strong>A Usenet provider account</strong></td>
+<td>Faster, more reliable downloads than torrents</td>
+<td>Eweka, Newshosting, UsenetServer, etc. (paid)</td>
+</tr>
+<tr>
+<td><strong>An indexer or two</strong></td>
+<td>Where the *arr apps find releases</td>
+<td>Prowlarr ships with public indexers built-in. For private ones, see <a href="#6-step-4-first-time-setup-for-each-service">Step 4</a></td>
+</tr>
+</tbody></table></div>
+<blockquote>
+<p><strong>You don&#39;t need any of the optional items to start.</strong> The installer ships with
+free public indexers and you can turn off the VPN/qBittorrent profile if you
+only want usenet (or no torrents at all).</p>
+</blockquote>
+<hr>
+<h2 id="3-step-1-enable-ssh-on-your-nas">3. Step 1: Enable SSH on your NAS</h2>
+<blockquote>
+<p><strong>What&#39;s SSH?</strong> Short for &quot;Secure Shell.&quot; It&#39;s how the installer talks to your
+NAS to run commands. Think of it like the installer remotely typing into your
+NAS&#39;s keyboard. You enable it once and forget about it.</p>
+</blockquote>
+<ol>
+<li>Open your NAS&#39;s web interface. (In your browser, go to
+<code>http://&lt;your-nas-ip&gt;:5000</code>, e.g., <code>http://192.168.1.242:5000</code>.)</li>
+<li>Click <strong>Control Panel</strong>.</li>
+<li>Find <strong>Terminal &amp; SNMP</strong> (it&#39;s near the bottom of the list, so you may need
+to enable &quot;Advanced Mode&quot; using the toggle at the top of Control Panel to
+see it).</li>
+<li>Check the box for <strong>Enable SSH service</strong>.</li>
+<li>Leave the port as <code>22</code>.</li>
+<li>Click <strong>Apply</strong>.</li>
+</ol>
+<p>That&#39;s it. You can close the browser tab.</p>
+<hr>
+<h2 id="4-step-2-download-the-installer">4. Step 2: Download the installer</h2>
+<ol>
+<li>Go to the <strong>Releases</strong> page of this repository.</li>
+<li>Find the latest release (the one at the top).</li>
+<li>Under &quot;Assets,&quot; download the file that ends in <code>.zip</code> for Windows
+(or <code>.dmg</code> for macOS / <code>.AppImage</code> for Linux).</li>
+<li>Right-click the downloaded ZIP → <strong>Extract All...</strong> → pick any folder
+you like (your Desktop is fine for a first install).</li>
+<li>Open the extracted folder. You&#39;ll see a file named <strong><code>Mediarr Installer.exe</code></strong>.</li>
+</ol>
+<blockquote>
+<p><strong>Windows SmartScreen warning:</strong> The first time you double-click the .exe,
+Windows will say <em>&quot;Windows protected your PC&quot;</em>. Click <strong>More info</strong> →
+<strong>Run anyway</strong>. This happens because the .exe isn&#39;t signed by a corporate
+certificate (signing costs hundreds of dollars per year). If you&#39;d rather
+verify before running, you can check the SHA-256 hash listed on the release
+page against the file you downloaded.</p>
+</blockquote>
+<hr>
+<h2 id="5-step-3-run-the-installer">5. Step 3: Run the installer</h2>
+<p>Double-click <code>Mediarr Installer.exe</code>.</p>
+<p>The installer is a multi-screen wizard with a big green hero icon at the
+top of each screen, a stepper rail showing where you are, and a Help
+button in the bottom-right corner that opens a searchable list of fixes
+for every common problem. Here&#39;s what each screen does and what you
+should fill in. ASCII art shows the rough layout. Your actual window
+has friendly icons + animations.</p>
+<h3 id="welcome-screen">Welcome screen</h3>
+<pre><code class="hljs">┌─────────────────────────────────────────────────────────┐
+│  [🖥]  Welcome back                                     │
+│         Pick a NAS to set up — or start fresh.          │
+│                                                         │
+│   ── Your NAS profiles ──         + New · ⬇ Import      │
+│   ┌─────────────────────────────────────────────────┐   │
+│   │ [DS]  DS1522+                  ┌─────────────┐  │   │
+│   │       heoki@192.168.1.242:22   │ ▶  Install  │ ⚙│   │
+│   │       ✓ config saved           └─────────────┘  │   │
+│   └─────────────────────────────────────────────────┘   │
+│                                                         │
+│   ── Before you begin ──                                │
+│    [🖥] SSH is enabled on the NAS                       │
+│    [📦] Docker (Container Manager) is installed         │
+│    [👤] (Optional) An account at plex.tv                │
+└─────────────────────────────────────────────────────────┘</code></pre>
+<p><strong>First run:</strong> the profile list is empty. The wizard shows a centered
+&quot;Let&#39;s set up your first NAS&quot; card with two buttons: <strong>Create your first
+profile</strong> and <strong>Import from a file</strong>.</p>
+<p><strong>Returning runs:</strong> click the green <strong>Install</strong> button on the profile
+you want to set up. The little gear icon on each row opens an overflow
+menu with the other actions:</p>
+<ul>
+<li><strong>Edit</strong> - jump straight to the Configure screen with the saved values.</li>
+<li><strong>Update</strong> - pull newer container images for an existing install
+without redoing everything.</li>
+<li><strong>Migrate</strong> - bring an existing Sonarr/Radarr library across from
+another instance.</li>
+<li><strong>Export</strong> - save the profile to an encrypted <code>.mediarr-profile.json</code>
+file (passphrase-protected).</li>
+</ul>
+<p>Profiles are encrypted at rest with Electron&#39;s built-in <code>safeStorage</code>.</p>
+<hr>
+<h3 id="connect-screen">Connect screen</h3>
+<pre><code class="hljs">┌─────────────────────────────────────────────────────────┐
+│  [🔌]  Connect to your NAS                              │
+│         On Synology: Control Panel → Terminal → SSH     │
+│                                                         │
+│   Host:      [ 192.168.1.242             ]  Port: [22]  │
+│   User:      [ heoki                                 ]  │
+│                                                         │
+│   Authentication                                        │
+│    [ 🔒 Password ]  [ 🔑 Private key ]                  │
+│                                                         │
+│   Password:  [ ●●●●●●●●●●●●●                  ] [ 👁 ]  │
+│                                                         │
+│   ┌── Back ──┐         ┌── 🛡 Test ──┐  ┌── Continue ──┐│
+│   └──────────┘         └──────────────┘  └─────────────┘│
+└─────────────────────────────────────────────────────────┘</code></pre>
+<p>Fill in:</p>
+<ul>
+<li><strong>Host</strong> - your NAS&#39;s LAN IP (e.g. <code>192.168.1.242</code>). If you don&#39;t know it:<ul>
+<li><strong>Windows:</strong> open Command Prompt → <code>arp -a</code> → look for a manufacturer
+like Synology.</li>
+<li><strong>Or check your router&#39;s admin page</strong> - it&#39;ll list connected devices
+by name.</li>
+</ul>
+</li>
+<li>The wizard accepts pasted DSM URLs (e.g. <code>http://192.168.1.242:5000</code>)
+and strips the scheme + port automatically. It&#39;ll also warn you if you
+type port 80/443/5000/5001. Those are DSM&#39;s web ports, not SSH (which
+is 22).</li>
+<li><strong>Port</strong> - leave as <code>22</code>.</li>
+<li><strong>User</strong> - your DSM admin username.</li>
+<li><strong>Authentication</strong> - click the <strong>Password</strong> or <strong>Private key</strong> pill.
+The wizard handles both. The little 👁 icon in the password field
+lets you peek at what you typed.</li>
+<li><strong>Sudo password</strong> <em>(only if you&#39;re not logging in as root)</em>, appears
+below in an amber-tinted box. Leave blank to reuse the SSH password.</li>
+</ul>
+<p>Click <strong>Test</strong> first. The wizard will verify the SSH credentials without
+opening a persistent session. You&#39;ll see a green ✓ &quot;Connection
+successful&quot; banner, after which the <strong>Continue</strong> button lights up green.
+Click Continue to open the SSH session and advance to Env Detect.</p>
+<p><strong>Common stumbles:</strong></p>
+<ul>
+<li><em>&quot;Authentication failed&quot;</em> → wrong username or password.</li>
+<li><em>&quot;Connection refused&quot;</em> → SSH isn&#39;t enabled, OR the firewall is blocking port<ol start="22">
+<li>Check Step 1.</li>
+</ol>
+</li>
+<li><em>&quot;No route to host&quot;</em> → wrong IP, or the PC and the NAS aren&#39;t on the same
+network.</li>
+</ul>
+<hr>
+<h3 id="env-detect-screen">Env Detect screen</h3>
+<pre><code class="hljs">┌─────────────────────────────────────────────────────────┐
+│  [📡 ↻]  Scanning your NAS…                             │
+│           Looking up Docker, your user IDs, timezone…   │
+│                                                         │
+│   Detected NAS  Synology DSM  7.2.2                     │
+│      Install dir: /volume1/docker/media                 │
+│      Data root:   /volume1/Data                         │
+│                                                         │
+│   Required                                              │
+│      ✓  Docker                v2                        │
+│      ✓  /volume1 exists       /volume1 (Synology)       │
+│      ✓  python3               /usr/bin/python3          │
+│      ✓  iptables              /sbin/iptables            │
+│                                                         │
+│   Capacity &amp; connectivity                               │
+│      ✓  Disk space            842 GiB free of 4096 GiB  │
+│      ✓  Image pulls           verified reachable        │
+│                                                         │
+│   Auto-filled                                           │
+│      ✓  Timezone              America/New_York          │
+│      ✓  LAN IP                192.168.1.242             │
+│         Detected interfaces (click to use):             │
+│         [ 192.168.1.242 ]  [ 100.64.0.42 (Tailscale) ]  │
+│                                                         │
+│   ┌── Back ──┐    ✓ All required checks passed          │
+│                                ┌── Continue → ──┐       │
+│                                └─────────────────┘      │
+└─────────────────────────────────────────────────────────┘</code></pre>
+<p>The Radar icon spins slowly while the scan is in flight, then settles
+once results land. Each check has a Lucide CheckCircle2 (green) or
+XCircle (red) icon so you can tell pass / fail in shape, not just color.
+This is useful if you&#39;re color-blind or have a dim screen.</p>
+<p><strong>You don&#39;t need to do anything here, just click Continue</strong> if every
+required check is green.</p>
+<p>If anything is red or amber, the screen explains exactly what to do
+(e.g. &quot;Create the Data shared folder in DSM → Control Panel → Shared
+Folder → Create&quot;). The wizard also detects:</p>
+<ul>
+<li><strong>Existing installs</strong> - a sky-blue &quot;An install already exists&quot; banner
+appears with a <strong>Switch to Update mode</strong> button if you&#39;ve installed
+here before.</li>
+<li><strong>Already-running services</strong> - if Plex / Sonarr / Radarr are already
+running, an amber &quot;Services already running — keep them?&quot; panel lets
+you tick which ones the wizard should leave alone.</li>
+<li><strong>Port conflicts</strong> - a red panel surfaces any port already bound by
+something else (with a specific fix for Synology Media Server squatting
+on port 49152).</li>
+<li><strong>DSM-7 platform quirks</strong> - missing tun module, unloaded iptables
+modules, install dir on a network filesystem. Each comes with the
+exact fix command.</li>
+</ul>
+<hr>
+<h3 id="configure-screen">Configure screen</h3>
+<p>This is the longest screen but the wizard pre-fills sensible defaults.
+You only need to touch a few sections. Every section header has a small
+tinted icon (Boxes, Award, Shield, HardDrive, UserCircle, KeyRound,
+Lock, Wrench) so you can find a section at a glance instead of reading
+each heading.</p>
+<p>A small <strong>Saving… → Saved ✓</strong> chip appears in the profile pill at the
+top whenever you change a field. Your edits persist automatically and
+you&#39;ll see proof of it.</p>
+<pre><code class="hljs">┌─────────────────────────────────────────────────────────┐
+│  [⚙]   Make it yours                                    │
+│         We pre-filled what we could from the scan.      │
+│                                                         │
+│   [📦] Services  (10 of 10 enabled — Prowlarr always on)│
+│     ☑ Plex stack    ☑ Sonarr     ☑ Radarr               │
+│     ☑ Lidarr        ☑ Bazarr     ☑ qBittorrent          │
+│     ☑ SABnzbd       ☑ Homepage   ☑ Recyclarr            │
+│     ☑ Unpackerr                                         │
+│                                                         │
+│   [🏆] TRaSH Guide profiles                             │
+│     Sonarr:  [ WEB-1080p     ▾ ]                        │
+│     Radarr:  [ HD Bluray+WEB ▾ ]                        │
+│                                                         │
+│   [🛡] VPN  ▾                                            │
+│                                                         │
+│   [💾] Install location                                  │
+│     Install dir   [/volume1/docker/media             ]  │
+│     Data root     [/volume1/Data                     ]  │
+│                                                         │
+│   [👤] Identity                                          │
+│     User    [ heoki    ▾ ]   Group   [ users   ▾ ]      │
+│                                                         │
+│   [🔑] Arr Web UI auth                                   │
+│     Username  [ admin                                 ] │
+│     Password  [ ●●●●●●●●●●●●●●●●           ] [ 👁 ]     │
+│                                                         │
+│   [🔒] qBittorrent WebUI                                 │
+│     User      [ admin                                 ] │
+│     Password  [ ●●●●●●●●●●●●●●●●           ] [ 👁 ]     │
+│                                                         │
+│   [🔧] Advanced  ▾                                       │
+│        — usenet provider, indexer keys, private tracker │
+│          logins, subtitle providers                     │
+│                                                         │
+│   ┌── ← Back ──┐               ┌── Continue → ──┐       │
+│   └────────────┘               └─────────────────┘      │
+└─────────────────────────────────────────────────────────┘</code></pre>
+<p><strong>What to fill in (in order of importance):</strong></p>
+<ol>
+<li><p><strong>Services + media server</strong> - uncheck anything you don&#39;t want. The
+<strong>Media server</strong> row has a <strong>Plex / Jellyfin</strong> picker, so choose <strong>Jellyfin</strong>
+if you&#39;d rather not use a Plex account (it&#39;s free, open-source, no signup).
+Uncheck the media server entirely if you only want the <em>arr</em> automation.
+If you only do usenet, uncheck qBittorrent. If unsure, leave them on. You
+can turn things off later.</p>
+</li>
+<li><p><strong>TRaSH Guide profiles</strong> - these set the quality bar for your downloads.
+Defaults are fine. If you have lots of storage and want 4K, pick UHD. For
+anime, pick Anime. (See <a href="https://recyclarr.dev">Recyclarr docs</a> for what
+each profile does.)</p>
+</li>
+<li><p><strong>Plex claim token</strong> <em>(Plex only, skip if you picked Jellyfin)</em> - this
+links your Plex container to your Plex account. <strong>It expires after 4
+minutes</strong>, so do this LAST before clicking Continue:</p>
+<ul>
+<li>Open <a href="https://plex.tv/claim">https://plex.tv/claim</a> in a new browser tab.</li>
+<li>Sign in if needed.</li>
+<li>Copy the <code>claim-XXXX...</code> code shown on the page.</li>
+<li>Paste it into the Plex claim token field in the wizard.</li>
+</ul>
+<p><strong>Jellyfin</strong> has no claim token. Install right away, then open
+<code>http://&lt;NAS&gt;:8096</code>, finish Jellyfin&#39;s first-run setup in your browser,
+then (optionally) paste a Jellyfin API key on the Run screen so the
+<em>arrs</em> refresh Jellyfin&#39;s library automatically on import.</p>
+</li>
+<li><p><strong>qBittorrent password</strong> - pick any password (at least 8 characters). You&#39;ll
+use this to log into qBittorrent&#39;s web UI later.</p>
+</li>
+<li><p><strong>VPN</strong> <em>(optional, skip if you don&#39;t have a VPN account)</em>:</p>
+<ul>
+<li>Click the VPN section to expand it.</li>
+<li>Pick your provider (NordVPN / Proton / Mullvad / AirVPN / Surfshark).</li>
+<li>Fill in the credentials per the prompts. The wizard tells you exactly
+where to find each value (e.g. &quot;from your provider&#39;s WireGuard config
+download&quot;).</li>
+</ul>
+</li>
+<li><p><strong>Indexers</strong> <em>(optional, skip on first install and add them later)</em>:</p>
+<ul>
+<li>Click to expand if you have private indexer accounts.</li>
+<li>For usenet: paste the API keys for the indexers you have accounts on.</li>
+<li>For trackers: fill in user/password (or cookie for IPTorrents).</li>
+</ul>
+</li>
+<li><p><strong>Identity</strong> - usually fine as it is. This is which Linux user inside the
+containers owns the files. The dropdown lists every user on your NAS.</p>
+</li>
+</ol>
+<p>Click <strong>Save &amp; Continue</strong>.</p>
+<hr>
+<h3 id="run-screen">Run screen</h3>
+<pre><code class="hljs">┌─────────────────────────────────────────────────────────┐
+│  Installing the stack                                   │
+│  [🚀] Applying firewall rules…                          │
+│  ████████████████░░░░░░░░░░░░░░░░░░░░  40% · step 4/12  │
+│                                                         │
+│   ✓  Step 1  Set file permissions                       │
+│   ✓  Step 2  Create data and config directories         │
+│   ✓  Step 3  Apply firewall rules                       │
+│   ↻  Step 4  Fetch NordVPN WireGuard key       ← here   │
+│      Step 5  Validate configuration                     │
+│      Step 6  Start the stack                            │
+│      Step 7  Configure all services                     │
+│      Step 8  Add Prowlarr indexers                      │
+│      Step 9  Enable Bazarr subtitle providers           │
+│      Step 10 Verify stack health                        │
+│      Step 11 Import any download backlog                │
+│      Step 12 Auto-confirm manual imports                │
+│                                                         │
+│   ┌── 📋 Copy log · 💾 Save log… ───────────────────┐    │
+│   │ [VPN] Fetching WireGuard key from NordVPN API… │    │
+│   │ [VPN] Got key in 1.4s                          │    │
+│   │ ...                                            │    │
+│   └────────────────────────────────────────────────┘    │
+│                                                         │
+│   ┌── ← Back ──┐  ┌── ↻ Retry ──┐  ┌── Continue → ──┐   │
+│   └────────────┘  └─────────────┘  └─────────────────┘  │
+└─────────────────────────────────────────────────────────┘</code></pre>
+<p>This screen runs the actual install. <strong>Just wait.</strong> First time takes
+15 to 25 minutes because Docker has to download about 3 GB of images.</p>
+<p>The animated headline at the top changes as each phase begins (uploading
+→ writing .env → running setup). The progress bar fills with a gentle
+shimmer animation on its leading edge, so you can see the install is alive
+even when the log is quiet. Steps tick over from gray → amber-spinning →
+green-check. If any step fails it goes red and a banner above the
+stepper appears with two buttons (<strong>N failed</strong> / <strong>N need action</strong>),
+each opening a tabbed details modal.</p>
+<p><strong>If the install pauses:</strong> the headline softens to &quot;Install paused&quot; and
+the Retry button promotes to primary green. Tap Retry to run the whole
+install again (your config is already saved), or Back to tweak a setting
+first. Hovering any finished step in the rail reveals a small
+<strong>re-run</strong> button so you can re-run just that step without redoing the
+whole install.</p>
+<p><strong>While you wait:</strong> open <a href="https://plex.tv/claim">https://plex.tv/claim</a> in another tab, generate
+a new claim token, and keep it handy, because Plex will need it. The wizard
+has a &quot;Refresh Plex claim&quot; panel that appears on pause, so you can
+paste a fresh token directly there if needed.</p>
+<hr>
+<h3 id="done-screen">Done screen</h3>
+<pre><code class="hljs">┌─────────────────────────────────────────────────────────┐
+│                                                         │
+│                        [ ✓ ]                            │
+│                                                         │
+│                    You did it!                          │
+│       Your media stack is live. Click any service       │
+│              below to open it.   🎉 (confetti)          │
+│                                                         │
+│              ┌── ↻ Re-check health ──┐                  │
+│                                                         │
+│   ┌──────────────────┐  ┌────────────────────┐          │
+│   │ ✓ Homepage [Start]│  │ ✓ Plex             │          │
+│   │   :3000   →       │  │   :32400/web      → │          │
+│   └──────────────────┘  └────────────────────┘          │
+│   ┌──────────────────┐  ┌────────────────────┐          │
+│   │ ✓ Sonarr   :49152│  │ ✓ Radarr   :49151  │          │
+│   └──────────────────┘  └────────────────────┘          │
+│   ... (Lidarr, Prowlarr, Bazarr, SABnzbd,               │
+│        qBit, Seerr, Tautulli, Flaresolverr)             │
+│                                                         │
+│   ▾ Validation log  (exit 0)        📋 Copy · 💾 Save  │
+│                                                         │
+│   exit 0       ✓ All 12 services reachable              │
+│                                  ┌── ↺ Start over ──┐   │
+└─────────────────────────────────────────────────────────┘</code></pre>
+<p>A big green checkmark draws itself in over ~1s, then a quick confetti
+burst celebrates the install. The headline says <strong>&quot;You did it!&quot;</strong> if
+all services came up cleanly, or <strong>&quot;Setup complete&quot;</strong> with a different
+status banner if some need attention.</p>
+<p>Each service tile shows:</p>
+<ul>
+<li><strong>CheckCircle2</strong> (green) - service responded on its port.</li>
+<li><strong>XCircle</strong> (red) - service didn&#39;t respond. Tile hover highlights the
+service in rose so you can spot it.</li>
+<li><strong>Circle</strong> (slate) - validation still running.</li>
+</ul>
+<p>Click any tile to open that service in your browser. The <strong>Homepage</strong>
+tile has a small &quot;Start&quot; badge. Bookmark that URL. It&#39;s your one-stop
+dashboard with tiles linking to everything else.</p>
+<hr>
+<h2 id="6-step-4-first-time-setup-for-each-service">6. Step 4: First-time setup for each service</h2>
+<p>Most services Just Work after the wizard. A few need one more click to come
+fully online. Open each URL in order:</p>
+<h3 id="plex">Plex</h3>
+<ul>
+<li>Open <code>http://&lt;nas-ip&gt;:32400/web</code>.</li>
+<li>If you used a fresh claim token: you&#39;re signed in, name the server, finish
+the wizard.</li>
+<li>If the claim token expired during install: Plex shows an unclaimed setup
+screen. Sign in with your Plex account, name the server, claim it.</li>
+<li><strong>Add libraries:</strong> Settings → Manage → Libraries → Add Library:<ul>
+<li>Movies → <code>/media/Movies</code></li>
+<li>TV Shows → <code>/media/TV Shows</code></li>
+<li>Music → <code>/media/Music</code></li>
+<li>(Add more for Anime if you use them.)</li>
+</ul>
+</li>
+</ul>
+<h3 id="seerr-request-portal">Seerr (request portal)</h3>
+<ul>
+<li>Open <code>http://&lt;nas-ip&gt;:5056</code>.</li>
+<li>The first time it loads it shows its own setup wizard.</li>
+<li><strong>Plex step:</strong> sign in with the Plex account that owns your server, pick
+your server when prompted (use the internal connection <code>plex:32400</code>).</li>
+<li><strong>Sonarr / Radarr step:</strong> the wizard wires these up automatically, so pick
+your default quality profile + root folder when prompted.</li>
+<li><strong>Done.</strong> Now share Seerr&#39;s URL with family/friends so they can request
+content.</li>
+</ul>
+<h3 id="homepage-dashboard">Homepage (dashboard)</h3>
+<ul>
+<li>Open <code>http://&lt;nas-ip&gt;:3000</code>.</li>
+<li>You&#39;ll see a row of tiles, one per service. Click any tile to open that
+service. The &quot;Maintenance&quot; section shows Recyclarr&#39;s current TRaSH profile.</li>
+</ul>
+<h3 id="tautulli-plex-analytics">Tautulli (Plex analytics)</h3>
+<ul>
+<li>Open <code>http://&lt;nas-ip&gt;:8181</code>.</li>
+<li>The wizard already wired it to Plex automatically. Open it and confirm
+it shows your server name in the top-left.</li>
+</ul>
+<h3 id="qbittorrent">qBittorrent</h3>
+<ul>
+<li>Open <code>http://&lt;nas-ip&gt;:49156</code>.</li>
+<li>Username: <code>admin</code>. Password: whatever you set in the Configure screen.</li>
+<li><strong>First-run kindness:</strong> Settings → BitTorrent → set a seeding ratio (e.g.
+2.0) so you don&#39;t seed forever.</li>
+</ul>
+<h3 id="sonarr-radarr-lidarr">Sonarr, Radarr, Lidarr</h3>
+<ul>
+<li>Open each one. They should ask for login if you set <code>ARR_USERNAME</code> /
+<code>ARR_PASSWORD</code> in the wizard. If not, they&#39;re open by default.</li>
+<li>The wizard has already configured: root folders, download clients, indexer
+connections, and (if you ticked Recyclarr) TRaSH-Guide quality profiles.</li>
+<li><strong>You don&#39;t need to do anything here yet</strong> - they&#39;re ready to receive
+series/movies/artists.</li>
+</ul>
+<h3 id="prowlarr">Prowlarr</h3>
+<ul>
+<li>Open <code>http://&lt;nas-ip&gt;:49150</code>.</li>
+<li>The wizard already added free public indexers (1337x, The Pirate Bay, YTS, EBookBay, etc.).</li>
+<li>If you have paid indexer accounts you didn&#39;t enter in the wizard, add them
+here: Indexers → Add Indexer.</li>
+</ul>
+<h3 id="bazarr">Bazarr</h3>
+<ul>
+<li>Open <code>http://&lt;nas-ip&gt;:49153</code>.</li>
+<li>The wizard wired Sonarr and Radarr and enabled free subtitle providers.</li>
+<li>If you want OpenSubtitles.com (best free provider), enter your account
+credentials under Settings → Providers.</li>
+</ul>
+<hr>
+<h2 id="7-step-5-add-your-first-movie-or-tv-show">7. Step 5: Add your first movie or TV show</h2>
+<p>Two ways: the friendly way (Seerr) or the power-user way (direct in Sonarr/Radarr).</p>
+<h3 id="the-friendly-way-seerr">The friendly way: Seerr</h3>
+<ol>
+<li>Open <code>http://&lt;nas-ip&gt;:5056</code>.</li>
+<li>Search for a movie or show in the top search bar.</li>
+<li>Click <strong>Request</strong>.</li>
+<li>Seerr forwards it to Sonarr (TV) or Radarr (movies).</li>
+<li>Sonarr/Radarr searches indexers, sends to qBittorrent or SABnzbd, waits
+for the download, hardlinks the file to <code>/data/Media/...</code>, and Plex picks
+it up.</li>
+</ol>
+<p><strong>End-to-end: typically 5 to 30 minutes for popular content.</strong> For something
+obscure it can take hours (or never appear) depending on indexer coverage.</p>
+<h3 id="the-power-user-way-sonarr--radarr-directly">The power-user way: Sonarr / Radarr directly</h3>
+<ul>
+<li>Sonarr → Series → Add New → search for the show → pick quality profile →
+pick root folder (<code>/data/Media/TV Shows</code>) → Add + Search.</li>
+<li>Same flow in Radarr for movies.</li>
+</ul>
+<hr>
+<h2 id="8-where-things-live-a-quick-map">8. Where things live (a quick map)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>What</th>
+<th>Where on the NAS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Config files for every service</td>
+<td><code>/volume1/docker/media/&lt;service&gt;/config/</code></td>
+</tr>
+<tr>
+<td>Your media library</td>
+<td><code>/volume1/Data/Media/</code></td>
+</tr>
+<tr>
+<td>Downloads (in progress)</td>
+<td><code>/volume1/Data/Downloads/Torrents/InProgress/</code> or <code>/volume1/Data/Downloads/Usenet/incomplete/</code></td>
+</tr>
+<tr>
+<td>Downloads (finished)</td>
+<td><code>/volume1/Data/Downloads/Torrents/Completed/</code> or <code>/volume1/Data/Downloads/Usenet/complete/</code></td>
+</tr>
+<tr>
+<td>Plex data</td>
+<td><code>/volume1/docker/media/plex/config/</code></td>
+</tr>
+<tr>
+<td>The wizard&#39;s compose file</td>
+<td><code>/volume1/docker/media/scripts/docker-compose.yml</code></td>
+</tr>
+<tr>
+<td>The wizard&#39;s <code>.env</code></td>
+<td><code>/volume1/docker/media/scripts/.env</code> (don&#39;t share this, it has your passwords)</td>
+</tr>
+<tr>
+<td>Helper scripts (re-run sync, etc.)</td>
+<td><code>/volume1/docker/media/scripts/recyclarr-sync.sh</code>, <code>scripts/restart-qbit.sh</code>, etc. (v0.3.22+ tucks all <code>.sh</code> / <code>.py</code> helpers under <code>scripts/</code> so the install dir stays tidy).</td>
+</tr>
+</tbody></table></div>
+<p>To inspect any of these from your PC: connect to your NAS in File Explorer
+via <code>\\&lt;nas-ip&gt;</code> and browse to the share. (Most paths are visible through the
+&quot;docker&quot; or &quot;Data&quot; shares.)</p>
+<hr>
+<h2 id="9-help-something-went-wrong">9. Help: something went wrong</h2>
+<h3 id="first-stop-the-in-app-help-button">First stop: the in-app Help button</h3>
+<p>Click <strong>Help</strong> in the installer&#39;s footer (works on any screen). A modal
+opens with a HelpCircle hero icon and a searchable list of 30+
+troubleshooting entries. Each one has a symptom, the underlying cause,
+the fix, and copy-pasteable commands. The wizard auto-substitutes your
+actual install path into every command, so you can copy-paste straight
+to SSH without editing.</p>
+<p>Tips:</p>
+<ul>
+<li>Search by <strong>symptom</strong> (&quot;HTTP 000&quot;), <strong>service name</strong> (&quot;qBittorrent&quot;,
+&quot;tautulli&quot;), or <strong>exact error text</strong> (&quot;must join at least one network&quot;).</li>
+<li>Each command snippet has a 📋 → ✓ icon swap so you can confirm the copy
+landed before pasting.</li>
+<li>ESC closes the modal.</li>
+</ul>
+<h3 id="the-most-common-stumbles">The most common stumbles</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Most likely cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&quot;Authentication failed&quot; on Connect screen</td>
+<td>Wrong DSM password</td>
+<td>Try logging into DSM with that exact password to confirm</td>
+</tr>
+<tr>
+<td>Install timed out at step 4</td>
+<td>iptables not installed (DSM 7 quirk)</td>
+<td>DSM Package Center → install &quot;iptables&quot; → re-run install</td>
+</tr>
+<tr>
+<td>qBittorrent shows &quot;container must join at least one network&quot; after a reboot</td>
+<td>Gluetun (the VPN) wasn&#39;t running yet</td>
+<td><code>bash /volume1/docker/media/scripts/restart-qbit.sh</code></td>
+</tr>
+<tr>
+<td>Plex shows a hash code instead of your server name</td>
+<td>Claim token expired before Plex started</td>
+<td>Open <code>http://&lt;nas-ip&gt;:32400/web</code>, sign in, claim it manually</td>
+</tr>
+<tr>
+<td>Seerr shows &quot;Port 5056 connection refused&quot;</td>
+<td>First-run wizard not yet completed</td>
+<td>Open Seerr in a browser and finish its setup wizard</td>
+</tr>
+<tr>
+<td>A movie/show I requested never downloads</td>
+<td>Indexer coverage gap, or it&#39;s not available on free indexers</td>
+<td>Add a paid indexer in Prowlarr</td>
+</tr>
+<tr>
+<td><code>post-deploy-validate.sh</code> reports &quot;Hardlink probe FAILED&quot;</td>
+<td>Downloads and Media are in separate Synology shared folders</td>
+<td>Move both under a single shared folder (e.g. <code>/volume1/Data/{Downloads,Media}</code>) and update <code>DATA_ROOT</code> in <code>.env</code> to point at the parent</td>
+</tr>
+<tr>
+<td>qBittorrent shows &quot;Firewalled&quot; / port forwarding doesn&#39;t work</td>
+<td>Using NordVPN, where gluetun doesn&#39;t support PF</td>
+<td>Either accept reduced seed ratio, or switch <code>VPN_PROVIDER</code> to <code>protonvpn</code> / <code>pia</code> / <code>privatevpn</code></td>
+</tr>
+<tr>
+<td>&quot;Another setup.sh is already running&quot; but no install is in flight</td>
+<td>Stale <code>.setup.lock</code> from a crashed previous run</td>
+<td><code>rm /volume1/docker/media/.setup.lock</code> and retry</td>
+</tr>
+<tr>
+<td>Plex doesn&#39;t show new files within a minute of import</td>
+<td>Plex Connect notification missing</td>
+<td>The wizard configures this automatically. If it&#39;s missing, add it manually in Sonarr/Radarr → Settings → Connect → Plex Media Server (host=plex, port=32400)</td>
+</tr>
+</tbody></table></div>
+<h3 id="diagnostic-commands">Diagnostic commands</h3>
+<p>If you want to inspect what&#39;s running:</p>
+<pre><code class="language-bash hljs"><span class="hljs-comment"># Open an SSH session to your NAS, then:</span>
+<span class="hljs-built_in">cd</span> /volume1/docker/media/scripts
+
+<span class="hljs-comment"># What containers are running?</span>
+docker compose ps
+
+<span class="hljs-comment"># Recent logs for one service</span>
+docker compose logs --<span class="hljs-built_in">tail</span>=80 sonarr
+
+<span class="hljs-comment"># Live logs</span>
+docker compose logs -f plex
+
+<span class="hljs-comment"># Re-run the post-deploy validator (the wizard&#x27;s final check)</span>
+<span class="hljs-built_in">sudo</span> bash /volume1/docker/media/scripts/post-deploy-validate.sh</code></pre>
+<h3 id="re-running-the-wizard">Re-running the wizard</h3>
+<p>Safe to do any time, because the wizard&#39;s idempotent. It detects what&#39;s already
+configured and skips it, only changing what you&#39;ve changed.</p>
+<p>Just double-click <code>Mediarr Installer.exe</code> again → <strong>Resume last setup</strong> → step
+through. Changes to .env / profile picks / VPN credentials all get re-applied.</p>
+<h3 id="if-youre-really-stuck">If you&#39;re really stuck</h3>
+<p>Open an issue on this repo with:</p>
+<ol>
+<li>The install log from the wizard (Run screen → &quot;Copy log&quot; button).</li>
+<li>Output of <code>docker compose ps</code>.</li>
+<li>Output of <code>sudo bash /volume1/docker/media/scripts/post-deploy-validate.sh</code>.</li>
+</ol>
+<hr>
+<h2 id="youre-done">You&#39;re done</h2>
+<p>You now have a personal media stack that&#39;s better than most paid streaming
+services. New content shows up automatically. Family can request via Seerr.
+Everything streams to phones, smart TVs, and browsers via Plex.</p>
+<p><strong>Things to do next:</strong></p>
+<ul>
+<li><strong>Change quality profiles whenever you want</strong> - open the Recyclarr tile
+on Homepage, pick a different Sonarr / Radarr profile from the dropdown,
+click &quot;Save profile &amp; sync&quot;. The page rewrites <code>.env</code> + <code>recyclarr.yml</code>
+and runs the sync in one click, with no need to edit files or re-run the
+installer.</li>
+<li><strong>Update the stack periodically</strong> - re-launch <strong>Mediarr Installer.exe</strong>,
+pick your profile, click <strong>Update</strong>, then <strong>Pull + recreate</strong>. The
+wizard handles <code>docker compose pull &amp;&amp; up -d</code> over SSH for you.</li>
+<li><strong>Schedule weekly TRaSH-Guide updates</strong> - DSM → Task Scheduler → run
+<code>bash /volume1/docker/media/scripts/recyclarr-sync.sh</code> weekly. (Or
+just click the Recyclarr tile when you remember.)</li>
+<li><strong>Browse <a href="https://trash-guides.info">TRaSH Guides</a></strong> to fine-tune quality
+profiles.</li>
+<li><strong>Browse <a href="https://reddit.com/r/selfhosted">r/selfhosted</a> and
+<a href="https://reddit.com/r/synology">r/synology</a></strong> for ideas.</li>
+</ul>
+<p>Welcome to self-hosted media.</p>
+
+<div class="doc-pager"><span></span><span class="pager-spacer"></span><a class="pager-next" href="../tutorial/">Build It Yourself</a></div></main>
+</div>
+
+<footer id="site-footer">
+  <span class="footer-note">Mediarr Installer</span>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer">Source</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/releases/latest">Releases</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/defessler/Mediarr-Installer/issues">Issues</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({"startOnLoad":false,"securityLevel":"strict","theme":"base","themeVariables":{"darkMode":true,"background":"#141414","fontFamily":"'JetBrains Mono', 'Fira Code', monospace","fontSize":"15px","primaryColor":"#39392f","primaryTextColor":"#FFFFFF","primaryBorderColor":"#66D9EF","secondaryColor":"#2d2d2d","secondaryTextColor":"#FFFFFF","secondaryBorderColor":"#66D9EF","tertiaryColor":"#2d2d2d","tertiaryTextColor":"#FFFFFF","tertiaryBorderColor":"#66D9EF","lineColor":"#BFBBAA","textColor":"#FFFFFF","mainBkg":"#39392f","nodeBorder":"#66D9EF","nodeTextColor":"#FFFFFF","clusterBkg":"rgba(166, 226, 46, 0.10)","clusterBorder":"#A6E22E","titleColor":"#A6E22E","edgeLabelBackground":"#141414","actorBkg":"#2d2d2d","actorBorder":"#66D9EF","actorTextColor":"#F8F8F2","actorLineColor":"#75715E","signalColor":"#F8F8F2","signalTextColor":"#F8F8F2","labelBoxBkgColor":"#2d2d2d","labelBoxBorderColor":"#49483E","labelTextColor":"#F8F8F2","loopTextColor":"#E6DB74","noteBkgColor":"#141414","noteBorderColor":"#E6DB74","noteTextColor":"#E6DB74","activationBkgColor":"#49483E","activationBorderColor":"#75715E"},"flowchart":{"curve":"basis","useMaxWidth":true,"htmlLabels":false,"padding":16,"nodeSpacing":50,"rankSpacing":65,"subGraphTitleMargin":{"top":6,"bottom":18}},"sequence":{"useMaxWidth":true,"showSequenceNumbers":true,"mirrorActors":false}});
+  await mermaid.run({ querySelector: '.mermaid' });
+</script>
+</body>
+</html>
