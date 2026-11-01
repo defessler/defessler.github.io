@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>smartplan — M365: Atlassian On-Prem Verdict</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: dark;
+  --void: #0a0e14;
+  --void-2: #101827;
+  --cell: #0d1420;
+  --cell-head: #131c2b;
+  --panel: rgba(23,34,51,.55);
+  --mint: #35e0c8;
+  --peri: #7c8cff;
+  --rose: #ff5f9e;
+  --amber: #ffb35c;
+  --ink: #e6edf3;
+  --ink-2: #b7c3cd;
+  --ink-dim: #8b98a5;
+  --line: rgba(120,160,200,.16);
+  --glow-mint: 0 0 22px rgba(53,224,200,.4);
+  --ease: cubic-bezier(.2,.7,.2,1);
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background-color: var(--void);
+  background-image:
+    radial-gradient(ellipse 900px 700px at -10% -15%, rgba(53,224,200,.10), transparent 60%),
+    radial-gradient(ellipse 1000px 800px at 115% 5%, rgba(124,140,255,.09), transparent 60%),
+    radial-gradient(ellipse 800px 700px at 105% 115%, rgba(53,224,200,.08), transparent 60%);
+  background-repeat: no-repeat;
+  background-attachment: fixed, fixed, fixed;
+  color: var(--ink);
+  font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.65;
+}
+::selection { background: var(--mint); color: var(--void); }
+a:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+nav.site-nav {
+  max-width: 84rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+.nav-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1.4rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+/* Smooth the horizontal scroll while a pointer rests on a nav row. :has() is
+   widely supported. A browser without it just scrolls instantly. */
+@supports selector(:has(*)) {
+  nav.site-nav:has(.nav-row) .nav-row:hover { scroll-behavior: smooth; }
+}
+.nav-row > * { scroll-snap-align: start; }
+.nav-row::-webkit-scrollbar { display: none; }
+/* Below the widest phone, trim the nav's horizontal padding and tighten the
+   gaps so more than three destinations are reachable without scrolling at
+   all. */
+@media (max-width: 40rem) {
+  nav.site-nav { padding: 0 0.75rem; }
+  .nav-row { gap: 1rem; }
+  .nav-groups { padding: 0.6rem 0 0.4rem; }
+}
+.nav-groups { padding: 0.8rem 0 0.55rem; }
+.subnav {
+  padding: 0.45rem 0 0.6rem;
+  border-top: 1px solid var(--line);
+  gap: 1.15rem;
+}
+.brand {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  background: linear-gradient(90deg, var(--mint), var(--peri));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-right: 0.4rem;
+}
+.stamp {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  opacity: 0.55;
+  white-space: nowrap;
+  align-self: center;
+  /* Anchored right: the group links sit left of it, this takes the slack. */
+  margin-left: auto;
+  padding-left: 1.5rem;
+}
+@media (max-width: 40rem) {
+  /* On a phone the nav row already scrolls, so a right-anchored stamp would
+     sit off-screen past the last link. Let it flow after them instead. */
+  .stamp { margin-left: 0; padding-left: 0.75rem; font-size: 0.66rem; }
+}
+.nav-groups a {
+  font-family: "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  color: var(--ink-2);
+  text-decoration: none;
+  padding-bottom: 0.3rem;
+  transition: color 0.2s var(--ease), text-shadow 0.2s var(--ease);
+}
+.nav-groups a:hover { color: var(--mint); text-shadow: var(--glow-mint); }
+/* The one call-to-action in the chrome. Reads as a button rather than a nav
+   link, because it does something different from every other link up there. */
+.nav-groups a.dl-btn {
+  color: var(--void);
+  background: var(--mint);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  margin-left: 1rem;
+  align-self: center;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: filter 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.nav-groups a.dl-btn:hover {
+  color: var(--void);
+  text-shadow: none;
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+@media (max-width: 720px) {
+  .nav-groups a.dl-btn { padding: 0.25rem 0.7rem; margin-left: 0.6rem; }
+}
+/* Build facts under a download link. Deliberately quiet: they answer a
+   question you only ask after the link has already caught your eye. */
+.dl-meta {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.82em;
+  line-height: 1.45;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* A filename is one token to a reader. Breaking it across lines reads as a
+   rendering fault, so the cell holding a build stamp keeps its code spans
+   whole. Scoped by :has() to that cell alone — every other table on the site
+   still wraps long code spans, which is what keeps them narrow. */
+td:has(.dl-meta) code { white-space: nowrap; }
+.nav-groups a.current {
+  color: var(--ink);
+  background-image: linear-gradient(90deg, var(--mint), var(--peri));
+  background-size: 100% 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+}
+.subnav a {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.03em;
+  color: var(--ink-dim);
+  text-decoration: none;
+  transition: color 0.2s var(--ease);
+}
+.page-toc {
+  margin: 1.5rem 0 2rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--mint);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--panel) 60%, transparent);
+}
+.page-toc > summary {
+  cursor: pointer;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.page-toc > ul {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  columns: 2;
+  column-gap: 2rem;
+}
+.page-toc li {
+  margin: 0 0 0.35rem;
+  break-inside: avoid;
+  font-size: 0.92rem;
+}
+@media (max-width: 40rem) {
+  .page-toc > ul { columns: 1; }
+}
+.subnav a:hover { color: var(--mint); }
+.subnav a.current { color: var(--mint); }
+.subnav a.current::before { content: "▸ "; }
+main {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 4rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+/* Text uses the page. `main` caps at 80rem and centres, which is the whole
+   measure. Nothing narrows its children further. An earlier 46rem prose cap
+   wrapped text well before the page needed to and left a wide empty gutter
+   beside every paragraph. It was removed on purpose. Don't add it back. */
+a {
+  color: var(--mint);
+  text-decoration: none;
+  transition: color 0.2s var(--ease), text-shadow 0.2s var(--ease);
+}
+a:hover { text-decoration: underline; text-shadow: var(--glow-mint); }
+strong { color: var(--ink); font-weight: 600; }
+h1, h2, h3 { font-family: "Space Grotesk", sans-serif; line-height: 1.25; }
+h4, h5, h6 { font-family: "Space Grotesk", sans-serif; color: var(--ink-2); line-height: 1.25; }
+h1 {
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--mint), var(--peri));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+h2 {
+  font-weight: 600;
+  color: var(--ink);
+  margin-top: 3rem;
+  padding-bottom: 0.85rem;
+}
+h2::after {
+  content: "";
+  display: block;
+  width: 2.5rem;
+  height: 3px;
+  margin-top: 0.6rem;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--mint), var(--peri), var(--rose));
+}
+h3 {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 1rem;
+  color: var(--ink-2);
+  margin-top: 2rem;
+}
+.hero { margin-bottom: 3rem; }
+.thesis {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.5vw, 1.8rem);
+  line-height: 1.35;
+  margin: 0 0 1.75rem;
+  color: var(--ink);
+}
+.thesis em {
+  font-style: normal;
+  background: linear-gradient(90deg, var(--mint), var(--peri));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.board { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+.board td a { color: var(--ink); font-weight: 600; }
+.board td a:hover { color: var(--mint); }
+.chip {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 0.1em 0.55em;
+  border: 1px solid rgba(53,224,200,.35);
+  border-radius: 999px;
+  color: var(--mint);
+  white-space: nowrap;
+}
+.table-wrap {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9rem;
+}
+th {
+  background: var(--cell-head);
+  font-family: "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  text-align: left;
+  padding: 0.65rem 0.85rem;
+  vertical-align: bottom;
+}
+td {
+  padding: 0.7rem 0.85rem;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  color: var(--ink-2);
+  background: var(--void);
+  /* Top-align, because a one-word cell centred beside a paragraph is the
+     single worst thing about a dense comparison table. */
+  vertical-align: top;
+  line-height: 1.5;
+}
+/* Zebra striping. Subtle enough not to fight the palette, strong enough to
+   let the eye track a row across seven columns. */
+tbody tr:nth-child(even) td { background: #0c121c; }
+td:first-child, th:first-child {
+  color: var(--ink);
+  position: sticky;
+  left: 0;
+  background: var(--cell);
+  /* The frozen column needs an edge or it reads as part of the scroll. */
+  box-shadow: 1px 0 0 var(--line);
+}
+tbody tr:nth-child(even) td:first-child { background: #0f1622; }
+th:first-child { background: var(--cell-head); z-index: 3; }
+tbody tr:hover td { background: #12222a; }
+tbody tr:hover td:first-child { background: #16262f; }
+
+/* Dense tables: cap the height so the header can stick, and give columns a
+   floor so prose does not shred into one word per line. */
+.table-tall {
+  max-height: 78vh;
+  overflow: auto;
+}
+.table-tall thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+/* The corner cell has to stick on BOTH axes and outrank both. Without this
+   the header scrolls left while the body's frozen column stays put, so the
+   wrong heading ends up sitting over the row labels. */
+.table-tall thead th:first-child {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 4;
+}
+.table-wide table { font-size: 0.85rem; }
+.table-wide td, .table-wide th { min-width: 12rem; }
+.table-wide td:first-child, .table-wide th:first-child {
+  min-width: 9rem;
+  max-width: 14rem;
+}
+/* Price-ish second column reads as data, not prose. */
+.table-wide td:nth-child(2) { min-width: 6rem; white-space: nowrap; }
+
+@media (max-width: 720px) {
+  .table-tall { max-height: 70vh; }
+  .table-wide td, .table-wide th { min-width: 9rem; }
+}
+
+/* Capability strip. Added 2026-08-22, replacing five prose columns with one.
+   The grid is a FIXED five across rather than auto-fit, because the whole
+   point is that "Code reviews" sits under "Code reviews" on the row above:
+   a reader scans one task down the table instead of reading 21 sentences.
+   Auto-fit reflows per cell and loses that. */
+.caps {
+  display: grid;
+  /* 6rem is the measured width of the longest label, "Code reviews", at the
+     font size below plus its glyph. Under that the labels collide, which is
+     what a first pass at 5.4rem did. */
+  grid-template-columns: repeat(5, minmax(6rem, 1fr));
+  gap: 0.25rem 0.4rem;
+  min-width: 31rem;
+}
+.caps span {
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+/* A band leader (★) is the one chip that should out-rank a plain check, so
+   it gets both the strongest weight and the accent color. */
+.caps .s { font-weight: 600; color: var(--mint); }
+.caps .y { color: var(--ink); }
+.caps .m { color: var(--ink-2); }
+.caps .w { color: var(--ink-2); }
+/* A "wrong tool" verdict is the one a reader should skim past, so it recedes
+   rather than shouting. It is still legible, just not competing. Unknown
+   (no Artificial Analysis row) dims the same way, for the same reason. */
+.caps .n { opacity: 0.45; }
+.caps .u { opacity: 0.45; }
+
+/* Value and board score, one column. Added 2026-08-23, replacing two adjacent
+   numeric columns. They were always read together -- a ratio on its own sells
+   the cheapest model in the room -- so stacking them puts the check directly
+   under the claim instead of one saccade to the right.
+   Tooltips are native `title` on purpose. .table-wrap scrolls on x, which
+   makes overflow-y compute to auto as well, so a positioned CSS bubble would
+   be clipped by the very row it belongs to. */
+.dual { display: block; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.dual .dv, .dual .ds {
+  display: block;
+  cursor: help;
+  /* Underlines the glyphs, not the block. A border-bottom here would draw a
+     rule the full width of the cell. */
+  text-decoration: underline dotted rgba(120,160,200,.4);
+  text-underline-offset: 3px;
+}
+.dual .dv { font-weight: 600; font-size: 1rem; color: var(--ink); }
+.dual .ds { font-size: 0.8rem; color: var(--ink-dim); }
+.dual.lead .dv { color: var(--mint); }
+th span[title] { cursor: help; }
+
+/* Click-to-sort. The affordance has to be visible without hover, since a
+   header that only reveals itself on hover is invisible on touch. */
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  padding-right: 1.6rem;
+  position: relative;
+}
+th.sortable:hover, th.sortable:focus-visible { color: var(--ink); }
+th.sortable::after {
+  content: "↕";
+  position: absolute;
+  right: 0.6rem;
+  opacity: 0.3;
+  font-size: 0.9em;
+}
+/* The active column is announced, not just arrowed: this table ships
+   sorted by value and a reader needs to see that without clicking. */
+th.sortable[aria-sort="descending"], th.sortable[aria-sort="ascending"] {
+  color: var(--mint);
+}
+th.sortable[aria-sort="descending"]::after { content: "↓"; opacity: 1; }
+th.sortable[aria-sort="ascending"]::after { content: "↑"; opacity: 1; }
+th.sortable:focus-visible { outline: 2px solid var(--mint); outline-offset: -2px; }
+/* A dual header swaps its text for the live key name, which is longer than
+   the name it replaces. Wrapping it would read as two headers. */
+th.sortable-dual { white-space: nowrap; }
+
+/* A table carrying capability strips sets its own widths. .table-wide's
+   12rem floor per column is right for five columns of prose and wrong here,
+   where one column is a fixed grid and three are short data. Declared after
+   .table-wide so it wins on source order at equal specificity. */
+.table-caps table { font-size: 0.85rem; }
+.table-caps td, .table-caps th { min-width: 0; }
+.table-caps td:first-child, .table-caps th:first-child {
+  min-width: 8.5rem;
+  max-width: 11rem;
+}
+.table-caps td:nth-child(2), .table-caps td:nth-child(3) { white-space: nowrap; }
+.table-caps td:last-child, .table-caps th:last-child { min-width: 14rem; }
+
+@media (max-width: 720px) {
+  .caps { grid-template-columns: repeat(2, minmax(6.5rem, 1fr)); min-width: 14rem; }
+}
+code, pre {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas,
+    "Liberation Mono", Menlo, monospace;
+}
+code {
+  background: var(--void-2);
+  color: var(--mint);
+  border: 1px solid var(--line);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+pre {
+  background: var(--void-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--mint);
+  color: var(--ink);
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+pre code {
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 0;
+}
+blockquote {
+  margin: 1.25rem 0;
+  padding: 0.75rem 1.25rem;
+  background: var(--panel);
+  border-left: 3px solid var(--peri);
+  border-radius: 0 6px 6px 0;
+  color: var(--ink-2);
+}
+hr {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 2rem 0;
+}
+footer {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+  color: var(--ink-dim);
+  font-size: 0.85rem;
+  text-align: center;
+  border-top: 1px solid var(--line);
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<header>
+<nav class="site-nav">
+<div class="nav-row nav-groups">
+<span class="brand">smartplan</span>
+<a href="index.html">Start</a>
+<a href="copilot-model-guide.html">Guides</a>
+<a href="benchmarks.html">Evidence</a>
+<a href="whats-new.html">Project</a>
+<a class="current" href="m365-setup.html">M365 Agents</a>
+<a href="https://github.com/defessler/smartplan">GitHub</a>
+<span class="stamp">v4.151.0 &middot; data 2026-10-20 &middot; built 2026-11-01 3:20 AM PST / 6:20 AM EST</span>
+<a class="dl-btn" href="downloads.html">Download</a>
+
+</div>
+<div class="nav-row subnav">
+<a href="m365-setup.html">Install Guide</a>
+<a href="m365-ue5-engineer.html">UE5 Engineer</a>
+<a href="m365-doc-writer.html">Doc Writer</a>
+<a href="m365-build-crash-doctor.html">Build & Crash Doctor</a>
+<a class="current" href="m365-atlassian-verdict.html">Atlassian On-Prem Verdict</a>
+<a href="m365-self-improvement.html">Can Agents Learn?</a>
+<a href="m365-sync.html">Keeping Them In Sync</a>
+</div>
+</nav>
+</header>
+<main>
+<h1 id="jira-and-confluence-in-the-copilot-era-what-actually-works-behind-your-firewall">Jira and Confluence in the Copilot era: what actually works behind your firewall</h1>
+<details class="page-toc" open>
+<summary>On this page</summary>
+<ul>
+<li><a href="#0-settle-this-before-you-read-the-table">0. Settle this before you read the table</a></li>
+<li><a href="#1-what-just-died">1. What just died</a></li>
+<li><a href="#2-per-job-verdict">2. Per-job verdict</a></li>
+<li><a href="#3-the-recommended-build">3. The recommended build</a></li>
+<li><a href="#4-what-m365-copilot-is-genuinely-best-at-here">4. What M365 Copilot is genuinely best at here</a></li>
+<li><a href="#5-the-honest-ceiling">5. The honest ceiling</a></li>
+</ul>
+</details>
+<p><strong>Decided against:</strong> every Atlassian-published AI surface (all Cloud-only), and every write path from M365 Copilot (none documented).
+<strong>Recommended:</strong> a small local MCP server for Claude Code. M365 Copilot stays a Q&amp;A tool.
+<strong>Date:</strong> 2026-08-12, from vendor primary sources.</p>
+<hr />
+<h2 id="0-settle-this-before-you-read-the-table">0. Settle this before you read the table</h2>
+<p>Server vs Data Center changes two of the four answers. Check the <strong>license string</strong>, not the version number: Jira admin -&gt; Applications -&gt; Versions and licenses, or Confluence admin -&gt; General Configuration -&gt; License Details. Note the version too.</p>
+<ul>
+<li><strong>Server</strong>: support ended 2024-02-15. No connectors and no patches. The REST API still works.</li>
+<li><strong>Data Center</strong>: connectors are possible, above version floors higher than you'd guess.</li>
+</ul>
+<hr />
+<h2 id="1-what-just-died">1. What just died</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Why it's dead</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>"Jira Cloud for Microsoft Teams" / "Confluence Cloud for Microsoft Teams"</strong> (the two agents in your agent store)</td>
+<td>Both need an Atlassian Cloud site.</td>
+</tr>
+<tr>
+<td><strong>Atlassian Rovo MCP Server</strong> (<code>mcp.atlassian.com/v1/mcp/authv2</code>)</td>
+<td>Cloud-only, with no base-URL parameter for your host.</td>
+</tr>
+<tr>
+<td><strong>Rovo as a product, running on Data Center</strong></td>
+<td>Cloud-only. Its DC connectors pull content <em>into</em> Atlassian's Cloud.</td>
+</tr>
+<tr>
+<td><strong>Atlassian's Teamwork Graph DC connectors</strong></td>
+<td>Needs Jira 11.0+ (11.3+ for the current path) or Confluence 9.4+ (10.2+), plus a paid Atlassian Cloud org. It feeds Rovo, not M365 Copilot.</td>
+</tr>
+<tr>
+<td><strong>Copilot Studio agent → custom connector → on-premises data gateway, to write to Jira</strong></td>
+<td>Copilot Studio scopes custom connectors to "any publicly available API" and isn't on the gateway's supported-services lists. Unproven at primary source.</td>
+</tr>
+<tr>
+<td><strong>A declarative agent API plugin or MCP plugin pointed at your instance</strong></td>
+<td>Microsoft's cloud calls plugin endpoints directly, with no gateway. A firewalled host is unreachable.</td>
+</tr>
+<tr>
+<td><strong>Microsoft's "Confluence On-premises" connector, if you're on Server</strong></td>
+<td>The required Marketplace plugin has no Server build.</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="2-per-job-verdict">2. Per-job verdict</h2>
+<div class="table-wrap table-wide"><table>
+<thead>
+<tr>
+<th>Job</th>
+<th>Best tool</th>
+<th>M365 Copilot involved?</th>
+<th>Effort</th>
+<th>Who must approve</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Perforce CL descriptions</strong></td>
+<td>Claude Code reading the pending changelist through <code>p4</code>. Nothing leaves the workstation.</td>
+<td>No</td>
+<td>Already working</td>
+<td>Nobody</td>
+</tr>
+<tr>
+<td><strong>Confluence pages</strong> (stakeholder change summaries)</td>
+<td>Claude Code + a local MCP server doing <code>POST /rest/api/content</code> with your own Personal Access Token</td>
+<td>No</td>
+<td>Half a day to a day</td>
+<td>Nobody if PATs work (see Auth). Otherwise a Confluence admin</td>
+</tr>
+<tr>
+<td><strong>Jira issue creation</strong></td>
+<td>Same local server, <code>POST /rest/api/2/issue</code></td>
+<td>No</td>
+<td>Two hours after the Confluence path</td>
+<td>Same as above</td>
+</tr>
+<tr>
+<td><strong>Gamedev error triage</strong></td>
+<td>Claude Code for the depot, engine source, and build logs. M365 Copilot for "how does Unreal do X" and Perforce how-to.</td>
+<td>Partly, and it already works</td>
+<td>Zero</td>
+<td>Nobody</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="3-the-recommended-build">3. The recommended build</h2>
+<p><strong>Build a local MCP server for Claude Code that speaks Jira and Confluence Data Center REST.</strong> The hard part, turning a VCS diff into a stakeholder summary, already exists as a skill family. What's missing is a POST.</p>
+<h3 id="why-this-path-and-not-the-others">Why this path and not the others</h3>
+<p>It's the only option that can write. It needs no Atlassian Cloud org, M365 admin action, Windows VM, firewall change, Entra app, or production plugin. A process on an engineer's workstation is already inside the firewall, where <code>https://jira.internal/rest/api/2/issue</code> is just a URL.</p>
+<h3 id="what-to-build">What to build</h3>
+<p>Four tools:</p>
+<ul>
+<li><code>confluence_create_page</code> → <code>POST {base}/rest/api/content</code></li>
+<li><code>confluence_update_page</code> → <code>PUT {base}/rest/api/content/{id}</code></li>
+<li><code>jira_create_issue</code> → <code>POST {base}/rest/api/2/issue</code></li>
+<li><code>jira_search</code> → JQL, for "has this already been filed"</li>
+</ul>
+<h3 id="the-five-things-that-will-actually-cost-you-time">The five things that will actually cost you time</h3>
+<ol>
+<li><strong>Confluence storage format, not Markdown.</strong> The body is an XHTML subset. Code blocks need <code>&lt;ac:structured-macro ac:name="code"&gt;</code>. This conversion is most of the day.</li>
+<li><strong>Update is read-modify-write.</strong> A <code>PUT</code> must carry <code>version.number</code> incremented by exactly one. Fetch, bump, send.</li>
+<li><strong>Don't copy Cloud code.</strong> DC uses Jira <code>/rest/api/2</code> (plain text or wiki markup in <code>description</code>, <code>username</code>/<code>userKey</code> for users) and Confluence <code>/rest/api/content</code>. Cloud uses <code>/rest/api/3</code> (Atlassian Document Format, <code>accountId</code>) and <code>/wiki/api/v2/pages</code>. Most Stack Overflow answers from the last three years are Cloud-shaped.</li>
+<li><strong>Base URL includes the context path.</strong> Atlassian's own example is <code>http://localhost:8080/confluence/rest/api/content/</code>.</li>
+<li><strong>Internal CA.</strong> Set <code>NODE_EXTRA_CA_CERTS</code> or <code>REQUESTS_CA_BUNDLE</code> for the corporate root rather than disabling verification.</li>
+</ol>
+<h3 id="auth">Auth</h3>
+<p>Send a Personal Access Token as <code>Authorization: Bearer &lt;token&gt;</code>. Each engineer makes their own in their profile. It inherits their permissions and attributes writes to them.</p>
+<p>PATs need Jira Core/Software 8.14+, Jira Service Management 4.15+, or Confluence 7.9+. Below that you're on basic auth. A retry loop on a stale password trips Jira's CAPTCHA, which <strong>locks the REST API out entirely</strong> until someone solves it in a browser.</p>
+<p>Admins can disable PATs with <code>-Datlassian.pats.enabled</code>. Tokens expire (default 365 days, max 10 per user) and can't be reactivated. Plan rotation.</p>
+<h3 id="one-jira-gotcha">One Jira gotcha</h3>
+<p>Don't build field discovery on <code>createmeta</code>. Atlassian recommends disabling it on 8.4+ and removed it in Jira 9.0. Hardcode <code>project</code>, <code>summary</code>, <code>description</code>, and <code>issuetype</code> per template.</p>
+<h3 id="what-this-costs">What this costs</h3>
+<p>A day and one engineer, with no procurement or IT meetings.</p>
+<h3 id="the-build-that-is-genuinely-worth-considering-and-it-isnt-this-one">The build that is genuinely worth considering, and it isn't this one</h3>
+<p>If the goal becomes "<strong>let the whole studio ask Copilot Chat what's in the wiki</strong>," use Microsoft's GA Copilot connectors for <strong>Jira Data Center</strong> and <strong>Confluence On-premises</strong>. A Windows box inside your network crawls over the LAN and pushes outbound to Graph. Here's the price:</p>
+<div class="table-wrap table-tall"><table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Detail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Deployment</td>
+<td>Data Center only.</td>
+</tr>
+<tr>
+<td>Version</td>
+<td>Confluence 8.0+. Jira 8.14 through 11.3.10, with the <em>matching</em> plugin build (build 3.0.0 won't install below 11.3). Microsoft's own pages disagree (8.10.0 to 10.5.1, or 8.14+).</td>
+</tr>
+<tr>
+<td>Infrastructure</td>
+<td>Windows VM inside the network, 8 cores, 16 GB, 40 GB per 5M items</td>
+</tr>
+<tr>
+<td>Atlassian side</td>
+<td>Third-party Marketplace plugin on production. Confluence needs a <strong>Global Administrator</strong> service account, public User Email Visibility, and the Mobile Web Plugin.</td>
+</tr>
+<tr>
+<td>Entra side</td>
+<td>App registration with tenant-wide admin consent. Confluence DC needs <code>Directory.Read.All</code>.</td>
+</tr>
+<tr>
+<td>Network</td>
+<td>Outbound 443 allowlist. Proxy authentication isn't supported either way. An outbound proxy breaks the crawl unless bypassed.</td>
+</tr>
+<tr>
+<td>Capability</td>
+<td><strong>Read-only.</strong> No issue or page creation, ever.</td>
+</tr>
+<tr>
+<td>Support</td>
+<td>Microsoft's plugin EULA disclaims support and caps liability at USD 5.00.</td>
+</tr>
+<tr>
+<td>People</td>
+<td>Four: AI administrator, Azure App admin, Confluence admin, network admin</td>
+</tr>
+</tbody>
+</table></div>
+<p>Expect one to three days across four people who don't report to you, likely stalling at the production plugin install. Tell security that Microsoft's Confluence prerequisite asks you to allowlist Microsoft IP ranges "so the connector can access Confluence APIs," which contradicts the outbound-only story.</p>
+<p><strong>Recommendation:</strong> not now. Do the local build first, prove people read the summaries, and revisit when someone outside engineering asks.</p>
+<h3 id="and-explicitly-no-copilot-studio-build">And explicitly: no Copilot Studio build</h3>
+<p>The write path is unproven. Licensing is metered per action. It'd be a worse version of an HTTP POST you can already make from a laptop.</p>
+<hr />
+<h2 id="4-what-m365-copilot-is-genuinely-best-at-here">4. What M365 Copilot is genuinely best at here</h2>
+<p>Copilot is strong where the answer is <strong>public knowledge or lives in M365</strong>: Unreal API questions, Perforce syntax, what a build config flag does, C++ patterns. None of that needs a connector.</p>
+<p>Underused surfaces you already own:</p>
+<ul>
+<li><strong>Power BI</strong> is connected. Copilot can already answer questions over build health, crash rates, test pass rates, or burndown kept there.</li>
+<li><strong>M365 content</strong> (producer notes, milestone plans, publisher threads, meeting recaps, SharePoint design docs) holds most of the non-code decision record at a lot of studios.</li>
+<li><strong>Agent Builder over a SharePoint document library</strong> costs an afternoon, needs no approvals, and gives non-engineers a self-serve answer source.</li>
+<li><strong>Viva Engage and Viva Learning</strong> already cover announcements and onboarding.</li>
+</ul>
+<hr />
+<h2 id="5-the-honest-ceiling">5. The honest ceiling</h2>
+<ol>
+<li><strong>Nothing writes to self-hosted Jira or Confluence from M365 Copilot.</strong> Writes originate inside the network.</li>
+<li><strong>Read grounding needs at least one Windows VM and four approvals.</strong> Nothing lighter is coming.</li>
+<li><strong>Perforce is not a Copilot data source at any tier.</strong> Nor are Unreal source or build logs. What changed, why, and what broke stays on the Claude Code side.</li>
+<li><strong>Data Center itself runs until 2029-03-28</strong>, with extensions "by exception only." Your own release gets two years from its feature or LTS release and runs out first. After a Cloud migration the MCP server is a day's rewrite against Cloud's <code>/rest/api/3</code> and ADF. The connector build costs the whole project again.</li>
+<li><strong>Per-user PATs scale to a team but not to automation.</strong> A nightly job needs a service account, which means an admin conversation. Push that out as far as you can.</li>
+</ol>
+<hr />
+<p><strong>Do this week:</strong> check Server vs Data Center, build the four-tool MCP server, and ship one real change summary to see if designers read it.</p>
+<p><strong>Don't do this week:</strong> anything involving Copilot Studio, an Atlassian Cloud trial, or a gateway.</p>
+</main>
+<footer>
+<p>smartplan · MIT · generated from repo markdown</p>
+</footer>
+<script>
+/* Click-to-sort for every data table on the site. Added 2026-08-22 for the
+   quick-picks page, written generically because a comparison table nobody
+   can re-sort answers only the question its author happened to ask.
+   No dependencies, and the page is fully readable with JS off: this only
+   ever reorders rows that are already there. */
+(function () {
+  var NUM = /-?\d+(?:[.,]\d+)?/g;
+
+  /* Cell -> sort key. Three kinds, in order of specificity.
+     1. A capability strip sorts by how good the model is: four points a
+        band leader, three a check, two an "it depends", one a warning,
+        zero a cross or an unknown.
+     2. Anything that LEADS with a digit sorts numerically. A price reads
+        "0.20 / 1.20", and the number that matters there is the one AFTER the
+        slash, since output is what agentic work actually spends.
+     3. Everything else compares as text. "Sonnet 5" and "GPT-5.4" contain
+        digits and are not numbers; what separates them from a real number is
+        that a number leads. A letter-count rule was tried first and failed on
+        "GPT-5.4", whose three letters slipped under the bar and sorted the
+        Model column by version number.
+     An em dash means "not measured" and returns NaN, which counts as numeric
+     for column detection AND pins the row last in both directions. */
+  function key(cell, alt) {
+    /* A merged cell shows two numbers, and no parse can know which one the
+       reader means, so it carries both keys explicitly. `alt` picks the
+       second. An empty attribute is "not measured", same as an em dash. */
+    var dual = cell.querySelector(".dual");
+    if (dual) {
+      var raw = dual.getAttribute(alt ? "data-k2" : "data-k");
+      return raw ? parseFloat(raw) : NaN;
+    }
+    var caps = cell.querySelector(".caps");
+    if (caps) {
+      var score = 0;
+      caps.querySelectorAll("span").forEach(function (s) {
+        if (s.classList.contains("s")) score += 4;
+        else if (s.classList.contains("y")) score += 3;
+        else if (s.classList.contains("m")) score += 2;
+        else if (s.classList.contains("w")) score += 1;
+      });
+      return score;
+    }
+    var text = (cell.textContent || "").trim();
+    if (!text || /^[\u2014\u2013-]$/.test(text)) return NaN;
+    if (!/^[^0-9A-Za-z]*[0-9]/.test(text)) return text.toLowerCase();
+    var nums = text.match(NUM);
+    if (!nums || !nums.length) return text.toLowerCase();
+    if (nums.length > 1 && text.indexOf("/") !== -1) {
+      return parseFloat(nums[1].replace(",", "."));
+    }
+    return parseFloat(nums[0].replace(",", "."));
+  }
+
+  function missing(v) { return typeof v === "number" && isNaN(v); }
+
+  function sortable(table) {
+    var head = table.tHead && table.tHead.rows[0];
+    var body = table.tBodies[0];
+    if (!head || !body || head.cells.length < 3 || body.rows.length < 3) return;
+
+    var rows = Array.prototype.slice.call(body.rows);
+    rows.forEach(function (r, i) { r.dataset.i = i; });
+
+    /* A column is numeric when most of it parses as a number. Deciding per
+       column rather than per cell keeps one stray footnote marker from
+       flipping a whole column to text sorting. */
+    var numeric = [];
+    var dual = [];
+    for (var c = 0; c < head.cells.length; c++) {
+      var hits = 0;
+      for (var r = 0; r < rows.length; r++) {
+        if (rows[r].cells[c] && typeof key(rows[r].cells[c]) === "number") hits++;
+      }
+      numeric[c] = hits >= rows.length * 0.6;
+      dual[c] = rows.some(function (row) {
+        return row.cells[c] && !!row.cells[c].querySelector(".dual");
+      });
+    }
+
+    /* "The useful direction" is not the same for every number. High value and
+       high capability are good, so those open descending. A price is the one
+       column where low is the good news, so it opens ascending. Nothing
+       generic infers that, so the header text is asked directly. */
+    function opensDescending(col) {
+      var cheapFirst = /price|cost|\$/i.test(head.cells[col].textContent || "");
+      return !!numeric[col] && !cheapFirst;
+    }
+
+    /* Three clicks, three states. For an ordinary column those are the useful
+       direction, its reverse, and the shipped order. A dual-key column spends
+       the middle state on its SECOND key instead of on a reverse, because
+       "worst value first" is a direction nobody wants and "sort by score" is
+       a question people actually ask. Both of its states run descending. */
+    function ordered(col, state) {
+      var out = rows.slice();
+      if (state === 0) {
+        out.sort(function (a, b) { return a.dataset.i - b.dataset.i; });
+        return out;
+      }
+      var alt = dual[col] && state > 2;
+      /* A dual column runs key1 down, key1 up, key2 down, key2 up, so odd
+         states are descending. Everything else is the column's own useful
+         direction and then its reverse. */
+      var desc = dual[col]
+        ? (state % 2 === 1)
+        : ((state === 1) === opensDescending(col));
+      out.sort(function (a, b) {
+        var x = key(a.cells[col], alt), y = key(b.cells[col], alt);
+        var xm = missing(x), ym = missing(y);
+        if (xm && ym) return a.dataset.i - b.dataset.i;
+        /* Returned before the direction flip, so an unmeasured row sinks
+           whichever way the column is pointing. */
+        if (xm) return 1;
+        if (ym) return -1;
+        var d = (typeof x === "number" && typeof y === "number")
+          ? x - y
+          : String(x).localeCompare(String(y));
+        return desc ? -d : d;
+      });
+      return out;
+    }
+
+    function ids(list) {
+      return list.map(function (r) { return r.dataset.i; }).join(",");
+    }
+
+    /* A dual column sorts two ways on each of two keys, so its cycle is four
+       long where an ordinary column's is two. */
+    function lastState(col) { return dual[col] ? 4 : 2; }
+
+    function keyName(col, state) {
+      var cell = body.querySelector(
+        "tr td:nth-child(" + (col + 1) + ") .dual[data-n]");
+      return cell && cell.getAttribute(state > 2 ? "data-n2" : "data-n");
+    }
+
+    function paint(col, state) {
+      head.querySelectorAll("th").forEach(function (th, i) {
+        if (i !== col || state === 0) { th.setAttribute("aria-sort", "none"); }
+        /* Restore any header that was showing a sort-key name. */
+        if ((i !== col || state === 0) && th.dataset.name) {
+          (th.querySelector("[title]") || th).textContent = th.dataset.name;
+        }
+      });
+      if (state === 0) return;
+
+      var desc = dual[col]
+        ? (state % 2 === 1)
+        : ((state === 1) === opensDescending(col));
+      var th = head.cells[col];
+      th.setAttribute("aria-sort", desc ? "descending" : "ascending");
+
+      /* Say which key is live. Without it the third click on a dual-key
+         column looks like a bug: the rows move and the header does not.
+         The name REPLACES the header text rather than sitting under it in a
+         block of its own -- a block child pushes the arrow's static position
+         onto a second line, which put the indicator somewhere no other header
+         puts it. Staying on one line keeps this column's chrome identical to
+         every other. The names are read off the cells, so a second dual
+         column anywhere on the site labels itself. */
+      var name = dual[col] && keyName(col, state);
+      if (name) {
+        var slot = th.querySelector("[title]") || th;
+        if (!th.dataset.name) { th.dataset.name = slot.textContent; }
+        slot.textContent = "by " + name;
+      }
+    }
+
+    /* Which column is the table ALREADY sorted by? Answered below, before any
+       click can land. It decides the length of the click cycle, so it is a
+       closure variable rather than a local. */
+    var shippedCol = -1;
+
+    /* One shared state, not one per header. Clicking a different column
+       restarts at its first direction rather than resuming wherever that
+       column was left, which is what a per-header closure did.
+
+       State 0 is "the order it shipped in". Where a column reproduces that
+       order, 0 is a duplicate of that column's own sorted state AND the only
+       state that leaves the table with no header marked, so it is dropped and
+       the cycle runs 1, 2, 1. Clicking that column is how a reader gets the
+       original order back, and it stays marked while they look at it.
+       Where NO column reproduces the shipped order, 0 is kept: it is then the
+       only way back to an order the reader would otherwise lose for good. */
+    var active = { col: -1, state: 0 };
+
+    function activate(col) {
+      var state;
+      if (active.col !== col) state = 1;
+      else if (active.state < lastState(col)) state = active.state + 1;
+      else state = shippedCol >= 0 ? 1 : 0;
+      active = { col: col, state: state };
+      ordered(col, state).forEach(function (r) { body.appendChild(r); });
+      paint(col, state);
+    }
+
+    head.querySelectorAll("th").forEach(function (th, col) {
+      th.classList.add("sortable");
+      /* A swapped-in key name is longer than the header it replaces, and
+         "by SWE-V" breaking after "by" would read as two headers. */
+      if (dual[col]) { th.classList.add("sortable-dual"); }
+      th.tabIndex = 0;
+      th.setAttribute("role", "button");
+      th.setAttribute("aria-sort", "none");
+      th.addEventListener("click", function () { activate(col); });
+      th.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(col); }
+      });
+    });
+
+    /* Which column is the table ALREADY sorted by? Markdown ships in an order
+       its author chose -- this roster ships by value -- and a header row that
+       marks every column "unsorted" tells the reader nothing about the order
+       they are looking at. So the shipped order is compared against what each
+       column would produce, and the first exact match is shown as active.
+       Columns whose keys are all identical are skipped: they match every
+       order and would claim credit for one they did not cause. */
+    var shipped = ids(rows);
+    for (var col = 0; col < head.cells.length && active.col < 0; col++) {
+      var seen = {}, distinct = 0;
+      for (var i = 0; i < rows.length; i++) {
+        var k = String(key(rows[i].cells[col]));
+        if (!seen[k]) { seen[k] = 1; distinct++; }
+      }
+      if (distinct < 2) continue;
+      for (var s = 1; s <= lastState(col); s++) {
+        if (ids(ordered(col, s)) === shipped) {
+          active = { col: col, state: s };
+          shippedCol = col;
+          paint(col, s);
+          break;
+        }
+      }
+    }
+  }
+
+  document.querySelectorAll(".table-wrap table").forEach(sortable);
+})();
+</script>
+</body>
+</html>

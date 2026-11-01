@@ -1,0 +1,1598 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>smartplan — Model Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: dark;
+  --void: #0a0e14;
+  --void-2: #101827;
+  --cell: #0d1420;
+  --cell-head: #131c2b;
+  --panel: rgba(23,34,51,.55);
+  --mint: #35e0c8;
+  --peri: #7c8cff;
+  --rose: #ff5f9e;
+  --amber: #ffb35c;
+  --ink: #e6edf3;
+  --ink-2: #b7c3cd;
+  --ink-dim: #8b98a5;
+  --line: rgba(120,160,200,.16);
+  --glow-mint: 0 0 22px rgba(53,224,200,.4);
+  --ease: cubic-bezier(.2,.7,.2,1);
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background-color: var(--void);
+  background-image:
+    radial-gradient(ellipse 900px 700px at -10% -15%, rgba(53,224,200,.10), transparent 60%),
+    radial-gradient(ellipse 1000px 800px at 115% 5%, rgba(124,140,255,.09), transparent 60%),
+    radial-gradient(ellipse 800px 700px at 105% 115%, rgba(53,224,200,.08), transparent 60%);
+  background-repeat: no-repeat;
+  background-attachment: fixed, fixed, fixed;
+  color: var(--ink);
+  font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.65;
+}
+::selection { background: var(--mint); color: var(--void); }
+a:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+nav.site-nav {
+  max-width: 84rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+.nav-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1.4rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+/* Smooth the horizontal scroll while a pointer rests on a nav row. :has() is
+   widely supported. A browser without it just scrolls instantly. */
+@supports selector(:has(*)) {
+  nav.site-nav:has(.nav-row) .nav-row:hover { scroll-behavior: smooth; }
+}
+.nav-row > * { scroll-snap-align: start; }
+.nav-row::-webkit-scrollbar { display: none; }
+/* Below the widest phone, trim the nav's horizontal padding and tighten the
+   gaps so more than three destinations are reachable without scrolling at
+   all. */
+@media (max-width: 40rem) {
+  nav.site-nav { padding: 0 0.75rem; }
+  .nav-row { gap: 1rem; }
+  .nav-groups { padding: 0.6rem 0 0.4rem; }
+}
+.nav-groups { padding: 0.8rem 0 0.55rem; }
+.subnav {
+  padding: 0.45rem 0 0.6rem;
+  border-top: 1px solid var(--line);
+  gap: 1.15rem;
+}
+.brand {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  background: linear-gradient(90deg, var(--mint), var(--peri));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-right: 0.4rem;
+}
+.stamp {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  opacity: 0.55;
+  white-space: nowrap;
+  align-self: center;
+  /* Anchored right: the group links sit left of it, this takes the slack. */
+  margin-left: auto;
+  padding-left: 1.5rem;
+}
+@media (max-width: 40rem) {
+  /* On a phone the nav row already scrolls, so a right-anchored stamp would
+     sit off-screen past the last link. Let it flow after them instead. */
+  .stamp { margin-left: 0; padding-left: 0.75rem; font-size: 0.66rem; }
+}
+.nav-groups a {
+  font-family: "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  color: var(--ink-2);
+  text-decoration: none;
+  padding-bottom: 0.3rem;
+  transition: color 0.2s var(--ease), text-shadow 0.2s var(--ease);
+}
+.nav-groups a:hover { color: var(--mint); text-shadow: var(--glow-mint); }
+/* The one call-to-action in the chrome. Reads as a button rather than a nav
+   link, because it does something different from every other link up there. */
+.nav-groups a.dl-btn {
+  color: var(--void);
+  background: var(--mint);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  margin-left: 1rem;
+  align-self: center;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: filter 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.nav-groups a.dl-btn:hover {
+  color: var(--void);
+  text-shadow: none;
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+@media (max-width: 720px) {
+  .nav-groups a.dl-btn { padding: 0.25rem 0.7rem; margin-left: 0.6rem; }
+}
+/* Build facts under a download link. Deliberately quiet: they answer a
+   question you only ask after the link has already caught your eye. */
+.dl-meta {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.82em;
+  line-height: 1.45;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* A filename is one token to a reader. Breaking it across lines reads as a
+   rendering fault, so the cell holding a build stamp keeps its code spans
+   whole. Scoped by :has() to that cell alone — every other table on the site
+   still wraps long code spans, which is what keeps them narrow. */
+td:has(.dl-meta) code { white-space: nowrap; }
+.nav-groups a.current {
+  color: var(--ink);
+  background-image: linear-gradient(90deg, var(--mint), var(--peri));
+  background-size: 100% 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+}
+.subnav a {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.03em;
+  color: var(--ink-dim);
+  text-decoration: none;
+  transition: color 0.2s var(--ease);
+}
+.page-toc {
+  margin: 1.5rem 0 2rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--mint);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--panel) 60%, transparent);
+}
+.page-toc > summary {
+  cursor: pointer;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.page-toc > ul {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  columns: 2;
+  column-gap: 2rem;
+}
+.page-toc li {
+  margin: 0 0 0.35rem;
+  break-inside: avoid;
+  font-size: 0.92rem;
+}
+@media (max-width: 40rem) {
+  .page-toc > ul { columns: 1; }
+}
+.subnav a:hover { color: var(--mint); }
+.subnav a.current { color: var(--mint); }
+.subnav a.current::before { content: "▸ "; }
+main {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 4rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+/* Text uses the page. `main` caps at 80rem and centres, which is the whole
+   measure. Nothing narrows its children further. An earlier 46rem prose cap
+   wrapped text well before the page needed to and left a wide empty gutter
+   beside every paragraph. It was removed on purpose. Don't add it back. */
+a {
+  color: var(--mint);
+  text-decoration: none;
+  transition: color 0.2s var(--ease), text-shadow 0.2s var(--ease);
+}
+a:hover { text-decoration: underline; text-shadow: var(--glow-mint); }
+strong { color: var(--ink); font-weight: 600; }
+h1, h2, h3 { font-family: "Space Grotesk", sans-serif; line-height: 1.25; }
+h4, h5, h6 { font-family: "Space Grotesk", sans-serif; color: var(--ink-2); line-height: 1.25; }
+h1 {
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--mint), var(--peri));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+h2 {
+  font-weight: 600;
+  color: var(--ink);
+  margin-top: 3rem;
+  padding-bottom: 0.85rem;
+}
+h2::after {
+  content: "";
+  display: block;
+  width: 2.5rem;
+  height: 3px;
+  margin-top: 0.6rem;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--mint), var(--peri), var(--rose));
+}
+h3 {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 1rem;
+  color: var(--ink-2);
+  margin-top: 2rem;
+}
+.hero { margin-bottom: 3rem; }
+.thesis {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.5vw, 1.8rem);
+  line-height: 1.35;
+  margin: 0 0 1.75rem;
+  color: var(--ink);
+}
+.thesis em {
+  font-style: normal;
+  background: linear-gradient(90deg, var(--mint), var(--peri));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.board { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+.board td a { color: var(--ink); font-weight: 600; }
+.board td a:hover { color: var(--mint); }
+.chip {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 0.1em 0.55em;
+  border: 1px solid rgba(53,224,200,.35);
+  border-radius: 999px;
+  color: var(--mint);
+  white-space: nowrap;
+}
+.table-wrap {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9rem;
+}
+th {
+  background: var(--cell-head);
+  font-family: "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  text-align: left;
+  padding: 0.65rem 0.85rem;
+  vertical-align: bottom;
+}
+td {
+  padding: 0.7rem 0.85rem;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  color: var(--ink-2);
+  background: var(--void);
+  /* Top-align, because a one-word cell centred beside a paragraph is the
+     single worst thing about a dense comparison table. */
+  vertical-align: top;
+  line-height: 1.5;
+}
+/* Zebra striping. Subtle enough not to fight the palette, strong enough to
+   let the eye track a row across seven columns. */
+tbody tr:nth-child(even) td { background: #0c121c; }
+td:first-child, th:first-child {
+  color: var(--ink);
+  position: sticky;
+  left: 0;
+  background: var(--cell);
+  /* The frozen column needs an edge or it reads as part of the scroll. */
+  box-shadow: 1px 0 0 var(--line);
+}
+tbody tr:nth-child(even) td:first-child { background: #0f1622; }
+th:first-child { background: var(--cell-head); z-index: 3; }
+tbody tr:hover td { background: #12222a; }
+tbody tr:hover td:first-child { background: #16262f; }
+
+/* Dense tables: cap the height so the header can stick, and give columns a
+   floor so prose does not shred into one word per line. */
+.table-tall {
+  max-height: 78vh;
+  overflow: auto;
+}
+.table-tall thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+/* The corner cell has to stick on BOTH axes and outrank both. Without this
+   the header scrolls left while the body's frozen column stays put, so the
+   wrong heading ends up sitting over the row labels. */
+.table-tall thead th:first-child {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 4;
+}
+.table-wide table { font-size: 0.85rem; }
+.table-wide td, .table-wide th { min-width: 12rem; }
+.table-wide td:first-child, .table-wide th:first-child {
+  min-width: 9rem;
+  max-width: 14rem;
+}
+/* Price-ish second column reads as data, not prose. */
+.table-wide td:nth-child(2) { min-width: 6rem; white-space: nowrap; }
+
+@media (max-width: 720px) {
+  .table-tall { max-height: 70vh; }
+  .table-wide td, .table-wide th { min-width: 9rem; }
+}
+
+/* Capability strip. Added 2026-08-22, replacing five prose columns with one.
+   The grid is a FIXED five across rather than auto-fit, because the whole
+   point is that "Code reviews" sits under "Code reviews" on the row above:
+   a reader scans one task down the table instead of reading 21 sentences.
+   Auto-fit reflows per cell and loses that. */
+.caps {
+  display: grid;
+  /* 6rem is the measured width of the longest label, "Code reviews", at the
+     font size below plus its glyph. Under that the labels collide, which is
+     what a first pass at 5.4rem did. */
+  grid-template-columns: repeat(5, minmax(6rem, 1fr));
+  gap: 0.25rem 0.4rem;
+  min-width: 31rem;
+}
+.caps span {
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+/* A band leader (★) is the one chip that should out-rank a plain check, so
+   it gets both the strongest weight and the accent color. */
+.caps .s { font-weight: 600; color: var(--mint); }
+.caps .y { color: var(--ink); }
+.caps .m { color: var(--ink-2); }
+.caps .w { color: var(--ink-2); }
+/* A "wrong tool" verdict is the one a reader should skim past, so it recedes
+   rather than shouting. It is still legible, just not competing. Unknown
+   (no Artificial Analysis row) dims the same way, for the same reason. */
+.caps .n { opacity: 0.45; }
+.caps .u { opacity: 0.45; }
+
+/* Value and board score, one column. Added 2026-08-23, replacing two adjacent
+   numeric columns. They were always read together -- a ratio on its own sells
+   the cheapest model in the room -- so stacking them puts the check directly
+   under the claim instead of one saccade to the right.
+   Tooltips are native `title` on purpose. .table-wrap scrolls on x, which
+   makes overflow-y compute to auto as well, so a positioned CSS bubble would
+   be clipped by the very row it belongs to. */
+.dual { display: block; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.dual .dv, .dual .ds {
+  display: block;
+  cursor: help;
+  /* Underlines the glyphs, not the block. A border-bottom here would draw a
+     rule the full width of the cell. */
+  text-decoration: underline dotted rgba(120,160,200,.4);
+  text-underline-offset: 3px;
+}
+.dual .dv { font-weight: 600; font-size: 1rem; color: var(--ink); }
+.dual .ds { font-size: 0.8rem; color: var(--ink-dim); }
+.dual.lead .dv { color: var(--mint); }
+th span[title] { cursor: help; }
+
+/* Click-to-sort. The affordance has to be visible without hover, since a
+   header that only reveals itself on hover is invisible on touch. */
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  padding-right: 1.6rem;
+  position: relative;
+}
+th.sortable:hover, th.sortable:focus-visible { color: var(--ink); }
+th.sortable::after {
+  content: "↕";
+  position: absolute;
+  right: 0.6rem;
+  opacity: 0.3;
+  font-size: 0.9em;
+}
+/* The active column is announced, not just arrowed: this table ships
+   sorted by value and a reader needs to see that without clicking. */
+th.sortable[aria-sort="descending"], th.sortable[aria-sort="ascending"] {
+  color: var(--mint);
+}
+th.sortable[aria-sort="descending"]::after { content: "↓"; opacity: 1; }
+th.sortable[aria-sort="ascending"]::after { content: "↑"; opacity: 1; }
+th.sortable:focus-visible { outline: 2px solid var(--mint); outline-offset: -2px; }
+/* A dual header swaps its text for the live key name, which is longer than
+   the name it replaces. Wrapping it would read as two headers. */
+th.sortable-dual { white-space: nowrap; }
+
+/* A table carrying capability strips sets its own widths. .table-wide's
+   12rem floor per column is right for five columns of prose and wrong here,
+   where one column is a fixed grid and three are short data. Declared after
+   .table-wide so it wins on source order at equal specificity. */
+.table-caps table { font-size: 0.85rem; }
+.table-caps td, .table-caps th { min-width: 0; }
+.table-caps td:first-child, .table-caps th:first-child {
+  min-width: 8.5rem;
+  max-width: 11rem;
+}
+.table-caps td:nth-child(2), .table-caps td:nth-child(3) { white-space: nowrap; }
+.table-caps td:last-child, .table-caps th:last-child { min-width: 14rem; }
+
+@media (max-width: 720px) {
+  .caps { grid-template-columns: repeat(2, minmax(6.5rem, 1fr)); min-width: 14rem; }
+}
+code, pre {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas,
+    "Liberation Mono", Menlo, monospace;
+}
+code {
+  background: var(--void-2);
+  color: var(--mint);
+  border: 1px solid var(--line);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+pre {
+  background: var(--void-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--mint);
+  color: var(--ink);
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+pre code {
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 0;
+}
+blockquote {
+  margin: 1.25rem 0;
+  padding: 0.75rem 1.25rem;
+  background: var(--panel);
+  border-left: 3px solid var(--peri);
+  border-radius: 0 6px 6px 0;
+  color: var(--ink-2);
+}
+hr {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 2rem 0;
+}
+footer {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+  color: var(--ink-dim);
+  font-size: 0.85rem;
+  text-align: center;
+  border-top: 1px solid var(--line);
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<header>
+<nav class="site-nav">
+<div class="nav-row nav-groups">
+<span class="brand">smartplan</span>
+<a href="index.html">Start</a>
+<a class="current" href="copilot-model-guide.html">Guides</a>
+<a href="benchmarks.html">Evidence</a>
+<a href="whats-new.html">Project</a>
+<a href="m365-setup.html">M365 Agents</a>
+<a href="https://github.com/defessler/smartplan">GitHub</a>
+<span class="stamp">v4.151.0 &middot; data 2026-10-20 &middot; built 2026-11-01 3:20 AM PST / 6:20 AM EST</span>
+<a class="dl-btn" href="downloads.html">Download</a>
+
+</div>
+<div class="nav-row subnav">
+<a class="current" href="copilot-model-guide.html">Model Guide</a>
+<a href="copilot-model-guide-simple.html">Quick Picks</a>
+<a href="model-classes.html">Model Classes</a>
+<a href="copilot-budget.html">Copilot on a Budget</a>
+</div>
+</nav>
+</header>
+<main>
+<h1 id="copilot-model-guide-what-each-model-is-good-at">Copilot Model Guide: What Each Model Is Good At</h1>
+<details class="page-toc" open>
+<summary>On this page</summary>
+<ul>
+<li><a href="#where-this-page-sits">Where this page sits</a></li>
+<li><a href="#reading-the-tiers">Reading the Tiers</a></li>
+<li><a href="#seven-models-are-gone">Seven models are gone</a></li>
+<li><a href="#four-more-went-on-2026-10-02">Four more went on 2026-10-02</a></li>
+<li><a href="#six-went-on-2026-10-19">Six went on 2026-10-19</a></li>
+<li><a href="#three-more-go-on-2026-11-16">Three more go on 2026-11-16</a></li>
+<li><a href="#roster-footnotes">Roster Footnotes</a></li>
+<li><a href="#writing-as-a-separate-question-researched-2026-07-26">Writing, as a separate question (researched 2026-07-26)</a></li>
+<li><a href="#beyond-copilot-frontier-models-you-cant-route-to-researched-2026-07-25">Beyond Copilot: frontier models you can't route to (researched 2026-07-25)</a></li>
+<li><a href="#the-open-weight-field-researched-2026-07-25">The open-weight field (researched 2026-07-25)</a></li>
+</ul>
+</details>
+<p>This page is meant as a quick reference on the Copilot CLI roster and
+what each model is good at. It's distilled from smartplan's model
+registry. If you only want a pick, start at
+<a href="copilot-model-guide-simple.html">Quick picks by task</a>.</p>
+<p>How to read the numbers:</p>
+<ul>
+<li>Prices are $/1M tokens in/out from GitHub's pricing table, mostly read
+  2026-08-22 to 2026-10-13. The roster was confirmed live on 2026-09-02.</li>
+<li>Terminal-Bench means version 4.0 unless a figure names 2.1 or 2.0. A
+  rank like (#7) is from the official tbench.ai board.</li>
+<li>vals.ai archived its SWE-bench Verified board on 2026-09-21. Its
+  figures are frozen, so a model released after that never gets one.</li>
+</ul>
+<p>What changed recently:</p>
+<ul>
+<li><strong>Gemini 4 Argon reached Copilot on 2026-10-13</strong>, GA for Pro+, Max,
+  Business and Enterprise (not plain Pro) in GitHub's Powerful category.
+  It lists at 2 / 0.10 / 10 as a promotion until 2026-12-01. Artificial
+  Analysis measures it 52.56 at high effort and vals.ai's Terminal-Bench
+  puts it 6th at 57.58. Stable CLI 1.0.98 added its slug. Auto
+  doesn't include it, and it's unprobed here. It holds no seat.</li>
+<li><strong>tbench.ai's Terminal-Bench 4.0 board was re-read on 2026-10-13.</strong> It
+  now lists 35 rows. Opus 5.5 leads at 64.85, Sonnet 5.5 is second at
+  61.82, and GPT-6 Astra drops to a tie for third at 58.18 with GPT-6.1
+  Sol. Every rank in the table below moved with the new rows.</li>
+<li><strong>Haiku 5.5 reached Copilot on 2026-10-07</strong>, GA on every paid plan
+  including Pro at Anthropic's list 0.10 / 0.50 on prompts to 100K tokens
+  (0.50 / 2.50 over). It's the first Claude model in GitHub's Lightweight
+  category. It measures Reasoning (AA 43.4 at max), above GPT-6 Luna at the
+  same price, and vals.ai scores it 36.36 on Terminal-Bench against Luna's
+  13.64. Stable CLI 1.0.94 and later name it. From 2026-10-13 it backs
+  GPT-6 Luna on the Cheap implementer seat (T46), and Luna stays the
+  primary at the author's direction. Sonnet 5.5's cache read halved to
+  0.10 the same day.</li>
+<li><strong>vals.ai re-ran Terminal-Bench 4.0 on Mini-SWE-agent.</strong> Every score on
+  that board moved, most of them up. Opus 5.5 leads at 65.15 with Sonnet
+  5.5 at 64.14, GPT-6 Astra 59.60 and GPT-6.1 Sol 55.05.</li>
+<li><strong>Opus 5.5 is the default planner and Strong verifier from 2026-09-22.</strong>
+  Anthropic moved Opus 5 to Legacy the same day. The registry seats the
+  newest version of a model line wherever the harness serves it.</li>
+<li><strong>Models are retiring in waves.</strong> Seven left in September, four on
+  2026-10-02 and six on 2026-10-19. Three more go on 2026-11-16. Each has
+  a named successor, mapped under <a href="#seven-models-are-gone">seven models are gone</a>,
+  <a href="#four-more-went-on-2026-10-02">four more went on 2026-10-02</a>,
+  <a href="#six-went-on-2026-10-19">six went on 2026-10-19</a> and
+  <a href="#three-more-go-on-2026-11-16">three more go on 2026-11-16</a>. The table
+  lists only what you can select today.</li>
+<li><strong>Sonnet 5's 2 / 10 became its standard price on 2026-08-10.</strong> The rise
+  to 3 / 15 scheduled for 2026-09-01 was cancelled. Sonnet 5.5 launched at
+  the same rate.</li>
+<li><strong>Copilot runs under a GPT-6 Luna ceiling from 2026-09-23.</strong> The
+  session and every Cheap seat pin GPT-6 Luna alone. Anything above it
+  needs your yes: GPT-6.1 Sol plans and leads the Mid seat from
+  2026-09-30, and GPT-6 Astra is the Reserve, with Opus 5.5 behind it. Fable gets no seat. A
+  Pro+ probe served every one of these slugs on CLI 1.0.83. None is
+  trialed in its seat. Prerelease CLI 1.0.89-1 was the first build to list
+  GPT-6 Sol and Luna in its model picker, and stable 1.0.89 shipped them
+  on 2026-09-28.</li>
+<li><strong>GPT-6.1 Sol takes both Sol seats on 2026-09-30.</strong> Artificial
+  Analysis scored it 51.8 that day, against GPT-6 Sol's 47.5, and stable
+  CLI 1.0.90 named its slug. It beats GPT-6 Sol at every effort for less
+  per task. Both seats now run it at low effort, which still measures
+  42.1, above the Reasoning anchor. GPT-6 Sol stays behind it for older
+  builds.</li>
+<li><strong>Sonnet 5.5 and GPT-6.1 Sol shipped on 2026-09-28 and 2026-09-29.</strong>
+  Sonnet 5.5 takes Sonnet 5's place behind the Sol models on the Mid
+  seat, at the same 2 / 10.</li>
+<li><strong>Classes now come from measured data.</strong> Each class is the model's best
+  measured Artificial Analysis index against an anchor this repo ran in
+  that role: Opus 4.8 for Reasoning (41.8), Sonnet 5 for Implementer
+  (38.2), Haiku 4.5 for Mechanical (16.9). The class column shows each
+  score. Several moved on 2026-09-23. GPT-6 Sol, GPT-5.6 Sol, Terra, the
+  newer Groks and Kimi K3 read Reasoning. Both Lunas read Mechanical.</li>
+</ul>
+<p>Three GA models aren't tabled, since each has only one board score. On
+vals.ai SWE-bench Verified, GPT-5.3-Codex (1.75 / 14) scores 78.0,
+GPT-5.4 mini (0.75 / 4.50) 73.0, and GPT-5.4 nano (0.20 / 1.25, Pro+ and
+Max only, not on the CLI) 69.8. OpenAI deprecated GPT-5.3-Codex and GPT-5.4
+nano on 2026-10-01, for removal from its API on 2027-04-01. It names GPT-6
+Sol and GPT-6 Luna as the replacements. Their prices are unchanged.</p>
+<p>Terms used below. A <strong>verifier</strong> checks another model's work for
+correctness. A <strong>cross-family</strong> verifier comes from a different vendor
+than the model it checks, which helps it catch mistakes a same-family
+reviewer might share. <strong>ctx</strong> is the context window. A <strong>surcharge</strong> is a
+higher per-token rate once a request passes a stated context size.
+<strong>Cache read</strong>, <strong>cache write</strong> and <strong>cache-hit</strong> prices are discounted
+rates for reusing text from an earlier request.</p>
+<h2 id="where-this-page-sits">Where this page sits</h2>
+<p>The roster table comes first. After it come the retirement schedule and
+three wider sections: writing, frontier models you can't route to, and
+the open-weight field (the last two re-swept 2026-08-05).
+<a href="copilot-budget.html">Copilot on a Budget</a> covers spending less.</p>
+<div class="table-wrap table-tall table-wide"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Vendor</th>
+<th>Tier</th>
+<th>Price</th>
+<th>Good at</th>
+<th>Watch out for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fable 5.1</strong></td>
+<td>Anthropic</td>
+<td>Reasoning (AA 53.4)</td>
+<td>10 / 50</td>
+<td><strong>The current Max-tier row, GA 2026-09-01.</strong> It plans the hardest architecture and decomposition decisions. Terminal-Bench is 57.9% (#5).</td>
+<td>It never implements or verifies. It's Pro+/Max only, with no vals.ai SWE-bench Verified or Scale entry. Anthropic keeps prompts and outputs by default for its safety classifiers, apart from a time-bound enterprise exemption through the end of 2026.</td>
+</tr>
+<tr>
+<td><strong>Fable 5</strong></td>
+<td>Anthropic</td>
+<td>Reasoning (AA 49.6)</td>
+<td>10 / 50</td>
+<td>It plans the hardest architecture and decomposition decisions. Terminal-Bench is 44.5% (#18), vals.ai SWE-bench Verified 95.0 and vendor SWE-bench Pro 80.3. Opus 5.5's vendor SWE-bench Pro is higher, at 89.9.</td>
+<td><strong>Legacy since 2026-09-07.</strong> Fable 5.1 replaces it at the same price. It never implements or verifies. It's Pro+/Max only.</td>
+</tr>
+<tr>
+<td><strong>GPT-6 Astra</strong></td>
+<td>OpenAI</td>
+<td>Reasoning (AA 52.7)</td>
+<td>10 / 50 (&gt;272K: 20 / 75)</td>
+<td>OpenAI's flagship, GA 2026-09-04 and on the CLI from 1.0.85. It's strong at long, hard agentic terminal work and creative writing. <strong>It's #3 on Terminal-Bench at 58.2% ± 2.8%</strong> (max, Codex agent, read 2026-10-13), tied with GPT-6.1 Sol and behind Opus 5.5 at 64.85 and Sonnet 5.5 at 61.82. It cost about half Fable 5.1's run. It's #1 on EQ-Bench Creative Writing v3 by Elo. It has 1.05M ctx and 128K max output.</td>
+<td>Fanning it out costs like fanning Fable out. It's Pro+, Max, Business and Enterprise only. Past 272K tokens the whole request reprices. It's in Copilot's Auto pool on every surface, which lets Auto on Pro+ and up route a hard prompt to a 10 / 50 model. It holds the Copilot Reserve from 2026-09-23, kept for the toughest cases and run only after you say yes. At xhigh it scores 57.9% on Terminal-Bench, well under half Opus 5.5's cost per task.</td>
+</tr>
+<tr>
+<td><strong>Opus 5.5</strong></td>
+<td>Anthropic</td>
+<td>Reasoning (AA 57.6)</td>
+<td>4 / 20</td>
+<td><strong>The default planner and Strong verifier from 2026-09-22</strong>, GA that day in a gradual rollout. It's 20% under Opus 5 on input and output and 60% under on cache read, with 1M ctx. Artificial Analysis's Intelligence Index v4.3.2 puts it #1 overall at 58 (max) and top of the roster at medium (51), where it also leads AA's Terminal-Bench run (52.5%). vals.ai's Terminal-Bench board puts it #1 at 61.62, or 53.54 counting fallback-served attempts as failures. GitHub says it matched Opus 5 with significantly fewer steps and tokens.</td>
+<td><strong>It leads the official Terminal-Bench board at 64.85% ± 3.1%</strong> (max, Claude Code agent, #1 of 35, read 2026-10-13). Every board score is blended, since its safeguards hand some tasks to Opus 5 or Opus 4.8. It's Pro+, Max, Business and Enterprise only, and in CLI Auto's pool (read 2026-10-20). Stable CLI 1.0.89 names <code>claude-opus-5.5</code> in <code>copilot help config</code>. It watermarks its text output at no token cost. Unlike the Fables it runs under zero data retention on Copilot.</td>
+</tr>
+<tr>
+<td><strong>Opus 5</strong></td>
+<td>Anthropic</td>
+<td>Reasoning (AA 50.8)</td>
+<td>5 / 25</td>
+<td><strong>Legacy since 2026-09-22.</strong> It isn't on this repo's planner or reserve seats. Auto can still pick it until it leaves on 2026-11-16. It tops vals.ai's archived SWE-bench Verified board at 97.0. Terminal-Bench is 53.9% ± 3.2% (xhigh, tied #11). Unlike Fable it can implement and verify.</td>
+<td><strong>Retires from Copilot on 2026-11-16</strong>, successor Opus 5.5. A fallback onto it is a climb in price. At 5 / 25 it's fine for one plan and ruinous fanned out across many. It's documented Pro+/Max. Anthropic's fast mode re-prices it at 10 / 50 on the first-party API only.</td>
+</tr>
+<tr>
+<td><strong>Opus 4.8</strong></td>
+<td>Anthropic</td>
+<td>Reasoning (AA 41.8)</td>
+<td>5 / 25</td>
+<td><strong>Superseded by Opus 5 at the same price.</strong> It's still a capable planner and verifier. Fable 5's safeguards and Opus 5.5's cybersecurity safeguard fall back to it. Terminal-Bench is 23.6% (#26).</td>
+<td>It costs the same as Opus 5 and 25% more than Opus 5.5. Reach for it only if you need a number measured on 4.8. <strong>Retires from Copilot on 2026-11-16</strong>, successor Opus 5.5, though individual subscribers on annual Copilot plans keep it.</td>
+</tr>
+<tr>
+<td><strong>GPT-5.6 Sol</strong></td>
+<td>OpenAI</td>
+<td>Reasoning (AA 47.0)</td>
+<td>4 / 20</td>
+<td>An elite agentic coder, independently confirmed. It's #1 on Artificial Analysis's live coding metrics and scores 96.2 on vals.ai SWE-bench Verified. It has the highest bug recall on CodeRabbit's review bench, at 69.7%.</td>
+<td>Terminal-Bench is 37.3% (#22). It trails Anthropic on SWE-bench Pro (vendor 64.6), over-engineers open-ended briefs, and is a noisy reviewer (31.6% precision). METR measured the highest eval-gaming rate of any public model. Keep it away from tests it can see. It's Pro+/Max gated. Above 272K it bills 8 / 30. The 2 / 10 promotional rate ended after 2026-09-03. Sol, Terra and Luna add a cache-write charge earlier OpenAI models don't have.</td>
+</tr>
+<tr>
+<td><strong>GPT-5.6 Terra</strong></td>
+<td>OpenAI</td>
+<td>Reasoning (AA 42.1)</td>
+<td>2 / 12</td>
+<td>A cross-family verifier on Pro. Trial T18 found it the most thorough on non-seeded defects, but T42 measured it at 13 of 16 seeded defects for 41.7 credits, the same recall as Gemini 3.8 Flash at 5.8. vals.ai SWE-bench Verified is 95.4 and Terminal-Bench 21.5% (#27).</td>
+<td>Above 272K tokens it bills 4 / 18. Since a 20% price cut on 2026-08-12, T18's "about 2 times Gemini's cost" no longer follows from list rates. <strong>Retires from Copilot on 2026-11-16</strong>, successor GPT-6.1 Sol or GPT-6 Luna.</td>
+</tr>
+<tr>
+<td><strong>GPT-6.1 Sol</strong></td>
+<td>OpenAI</td>
+<td>Reasoning (AA 51.8)</td>
+<td>2 / 10 (&gt;272K: 4 / 15)</td>
+<td><strong>GPT-6 Sol's successor, GA on Copilot 2026-09-29</strong>, Pro+ and up. OpenAI prices it at GPT-6 Sol's rate with half the cache-read (0.10) and describes "near-Astra performance". On Artificial Analysis it beats GPT-6 Sol at every effort for less per task (medium 47.8 at $0.21 against 39.8 at $0.25), and AA's own Terminal-Bench 4.0 run gives it 56.1% at max against Astra's 59.6%. <strong>It leads this repo's planner and Mid seats from 2026-09-30</strong> (<code>models: [gpt-6.1-sol, gpt-6-sol, ...]</code>).</td>
+<td><strong>It's #3 on tbench.ai at 58.18% ± 3.1%</strong> (max, tied with GPT-6 Astra, read 2026-10-13) and 7th on vals.ai's Terminal-Bench at 55.05. CLI 1.0.90 (2026-09-30) is the first build that names <code>gpt-6.1-sol</code>. A Pro+ probe served it that day. Plain Pro doesn't get it. Both seats sit above the Luna ceiling, so each use is an ask. Untrialed in either seat.</td>
+</tr>
+<tr>
+<td><strong>GPT-6 Sol</strong></td>
+<td>OpenAI</td>
+<td>Reasoning (AA 47.6)</td>
+<td>2 / 10 (&gt;272K: 4 / 15)</td>
+<td>OpenAI's successor to GPT-5.6 Sol at half its price, GA 2026-09-22, with 1.05M ctx. OpenAI hasn't deprecated GPT-5.6 Sol. At medium effort it beats Sonnet 5 on every Artificial Analysis eval both carry (index 39.8 against 28.1) at the same price and a quarter of the cost per task. It matches GPT-5.6 Sol's index and hallucinates far less. It led this repo's Mid implementer seat from 2026-09-22 and now sits second, behind GPT-6.1 Sol, from 2026-09-30.</td>
+<td><strong>It's #16 on tbench.ai at 49.39%</strong> (max, read 2026-10-13), with no vals.ai row. It's Pro+, Max, Business and Enterprise only, and in CLI Auto's pool (read 2026-10-20). Past 272K tokens the whole request reprices. A Pro+ probe served <code>gpt-6-sol</code> on CLI 1.0.83 on 2026-09-23. It's the planner's fallback too, for CLI builds before 1.0.90.</td>
+</tr>
+<tr>
+<td><strong>Sonnet 5.5</strong></td>
+<td>Anthropic</td>
+<td>Reasoning (AA 56.0)</td>
+<td>2 / 10</td>
+<td><strong>Sonnet 5's successor at the same price, GA on Copilot 2026-09-28 on every paid plan including plain Pro.</strong> It takes Sonnet 5's seats under the newest-version rule, third on this repo's Mid list behind GPT-6.1 Sol and GPT-6 Sol. At medium effort Artificial Analysis scores it 40.7 against Sonnet 5's 28.1, at $0.59 a task against $1.00. vals.ai's Terminal-Bench 4.0 puts it third at 53.0, behind Opus 5.5 and GPT-6 Astra. It has 1M ctx.</td>
+<td>It's #2 on tbench.ai at 61.82% ± 2.9% (max, Claude Code agent, read 2026-10-13) and has had no trial in its seat. Stable CLI 1.0.90 (2026-09-30) is the first build whose help config names <code>claude-sonnet-5.5</code>.</td>
+</tr>
+<tr>
+<td><strong>Sonnet 5</strong></td>
+<td>Anthropic</td>
+<td>Implementer (AA 38.2)</td>
+<td>2 / 10</td>
+<td><strong>Legacy since 2026-09-28.</strong> Sonnet 5.5 replaces it at the same price. It was the implementer floor, and it stays the Mid seat's last fallback and the Implementer class anchor.</td>
+<td><strong>It scores 79.6</strong> on vals.ai SWE-bench Verified, not the widely quoted 85.2. Terminal-Bench is 12.4% (tied #33).</td>
+</tr>
+<tr>
+<td><strong>Grok 4.6</strong></td>
+<td>xAI</td>
+<td>Reasoning (AA 44.3)</td>
+<td>2 / 6</td>
+<td>vals.ai SWE-bench Verified is 95.60 and Terminal-Bench 20.3% (#28).</td>
+<td>Past 200K tokens it bills 4 / 12 on the <em>whole</em> request, a cliff rather than a marginal tier. Its picker context cap is unverified.</td>
+</tr>
+<tr>
+<td><strong>Grok 4.7</strong></td>
+<td>xAI</td>
+<td>Reasoning (AA 46.4)</td>
+<td>2 / 6</td>
+<td>Rolling out on Copilot since 2026-09-21, on every paid plan including plain Pro. <strong>Terminal-Bench is 37.6% ± 3.5% (#21, agent Grok Build)</strong>, above GPT-5.6 Sol. vals.ai's own Terminal-Bench run puts it 20th of 51 (read 2026-10-20).</td>
+<td>Treat it as a deliberate trial, not a pick. No seat uses a Grok yet. It has the family's 200K whole-request cliff. Grok 4.7 Fast, the same model on faster infrastructure, bills 4 / 12 (6 / 18 past 200K) through Cursor and Grok Build only.</td>
+</tr>
+<tr>
+<td><strong>Haiku 5.5</strong></td>
+<td>Anthropic</td>
+<td>Reasoning (AA 43.4)</td>
+<td>0.10 / 0.50 (&gt;100K: 0.50 / 2.50)</td>
+<td>Anthropic's new small model, GA on Copilot 2026-10-07 on every paid plan including Pro. It matches GPT-6 Luna's price on prompts to 100K tokens and measures far higher: AA 43.4 at max against Luna's 38.1, vals.ai Terminal-Bench 36.36 against 13.64. 1M ctx, 128K out, and the full effort dial. On Claude Code it's the scout from 2.1.293 and the Cheap implementer from 2026-10-13.</td>
+<td><strong>Named in stable CLI 1.0.94 and later, served on Pro+.</strong> On T46 (2026-10-13) it passed both coding tasks 3 of 3 at low, where Luna missed one semver2 case every run, but Luna renamed for half the credits. So it backs Luna on the Cheap implementer seat rather than leading it. Over 100K tokens of prompt it bills 0.50 / 2.50, five times Luna's long-context rate. Safety classifiers can refuse with no fallback. GPT-6 Luna stays the Copilot primary.</td>
+</tr>
+<tr>
+<td><strong>Haiku 4.5</strong></td>
+<td>Anthropic</td>
+<td>Mechanical (AA 16.9)</td>
+<td>1 / 5</td>
+<td>Legacy since 2026-10-07, when Haiku 5.5 shipped at a tenth of its price. It was the Claude Code scout until 2.1.293 moved the <code>haiku</code> alias. <strong>It scores 66.6</strong> on vals.ai SWE-bench Verified, second-lowest on the roster.</td>
+<td>Silent-failure risk. Only use it behind independent verification. It never plans or judges. Still selectable, but nothing it does is cheaper than Haiku 5.5.</td>
+</tr>
+<tr>
+<td><strong>GPT-5.6 Luna</strong></td>
+<td>OpenAI</td>
+<td>Mechanical (AA 37.3)</td>
+<td>0.20 / 1.20</td>
+<td><strong>Held the Copilot coding-leaf floor and scout seat from 2026-09-07.</strong> Off every seat list from 2026-09-23, since it prices above GPT-6 Luna. It undercuts GPT-5 mini while scoring 93.0 on vals.ai SWE-bench Verified. Terminal-Bench is 17.3% (#30). It's fast, at 172 tok/s.</td>
+<td>Keep hard multi-file reasoning and big-context retrieval away from it. Its system card notes a tendency to act beyond user intent. Keep a verify gate on it. vals.ai's Terminal-Bench run ranks it below Sonnet 5 (4.55 against 8.08), the reverse of the official board. Above 200K tokens GitHub bills 0.40 / 1.80.</td>
+</tr>
+<tr>
+<td><strong>GPT-6 Luna</strong></td>
+<td>OpenAI</td>
+<td>Mechanical (AA 38.1)</td>
+<td>0.10 / 0.50 (&gt;272K: 0.20 / 0.75)</td>
+<td>OpenAI's successor to GPT-5.6 Luna, GA 2026-09-22 on every paid plan including plain Pro. OpenAI hasn't deprecated GPT-5.6 Luna. <strong>The cheapest Copilot model on every axis</strong>, matched to 100K tokens by Haiku 5.5 from 2026-10-07, with 1.05M ctx. Artificial Analysis scores it above GPT-5.6 Luna on every index eval both carry (29.5 against 25.0). <strong>It leads this repo's Cheap implementer, scout and Cheap verifier seats</strong> at the author's direction, alone from 2026-09-23.</td>
+<td>It isn't a hard-task model. At medium it solved 5 of AA's 198 terminal attempts. Both Lunas solved none at the low effort the Cheap implementer and scout seats pin. <strong>vals.ai Terminal-Bench is 13.64</strong>, 34th on that board. It's #31 of 35 on tbench.ai at 16.4% (max, read 2026-10-13). It's in CLI Auto's pool (read 2026-10-20). A Pro+ probe served <code>gpt-6-luna</code> on CLI 1.0.83 on 2026-09-23. It's the Copilot ceiling: the session model and the sole entry on every Cheap seat. Untrialed in those seats.</td>
+</tr>
+<tr>
+<td><strong>MAI-Code-1.1-Flash</strong></td>
+<td>Microsoft</td>
+<td>Unclassified</td>
+<td>0.20 / 1.20</td>
+<td>MAI-Code-1-Flash's named successor, at GPT-5.6 Luna's exact rate.</td>
+<td><strong>Vendor-only benchmarks</strong>, run in the Copilot VS Code harness: SWE-bench Verified 72.6 and Terminal-Bench 2.1 62.9, against 69.8 for Haiku 4.5 there. No independent board carries a Microsoft model. It's a trial candidate, never a floor.</td>
+</tr>
+<tr>
+<td><strong>Kimi K3</strong></td>
+<td>Moonshot</td>
+<td>Reasoning (AA 43.6)</td>
+<td>3 / 15</td>
+<td>The strongest open-weight coder on the roster, GA since 2026-08-06. vals.ai SWE-bench Verified is 93.4.</td>
+<td>It costs <strong>more</strong> than Sonnet 5 on both axes. Trial it before flooring on it. The picker reports it at reasoning High where other roster models show Medium, which adds cost.</td>
+</tr>
+<tr>
+<td><strong>Gemini 3.8 Flash</strong></td>
+<td>Google</td>
+<td>Implementer (AA 40.9)</td>
+<td>0.75 / 3.75</td>
+<td>GA 2026-09-03 on every paid plan including Pro. Its rate, shared with 3.6 and 3.7, is promotional through 2026-12-31 (<code>gemini-flash-promo</code>), with cached input at 0.075. It's cross-family to both the Claude and the GPT seats.</td>
+<td><strong>It holds the cross-family verifier pin without having run T34.</strong> Run T34 before trusting it on a shared-blind-spot leaf. Terminal-Bench is 19.1% (#29) and vals.ai SWE-bench Verified 80.0. From 2027-01-01 the rate doubles to 1.50 / 7.50. It's in CLI Auto's pool (read 2026-10-20).</td>
+</tr>
+<tr>
+<td><strong>Gemini 4 Argon</strong></td>
+<td>Google</td>
+<td>Reasoning (AA 52.6)</td>
+<td>2 / 10 (cache 0.10)</td>
+<td>Google's newest frontier model, GA on Copilot 2026-10-13 for Pro+, Max, Business and Enterprise, in GitHub's Powerful category. Artificial Analysis scores it 52.56 at high effort (measured, $1.99 a task), which is Reasoning and just under GPT-6 Astra's 52.7. vals.ai's Terminal-Bench puts it 6th at 57.58. It's cross-family to both the Claude and the GPT seats, with 1M ctx.</td>
+<td><strong>The 2 / 0.10 / 10 rate is promotional until 2026-12-01.</strong> Google's own rate doubles to 4 / 20 from then, and GitHub hasn't printed its post-promo rate. Stable CLI 1.0.98 added its slug. It's unprobed and not in Auto. Rollout is gradual. <strong>Not a seat</strong> (2026-10-13), untrialed. No tbench.ai or Scale SWE-bench Pro row.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="reading-the-tiers">Reading the Tiers</h2>
+<ul>
+<li><strong>Reasoning</strong> models plan, verify work from the Mid and Strong tiers,
+  and take on irreducibly cross-cutting tasks. They never do first-pass
+  implementation or mechanical work, which would waste their price.</li>
+<li><strong>Implementer</strong> (Mid) models are the floor for briefed,
+  correctness-sensitive execution. They also verify Cheap-tier output.</li>
+<li><strong>Mechanical</strong> (Cheap) models handle single-concern tasks, always behind
+  a verification gate. A model priced below Haiku stays a trial candidate
+  until it earns a seat. GPT-5.6 Luna holds the Copilot coding-leaf floor
+  on board evidence and the author's call, with no trial yet. GPT-6 Luna
+  is listed ahead of it, also untrialed. We record outcomes before any
+  other floor moves.</li>
+</ul>
+<h2 id="seven-models-are-gone">Seven models are gone</h2>
+<p>Six left Copilot on 2026-09-01 and MAI-Code-1-Flash on 2026-09-10. None
+of these is selectable any more.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Gone</th>
+<th>Go to</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gemini 3.1 Pro</td>
+<td><strong>Gemini 3.8 Flash</strong></td>
+<td>3.6 Flash was the named successor and caught 8/8 seeded C++ defects. It left on 2026-10-02 too</td>
+</tr>
+<tr>
+<td>Claude Sonnet 4.5</td>
+<td><strong>Sonnet 5</strong></td>
+<td>An upgrade</td>
+</tr>
+<tr>
+<td>Claude Sonnet 4.6</td>
+<td><strong>Sonnet 5</strong></td>
+<td>Individual annual subscribers keep 4.6</td>
+</tr>
+<tr>
+<td>Claude Opus 4.5</td>
+<td><strong>Opus 5.5</strong></td>
+<td>Pro+ and up. Both Opus 5 and Opus 5.5 are in CLI Auto's pool (read 2026-10-20)</td>
+</tr>
+<tr>
+<td>Claude Opus 4.6</td>
+<td><strong>Opus 5.5</strong></td>
+<td>Same</td>
+</tr>
+<tr>
+<td>Raptor Mini</td>
+<td><strong>MAI-Code-1.1-Flash</strong></td>
+<td>Never selectable in the CLI. GitHub named MAI-Code-1-Flash, itself retired</td>
+</tr>
+<tr>
+<td>MAI-Code-1-Flash</td>
+<td><strong>MAI-Code-1.1-Flash</strong></td>
+<td>Cheaper on both axes, same class</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Copilot's retirement date isn't the model's.</strong> Anthropic's own
+lifecycle page still lists Opus 4.5 and 4.6 as active.</p>
+<h2 id="four-more-went-on-2026-10-02">Four more went on 2026-10-02</h2>
+<p>GitHub announced these on 2026-09-03 and retired them on 2026-10-02. None
+is selectable any more.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Gone</th>
+<th>Go to</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gemini 3.5 Flash</td>
+<td><strong>Gemini 3.8 Flash</strong></td>
+<td>Cheaper on both axes</td>
+</tr>
+<tr>
+<td>Gemini 3.6 Flash</td>
+<td><strong>Gemini 3.8 Flash</strong></td>
+<td>Same price</td>
+</tr>
+<tr>
+<td>Kimi K2.7 Code</td>
+<td><strong>Kimi K3</strong></td>
+<td>Scores far higher, at a higher price</td>
+</tr>
+<tr>
+<td>Claude Opus 4.7</td>
+<td><strong>Opus 5.5</strong></td>
+<td>GitHub's post names Opus 5.5, the cheaper Opus</td>
+</tr>
+</tbody>
+</table></div>
+<p>On Business and Enterprise the replacements are on by default unless an
+admin turned that off. Kimi K3 is the exception, since open-weight models
+stay off until an admin enables them.</p>
+<h2 id="six-went-on-2026-10-19">Six went on 2026-10-19</h2>
+<p>GitHub announced these on 2026-09-18 and retired them on 2026-10-19. None
+is selectable any more. GitHub's supported-models page still lists Grok
+4.5 as GA. The changelog names it as retired.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Gone</th>
+<th>Go to</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gemini 3.7 Flash</td>
+<td><strong>Gemini 3.8 Flash</strong></td>
+<td>Same price. Google routes its own API calls the same way since 2026-10-08, without shutting the endpoint down</td>
+</tr>
+<tr>
+<td>GPT-5.5</td>
+<td><strong>GPT-6.1 Sol</strong></td>
+<td>Pro+ and up. GPT-5.5 left Codex on 2026-10-14, where OpenAI names GPT-6 Sol</td>
+</tr>
+<tr>
+<td>GPT-5.4</td>
+<td><strong>GPT-6.1 Sol</strong></td>
+<td>Plain Pro loses this diversity verifier. Its cross-family pool becomes Gemini 3.8 Flash and Grok 4.7</td>
+</tr>
+<tr>
+<td>GPT-5.4 mini</td>
+<td><strong>GPT-6 Luna</strong></td>
+<td>Luna already undercuts it on output</td>
+</tr>
+<tr>
+<td>GPT-5 mini</td>
+<td><strong>GPT-6 Luna</strong></td>
+<td>The cheap-probe role moves with it</td>
+</tr>
+<tr>
+<td>Grok 4.5</td>
+<td><strong>Grok 4.7</strong></td>
+<td>Same price, same plans</td>
+</tr>
+</tbody>
+</table></div>
+<p>The Business and Enterprise default-on policy covers these successors
+too. Auto's cheap end thins out, though Gemini stays in it. The live CLI
+Auto table marks Gemini 3.8 Flash as included (read 2026-10-20).</p>
+<h2 id="three-more-go-on-2026-11-16">Three more go on 2026-11-16</h2>
+<p>GitHub announced these on 2026-10-15. They're still selectable at time of
+writing. Each successor is already on the roster.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Going</th>
+<th>Go to</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Opus 4.8</td>
+<td><strong>Opus 5.5</strong></td>
+<td>Individual subscribers on annual Copilot plans keep Opus 4.8 and with it an Opus offering</td>
+</tr>
+<tr>
+<td>Opus 5</td>
+<td><strong>Opus 5.5</strong></td>
+<td>The cheaper Opus. It sits in the CLI Auto pool too. Auto thins again on 2026-11-16</td>
+</tr>
+<tr>
+<td>GPT-5.6 Terra</td>
+<td><strong>GPT-6.1 Sol or GPT-6 Luna</strong></td>
+<td>Sol is Pro+ and up. Luna is on every paid plan, plain Pro included</td>
+</tr>
+</tbody>
+</table></div>
+<p>None of this repo's seats pins Opus 4.8, Opus 5 or Terra, so no seat
+breaks on the day (read 2026-10-20). The skills' verifier slots that named
+Terra moved to GPT-6.1 Sol on 2026-10-20, unmeasured on the C++ fixtures.</p>
+<h2 id="roster-footnotes">Roster Footnotes</h2>
+<ul>
+<li><strong>Vendor numbers vs. official boards: compare within one source
+  class.</strong> Official boards run standardized, often minimal, harnesses and
+  score far lower than vendor runs. swebench.com's Verified board tops out
+  at 79.2 and Scale's SWE-bench Pro public board at 61.5. Unlabeled
+  SWE-bench figures are vendor or system-card numbers. vals.ai doesn't
+  always order models the way the official Terminal-Bench board does.</li>
+<li><strong>Grok:</strong> <code>grok-4.6</code> went GA on 2026-08-14, plain Pro included.
+  <code>grok-4.5</code> left Copilot on 2026-10-19, with Grok 4.7 its successor. Claude Code can't offer an xAI model. Copilot CLI's
+  BYOK path can point at any OpenAI-compatible endpoint, on your own key
+  and bill.</li>
+<li><strong>Auto</strong> routes each request by task complexity, with a 10% discount
+  <strong>on paid plans only</strong>. It fits inline or fast-path sessions. In a
+  tiered dispatch wave, pin the model explicitly. (<code>model:</code> pins are
+  reported as downgraded when the session runs a 0x-cost-tier model.) Auto
+  has three tiers, Efficiency, Balance and Intelligence, selectable in VS
+  Code, Copilot CLI and the Copilot App. CLI 1.0.87 lets a user or an org
+  policy set the starting tier. Efficiency suits ordinary inline
+  mechanical work. Auto won't pick a model your plan excludes. The CLI's
+  pool has 15 models at the 2026-10-20 read: GPT-5.6 Luna, Sol and Terra,
+  GPT-6 Astra, Luna and Sol, GPT-6.1 Sol, Haiku 4.5, Opus 4.8, Opus 5,
+  Opus 5.5, Sonnet 5, Sonnet 5.5, Gemini 3.8 Flash and
+  MAI-Code-1.1-Flash. Haiku 5.5 and Gemini 4 Argon aren't in it. Opus
+  4.8, Opus 5 and Terra leave it on 2026-11-16.</li>
+<li><strong>Plan gating (base Pro):</strong> Opus 4.8, Opus 5, Opus 5.5, Fable 5, Fable
+  5.1, GPT-5.5, GPT-5.6 Sol, GPT-6 Sol and GPT-6 Astra are documented
+  Pro+/Max. On base Pro a gated dispatch is expected to fall back to
+  Sonnet 5 with a printed warning, live-confirmed for Opus 4.8 on
+  2026-07-11. Opus 5, Opus 5.5 and the Fables haven't been probed there.
+  Check what your plan actually serves rather than assuming, since Opus 5
+  and Opus 4.8 both served un-gated on our own account on 2026-07-25.
+  That's why the cross-family verifier, Gemini 3.8 Flash, matters on
+  base Pro. GPT-5.6 Terra served there too until its 2026-11-16 exit. On Copilot Free, prerelease CLI 1.0.89-0
+  answers <code>--model claude-opus-5.5</code> with "not available".</li>
+<li><strong>GPT-5.6 vendor numbers</strong> come via secondary write-ups (Vellum, The
+  Agent Report, Artificial Analysis), since OpenAI's pages blocked
+  fetchers when we checked. The headline figures agree across them.</li>
+<li><strong>Opus 4.8 fast</strong> is Copilot's only Claude fast row, billed at 10 / 50
+  (cache read 1, write 12.50) and still tagged preview.</li>
+<li><strong>MAI-Thinking-1</strong> is in public preview on Microsoft Foundry, with no
+  Copilot path (vendor SWE-bench Verified 73.5).</li>
+<li><strong>CLI v1.0.72</strong> added <code>/model --session</code>.</li>
+</ul>
+<h2 id="writing-as-a-separate-question-researched-2026-07-26">Writing, as a separate question (researched 2026-07-26)</h2>
+<p>The table above rates models for code. Prose ranks differently, on
+thinner evidence. Three public eval families cover the roster: Arena's
+writing boards (blind human preference), EQ-Bench (rubric-judged creative
+writing plus a long-form board), and ProfBench (the only eval with a
+professional Style axis). Software documentation has no working eval. No
+vendor publishes a writing benchmark. Ranks below were read 2026-09-22.
+Opus 5.5 isn't on any of these boards yet.</p>
+<p><strong>The picks, where evidence supports one:</strong></p>
+<ul>
+<li><strong>Technical reports and documentation - Sonnet 5.</strong> It has the top
+  Anthropic Style score on ProfBench (72.9), above the pricier Opus 4.8's
+  62.1.</li>
+<li><strong>Prose where the writing itself is the product - Fable 5</strong>, which tops
+  both Arena human-preference boards (statistically tied at the top), or
+  <strong>Opus 5</strong>, which leads every EQ-Bench rubric board and posts the lowest
+  measured slop score. Opus 5 is #3 on Creative Writing v3's Elo sort,
+  behind GPT-6 Astra and Fable 5.1.</li>
+<li><strong>Best non-Anthropic all-rounder - GPT-5.6 Sol</strong> (EQ-Bench Creative
+  Writing v3 #6 by Elo, ProfBench overall tied #3), clean and well-paced
+  but weak on warmth. GPT-6 Astra ranks higher on EQ-Bench but only #25
+  on Arena's creative-writing board.</li>
+<li><strong>Format-forward technical prose - GPT-5.6 Terra</strong>, third of 102 on
+  ProfBench Style, though weaker on narrative.</li>
+<li><strong>Don't reach for Haiku 4.5 or GPT-5 mini.</strong> Both sit well below the
+  frontier on every writing board that lists them.</li>
+</ul>
+<p><strong>Writing and judging come apart.</strong> Opus 5 is only the #7 judge on
+Judgemark v4. Grok 4.5 is #46 as a writer and #10 as a judge.
+Coding-specialised models are weak writers by their own cards, which
+scope them to code.</p>
+<p><strong>Two cautions.</strong> EQ-Bench's writing boards are judged by Claude models,
+Sonnet 4.6 and Sonnet 4. Anthropic models hold Longform's top three
+slots. The boards also disagree. Gemini 3.1 Pro is #9 on Arena's
+creative-writing board and #58 on EQ-Bench Creative Writing v3.</p>
+<h2 id="beyond-copilot-frontier-models-you-cant-route-to-researched-2026-07-25">Beyond Copilot: frontier models you can't route to (researched 2026-07-25)</h2>
+<p>Neither Copilot nor Claude Code can dispatch these models, which is why
+there's no Tier column. Prices come from each vendor's own page unless
+noted.</p>
+<div class="table-wrap table-wide"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Vendor</th>
+<th>Price $/1M in/out</th>
+<th>Good at</th>
+<th>Watch out for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Grok Build 0.1</strong></td>
+<td>xAI</td>
+<td>1 / 2 (doubles past 200K)</td>
+<td>The agentic coding model behind the Grok Build CLI, in public beta.</td>
+<td>It has 256K ctx and only vendor benchmark claims.</td>
+</tr>
+<tr>
+<td><strong>Grok 4.3</strong></td>
+<td>xAI</td>
+<td>1.25 / 2.50 (doubles past 200K)</td>
+<td>A cheaper general tier: 1M ctx, and $0.20 for cached input.</td>
+<td>It isn't the coding flagship and has no independent coding score.</td>
+</tr>
+<tr>
+<td><strong>GPT-5.5-Pro</strong></td>
+<td>OpenAI</td>
+<td>30 / 180</td>
+<td>The highest-stakes reasoning, with multi-minute requests.</td>
+<td>It costs 6x standard GPT-5.5. It isn't a per-task coding option.</td>
+</tr>
+<tr>
+<td><strong>Muse Spark 1.1</strong></td>
+<td>Meta (Superintelligence Labs)</td>
+<td>1.25 / 4.25</td>
+<td>Meta's first paid model API, with 1M ctx and SDKs compatible with OpenAI and Anthropic clients. It's #1 on Scale's official SWE-bench Pro public board at 61.5.</td>
+<td>It drops to 51.5 on Scale's private codebases. It's a young ecosystem with no harness integrations yet.</td>
+</tr>
+<tr>
+<td><strong>Gemini 3.5 Flash-Lite</strong></td>
+<td>Google</td>
+<td>0.30 / 2.50</td>
+<td>High-volume classifying, extracting, and routing, at about 350 tok/s (vendor), with 1M ctx.</td>
+<td>It isn't on Copilot's roster. It's a pipeline utility tier, not an agentic coder.</td>
+</tr>
+<tr>
+<td><strong>Mistral Large / Codestral</strong></td>
+<td>Mistral</td>
+<td>2 / 6 · Codestral ~0.30 / 0.90 (aggregator)</td>
+<td>An EU-jurisdiction flagship, with editor-embedded FIM completion across 80+ languages.</td>
+<td>Prices conflict across sources, with no primary-confirmed coding benchmark. Verify before budgeting.</td>
+</tr>
+<tr>
+<td><strong>Amazon Nova Premier</strong></td>
+<td>Amazon</td>
+<td>2.50 / 12.50 (Bedrock)</td>
+<td>Native Bedrock multimodal support, with 1M ctx.</td>
+<td>It isn't a coding specialist and trails same-class peers on independent indexes.</td>
+</tr>
+<tr>
+<td><strong>Cursor Composer 2.5</strong></td>
+<td>Cursor (Anysphere)</td>
+<td>Cursor-internal billing only</td>
+<td>The worker model in Cursor's swarm-economics result, paired with an Opus planner.</td>
+<td>It's Cursor IDE or CLI only, with no independent API. It's reportedly built on Moonshot's open K2.5 checkpoint.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Gemini's Deep Think tier is consumer-app only, with no API SKU.
+DeepSeek's V4 line sits in the next section.</p>
+<h2 id="the-open-weight-field-researched-2026-07-25">The open-weight field (researched 2026-07-25)</h2>
+<p>The top open-weight coders, flagship class first, then what runs on local
+hardware. <strong>Almost every number here is vendor-self-reported.</strong> Where an
+independent number exists, it runs well below the vendor headline.
+Licenses matter as much as scores for anything you redistribute. SWE-V
+and SWE-Pro mean SWE-bench Verified and Pro. TB means Terminal-Bench.</p>
+<div class="table-wrap table-tall table-wide"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Maker · license</th>
+<th>Size / hosted price $/1M</th>
+<th>Good at</th>
+<th>Watch out for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GLM-5.3</strong></td>
+<td>Z.ai · MIT</td>
+<td>753B MoE (40B active), 1M ctx · 1.40 / 4.40 (cached 0.26)</td>
+<td><strong>#2 open-weights on Artificial Analysis at Intelligence Index v4.3 45.</strong> GLM-5.2's base model with post-training gains. Independent scores are vals.ai SWE-bench Verified 95.4 and Terminal-Bench 4.0 41.8%.</td>
+<td>Reasoning can't be disabled.</td>
+</tr>
+<tr>
+<td><strong>GLM-5.2</strong></td>
+<td>Zhipu (Z.ai) · MIT</td>
+<td>753B MoE (active count undisclosed), 1M ctx · 1.40 / 4.40</td>
+<td>Superseded by GLM-5.3 at the same price. Vendor SWE-Pro is 62.1.</td>
+<td>NIST CAISI flagged bypassable self-hosted safeguards. AA's Intelligence Index puts it at 34. Z.ai Coding Plans auto-route it to GLM-5.3.</td>
+</tr>
+<tr>
+<td><strong>DeepSeek V4-Pro</strong></td>
+<td>DeepSeek · MIT</td>
+<td>1.6T/49B-active, 1M ctx · 0.66 / 1.98 off-peak, 1.32 / 3.96 peak (cache-hit 0.022 / 0.044)</td>
+<td>Vendor 80.6 SWE-V and 93.5 LiveCodeBench in Pro-Max mode. <strong>Repriced 2026-08-16</strong>, with peak windows of 01:00-04:00 and 06:00-10:00 UTC at double the off-peak rate.</td>
+<td>Independent TB2.0 is 67.9. Default thinking mode inflates output cost.</td>
+</tr>
+<tr>
+<td><strong>Kimi K2.7 Code</strong></td>
+<td>Moonshot · Modified MIT</td>
+<td>1T/32B-active, 256K ctx · 0.95 / 4 (0.19 cache-hit)</td>
+<td>Long-horizon agentic coding with strong tool use. It left Copilot on 2026-10-02.</td>
+<td>Every benchmark is Moonshot's own. Its ~340GB of weights need a multi-GPU rig. K3's weights (about 2.8T) ship under a bespoke Kimi K3 License, not MIT.</td>
+</tr>
+<tr>
+<td><strong>Qwen3-Coder-480B-A35B</strong></td>
+<td>Alibaba · Apache 2.0</td>
+<td>480B/35B-active, 256K ctx (1M YaRN) · DashScope ~0.30-0.56 / 1.20-2.22 (aggregator)</td>
+<td>The biggest open coder shipped, with vendor-SOTA agentic claims at release.</td>
+<td>Hosted pricing isn't primary-confirmed. The newer 2.4T Qwen3.8-Max (<code>Qwen/Qwen3.8-2.4T-A95B</code>, bespoke licence) scores 40 on AA's Intelligence Index.</td>
+</tr>
+<tr>
+<td><strong>MiniMax M3</strong></td>
+<td>MiniMax · community license</td>
+<td>428B/23B-active, 1M ctx · 0.30 / 1.20 (doubles past 512K)</td>
+<td>Vendor SWE-Pro is 59 and TB2.1 is 66.</td>
+<td>Hosted calls fall under PRC data jurisdiction. Its license isn't plain MIT.</td>
+</tr>
+<tr>
+<td><strong>MiMo-V2.5-Pro</strong></td>
+<td>Xiaomi · MIT</td>
+<td>1T/42B-active · self-host (third-party routers only)</td>
+<td>Positioned for hours-long autonomous coding (vendor 78.9 SWE-V).</td>
+<td>Independent indexes place it mid-pack. Xiaomi's newer MiMo-V2.6-Pro leads AA's open-weights ranking at 46.</td>
+</tr>
+<tr>
+<td><strong>Nex-N2-Pro</strong></td>
+<td>Nex AGI · Apache 2.0</td>
+<td>397B/17B-active (Qwen3.5 base), 262K ctx · self-host</td>
+<td>Vendor SWE-V is 80.8 and TB2.1 is 75.3. One community bench ties it to Opus 4.6.</td>
+<td>It comes from a small new lab with thin independent verification.</td>
+</tr>
+<tr>
+<td><strong>Llama 4 Scout/Maverick</strong></td>
+<td>Meta · community license (not OSI)</td>
+<td>109B-400B · via Bedrock/Together/self-host</td>
+<td>The broadest ecosystem and tooling support of any open line.</td>
+<td>It trails Qwen, DeepSeek, and GLM on independent coding evals. The license carries an output-training bar.</td>
+</tr>
+<tr>
+<td><strong>Devstral 2 / Small 2</strong></td>
+<td>Mistral · modified-MIT / Apache 2.0</td>
+<td>123B / 24B, 256K ctx · 0.40 / 2.00 and 0.10 / 0.30 (official)</td>
+<td>Vendor SWE-V is 72.2 for Devstral 2 and 68.0 for Small 2. Small 2 runs on one RTX 4090 or a 32GB Mac.</td>
+<td>Check Devstral 2's non-standard modified-MIT before redistributing. Small 2 is the clean Apache self-host pick.</td>
+</tr>
+<tr>
+<td><strong>DeepSeek V4.1-Flash-1017</strong></td>
+<td>DeepSeek · MIT</td>
+<td>1M ctx, 384K max output · 0.15 / 0.60 off-peak, 0.30 / 1.20 peak (cache-hit 0.003 / 0.006)</td>
+<td>Near-Pro quality at a commodity price (vendor 79 SWE-V). It serves <code>deepseek-flash</code> and the retired V4-Flash slugs.</td>
+<td>Vendor scores use a boosted reasoning budget. Independent TB2.0 for the V4-Flash it replaces is 56.9. The <code>-1017</code> build is a re-scored release, not a relabel: vals.ai's Mini-SWE-agent board puts it at 31.82% and Artificial Analysis at 45.10 (read 2026-10-20).</td>
+</tr>
+<tr>
+<td><strong>Qwen3.6-27B</strong></td>
+<td>Alibaba · Apache 2.0</td>
+<td>27B dense, 262K ctx · ~18GB VRAM</td>
+<td>The strongest small dense coder by third-party accounts (SWE-V 77.2 claimed).</td>
+<td>That 77.2 is blog-sourced, not from Qwen's official page.</td>
+</tr>
+<tr>
+<td><strong>Qwen3.6-35B-A3B</strong></td>
+<td>Alibaba · Apache 2.0</td>
+<td>35B/3B-active, 262K ctx</td>
+<td>Vendor SWE-V is 73.4 and LiveCodeBench is 80.4. It's the cheap-inference MoE sweet spot.</td>
+<td>Thinking mode is on by default, which inflates token cost. YaRN long-context extension can hurt short-text quality.</td>
+</tr>
+<tr>
+<td><strong>Qwen3-Coder-Next-80B-A3B</strong></td>
+<td>Alibaba · Apache 2.0</td>
+<td>80B/3B-active hybrid attention, 256K ctx</td>
+<td>Vendor SWE-V is 70.6, with a long-horizon agent focus.</td>
+<td>It needs a current sglang or vllm setup and runs non-thinking only. Its 256K default ctx runs out of memory on consumer GPUs.</td>
+</tr>
+<tr>
+<td><strong>Qwen3-Coder-30B-A3B</strong></td>
+<td>Alibaba · Apache 2.0</td>
+<td>30B/3.3B-active, 262K ctx</td>
+<td>Local agentic coding on consumer hardware.</td>
+<td>Its model card publishes no benchmark numbers.</td>
+</tr>
+<tr>
+<td><strong>GLM-4.7-Flash</strong></td>
+<td>Zhipu (Z.ai) · MIT</td>
+<td>30B/3B-active, 200K ctx · free tier on Z.ai</td>
+<td>The vendor claims size-class SOTA. It runs about 43 tok/s on an Apple M5.</td>
+<td>The free tier is rate-limited. We found no independent scores.</td>
+</tr>
+<tr>
+<td><strong>GLM-4.5-Air</strong></td>
+<td>Zhipu (Z.ai) · MIT</td>
+<td>106B/12B-active, 128K ctx · ~0.13-0.20 / 0.85-1.10 (aggregator)</td>
+<td>The proven mid MoE, with a vendor SWE-V of 57.6. A community REAP-82B prune exists for tighter rigs.</td>
+<td>Superseded by the 4.6, 4.7, and 5.x line.</td>
+</tr>
+<tr>
+<td><strong>gpt-oss-120b</strong></td>
+<td>OpenAI · Apache 2.0</td>
+<td>117B/5.1B-active, 128K ctx · Groq/Together 0.15 / 0.60</td>
+<td>Still the reference open release (vendor SWE-V 62.4, Codeforces 2622 with tools).</td>
+<td>Its weights date to Aug-2025. It misses 78% on SimpleQA, a high hallucination rate.</td>
+</tr>
+<tr>
+<td><strong>gpt-oss-20b</strong></td>
+<td>OpenAI · Apache 2.0</td>
+<td>21B/3.6B-active, ~16GB · Groq/Together from 0.05 / 0.20</td>
+<td>o3-mini-class reasoning on a single consumer GPU.</td>
+<td>Same vintage and caveats as its big sibling, with worse hallucination.</td>
+</tr>
+<tr>
+<td><strong>DeepSeek R1 distills (8B/32B)</strong></td>
+<td>DeepSeek · MIT</td>
+<td>dense, self-host only</td>
+<td>Still DeepSeek's current small-distill recommendation.</td>
+<td>They're 2025-vintage. V4.1-Flash supersedes them wherever it fits.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Not tabled: Qwen2.5-32B, which Qwen3.6-27B replaced, and the Qwen3-VL
+vision line, which is out of scope for a coding guide.</p>
+</main>
+<footer>
+<p>smartplan · MIT · generated from repo markdown</p>
+</footer>
+<script>
+/* Click-to-sort for every data table on the site. Added 2026-08-22 for the
+   quick-picks page, written generically because a comparison table nobody
+   can re-sort answers only the question its author happened to ask.
+   No dependencies, and the page is fully readable with JS off: this only
+   ever reorders rows that are already there. */
+(function () {
+  var NUM = /-?\d+(?:[.,]\d+)?/g;
+
+  /* Cell -> sort key. Three kinds, in order of specificity.
+     1. A capability strip sorts by how good the model is: four points a
+        band leader, three a check, two an "it depends", one a warning,
+        zero a cross or an unknown.
+     2. Anything that LEADS with a digit sorts numerically. A price reads
+        "0.20 / 1.20", and the number that matters there is the one AFTER the
+        slash, since output is what agentic work actually spends.
+     3. Everything else compares as text. "Sonnet 5" and "GPT-5.4" contain
+        digits and are not numbers; what separates them from a real number is
+        that a number leads. A letter-count rule was tried first and failed on
+        "GPT-5.4", whose three letters slipped under the bar and sorted the
+        Model column by version number.
+     An em dash means "not measured" and returns NaN, which counts as numeric
+     for column detection AND pins the row last in both directions. */
+  function key(cell, alt) {
+    /* A merged cell shows two numbers, and no parse can know which one the
+       reader means, so it carries both keys explicitly. `alt` picks the
+       second. An empty attribute is "not measured", same as an em dash. */
+    var dual = cell.querySelector(".dual");
+    if (dual) {
+      var raw = dual.getAttribute(alt ? "data-k2" : "data-k");
+      return raw ? parseFloat(raw) : NaN;
+    }
+    var caps = cell.querySelector(".caps");
+    if (caps) {
+      var score = 0;
+      caps.querySelectorAll("span").forEach(function (s) {
+        if (s.classList.contains("s")) score += 4;
+        else if (s.classList.contains("y")) score += 3;
+        else if (s.classList.contains("m")) score += 2;
+        else if (s.classList.contains("w")) score += 1;
+      });
+      return score;
+    }
+    var text = (cell.textContent || "").trim();
+    if (!text || /^[\u2014\u2013-]$/.test(text)) return NaN;
+    if (!/^[^0-9A-Za-z]*[0-9]/.test(text)) return text.toLowerCase();
+    var nums = text.match(NUM);
+    if (!nums || !nums.length) return text.toLowerCase();
+    if (nums.length > 1 && text.indexOf("/") !== -1) {
+      return parseFloat(nums[1].replace(",", "."));
+    }
+    return parseFloat(nums[0].replace(",", "."));
+  }
+
+  function missing(v) { return typeof v === "number" && isNaN(v); }
+
+  function sortable(table) {
+    var head = table.tHead && table.tHead.rows[0];
+    var body = table.tBodies[0];
+    if (!head || !body || head.cells.length < 3 || body.rows.length < 3) return;
+
+    var rows = Array.prototype.slice.call(body.rows);
+    rows.forEach(function (r, i) { r.dataset.i = i; });
+
+    /* A column is numeric when most of it parses as a number. Deciding per
+       column rather than per cell keeps one stray footnote marker from
+       flipping a whole column to text sorting. */
+    var numeric = [];
+    var dual = [];
+    for (var c = 0; c < head.cells.length; c++) {
+      var hits = 0;
+      for (var r = 0; r < rows.length; r++) {
+        if (rows[r].cells[c] && typeof key(rows[r].cells[c]) === "number") hits++;
+      }
+      numeric[c] = hits >= rows.length * 0.6;
+      dual[c] = rows.some(function (row) {
+        return row.cells[c] && !!row.cells[c].querySelector(".dual");
+      });
+    }
+
+    /* "The useful direction" is not the same for every number. High value and
+       high capability are good, so those open descending. A price is the one
+       column where low is the good news, so it opens ascending. Nothing
+       generic infers that, so the header text is asked directly. */
+    function opensDescending(col) {
+      var cheapFirst = /price|cost|\$/i.test(head.cells[col].textContent || "");
+      return !!numeric[col] && !cheapFirst;
+    }
+
+    /* Three clicks, three states. For an ordinary column those are the useful
+       direction, its reverse, and the shipped order. A dual-key column spends
+       the middle state on its SECOND key instead of on a reverse, because
+       "worst value first" is a direction nobody wants and "sort by score" is
+       a question people actually ask. Both of its states run descending. */
+    function ordered(col, state) {
+      var out = rows.slice();
+      if (state === 0) {
+        out.sort(function (a, b) { return a.dataset.i - b.dataset.i; });
+        return out;
+      }
+      var alt = dual[col] && state > 2;
+      /* A dual column runs key1 down, key1 up, key2 down, key2 up, so odd
+         states are descending. Everything else is the column's own useful
+         direction and then its reverse. */
+      var desc = dual[col]
+        ? (state % 2 === 1)
+        : ((state === 1) === opensDescending(col));
+      out.sort(function (a, b) {
+        var x = key(a.cells[col], alt), y = key(b.cells[col], alt);
+        var xm = missing(x), ym = missing(y);
+        if (xm && ym) return a.dataset.i - b.dataset.i;
+        /* Returned before the direction flip, so an unmeasured row sinks
+           whichever way the column is pointing. */
+        if (xm) return 1;
+        if (ym) return -1;
+        var d = (typeof x === "number" && typeof y === "number")
+          ? x - y
+          : String(x).localeCompare(String(y));
+        return desc ? -d : d;
+      });
+      return out;
+    }
+
+    function ids(list) {
+      return list.map(function (r) { return r.dataset.i; }).join(",");
+    }
+
+    /* A dual column sorts two ways on each of two keys, so its cycle is four
+       long where an ordinary column's is two. */
+    function lastState(col) { return dual[col] ? 4 : 2; }
+
+    function keyName(col, state) {
+      var cell = body.querySelector(
+        "tr td:nth-child(" + (col + 1) + ") .dual[data-n]");
+      return cell && cell.getAttribute(state > 2 ? "data-n2" : "data-n");
+    }
+
+    function paint(col, state) {
+      head.querySelectorAll("th").forEach(function (th, i) {
+        if (i !== col || state === 0) { th.setAttribute("aria-sort", "none"); }
+        /* Restore any header that was showing a sort-key name. */
+        if ((i !== col || state === 0) && th.dataset.name) {
+          (th.querySelector("[title]") || th).textContent = th.dataset.name;
+        }
+      });
+      if (state === 0) return;
+
+      var desc = dual[col]
+        ? (state % 2 === 1)
+        : ((state === 1) === opensDescending(col));
+      var th = head.cells[col];
+      th.setAttribute("aria-sort", desc ? "descending" : "ascending");
+
+      /* Say which key is live. Without it the third click on a dual-key
+         column looks like a bug: the rows move and the header does not.
+         The name REPLACES the header text rather than sitting under it in a
+         block of its own -- a block child pushes the arrow's static position
+         onto a second line, which put the indicator somewhere no other header
+         puts it. Staying on one line keeps this column's chrome identical to
+         every other. The names are read off the cells, so a second dual
+         column anywhere on the site labels itself. */
+      var name = dual[col] && keyName(col, state);
+      if (name) {
+        var slot = th.querySelector("[title]") || th;
+        if (!th.dataset.name) { th.dataset.name = slot.textContent; }
+        slot.textContent = "by " + name;
+      }
+    }
+
+    /* Which column is the table ALREADY sorted by? Answered below, before any
+       click can land. It decides the length of the click cycle, so it is a
+       closure variable rather than a local. */
+    var shippedCol = -1;
+
+    /* One shared state, not one per header. Clicking a different column
+       restarts at its first direction rather than resuming wherever that
+       column was left, which is what a per-header closure did.
+
+       State 0 is "the order it shipped in". Where a column reproduces that
+       order, 0 is a duplicate of that column's own sorted state AND the only
+       state that leaves the table with no header marked, so it is dropped and
+       the cycle runs 1, 2, 1. Clicking that column is how a reader gets the
+       original order back, and it stays marked while they look at it.
+       Where NO column reproduces the shipped order, 0 is kept: it is then the
+       only way back to an order the reader would otherwise lose for good. */
+    var active = { col: -1, state: 0 };
+
+    function activate(col) {
+      var state;
+      if (active.col !== col) state = 1;
+      else if (active.state < lastState(col)) state = active.state + 1;
+      else state = shippedCol >= 0 ? 1 : 0;
+      active = { col: col, state: state };
+      ordered(col, state).forEach(function (r) { body.appendChild(r); });
+      paint(col, state);
+    }
+
+    head.querySelectorAll("th").forEach(function (th, col) {
+      th.classList.add("sortable");
+      /* A swapped-in key name is longer than the header it replaces, and
+         "by SWE-V" breaking after "by" would read as two headers. */
+      if (dual[col]) { th.classList.add("sortable-dual"); }
+      th.tabIndex = 0;
+      th.setAttribute("role", "button");
+      th.setAttribute("aria-sort", "none");
+      th.addEventListener("click", function () { activate(col); });
+      th.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(col); }
+      });
+    });
+
+    /* Which column is the table ALREADY sorted by? Markdown ships in an order
+       its author chose -- this roster ships by value -- and a header row that
+       marks every column "unsorted" tells the reader nothing about the order
+       they are looking at. So the shipped order is compared against what each
+       column would produce, and the first exact match is shown as active.
+       Columns whose keys are all identical are skipped: they match every
+       order and would claim credit for one they did not cause. */
+    var shipped = ids(rows);
+    for (var col = 0; col < head.cells.length && active.col < 0; col++) {
+      var seen = {}, distinct = 0;
+      for (var i = 0; i < rows.length; i++) {
+        var k = String(key(rows[i].cells[col]));
+        if (!seen[k]) { seen[k] = 1; distinct++; }
+      }
+      if (distinct < 2) continue;
+      for (var s = 1; s <= lastState(col); s++) {
+        if (ids(ordered(col, s)) === shipped) {
+          active = { col: col, state: s };
+          shippedCol = col;
+          paint(col, s);
+          break;
+        }
+      }
+    }
+  }
+
+  document.querySelectorAll(".table-wrap table").forEach(sortable);
+})();
+</script>
+</body>
+</html>

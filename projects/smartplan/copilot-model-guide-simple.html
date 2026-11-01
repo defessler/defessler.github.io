@@ -1,0 +1,1565 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>smartplan — Quick Picks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: dark;
+  --void: #0a0e14;
+  --void-2: #101827;
+  --cell: #0d1420;
+  --cell-head: #131c2b;
+  --panel: rgba(23,34,51,.55);
+  --mint: #35e0c8;
+  --peri: #7c8cff;
+  --rose: #ff5f9e;
+  --amber: #ffb35c;
+  --ink: #e6edf3;
+  --ink-2: #b7c3cd;
+  --ink-dim: #8b98a5;
+  --line: rgba(120,160,200,.16);
+  --glow-mint: 0 0 22px rgba(53,224,200,.4);
+  --ease: cubic-bezier(.2,.7,.2,1);
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background-color: var(--void);
+  background-image:
+    radial-gradient(ellipse 900px 700px at -10% -15%, rgba(53,224,200,.10), transparent 60%),
+    radial-gradient(ellipse 1000px 800px at 115% 5%, rgba(124,140,255,.09), transparent 60%),
+    radial-gradient(ellipse 800px 700px at 105% 115%, rgba(53,224,200,.08), transparent 60%);
+  background-repeat: no-repeat;
+  background-attachment: fixed, fixed, fixed;
+  color: var(--ink);
+  font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.65;
+}
+::selection { background: var(--mint); color: var(--void); }
+a:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+nav.site-nav {
+  max-width: 84rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+.nav-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1.4rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+/* Smooth the horizontal scroll while a pointer rests on a nav row. :has() is
+   widely supported. A browser without it just scrolls instantly. */
+@supports selector(:has(*)) {
+  nav.site-nav:has(.nav-row) .nav-row:hover { scroll-behavior: smooth; }
+}
+.nav-row > * { scroll-snap-align: start; }
+.nav-row::-webkit-scrollbar { display: none; }
+/* Below the widest phone, trim the nav's horizontal padding and tighten the
+   gaps so more than three destinations are reachable without scrolling at
+   all. */
+@media (max-width: 40rem) {
+  nav.site-nav { padding: 0 0.75rem; }
+  .nav-row { gap: 1rem; }
+  .nav-groups { padding: 0.6rem 0 0.4rem; }
+}
+.nav-groups { padding: 0.8rem 0 0.55rem; }
+.subnav {
+  padding: 0.45rem 0 0.6rem;
+  border-top: 1px solid var(--line);
+  gap: 1.15rem;
+}
+.brand {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  background: linear-gradient(90deg, var(--mint), var(--peri));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-right: 0.4rem;
+}
+.stamp {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  opacity: 0.55;
+  white-space: nowrap;
+  align-self: center;
+  /* Anchored right: the group links sit left of it, this takes the slack. */
+  margin-left: auto;
+  padding-left: 1.5rem;
+}
+@media (max-width: 40rem) {
+  /* On a phone the nav row already scrolls, so a right-anchored stamp would
+     sit off-screen past the last link. Let it flow after them instead. */
+  .stamp { margin-left: 0; padding-left: 0.75rem; font-size: 0.66rem; }
+}
+.nav-groups a {
+  font-family: "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  color: var(--ink-2);
+  text-decoration: none;
+  padding-bottom: 0.3rem;
+  transition: color 0.2s var(--ease), text-shadow 0.2s var(--ease);
+}
+.nav-groups a:hover { color: var(--mint); text-shadow: var(--glow-mint); }
+/* The one call-to-action in the chrome. Reads as a button rather than a nav
+   link, because it does something different from every other link up there. */
+.nav-groups a.dl-btn {
+  color: var(--void);
+  background: var(--mint);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  margin-left: 1rem;
+  align-self: center;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: filter 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.nav-groups a.dl-btn:hover {
+  color: var(--void);
+  text-shadow: none;
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+@media (max-width: 720px) {
+  .nav-groups a.dl-btn { padding: 0.25rem 0.7rem; margin-left: 0.6rem; }
+}
+/* Build facts under a download link. Deliberately quiet: they answer a
+   question you only ask after the link has already caught your eye. */
+.dl-meta {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.82em;
+  line-height: 1.45;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* A filename is one token to a reader. Breaking it across lines reads as a
+   rendering fault, so the cell holding a build stamp keeps its code spans
+   whole. Scoped by :has() to that cell alone — every other table on the site
+   still wraps long code spans, which is what keeps them narrow. */
+td:has(.dl-meta) code { white-space: nowrap; }
+.nav-groups a.current {
+  color: var(--ink);
+  background-image: linear-gradient(90deg, var(--mint), var(--peri));
+  background-size: 100% 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+}
+.subnav a {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.03em;
+  color: var(--ink-dim);
+  text-decoration: none;
+  transition: color 0.2s var(--ease);
+}
+.page-toc {
+  margin: 1.5rem 0 2rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--mint);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--panel) 60%, transparent);
+}
+.page-toc > summary {
+  cursor: pointer;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.page-toc > ul {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  columns: 2;
+  column-gap: 2rem;
+}
+.page-toc li {
+  margin: 0 0 0.35rem;
+  break-inside: avoid;
+  font-size: 0.92rem;
+}
+@media (max-width: 40rem) {
+  .page-toc > ul { columns: 1; }
+}
+.subnav a:hover { color: var(--mint); }
+.subnav a.current { color: var(--mint); }
+.subnav a.current::before { content: "▸ "; }
+main {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 4rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+/* Text uses the page. `main` caps at 80rem and centres, which is the whole
+   measure. Nothing narrows its children further. An earlier 46rem prose cap
+   wrapped text well before the page needed to and left a wide empty gutter
+   beside every paragraph. It was removed on purpose. Don't add it back. */
+a {
+  color: var(--mint);
+  text-decoration: none;
+  transition: color 0.2s var(--ease), text-shadow 0.2s var(--ease);
+}
+a:hover { text-decoration: underline; text-shadow: var(--glow-mint); }
+strong { color: var(--ink); font-weight: 600; }
+h1, h2, h3 { font-family: "Space Grotesk", sans-serif; line-height: 1.25; }
+h4, h5, h6 { font-family: "Space Grotesk", sans-serif; color: var(--ink-2); line-height: 1.25; }
+h1 {
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--mint), var(--peri));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+h2 {
+  font-weight: 600;
+  color: var(--ink);
+  margin-top: 3rem;
+  padding-bottom: 0.85rem;
+}
+h2::after {
+  content: "";
+  display: block;
+  width: 2.5rem;
+  height: 3px;
+  margin-top: 0.6rem;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--mint), var(--peri), var(--rose));
+}
+h3 {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 1rem;
+  color: var(--ink-2);
+  margin-top: 2rem;
+}
+.hero { margin-bottom: 3rem; }
+.thesis {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.5vw, 1.8rem);
+  line-height: 1.35;
+  margin: 0 0 1.75rem;
+  color: var(--ink);
+}
+.thesis em {
+  font-style: normal;
+  background: linear-gradient(90deg, var(--mint), var(--peri));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.board { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+.board td a { color: var(--ink); font-weight: 600; }
+.board td a:hover { color: var(--mint); }
+.chip {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 0.1em 0.55em;
+  border: 1px solid rgba(53,224,200,.35);
+  border-radius: 999px;
+  color: var(--mint);
+  white-space: nowrap;
+}
+.table-wrap {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9rem;
+}
+th {
+  background: var(--cell-head);
+  font-family: "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  text-align: left;
+  padding: 0.65rem 0.85rem;
+  vertical-align: bottom;
+}
+td {
+  padding: 0.7rem 0.85rem;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  color: var(--ink-2);
+  background: var(--void);
+  /* Top-align, because a one-word cell centred beside a paragraph is the
+     single worst thing about a dense comparison table. */
+  vertical-align: top;
+  line-height: 1.5;
+}
+/* Zebra striping. Subtle enough not to fight the palette, strong enough to
+   let the eye track a row across seven columns. */
+tbody tr:nth-child(even) td { background: #0c121c; }
+td:first-child, th:first-child {
+  color: var(--ink);
+  position: sticky;
+  left: 0;
+  background: var(--cell);
+  /* The frozen column needs an edge or it reads as part of the scroll. */
+  box-shadow: 1px 0 0 var(--line);
+}
+tbody tr:nth-child(even) td:first-child { background: #0f1622; }
+th:first-child { background: var(--cell-head); z-index: 3; }
+tbody tr:hover td { background: #12222a; }
+tbody tr:hover td:first-child { background: #16262f; }
+
+/* Dense tables: cap the height so the header can stick, and give columns a
+   floor so prose does not shred into one word per line. */
+.table-tall {
+  max-height: 78vh;
+  overflow: auto;
+}
+.table-tall thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+/* The corner cell has to stick on BOTH axes and outrank both. Without this
+   the header scrolls left while the body's frozen column stays put, so the
+   wrong heading ends up sitting over the row labels. */
+.table-tall thead th:first-child {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 4;
+}
+.table-wide table { font-size: 0.85rem; }
+.table-wide td, .table-wide th { min-width: 12rem; }
+.table-wide td:first-child, .table-wide th:first-child {
+  min-width: 9rem;
+  max-width: 14rem;
+}
+/* Price-ish second column reads as data, not prose. */
+.table-wide td:nth-child(2) { min-width: 6rem; white-space: nowrap; }
+
+@media (max-width: 720px) {
+  .table-tall { max-height: 70vh; }
+  .table-wide td, .table-wide th { min-width: 9rem; }
+}
+
+/* Capability strip. Added 2026-08-22, replacing five prose columns with one.
+   The grid is a FIXED five across rather than auto-fit, because the whole
+   point is that "Code reviews" sits under "Code reviews" on the row above:
+   a reader scans one task down the table instead of reading 21 sentences.
+   Auto-fit reflows per cell and loses that. */
+.caps {
+  display: grid;
+  /* 6rem is the measured width of the longest label, "Code reviews", at the
+     font size below plus its glyph. Under that the labels collide, which is
+     what a first pass at 5.4rem did. */
+  grid-template-columns: repeat(5, minmax(6rem, 1fr));
+  gap: 0.25rem 0.4rem;
+  min-width: 31rem;
+}
+.caps span {
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+/* A band leader (★) is the one chip that should out-rank a plain check, so
+   it gets both the strongest weight and the accent color. */
+.caps .s { font-weight: 600; color: var(--mint); }
+.caps .y { color: var(--ink); }
+.caps .m { color: var(--ink-2); }
+.caps .w { color: var(--ink-2); }
+/* A "wrong tool" verdict is the one a reader should skim past, so it recedes
+   rather than shouting. It is still legible, just not competing. Unknown
+   (no Artificial Analysis row) dims the same way, for the same reason. */
+.caps .n { opacity: 0.45; }
+.caps .u { opacity: 0.45; }
+
+/* Value and board score, one column. Added 2026-08-23, replacing two adjacent
+   numeric columns. They were always read together -- a ratio on its own sells
+   the cheapest model in the room -- so stacking them puts the check directly
+   under the claim instead of one saccade to the right.
+   Tooltips are native `title` on purpose. .table-wrap scrolls on x, which
+   makes overflow-y compute to auto as well, so a positioned CSS bubble would
+   be clipped by the very row it belongs to. */
+.dual { display: block; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.dual .dv, .dual .ds {
+  display: block;
+  cursor: help;
+  /* Underlines the glyphs, not the block. A border-bottom here would draw a
+     rule the full width of the cell. */
+  text-decoration: underline dotted rgba(120,160,200,.4);
+  text-underline-offset: 3px;
+}
+.dual .dv { font-weight: 600; font-size: 1rem; color: var(--ink); }
+.dual .ds { font-size: 0.8rem; color: var(--ink-dim); }
+.dual.lead .dv { color: var(--mint); }
+th span[title] { cursor: help; }
+
+/* Click-to-sort. The affordance has to be visible without hover, since a
+   header that only reveals itself on hover is invisible on touch. */
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  padding-right: 1.6rem;
+  position: relative;
+}
+th.sortable:hover, th.sortable:focus-visible { color: var(--ink); }
+th.sortable::after {
+  content: "↕";
+  position: absolute;
+  right: 0.6rem;
+  opacity: 0.3;
+  font-size: 0.9em;
+}
+/* The active column is announced, not just arrowed: this table ships
+   sorted by value and a reader needs to see that without clicking. */
+th.sortable[aria-sort="descending"], th.sortable[aria-sort="ascending"] {
+  color: var(--mint);
+}
+th.sortable[aria-sort="descending"]::after { content: "↓"; opacity: 1; }
+th.sortable[aria-sort="ascending"]::after { content: "↑"; opacity: 1; }
+th.sortable:focus-visible { outline: 2px solid var(--mint); outline-offset: -2px; }
+/* A dual header swaps its text for the live key name, which is longer than
+   the name it replaces. Wrapping it would read as two headers. */
+th.sortable-dual { white-space: nowrap; }
+
+/* A table carrying capability strips sets its own widths. .table-wide's
+   12rem floor per column is right for five columns of prose and wrong here,
+   where one column is a fixed grid and three are short data. Declared after
+   .table-wide so it wins on source order at equal specificity. */
+.table-caps table { font-size: 0.85rem; }
+.table-caps td, .table-caps th { min-width: 0; }
+.table-caps td:first-child, .table-caps th:first-child {
+  min-width: 8.5rem;
+  max-width: 11rem;
+}
+.table-caps td:nth-child(2), .table-caps td:nth-child(3) { white-space: nowrap; }
+.table-caps td:last-child, .table-caps th:last-child { min-width: 14rem; }
+
+@media (max-width: 720px) {
+  .caps { grid-template-columns: repeat(2, minmax(6.5rem, 1fr)); min-width: 14rem; }
+}
+code, pre {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas,
+    "Liberation Mono", Menlo, monospace;
+}
+code {
+  background: var(--void-2);
+  color: var(--mint);
+  border: 1px solid var(--line);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+pre {
+  background: var(--void-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--mint);
+  color: var(--ink);
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+pre code {
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 0;
+}
+blockquote {
+  margin: 1.25rem 0;
+  padding: 0.75rem 1.25rem;
+  background: var(--panel);
+  border-left: 3px solid var(--peri);
+  border-radius: 0 6px 6px 0;
+  color: var(--ink-2);
+}
+hr {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 2rem 0;
+}
+footer {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+  color: var(--ink-dim);
+  font-size: 0.85rem;
+  text-align: center;
+  border-top: 1px solid var(--line);
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<header>
+<nav class="site-nav">
+<div class="nav-row nav-groups">
+<span class="brand">smartplan</span>
+<a href="index.html">Start</a>
+<a class="current" href="copilot-model-guide.html">Guides</a>
+<a href="benchmarks.html">Evidence</a>
+<a href="whats-new.html">Project</a>
+<a href="m365-setup.html">M365 Agents</a>
+<a href="https://github.com/defessler/smartplan">GitHub</a>
+<span class="stamp">v4.151.0 &middot; data 2026-10-20 &middot; built 2026-11-01 3:20 AM PST / 6:20 AM EST</span>
+<a class="dl-btn" href="downloads.html">Download</a>
+
+</div>
+<div class="nav-row subnav">
+<a href="copilot-model-guide.html">Model Guide</a>
+<a class="current" href="copilot-model-guide-simple.html">Quick Picks</a>
+<a href="model-classes.html">Model Classes</a>
+<a href="copilot-budget.html">Copilot on a Budget</a>
+</div>
+</nav>
+</header>
+<main>
+<h1 id="copilot-models-quick-picks-by-task">Copilot models: quick picks by task</h1>
+<p>The shortlist. <a href="copilot-model-guide.html">The full guide</a> has the evidence,
+tier definitions, and deprecation table. Prices are $/1M tokens in/out from
+GitHub's pricing table, read 2026-08-22 to 2026-10-13. Artificial Analysis
+(AA) values were read 2026-09-30, except Gemini 4 Argon's, read
+2026-10-13, and GPT-6 Sol's, read 2026-10-20. The Good at scores were read
+2026-10-13 and re-cut 2026-10-20 without the models retired on 2026-10-19.</p>
+<h2 id="quick-picks">Quick picks</h2>
+<ul>
+<li><strong>Writing code</strong> - GPT-6 Luna, behind a scripted check. GPT-6.1 Sol for
+  judgement calls on Pro+ and up, Sonnet 5.5 on plain Pro. GPT-6.1 Sol
+  needs CLI 1.0.90 or later, so use GPT-6 Sol on an older build. Both
+  GPT-6 picks are untrialed here. A Pro+ probe served GPT-6.1 Sol on CLI
+  1.0.90 on 2026-09-30</li>
+<li><strong>Code reviews</strong> - Gemini 3.8 Flash. In T42 it caught 13 of 16 seeded
+  C++ defects for 5.8 credits, the same as GPT-5.6 Terra at 41.7. GPT-6 Sol
+  caught 14 to 15 when the budget allows. On the tightest budget a fresh
+  Luna re-runs the scripted check on its own simple work</li>
+<li><strong>Writing docs</strong> - Sonnet 5.5 for technical reports, or GPT-5.6 Terra until it leaves Copilot on 2026-11-16.
+  Opus 5.5 when the prose is the product, though only one writing board
+  lists it so far</li>
+<li><strong>Exploring a codebase</strong> - GPT-6 Luna or GPT-5.6 Luna to find things
+  (Haiku 5.5 serves at the same price). Sonnet 5.5 to understand them. On
+  Pro+ and up, GPT-6.1 Sol reads long context better at the same list price</li>
+<li><strong>Planning and architecture</strong> - Opus 5.5 on Pro+ and up, with Opus 5 as
+  the pricier fallback</li>
+<li><strong>Don't want to pick</strong> - "Auto" routes per task and takes 10% off on a
+  paid plan. Pin a model when the tier matters. On Pro+ and up, Auto can
+  route a hard prompt to GPT-6 Astra at 10 / 50</li>
+</ul>
+<h2 id="the-table">The table</h2>
+<p><strong>Models are grouped by what a task actually costs</strong>, not by list price.
+Artificial Analysis measures dollars per task on its own index run,
+counting every input, cache, and reasoning token. List price can mislead.
+Grok 4.7 lists at 2 / 6 but costs $2.73 a task, twice Opus 5.5.</p>
+<p><strong>Good at compares a model only with the others in its band.</strong></p>
+<ul>
+<li>★ best in its band at that job</li>
+<li>✅ within 1.5 points of the best</li>
+<li>🟡 within 3 points</li>
+<li>🟠 more than 3 points behind</li>
+<li>❌ wrong tool: the registry never seats this model for that job,
+  whatever it scores</li>
+<li>? no AA row, so no score</li>
+</ul>
+<p>So a ★ on a budget model means best for the money, not best overall.
+Hover a mark for its score out of 10. For the absolute picture, read
+<a href="#two-more-views">the grades and scores</a> below the bands.</p>
+<p><strong>Value is quality divided by cost</strong>, AA's Intelligence Index (the
+bracketed number) over its measured dollars per task. GPT-6.1 Sol, GPT-6
+Sol, Sonnet 5.5 and Sonnet 5 all list at 2 / 10, yet their values are 224,
+161, 69.5 and 28.1. Eleven
+models lack a measured AA row at Copilot's default effort and use the
+nearest or only one, which the tooltip names. A max row flatters the
+index and inflates the cost. <strong>—</strong> means AA has no measured cost. Click a
+header to sort within a band. The value column cycles through value and
+index.</p>
+<h3 id="budget-under-010-a-task">Budget · under $0.10 a task</h3>
+<div class="table-wrap table-wide table-caps"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Price</th>
+<th><span title="Value = quality ÷ measured cost. Each model's Artificial Analysis Intelligence Index at the effort Copilot serves by default, divided by AA's measured cost in dollars per index task at that effort. The index blends ten evals, weighted Agents 30%, Coding 20%, Scientific Reasoning 20% and General 30%. AA puts its 95% confidence interval under ±1%. Cost moves this ratio far more than quality does. Read the bracketed index under each value too.">Value</span></th>
+<th>Good at</th>
+<th>Watch out for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GPT-6 Luna</strong></td>
+<td>0.10 / 0.50</td>
+<td><span class="dual lead" data-k="1677.7" data-k2="29.5" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 29.46 ÷ AA's measured $0.0176 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">1678</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names GPT-6 Luna (medium). Medium is its vendor's default. No Copilot picker read covers it yet.">(29.5)</span></span></td>
+<td><span class="caps"><span class="y" title="Score 2.4 of 10, grade D. Band leader: Haiku 5.5 at 3.0.">✅ Writing code</span><span class="y" title="Score 5.4 of 10, grade B. Band leader: Haiku 5.5 at 5.6.">✅ Writing docs</span><span class="m" title="Score 1.9 of 10, grade D. Band leader: Haiku 5.5 at 4.1.">🟡 Code reviews</span><span class="s" title="Score 4.1 of 10, grade C. Best in its band.">★ Research</span><span class="n" title="Wrong tool: Mechanical-tier, with no planner role.">❌ Planning</span></span></td>
+<td><strong>It's the cheapest model on Copilot</strong>, on every paid plan including plain Pro. Past 272K it bills 0.20 / 0.75 on the whole request. In CLI Auto's pool.</td>
+</tr>
+<tr>
+<td><strong>GPT-5.6 Luna</strong></td>
+<td>0.20 / 1.20</td>
+<td><span class="dual" data-k="1605.1" data-k2="25.0" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 25.04 ÷ AA's measured $0.0156 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">1605</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names GPT-5.6 Luna (medium). Copilot's picker showed Medium for it on 2026-08-06.">(25.0)</span></span></td>
+<td><span class="caps"><span class="m" title="Score 1.2 of 10, grade D. Band leader: Haiku 5.5 at 3.0.">🟡 Writing code</span><span class="y" title="Score 4.1 of 10, grade C. Band leader: Haiku 5.5 at 5.6.">✅ Writing docs</span><span class="w" title="Score 0.8 of 10, grade D. Band leader: Haiku 5.5 at 4.1.">🟠 Code reviews</span><span class="y" title="Score 3.0 of 10, grade C. Band leader: GPT-6 Luna at 4.1.">✅ Research</span><span class="n" title="Wrong tool: Mechanical-tier, with no planner role.">❌ Planning</span></span></td>
+<td>Use it <strong>only behind an independent verifier</strong>, since no trial here has cleared it yet. It beats Sonnet 5 on the official Terminal-Bench 4.0 board (17.3% against 12.4%) but trails it on vals.ai (4.55) and AA (0.5%)</td>
+</tr>
+<tr>
+<td><strong>Haiku 5.5</strong></td>
+<td>0.10 / 0.50 (&gt;100K: 0.50 / 2.50)</td>
+<td><span class="dual" data-k="732.8" data-k2="34.5" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 34.46 ÷ AA's measured $0.0470 per index task, both from one Artificial Analysis row, read 2026-10-08. The bracketed number under it is the index.">733</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Claude Haiku 5.5 (Medium). Medium is its vendor's default. No Copilot picker read covers it yet.">(34.5)</span></span></td>
+<td><span class="caps"><span class="s" title="Score 3.0 of 10, grade C. Best in its band.">★ Writing code</span><span class="s" title="Score 5.6 of 10, grade B. Best in its band.">★ Writing docs</span><span class="s" title="Score 4.1 of 10, grade C. Best in its band.">★ Code reviews</span><span class="y" title="Score 3.6 of 10, grade C. Band leader: GPT-6 Luna at 4.1.">✅ Research</span><span class="s" title="Score 4.9 of 10, grade C. Best in its band.">★ Planning</span></span></td>
+<td>GA on Copilot 2026-10-07. Stable 1.0.93 serves <code>claude-haiku-5.5</code> though its help config doesn't list it. Over 100K tokens of prompt it bills five times this rate. GPT-6 Luna stays the primary. Untrialed in any Copilot seat.</td>
+</tr>
+<tr>
+<td><strong>MAI-Code-1.1-Flash</strong></td>
+<td>0.20 / 1.20</td>
+<td><span class="dual" data-k="" data-k2="" data-n="Value" data-n2="AA Index"><span class="dv" title="Not measured. Artificial Analysis has no row for any Microsoft model. With no index and no measured cost, no value can be computed.">—</span></span></td>
+<td><span class="caps"><span class="u" title="No Artificial Analysis row, so no score.">? Writing code</span><span class="n" title="Wrong tool: The vendor scopes it to coding.">❌ Writing docs</span><span class="u" title="No Artificial Analysis row, so no score.">? Code reviews</span><span class="u" title="No Artificial Analysis row, so no score.">? Research</span><span class="n" title="Wrong tool: Cheap and unclassified, with no planner role.">❌ Planning</span></span></td>
+<td><strong>No independent benchmark covers it.</strong> Microsoft's own card gives it 72.6 on SWE-bench Verified in Copilot's VS Code harness. Trial it before relying on it</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="low-010-to-060-a-task">Low · $0.10 to $0.60 a task</h3>
+<div class="table-wrap table-wide table-caps"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Price</th>
+<th><span title="Value = quality ÷ measured cost. Each model's Artificial Analysis Intelligence Index at the effort Copilot serves by default, divided by AA's measured cost in dollars per index task at that effort. The index blends ten evals, weighted Agents 30%, Coding 20%, Scientific Reasoning 20% and General 30%. AA puts its 95% confidence interval under ±1%. Cost moves this ratio far more than quality does. Read the bracketed index under each value too.">Value</span></th>
+<th>Good at</th>
+<th>Watch out for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GPT-6.1 Sol</strong> ¹</td>
+<td>2 / 10</td>
+<td><span class="dual" data-k="223.6" data-k2="47.8" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 47.78 ÷ AA's measured $0.214 per index task, both from one Artificial Analysis row, read 2026-09-30. The bracketed number under it is the index.">224</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names GPT-6.1 Sol (medium). Medium is its vendor's default. Copilot's picker files it under Powerful (read 2026-09-30).">(47.8)</span></span></td>
+<td><span class="caps"><span class="s" title="Score 7.0 of 10, grade B. Best in its band.">★ Writing code</span><span class="s" title="Score 7.3 of 10, grade B. Best in its band.">★ Writing docs</span><span class="s" title="Score 6.4 of 10, grade B. Best in its band.">★ Code reviews</span><span class="s" title="Score 8.0 of 10, grade A. Best in its band.">★ Research</span><span class="s" title="Score 8.7 of 10, grade A. Best in its band.">★ Planning</span></span></td>
+<td><strong>New 2026-09-29.</strong> It beats GPT-6 Sol on AA at every effort for less per task, and it leads both Sol seats from 2026-09-30. It has no tbench.ai or vals.ai row yet. Needs CLI 1.0.90 or later. Past 272K it bills <strong>4 / 15 on the whole request</strong></td>
+</tr>
+<tr>
+<td><strong>GPT-5.6 Terra</strong></td>
+<td>2 / 12</td>
+<td><span class="dual" data-k="164.1" data-k2="30.1" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 30.09 ÷ AA's measured $0.183 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">164</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names GPT-5.6 Terra (medium). Copilot's picker showed Medium for it on 2026-08-06.">(30.1)</span></span></td>
+<td><span class="caps"><span class="w" title="Score 2.2 of 10, grade D. Band leader: GPT-6.1 Sol at 7.0.">🟠 Writing code</span><span class="m" title="Score 5.5 of 10, grade B. Band leader: GPT-6.1 Sol at 7.3.">🟡 Writing docs</span><span class="w" title="Score 1.5 of 10, grade D. Band leader: GPT-6.1 Sol at 6.4.">🟠 Code reviews</span><span class="w" title="Score 3.6 of 10, grade C. Band leader: GPT-6.1 Sol at 8.0.">🟠 Research</span><span class="w" title="Score 3.7 of 10, grade C. Band leader: GPT-6.1 Sol at 8.7.">🟠 Planning</span></span></td>
+<td><strong>It's the most thorough reviewer measured here</strong> (T18). AA's Terminal-Bench 4.0 run gives it 1% at medium and 35% at max. It gives no cross-family check on GPT-written code. Above 272K it bills 4 / 18. <strong>Retires from Copilot 2026-11-16</strong>, successor GPT-6.1 Sol or GPT-6 Luna</td>
+</tr>
+<tr>
+<td><strong>GPT-6 Sol</strong> ¹</td>
+<td>2 / 10</td>
+<td><span class="dual" data-k="161.0" data-k2="39.8" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 39.81 ÷ AA's measured $0.247 per index task, both from one Artificial Analysis row, read 2026-10-20. The bracketed number under it is the index.">161</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names GPT-6 Sol (medium). Medium is its vendor's default. No Copilot picker read covers it yet.">(39.8)</span></span></td>
+<td><span class="caps"><span class="m" title="Score 4.6 of 10, grade C. Band leader: GPT-6.1 Sol at 7.0.">🟡 Writing code</span><span class="y" title="Score 6.3 of 10, grade B. Band leader: GPT-6.1 Sol at 7.3.">✅ Writing docs</span><span class="m" title="Score 4.6 of 10, grade C. Band leader: GPT-6.1 Sol at 6.4.">🟡 Code reviews</span><span class="y" title="Score 6.6 of 10, grade B. Band leader: GPT-6.1 Sol at 8.0.">✅ Research</span><span class="m" title="Score 6.4 of 10, grade B. Band leader: GPT-6.1 Sol at 8.7.">🟡 Planning</span></span></td>
+<td>It has no tbench.ai or vals.ai row yet. Past 272K it bills <strong>4 / 15 on the whole request</strong>. In CLI Auto's pool.</td>
+</tr>
+<tr>
+<td><strong>GPT-5.6 Sol</strong> ¹</td>
+<td>4 / 20</td>
+<td><span class="dual" data-k="77.7" data-k2="39.2" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 39.24 ÷ AA's measured $0.505 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">77.7</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names GPT-5.6 Sol (medium). Copilot's picker showed Medium for it on 2026-08-06.">(39.2)</span></span></td>
+<td><span class="caps"><span class="m" title="Score 5.2 of 10, grade B. Band leader: GPT-6.1 Sol at 7.0.">🟡 Writing code</span><span class="y" title="Score 7.1 of 10, grade B. Band leader: GPT-6.1 Sol at 7.3.">✅ Writing docs</span><span class="w" title="Score 3.4 of 10, grade C. Band leader: GPT-6.1 Sol at 6.4.">🟠 Code reviews</span><span class="y" title="Score 6.6 of 10, grade B. Band leader: GPT-6.1 Sol at 8.0.">✅ Research</span><span class="m" title="Score 6.3 of 10, grade B. Band leader: GPT-6.1 Sol at 8.7.">🟡 Planning</span></span></td>
+<td>It over-builds an open brief (56/100 against Fable 5's 90) and reviews noisily (31.6% precision). It has the highest eval-gaming rate METR has measured. Keep it away from tests it can see. GPT-6 Sol matches its index for half the price</td>
+</tr>
+<tr>
+<td><strong>Sonnet 5.5</strong></td>
+<td>2 / 10</td>
+<td><span class="dual" data-k="69.5" data-k2="40.7" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 40.74 ÷ AA's measured $0.586 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">69.5</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Claude Sonnet 5.5 (Adaptive Reasoning, Medium Effort, Default Fallback). Medium is its default in Anthropic's own apps. No Copilot picker read covers it yet.">(40.7)</span></span></td>
+<td><span class="caps"><span class="m" title="Score 5.3 of 10, grade B. Band leader: GPT-6.1 Sol at 7.0.">🟡 Writing code</span><span class="y" title="Score 6.1 of 10, grade B. Band leader: GPT-6.1 Sol at 7.3.">✅ Writing docs</span><span class="y" title="Score 5.3 of 10, grade B. Band leader: GPT-6.1 Sol at 6.4.">✅ Code reviews</span><span class="w" title="Score 4.7 of 10, grade C. Band leader: GPT-6.1 Sol at 8.0.">🟠 Research</span><span class="m" title="Score 6.7 of 10, grade B. Band leader: GPT-6.1 Sol at 8.7.">🟡 Planning</span></span></td>
+<td><strong>New 2026-09-28, on every paid plan including plain Pro.</strong> It replaces Sonnet 5 at the same price, at more than twice the value. No tbench.ai row yet. vals.ai's Terminal-Bench 4.0 puts it third at 53.0</td>
+</tr>
+<tr>
+<td><strong>Haiku 4.5</strong></td>
+<td>1 / 5</td>
+<td><span class="dual" data-k="61.0" data-k2="16.9" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 16.88 ÷ AA's measured $0.277 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">61.0</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Claude 4.5 Haiku (Reasoning). Haiku 4.5 has no effort dial. AA splits it by thinking on or off. Only the thinking row is measured.">(16.9)</span></span></td>
+<td><span class="caps"><span class="w" title="Score 0.0 of 10, grade D. Band leader: GPT-6.1 Sol at 7.0.">🟠 Writing code</span><span class="w" title="Score 0.0 of 10, grade D. Band leader: GPT-6.1 Sol at 7.3.">🟠 Writing docs</span><span class="w" title="Score 2.8 of 10, grade C. Band leader: GPT-6.1 Sol at 6.4.">🟠 Code reviews</span><span class="w" title="Score 0.1 of 10, grade D. Band leader: GPT-6.1 Sol at 8.0.">🟠 Research</span><span class="n" title="Wrong tool: Mechanical-tier, with no planner role.">❌ Planning</span></span></td>
+<td><strong>It has the second-lowest index here.</strong> Keep it behind a check. Its value assumes thinking mode, which Copilot may not serve</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="mid-060-to-125-a-task">Mid · $0.60 to $1.25 a task</h3>
+<div class="table-wrap table-wide table-caps"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Price</th>
+<th><span title="Value = quality ÷ measured cost. Each model's Artificial Analysis Intelligence Index at the effort Copilot serves by default, divided by AA's measured cost in dollars per index task at that effort. The index blends ten evals, weighted Agents 30%, Coding 20%, Scientific Reasoning 20% and General 30%. AA puts its 95% confidence interval under ±1%. Cost moves this ratio far more than quality does. Read the bracketed index under each value too.">Value</span></th>
+<th>Good at</th>
+<th>Watch out for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Gemini 3.8 Flash</strong></td>
+<td>0.75 / 3.75</td>
+<td><span class="dual" data-k="42.7" data-k2="39.8" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 39.77 ÷ AA's measured $0.931 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">42.7</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Gemini 3.8 Flash (medium). Medium by pattern. The 2026-08-06 picker read showed Medium on every roster model but Kimi K3. This one arrived later.">(39.8)</span></span></td>
+<td><span class="caps"><span class="s" title="Score 5.0 of 10, grade B. Best in its band.">★ Writing code</span><span class="m" title="Score 7.1 of 10, grade B. Band leader: Grok 4.6 at 9.0.">🟡 Writing docs</span><span class="y" title="Score 5.1 of 10, grade B. Band leader: Grok 4.6 at 6.0.">✅ Code reviews</span><span class="s" title="Score 7.0 of 10, grade B. Best in its band.">★ Research</span><span class="y" title="Score 6.4 of 10, grade B. Band leader: Grok 4.6 at 7.3.">✅ Planning</span></span></td>
+<td><strong>It hasn't run T34, the seeded C++ recall trial.</strong> Despite the low list price it costs $0.93 a task, near Sonnet 5's $1.00. Its promotional rate runs through 2026-12-31, then 1.50 / 7.50. In CLI Auto's pool.</td>
+</tr>
+<tr>
+<td><strong>Grok 4.6</strong></td>
+<td>2 / 6</td>
+<td><span class="dual" data-k="28.6" data-k2="42.8" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 42.84 ÷ AA's measured $1.50 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">28.6</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Grok 4.6 (medium). Medium by pattern. The 2026-08-06 picker read showed Medium on every roster model but Kimi K3. This one arrived later.">(42.8)</span></span></td>
+<td><span class="caps"><span class="y" title="Score 4.6 of 10, grade C. Band leader: Gemini 3.8 Flash at 5.0.">✅ Writing code</span><span class="s" title="Score 9.0 of 10, grade A. Best in its band.">★ Writing docs</span><span class="s" title="Score 6.0 of 10, grade B. Best in its band.">★ Code reviews</span><span class="y" title="Score 5.6 of 10, grade B. Band leader: Gemini 3.8 Flash at 7.0.">✅ Research</span><span class="s" title="Score 7.3 of 10, grade B. Best in its band.">★ Planning</span></span></td>
+<td>Grok 4.7 scores higher on all three Terminal-Bench 4.0 boards at the same list price. Past 200K it bills <strong>4 / 12 on the whole request</strong></td>
+</tr>
+<tr>
+<td><strong>Sonnet 5</strong></td>
+<td>2 / 10</td>
+<td><span class="dual" data-k="28.1" data-k2="28.1" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 28.05 ÷ AA's measured $0.999 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">28.1</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Claude Sonnet 5 (Adaptive Reasoning, Medium Effort). Copilot's picker showed Medium for it on 2026-08-06.">(28.1)</span></span></td>
+<td><span class="caps"><span class="m" title="Score 2.6 of 10, grade C. Band leader: Gemini 3.8 Flash at 5.0.">🟡 Writing code</span><span class="w" title="Score 4.4 of 10, grade C. Band leader: Grok 4.6 at 9.0.">🟠 Writing docs</span><span class="w" title="Score 2.6 of 10, grade C. Band leader: Grok 4.6 at 6.0.">🟠 Code reviews</span><span class="w" title="Score 2.7 of 10, grade C. Band leader: Gemini 3.8 Flash at 7.0.">🟠 Research</span><span class="w" title="Score 3.1 of 10, grade C. Band leader: Grok 4.6 at 7.3.">🟠 Planning</span></span></td>
+<td>It scores low at medium effort, but this repo's trials (T32, T33) seat it as the Mid implementer. Its Copilot bill didn't move between none and high effort (T36). The widely quoted 85.2 SWE-bench Verified is a vendor figure</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="premium-125-to-250-a-task">Premium · $1.25 to $2.50 a task</h3>
+<div class="table-wrap table-wide table-caps"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Price</th>
+<th><span title="Value = quality ÷ measured cost. Each model's Artificial Analysis Intelligence Index at the effort Copilot serves by default, divided by AA's measured cost in dollars per index task at that effort. The index blends ten evals, weighted Agents 30%, Coding 20%, Scientific Reasoning 20% and General 30%. AA puts its 95% confidence interval under ±1%. Cost moves this ratio far more than quality does. Read the bracketed index under each value too.">Value</span></th>
+<th>Good at</th>
+<th>Watch out for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Opus 5.5</strong> ¹</td>
+<td>4 / 20</td>
+<td><span class="dual" data-k="38.4" data-k2="51.2" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 51.24 ÷ AA's measured $1.34 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">38.4</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Claude Opus 5.5 (Adaptive Reasoning, Medium Effort, Default Fallback). Medium is its vendor's default. No Copilot picker read covers it yet. AA's row includes tasks a safety fallback handed to another model.">(51.2)</span></span></td>
+<td><span class="caps"><span class="y" title="Score 9.0 of 10, grade A. Band leader: Gemini 4 Argon at 10.0.">✅ Writing code</span><span class="y" title="Score 8.7 of 10, grade A. Band leader: Gemini 4 Argon at 9.1.">✅ Writing docs</span><span class="m" title="Score 7.0 of 10, grade B. Band leader: Gemini 4 Argon at 10.0.">🟡 Code reviews</span><span class="s" title="Score 8.8 of 10, grade A. Best in its band.">★ Research</span><span class="y" title="Score 9.6 of 10, grade A. Band leader: Gemini 4 Argon at 10.0.">✅ Planning</span></span></td>
+<td><strong>Its index is second only to Gemini 4 Argon's on this page</strong>, and it costs less per task than Opus 5. No review trial here has run it yet. Its board scores include tasks a safety fallback handed to Opus 5 or Opus 4.8 (vals.ai logged 30 of 198). Stable CLI 1.0.89 lists it. In CLI Auto's pool.</td>
+</tr>
+<tr>
+<td><strong>GPT-6 Astra</strong> ¹</td>
+<td>10 / 50</td>
+<td><span class="dual" data-k="32.2" data-k2="49.6" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 49.57 ÷ AA's measured $1.54 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">32.2</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names GPT-6 Astra (medium). Medium by pattern. The 2026-08-06 picker read showed Medium on every roster model but Kimi K3. This one arrived later.">(49.6)</span></span></td>
+<td><span class="caps"><span class="m" title="Score 7.4 of 10, grade B. Band leader: Gemini 4 Argon at 10.0.">🟡 Writing code</span><span class="y" title="Score 7.7 of 10, grade A. Band leader: Gemini 4 Argon at 9.1.">✅ Writing docs</span><span class="w" title="Score 6.9 of 10, grade B. Band leader: Gemini 4 Argon at 10.0.">🟠 Code reviews</span><span class="y" title="Score 7.4 of 10, grade B. Band leader: Opus 5.5 at 8.8.">✅ Research</span><span class="y" title="Score 9.2 of 10, grade A. Band leader: Gemini 4 Argon at 10.0.">✅ Planning</span></span></td>
+<td>Opus 5.5 scores higher and lists at 4 / 20. Past 272K the whole request reprices at 20 / 75</td>
+</tr>
+<tr>
+<td><strong>Gemini 4 Argon</strong></td>
+<td>2 / 10 (cache 0.10)</td>
+<td><span class="dual" data-k="26.4" data-k2="52.6" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 52.56 ÷ AA's measured $1.99 per index task, both from one Artificial Analysis row, read 2026-10-13. The bracketed number under it is the index.">26.4</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Gemini 4 Argon (High), AA's only row for this model. No Copilot picker read covers its default effort yet.">(52.6)</span></span></td>
+<td><span class="caps"><span class="s" title="Score 10.0 of 10, grade A. Best in its band.">★ Writing code</span><span class="s" title="Score 9.1 of 10, grade A. Best in its band.">★ Writing docs</span><span class="s" title="Score 10.0 of 10, grade A. Best in its band.">★ Code reviews</span><span class="m" title="Score 6.9 of 10, grade B. Band leader: Opus 5.5 at 8.8.">🟡 Research</span><span class="s" title="Score 10.0 of 10, grade A. Best in its band.">★ Planning</span></span></td>
+<td>GA on Copilot 2026-10-13 for Pro+, Max, Business and Enterprise only. <strong>The 2 / 0.10 / 10 rate is promotional until 2026-12-01</strong>, and Google's own rate doubles from then. Stable CLI 1.0.98 added its slug. It's unprobed, not in Auto, and not a seat. Untrialed. vals.ai Terminal-Bench is 57.58, 6th</td>
+</tr>
+<tr>
+<td><strong>Kimi K3</strong></td>
+<td>3 / 15</td>
+<td><span class="dual" data-k="21.8" data-k2="43.6" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 43.59 ÷ AA's measured $2.00 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">21.8</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Kimi K3 (max). Copilot's picker shows High for it. AA has no high row, only max and an estimated low.">(43.6)</span></span></td>
+<td><span class="caps"><span class="w" title="Score 5.5 of 10, grade B. Band leader: Gemini 4 Argon at 10.0.">🟠 Writing code</span><span class="y" title="Score 8.2 of 10, grade A. Band leader: Gemini 4 Argon at 9.1.">✅ Writing docs</span><span class="w" title="Score 5.3 of 10, grade B. Band leader: Gemini 4 Argon at 10.0.">🟠 Code reviews</span><span class="y" title="Score 8.0 of 10, grade A. Band leader: Opus 5.5 at 8.8.">✅ Research</span><span class="m" title="Score 7.5 of 10, grade A. Band leader: Gemini 4 Argon at 10.0.">🟡 Planning</span></span></td>
+<td>It's the strongest open-weight coder here. It costs <strong>more</strong> than Sonnet 5 on both list axes. Trial it before relying on it. Copilot runs it at High, while the value reads AA's max row</td>
+</tr>
+<tr>
+<td><strong>Opus 5</strong></td>
+<td>5 / 25</td>
+<td><span class="dual" data-k="20.5" data-k2="44.8" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 44.83 ÷ AA's measured $2.19 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">20.5</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Claude Opus 5 (Adaptive Reasoning, Medium Effort). Copilot's picker showed Medium for it on 2026-08-06.">(44.8)</span></span></td>
+<td><span class="caps"><span class="w" title="Score 5.4 of 10, grade B. Band leader: Gemini 4 Argon at 10.0.">🟠 Writing code</span><span class="y" title="Score 7.8 of 10, grade A. Band leader: Gemini 4 Argon at 9.1.">✅ Writing docs</span><span class="w" title="Score 4.9 of 10, grade C. Band leader: Gemini 4 Argon at 10.0.">🟠 Code reviews</span><span class="y" title="Score 7.5 of 10, grade A. Band leader: Opus 5.5 at 8.8.">✅ Research</span><span class="m" title="Score 7.8 of 10, grade A. Band leader: Gemini 4 Argon at 10.0.">🟡 Planning</span></span></td>
+<td><strong>Legacy since 2026-09-22. Retires from Copilot 2026-11-16</strong>, successor Opus 5.5. It costs more per task than Opus 5.5 at every effort but max, for a lower index. It's fine for one planning pass and ruinous when fanned out to many agents. It tops EQ-Bench's long-form writing board</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="frontier-250-and-up-a-task">Frontier · $2.50 and up a task</h3>
+<div class="table-wrap table-wide table-caps"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Price</th>
+<th><span title="Value = quality ÷ measured cost. Each model's Artificial Analysis Intelligence Index at the effort Copilot serves by default, divided by AA's measured cost in dollars per index task at that effort. The index blends ten evals, weighted Agents 30%, Coding 20%, Scientific Reasoning 20% and General 30%. AA puts its 95% confidence interval under ±1%. Cost moves this ratio far more than quality does. Read the bracketed index under each value too.">Value</span></th>
+<th>Good at</th>
+<th>Watch out for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Grok 4.7</strong></td>
+<td>2 / 6</td>
+<td><span class="dual" data-k="17.0" data-k2="46.3" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 46.33 ÷ AA's measured $2.73 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">17.0</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Grok 4.7 (high). AA has no medium row. High is the nearer of its two rows and xAI's own default.">(46.3)</span></span></td>
+<td><span class="caps"><span class="s" title="Score 6.1 of 10, grade B. Best in its band.">★ Writing code</span><span class="s" title="Score 10.0 of 10, grade A. Best in its band.">★ Writing docs</span><span class="s" title="Score 6.7 of 10, grade B. Best in its band.">★ Code reviews</span><span class="y" title="Score 5.1 of 10, grade B. Band leader: Opus 4.8 at 5.8.">✅ Research</span><span class="y" title="Score 8.3 of 10, grade A. Band leader: Fable 5 at 9.2.">✅ Planning</span></span></td>
+<td><strong>The list price hides the bill.</strong> It costs $2.73 a task at high, twice Opus 5.5 at medium. Past 200K the whole request bills 4 / 12</td>
+</tr>
+<tr>
+<td><strong>Fable 5.1</strong> ¹</td>
+<td>10 / 50</td>
+<td><span class="dual" data-k="16.4" data-k2="48.9" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 48.92 ÷ AA's measured $2.98 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">16.4</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Claude Fable 5.1 (Adaptive Reasoning, Medium Effort, Default Fallback). Medium by pattern. The 2026-08-06 picker read showed Medium on every roster model but Kimi K3. This one arrived later. AA's row includes tasks a safety fallback handed to another model.">(48.9)</span></span></td>
+<td><span class="caps"><span class="n" title="Wrong tool: It only plans, per the registry's seat rules.">❌ Writing code</span><span class="m" title="Score 8.3 of 10, grade A. Band leader: Grok 4.7 at 10.0.">🟡 Writing docs</span><span class="n" title="Wrong tool: It only plans, per the registry's seat rules.">❌ Code reviews</span><span class="n" title="Wrong tool: It only plans, per the registry's seat rules.">❌ Research</span><span class="y" title="Score 9.0 of 10, grade A. Band leader: Fable 5 at 9.2.">✅ Planning</span></span></td>
+<td>It only plans. Keep it for the hardest architecture calls. Anthropic keeps its prompts and outputs by default for safety classifiers. Other Claude models on Copilot are zero-retention</td>
+</tr>
+<tr>
+<td><strong>Opus 4.8</strong></td>
+<td>5 / 25</td>
+<td><span class="dual" data-k="10.2" data-k2="41.8" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 41.79 ÷ AA's measured $4.08 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">10.2</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Claude Opus 4.8 (Adaptive Reasoning, Max Effort). It's AA's only row for this model, above the Medium Copilot's picker showed on 2026-08-06.">(41.8)</span></span></td>
+<td><span class="caps"><span class="y" title="Score 5.0 of 10, grade B. Band leader: Grok 4.7 at 6.1.">✅ Writing code</span><span class="m" title="Score 7.4 of 10, grade B. Band leader: Grok 4.7 at 10.0.">🟡 Writing docs</span><span class="y" title="Score 5.6 of 10, grade B. Band leader: Grok 4.7 at 6.7.">✅ Code reviews</span><span class="s" title="Score 5.8 of 10, grade B. Best in its band.">★ Research</span><span class="m" title="Score 7.0 of 10, grade B. Band leader: Fable 5 at 9.2.">🟡 Planning</span></span></td>
+<td>Opus 5 supersedes it at the same price. <strong>Retires from Copilot 2026-11-16</strong>, successor Opus 5.5, though individual subscribers on annual plans keep it. Its value reads AA's only row, at max. Fable 5's safeguards and Opus 5.5's cybersecurity safeguard fall back to it</td>
+</tr>
+<tr>
+<td><strong>Fable 5</strong> ¹</td>
+<td>10 / 50</td>
+<td><span class="dual" data-k="5.7" data-k2="49.6" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 49.63 ÷ AA's measured $8.75 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">5.7</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Claude Fable 5 (Adaptive Reasoning, Max Effort, Opus 4.8 Fallback). It's AA's only row for this model, above the Medium Copilot's picker showed on 2026-08-06. AA's row includes tasks a safety fallback handed to another model.">(49.6)</span></span></td>
+<td><span class="caps"><span class="n" title="Wrong tool: It only plans, per the registry's seat rules.">❌ Writing code</span><span class="y" title="Score 9.0 of 10, grade A. Band leader: Grok 4.7 at 10.0.">✅ Writing docs</span><span class="n" title="Wrong tool: It only plans, per the registry's seat rules.">❌ Code reviews</span><span class="n" title="Wrong tool: It only plans, per the registry's seat rules.">❌ Research</span><span class="s" title="Score 9.2 of 10, grade A. Best in its band.">★ Planning</span></span></td>
+<td><strong>Legacy as of 2026-09-07.</strong> Its value reads AA's only row, at max. Like Fable 5.1, it only plans and retains data by default</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="two-more-views">Two more views</h2>
+<p>The same data, compared across the whole roster instead of within a
+band.</p>
+<h3 id="grades-and-value">Grades and value</h3>
+<p>The grade is absolute, on one scale for every model. A is 7.5 or more
+out of 10, B is 5 or more, C is 2.5 or more, and D is below that. The
+arrow compares the score with what the model's cost per task predicts,
+from a fit across the whole roster:</p>
+<ul>
+<li>↑ at least 1.5 points better than its cost predicts</li>
+<li>→ about what you pay for</li>
+<li>↓ at least 1.5 points worse than its cost predicts</li>
+</ul>
+<div class="table-wrap table-tall table-wide"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Band</th>
+<th>Writing code</th>
+<th>Writing docs</th>
+<th>Code reviews</th>
+<th>Research</th>
+<th>Planning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GPT-6 Luna</strong></td>
+<td>Budget</td>
+<td>D →</td>
+<td>B →</td>
+<td>D →</td>
+<td>C →</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong>GPT-5.6 Luna</strong></td>
+<td>Budget</td>
+<td>D →</td>
+<td>C →</td>
+<td>D →</td>
+<td>C →</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong>Haiku 5.5</strong></td>
+<td>Budget</td>
+<td>C →</td>
+<td>B →</td>
+<td>C →</td>
+<td>C →</td>
+<td>C →</td>
+</tr>
+<tr>
+<td><strong>MAI-Code-1.1-Flash</strong></td>
+<td>Budget</td>
+<td>?</td>
+<td>❌</td>
+<td>?</td>
+<td>?</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong>GPT-6.1 Sol</strong> ¹</td>
+<td>Low</td>
+<td>B ↑</td>
+<td>B →</td>
+<td>B ↑</td>
+<td>A ↑</td>
+<td>A ↑</td>
+</tr>
+<tr>
+<td><strong>GPT-5.6 Terra</strong></td>
+<td>Low</td>
+<td>D ↓</td>
+<td>B →</td>
+<td>D ↓</td>
+<td>C →</td>
+<td>C ↓</td>
+</tr>
+<tr>
+<td><strong>GPT-6 Sol</strong> ¹</td>
+<td>Low</td>
+<td>C →</td>
+<td>B →</td>
+<td>C →</td>
+<td>B →</td>
+<td>B →</td>
+</tr>
+<tr>
+<td><strong>GPT-5.6 Sol</strong> ¹</td>
+<td>Low</td>
+<td>B →</td>
+<td>B →</td>
+<td>C →</td>
+<td>B →</td>
+<td>B →</td>
+</tr>
+<tr>
+<td><strong>Sonnet 5.5</strong></td>
+<td>Low</td>
+<td>B →</td>
+<td>B →</td>
+<td>B →</td>
+<td>C →</td>
+<td>B →</td>
+</tr>
+<tr>
+<td><strong>Haiku 4.5</strong></td>
+<td>Low</td>
+<td>D ↓</td>
+<td>D ↓</td>
+<td>C →</td>
+<td>D ↓</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong>Gemini 3.8 Flash</strong></td>
+<td>Mid</td>
+<td>B →</td>
+<td>B →</td>
+<td>B →</td>
+<td>B →</td>
+<td>B →</td>
+</tr>
+<tr>
+<td><strong>Grok 4.6</strong></td>
+<td>Mid</td>
+<td>C →</td>
+<td>A ↑</td>
+<td>B →</td>
+<td>B →</td>
+<td>B →</td>
+</tr>
+<tr>
+<td><strong>Sonnet 5</strong></td>
+<td>Mid</td>
+<td>C ↓</td>
+<td>C ↓</td>
+<td>C ↓</td>
+<td>C ↓</td>
+<td>C ↓</td>
+</tr>
+<tr>
+<td><strong>Opus 5.5</strong> ¹</td>
+<td>Premium</td>
+<td>A ↑</td>
+<td>A →</td>
+<td>B →</td>
+<td>A ↑</td>
+<td>A ↑</td>
+</tr>
+<tr>
+<td><strong>GPT-6 Astra</strong> ¹</td>
+<td>Premium</td>
+<td>B →</td>
+<td>A →</td>
+<td>B →</td>
+<td>B →</td>
+<td>A ↑</td>
+</tr>
+<tr>
+<td><strong>Gemini 4 Argon</strong></td>
+<td>Premium</td>
+<td>A ↑</td>
+<td>A →</td>
+<td>A ↑</td>
+<td>B →</td>
+<td>A ↑</td>
+</tr>
+<tr>
+<td><strong>Kimi K3</strong></td>
+<td>Premium</td>
+<td>B →</td>
+<td>A →</td>
+<td>B →</td>
+<td>A →</td>
+<td>A →</td>
+</tr>
+<tr>
+<td><strong>Opus 5</strong></td>
+<td>Premium</td>
+<td>B →</td>
+<td>A →</td>
+<td>C →</td>
+<td>A →</td>
+<td>A →</td>
+</tr>
+<tr>
+<td><strong>Grok 4.7</strong></td>
+<td>Frontier</td>
+<td>B →</td>
+<td>A ↑</td>
+<td>B →</td>
+<td>B ↓</td>
+<td>A →</td>
+</tr>
+<tr>
+<td><strong>Fable 5.1</strong> ¹</td>
+<td>Frontier</td>
+<td>❌</td>
+<td>A →</td>
+<td>❌</td>
+<td>❌</td>
+<td>A →</td>
+</tr>
+<tr>
+<td><strong>Opus 4.8</strong></td>
+<td>Frontier</td>
+<td>B ↓</td>
+<td>B →</td>
+<td>B →</td>
+<td>B →</td>
+<td>B →</td>
+</tr>
+<tr>
+<td><strong>Fable 5</strong> ¹</td>
+<td>Frontier</td>
+<td>❌</td>
+<td>A →</td>
+<td>❌</td>
+<td>❌</td>
+<td>A →</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="scores">Scores</h3>
+<p>Each score places the model between the roster's worst (0) and best (10)
+on the column's evals, averaged. The scores are relative to this roster,
+so a new model at either end moves everyone's number.</p>
+<div class="table-wrap table-tall table-wide"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Cost per task</th>
+<th>Writing code</th>
+<th>Writing docs</th>
+<th>Code reviews</th>
+<th>Research</th>
+<th>Planning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GPT-6 Luna</strong></td>
+<td>$0.017</td>
+<td>2.4</td>
+<td>5.4</td>
+<td>1.9</td>
+<td>4.1</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong>GPT-5.6 Luna</strong></td>
+<td>$0.016</td>
+<td>1.2</td>
+<td>4.1</td>
+<td>0.8</td>
+<td>3.0</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong>Haiku 5.5</strong></td>
+<td>$0.047</td>
+<td>3.0</td>
+<td>5.6</td>
+<td>4.1</td>
+<td>3.6</td>
+<td>4.9</td>
+</tr>
+<tr>
+<td><strong>MAI-Code-1.1-Flash</strong></td>
+<td>—</td>
+<td>—</td>
+<td>❌</td>
+<td>—</td>
+<td>—</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong>GPT-6.1 Sol</strong> ¹</td>
+<td>$0.214</td>
+<td>7.0</td>
+<td>7.3</td>
+<td>6.4</td>
+<td>8.0</td>
+<td>8.7</td>
+</tr>
+<tr>
+<td><strong>GPT-5.6 Terra</strong></td>
+<td>$0.183</td>
+<td>2.2</td>
+<td>5.5</td>
+<td>1.5</td>
+<td>3.6</td>
+<td>3.7</td>
+</tr>
+<tr>
+<td><strong>GPT-6 Sol</strong> ¹</td>
+<td>$0.247</td>
+<td>4.6</td>
+<td>6.3</td>
+<td>4.6</td>
+<td>6.6</td>
+<td>6.4</td>
+</tr>
+<tr>
+<td><strong>GPT-5.6 Sol</strong> ¹</td>
+<td>$0.505</td>
+<td>5.2</td>
+<td>7.1</td>
+<td>3.4</td>
+<td>6.6</td>
+<td>6.3</td>
+</tr>
+<tr>
+<td><strong>Sonnet 5.5</strong></td>
+<td>$0.483</td>
+<td>5.3</td>
+<td>6.1</td>
+<td>5.3</td>
+<td>4.7</td>
+<td>6.7</td>
+</tr>
+<tr>
+<td><strong>Haiku 4.5</strong></td>
+<td>$0.277</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>2.8</td>
+<td>0.1</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong>Gemini 3.8 Flash</strong></td>
+<td>$0.931</td>
+<td>5.0</td>
+<td>7.1</td>
+<td>5.1</td>
+<td>7.0</td>
+<td>6.4</td>
+</tr>
+<tr>
+<td><strong>Grok 4.6</strong></td>
+<td>$1.14</td>
+<td>4.6</td>
+<td>9.0</td>
+<td>6.0</td>
+<td>5.6</td>
+<td>7.3</td>
+</tr>
+<tr>
+<td><strong>Sonnet 5</strong></td>
+<td>$0.999</td>
+<td>2.6</td>
+<td>4.4</td>
+<td>2.6</td>
+<td>2.7</td>
+<td>3.1</td>
+</tr>
+<tr>
+<td><strong>Opus 5.5</strong> ¹</td>
+<td>$1.34</td>
+<td>9.0</td>
+<td>8.7</td>
+<td>7.0</td>
+<td>8.8</td>
+<td>9.6</td>
+</tr>
+<tr>
+<td><strong>GPT-6 Astra</strong> ¹</td>
+<td>$1.54</td>
+<td>7.4</td>
+<td>7.7</td>
+<td>6.9</td>
+<td>7.4</td>
+<td>9.2</td>
+</tr>
+<tr>
+<td><strong>Gemini 4 Argon</strong></td>
+<td>$1.99</td>
+<td>10.0</td>
+<td>9.1</td>
+<td>10.0</td>
+<td>6.9</td>
+<td>10.0</td>
+</tr>
+<tr>
+<td><strong>Kimi K3</strong></td>
+<td>$2.00</td>
+<td>5.5</td>
+<td>8.2</td>
+<td>5.3</td>
+<td>8.0</td>
+<td>7.5</td>
+</tr>
+<tr>
+<td><strong>Opus 5</strong></td>
+<td>$2.19</td>
+<td>5.4</td>
+<td>7.8</td>
+<td>4.9</td>
+<td>7.5</td>
+<td>7.8</td>
+</tr>
+<tr>
+<td><strong>Grok 4.7</strong></td>
+<td>$2.73</td>
+<td>6.1</td>
+<td>10.0</td>
+<td>6.7</td>
+<td>5.1</td>
+<td>8.3</td>
+</tr>
+<tr>
+<td><strong>Fable 5.1</strong> ¹</td>
+<td>$2.98</td>
+<td>❌</td>
+<td>8.3</td>
+<td>❌</td>
+<td>❌</td>
+<td>9.0</td>
+</tr>
+<tr>
+<td><strong>Opus 4.8</strong></td>
+<td>$4.08</td>
+<td>5.0</td>
+<td>7.4</td>
+<td>5.6</td>
+<td>5.8</td>
+<td>7.0</td>
+</tr>
+<tr>
+<td><strong>Fable 5</strong> ¹</td>
+<td>$8.75</td>
+<td>❌</td>
+<td>9.0</td>
+<td>❌</td>
+<td>❌</td>
+<td>9.2</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="fine-print">Fine print</h2>
+<p>¹ <strong>Pro+/Max only.</strong> GitHub documents Opus 5 and Opus 4.8 this way too,
+though both served on a plain Pro account on 2026-07-25 (T30). On base Pro a
+gated model falls back to a Sonnet with a printed warning. Check what your
+plan serves.</p>
+<p><strong>How the scores are computed.</strong> Every score comes from one AA row per
+model, the same row the Value column reads, taken from AA's leaderboard
+dataset on 2026-10-13. Each column averages a few of AA's evals:</p>
+<ul>
+<li>Writing code - Terminal-Bench 4.0 and SciCode.</li>
+<li>Writing docs - GDPval, which grades real work files from 44
+  occupations. It's one board, so treat this column as the thinnest.</li>
+<li>Code reviews - the two coding evals plus AA's non-hallucination rate,
+  since a reviewer has to find bugs without inventing them. No public
+  board scores code review directly. This repo's review trials (T16,
+  T18, T34, T42) are in the Watch out notes instead.</li>
+<li>Research - Humanity's Last Exam, AA's long-context reasoning eval, and
+  its knowledge-accuracy eval.</li>
+<li>Planning - the Intelligence Index itself.</li>
+</ul>
+<p>Cost bands and the value fit both use AA's measured cost per task.
+MAI-Code-1.1-Flash has no AA row, so it gets a band from its list
+price and a ? wherever no role rule applies.</p>
+<p><strong>Where the ❌ marks come from.</strong> They follow the registry's
+<a href="copilot-model-guide.html#reading-the-tiers">tiers</a> and seats, not the
+scores. The Fables only plan. Mechanical-tier and cheap unclassified
+models never plan. MAI-Code-1.1-Flash and Kimi
+K2.7 Code are scoped to coding by their own vendor cards.</p>
+<p><strong>Scores aren't trials.</strong> Sonnet 5 scores low at medium effort on these
+boards. Its Mid seat rested on this repo's own trials (T32, T33),
+which put it through real briefed work. Sonnet 5.5 took that seat on
+2026-09-28 by the newest-version rule, with no trial of its own yet. <code>scripts/good-at.py</code> computes
+every mark from <code>research/2026-10-20-good-at-data.json</code>, and check.sh
+gate (y) fails the build if this page drifts from it.</p>
+<p><strong>Effort.</strong> Values read medium for most rows. At low effort AA scores both
+Lunas lower and cheaper, with an index of 20.9 and 21.0 at $0.0045 and
+$0.0098 a task. Both solved 0 of AA's 198 Terminal-Bench 4.0 attempts there.</p>
+<p><strong>Cheap models fail silently.</strong> Only put them on work something else checks.</p>
+</main>
+<footer>
+<p>smartplan · MIT · generated from repo markdown</p>
+</footer>
+<script>
+/* Click-to-sort for every data table on the site. Added 2026-08-22 for the
+   quick-picks page, written generically because a comparison table nobody
+   can re-sort answers only the question its author happened to ask.
+   No dependencies, and the page is fully readable with JS off: this only
+   ever reorders rows that are already there. */
+(function () {
+  var NUM = /-?\d+(?:[.,]\d+)?/g;
+
+  /* Cell -> sort key. Three kinds, in order of specificity.
+     1. A capability strip sorts by how good the model is: four points a
+        band leader, three a check, two an "it depends", one a warning,
+        zero a cross or an unknown.
+     2. Anything that LEADS with a digit sorts numerically. A price reads
+        "0.20 / 1.20", and the number that matters there is the one AFTER the
+        slash, since output is what agentic work actually spends.
+     3. Everything else compares as text. "Sonnet 5" and "GPT-5.4" contain
+        digits and are not numbers; what separates them from a real number is
+        that a number leads. A letter-count rule was tried first and failed on
+        "GPT-5.4", whose three letters slipped under the bar and sorted the
+        Model column by version number.
+     An em dash means "not measured" and returns NaN, which counts as numeric
+     for column detection AND pins the row last in both directions. */
+  function key(cell, alt) {
+    /* A merged cell shows two numbers, and no parse can know which one the
+       reader means, so it carries both keys explicitly. `alt` picks the
+       second. An empty attribute is "not measured", same as an em dash. */
+    var dual = cell.querySelector(".dual");
+    if (dual) {
+      var raw = dual.getAttribute(alt ? "data-k2" : "data-k");
+      return raw ? parseFloat(raw) : NaN;
+    }
+    var caps = cell.querySelector(".caps");
+    if (caps) {
+      var score = 0;
+      caps.querySelectorAll("span").forEach(function (s) {
+        if (s.classList.contains("s")) score += 4;
+        else if (s.classList.contains("y")) score += 3;
+        else if (s.classList.contains("m")) score += 2;
+        else if (s.classList.contains("w")) score += 1;
+      });
+      return score;
+    }
+    var text = (cell.textContent || "").trim();
+    if (!text || /^[\u2014\u2013-]$/.test(text)) return NaN;
+    if (!/^[^0-9A-Za-z]*[0-9]/.test(text)) return text.toLowerCase();
+    var nums = text.match(NUM);
+    if (!nums || !nums.length) return text.toLowerCase();
+    if (nums.length > 1 && text.indexOf("/") !== -1) {
+      return parseFloat(nums[1].replace(",", "."));
+    }
+    return parseFloat(nums[0].replace(",", "."));
+  }
+
+  function missing(v) { return typeof v === "number" && isNaN(v); }
+
+  function sortable(table) {
+    var head = table.tHead && table.tHead.rows[0];
+    var body = table.tBodies[0];
+    if (!head || !body || head.cells.length < 3 || body.rows.length < 3) return;
+
+    var rows = Array.prototype.slice.call(body.rows);
+    rows.forEach(function (r, i) { r.dataset.i = i; });
+
+    /* A column is numeric when most of it parses as a number. Deciding per
+       column rather than per cell keeps one stray footnote marker from
+       flipping a whole column to text sorting. */
+    var numeric = [];
+    var dual = [];
+    for (var c = 0; c < head.cells.length; c++) {
+      var hits = 0;
+      for (var r = 0; r < rows.length; r++) {
+        if (rows[r].cells[c] && typeof key(rows[r].cells[c]) === "number") hits++;
+      }
+      numeric[c] = hits >= rows.length * 0.6;
+      dual[c] = rows.some(function (row) {
+        return row.cells[c] && !!row.cells[c].querySelector(".dual");
+      });
+    }
+
+    /* "The useful direction" is not the same for every number. High value and
+       high capability are good, so those open descending. A price is the one
+       column where low is the good news, so it opens ascending. Nothing
+       generic infers that, so the header text is asked directly. */
+    function opensDescending(col) {
+      var cheapFirst = /price|cost|\$/i.test(head.cells[col].textContent || "");
+      return !!numeric[col] && !cheapFirst;
+    }
+
+    /* Three clicks, three states. For an ordinary column those are the useful
+       direction, its reverse, and the shipped order. A dual-key column spends
+       the middle state on its SECOND key instead of on a reverse, because
+       "worst value first" is a direction nobody wants and "sort by score" is
+       a question people actually ask. Both of its states run descending. */
+    function ordered(col, state) {
+      var out = rows.slice();
+      if (state === 0) {
+        out.sort(function (a, b) { return a.dataset.i - b.dataset.i; });
+        return out;
+      }
+      var alt = dual[col] && state > 2;
+      /* A dual column runs key1 down, key1 up, key2 down, key2 up, so odd
+         states are descending. Everything else is the column's own useful
+         direction and then its reverse. */
+      var desc = dual[col]
+        ? (state % 2 === 1)
+        : ((state === 1) === opensDescending(col));
+      out.sort(function (a, b) {
+        var x = key(a.cells[col], alt), y = key(b.cells[col], alt);
+        var xm = missing(x), ym = missing(y);
+        if (xm && ym) return a.dataset.i - b.dataset.i;
+        /* Returned before the direction flip, so an unmeasured row sinks
+           whichever way the column is pointing. */
+        if (xm) return 1;
+        if (ym) return -1;
+        var d = (typeof x === "number" && typeof y === "number")
+          ? x - y
+          : String(x).localeCompare(String(y));
+        return desc ? -d : d;
+      });
+      return out;
+    }
+
+    function ids(list) {
+      return list.map(function (r) { return r.dataset.i; }).join(",");
+    }
+
+    /* A dual column sorts two ways on each of two keys, so its cycle is four
+       long where an ordinary column's is two. */
+    function lastState(col) { return dual[col] ? 4 : 2; }
+
+    function keyName(col, state) {
+      var cell = body.querySelector(
+        "tr td:nth-child(" + (col + 1) + ") .dual[data-n]");
+      return cell && cell.getAttribute(state > 2 ? "data-n2" : "data-n");
+    }
+
+    function paint(col, state) {
+      head.querySelectorAll("th").forEach(function (th, i) {
+        if (i !== col || state === 0) { th.setAttribute("aria-sort", "none"); }
+        /* Restore any header that was showing a sort-key name. */
+        if ((i !== col || state === 0) && th.dataset.name) {
+          (th.querySelector("[title]") || th).textContent = th.dataset.name;
+        }
+      });
+      if (state === 0) return;
+
+      var desc = dual[col]
+        ? (state % 2 === 1)
+        : ((state === 1) === opensDescending(col));
+      var th = head.cells[col];
+      th.setAttribute("aria-sort", desc ? "descending" : "ascending");
+
+      /* Say which key is live. Without it the third click on a dual-key
+         column looks like a bug: the rows move and the header does not.
+         The name REPLACES the header text rather than sitting under it in a
+         block of its own -- a block child pushes the arrow's static position
+         onto a second line, which put the indicator somewhere no other header
+         puts it. Staying on one line keeps this column's chrome identical to
+         every other. The names are read off the cells, so a second dual
+         column anywhere on the site labels itself. */
+      var name = dual[col] && keyName(col, state);
+      if (name) {
+        var slot = th.querySelector("[title]") || th;
+        if (!th.dataset.name) { th.dataset.name = slot.textContent; }
+        slot.textContent = "by " + name;
+      }
+    }
+
+    /* Which column is the table ALREADY sorted by? Answered below, before any
+       click can land. It decides the length of the click cycle, so it is a
+       closure variable rather than a local. */
+    var shippedCol = -1;
+
+    /* One shared state, not one per header. Clicking a different column
+       restarts at its first direction rather than resuming wherever that
+       column was left, which is what a per-header closure did.
+
+       State 0 is "the order it shipped in". Where a column reproduces that
+       order, 0 is a duplicate of that column's own sorted state AND the only
+       state that leaves the table with no header marked, so it is dropped and
+       the cycle runs 1, 2, 1. Clicking that column is how a reader gets the
+       original order back, and it stays marked while they look at it.
+       Where NO column reproduces the shipped order, 0 is kept: it is then the
+       only way back to an order the reader would otherwise lose for good. */
+    var active = { col: -1, state: 0 };
+
+    function activate(col) {
+      var state;
+      if (active.col !== col) state = 1;
+      else if (active.state < lastState(col)) state = active.state + 1;
+      else state = shippedCol >= 0 ? 1 : 0;
+      active = { col: col, state: state };
+      ordered(col, state).forEach(function (r) { body.appendChild(r); });
+      paint(col, state);
+    }
+
+    head.querySelectorAll("th").forEach(function (th, col) {
+      th.classList.add("sortable");
+      /* A swapped-in key name is longer than the header it replaces, and
+         "by SWE-V" breaking after "by" would read as two headers. */
+      if (dual[col]) { th.classList.add("sortable-dual"); }
+      th.tabIndex = 0;
+      th.setAttribute("role", "button");
+      th.setAttribute("aria-sort", "none");
+      th.addEventListener("click", function () { activate(col); });
+      th.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(col); }
+      });
+    });
+
+    /* Which column is the table ALREADY sorted by? Markdown ships in an order
+       its author chose -- this roster ships by value -- and a header row that
+       marks every column "unsorted" tells the reader nothing about the order
+       they are looking at. So the shipped order is compared against what each
+       column would produce, and the first exact match is shown as active.
+       Columns whose keys are all identical are skipped: they match every
+       order and would claim credit for one they did not cause. */
+    var shipped = ids(rows);
+    for (var col = 0; col < head.cells.length && active.col < 0; col++) {
+      var seen = {}, distinct = 0;
+      for (var i = 0; i < rows.length; i++) {
+        var k = String(key(rows[i].cells[col]));
+        if (!seen[k]) { seen[k] = 1; distinct++; }
+      }
+      if (distinct < 2) continue;
+      for (var s = 1; s <= lastState(col); s++) {
+        if (ids(ordered(col, s)) === shipped) {
+          active = { col: col, state: s };
+          shippedCol = col;
+          paint(col, s);
+          break;
+        }
+      }
+    }
+  }
+
+  document.querySelectorAll(".table-wrap table").forEach(sortable);
+})();
+</script>
+</body>
+</html>

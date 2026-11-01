@@ -1,0 +1,1106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>smartplan — Goals & Status</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: dark;
+  --void: #0a0e14;
+  --void-2: #101827;
+  --cell: #0d1420;
+  --cell-head: #131c2b;
+  --panel: rgba(23,34,51,.55);
+  --mint: #35e0c8;
+  --peri: #7c8cff;
+  --rose: #ff5f9e;
+  --amber: #ffb35c;
+  --ink: #e6edf3;
+  --ink-2: #b7c3cd;
+  --ink-dim: #8b98a5;
+  --line: rgba(120,160,200,.16);
+  --glow-mint: 0 0 22px rgba(53,224,200,.4);
+  --ease: cubic-bezier(.2,.7,.2,1);
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background-color: var(--void);
+  background-image:
+    radial-gradient(ellipse 900px 700px at -10% -15%, rgba(53,224,200,.10), transparent 60%),
+    radial-gradient(ellipse 1000px 800px at 115% 5%, rgba(124,140,255,.09), transparent 60%),
+    radial-gradient(ellipse 800px 700px at 105% 115%, rgba(53,224,200,.08), transparent 60%);
+  background-repeat: no-repeat;
+  background-attachment: fixed, fixed, fixed;
+  color: var(--ink);
+  font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.65;
+}
+::selection { background: var(--mint); color: var(--void); }
+a:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+nav.site-nav {
+  max-width: 84rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+.nav-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1.4rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+/* Smooth the horizontal scroll while a pointer rests on a nav row. :has() is
+   widely supported. A browser without it just scrolls instantly. */
+@supports selector(:has(*)) {
+  nav.site-nav:has(.nav-row) .nav-row:hover { scroll-behavior: smooth; }
+}
+.nav-row > * { scroll-snap-align: start; }
+.nav-row::-webkit-scrollbar { display: none; }
+/* Below the widest phone, trim the nav's horizontal padding and tighten the
+   gaps so more than three destinations are reachable without scrolling at
+   all. */
+@media (max-width: 40rem) {
+  nav.site-nav { padding: 0 0.75rem; }
+  .nav-row { gap: 1rem; }
+  .nav-groups { padding: 0.6rem 0 0.4rem; }
+}
+.nav-groups { padding: 0.8rem 0 0.55rem; }
+.subnav {
+  padding: 0.45rem 0 0.6rem;
+  border-top: 1px solid var(--line);
+  gap: 1.15rem;
+}
+.brand {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  background: linear-gradient(90deg, var(--mint), var(--peri));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-right: 0.4rem;
+}
+.stamp {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  opacity: 0.55;
+  white-space: nowrap;
+  align-self: center;
+  /* Anchored right: the group links sit left of it, this takes the slack. */
+  margin-left: auto;
+  padding-left: 1.5rem;
+}
+@media (max-width: 40rem) {
+  /* On a phone the nav row already scrolls, so a right-anchored stamp would
+     sit off-screen past the last link. Let it flow after them instead. */
+  .stamp { margin-left: 0; padding-left: 0.75rem; font-size: 0.66rem; }
+}
+.nav-groups a {
+  font-family: "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  color: var(--ink-2);
+  text-decoration: none;
+  padding-bottom: 0.3rem;
+  transition: color 0.2s var(--ease), text-shadow 0.2s var(--ease);
+}
+.nav-groups a:hover { color: var(--mint); text-shadow: var(--glow-mint); }
+/* The one call-to-action in the chrome. Reads as a button rather than a nav
+   link, because it does something different from every other link up there. */
+.nav-groups a.dl-btn {
+  color: var(--void);
+  background: var(--mint);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  margin-left: 1rem;
+  align-self: center;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: filter 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.nav-groups a.dl-btn:hover {
+  color: var(--void);
+  text-shadow: none;
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+@media (max-width: 720px) {
+  .nav-groups a.dl-btn { padding: 0.25rem 0.7rem; margin-left: 0.6rem; }
+}
+/* Build facts under a download link. Deliberately quiet: they answer a
+   question you only ask after the link has already caught your eye. */
+.dl-meta {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.82em;
+  line-height: 1.45;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* A filename is one token to a reader. Breaking it across lines reads as a
+   rendering fault, so the cell holding a build stamp keeps its code spans
+   whole. Scoped by :has() to that cell alone — every other table on the site
+   still wraps long code spans, which is what keeps them narrow. */
+td:has(.dl-meta) code { white-space: nowrap; }
+.nav-groups a.current {
+  color: var(--ink);
+  background-image: linear-gradient(90deg, var(--mint), var(--peri));
+  background-size: 100% 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+}
+.subnav a {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.03em;
+  color: var(--ink-dim);
+  text-decoration: none;
+  transition: color 0.2s var(--ease);
+}
+.page-toc {
+  margin: 1.5rem 0 2rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--mint);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--panel) 60%, transparent);
+}
+.page-toc > summary {
+  cursor: pointer;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.page-toc > ul {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  columns: 2;
+  column-gap: 2rem;
+}
+.page-toc li {
+  margin: 0 0 0.35rem;
+  break-inside: avoid;
+  font-size: 0.92rem;
+}
+@media (max-width: 40rem) {
+  .page-toc > ul { columns: 1; }
+}
+.subnav a:hover { color: var(--mint); }
+.subnav a.current { color: var(--mint); }
+.subnav a.current::before { content: "▸ "; }
+main {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 4rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+/* Text uses the page. `main` caps at 80rem and centres, which is the whole
+   measure. Nothing narrows its children further. An earlier 46rem prose cap
+   wrapped text well before the page needed to and left a wide empty gutter
+   beside every paragraph. It was removed on purpose. Don't add it back. */
+a {
+  color: var(--mint);
+  text-decoration: none;
+  transition: color 0.2s var(--ease), text-shadow 0.2s var(--ease);
+}
+a:hover { text-decoration: underline; text-shadow: var(--glow-mint); }
+strong { color: var(--ink); font-weight: 600; }
+h1, h2, h3 { font-family: "Space Grotesk", sans-serif; line-height: 1.25; }
+h4, h5, h6 { font-family: "Space Grotesk", sans-serif; color: var(--ink-2); line-height: 1.25; }
+h1 {
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--mint), var(--peri));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+h2 {
+  font-weight: 600;
+  color: var(--ink);
+  margin-top: 3rem;
+  padding-bottom: 0.85rem;
+}
+h2::after {
+  content: "";
+  display: block;
+  width: 2.5rem;
+  height: 3px;
+  margin-top: 0.6rem;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--mint), var(--peri), var(--rose));
+}
+h3 {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 1rem;
+  color: var(--ink-2);
+  margin-top: 2rem;
+}
+.hero { margin-bottom: 3rem; }
+.thesis {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.5vw, 1.8rem);
+  line-height: 1.35;
+  margin: 0 0 1.75rem;
+  color: var(--ink);
+}
+.thesis em {
+  font-style: normal;
+  background: linear-gradient(90deg, var(--mint), var(--peri));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.board { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+.board td a { color: var(--ink); font-weight: 600; }
+.board td a:hover { color: var(--mint); }
+.chip {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 0.1em 0.55em;
+  border: 1px solid rgba(53,224,200,.35);
+  border-radius: 999px;
+  color: var(--mint);
+  white-space: nowrap;
+}
+.table-wrap {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9rem;
+}
+th {
+  background: var(--cell-head);
+  font-family: "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  text-align: left;
+  padding: 0.65rem 0.85rem;
+  vertical-align: bottom;
+}
+td {
+  padding: 0.7rem 0.85rem;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  color: var(--ink-2);
+  background: var(--void);
+  /* Top-align, because a one-word cell centred beside a paragraph is the
+     single worst thing about a dense comparison table. */
+  vertical-align: top;
+  line-height: 1.5;
+}
+/* Zebra striping. Subtle enough not to fight the palette, strong enough to
+   let the eye track a row across seven columns. */
+tbody tr:nth-child(even) td { background: #0c121c; }
+td:first-child, th:first-child {
+  color: var(--ink);
+  position: sticky;
+  left: 0;
+  background: var(--cell);
+  /* The frozen column needs an edge or it reads as part of the scroll. */
+  box-shadow: 1px 0 0 var(--line);
+}
+tbody tr:nth-child(even) td:first-child { background: #0f1622; }
+th:first-child { background: var(--cell-head); z-index: 3; }
+tbody tr:hover td { background: #12222a; }
+tbody tr:hover td:first-child { background: #16262f; }
+
+/* Dense tables: cap the height so the header can stick, and give columns a
+   floor so prose does not shred into one word per line. */
+.table-tall {
+  max-height: 78vh;
+  overflow: auto;
+}
+.table-tall thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+/* The corner cell has to stick on BOTH axes and outrank both. Without this
+   the header scrolls left while the body's frozen column stays put, so the
+   wrong heading ends up sitting over the row labels. */
+.table-tall thead th:first-child {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 4;
+}
+.table-wide table { font-size: 0.85rem; }
+.table-wide td, .table-wide th { min-width: 12rem; }
+.table-wide td:first-child, .table-wide th:first-child {
+  min-width: 9rem;
+  max-width: 14rem;
+}
+/* Price-ish second column reads as data, not prose. */
+.table-wide td:nth-child(2) { min-width: 6rem; white-space: nowrap; }
+
+@media (max-width: 720px) {
+  .table-tall { max-height: 70vh; }
+  .table-wide td, .table-wide th { min-width: 9rem; }
+}
+
+/* Capability strip. Added 2026-08-22, replacing five prose columns with one.
+   The grid is a FIXED five across rather than auto-fit, because the whole
+   point is that "Code reviews" sits under "Code reviews" on the row above:
+   a reader scans one task down the table instead of reading 21 sentences.
+   Auto-fit reflows per cell and loses that. */
+.caps {
+  display: grid;
+  /* 6rem is the measured width of the longest label, "Code reviews", at the
+     font size below plus its glyph. Under that the labels collide, which is
+     what a first pass at 5.4rem did. */
+  grid-template-columns: repeat(5, minmax(6rem, 1fr));
+  gap: 0.25rem 0.4rem;
+  min-width: 31rem;
+}
+.caps span {
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+/* A band leader (★) is the one chip that should out-rank a plain check, so
+   it gets both the strongest weight and the accent color. */
+.caps .s { font-weight: 600; color: var(--mint); }
+.caps .y { color: var(--ink); }
+.caps .m { color: var(--ink-2); }
+.caps .w { color: var(--ink-2); }
+/* A "wrong tool" verdict is the one a reader should skim past, so it recedes
+   rather than shouting. It is still legible, just not competing. Unknown
+   (no Artificial Analysis row) dims the same way, for the same reason. */
+.caps .n { opacity: 0.45; }
+.caps .u { opacity: 0.45; }
+
+/* Value and board score, one column. Added 2026-08-23, replacing two adjacent
+   numeric columns. They were always read together -- a ratio on its own sells
+   the cheapest model in the room -- so stacking them puts the check directly
+   under the claim instead of one saccade to the right.
+   Tooltips are native `title` on purpose. .table-wrap scrolls on x, which
+   makes overflow-y compute to auto as well, so a positioned CSS bubble would
+   be clipped by the very row it belongs to. */
+.dual { display: block; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.dual .dv, .dual .ds {
+  display: block;
+  cursor: help;
+  /* Underlines the glyphs, not the block. A border-bottom here would draw a
+     rule the full width of the cell. */
+  text-decoration: underline dotted rgba(120,160,200,.4);
+  text-underline-offset: 3px;
+}
+.dual .dv { font-weight: 600; font-size: 1rem; color: var(--ink); }
+.dual .ds { font-size: 0.8rem; color: var(--ink-dim); }
+.dual.lead .dv { color: var(--mint); }
+th span[title] { cursor: help; }
+
+/* Click-to-sort. The affordance has to be visible without hover, since a
+   header that only reveals itself on hover is invisible on touch. */
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  padding-right: 1.6rem;
+  position: relative;
+}
+th.sortable:hover, th.sortable:focus-visible { color: var(--ink); }
+th.sortable::after {
+  content: "↕";
+  position: absolute;
+  right: 0.6rem;
+  opacity: 0.3;
+  font-size: 0.9em;
+}
+/* The active column is announced, not just arrowed: this table ships
+   sorted by value and a reader needs to see that without clicking. */
+th.sortable[aria-sort="descending"], th.sortable[aria-sort="ascending"] {
+  color: var(--mint);
+}
+th.sortable[aria-sort="descending"]::after { content: "↓"; opacity: 1; }
+th.sortable[aria-sort="ascending"]::after { content: "↑"; opacity: 1; }
+th.sortable:focus-visible { outline: 2px solid var(--mint); outline-offset: -2px; }
+/* A dual header swaps its text for the live key name, which is longer than
+   the name it replaces. Wrapping it would read as two headers. */
+th.sortable-dual { white-space: nowrap; }
+
+/* A table carrying capability strips sets its own widths. .table-wide's
+   12rem floor per column is right for five columns of prose and wrong here,
+   where one column is a fixed grid and three are short data. Declared after
+   .table-wide so it wins on source order at equal specificity. */
+.table-caps table { font-size: 0.85rem; }
+.table-caps td, .table-caps th { min-width: 0; }
+.table-caps td:first-child, .table-caps th:first-child {
+  min-width: 8.5rem;
+  max-width: 11rem;
+}
+.table-caps td:nth-child(2), .table-caps td:nth-child(3) { white-space: nowrap; }
+.table-caps td:last-child, .table-caps th:last-child { min-width: 14rem; }
+
+@media (max-width: 720px) {
+  .caps { grid-template-columns: repeat(2, minmax(6.5rem, 1fr)); min-width: 14rem; }
+}
+code, pre {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas,
+    "Liberation Mono", Menlo, monospace;
+}
+code {
+  background: var(--void-2);
+  color: var(--mint);
+  border: 1px solid var(--line);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+pre {
+  background: var(--void-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--mint);
+  color: var(--ink);
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+pre code {
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 0;
+}
+blockquote {
+  margin: 1.25rem 0;
+  padding: 0.75rem 1.25rem;
+  background: var(--panel);
+  border-left: 3px solid var(--peri);
+  border-radius: 0 6px 6px 0;
+  color: var(--ink-2);
+}
+hr {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 2rem 0;
+}
+footer {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+  color: var(--ink-dim);
+  font-size: 0.85rem;
+  text-align: center;
+  border-top: 1px solid var(--line);
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<header>
+<nav class="site-nav">
+<div class="nav-row nav-groups">
+<span class="brand">smartplan</span>
+<a href="index.html">Start</a>
+<a href="copilot-model-guide.html">Guides</a>
+<a class="current" href="benchmarks.html">Evidence</a>
+<a href="whats-new.html">Project</a>
+<a href="m365-setup.html">M365 Agents</a>
+<a href="https://github.com/defessler/smartplan">GitHub</a>
+<span class="stamp">v4.151.0 &middot; data 2026-10-20 &middot; built 2026-11-01 3:20 AM PST / 6:20 AM EST</span>
+<a class="dl-btn" href="downloads.html">Download</a>
+
+</div>
+<div class="nav-row subnav">
+<a href="benchmarks.html">Benchmarks</a>
+<a class="current" href="goals.html">Goals & Status</a>
+<a href="benchmark-latest.html">Latest Record: T40</a>
+</div>
+</nav>
+</header>
+<main>
+<h1 id="smartplan-goals-and-how-close-it-is">smartplan: goals, and how close it is</h1>
+<details class="page-toc" open>
+<summary>On this page</summary>
+<ul>
+<li><a href="#the-goal-in-one-paragraph">The goal, in one paragraph</a></li>
+<li><a href="#two-dials-not-one">Two dials, not one</a></li>
+<li><a href="#the-cost-ceiling-shipped-and-awaiting-its-measurement">The cost ceiling, shipped and awaiting its measurement</a></li>
+<li><a href="#shorthand-used-below">Shorthand used below</a></li>
+<li><a href="#the-goals-measured">The goals, measured</a></li>
+<li><a href="#the-fan-out-loss-is-published-guidance-not-a-local-bruise">The fan-out loss is published guidance, not a local bruise</a></li>
+<li><a href="#overall-how-close">Overall: how close?</a></li>
+<li><a href="#what-this-family-is-not-built-for">What this family is not built for</a></li>
+<li><a href="#where-the-evidence-lives">Where the evidence lives</a></li>
+</ul>
+</details>
+<p>Every number here comes from a timestamped live test in
+<code>docs/benchmarks/</code>. The A/B cost comparisons were pre-registered (rules
+written before the test ran) and used real dispatches, metered credits,
+and hidden functional oracles. The early capability probes didn't. T1 and
+T2 were graded from a written report, T15 by checklist.</p>
+<p>Note: <strong>every grade below rests on evidence through T30, 2026-07-25.</strong> T31
+through T40 await re-grading. Five of them move a reading:</p>
+<ul>
+<li>T33 reverses T9's cost win on the current stack (see Overall).</li>
+<li>T35's derived cost model is retracted.</li>
+<li>T36 found the effort dial buys nothing below <code>max</code>.</li>
+<li>T39 and T40, the first ablations of whether the skill works at all,
+  passed 62 of 63 runs with it against 4 of 21 without, across Haiku
+  4.5, Sonnet 5, and Opus 5.</li>
+</ul>
+<h2 id="the-goal-in-one-paragraph">The goal, in one paragraph</h2>
+<p>Ship a <strong>portable policy</strong>, not an engine, that makes AI coding work cost
+what it should. The strong model plans and judges, where it compounds
+most. Cheaper models handle bounded, well-specified implementation that an
+automated check can grade. An <strong>independent verifier</strong> checks the result
+before it counts as done. Escalation to a stronger model happens only on
+demonstrated failure. A human gates every plan. Every claim traces to
+evidence. Success means <strong>equal-or-better delivered quality than a strong
+model used inline, at materially lower cost, on both supported harnesses
+(Claude Code, Copilot CLI), without overselling what's verified.</strong> The
+primary domain is C++ game development. The policy itself is
+language-agnostic.</p>
+<h2 id="two-dials-not-one">Two dials, not one</h2>
+<p>Cheaper models handle implementation only <strong>within a scope</strong>. Anthropic's
+published default runs the other way: start with the most intelligent
+model and use effort level to dial in cost, since "Cost-per-task is often lower for more intelligent models, especially at lower effort levels, even if the price-per-token is higher" (<a href="https://claude.com/blog/claude-models-explained-choosing-the-best-model-for-your-use-case">Claude models explained</a>).
+Going down the ladder is the second move. The same page warns that
+"Starting with a smaller model can also make it harder to distinguish
+between model failures and setup failures." The guard is running the same
+brief, oracle, and setup at more than one tier, where a setup fault shows
+up in every arm. It's only as strong as the arm count.</p>
+<p><strong>Tier answers "it didn't know enough". Effort answers "it didn't try hard
+enough."</strong> smartplan's <code>routing.md</code> sets effort next to the tier at plan
+time and raises it first when a run didn't try hard enough. The Claude
+Code implementer pins medium, since T44 measured it at high's scores for
+38 to 59% less. The verifier pins high. Cheap seats pin low where the
+model has the dial.</p>
+<p>Effort isn't yet the co-equal move the vendor framing suggests. On Sonnet
+5 via Copilot, <code>max</code> effort cost <strong>1.92× for no measured quality gain</strong>
+(one task, k=2). Switching effort mid-session busts the prefix cache on
+most models and costs ~2.4× on the next turn. Fable 5.1 (Claude Code
+v2.1.260+) and Opus 5.5 keep the cache on an API key or a subscription.
+Haiku 4.5 has no effort dial. On Copilot CLI, effort is session-wide unless
+a seat pins it with the <code>reasoningEffort</code> frontmatter field (documented,
+untested here), as the Cheap implementer and scout do.</p>
+<h2 id="the-cost-ceiling-shipped-and-awaiting-its-measurement">The cost ceiling, shipped and awaiting its measurement</h2>
+<p>Since 2026-09-21 a third constraint ships: <strong>no initial seat pick prices
+above the incumbent</strong>, meaning the session seat or the seat handing the
+leaf down (<code>routing.md</code> § The cost ceiling). A pick climbs above the
+seat only through the ask-first seat ceiling, fail-twice escalation, the
+planner seat, or the verifier floor. <code>scripts/seat-map.py</code> checks the
+ceiling, with a warn-only hook note whenever <code>$SMARTPLAN_SEAT</code> is exported
+(off by default). <code>t41-cost-ceiling-validation-prereg.md</code> pre-registers
+the open measurement: paired arms that validate a cheaper pick under the ceiling at
+equal quality, doubling as the GLM-5.3-Flash candidate trial.</p>
+<h2 id="shorthand-used-below">Shorthand used below</h2>
+<ul>
+<li>leaf - One small independent unit of work. A wave fans out into leaves, each with its own model and check.</li>
+<li>fan-out - Splitting a task across parallel leaves instead of one pass.</li>
+<li>seat - The role a model class fills: planner, implementer, verifier.</li>
+<li>regime - A task's shape (size, whether it fits one context, how failure-prone), which decides routing.</li>
+<li>oracle - A hidden automated check grading whether the code <em>works</em>, not how it looks.</li>
+<li>k=N / n=N - How many times a test was repeated.</li>
+<li>cr - AI credits, the unit Copilot meters.</li>
+<li>warm / cold - Whether an earlier call already primed the shared context.</li>
+<li>bounce - A run that failed and needed rework before it passed.</li>
+<li>break-even - Where the tiered flow's premium on easy work is repaid by the failures it catches.</li>
+</ul>
+<h2 id="the-goals-measured">The goals, measured</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Goal</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Cheaper per correct change</td>
+<td><strong>Met only for execution and repair from a precise spec.</strong> Not met for tasks that fit one strong model's context.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Quality never sacrificed silently</td>
+<td><strong>Met</strong> for scriptable mechanical work and convention-standard judgment. Novel ambiguity is open.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Verification that actually catches things</td>
+<td><strong>Met and economical.</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Portable across harnesses</td>
+<td><strong>Met, asymmetrically.</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Honesty as a feature</td>
+<td><strong>Met, with one caught lapse.</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td>The primary domain works</td>
+<td><strong>Partial, advancing.</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="1-cheaper-per-correct-change">1. Cheaper per correct change</h3>
+<p>Success looks like the tiered flow beating inline strong-model usage on
+cost per correct change.</p>
+<ul>
+<li><strong>Where it wins.</strong> In T9, a pre-registered A/B at k=3, tiered won
+  <strong>3/3 runs at 39-55% of inline cost</strong>, with inline failing outright on
+  1 of the 3.</li>
+<li><strong>Where it loses.</strong> Forced fan-out on one-context work lost every time
+  at equal oracle quality. T14 (one leaf) ran at 148% of inline in raw
+  tokens. On a pre-registered price-weighted metric, T19 (5 leaves, k=2,
+  11/11 quality) ran at 234%/289% of inline Opus, T20 (12 Haiku leaves,
+  k=1) at 180%, and T21 (5 big Sonnet leaves, k=1) at 163%. One strong
+  context is more token-efficient than N cold cheaper ones at every leaf
+  count, size, and tier tested. Credit-billed forced fan-out loses too,
+  at 4.0-4.2× (tiny) to 2.3× (complex) on Copilot credits (T22/T23/T24,
+  mechanism references rather than product costs).</li>
+<li><strong>As shipped.</strong> smartplan routes one-context work inline and pays a
+  load tax that shrinks as the task grows: 1.52× (T25), 1.20× (T25b),
+  1.05× on a real UE5 task (T28), and ~1.0× in T30, where both
+  with-skill arms ran <em>under</em> the no-skill baseline (0.88×/0.86×, 6/6
+  parity, n=2 vs n=1). T28's Claude Code A/B left its cost ratio
+  unresolved (confounded, k=1).</li>
+<li><strong>How to read it.</strong> "Cheaper per correct change across a workload with
+  a failure tail." Break-even is ≈1 failure-prone task in 20 at the old
+  +4.62 cr tax (T25) and ≈1 in 40 at +2.06 cr (T25b), against a ~90 cr
+  T9-class blind repair. That's derived, not measured. T9's repairs ran
+  75-167 cr.</li>
+</ul>
+<h3 id="2-quality-never-sacrificed-silently">2. Quality never sacrificed silently</h3>
+<p>Success looks like cheap tiers landing the same quality behind
+verification.</p>
+<ul>
+<li>In T8, max-savings mode matched balanced mode on a 50-case hidden
+  oracle at 54% of the cost. Its wide-wave probe bounced 1 of 11
+  dispatches (~9%), well under <code>routing.md</code>'s 20-30% bounce-rate
+  threshold.</li>
+<li>T9 showed identical first-shot quality across arms. T28 showed 12/12
+  rubric parity across all five arms on real Epic code.</li>
+<li>Met for scriptable mechanical work (T8) and for convention-standard
+  judgment (T13: 23/23 hidden edges, zero delta, 32% cost). Novel-ambiguity
+  judgment is still open.</li>
+</ul>
+<h3 id="3-verification-that-actually-catches-things">3. Verification that actually catches things</h3>
+<p>Success looks like independent checks catching what executors and
+self-review miss, affordably.</p>
+<ul>
+<li>Verification caught 4/4 seeded defects (T1/T2) and named a falsified
+  DONE claim (T11).</li>
+<li>The C++ UB (undefined behavior) layer caught a real latent bug in code
+  that compiles clean (T12).</li>
+<li>Verify first cost <strong>55% of wave cost</strong> (T2). Script and batch modes cut
+  that by 68%, with FAIL-isolation proven (T10/T11).</li>
+<li>Known limit: 2/2 unhinted model verifiers missed a shared blind-spot
+  defect that the functional oracle caught (T9). Scripts and
+  decorrelation aren't optional.</li>
+</ul>
+<h3 id="4-portable-across-harnesses">4. Portable across harnesses</h3>
+<p>Success looks like the same seats and working levers on Claude Code and
+Copilot CLI.</p>
+<ul>
+<li>Both harnesses were live-validated end-to-end, with tool-locked agent
+  seats for each (<code>.github/agents/</code>, <code>.claude/agents/</code>). Copilot's levers
+  are native and observable. Copilot CLI reads the project
+  <code>.claude/skills</code> tree natively. T28 ran the same real UE5 task on both
+  harnesses with exact routing compliance.</li>
+<li>Claude Code routing is validated. Whether a routed tier <em>bills</em> as
+  routed is contested upstream (#43869) and can't be confirmed from
+  inside the harness.</li>
+<li>On Copilot, <strong>read plan-gating as an expectation to confirm per
+  account, not a fact.</strong> In T30, <code>claude-opus-5</code> <em>and</em> <code>claude-opus-4.8</code>
+  served un-gated on an account that had refused 4.8 two weeks earlier.</li>
+<li>Copilot's sandbox can't read a junction that points outside the
+  project root (T28). <code>install-project.ps1</code> installs need <code>--add-dir</code>.</li>
+</ul>
+<h3 id="5-honesty-as-a-feature">5. Honesty as a feature</h3>
+<p>Success looks like no claim outliving its evidence, and failures
+reported as found.</p>
+<ul>
+<li>The VERIFIED.md claim ledger keeps dated sources and is CI-gated.
+  Deviations get pre-registered and declared, including T9's own
+  instrument bugs. Null results get published, like T4's escalation that
+  never fired. Unmeasured claims are labeled.</li>
+<li>The discipline held even when it made the program's own tests look
+  worse. It isn't automatic. CI gates cover VERIFIED.md rows, not
+  narrative prose, where a stale claim that Opus is plan-gated on Copilot
+  Pro survived eleven days after T30 falsified it.</li>
+</ul>
+<h3 id="6-the-primary-domain-works">6. The primary domain works</h3>
+<p>Success looks like C++ gamedev leaves flowing through with the
+correctness layer biting.</p>
+<ul>
+<li>T12, the first live C++ leaf, produced a <strong>blocking UB finding</strong> with a
+  concrete fix on code that passes desk-checks.</li>
+<li>T28, a real Lyra task on UE 5.8, gave the first compile-gated arms in
+  the primary domain, all 5/5 compile-clean. Both harnesses' reviews
+  found the same finding classes with zero invented values.</li>
+<li>On real Epic code, smartreview's Unreal profile discriminated correctly
+  in T15 (15/8/20 PASS/FAIL/N-A), handled ambiguity honestly, and found a
+  checklist gap in Lyra's component lifecycle. Vanilla was probed in T12.</li>
+<li>T39's one ranking case passed 9/9 with the skill across three tiers,
+  and without it on all three too (k=1), an honest null.</li>
+<li>Still open: run acceptance, the custom-engine profile, and the
+  never-measured recall of smartreview's <strong>BREAKING</strong> category, which
+  <code>tests/fixtures/cpp/unreal/</code> could measure.</li>
+</ul>
+<h2 id="the-fan-out-loss-is-published-guidance-not-a-local-bruise">The fan-out loss is published guidance, not a local bruise</h2>
+<p>Anthropic reserves multi-agent for "when context pollution degrades
+performance, when tasks can run in parallel, and when specialization
+improves tool selection or task focus", and says "Outside these
+situations, the coordination costs typically exceed the benefits"
+(<a href="https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them">Building multi-agent systems: When and how to use them</a>,
+2026-01-23). Those three map onto what survived our measurement: work
+beyond one context (context pollution), wall-clock-bound batches
+(parallel), and the independent verify floor (specialization). The regimes
+the tests killed met none of the three.</p>
+<p>The token overhead matches too. "Multi-agent implementations typically use
+3-10x more tokens than single-agent approaches" (same post). Our forced
+fan-out measured 4.07x (T21), 5.3x (T19), and 7.46x (T20) in tokens,
+inside that band. The price-weighted figures above run lower because
+cheaper per-token tiers buy part of that back. The architecture isn't the
+surprise.</p>
+<p>Task shape is. <a href="https://www.anthropic.com/engineering/multi-agent-research-system">Building a multi-agent research system</a>
+(2025-06-13) names it: "most coding tasks involve fewer truly
+parallelizable tasks than research, and LLM agents are not yet great at
+coordinating and delegating to other agents in real time." Its second
+clause is why plan-then-dispatch with no live inter-agent chatter is the
+right conservative shape, not a missing feature.</p>
+<p>The losses stand. What ships is a gate that refuses to fan out unless one
+of those three situations holds, plus a verify floor that makes fan-out
+safe when it does.</p>
+<h2 id="overall-how-close">Overall: how close?</h2>
+<p><strong>The machinery is demonstrated. The economic claim is bounded.</strong> Every
+mechanism in the flow (briefing, tiered dispatch, independent
+verification, retry, live tier escalation, batching, script checks, the
+mode dial) has run for real. T9's cost win came from inline failing.
+<strong>T33 replayed T9's question on the current stack and measured tiering at
+2.78x AGAINST inline</strong> at identical quality, k=3, once inline stopped
+failing. So the regime that wins is rework-avoidance under demonstrated
+failure, not spec-plus-oracle execution as such. SKILL.md's inline default
+rests on these numbers. What remains:</p>
+<ul>
+<li><strong>Untested regimes</strong> - work beyond one context, wall-clock-bound
+  batches, and the failure-prone regime as shipped. T26 tested that last
+  one and came back null: none of its three organic traps fired on
+  current models.</li>
+<li><strong>Real C++ scale</strong> - an engine-profiled (Unreal or custom) leaf set with
+  run acceptance at scale.</li>
+<li><strong>Claude Code billing confirmation</strong> - it's structural (#43869).
+  Documented mitigations: opusplan, Console spot-checks, and the Copilot
+  path.</li>
+<li><strong>Sample sizes</strong> - n=1-6 per cell. The large ratios (roughly 1.5× to
+  4.2× across T9-T24) sit well outside documented run-to-run noise. The
+  near-parity results (T28 1.05×, T30 0.88×) don't. They count as parity,
+  not wins. These are case studies with variance bars, not benchmarks.</li>
+</ul>
+<h2 id="what-this-family-is-not-built-for">What this family is not built for</h2>
+<p>Every skill in this family assumes a real filesystem, a git checkout, and
+shell access. Skills on the API surface "run in a sandboxed container
+with no network access and no runtime package installation" (<a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview">Agent Skills overview</a>).
+So this family targets filesystem agents (Claude Code, Copilot CLI, and
+CLI-class clients), which is why Goal 4 names only those two harnesses.</p>
+<p><code>smartexec</code> carries <code>user-invocable: false</code> and
+<code>disable-model-invocation: true</code> to stay out of the session skill
+listing. Neither is in the six-field Agent Skills spec at
+agentskills.io/specification (unversioned, both pages read 2026-08-05).
+So it hard-errors where that spec is enforced: claude.ai uploads, the
+Skills API, <code>package_skill.py</code>, and Cowork and cloud sessions. If your
+work is sensitive, Agent Skills "is not covered by ZDR arrangements", per
+the same overview.</p>
+<h2 id="where-the-evidence-lives">Where the evidence lives</h2>
+<p><code>docs/benchmarks/README.md</code> indexes the tests.
+<code>research/eval-methodology-2026-07.md</code> holds the external standards they
+meet. <code>VERIFIED.md</code> is the claim ledger CI enforces.
+<code>docs/changelogs/smartplan.md</code> holds every version's story.</p>
+</main>
+<footer>
+<p>smartplan · MIT · generated from repo markdown</p>
+</footer>
+<script>
+/* Click-to-sort for every data table on the site. Added 2026-08-22 for the
+   quick-picks page, written generically because a comparison table nobody
+   can re-sort answers only the question its author happened to ask.
+   No dependencies, and the page is fully readable with JS off: this only
+   ever reorders rows that are already there. */
+(function () {
+  var NUM = /-?\d+(?:[.,]\d+)?/g;
+
+  /* Cell -> sort key. Three kinds, in order of specificity.
+     1. A capability strip sorts by how good the model is: four points a
+        band leader, three a check, two an "it depends", one a warning,
+        zero a cross or an unknown.
+     2. Anything that LEADS with a digit sorts numerically. A price reads
+        "0.20 / 1.20", and the number that matters there is the one AFTER the
+        slash, since output is what agentic work actually spends.
+     3. Everything else compares as text. "Sonnet 5" and "GPT-5.4" contain
+        digits and are not numbers; what separates them from a real number is
+        that a number leads. A letter-count rule was tried first and failed on
+        "GPT-5.4", whose three letters slipped under the bar and sorted the
+        Model column by version number.
+     An em dash means "not measured" and returns NaN, which counts as numeric
+     for column detection AND pins the row last in both directions. */
+  function key(cell, alt) {
+    /* A merged cell shows two numbers, and no parse can know which one the
+       reader means, so it carries both keys explicitly. `alt` picks the
+       second. An empty attribute is "not measured", same as an em dash. */
+    var dual = cell.querySelector(".dual");
+    if (dual) {
+      var raw = dual.getAttribute(alt ? "data-k2" : "data-k");
+      return raw ? parseFloat(raw) : NaN;
+    }
+    var caps = cell.querySelector(".caps");
+    if (caps) {
+      var score = 0;
+      caps.querySelectorAll("span").forEach(function (s) {
+        if (s.classList.contains("s")) score += 4;
+        else if (s.classList.contains("y")) score += 3;
+        else if (s.classList.contains("m")) score += 2;
+        else if (s.classList.contains("w")) score += 1;
+      });
+      return score;
+    }
+    var text = (cell.textContent || "").trim();
+    if (!text || /^[\u2014\u2013-]$/.test(text)) return NaN;
+    if (!/^[^0-9A-Za-z]*[0-9]/.test(text)) return text.toLowerCase();
+    var nums = text.match(NUM);
+    if (!nums || !nums.length) return text.toLowerCase();
+    if (nums.length > 1 && text.indexOf("/") !== -1) {
+      return parseFloat(nums[1].replace(",", "."));
+    }
+    return parseFloat(nums[0].replace(",", "."));
+  }
+
+  function missing(v) { return typeof v === "number" && isNaN(v); }
+
+  function sortable(table) {
+    var head = table.tHead && table.tHead.rows[0];
+    var body = table.tBodies[0];
+    if (!head || !body || head.cells.length < 3 || body.rows.length < 3) return;
+
+    var rows = Array.prototype.slice.call(body.rows);
+    rows.forEach(function (r, i) { r.dataset.i = i; });
+
+    /* A column is numeric when most of it parses as a number. Deciding per
+       column rather than per cell keeps one stray footnote marker from
+       flipping a whole column to text sorting. */
+    var numeric = [];
+    var dual = [];
+    for (var c = 0; c < head.cells.length; c++) {
+      var hits = 0;
+      for (var r = 0; r < rows.length; r++) {
+        if (rows[r].cells[c] && typeof key(rows[r].cells[c]) === "number") hits++;
+      }
+      numeric[c] = hits >= rows.length * 0.6;
+      dual[c] = rows.some(function (row) {
+        return row.cells[c] && !!row.cells[c].querySelector(".dual");
+      });
+    }
+
+    /* "The useful direction" is not the same for every number. High value and
+       high capability are good, so those open descending. A price is the one
+       column where low is the good news, so it opens ascending. Nothing
+       generic infers that, so the header text is asked directly. */
+    function opensDescending(col) {
+      var cheapFirst = /price|cost|\$/i.test(head.cells[col].textContent || "");
+      return !!numeric[col] && !cheapFirst;
+    }
+
+    /* Three clicks, three states. For an ordinary column those are the useful
+       direction, its reverse, and the shipped order. A dual-key column spends
+       the middle state on its SECOND key instead of on a reverse, because
+       "worst value first" is a direction nobody wants and "sort by score" is
+       a question people actually ask. Both of its states run descending. */
+    function ordered(col, state) {
+      var out = rows.slice();
+      if (state === 0) {
+        out.sort(function (a, b) { return a.dataset.i - b.dataset.i; });
+        return out;
+      }
+      var alt = dual[col] && state > 2;
+      /* A dual column runs key1 down, key1 up, key2 down, key2 up, so odd
+         states are descending. Everything else is the column's own useful
+         direction and then its reverse. */
+      var desc = dual[col]
+        ? (state % 2 === 1)
+        : ((state === 1) === opensDescending(col));
+      out.sort(function (a, b) {
+        var x = key(a.cells[col], alt), y = key(b.cells[col], alt);
+        var xm = missing(x), ym = missing(y);
+        if (xm && ym) return a.dataset.i - b.dataset.i;
+        /* Returned before the direction flip, so an unmeasured row sinks
+           whichever way the column is pointing. */
+        if (xm) return 1;
+        if (ym) return -1;
+        var d = (typeof x === "number" && typeof y === "number")
+          ? x - y
+          : String(x).localeCompare(String(y));
+        return desc ? -d : d;
+      });
+      return out;
+    }
+
+    function ids(list) {
+      return list.map(function (r) { return r.dataset.i; }).join(",");
+    }
+
+    /* A dual column sorts two ways on each of two keys, so its cycle is four
+       long where an ordinary column's is two. */
+    function lastState(col) { return dual[col] ? 4 : 2; }
+
+    function keyName(col, state) {
+      var cell = body.querySelector(
+        "tr td:nth-child(" + (col + 1) + ") .dual[data-n]");
+      return cell && cell.getAttribute(state > 2 ? "data-n2" : "data-n");
+    }
+
+    function paint(col, state) {
+      head.querySelectorAll("th").forEach(function (th, i) {
+        if (i !== col || state === 0) { th.setAttribute("aria-sort", "none"); }
+        /* Restore any header that was showing a sort-key name. */
+        if ((i !== col || state === 0) && th.dataset.name) {
+          (th.querySelector("[title]") || th).textContent = th.dataset.name;
+        }
+      });
+      if (state === 0) return;
+
+      var desc = dual[col]
+        ? (state % 2 === 1)
+        : ((state === 1) === opensDescending(col));
+      var th = head.cells[col];
+      th.setAttribute("aria-sort", desc ? "descending" : "ascending");
+
+      /* Say which key is live. Without it the third click on a dual-key
+         column looks like a bug: the rows move and the header does not.
+         The name REPLACES the header text rather than sitting under it in a
+         block of its own -- a block child pushes the arrow's static position
+         onto a second line, which put the indicator somewhere no other header
+         puts it. Staying on one line keeps this column's chrome identical to
+         every other. The names are read off the cells, so a second dual
+         column anywhere on the site labels itself. */
+      var name = dual[col] && keyName(col, state);
+      if (name) {
+        var slot = th.querySelector("[title]") || th;
+        if (!th.dataset.name) { th.dataset.name = slot.textContent; }
+        slot.textContent = "by " + name;
+      }
+    }
+
+    /* Which column is the table ALREADY sorted by? Answered below, before any
+       click can land. It decides the length of the click cycle, so it is a
+       closure variable rather than a local. */
+    var shippedCol = -1;
+
+    /* One shared state, not one per header. Clicking a different column
+       restarts at its first direction rather than resuming wherever that
+       column was left, which is what a per-header closure did.
+
+       State 0 is "the order it shipped in". Where a column reproduces that
+       order, 0 is a duplicate of that column's own sorted state AND the only
+       state that leaves the table with no header marked, so it is dropped and
+       the cycle runs 1, 2, 1. Clicking that column is how a reader gets the
+       original order back, and it stays marked while they look at it.
+       Where NO column reproduces the shipped order, 0 is kept: it is then the
+       only way back to an order the reader would otherwise lose for good. */
+    var active = { col: -1, state: 0 };
+
+    function activate(col) {
+      var state;
+      if (active.col !== col) state = 1;
+      else if (active.state < lastState(col)) state = active.state + 1;
+      else state = shippedCol >= 0 ? 1 : 0;
+      active = { col: col, state: state };
+      ordered(col, state).forEach(function (r) { body.appendChild(r); });
+      paint(col, state);
+    }
+
+    head.querySelectorAll("th").forEach(function (th, col) {
+      th.classList.add("sortable");
+      /* A swapped-in key name is longer than the header it replaces, and
+         "by SWE-V" breaking after "by" would read as two headers. */
+      if (dual[col]) { th.classList.add("sortable-dual"); }
+      th.tabIndex = 0;
+      th.setAttribute("role", "button");
+      th.setAttribute("aria-sort", "none");
+      th.addEventListener("click", function () { activate(col); });
+      th.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(col); }
+      });
+    });
+
+    /* Which column is the table ALREADY sorted by? Markdown ships in an order
+       its author chose -- this roster ships by value -- and a header row that
+       marks every column "unsorted" tells the reader nothing about the order
+       they are looking at. So the shipped order is compared against what each
+       column would produce, and the first exact match is shown as active.
+       Columns whose keys are all identical are skipped: they match every
+       order and would claim credit for one they did not cause. */
+    var shipped = ids(rows);
+    for (var col = 0; col < head.cells.length && active.col < 0; col++) {
+      var seen = {}, distinct = 0;
+      for (var i = 0; i < rows.length; i++) {
+        var k = String(key(rows[i].cells[col]));
+        if (!seen[k]) { seen[k] = 1; distinct++; }
+      }
+      if (distinct < 2) continue;
+      for (var s = 1; s <= lastState(col); s++) {
+        if (ids(ordered(col, s)) === shipped) {
+          active = { col: col, state: s };
+          shippedCol = col;
+          paint(col, s);
+          break;
+        }
+      }
+    }
+  }
+
+  document.querySelectorAll(".table-wrap table").forEach(sortable);
+})();
+</script>
+</body>
+</html>

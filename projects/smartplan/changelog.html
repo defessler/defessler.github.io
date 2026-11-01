@@ -1,0 +1,1152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>smartplan — Changelog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: dark;
+  --void: #0a0e14;
+  --void-2: #101827;
+  --cell: #0d1420;
+  --cell-head: #131c2b;
+  --panel: rgba(23,34,51,.55);
+  --mint: #35e0c8;
+  --peri: #7c8cff;
+  --rose: #ff5f9e;
+  --amber: #ffb35c;
+  --ink: #e6edf3;
+  --ink-2: #b7c3cd;
+  --ink-dim: #8b98a5;
+  --line: rgba(120,160,200,.16);
+  --glow-mint: 0 0 22px rgba(53,224,200,.4);
+  --ease: cubic-bezier(.2,.7,.2,1);
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background-color: var(--void);
+  background-image:
+    radial-gradient(ellipse 900px 700px at -10% -15%, rgba(53,224,200,.10), transparent 60%),
+    radial-gradient(ellipse 1000px 800px at 115% 5%, rgba(124,140,255,.09), transparent 60%),
+    radial-gradient(ellipse 800px 700px at 105% 115%, rgba(53,224,200,.08), transparent 60%);
+  background-repeat: no-repeat;
+  background-attachment: fixed, fixed, fixed;
+  color: var(--ink);
+  font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.65;
+}
+::selection { background: var(--mint); color: var(--void); }
+a:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+nav.site-nav {
+  max-width: 84rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+.nav-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1.4rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+/* Smooth the horizontal scroll while a pointer rests on a nav row. :has() is
+   widely supported. A browser without it just scrolls instantly. */
+@supports selector(:has(*)) {
+  nav.site-nav:has(.nav-row) .nav-row:hover { scroll-behavior: smooth; }
+}
+.nav-row > * { scroll-snap-align: start; }
+.nav-row::-webkit-scrollbar { display: none; }
+/* Below the widest phone, trim the nav's horizontal padding and tighten the
+   gaps so more than three destinations are reachable without scrolling at
+   all. */
+@media (max-width: 40rem) {
+  nav.site-nav { padding: 0 0.75rem; }
+  .nav-row { gap: 1rem; }
+  .nav-groups { padding: 0.6rem 0 0.4rem; }
+}
+.nav-groups { padding: 0.8rem 0 0.55rem; }
+.subnav {
+  padding: 0.45rem 0 0.6rem;
+  border-top: 1px solid var(--line);
+  gap: 1.15rem;
+}
+.brand {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  background: linear-gradient(90deg, var(--mint), var(--peri));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-right: 0.4rem;
+}
+.stamp {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  opacity: 0.55;
+  white-space: nowrap;
+  align-self: center;
+  /* Anchored right: the group links sit left of it, this takes the slack. */
+  margin-left: auto;
+  padding-left: 1.5rem;
+}
+@media (max-width: 40rem) {
+  /* On a phone the nav row already scrolls, so a right-anchored stamp would
+     sit off-screen past the last link. Let it flow after them instead. */
+  .stamp { margin-left: 0; padding-left: 0.75rem; font-size: 0.66rem; }
+}
+.nav-groups a {
+  font-family: "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  color: var(--ink-2);
+  text-decoration: none;
+  padding-bottom: 0.3rem;
+  transition: color 0.2s var(--ease), text-shadow 0.2s var(--ease);
+}
+.nav-groups a:hover { color: var(--mint); text-shadow: var(--glow-mint); }
+/* The one call-to-action in the chrome. Reads as a button rather than a nav
+   link, because it does something different from every other link up there. */
+.nav-groups a.dl-btn {
+  color: var(--void);
+  background: var(--mint);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  margin-left: 1rem;
+  align-self: center;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: filter 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.nav-groups a.dl-btn:hover {
+  color: var(--void);
+  text-shadow: none;
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+@media (max-width: 720px) {
+  .nav-groups a.dl-btn { padding: 0.25rem 0.7rem; margin-left: 0.6rem; }
+}
+/* Build facts under a download link. Deliberately quiet: they answer a
+   question you only ask after the link has already caught your eye. */
+.dl-meta {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.82em;
+  line-height: 1.45;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* A filename is one token to a reader. Breaking it across lines reads as a
+   rendering fault, so the cell holding a build stamp keeps its code spans
+   whole. Scoped by :has() to that cell alone — every other table on the site
+   still wraps long code spans, which is what keeps them narrow. */
+td:has(.dl-meta) code { white-space: nowrap; }
+.nav-groups a.current {
+  color: var(--ink);
+  background-image: linear-gradient(90deg, var(--mint), var(--peri));
+  background-size: 100% 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+}
+.subnav a {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.03em;
+  color: var(--ink-dim);
+  text-decoration: none;
+  transition: color 0.2s var(--ease);
+}
+.page-toc {
+  margin: 1.5rem 0 2rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--mint);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--panel) 60%, transparent);
+}
+.page-toc > summary {
+  cursor: pointer;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.page-toc > ul {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  columns: 2;
+  column-gap: 2rem;
+}
+.page-toc li {
+  margin: 0 0 0.35rem;
+  break-inside: avoid;
+  font-size: 0.92rem;
+}
+@media (max-width: 40rem) {
+  .page-toc > ul { columns: 1; }
+}
+.subnav a:hover { color: var(--mint); }
+.subnav a.current { color: var(--mint); }
+.subnav a.current::before { content: "▸ "; }
+main {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 4rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+/* Text uses the page. `main` caps at 80rem and centres, which is the whole
+   measure. Nothing narrows its children further. An earlier 46rem prose cap
+   wrapped text well before the page needed to and left a wide empty gutter
+   beside every paragraph. It was removed on purpose. Don't add it back. */
+a {
+  color: var(--mint);
+  text-decoration: none;
+  transition: color 0.2s var(--ease), text-shadow 0.2s var(--ease);
+}
+a:hover { text-decoration: underline; text-shadow: var(--glow-mint); }
+strong { color: var(--ink); font-weight: 600; }
+h1, h2, h3 { font-family: "Space Grotesk", sans-serif; line-height: 1.25; }
+h4, h5, h6 { font-family: "Space Grotesk", sans-serif; color: var(--ink-2); line-height: 1.25; }
+h1 {
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--mint), var(--peri));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+h2 {
+  font-weight: 600;
+  color: var(--ink);
+  margin-top: 3rem;
+  padding-bottom: 0.85rem;
+}
+h2::after {
+  content: "";
+  display: block;
+  width: 2.5rem;
+  height: 3px;
+  margin-top: 0.6rem;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--mint), var(--peri), var(--rose));
+}
+h3 {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 1rem;
+  color: var(--ink-2);
+  margin-top: 2rem;
+}
+.hero { margin-bottom: 3rem; }
+.thesis {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.5vw, 1.8rem);
+  line-height: 1.35;
+  margin: 0 0 1.75rem;
+  color: var(--ink);
+}
+.thesis em {
+  font-style: normal;
+  background: linear-gradient(90deg, var(--mint), var(--peri));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.board { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+.board td a { color: var(--ink); font-weight: 600; }
+.board td a:hover { color: var(--mint); }
+.chip {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 0.1em 0.55em;
+  border: 1px solid rgba(53,224,200,.35);
+  border-radius: 999px;
+  color: var(--mint);
+  white-space: nowrap;
+}
+.table-wrap {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9rem;
+}
+th {
+  background: var(--cell-head);
+  font-family: "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  text-align: left;
+  padding: 0.65rem 0.85rem;
+  vertical-align: bottom;
+}
+td {
+  padding: 0.7rem 0.85rem;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  color: var(--ink-2);
+  background: var(--void);
+  /* Top-align, because a one-word cell centred beside a paragraph is the
+     single worst thing about a dense comparison table. */
+  vertical-align: top;
+  line-height: 1.5;
+}
+/* Zebra striping. Subtle enough not to fight the palette, strong enough to
+   let the eye track a row across seven columns. */
+tbody tr:nth-child(even) td { background: #0c121c; }
+td:first-child, th:first-child {
+  color: var(--ink);
+  position: sticky;
+  left: 0;
+  background: var(--cell);
+  /* The frozen column needs an edge or it reads as part of the scroll. */
+  box-shadow: 1px 0 0 var(--line);
+}
+tbody tr:nth-child(even) td:first-child { background: #0f1622; }
+th:first-child { background: var(--cell-head); z-index: 3; }
+tbody tr:hover td { background: #12222a; }
+tbody tr:hover td:first-child { background: #16262f; }
+
+/* Dense tables: cap the height so the header can stick, and give columns a
+   floor so prose does not shred into one word per line. */
+.table-tall {
+  max-height: 78vh;
+  overflow: auto;
+}
+.table-tall thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+/* The corner cell has to stick on BOTH axes and outrank both. Without this
+   the header scrolls left while the body's frozen column stays put, so the
+   wrong heading ends up sitting over the row labels. */
+.table-tall thead th:first-child {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 4;
+}
+.table-wide table { font-size: 0.85rem; }
+.table-wide td, .table-wide th { min-width: 12rem; }
+.table-wide td:first-child, .table-wide th:first-child {
+  min-width: 9rem;
+  max-width: 14rem;
+}
+/* Price-ish second column reads as data, not prose. */
+.table-wide td:nth-child(2) { min-width: 6rem; white-space: nowrap; }
+
+@media (max-width: 720px) {
+  .table-tall { max-height: 70vh; }
+  .table-wide td, .table-wide th { min-width: 9rem; }
+}
+
+/* Capability strip. Added 2026-08-22, replacing five prose columns with one.
+   The grid is a FIXED five across rather than auto-fit, because the whole
+   point is that "Code reviews" sits under "Code reviews" on the row above:
+   a reader scans one task down the table instead of reading 21 sentences.
+   Auto-fit reflows per cell and loses that. */
+.caps {
+  display: grid;
+  /* 6rem is the measured width of the longest label, "Code reviews", at the
+     font size below plus its glyph. Under that the labels collide, which is
+     what a first pass at 5.4rem did. */
+  grid-template-columns: repeat(5, minmax(6rem, 1fr));
+  gap: 0.25rem 0.4rem;
+  min-width: 31rem;
+}
+.caps span {
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+/* A band leader (★) is the one chip that should out-rank a plain check, so
+   it gets both the strongest weight and the accent color. */
+.caps .s { font-weight: 600; color: var(--mint); }
+.caps .y { color: var(--ink); }
+.caps .m { color: var(--ink-2); }
+.caps .w { color: var(--ink-2); }
+/* A "wrong tool" verdict is the one a reader should skim past, so it recedes
+   rather than shouting. It is still legible, just not competing. Unknown
+   (no Artificial Analysis row) dims the same way, for the same reason. */
+.caps .n { opacity: 0.45; }
+.caps .u { opacity: 0.45; }
+
+/* Value and board score, one column. Added 2026-08-23, replacing two adjacent
+   numeric columns. They were always read together -- a ratio on its own sells
+   the cheapest model in the room -- so stacking them puts the check directly
+   under the claim instead of one saccade to the right.
+   Tooltips are native `title` on purpose. .table-wrap scrolls on x, which
+   makes overflow-y compute to auto as well, so a positioned CSS bubble would
+   be clipped by the very row it belongs to. */
+.dual { display: block; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.dual .dv, .dual .ds {
+  display: block;
+  cursor: help;
+  /* Underlines the glyphs, not the block. A border-bottom here would draw a
+     rule the full width of the cell. */
+  text-decoration: underline dotted rgba(120,160,200,.4);
+  text-underline-offset: 3px;
+}
+.dual .dv { font-weight: 600; font-size: 1rem; color: var(--ink); }
+.dual .ds { font-size: 0.8rem; color: var(--ink-dim); }
+.dual.lead .dv { color: var(--mint); }
+th span[title] { cursor: help; }
+
+/* Click-to-sort. The affordance has to be visible without hover, since a
+   header that only reveals itself on hover is invisible on touch. */
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  padding-right: 1.6rem;
+  position: relative;
+}
+th.sortable:hover, th.sortable:focus-visible { color: var(--ink); }
+th.sortable::after {
+  content: "↕";
+  position: absolute;
+  right: 0.6rem;
+  opacity: 0.3;
+  font-size: 0.9em;
+}
+/* The active column is announced, not just arrowed: this table ships
+   sorted by value and a reader needs to see that without clicking. */
+th.sortable[aria-sort="descending"], th.sortable[aria-sort="ascending"] {
+  color: var(--mint);
+}
+th.sortable[aria-sort="descending"]::after { content: "↓"; opacity: 1; }
+th.sortable[aria-sort="ascending"]::after { content: "↑"; opacity: 1; }
+th.sortable:focus-visible { outline: 2px solid var(--mint); outline-offset: -2px; }
+/* A dual header swaps its text for the live key name, which is longer than
+   the name it replaces. Wrapping it would read as two headers. */
+th.sortable-dual { white-space: nowrap; }
+
+/* A table carrying capability strips sets its own widths. .table-wide's
+   12rem floor per column is right for five columns of prose and wrong here,
+   where one column is a fixed grid and three are short data. Declared after
+   .table-wide so it wins on source order at equal specificity. */
+.table-caps table { font-size: 0.85rem; }
+.table-caps td, .table-caps th { min-width: 0; }
+.table-caps td:first-child, .table-caps th:first-child {
+  min-width: 8.5rem;
+  max-width: 11rem;
+}
+.table-caps td:nth-child(2), .table-caps td:nth-child(3) { white-space: nowrap; }
+.table-caps td:last-child, .table-caps th:last-child { min-width: 14rem; }
+
+@media (max-width: 720px) {
+  .caps { grid-template-columns: repeat(2, minmax(6.5rem, 1fr)); min-width: 14rem; }
+}
+code, pre {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas,
+    "Liberation Mono", Menlo, monospace;
+}
+code {
+  background: var(--void-2);
+  color: var(--mint);
+  border: 1px solid var(--line);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+pre {
+  background: var(--void-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--mint);
+  color: var(--ink);
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+pre code {
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 0;
+}
+blockquote {
+  margin: 1.25rem 0;
+  padding: 0.75rem 1.25rem;
+  background: var(--panel);
+  border-left: 3px solid var(--peri);
+  border-radius: 0 6px 6px 0;
+  color: var(--ink-2);
+}
+hr {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 2rem 0;
+}
+footer {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+  color: var(--ink-dim);
+  font-size: 0.85rem;
+  text-align: center;
+  border-top: 1px solid var(--line);
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<header>
+<nav class="site-nav">
+<div class="nav-row nav-groups">
+<span class="brand">smartplan</span>
+<a href="index.html">Start</a>
+<a href="copilot-model-guide.html">Guides</a>
+<a href="benchmarks.html">Evidence</a>
+<a class="current" href="whats-new.html">Project</a>
+<a href="m365-setup.html">M365 Agents</a>
+<a href="https://github.com/defessler/smartplan">GitHub</a>
+<span class="stamp">v4.151.0 &middot; data 2026-10-20 &middot; built 2026-11-01 3:20 AM PST / 6:20 AM EST</span>
+<a class="dl-btn" href="downloads.html">Download</a>
+
+</div>
+<div class="nav-row subnav">
+<a href="whats-new.html">What's New</a>
+<a href="refresh-pipeline.html">Refresh Pipeline</a>
+<a class="current" href="changelog.html">Changelog</a>
+</div>
+</nav>
+</header>
+<main>
+<h1 id="smartplan-changelog-edge-case-log">smartplan — changelog / edge-case log</h1>
+<details class="page-toc" open>
+<summary>On this page</summary>
+<ul>
+<li><a href="#2026-09-23-sonnet-implements-and-opus-verifies-on-claude-code-the-fixtures-lose-their-answer-hints-and-t43-measures-every-task-so-it-can-fail-v41400">2026-09-23 · Sonnet implements and Opus verifies on Claude Code, the fixtures lose their answer hints, and T43 measures every task so it can fail (v4.140.0)</a></li>
+<li><a href="#2026-09-24-good-at-is-scored-against-its-cost-band-and-the-site-reads-easier-v41410">2026-09-24 · Good at is scored against its cost band, and the site reads easier (v4.141.0)</a></li>
+<li><a href="#2026-09-29-sonnet-55-takes-the-sonnet-seats-and-gpt-61-sol-waits-for-a-score-v41420">2026-09-29 · Sonnet 5.5 takes the Sonnet seats, and GPT-6.1 Sol waits for a score (v4.142.0)</a></li>
+<li><a href="#2026-09-29-t44-moves-the-claude-code-implementer-to-medium-effort-v41430">2026-09-29 · T44 moves the Claude Code implementer to medium effort (v4.143.0)</a></li>
+<li><a href="#2026-09-29-the-m365-agents-match-the-repo-and-the-exporters-recover-from-a-failed-run-v41431">2026-09-29 · The M365 agents match the repo, and the exporters recover from a failed run (v4.143.1)</a></li>
+<li><a href="#2026-09-30-gpt-61-sol-takes-both-copilot-sol-seats-v41440">2026-09-30 · GPT-6.1 Sol takes both Copilot Sol seats (v4.144.0)</a></li>
+<li><a href="#2026-10-08-haiku-55-takes-the-claude-code-scout-and-valsai-re-runs-its-board-v41450">2026-10-08 · Haiku 5.5 takes the Claude Code scout, and vals.ai re-runs its board (v4.145.0)</a></li>
+<li><a href="#2026-10-08-haiku-55-passes-the-implementer-trial-per-call-effort-beats-the-pin-and-copilot-is-back-on-free-v41460">2026-10-08 · Haiku 5.5 passes the implementer trial, per-call effort beats the pin, and Copilot is back on Free (v4.146.0)</a></li>
+<li><a href="#2026-10-08-pro-is-back-every-seat-serves-and-the-hook-stops-denying-copilot-v41461">2026-10-08 · Pro+ is back, every seat serves, and the hook stops denying Copilot (v4.146.1)</a></li>
+<li><a href="#2026-10-13-haiku-takes-the-claude-code-cheap-leaves-and-a-copilot-seat-keeps-its-own-work-v41470">2026-10-13 · Haiku takes the Claude Code Cheap leaves, and a Copilot seat keeps its own work (v4.147.0)</a></li>
+<li><a href="#2026-10-13-no-model-grade-is-required-anywhere-v41480">2026-10-13 · No model grade is required anywhere (v4.148.0)</a></li>
+<li><a href="#2026-10-17-a-grilled-plan-a-ready-frontier-phased-diagnosis-and-leaner-references-v41490">2026-10-17 · A grilled plan, a ready frontier, phased diagnosis, and leaner references (v4.149.0)</a></li>
+<li><a href="#2026-10-19-haiku-takes-the-mid-seat-fable-gets-triggers-leaner-standing-load-v41500">2026-10-19 · Haiku takes the Mid seat, Fable gets triggers, leaner standing load (v4.150.0)</a></li>
+<li><a href="#2026-10-20-the-weekly-sweep-copilots-november-retirements-gpt-61-sol-takes-terras-verifier-slots-and-the-auto-pool-corrected-v41510">2026-10-20 · The weekly sweep: Copilot's November retirements, GPT-6.1 Sol takes Terra's verifier slots, and the Auto pool corrected (v4.151.0)</a></li>
+</ul>
+</details>
+<p>History for the
+<a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
+skill, one section per release, oldest first. The fourteen most recent entries
+live here. Everything older is in git.</p>
+<h2 id="2026-09-23-sonnet-implements-and-opus-verifies-on-claude-code-the-fixtures-lose-their-answer-hints-and-t43-measures-every-task-so-it-can-fail-v41400">2026-09-23 · Sonnet implements and Opus verifies on Claude Code, the fixtures lose their answer hints, and T43 measures every task so it can fail (v4.140.0)</h2>
+<p>On Claude Code, Sonnet now writes every code change, the mechanical leaves
+included, and the verifier seat pins Opus. Haiku keeps only the scout seat,
+which T43 backs: it was exact at scouting and at a trap-laden rename.</p>
+<p>The seeded C++ fixtures no longer name their answer key or state a defect.
+Every hint line was rewritten in place, so each <code>DEFECTS.md</code> file:line still
+holds, and oracle stage (d) fails a regression. T34 gets a dated correction:
+its 8 of 8 ran on the hinted sources.</p>
+<p>T43 closed T42's gaps with a harness under <code>tests/bench/</code>. Every task has a
+known-good and a known-bad control proven before the runs, a scripted blind
+judge replaces the keyword grader, runs exclude every instruction file, and
+a 250-credit cap is enforced from the session store. Haiku fails spec-heavy
+work because it tests against its own beliefs, where Sonnet tests against
+the real library. GPT-6 Luna at medium matched max at a third of the cost,
+so Copilot's session now runs at medium. Scouts must take line numbers from
+a tool after Luna misnumbered correct call sites.</p>
+<p>Oracle stage (i) builds the Pages site before a merge, so a dead link fails
+a PR rather than the deploy. The local-stack benchmark left this repo.</p>
+<h2 id="2026-09-24-good-at-is-scored-against-its-cost-band-and-the-site-reads-easier-v41410">2026-09-24 · Good at is scored against its cost band, and the site reads easier (v4.141.0)</h2>
+<p>The quick-picks Good at marks were hand-set from written rules, which left
+readers unable to compare a cheap model with an expensive one. They're now
+computed. <code>scripts/good-at.py</code> scores each Copilot roster model 0 to 10 on
+five jobs from one dated Artificial Analysis snapshot
+(<code>research/2026-09-24-good-at-data.json</code>), the same AA row the Value column
+reads. The roster splits into five bands by measured cost per task, since
+list price hides the bill (Grok 4.7 lists at 2 / 6 and costs twice Opus 5.5
+a task). Each mark compares a model only with its band: ★ best, ✅ within
+1.5 points, 🟡 within 3, 🟠 further back, ❌ a job the registry never seats
+it for, and ? for no AA row. Two more tables show the same data across the
+whole roster, as absolute A to D grades with a value arrow against a fitted
+cost curve, and as raw scores. Gate (y) now fails the build when the page
+drifts from the generator.</p>
+<p>A clarity pass covered the entry pages and the model guides. GOALS trades
+paragraph-length table cells for a status table plus one short section per
+goal. README and Overview say why the skill ablation counts 63 runs against
+21. The budget page compares GPT-6 Luna at Copilot's default effort rather
+than at max, and the guides note that prerelease CLI 1.0.89-1 is the first
+build to list GPT-6 Sol and Luna in its model picker.</p>
+<h2 id="2026-09-29-sonnet-55-takes-the-sonnet-seats-and-gpt-61-sol-waits-for-a-score-v41420">2026-09-29 · Sonnet 5.5 takes the Sonnet seats, and GPT-6.1 Sol waits for a score (v4.142.0)</h2>
+<p>The weekly sweep re-read all eight research areas at primary sources, with
+a refute verifier on every new or changed claim. Claude Sonnet 5.5 shipped
+on 2026-09-28 at Sonnet 5's 2 / 10 and moved Sonnet 5 to Legacy. Claude
+Code 2.1.284 points <code>sonnet</code> at it, so it already writes every Claude Code
+code change. Artificial Analysis measures it Reasoning class (56.0 at max),
+and at Copilot's medium effort it scores 40.7 for $0.59 a task against
+Sonnet 5's 28.1 for $1.00. Under the newest-version rule it goes second on
+the Copilot Mid seat, ahead of Sonnet 5, and falls through until a CLI
+build names its slug. The registry, the cache lists, the class page and
+both Copilot guides carry it.</p>
+<p>GPT-6.1 Sol reached Copilot the day of the sweep at GPT-6 Sol's price with
+half the cache-read. No board has scored it, so the registry marks it not
+a seat and the Sol seats stay on GPT-6 Sol until one does.</p>
+<p>The cost ceiling now says what cheapest means, at the author's direction:
+cheapest per merged leaf. A seat is priced by its measured cost per task
+at the effort it runs, plus its retries, escalation and verify, never by
+list price alone. The cheaper row goes first on any class it lands under
+the bounce breakeven. T43 already showed both halves: GPT-6 Luna matched
+GPT-6 Sol on semver2 for a thirteenth of the credits, and Sonnet renamed
+for less than Haiku because it finished in half the time.</p>
+<p>Copilot CLI 1.0.89 went stable with the GPT-6 Sol, GPT-6 Luna and Opus 5.5
+slugs. Claude Code's auto mode is now the default start mode everywhere,
+and ultracode stops forcing xhigh. The quick-picks snapshot moved to
+<code>research/2026-09-29-good-at-data.json</code>. Haiku 4.5's cost per task rose a
+third. Five dated re-checks came due and were re-read. Full note:
+<code>research/2026-09-29-sweep.md</code>.</p>
+<h2 id="2026-09-29-t44-moves-the-claude-code-implementer-to-medium-effort-v41430">2026-09-29 · T44 moves the Claude Code implementer to medium effort (v4.143.0)</h2>
+<p>T44 put Opus 5.5 at low and medium against Sonnet 5.5 at medium and high on
+T43's rename and semver2 tasks, three runs each, pre-registered before any
+measured run. Every one of the 24 runs scored full marks, so it measured
+cost at equal accuracy. Per passing run, Sonnet 5.5 at medium cost $0.075
+and $0.497, Opus 5.5 at low $0.097 and $0.550, and the implementer seat's
+Sonnet 5.5 at high $0.099 and $1.213. At high Sonnet wrote 65K output
+tokens on semver2 against 28K at medium for the same score.</p>
+<p>At the author's direction the Claude Code implementer now pins <code>effort:
+medium</code>, which keeps the rule that Sonnet does all implementation. Its
+escalations ride the pin, so a fail-twice <code>model: opus</code> runs Opus 5.5 at
+medium. The verifier keeps <code>high</code>. Both tasks hit the ceiling, so T44 says
+nothing about accuracy on harder work. The collector also stopped splitting
+transcripts on U+2028, which model-written semver code put inside JSONL
+records.</p>
+<h2 id="2026-09-29-the-m365-agents-match-the-repo-and-the-exporters-recover-from-a-failed-run-v41431">2026-09-29 · The M365 agents match the repo, and the exporters recover from a failed run (v4.143.1)</h2>
+<p>The three M365 agents had never been stamped, so <code>m365-agents.py status</code>
+couldn't say whether Agent Builder matched the repo. A live compare found
+UE5 Engineer behind on two fields: its description still said 5.7 only,
+and its review rule still asked for PASS, FAIL or N/A per rule instead of
+the three ranked lists. Both were updated in Agent Builder, re-read from
+the server and hash-matched. The other two already matched. All three are
+now stamped, so <code>status</code> reports real drift from here on.</p>
+<p><code>copilot-export.sh</code> and <code>zcode-export.sh</code> wrote their ownership marker as
+the last step, after wiping the output dir. A run that failed partway left
+a non-empty, unmarked dir that every later run refused. The marker now
+goes down right after the wipe, as <code>release-export.sh</code> already did.</p>
+<h2 id="2026-09-30-gpt-61-sol-takes-both-copilot-sol-seats-v41440">2026-09-30 · GPT-6.1 Sol takes both Copilot Sol seats (v4.144.0)</h2>
+<p>A same-day Copilot pass after the author reported that Copilot changed
+models. GitHub's changelog carried no new model, but two things the
+registry was waiting on landed. Artificial Analysis published measured
+rows for GPT-6.1 Sol: 51.8 at max, Reasoning class, and ahead of GPT-6
+Sol at every effort for less per task. And stable Copilot CLI 1.0.90
+named the <code>gpt-6.1-sol</code> slug. With both conditions met, § How to edit's
+newest-version rule moves it to the head of the planner and Mid seats,
+with GPT-6 Sol behind it for older builds. A live probe on 1.0.90 served
+it on this Pro+ account at low effort, billed at OpenAI's list price.</p>
+<p>Both Sol seats now pin <code>low</code> in <code>~/.copilot/settings.json</code>, from the
+cheapest-effort-that-meets-the-class rule. GPT-6.1 Sol at low measures
+42.1 for $0.13 a task, which clears the Reasoning anchor by 0.28. The
+margin sits inside the board's noise. 1.0.90's help config also names
+<code>claude-sonnet-5.5</code>, so the Mid seat's Sonnet 5.5 fallback is reachable
+by slug now. The quick picks, the class page and both AA snapshots are
+regenerated from a 2026-09-30 read. AA has since blanked Sonnet 5.5's
+low-effort index, which no seat used.</p>
+<h2 id="2026-10-08-haiku-55-takes-the-claude-code-scout-and-valsai-re-runs-its-board-v41450">2026-10-08 · Haiku 5.5 takes the Claude Code scout, and vals.ai re-runs its board (v4.145.0)</h2>
+<p>A same-day sweep after the author reported Haiku 5.5. Anthropic shipped
+it on 2026-10-07 at 0.10 / 0.50 on prompts to 100K tokens and 0.50 / 2.50
+over, the first Claude model priced by prompt length, with a 1M window,
+128K output and the full effort dial. Artificial Analysis measures it at
+43.4 at max, which clears the Reasoning anchor, and vals.ai scores it
+35.35 on Terminal-Bench 4.0. Claude Code 2.1.293 points the <code>haiku</code> alias
+at it, so the scout seat moved with no edit and its <code>effort: low</code> pin is
+live. The Cheap implementer stays on Sonnet by the author's rule. A trial
+of Haiku 5.5 there is the obvious next measurement.</p>
+<p>Copilot made it GA on every paid plan the same day, in GitHub's
+Lightweight category at list, but no stable CLI names the slug and
+prerelease 1.0.94-3 is the first to list it. It matches GPT-6 Luna's
+price to 100K and measures higher, so the registry carries it as a
+candidate for the Luna seats, not a seat. Sonnet 5.5's cache read halved
+to 0.10. vals.ai switched its Terminal-Bench 4.0 harness to
+Mini-SWE-agent and every row moved, so each registry row carries both
+reads. Copilot retired Gemini 3.5 and 3.6 Flash, Kimi K2.7 Code and Opus
+4.7 on 2026-10-02, and they leave the quick picks. Sonnet 4.5 was
+deprecated 2026-09-30. Claude Code 2.1.292 added <code>effort</code> to the Agent
+tool, which the reference now says. A fresh-context Opus 5.5 verifier
+re-fetched every claimed change: 12 upheld, 1 corrected on wording.</p>
+<h2 id="2026-10-08-haiku-55-passes-the-implementer-trial-per-call-effort-beats-the-pin-and-copilot-is-back-on-free-v41460">2026-10-08 · Haiku 5.5 passes the implementer trial, per-call effort beats the pin, and Copilot is back on Free (v4.146.0)</h2>
+<p>T45, pre-registered and committed before any measured run, put Haiku 5.5
+at low, medium and high against the Claude Code implementer seat, Sonnet
+5.5 at medium, on T44's two tasks at k = 3. All 24 runs scored full marks.
+Haiku at low cost $0.0055 and $0.177 per passing run against Sonnet's
+$0.077 and $0.594, and finished semver2 in 391 seconds against 609. Every
+Haiku semver2 run crossed the 100K prompt tier, and the figures include
+it. The pre-registered rule says to recommend <code>model: haiku</code> at <code>effort:
+low</code> to the author, first for the Cheap implementer and then for the Mid
+one. The author's Sonnet rule holds, so nothing moved.</p>
+<p>Three probes on Claude Code 2.1.294 settled the per-call effort question
+2.1.292 opened. A <code>low</code>-pinned seat ran low on its own, stayed low under
+a per-call <code>model: opus</code>, and ran high under a per-call <code>effort: high</code>,
+so the new Agent-tool knob outranks a seat's frontmatter. The scout seat's
+<code>model: haiku</code> served <code>claude-haiku-5-5</code>. Four due re-check markers were
+re-read and moved.</p>
+<p>A Copilot retest found this box's account on <code>free_limited_copilot</code> since
+2026-10-03. On Free, CLI 1.0.93 refuses every pinned model, GPT-6 Luna
+included, and a session runs Auto on MAI-Code at about 0.25 credits a
+turn. That is what the earlier Haiku 5.5 refusal was, and the ledger now
+says so. GPT-6 Luna stays the Copilot primary for most work at the
+author's direction, with Haiku 5.5 at most a fallback behind it once a
+stable build names the slug. Claude Code's own cost figures turned out to
+price Sonnet 5.5 cache reads at the old 0.20 and Haiku 5.5 at both prompt
+tiers, which the T45 record documents. copilot.md and claude-code.md each
+took a budget raise.</p>
+<h2 id="2026-10-08-pro-is-back-every-seat-serves-and-the-hook-stops-denying-copilot-v41461">2026-10-08 · Pro+ is back, every seat serves, and the hook stops denying Copilot (v4.146.1)</h2>
+<p>The author restored Copilot Pro+ that evening. Six pinned models served
+on stable CLI 1.0.93 in one-turn probes, <code>claude-haiku-5.5</code> among them
+though the build's help config doesn't list it, each confirmed from the
+session store. A two-seat dispatch through the task tool was denied at
+first: Copilot runs this repo's <code>.claude/settings.json</code> hook under
+PowerShell, where this box has no <code>bash</code> on PATH, and treats the failed
+command as a fail-closed deny. The hook command now ends in a second
+<code>exit 0</code>, so PowerShell's command-not-found runs on to a clean exit, and
+the same dispatch served both seats on GPT-6 Luna at low. The
+enforcement-hook page, CLAUDE.md and the ledger carry the repair. The
+registry's Haiku 5.5 row records the served slug and its billing rates.
+GPT-6 Luna stays the Copilot primary.</p>
+<h2 id="2026-10-13-haiku-takes-the-claude-code-cheap-leaves-and-a-copilot-seat-keeps-its-own-work-v41470">2026-10-13 · Haiku takes the Claude Code Cheap leaves, and a Copilot seat keeps its own work (v4.147.0)</h2>
+<p>The author asked for a full refresh, to consider Haiku for coding, and to
+make a Copilot seat above Luna always hand its work to the newest Luna,
+if that proved a net positive.</p>
+<p><strong>Claude Code's Cheap implementer runs Haiku 5.5 at low.</strong> T45 is the
+evidence: both tasks passed 3 of 3 at 7% and 30% of Sonnet 5.5's cost per
+passing run. SKILL.md's Claude Code roles, the tier table, the verifier's
+tier check and the registry now say Haiku writes the mechanical leaves
+and Sonnet the rest. The Mid seat stays on Sonnet, since T45 hit the
+ceiling and never measured a judgment leaf.</p>
+<p><strong>T46 measured the Luna hand-off on Copilot and it doesn't ship.</strong>
+Pre-registered (fbaf045), 30 runs, 142 credits. A probe first showed a
+Copilot seat can dispatch its own subagent, and that the child runs at
+its parent's effort. A Mid seat on GPT-6.1 Sol that always handed
+execution to <code>smartplan-implementer-cheap</code> scored the same as the solo
+seat but cost 16.79 credits per passing semver2 run against 11.56. Sol's
+own requests rose from 10 to 16 per run to 19 to 26. copilot.md now says a
+seat above Luna may dispatch a Luna seat but never must.</p>
+<p><strong>Haiku 5.5 backs GPT-6 Luna on the Copilot Cheap implementer.</strong> It
+passed both T46 tasks 3 of 3 at low. Luna at medium missed one semver2
+case in every run, but renamed for 0.17 credits against 0.32. So the
+seat's list is <code>[gpt-6-luna, claude-haiku-5.5]</code> and Luna leads. Haiku's
+semver2 runs also paid for Copilot's own context compaction near 90K
+tokens, once at the over-100K tier.</p>
+<p><strong>The weekly sweep re-read all eight areas.</strong> Eight Sonnet readers and
+four Opus refute verifiers: 194 rows, 133 verdicts, 4 refuted, every one a
+reader error. Gemini 4 Argon is new on Copilot (Pro+ and up, a 2 / 10
+promo to 2026-12-01, AA 52.6) and gets a not-a-seat registry row, guide
+rows and a quick-picks band. tbench.ai renders again with 35 rows and
+reorders the top. Copilot CLI is at 1.0.97, and 1.0.94 was the first
+stable build to name Haiku 5.5. Claude Code 2.1.296's
+<code>CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL</code> overrides every stage's model, so
+the hook page warns against it. ZCode 3.15.1 adds a per-subagent workflow
+model. OpenAI and Google deprecated older small models. copilot.md,
+claude-code.md and zcode.md took budget raises.</p>
+<h2 id="2026-10-13-no-model-grade-is-required-anywhere-v41480">2026-10-13 · No model grade is required anywhere (v4.148.0)</h2>
+<p>The author asked that no part of smartplan require a specific grade of
+model. Offering one is fine. Requiring one isn't.</p>
+<p><strong>Every tier is now offered, never required.</strong> SKILL.md carries the rule
+on the inline route, and routing.md, flow.md, check.md and modes.md each
+point at it. A tier the user declines, or one the plan doesn't serve,
+falls to the strongest model on offer at or below the seat. The work
+leans on the executable oracle first, verifies in a fresh context, and
+names the gap at the gate and in the verdict. Judgment that reader can't
+settle comes back UNKNOWN for the human.</p>
+<p><strong>A Cheap seat no longer stops.</strong> It used to write the brief, stop, and
+name the session model to switch to. Now it writes the same brief,
+offers that model, and carries on at its own tier. The spiral diagnosis,
+the verify and a fail-twice retry run at its tier, and a Cheap session
+with no stronger planner plans the wave itself, flagged at the gate. It
+still never dispatches above its own price, so the cost ceiling is
+unchanged.</p>
+<p><strong>The fail-twice rule has an end that isn't a stop.</strong> On a no, or on a
+Cheap seat, the leaf gets one fresh retry at the top tier allowed, then
+comes back as the best attempt with its caveats. Below Strong, an Opus
+strike-out goes to the orchestrator with a stronger session offered.</p>
+<p><strong>The seats follow.</strong> The Claude Code verifier judges on whatever model
+the dispatcher can reach when Opus isn't on the account. Copilot's Cheap
+implementer and Cheap verifier take a never-Cheap leaf when the brief
+says the stronger seat was declined. <code>cpp-gamedev-check.md</code>, smartreview's
+breaking hunt and the GLM and local-model notes say the same. Four eval
+graders that passed a stop now fail it.</p>
+<p>The Claude Code Cheap seat's body still said it ran on Sonnet. It says
+Haiku now.</p>
+<h2 id="2026-10-17-a-grilled-plan-a-ready-frontier-phased-diagnosis-and-leaner-references-v41490">2026-10-17 · A grilled plan, a ready frontier, phased diagnosis, and leaner references (v4.149.0)</h2>
+<p>Six ideas from two outside skill sets, Matt Pocock's <code>mattpocock/skills</code>
+and affaan-m's <code>everything-claude-code</code>, checked against what the family
+already did.</p>
+<p><strong>The plan step grills.</strong> Ambiguity that would change the plan's shape
+is now walked one question at a time, each with a recommended answer,
+until no open branch would change it. The answers go into the persisted
+plan.</p>
+<p><strong>Leaves dispatch on a ready frontier.</strong> <code>run-state.md</code> gains a
+<code>blocked-by</code> column. A leaf is ready once every leaf it consumes has
+passed, and it dispatches at that pass rather than at the wave's end.</p>
+<p><strong>The spiral diagnosis is phased.</strong> Reproduce, narrow to the smallest
+input, state one falsifiable hypothesis, prove it with the oracle. No
+fix before the proof.</p>
+<p><strong>Compaction re-arms the run.</strong> SKILL.md says to re-read <code>flow.md</code>,
+<code>artifacts.md</code> and <code>run-state.md</code> mid-run after a compaction. This repo
+also wires a <code>SessionStart</code> hook on matcher <code>compact</code>,
+<code>rearm-after-compact.sh</code>, which tells Claude so when a <code>run-state.md</code>
+sits at the project root. It's silent otherwise and always exits 0.</p>
+<p><strong>The retro names a fix.</strong> The one retro line names the worst friction
+and its environment fix, landed as an executable check where one fits.</p>
+<p><strong>Verdicts print their grades.</strong> PASS and FAIL templates gain a Grades
+line, one grade per dimension, which step 6 already asked for.</p>
+<p><strong>References lost what other files already said, or what stopped being
+true.</strong> <code>copilot.md</code> dropped build-by-build slug history, a duplicate
+effort paragraph and account history, and no longer claims no seat has
+a T-record (T42 and T46 measured them) or that 3.8 Flash is untested.
+<code>modes.md</code> dropped a third copy of the T8 and T13 numbers. <code>routing.md</code>,
+<code>claude-code.md</code> and <code>modes.md</code> no longer describe Haiku by its 4.5
+window or missing effort dial. <code>routing.md</code>'s cheaper-row example cites
+T45 instead of a Haiku 4.5 result. Copilot effort pins point at
+<code>subagents.agents.&lt;name&gt;.effortLevel</code> everywhere, since dispatch ignores
+a seat's <code>reasoningEffort</code>. <code>artifacts.md</code>'s budget rose to 5.25KB for
+the new column.</p>
+<h2 id="2026-10-19-haiku-takes-the-mid-seat-fable-gets-triggers-leaner-standing-load-v41500">2026-10-19 · Haiku takes the Mid seat, Fable gets triggers, leaner standing load (v4.150.0)</h2>
+<p><strong>Haiku 5.5 writes general leaves on Claude Code.</strong> T47 measured it
+against Sonnet 5.5 on a planning task and a 16-defect C++ review.
+Planning came out at parity, 9.67 against 10.33 of 11, at 7% of the
+cost. The review didn't: 13.67 against 16. Haiku missed blocking I/O on
+the game thread and variable-DeltaTime determinism, which are the
+never-Cheap rows. Under the pre-registered rule <code>smartplan-implementer</code>
+moves to <code>model: haiku</code> at <code>effort: low</code>. A never-Cheap leaf and the
+first fail-twice go to the same seat with a per-call <code>model: sonnet</code> and
+<code>effort: medium</code>, since the low pin otherwise rides the override. Opus
+still verifies every diff.</p>
+<p><strong>Fable has named triggers.</strong> It stays by ask, and now on evidence: an
+Opus plan that already failed at integration, or the spiral guard's
+diagnosis on a never-Cheap row. It plans and diagnoses, never fixes.</p>
+<p><strong>UI leaves route Mid and verify from the render.</strong> <code>routing.md</code> gains a
+UI and visual design row, Mid on Sonnet and never Cheap, since design
+has no executable oracle and was trialed on Sonnet only. <code>check.md</code> gains a section saying to judge
+screenshots at the shipped widths, not the CSS diff, and to emulate a
+phone width rather than shrink a headless window, which Edge floors at
+504px. A trial of <code>pbakaus/impeccable</code> on the docs site found plain
+Sonnet winning 6 of 8 blind pairs, and its hook scoring one regression
+as its best result. Neither impeccable nor ui-ux-pro-max joins the
+family. The write-up is <code>research/2026-10-19-impeccable-trial.md</code>.</p>
+<p><strong>The registry and the project CLAUDE.md shed weight.</strong>
+<code>model-classes.md</code> drops from 97KB to 66KB. Sixteen retired or
+unreachable rows and twelve board notes moved to
+<code>research/2026-10-19-model-classes-retired.md</code>, and the registry now
+states the rule that keeps it that size. The project CLAUDE.md's Gotchas
+keep every rule at half the size, with the history in
+<code>research/2026-10-19-gotchas-history.md</code>.</p>
+<h2 id="2026-10-20-the-weekly-sweep-copilots-november-retirements-gpt-61-sol-takes-terras-verifier-slots-and-the-auto-pool-corrected-v41510">2026-10-20 · The weekly sweep: Copilot's November retirements, GPT-6.1 Sol takes Terra's verifier slots, and the Auto pool corrected (v4.151.0)</h2>
+<p><strong>Copilot retires Opus 4.8, Opus 5 and GPT-5.6 Terra on 2026-11-16.</strong>
+<code>copilot.md</code>, the registry and both Copilot guides carry the date, the
+named successors (Opus 5.5, and GPT-6.1 Sol or GPT-6 Luna) and the
+annual-plan carve-out for Opus 4.8. No seat pin names any of the three.</p>
+<p><strong>GPT-6.1 Sol replaces Terra in every verifier slot now.</strong> That's the
+interim C++ shared-blind-spot verifier in <code>cpp-gamedev-check.md</code>, the
+Tiering and Family decorrelation lines in <code>check.md</code>, and the Copilot
+verifier's Strong fallback, which also drops Opus 5. GitHub names Sol the
+successor. Each file says it's unmeasured on T42 and T34's fixtures,
+where Terra caught 13 of 16.</p>
+<p><strong>CLI Auto's pool was wrong in ten places.</strong> The live table lists 15
+models, Opus 5.5, GPT-6 Sol and GPT-6 Luna among them. The registry, the
+full guide's rows and the budget page said those three weren't in Auto.</p>
+<p><strong>The 2026-10-19 retirees leave the guides.</strong> Their successors moved to
+GPT-6.1 Sol, GPT-6 Luna and Grok 4.7. The five models left both Copilot
+guides and the new <code>research/2026-10-20-good-at-data.json</code> snapshot.</p>
+<p><strong>Harness facts.</strong> Claude Code 2.1.302 forks subagents by default in
+<code>claude -p</code> too, and 2.1.304 lets <code>CLAUDE_CODE_AUTO_COMPACT_WINDOW</code> take
+<code>k</code> and <code>M</code> suffixes. A probe on 2.1.304 re-confirmed that a per-call
+<code>model:</code> keeps the seat's effort pin. ZCode 3.16.2 is current, and its
+catalog still lacks every model newer than Astra. Opus 5.5's API fast
+mode is GA. vals.ai's re-run Terminal-Bench 4.0 ranks replace the
+Terminus 2 figures. Full note: <code>research/2026-10-20-sweep.md</code>.</p>
+<p><strong>Gate (q) matches a pin to its longest registry name.</strong> A substring test
+let the <code>claude-opus-5.5</code> pin inherit Opus 5's retirement, which would
+have failed every build from 2026-11-02.</p>
+</main>
+<footer>
+<p>smartplan · MIT · generated from repo markdown</p>
+</footer>
+<script>
+/* Click-to-sort for every data table on the site. Added 2026-08-22 for the
+   quick-picks page, written generically because a comparison table nobody
+   can re-sort answers only the question its author happened to ask.
+   No dependencies, and the page is fully readable with JS off: this only
+   ever reorders rows that are already there. */
+(function () {
+  var NUM = /-?\d+(?:[.,]\d+)?/g;
+
+  /* Cell -> sort key. Three kinds, in order of specificity.
+     1. A capability strip sorts by how good the model is: four points a
+        band leader, three a check, two an "it depends", one a warning,
+        zero a cross or an unknown.
+     2. Anything that LEADS with a digit sorts numerically. A price reads
+        "0.20 / 1.20", and the number that matters there is the one AFTER the
+        slash, since output is what agentic work actually spends.
+     3. Everything else compares as text. "Sonnet 5" and "GPT-5.4" contain
+        digits and are not numbers; what separates them from a real number is
+        that a number leads. A letter-count rule was tried first and failed on
+        "GPT-5.4", whose three letters slipped under the bar and sorted the
+        Model column by version number.
+     An em dash means "not measured" and returns NaN, which counts as numeric
+     for column detection AND pins the row last in both directions. */
+  function key(cell, alt) {
+    /* A merged cell shows two numbers, and no parse can know which one the
+       reader means, so it carries both keys explicitly. `alt` picks the
+       second. An empty attribute is "not measured", same as an em dash. */
+    var dual = cell.querySelector(".dual");
+    if (dual) {
+      var raw = dual.getAttribute(alt ? "data-k2" : "data-k");
+      return raw ? parseFloat(raw) : NaN;
+    }
+    var caps = cell.querySelector(".caps");
+    if (caps) {
+      var score = 0;
+      caps.querySelectorAll("span").forEach(function (s) {
+        if (s.classList.contains("s")) score += 4;
+        else if (s.classList.contains("y")) score += 3;
+        else if (s.classList.contains("m")) score += 2;
+        else if (s.classList.contains("w")) score += 1;
+      });
+      return score;
+    }
+    var text = (cell.textContent || "").trim();
+    if (!text || /^[\u2014\u2013-]$/.test(text)) return NaN;
+    if (!/^[^0-9A-Za-z]*[0-9]/.test(text)) return text.toLowerCase();
+    var nums = text.match(NUM);
+    if (!nums || !nums.length) return text.toLowerCase();
+    if (nums.length > 1 && text.indexOf("/") !== -1) {
+      return parseFloat(nums[1].replace(",", "."));
+    }
+    return parseFloat(nums[0].replace(",", "."));
+  }
+
+  function missing(v) { return typeof v === "number" && isNaN(v); }
+
+  function sortable(table) {
+    var head = table.tHead && table.tHead.rows[0];
+    var body = table.tBodies[0];
+    if (!head || !body || head.cells.length < 3 || body.rows.length < 3) return;
+
+    var rows = Array.prototype.slice.call(body.rows);
+    rows.forEach(function (r, i) { r.dataset.i = i; });
+
+    /* A column is numeric when most of it parses as a number. Deciding per
+       column rather than per cell keeps one stray footnote marker from
+       flipping a whole column to text sorting. */
+    var numeric = [];
+    var dual = [];
+    for (var c = 0; c < head.cells.length; c++) {
+      var hits = 0;
+      for (var r = 0; r < rows.length; r++) {
+        if (rows[r].cells[c] && typeof key(rows[r].cells[c]) === "number") hits++;
+      }
+      numeric[c] = hits >= rows.length * 0.6;
+      dual[c] = rows.some(function (row) {
+        return row.cells[c] && !!row.cells[c].querySelector(".dual");
+      });
+    }
+
+    /* "The useful direction" is not the same for every number. High value and
+       high capability are good, so those open descending. A price is the one
+       column where low is the good news, so it opens ascending. Nothing
+       generic infers that, so the header text is asked directly. */
+    function opensDescending(col) {
+      var cheapFirst = /price|cost|\$/i.test(head.cells[col].textContent || "");
+      return !!numeric[col] && !cheapFirst;
+    }
+
+    /* Three clicks, three states. For an ordinary column those are the useful
+       direction, its reverse, and the shipped order. A dual-key column spends
+       the middle state on its SECOND key instead of on a reverse, because
+       "worst value first" is a direction nobody wants and "sort by score" is
+       a question people actually ask. Both of its states run descending. */
+    function ordered(col, state) {
+      var out = rows.slice();
+      if (state === 0) {
+        out.sort(function (a, b) { return a.dataset.i - b.dataset.i; });
+        return out;
+      }
+      var alt = dual[col] && state > 2;
+      /* A dual column runs key1 down, key1 up, key2 down, key2 up, so odd
+         states are descending. Everything else is the column's own useful
+         direction and then its reverse. */
+      var desc = dual[col]
+        ? (state % 2 === 1)
+        : ((state === 1) === opensDescending(col));
+      out.sort(function (a, b) {
+        var x = key(a.cells[col], alt), y = key(b.cells[col], alt);
+        var xm = missing(x), ym = missing(y);
+        if (xm && ym) return a.dataset.i - b.dataset.i;
+        /* Returned before the direction flip, so an unmeasured row sinks
+           whichever way the column is pointing. */
+        if (xm) return 1;
+        if (ym) return -1;
+        var d = (typeof x === "number" && typeof y === "number")
+          ? x - y
+          : String(x).localeCompare(String(y));
+        return desc ? -d : d;
+      });
+      return out;
+    }
+
+    function ids(list) {
+      return list.map(function (r) { return r.dataset.i; }).join(",");
+    }
+
+    /* A dual column sorts two ways on each of two keys, so its cycle is four
+       long where an ordinary column's is two. */
+    function lastState(col) { return dual[col] ? 4 : 2; }
+
+    function keyName(col, state) {
+      var cell = body.querySelector(
+        "tr td:nth-child(" + (col + 1) + ") .dual[data-n]");
+      return cell && cell.getAttribute(state > 2 ? "data-n2" : "data-n");
+    }
+
+    function paint(col, state) {
+      head.querySelectorAll("th").forEach(function (th, i) {
+        if (i !== col || state === 0) { th.setAttribute("aria-sort", "none"); }
+        /* Restore any header that was showing a sort-key name. */
+        if ((i !== col || state === 0) && th.dataset.name) {
+          (th.querySelector("[title]") || th).textContent = th.dataset.name;
+        }
+      });
+      if (state === 0) return;
+
+      var desc = dual[col]
+        ? (state % 2 === 1)
+        : ((state === 1) === opensDescending(col));
+      var th = head.cells[col];
+      th.setAttribute("aria-sort", desc ? "descending" : "ascending");
+
+      /* Say which key is live. Without it the third click on a dual-key
+         column looks like a bug: the rows move and the header does not.
+         The name REPLACES the header text rather than sitting under it in a
+         block of its own -- a block child pushes the arrow's static position
+         onto a second line, which put the indicator somewhere no other header
+         puts it. Staying on one line keeps this column's chrome identical to
+         every other. The names are read off the cells, so a second dual
+         column anywhere on the site labels itself. */
+      var name = dual[col] && keyName(col, state);
+      if (name) {
+        var slot = th.querySelector("[title]") || th;
+        if (!th.dataset.name) { th.dataset.name = slot.textContent; }
+        slot.textContent = "by " + name;
+      }
+    }
+
+    /* Which column is the table ALREADY sorted by? Answered below, before any
+       click can land. It decides the length of the click cycle, so it is a
+       closure variable rather than a local. */
+    var shippedCol = -1;
+
+    /* One shared state, not one per header. Clicking a different column
+       restarts at its first direction rather than resuming wherever that
+       column was left, which is what a per-header closure did.
+
+       State 0 is "the order it shipped in". Where a column reproduces that
+       order, 0 is a duplicate of that column's own sorted state AND the only
+       state that leaves the table with no header marked, so it is dropped and
+       the cycle runs 1, 2, 1. Clicking that column is how a reader gets the
+       original order back, and it stays marked while they look at it.
+       Where NO column reproduces the shipped order, 0 is kept: it is then the
+       only way back to an order the reader would otherwise lose for good. */
+    var active = { col: -1, state: 0 };
+
+    function activate(col) {
+      var state;
+      if (active.col !== col) state = 1;
+      else if (active.state < lastState(col)) state = active.state + 1;
+      else state = shippedCol >= 0 ? 1 : 0;
+      active = { col: col, state: state };
+      ordered(col, state).forEach(function (r) { body.appendChild(r); });
+      paint(col, state);
+    }
+
+    head.querySelectorAll("th").forEach(function (th, col) {
+      th.classList.add("sortable");
+      /* A swapped-in key name is longer than the header it replaces, and
+         "by SWE-V" breaking after "by" would read as two headers. */
+      if (dual[col]) { th.classList.add("sortable-dual"); }
+      th.tabIndex = 0;
+      th.setAttribute("role", "button");
+      th.setAttribute("aria-sort", "none");
+      th.addEventListener("click", function () { activate(col); });
+      th.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(col); }
+      });
+    });
+
+    /* Which column is the table ALREADY sorted by? Markdown ships in an order
+       its author chose -- this roster ships by value -- and a header row that
+       marks every column "unsorted" tells the reader nothing about the order
+       they are looking at. So the shipped order is compared against what each
+       column would produce, and the first exact match is shown as active.
+       Columns whose keys are all identical are skipped: they match every
+       order and would claim credit for one they did not cause. */
+    var shipped = ids(rows);
+    for (var col = 0; col < head.cells.length && active.col < 0; col++) {
+      var seen = {}, distinct = 0;
+      for (var i = 0; i < rows.length; i++) {
+        var k = String(key(rows[i].cells[col]));
+        if (!seen[k]) { seen[k] = 1; distinct++; }
+      }
+      if (distinct < 2) continue;
+      for (var s = 1; s <= lastState(col); s++) {
+        if (ids(ordered(col, s)) === shipped) {
+          active = { col: col, state: s };
+          shippedCol = col;
+          paint(col, s);
+          break;
+        }
+      }
+    }
+  }
+
+  document.querySelectorAll(".table-wrap table").forEach(sortable);
+})();
+</script>
+</body>
+</html>
