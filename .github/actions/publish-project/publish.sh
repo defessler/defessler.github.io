@@ -21,6 +21,10 @@ src="$(cd "$src" && pwd)"
 [[ -n "$(find "$src" -type f -name '*.html' -print -quit)" ]] || fail "path '$src' holds no .html file"
 bad="$(find "$src" -mindepth 1 -name '_*' -print -quit)"
 [[ -z "$bad" ]] || fail "'${bad#"$src"/}' starts with '_'. Jekyll on the root site drops such paths"
+bad="$(find "$src" -type l -print -quit)"
+[[ -z "$bad" ]] || fail "'${bad#"$src"/}' is a symlink. Symlinks are not published"
+bad="$(find "$src" -mindepth 1 -name '.git' -print -quit)"
+[[ -z "$bad" ]] || fail "'${bad#"$src"/}' is named .git, which git would commit as a gitlink"
 
 rm -rf "$work"  # a reused self-hosted slot may hold a stale clone
 mkdir -p "$work"
@@ -29,30 +33,42 @@ keyfile="$work/deploy_key"
 hostsfile="$work/known_hosts"
 printf '%s\n' "$key" > "$keyfile"
 chmod 600 "$keyfile"
+unset INPUT_DEPLOY_KEY key
 
 if [[ "${PUBLISH_SKIP_HOSTKEYS:-}" == "1" ]]; then
   : > "$hostsfile"
 else
-  curl -fsSL https://api.github.com/meta \
-    | python3 -I -c 'import json,sys
+  meta="$(curl -fsSL --max-time 30 https://api.github.com/meta)" \
+    || fail "could not fetch https://api.github.com/meta for the GitHub host keys"
+  printf '%s' "$meta" | python3 -I -c 'import json,sys
 for k in json.load(sys.stdin)["ssh_keys"]:
-    print("github.com " + k)' > "$hostsfile"
-  [[ -s "$hostsfile" ]] || fail "could not build known_hosts from api.github.com/meta"
+    print("github.com " + k)' > "$hostsfile" 2>/dev/null \
+    || fail "could not read ssh_keys from api.github.com/meta"
+  [[ -s "$hostsfile" ]] || fail "api.github.com/meta returned no ssh_keys"
 fi
 chmod 600 "$hostsfile"
-export GIT_SSH_COMMAND="ssh -i $keyfile -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$hostsfile"
+export GIT_SSH_COMMAND="ssh -i '$keyfile' -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile='$hostsfile'"
 
 repo="$work/repo"
 git clone --quiet --depth 1 --branch master "$remote" "$repo"
 cd "$repo"
+git config user.name "github-actions[bot]"
+git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-mkdir -p projects
 target="projects/$slug"
-[[ ! -e "$target" ]] || git rm -rq --ignore-unmatch "$target"
-mkdir -p "$target"
-cp -R "$src"/. "$target"/
+sha="${GITHUB_SHA:-0000000}"
+changed=0
 
-python3 -I - "$target" <<'PY'
+# Replace the target with the source, tag the pages, commit. Sets changed=1 when a
+# commit was made. Failures abort the script (the function is called as a plain statement).
+build() {
+  changed=0
+  mkdir -p projects
+  [[ ! -e "$target" ]] || git rm -rq --ignore-unmatch "$target"
+  mkdir -p "$target"
+  cp -R "$src"/. "$target"/
+
+  python3 -I - "$target" <<'PY'
 import pathlib, sys
 ga = b"G-YQB4BCN1CH"
 tag = (b'<script async src="https://www.googletagmanager.com/gtag/js?id=' + ga + b'"></script>'
@@ -81,24 +97,27 @@ if not n and not had:
     sys.exit("::error::no pages were tagged")
 PY
 
-git add -A -- "$target"
-if git diff --cached --quiet; then
-  echo "No change to projects/$slug, nothing to publish."
-  exit 0
-fi
+  git add -A -- "$target"
+  if ! git diff --cached --quiet; then
+    git commit --quiet -m "$slug: publish from ${GITHUB_REPOSITORY:-unknown}@${sha::7}"
+    changed=1
+  fi
+}
 
-sha="${GITHUB_SHA:-0000000}"
-git -c user.name="github-actions[bot]" \
-    -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-    commit --quiet -m "$slug: publish from ${GITHUB_REPOSITORY:-unknown}@${sha::7}"
-
+# Last writer wins: on a rejected push, drop our commit, take the new master and redo it.
 for attempt in 1 2 3 4 5; do
+  build
+  if [[ "$changed" != 1 ]]; then
+    echo "No change to $target, nothing to publish."
+    exit 0
+  fi
   if git push --quiet origin HEAD:master; then
     echo "Pushed $slug on attempt $attempt."
     exit 0
   fi
-  echo "Push attempt $attempt failed, rebasing."
+  echo "Push attempt $attempt was rejected, refetching master."
   sleep $((attempt * backoff))
-  git pull --quiet --rebase origin master || true
+  git fetch --quiet --depth 1 origin master && git reset --quiet --hard FETCH_HEAD \
+    || fail "could not refetch master after a rejected push"
 done
 fail "push to master failed after 5 attempts"
