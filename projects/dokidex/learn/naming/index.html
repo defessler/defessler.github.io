@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decoding Model Names · DokiDex</title>
+<meta name="description" content="A component-by-component decoder for any model name you meet in the wild: architecture markers, size notation, tier words, training-stage suffixes, specialization tags, quantization grammar, versioning, and context notation. Real strings get parsed end to end.">
+
+<!-- Open Graph / Twitter, hand-rolled: jekyll-seo-tag is not available under the pinned
+     github-pages gem set used by actions/jekyll-build-pages. -->
+<meta property="og:site_name" content="DokiDex">
+<meta property="og:title" content="Decoding Model Names">
+<meta property="og:description" content="A component-by-component decoder for any model name you meet in the wild: architecture markers, size notation, tier words, training-stage suffixes, specialization tags, quantization grammar, versioning, and context notation. Real strings get parsed end to end.">
+<meta property="og:type" content="website">
+<!-- site_origin rather than absolute_url: see the comment in _config.yml. absolute_url would
+     emit http:// here, because the Pages API reports an http html_url while Enforce HTTPS is off. -->
+<meta property="og:url" content="https://dougfessler.com/projects/dokidex/learn/naming/">
+<link rel="canonical" href="https://dougfessler.com/projects/dokidex/learn/naming/">
+<!-- `summary`, not `summary_large_image`: no og:image or twitter:image is emitted anywhere on
+     this site, and the large-image card renders as a blank rectangle without one. Switch this back
+     the same day a 1200x630 share asset lands, not before. -->
+<meta name="twitter:card" content="summary">
+
+<!-- Same four families as the handbook, so the two halves of the site read as one product:
+     Marcellus (power words) · Kanit (headings, kickers, nav) · IBM Plex Mono (code, stats) ·
+     Figtree (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/dokidex.css">
+<link rel="icon" href="/projects/dokidex/assets/favicon.svg" type="image/svg+xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<!-- `wide: true` in a page's front matter opts it into --content-w-wide (assets/dokidex.css:51).
+     The CSS keys off `.page-wide` on an ancestor. Without the class emitted here the front-matter
+     flag silently does nothing. -->
+<body class="page-wide">
+<a class="skip-link" href="#content">Skip to content</a>
+
+<!-- CSS-only nav toggle. A checkbox beats a JS drawer here: the nav has to work on the mobile
+     read where the reader has scrolled 4000px into a reference table, and a checkbox cannot
+     desync from its own state the way a JS flag can. -->
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/">DokiDex</a>
+    <a class="topbar-cta" href="/projects/dokidex/download/"><svg class="dl-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><g class="dl-arrow"><path d="M8 2.2v6.5"/><path d="M5.2 5.9 8 8.7l2.8-2.8"/></g><path class="dl-tray" d="M3.2 11.3v2.5h9.6v-2.5"/></svg>
+Download</a>
+  </header>
+
+  <!-- Grouped navigation, driven by site.nav in _config.yml.
+
+     A page is "current" when its url matches exactly. The handbook is the one entry that also
+     needs to light up for its children (/handbook/03-serving.html), so it gets a prefix test —
+     without it, the sidebar would show nothing selected the moment a reader steps into a
+     chapter, which reads as "you have left the site". -->
+<nav class="sidebar" aria-label="Site sections">
+  <a class="sidebar-brand" href="/projects/dokidex/">
+    <span class="sidebar-mark" aria-hidden="true">&#9612;&#9608;&#9608;&#9616;</span>
+    <span class="sidebar-brand-text">DokiDex</span>
+  </a>
+
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Start</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/"
+             >Overview</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Use DokiDex</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/local-cli/"
+             >Run the CLIs locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/download/"
+             >Download the launchers</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/models/"
+             >Models it runs</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/games/"
+             >Games the models built</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/telemetry/"
+             >Performance data</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/qwen38/"
+             >Qwen3.8-27B, measured</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/architecture/"
+             >How it's built</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Learn AI</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/"
+             >Where to start</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/basics/"
+             >1 · Foundations</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/core/"
+             >2 · How models work</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/advanced/"
+             >3 · Advanced</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link is-active"
+             href="/projects/dokidex/learn/naming/"
+             aria-current="page">Decoding model names</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/open-vs-closed/"
+             >Open vs closed weights</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/benchmarks/"
+             >Benchmarks</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/local/"
+             >Running models locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/agents/"
+             >Coding agents</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Context</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/state-of-ai/"
+             >State of AI, 2026</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/reference/"
+             >Quick reference</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/glossary/"
+             >Glossary</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Deep dive</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/handbook/"
+             >The Handbook</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+</nav>
+
+
+  <main class="main">
+    <div class="page-head">
+      <p class="kicker">:: REFERENCE</p>
+      <h1 class="page-title">Decoding Model Names</h1>
+      <p class="page-desc">A component-by-component decoder for any model name you meet in the wild: architecture markers, size notation, tier words, training-stage suffixes, specialization tags, quantization grammar, versioning, and context notation. Real strings get parsed end to end.</p>
+      
+      <p class="level-badges">
+        <span class="level-badge level-beginner">Beginner</span><span class="level-badge level-intermediate">Intermediate</span>
+      </p>
+      
+    </div>
+
+    <article id="content" class="prose">
+      <p>A model name string is several independent pieces of grammar mashed together: some standardized
+across the field, some vendor dialect, some pure adjective with no technical content at all.
+<code class="language-plaintext highlighter-rouge">Qwen3-235B-A22B-Thinking-2507</code> tells you a total parameter count, an active parameter count, a
+training regime, and a release date, once you know the grammar. <code class="language-plaintext highlighter-rouge">Claude Opus 5</code> tells you almost
+none of that. It’s a tier name that only means something once you already know Anthropic’s
+ladder.</p>
+
+<blockquote>
+  <p><strong>Key idea</strong>: split any name into the parts that are standardized (the <code class="language-plaintext highlighter-rouge">A&lt;n&gt;B</code> active-parameter
+suffix, the <code class="language-plaintext highlighter-rouge">Q4_K_M</code>-style quant suffix, the <code class="language-plaintext highlighter-rouge">YYYYMMDD</code> date suffix) and the parts that are
+vendor dialect (<code class="language-plaintext highlighter-rouge">Flash</code>, <code class="language-plaintext highlighter-rouge">Pro</code>, <code class="language-plaintext highlighter-rouge">Air</code>, <code class="language-plaintext highlighter-rouge">Turbo</code>). This page is organized around that split.</p>
+</blockquote>
+
+<figure>
+<svg viewBox="0 0 720 260" role="img" aria-labelledby="dgm-anatomy-title dgm-anatomy-desc">
+<title id="dgm-anatomy-title">Anatomy of a model name string</title>
+<desc id="dgm-anatomy-desc">The string Qwen3-235B-A22B-Thinking-2507 broken into five labeled
+segments: family and generation, total parameters, active parameters, training stage, and
+release date.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="244" rx="3" />
+<text class="dgm-title" x="28" y="36">Anatomy of a name string</text>
+<text x="28" y="80" font-size="17">
+  <tspan class="dgm-ok" font-weight="700">Qwen3</tspan><tspan class="dgm-mono">-</tspan><tspan class="dgm-accent" font-weight="700">235B</tspan><tspan class="dgm-mono">-</tspan><tspan class="dgm-accent-2" font-weight="700">A22B</tspan><tspan class="dgm-mono">-</tspan><tspan class="dgm-accent-3" font-weight="700">Thinking</tspan><tspan class="dgm-mono">-</tspan><tspan class="dgm-mono">2507</tspan>
+</text>
+<path class="dgm-line" d="M52 90 L92 112" />
+<path class="dgm-line" d="M105 90 L232 112" />
+<path class="dgm-line" d="M153 90 L372 112" />
+<path class="dgm-line" d="M220 90 L512 112" />
+<path class="dgm-line" d="M288 90 L652 112" />
+<rect class="dgm-panel" x="28" y="112" width="128" height="96" rx="3" />
+<rect class="dgm-panel" x="168" y="112" width="128" height="96" rx="3" />
+<rect class="dgm-panel" x="308" y="112" width="128" height="96" rx="3" />
+<rect class="dgm-panel" x="448" y="112" width="128" height="96" rx="3" />
+<rect class="dgm-panel" x="588" y="112" width="128" height="96" rx="3" />
+<text class="dgm-ok" font-weight="700" font-size="13" x="36" y="130">Qwen3</text>
+<text class="dgm-label-sm" x="36" y="148">family +</text>
+<text class="dgm-label-sm" x="36" y="162">generation</text>
+<text class="dgm-label-sm" x="36" y="182">Alibaba, 3rd gen</text>
+<text class="dgm-accent" font-weight="700" font-size="13" x="176" y="130">235B</text>
+<text class="dgm-label-sm" x="176" y="148">total params</text>
+<text class="dgm-label-sm" x="176" y="162">(what VRAM</text>
+<text class="dgm-label-sm" x="176" y="182">must hold)</text>
+<text class="dgm-accent-2" font-weight="700" font-size="13" x="316" y="130">A22B</text>
+<text class="dgm-label-sm" x="316" y="148">active params</text>
+<text class="dgm-label-sm" x="316" y="162">(what compute</text>
+<text class="dgm-label-sm" x="316" y="182">tracks)</text>
+<text class="dgm-accent-3" font-weight="700" font-size="13" x="456" y="130">Thinking</text>
+<text class="dgm-label-sm" x="456" y="148">separate</text>
+<text class="dgm-label-sm" x="456" y="162">checkpoint, always</text>
+<text class="dgm-label-sm" x="456" y="182">emits &lt;think&gt;</text>
+<text class="dgm-label" font-weight="700" font-size="13" x="596" y="130">2507</text>
+<text class="dgm-label-sm" x="596" y="148">release date</text>
+<text class="dgm-label-sm" x="596" y="162">YY MM =</text>
+<text class="dgm-label-sm" x="596" y="182">July 2025</text>
+</svg>
+<figcaption><strong>Five segments, five different questions answered.</strong> Not every name
+packs this much in. But when one does, this is the order it comes in: who made it, how big it's
+stored, how big it computes, what training it got, and when it shipped.</figcaption>
+</figure>
+
+<hr />
+
+<h2 id="1-architecture-markers">1. Architecture markers</h2>
+
+<h3 id="dense-vs-mixture-of-experts-and-the-anb-grammar">Dense vs. Mixture-of-Experts, and the <code class="language-plaintext highlighter-rouge">A&lt;n&gt;B</code> grammar</h3>
+
+<p>A <strong>dense</strong> model runs every parameter on every token (classic GPT/Llama/Mistral-7B style). A
+<strong>sparse Mixture-of-Experts (MoE)</strong> model has many parallel expert feed-forward blocks per layer
+plus a router that activates only a subset per token. Stored weights end up far larger than
+weights multiplied per token.</p>
+
+<p><strong>Reading rule</strong>: in <code class="language-plaintext highlighter-rouge">XXXB-AYYB</code>, the first number is total (stored, VRAM) parameters and the <code class="language-plaintext highlighter-rouge">A</code>
+number is active (compute) parameters per token. A <code class="language-plaintext highlighter-rouge">235B-A22B</code> model needs storage for 235B
+parameters but computes roughly like a 22B dense model per token.</p>
+
+<ul>
+  <li><strong>Qwen3-235B-A22B</strong>: 235B total, 8 of 128 experts active per token (~22B activated). <a href="https://qwenlm.github.io/blog/qwen3/">Qwen3 blog</a></li>
+  <li><strong>DeepSeek-V3</strong>: 671B total / 37B active, 256 routed + shared experts, Multi-head Latent
+Attention for cheap KV-cache. <a href="https://arxiv.org/abs/2412.19437">arXiv:2412.19437</a></li>
+  <li><strong>Llama 4 Scout / Maverick</strong>: Scout is 17B active / ~109B total (16 experts). Maverick is 17B
+active / ~400B total (128 routed + 1 shared expert). Maverick alternates dense and MoE layers
+rather than running MoE at every layer. Scout doesn’t. <a href="https://ai.meta.com/blog/llama-4-multimodal-intelligence/">Meta AI blog</a></li>
+  <li><strong>gpt-oss-120b</strong>: 117B total / 5.1B active. gpt-oss-20b: 21B total / 3.6B active. <a href="https://github.com/openai/gpt-oss">OpenAI README</a></li>
+  <li><strong>Gemma 4 26B-A4B</strong>: 25.2B total / 3.8B active. <a href="https://huggingface.co/google/gemma-4-26B-A4B-it">Hugging Face</a></li>
+</ul>
+
+<blockquote>
+  <p><strong>Common trap</strong>: <code class="language-plaintext highlighter-rouge">Mixtral-8x7B</code> reads like “8 experts of 7B, so 56B total.” The real total is
+<strong>47B</strong>: attention layers and the embedding table are shared across experts, only the
+feed-forward blocks are duplicated. A bare <code class="language-plaintext highlighter-rouge">&lt;E&gt;x&lt;S&gt;B</code> string is never simply <code class="language-plaintext highlighter-rouge">E × S</code>: check the
+card. <a href="https://huggingface.co/mistralai/Mixtral-8x7B-v0.1">Hugging Face</a></p>
+</blockquote>
+
+<p>Two more names worth knowing exactly: <strong>Qwen3-Coder-480B-A35B</strong> (480B total / 35B active,
+code-specialized) <a href="https://qwenlm.github.io/blog/qwen3-coder/">Qwen3-Coder blog</a>, and <strong>GLM-4.6</strong>,
+whose card states <strong>357B total parameters</strong> (easy to transpose with predecessor GLM-4.5’s 355B).
+<a href="https://huggingface.co/zai-org/GLM-4.6">Hugging Face</a> GLM-4.6’s active-parameter count isn’t
+confirmed here, so it’s left out rather than guessed.</p>
+
+<h3 id="hybrid-ssm--mamba-markers">Hybrid SSM / Mamba markers</h3>
+
+<p>State Space Models (the Mamba family) supplement or replace attention with a linear-time recurrent
+scan, trading some quality for much cheaper long-context inference (no KV-cache growth with
+sequence length). <strong>Jamba</strong> (AI21) is literally an acronym for <strong>J</strong>oint <strong>A</strong>ttention and
+<strong>Mamba</strong>: an interleaved hybrid of attention and Mamba blocks plus MoE. <a href="https://arxiv.org/abs/2403.19887">arXiv:2403.19887</a>
+<strong>Zamba</strong> (Zyphra) is lighter still: a Mamba backbone with one <em>shared</em> attention module inserted
+periodically rather than Jamba’s fuller interleaving. <a href="https://arxiv.org/abs/2405.16712">arXiv:2405.16712</a>
+Samba and Hymba round out the family. The “-amba”/”-ymba” suffix nods to Mamba, not a formal spec.
+<strong>Reading rule</strong>: any “hybrid”/”SSM”/Mamba-sounding name mixes recurrent blocks with a minority of
+attention layers. The exact ratio is a card detail, never in the name.</p>
+
+<h3 id="matformer--nested-matryoshka-models">MatFormer / nested (“Matryoshka”) models</h3>
+
+<p>Google’s <strong>MatFormer</strong> trains one large model containing several smaller, independently-usable
+submodels nested inside it. One run yields multiple deployable sizes with no separate
+distillation pass. <a href="https://arxiv.org/abs/2310.07707">arXiv:2310.07707</a> Gemma 3n’s 4B-effective
+(E4B) checkpoint has a fully-functional 2B-effective (E2B) submodel nested inside it, switchable at
+runtime. <code class="language-plaintext highlighter-rouge">E</code> means <strong>effective</strong> parameters via Per-Layer Embedding caching, smaller than the raw
+on-disk count. <a href="https://ai.google.dev/gemma/docs/gemma-3n">Gemma docs</a> <strong>Reading rule</strong>: <code class="language-plaintext highlighter-rouge">E&lt;n&gt;B</code> is
+not the same axis as a plain <code class="language-plaintext highlighter-rouge">&lt;n&gt;B</code> elsewhere.</p>
+
+<h3 id="multi-token-prediction-and-attention-variants">Multi-token prediction and attention variants</h3>
+
+<p><strong>MTP</strong> predicts several future tokens from one hidden state instead of just the next, densifying
+the training signal. DeepSeek-V3’s MTP module adds ~14B parameters, mainly for training and
+speculative decoding. <a href="https://arxiv.org/abs/2412.19437">arXiv:2412.19437</a> It rarely appears in the
+name itself. <strong>Sliding-window attention</strong> caps each token to a nearby window, interleaved with
+occasional global layers to cut KV-cache cost. Gemma 3 uses 5 local layers per 1 global, a
+1,024-token window. <a href="https://huggingface.co/blog/gemma3">Hugging Face blog</a> Names never encode
+this ratio directly, though it correlates with whether a huge advertised context (1M-10M) is
+computationally viable at all.</p>
+
+<figure>
+<svg viewBox="0 0 720 240" role="img" aria-labelledby="dgm-moe-title dgm-moe-desc">
+<title id="dgm-moe-title">Total vs. active parameters in a Mixture-of-Experts layer</title>
+<desc id="dgm-moe-desc">A schematic MoE layer: a router sends each token to a small subset of
+experts. Every expert square is stored in VRAM regardless of color; only the colored ones are
+computed for a given token.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="224" rx="3" />
+<text class="dgm-title" x="28" y="34">All experts are stored. Few are computed.</text>
+<rect class="dgm-panel" x="28" y="90" width="90" height="60" rx="3" />
+<text class="dgm-label" x="73" y="115" text-anchor="middle">Router</text>
+<text class="dgm-label-sm" x="73" y="132" text-anchor="middle">picks per token</text>
+<path class="dgm-flow" d="M118 105 L216 68" />
+<path class="dgm-flow" d="M118 120 L372 156" />
+<path class="dgm-flow" d="M118 135 L450 214" />
+<g>
+<rect class="dgm-panel" x="160" y="40" width="70" height="50" rx="2" />
+<rect class="dgm-accent" x="238" y="40" width="70" height="50" rx="2" />
+<rect class="dgm-panel" x="316" y="40" width="70" height="50" rx="2" />
+<rect class="dgm-panel" x="394" y="40" width="70" height="50" rx="2" />
+<rect class="dgm-panel" x="472" y="40" width="70" height="50" rx="2" />
+<rect class="dgm-panel" x="550" y="40" width="70" height="50" rx="2" />
+<rect class="dgm-panel" x="160" y="98" width="70" height="50" rx="2" />
+<rect class="dgm-panel" x="238" y="98" width="70" height="50" rx="2" />
+<rect class="dgm-panel" x="316" y="98" width="70" height="50" rx="2" />
+<rect class="dgm-accent" x="394" y="98" width="70" height="50" rx="2" />
+<rect class="dgm-panel" x="472" y="98" width="70" height="50" rx="2" />
+<rect class="dgm-panel" x="550" y="98" width="70" height="50" rx="2" />
+<rect class="dgm-panel" x="160" y="156" width="70" height="50" rx="2" />
+<rect class="dgm-panel" x="238" y="156" width="70" height="50" rx="2" />
+<rect class="dgm-panel" x="316" y="156" width="70" height="50" rx="2" />
+<rect class="dgm-panel" x="394" y="156" width="70" height="50" rx="2" />
+<rect class="dgm-accent" x="472" y="156" width="70" height="50" rx="2" />
+<rect class="dgm-panel" x="550" y="156" width="70" height="50" rx="2" />
+</g>
+<rect class="dgm-accent" x="30" y="196" width="14" height="14" />
+<text class="dgm-label-sm" x="50" y="207">active this token (drives compute)</text>
+<rect class="dgm-panel" x="330" y="196" width="14" height="14" />
+<text class="dgm-label-sm" x="350" y="207">idle this token (still fills VRAM)</text>
+</svg>
+<figcaption><strong>Every square costs VRAM. Only the accent-colored ones cost compute.</strong>
+Schematic, not literal: real models route among far more experts (Qwen3-235B-A22B picks 8 of
+128). Check the card for the real count, never a diagram.</figcaption>
+</figure>
+
+<hr />
+
+<h2 id="2-size-notation">2. Size notation</h2>
+
+<p>The suffix number is total learnable parameters (weight matrix entries), not FLOPs, not
+“capability,” and not disk size directly (disk size = parameters × bytes per weight, Section 6).
+It includes attention and feed-forward/MoE weights plus the embedding and unembedding matrices,
+which can be a surprisingly large or small fraction of the total depending on vocabulary size and
+whether embeddings are tied. It does <strong>not</strong> include KV-cache, which scales with context length
+and batch size, not parameter count (Section 6). For MoE, <code class="language-plaintext highlighter-rouge">235B-A22B</code> is unambiguous. A bare
+<code class="language-plaintext highlighter-rouge">235B</code> alone is genuinely ambiguous without checking whether the card means total or active.</p>
+
+<p><strong>Why parameter count stopped predicting capability</strong>: two developments broke the old heuristic.
+First, <strong>overtraining past Chinchilla-optimal</strong>: the Chinchilla paper found that for fixed
+training compute, size and token count should scale together, at roughly 20 tokens per parameter
+(their own model: 70B params / 1.4T tokens). <a href="https://arxiv.org/abs/2203.15556">arXiv:2203.15556</a>
+Since 2023, most labs deliberately abandon that ratio, because Chinchilla minimizes <em>training</em>
+compute only, saying nothing about <em>inference</em> cost, which recurs on every request. Llama 3 8B was
+reportedly trained on roughly 15 trillion tokens (well-corroborated secondary reporting, no single
+verbatim primary quote available here), about 94x the Chinchilla ratio, to buy a smaller,
+cheaper-to-serve model. This tradeoff is formally called “inference-optimal” or “overtrained”
+scaling. <a href="https://arxiv.org/abs/2401.00448">arXiv:2401.00448</a> Second, <strong>architecture and
+post-training gains compound</strong>: Qwen’s own comparison shows each Qwen3 dense model (1.7B-32B)
+roughly matches the <em>prior-generation</em> Qwen2.5 model one size class up, credited to
+pretraining-recipe improvements rather than scale. <a href="https://qwenlm.github.io/blog/qwen3/">Qwen3 blog</a></p>
+
+<p>Net effect: a bare parameter count tells you little without also knowing tokens-trained relative
+to size, MoE total-vs-active split, and generation. There’s no name-string notation for
+tokens-trained. Check the card, since a 2024-era 8B trained on 2T tokens and a 2025-era 8B
+trained on 15T+ aren’t comparable despite an identical size suffix.</p>
+
+<hr />
+
+<h2 id="3-tier-words-a-vendor-by-vendor-dictionary">3. Tier words: a vendor-by-vendor dictionary</h2>
+
+<p>Almost none of these words mean the same thing twice across vendors. A few (<code class="language-plaintext highlighter-rouge">Flash</code>, <code class="language-plaintext highlighter-rouge">mini</code>/<code class="language-plaintext highlighter-rouge">nano</code>,
+<code class="language-plaintext highlighter-rouge">Air</code>) at least carry a consistent <em>direction</em> within one vendor’s own lineup: faster, cheaper,
+smaller. But the absolute capability behind the word is never comparable across vendors. Several
+(<code class="language-plaintext highlighter-rouge">Pro</code>, <code class="language-plaintext highlighter-rouge">Max</code>, <code class="language-plaintext highlighter-rouge">Plus</code>, <code class="language-plaintext highlighter-rouge">Turbo</code>, <code class="language-plaintext highlighter-rouge">Ultra</code>, <code class="language-plaintext highlighter-rouge">Fast</code>) are close to pure marketing: “better than the word
+next to it in this catalog,” and nothing that survives crossing a vendor boundary.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Term</th>
+      <th>Who uses it</th>
+      <th>What it signals</th>
+      <th>Portability</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Flash</code></td>
+      <td>Google</td>
+      <td>Lower-latency/cost tier below <code class="language-plaintext highlighter-rouge">Pro</code>, still large context. Gemini 2.5 Flash: 1,048,576-token context, $0.30/1M input ($0.15 after an April 2026 cut), $2.50/1M output. It’s a genuinely distinct model, not a rate-limited <code class="language-plaintext highlighter-rouge">Pro</code>. Vendor-reported, July 2026. <a href="https://ai.google.dev/gemini-api/docs/pricing">ai.google.dev</a></td>
+      <td>Google-only</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Flash-Lite</code></td>
+      <td>Google</td>
+      <td>Cheapest/fastest Google tier: $0.10/$0.40 per MTok, same 1,048,576-token window as Flash. Vendor-reported, July 2026. <a href="https://pricepertoken.com/pricing-page/model/google-gemini-2.5-flash-lite">pricepertoken.com</a></td>
+      <td>Google-only</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">mini</code> / <code class="language-plaintext highlighter-rouge">nano</code></td>
+      <td>OpenAI</td>
+      <td>Progressively smaller, cheaper siblings within a generation. Exact size undisclosed</td>
+      <td>Lineup has since moved to codenames (below). The wording is in flux</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">micro</code></td>
+      <td>Scattered smaller/open labs</td>
+      <td>Below “nano” wherever used, no standard meaning</td>
+      <td>Not standardized</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">small</code>/<code class="language-plaintext highlighter-rouge">medium</code>/<code class="language-plaintext highlighter-rouge">large</code></td>
+      <td>Mistral</td>
+      <td>A literal ladder: Large 3 = flagship, Medium 3.5 = frontier agentic/coding at lower cost, Small 4 = hybrid instruct/reasoning/coding, low end. <a href="https://docs.mistral.ai/getting-started/models/">docs.mistral.ai</a></td>
+      <td>Mistral’s own ladder. Others reuse the words on unrelated axes (<code class="language-plaintext highlighter-rouge">text-embedding-3-small</code>/<code class="language-plaintext highlighter-rouge">-large</code> track vector dimensions) <a href="https://developers.openai.com/api/docs/guides/embeddings">developers.openai.com</a></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Pro</code></td>
+      <td>Google, OpenAI</td>
+      <td>At Google, it’s the top GA tier. At OpenAI (<code class="language-plaintext highlighter-rouge">gpt-5-pro</code>), it’s a higher-reasoning-effort configuration of an existing model, not a separate architecture</td>
+      <td>Not portable. Check the vendor’s docs every time</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Max</code></td>
+      <td>Anthropic</td>
+      <td>“Claude Max” is a <strong>subscription plan</strong>, not a model (distinct from the Opus/Sonnet/Haiku/Fable model tiers)</td>
+      <td>Not a size signal anywhere observed</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Ultra</code></td>
+      <td>Google (historically)</td>
+      <td>Signaled “largest, most restricted” in the Gemini 1.0 generation</td>
+      <td>Largely retired as of the 2.5/3.x generations</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Turbo</code></td>
+      <td>OpenAI (legacy)</td>
+      <td>A faster/cheaper, often quietly-optimized flagship variant (<code class="language-plaintext highlighter-rouge">GPT-4-Turbo</code>)</td>
+      <td>Legacy branding, absent from current OpenAI naming</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Fast</code></td>
+      <td>xAI, general adjective</td>
+      <td>Speed-optimized, usually smaller/quantized (<code class="language-plaintext highlighter-rouge">grok-code-fast</code>)</td>
+      <td>Descriptive, not a formal grammar</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Lite</code></td>
+      <td>Google, Mistral, Cohere</td>
+      <td>Smaller/cheaper sibling within one line</td>
+      <td>Consistent direction, inconsistent absolute meaning</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Air</code></td>
+      <td>Zhipu/Z.ai</td>
+      <td>Lighter MoE variant of the flagship (<code class="language-plaintext highlighter-rouge">GLM-4.5-Air</code>): smaller expert count/active params</td>
+      <td>Zhipu-specific</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Plus</code></td>
+      <td>Alibaba Cloud</td>
+      <td>Mid-tier commercial-API positioning between “Turbo” and “Max,” a separate ladder from the open-weight Qwen3 releases</td>
+      <td>Alibaba-specific</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Thinking</code></td>
+      <td>Qwen, elsewhere a runtime mode</td>
+      <td>At Qwen, a genuinely separate checkpoint (<code class="language-plaintext highlighter-rouge">-Thinking-2507</code> vs. <code class="language-plaintext highlighter-rouge">-Instruct-2507</code>). Elsewhere, frequently a toggle on one model. <a href="https://huggingface.co/Qwen/Qwen3-235B-A22B-Thinking-2507">Qwen card</a></td>
+      <td>Check whether it’s a separate model ID or a request parameter</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Reasoning</code>/<code class="language-plaintext highlighter-rouge">Reasoner</code></td>
+      <td>OpenAI, xAI, Cohere</td>
+      <td>Same ambiguity as <code class="language-plaintext highlighter-rouge">Thinking</code>. xAI ships <code class="language-plaintext highlighter-rouge">grok-4.20-0309-reasoning</code>/<code class="language-plaintext highlighter-rouge">-non-reasoning</code> as <strong>separate model IDs</strong>, the least ambiguous version of this pattern. <a href="https://docs.x.ai/docs/models">docs.x.ai</a></td>
+      <td>Vendor-specific</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Preview</code>/<code class="language-plaintext highlighter-rouge">-exp</code></td>
+      <td>Google, OpenAI</td>
+      <td>Unstable release, looser limits, shorter deprecation notice than GA (<code class="language-plaintext highlighter-rouge">gemini-3.1-pro-preview</code>)</td>
+      <td>Fairly consistent: “may change or disappear on short notice”</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Instant</code></td>
+      <td>Anthropic (retired)</td>
+      <td>The fast/cheap tier before Haiku/Sonnet/Opus replaced it in March 2024</td>
+      <td>Retired, useful only for old integration code</td>
+    </tr>
+    <tr>
+      <td>Sonnet/Opus/Haiku/Fable/Mythos</td>
+      <td>Anthropic only</td>
+      <td>A poetic-length ladder: Haiku (shortest/fastest), Sonnet (balanced), Opus (flagship), and, added above Opus in 2026, <strong>Fable</strong> (GA) and <strong>Mythos</strong> (invitation-only, defensive-cyber focus). <a href="https://platform.claude.com/docs/en/docs/about-claude/models/overview">platform.claude.com</a></td>
+      <td>Fully Anthropic-proprietary</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Trust the <em>ordering</em> within one vendor’s own consistent words. Treat <code class="language-plaintext highlighter-rouge">Pro</code>/<code class="language-plaintext highlighter-rouge">Max</code>/<code class="language-plaintext highlighter-rouge">Plus</code>/<code class="language-plaintext highlighter-rouge">Turbo</code>/
+<code class="language-plaintext highlighter-rouge">Fast</code>/<code class="language-plaintext highlighter-rouge">Ultra</code> as near-zero-information until that vendor’s own docs are open in front of you.</p>
+
+<hr />
+
+<h2 id="4-training-stage-suffixes">4. Training-stage suffixes</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Suffix</th>
+      <th>What happened to the weights</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Base</code></td>
+      <td>Raw next-token pretraining only, no chat tuning. Prompt with text continuation, not chat turns</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Instruct</code>/<code class="language-plaintext highlighter-rouge">-It</code>/<code class="language-plaintext highlighter-rouge">Chat</code></td>
+      <td>SFT (usually plus RLHF/DPO/RLAIF) for instruction-following. Gemma: <code class="language-plaintext highlighter-rouge">PT</code> = base, <code class="language-plaintext highlighter-rouge">IT</code> = instruction-tuned. <a href="https://huggingface.co/blog/gemma3">Hugging Face blog</a></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SFT</code></td>
+      <td>Supervised fine-tuning on curated (prompt, ideal-response) pairs (the first alignment stage). It’s rarely in a shipped model’s <em>name</em></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">DPO</code></td>
+      <td>Direct Preference Optimization: skips a separate reward model and the RL loop, reformulating preference data as a classification-style loss. <a href="https://arxiv.org/abs/2305.18290">arXiv:2305.18290</a></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">RLHF</code></td>
+      <td>A reward model trained on human preferences, then RL against it. The dominant recipe since ChatGPT</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">RLAIF</code></td>
+      <td>Same as RLHF but the reward model trains on AI-generated preferences. Reported comparable quality at lower labeling cost. <a href="https://arxiv.org/abs/2309.00267">arXiv:2309.00267</a></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Thinking</code>/<code class="language-plaintext highlighter-rouge">Reasoner</code></td>
+      <td>Trained to emit extended chain-of-thought, often via RL on verifiable rewards: give it room, don’t truncate the trace, budget for far higher output tokens</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Distill</code></td>
+      <td>A smaller “student” trained to imitate a larger “teacher.” <code class="language-plaintext highlighter-rouge">DeepSeek-R1-Distill-Qwen-7B</code> was SFT’d on ~800K R1-generated reasoning traces atop a Qwen2.5 base. The grammar is <code class="language-plaintext highlighter-rouge">&lt;Teacher&gt;-Distill-&lt;StudentBase&gt;-&lt;Size&gt;</code>. <a href="https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B">Hugging Face</a> Treat teacher benchmarks as an upper bound, not a guarantee, for the student</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Abliterated</code>/<code class="language-plaintext highlighter-rouge">Uncensored</code></td>
+      <td>Post-hoc weight editing, not a training stage: the refusal-mediating direction is found and projected out, no retraining. <a href="https://huggingface.co/blog/mlabonne/abliteration">Labonne’s writeup</a> Community-produced, no safety guardrails. Research/red-team use, not production</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="5-specialization-markers">5. Specialization markers</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Marker</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Coder</code>/<code class="language-plaintext highlighter-rouge">Code</code></td>
+      <td>Heavy code-token pretraining (often 50-70%+ of the mix), often plus FIM and coding-agent RL. Qwen3-Coder-480B-A35B: 70% code across 7.5T tokens. <a href="https://qwenlm.github.io/blog/qwen3-coder/">Qwen3-Coder blog</a> A genuinely different checkpoint, not a prompt template</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">VL</code>/<code class="language-plaintext highlighter-rouge">Vision</code></td>
+      <td>Adds an image (sometimes video) encoder plus multimodal training (Qwen2.5-VL, Command A Vision). <a href="https://docs.cohere.com/docs/models">docs.cohere.com</a> Often a distinct branch, not a strict superset of the text-only sibling</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Omni</code></td>
+      <td>Marketing shorthand for “many modalities in one model.” No fixed technical definition: descriptive, not a formal token</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Audio</code></td>
+      <td>Speech-in/out capable, often a separate model line entirely (Mistral Voxtral, OpenAI GPT-Realtime). <a href="https://docs.mistral.ai/getting-started/models/">docs.mistral.ai</a> Frequently not a general chat model at all</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Embed</code></td>
+      <td>Outputs a fixed-size similarity vector, not text. <code class="language-plaintext highlighter-rouge">text-embedding-3-large</code> (3,072 dims) vs. <code class="language-plaintext highlighter-rouge">-small</code> (1,536). <a href="https://developers.openai.com/api/docs/guides/embeddings">developers.openai.com</a> “small/large” tracks dimensionality and accuracy. It’s a different axis from generative parameter count</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Rerank</code></td>
+      <td>Cross-encoder scoring of (query, document) pairs, a second retrieval stage. Cohere <code class="language-plaintext highlighter-rouge">rerank-v4.0-pro</code> (quality) vs. <code class="language-plaintext highlighter-rouge">-fast</code> (latency). <a href="https://docs.cohere.com/docs/models">docs.cohere.com</a> Not a generator</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Guard</code></td>
+      <td>Safety/moderation classifier, not a chat model (the Llama Guard family). “Classifier, not generator,” regardless of vendor</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Math</code></td>
+      <td>Extra pretraining/RL on math corpora (Qwen2.5-Math). Can regress on general chat quality vs. a generalist sibling</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Med</code></td>
+      <td>Medical-domain specialization exists across labs. No confirmed current naming convention for this page. Flagged, not asserted</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">FIM</code> (fill-in-the-middle)</td>
+      <td>Trained on <code class="language-plaintext highlighter-rouge">&lt;prefix&gt;&lt;suffix&gt;</code> → <code class="language-plaintext highlighter-rouge">&lt;middle&gt;</code> alongside normal next-token prediction (Qwen2.5-Coder, 5.2T tokens). <a href="https://arxiv.org/abs/2409.12186">arXiv:2409.12186</a> A pure chat model fakes this via prompting, with materially worse completion quality. IDE autocomplete wants a FIM-trained (often Base/Coder-Base) checkpoint</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="6-quantization-and-format">6. Quantization and format</h2>
+
+<h3 id="gguf-quantization-grammar-llamacpp">GGUF quantization grammar (llama.cpp)</h3>
+
+<p>GGUF is llama.cpp’s container format, split into three families. Bits-per-weight figures are from
+the llama.cpp quantize README. <a href="https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/README.md">llama.cpp README</a></p>
+
+<p><strong>Legacy/linear types</strong> use simple per-block affine scaling, block size 32:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Bits/weight</th>
+      <th>Note</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q8_0</code></td>
+      <td>~8.50</td>
+      <td>“Almost indistinguishable from float16,” per llama.cpp</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q4_0</code>, <code class="language-plaintext highlighter-rouge">Q5_0</code>, <code class="language-plaintext highlighter-rouge">Q4_1</code>, <code class="language-plaintext highlighter-rouge">Q5_1</code></td>
+      <td>N/A</td>
+      <td>Older, cruder. Superseded by K-quants at a comparable bit budget</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>K-quant family</strong> (<code class="language-plaintext highlighter-rouge">Q2_K</code>…<code class="language-plaintext highlighter-rouge">Q6_K</code>) uses 256-value super-blocks with per-sub-block scale/offset. The
+<code class="language-plaintext highlighter-rouge">_S</code>/<code class="language-plaintext highlighter-rouge">_M</code>/<code class="language-plaintext highlighter-rouge">_L</code> suffix selects which tensors get bumped to higher precision:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Bits/weight</th>
+      <th>What <code class="language-plaintext highlighter-rouge">_S</code>/<code class="language-plaintext highlighter-rouge">_M</code>/<code class="language-plaintext highlighter-rouge">_L</code> does</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code></td>
+      <td>4.89</td>
+      <td>Uses Q6_K for half of <code class="language-plaintext highlighter-rouge">attention.wv</code>/<code class="language-plaintext highlighter-rouge">feed_forward.w2</code>, else Q4_K. The recommended default</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_S</code></td>
+      <td>4.67</td>
+      <td>Plain all-Q4_K, no selective upgrade</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q5_K_S</code>/<code class="language-plaintext highlighter-rouge">Q5_K_M</code></td>
+      <td>5.57 / 5.70</td>
+      <td>Same <code class="language-plaintext highlighter-rouge">_S</code>/<code class="language-plaintext highlighter-rouge">_M</code> pattern one bit-family up</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q3_K_S</code>/<code class="language-plaintext highlighter-rouge">Q3_K_M</code>/<code class="language-plaintext highlighter-rouge">Q3_K_L</code></td>
+      <td>3.64 / 4.00 / 4.30</td>
+      <td><code class="language-plaintext highlighter-rouge">_L</code> upgrades more tensors than <code class="language-plaintext highlighter-rouge">_M</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q2_K_S</code>/<code class="language-plaintext highlighter-rouge">Q2_K</code></td>
+      <td>2.97 / 3.16</td>
+      <td>Quality drop becomes noticeable here for most models</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q6_K</code></td>
+      <td>6.56</td>
+      <td>Close to <code class="language-plaintext highlighter-rouge">Q8_0</code> quality at meaningfully smaller size</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>I-quant family</strong> (<code class="language-plaintext highlighter-rouge">IQ*</code>) uses non-uniform, importance/codebook-based quantization for aggressive
+2-3 bit compression:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Bits/weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">IQ1_S</code>/<code class="language-plaintext highlighter-rouge">IQ1_M</code></td>
+      <td>~2.00 / 2.15</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">IQ2_XXS</code>/<code class="language-plaintext highlighter-rouge">IQ2_XS</code>/<code class="language-plaintext highlighter-rouge">IQ2_S</code>/<code class="language-plaintext highlighter-rouge">IQ2_M</code></td>
+      <td>~2.38 / 2.59 / 2.74 / 2.93</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">IQ3_XXS</code>/<code class="language-plaintext highlighter-rouge">IQ3_XS</code>/<code class="language-plaintext highlighter-rouge">IQ3_S</code>/<code class="language-plaintext highlighter-rouge">IQ3_M</code></td>
+      <td>~3.25 / 3.50 / 3.66 / 3.76</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">IQ4_XS</code>/<code class="language-plaintext highlighter-rouge">IQ4_NL</code></td>
+      <td>~4.46 / 4.68</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>I-quants hold quality better than K-quants below ~3 bits, at the cost of more dequant compute. This
+is reported (community discussion, not an official benchmark) to run slower on CPU than a
+similarly-sized K-quant. <a href="https://github.com/ggml-org/llama.cpp/discussions/5063">GitHub discussion</a>
+<strong>Reading rule</strong>: <code class="language-plaintext highlighter-rouge">_S</code> = smaller/plainer, <code class="language-plaintext highlighter-rouge">_M</code> = medium (upgrades the most error-sensitive
+tensors), <code class="language-plaintext highlighter-rouge">_L</code> = large (upgrades more), all <em>within</em> a fixed bit family, not an independent size
+class. <code class="language-plaintext highlighter-rouge">_XS</code>/<code class="language-plaintext highlighter-rouge">_XXS</code> push further down than <code class="language-plaintext highlighter-rouge">_S</code>, used only at the 1-3 bit end.</p>
+
+<h3 id="other-formats">Other formats</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Format</th>
+      <th>Mechanism</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>AWQ</strong></td>
+      <td>Finds “salient” weight channels via activation magnitude, scales them before INT4/INT3 quantization. No backprop, generalizes well across domains. <a href="https://arxiv.org/abs/2306.00978">arXiv:2306.00978</a></td>
+    </tr>
+    <tr>
+      <td><strong>GPTQ</strong></td>
+      <td>One-shot, Hessian-informed layer-wise quantization minimizing output error. The long-standing GPU INT4 standard. <a href="https://arxiv.org/abs/2210.17323">arXiv:2210.17323</a></td>
+    </tr>
+    <tr>
+      <td><strong>EXL2</strong></td>
+      <td>ExLlamaV2’s mixed-bitrate format (2-8 bits, non-uniform within one model), plain <code class="language-plaintext highlighter-rouge">safetensors</code>. <a href="https://github.com/turboderp-org/exllamav2">exllamav2</a></td>
+    </tr>
+    <tr>
+      <td><strong>EXL3</strong></td>
+      <td>ExLlamaV3’s format, derived from Cornell’s QTIP. Lattice-codebook encoding, closer in spirit to I-quants than to GPTQ’s linear scaling. <a href="https://github.com/turboderp-org/exllamav3/blob/master/doc/exl3.md">EXL3 doc</a></td>
+    </tr>
+    <tr>
+      <td><strong>NF4</strong> (bitsandbytes)</td>
+      <td>“4-bit NormalFloat”: levels placed for equal probability mass under a Gaussian weight-distribution assumption. Built for QLoRA fine-tuning. <a href="https://arxiv.org/abs/2305.14314">arXiv:2305.14314</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Floating-point/integer precision</strong>: <code class="language-plaintext highlighter-rouge">FP16</code>/<code class="language-plaintext highlighter-rouge">BF16</code> (~2.00 bytes/weight) is the pre-2024 “full
+precision” baseline. <code class="language-plaintext highlighter-rouge">FP8</code> (E4M3, 1 byte/weight) powered DeepSeek-V3’s entire pretraining run. It’s
+the first large validated FP8 <em>training</em> run at this scale. <a href="https://arxiv.org/abs/2412.19437">arXiv:2412.19437</a>
+<code class="language-plaintext highlighter-rouge">MXFP4</code> (4-bit, open OCP spec, block-32 shared scale) is gpt-oss’s MoE-weight format at 4.25
+bits/parameter, fitting gpt-oss-120b on one 80GB GPU. <a href="https://github.com/openai/gpt-oss">OpenAI README</a>
+<code class="language-plaintext highlighter-rouge">NVFP4</code> (NVIDIA-specific, finer block-16 scale) is reported (vendor-reported) to beat MXFP4 by
+roughly 0.3-0.5 perplexity at equal bitrate. <a href="https://developer.nvidia.com/blog/introducing-nvfp4-for-efficient-and-accurate-low-precision-inference/">NVIDIA dev blog</a>
+<code class="language-plaintext highlighter-rouge">INT8</code>/<code class="language-plaintext highlighter-rouge">INT4</code> are the fixed-point substrate under GPTQ/AWQ/bitsandbytes. INT4 ≈ 0.5 bytes/weight
+before ~10-20% group-scale overhead.</p>
+
+<p><strong>QAT vs. PTQ</strong>: everything above (besides NF4-for-fine-tuning) is <strong>PTQ</strong>: an already-trained
+model quantized afterward. <strong>QAT</strong> bakes simulated quantization noise into training itself,
+generally yielding higher quality at a given bit-width, at the cost of training compute and data
+access instead of a cheap one-shot conversion. gpt-oss’s MXFP4 is applied post-training
+(OpenAI’s own card language), i.e. PTQ-adjacent, despite unusually little quality loss.</p>
+
+<h3 id="vram-math-the-practical-rule-and-a-worked-example">VRAM math: the practical rule and a worked example</h3>
+
+<blockquote>
+  <p><strong>Tip</strong>: <code class="language-plaintext highlighter-rouge">VRAM (GB) ≈ Total_Parameters(B) × Bytes_per_Weight × 1.05–1.20 + KV-cache overhead</code></p>
+</blockquote>
+
+<p>The 1.05-1.20 multiplier covers quantization metadata, the embedding table, and runtime buffers.
+KV-cache is a <strong>separate, context-length-dependent</strong> line item. It grows with context tokens ×
+batch × layers × hidden size × 2 (K and V), independent of weight footprint, which is why a model
+can fit at short context and still OOM near its advertised maximum. For <strong>MoE</strong>, use the <strong>total</strong>
+parameter count. Every expert must be resident in VRAM even though only a few compute per token.</p>
+
+<p>Take a 70B-parameter dense model (the class Llama 3.1 70B sits in):</p>
+
+<ul>
+  <li><strong>Q4_K_M</strong> (0.61 B/wt): <code class="language-plaintext highlighter-rouge">70 × 0.61 ≈ 43 GB</code> weights alone, roughly <strong>48-52 GB</strong> with overhead.</li>
+  <li><strong>Q8_0</strong> (1.06 B/wt): <code class="language-plaintext highlighter-rouge">70 × 1.06 ≈ 74 GB</code> weights, roughly <strong>85-89 GB</strong> with overhead.</li>
+  <li><strong>FP16</strong> (2.00 B/wt): <code class="language-plaintext highlighter-rouge">70 × 2.00 = 140 GB</code> weights, roughly <strong>150-160 GB</strong> with overhead.</li>
+</ul>
+
+<p>The same math on a 235B-A22B MoE model at Q4_K_M needs roughly <strong>155-165 GB</strong> to load, despite
+computing at close to the speed of a 22B dense model per token. That gap is the single most common
+practical surprise in MoE size math.</p>
+
+<figure>
+<svg viewBox="0 0 720 260" role="img" aria-labelledby="dgm-vram-title dgm-vram-desc">
+<title id="dgm-vram-title">Same 70B model, three precisions, VRAM for weights alone</title>
+<desc id="dgm-vram-desc">Bar chart comparing approximate VRAM in gigabytes for a 70-billion
+parameter dense model at Q4_K_M, Q8_0, and FP16 precision, before any KV cache.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="244" rx="3" />
+<text class="dgm-title" x="28" y="34">Same 70B model, three precisions</text>
+<text class="dgm-label" x="28" y="66">Q4_K_M</text>
+<text class="dgm-label-sm" x="28" y="80">0.61 B/wt</text>
+<rect class="dgm-ok" x="150" y="46" width="172" height="34" rx="2" />
+<text class="dgm-mono" x="332" y="68">~43 GB</text>
+<text class="dgm-label" x="28" y="136">Q8_0</text>
+<text class="dgm-label-sm" x="28" y="150">1.06 B/wt</text>
+<rect class="dgm-accent-2" x="150" y="116" width="296" height="34" rx="2" />
+<text class="dgm-mono" x="456" y="138">~74 GB</text>
+<text class="dgm-label" x="28" y="206">FP16</text>
+<text class="dgm-label-sm" x="28" y="220">2.00 B/wt</text>
+<rect class="dgm-accent-3" x="150" y="186" width="560" height="34" rx="2" />
+<text class="dgm-mono" x="676" y="208" text-anchor="end">~140 GB</text>
+</svg>
+<figcaption><strong>Bits per weight multiplies VRAM directly.</strong> Weights only. KV cache is
+a separate, context-length-dependent addition, not shown to scale here. See
+<a href="/projects/dokidex/learn/local/">Running models locally</a> for full fitting
+guidance across GPU tiers.</figcaption>
+</figure>
+
+<p>This is napkin math, not a benchmark. For measured end-to-end fitting guidance and per-GPU tier
+recommendations, see <a href="/projects/dokidex/learn/local/">Running models locally</a>.</p>
+
+<hr />
+
+<h2 id="7-version-and-date-conventions">7. Version and date conventions</h2>
+
+<p>Anthropic pins releases with an 8-digit date suffix: <code class="language-plaintext highlighter-rouge">claude-sonnet-4-5-20250929</code>,
+<code class="language-plaintext highlighter-rouge">claude-opus-4-1-20250805</code>. Every dated model ID is fixed to that release. Starting with Claude
+4.6, IDs use a dateless format (<code class="language-plaintext highlighter-rouge">claude-opus-4-6</code>) that’s <em>still</em> a pinned snapshot, not an
+evergreen pointer. <a href="https://platform.claude.com/docs/en/docs/about-claude/models/overview">platform.claude.com</a>
+For pre-4.6 models, a separate “API alias” (<code class="language-plaintext highlighter-rouge">claude-opus-4-5</code>) resolves to the dated ID
+(<code class="language-plaintext highlighter-rouge">claude-opus-4-5-20251101</code>). The alias can, in principle, be repointed. The dated ID never
+moves. The same alias/dated-ID split is standard across major API vendors.</p>
+
+<blockquote>
+  <p><strong>Common trap</strong>: a date suffix marks the <em>release</em> snapshot, not the <em>knowledge cutoff</em>.
+The two can differ. Claude Sonnet 4.5’s reliable knowledge cutoff is January 2025. Its
+training-data cutoff is July 2025. Those are two different columns in the same table. <a href="https://platform.claude.com/docs/en/docs/about-claude/models/overview">platform.claude.com</a></p>
+</blockquote>
+
+<p><strong><code class="language-plaintext highlighter-rouge">-latest</code>/undated aliases are a production hazard</strong>: a vendor can silently swap the weights
+behind an alias with zero code change on your side. Reproducibility breaks, eval numbers become
+unattributable to a specific weight set, and a regression can appear with zero deploy on your end.
+Pin the dated/versioned ID in production. Reserve bare aliases for exploratory work.</p>
+
+<p><strong><code class="language-plaintext highlighter-rouge">-preview</code>/<code class="language-plaintext highlighter-rouge">-exp</code></strong> signal an unstable, possibly short-lived release (<code class="language-plaintext highlighter-rouge">gemini-3.1-pro-preview</code>),
+with faster deprecation and looser SLAs than GA under the same base name. <a href="https://ai.google.dev/gemini-api/docs/pricing">ai.google.dev</a></p>
+
+<p>A live example of the churn this causes: as of this page’s snapshot (July 2026), DeepSeek’s docs
+had deprecated <code class="language-plaintext highlighter-rouge">deepseek-chat</code>/<code class="language-plaintext highlighter-rouge">deepseek-reasoner</code> on 2026-07-24 in favor of
+<code class="language-plaintext highlighter-rouge">deepseek-v4-flash</code>/<code class="language-plaintext highlighter-rouge">deepseek-v4-pro</code>, collapsing what used to be two model IDs into one mode
+flag. Any integration hardcoded to the old names needed a change within the week. <a href="https://api-docs.deepseek.com/quick_start/pricing">api-docs.deepseek.com</a>
+Similarly, xAI ships <code class="language-plaintext highlighter-rouge">grok-4.20-0309-reasoning</code>, <code class="language-plaintext highlighter-rouge">grok-4.20-0309-non-reasoning</code>, and
+<code class="language-plaintext highlighter-rouge">grok-4.20-multi-agent-0309</code> as distinct IDs. There’s no bare “Grok 4.20.” <a href="https://docs.x.ai/docs/models">docs.x.ai</a>
+Treat a date, a specific patch version, or an explicit “stable” designation as safe to hardcode.
+Treat bare family names, <code class="language-plaintext highlighter-rouge">-latest</code>, <code class="language-plaintext highlighter-rouge">-preview</code>, and <code class="language-plaintext highlighter-rouge">-exp</code> as requiring active re-validation.</p>
+
+<hr />
+
+<h2 id="8-context-notation">8. Context notation</h2>
+
+<p>“128k,” “200k,” “1M” mean the maximum input-plus-output token budget the model’s attention scheme
+was trained or extended to support, not a guarantee of usable quality at that length. Input and
+output limits are sometimes reported separately and differ a lot: Claude Sonnet 5, Opus 5, and
+Fable 5 all show a 1M-token context window but only a 128k-token max output in the same table.
+<a href="https://platform.claude.com/docs/en/docs/about-claude/models/overview">platform.claude.com</a>
+Tokenizer choice complicates this further. Anthropic notes Claude Opus 4.7+/Fable 5’s newer
+tokenizer produces roughly 30% more tokens than pre-4.7 models for the same text, so a nominal
+“1M-token” window isn’t directly comparable across generations of the same vendor, and the same
+caveat applies to per-token price comparisons.</p>
+
+<blockquote>
+  <p><strong>Warning</strong>: an advertised context window isn’t a promise the model reasons reliably across
+the whole thing.</p>
+</blockquote>
+
+<ul>
+  <li>NVIDIA’s <strong>RULER</strong> benchmark evaluated 17 models across 13 tasks and found that although all of
+them claim 32K context or more, only about half maintained satisfactory performance at 32K,
+despite near-perfect scores on the vanilla needle-in-a-haystack test. <a href="https://arxiv.org/abs/2404.06654">arXiv:2404.06654</a></li>
+  <li>Chroma’s <strong>“Context Rot”</strong> report evaluated 18 frontier models and found 20-50% accuracy drops
+between 10K and 100K+ tokens. A 200K window can show serious loss by 50K input, and a 1M window
+doesn’t reliably reason across 1M. Safe budgets for 2M-window models landed around 150K-400K
+tokens for high-accuracy work. <a href="https://www.trychroma.com/research/context-rot">Chroma research</a></li>
+  <li>The <strong>NoLiMa</strong> benchmark found 11 of 13 models dropped below 50% of their short-context baseline
+by 32K tokens. See <a href="/projects/dokidex/learn/advanced/">Advanced concepts</a> for the fuller
+treatment.</li>
+</ul>
+
+<p><strong>Practical implication</strong>: never treat an advertised context window as a proxy for how much you
+can put in front of a model and get reliable output. Effective context is empirically a fraction
+of the advertised figure (commonly cited in a 15-65% range depending on task). That fraction
+is vendor- and task-dependent, not a fixed ratio.</p>
+
+<hr />
+
+<h2 id="ten-real-model-strings-parsed-component-by-component">Ten real model strings, parsed component by component</h2>
+
+<p><strong>1. <code class="language-plaintext highlighter-rouge">Qwen3-235B-A22B-Thinking-2507</code></strong>: <a href="https://huggingface.co/Qwen/Qwen3-235B-A22B-Thinking-2507">Hugging Face</a>
+<code class="language-plaintext highlighter-rouge">Qwen3</code> = Alibaba’s 3rd generation · <code class="language-plaintext highlighter-rouge">235B</code> = total (MoE, stored/VRAM) · <code class="language-plaintext highlighter-rouge">A22B</code> = ~22B activated
+(8 of 128 experts routed) · <code class="language-plaintext highlighter-rouge">Thinking</code> = a distinct checkpoint, not a toggle, trained to always
+emit <code class="language-plaintext highlighter-rouge">&lt;think&gt;</code> chain-of-thought · <code class="language-plaintext highlighter-rouge">2507</code> = <code class="language-plaintext highlighter-rouge">YYMM</code> date, the July 2025 refresh.</p>
+
+<p><strong>2. <code class="language-plaintext highlighter-rouge">DeepSeek-V3</code></strong> (the API IDs that used to front this generation, <code class="language-plaintext highlighter-rouge">deepseek-chat</code>/
+<code class="language-plaintext highlighter-rouge">deepseek-reasoner</code>, were retired in favour of <code class="language-plaintext highlighter-rouge">deepseek-v4-flash</code>/<code class="language-plaintext highlighter-rouge">-pro</code>): <a href="https://arxiv.org/abs/2412.19437">arXiv:2412.19437</a>
+671B total / 37B active, 256 routed + shared experts, Multi-head Latent Attention, FP8
+pretraining on 14.8T tokens, plus a ~14B-parameter MTP module. The API names <code class="language-plaintext highlighter-rouge">deepseek-chat</code>/
+<code class="language-plaintext highlighter-rouge">deepseek-reasoner</code> were deprecated 2026-07-24 for <code class="language-plaintext highlighter-rouge">deepseek-v4-flash</code>/<code class="language-plaintext highlighter-rouge">-pro</code>, with the old split
+becoming a mode flag rather than two model IDs.</p>
+
+<p><strong>3. <code class="language-plaintext highlighter-rouge">gpt-oss-120b</code></strong> (a GGUF derivative reads <code class="language-plaintext highlighter-rouge">gpt-oss-120b-GGUF</code>, <code class="language-plaintext highlighter-rouge">Q4_K_M</code>): <a href="https://github.com/openai/gpt-oss">OpenAI README</a>
+<code class="language-plaintext highlighter-rouge">gpt-oss</code> = OpenAI’s open-weight line · <code class="language-plaintext highlighter-rouge">120b</code> = a rounded class label (actual parameters are 117B
+total / 5.1B active, 128 experts, 4 active per token) · MXFP4 quantization applied post-training
+to MoE weights (4.25 bits/param), non-MoE tensors kept at BF16, which is why it fits an 80GB GPU
+despite the nominal 117B size.</p>
+
+<p><strong>4. <code class="language-plaintext highlighter-rouge">Llama-4-Maverick-17B-128E-Instruct</code></strong>: <a href="https://huggingface.co/meta-llama/Llama-4-Maverick-17B-128E-Instruct">Hugging Face</a>
+<code class="language-plaintext highlighter-rouge">Llama-4</code> = Meta’s 4th generation · <code class="language-plaintext highlighter-rouge">Maverick</code> = the mid/flagship tier (Scout below it, unreleased
+Behemoth above) · <code class="language-plaintext highlighter-rouge">17B</code> = active parameters · <code class="language-plaintext highlighter-rouge">128E</code> = 128 routed experts plus one shared expert
+every token also passes through · <code class="language-plaintext highlighter-rouge">Instruct</code> = chat-tuned, not base · total ~400B · context up to a
+vendor-claimed 1M tokens.</p>
+
+<p><strong>5. <code class="language-plaintext highlighter-rouge">Qwen3-Coder-480B-A35B-Instruct</code></strong>: <a href="https://qwenlm.github.io/blog/qwen3-coder/">Qwen3-Coder blog</a>
+<code class="language-plaintext highlighter-rouge">Qwen3-Coder</code> = the code-specialized branch (70% code across 7.5T tokens, plus agentic-coding RL)
+· <code class="language-plaintext highlighter-rouge">480B-A35B</code> = 480B total / 35B active · <code class="language-plaintext highlighter-rouge">Instruct</code> = chat/agent-tuned · 256K native context,
+extending to 1M via extrapolation.</p>
+
+<p><strong>6. <code class="language-plaintext highlighter-rouge">DeepSeek-R1-Distill-Qwen-7B</code></strong>: <a href="https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B">Hugging Face</a>
+<code class="language-plaintext highlighter-rouge">DeepSeek-R1</code> = the teacher · <code class="language-plaintext highlighter-rouge">Distill</code> = the student was SFT’d on ~800K R1-generated reasoning
+traces · <code class="language-plaintext highlighter-rouge">Qwen</code> = the base architecture (Qwen2.5’s 7B checkpoint), not a from-scratch DeepSeek
+design · <code class="language-plaintext highlighter-rouge">7B</code> = the student’s own dense parameter count. Reading trap: this isn’t a shrunk
+version of R1’s own MoE architecture. It’s someone else’s dense model imitating R1’s outputs.</p>
+
+<p><strong>7. <code class="language-plaintext highlighter-rouge">google/gemma-4-26B-A4B-it</code></strong>: <a href="https://huggingface.co/google/gemma-4-26B-A4B-it">Hugging Face</a>
+<code class="language-plaintext highlighter-rouge">gemma-4</code> = Google’s 4th Gemma generation (this MoE variant doesn’t exist in the Gemma 3 line,
+despite the string being easy to misattribute) · <code class="language-plaintext highlighter-rouge">26B-A4B</code> = 25.2B total / 3.8B active · <code class="language-plaintext highlighter-rouge">it</code> =
+instruction-tuned · 256K context.</p>
+
+<p><strong>8. <code class="language-plaintext highlighter-rouge">claude-sonnet-4-5-20250929</code></strong> vs. <code class="language-plaintext highlighter-rouge">claude-opus-4-6</code>: <a href="https://platform.claude.com/docs/en/docs/about-claude/models/overview">platform.claude.com</a>
+The first is a pre-4.6-generation, date-pinned snapshot: <code class="language-plaintext highlighter-rouge">20250929</code> is the exact release date
+(September 29, 2025). This ID never moves. The second is a Claude 4.6-generation ID with no
+date suffix at all, which under Anthropic’s current scheme is <em>still</em> a pinned snapshot rather
+than an evergreen pointer. The dateless format changed. The pinning guarantee didn’t.</p>
+
+<p><strong>9. <code class="language-plaintext highlighter-rouge">GPT-5.6 Sol</code>/<code class="language-plaintext highlighter-rouge">Terra</code>/<code class="language-plaintext highlighter-rouge">Luna</code></strong>: <a href="https://developers.openai.com/api/docs/models">developers.openai.com</a>
+<code class="language-plaintext highlighter-rouge">GPT-5.6</code> = generation/point-version · <code class="language-plaintext highlighter-rouge">Sol</code>/<code class="language-plaintext highlighter-rouge">Terra</code>/<code class="language-plaintext highlighter-rouge">Luna</code> = OpenAI’s tier codenames as of July
+2026, replacing the older mini/nano wording at the frontier tier: Sol is highest-capability
+($5/$30 per MTok in/out), Terra balances cost and intelligence ($2.50/$15), Luna is
+cost-optimized ($1/$6). All three share a 1.05M-token context window and 128K max output.
+Vendor-reported, as of July 2026.</p>
+
+<p><strong>10. <code class="language-plaintext highlighter-rouge">unsloth/gpt-oss-120b-GGUF</code>, <code class="language-plaintext highlighter-rouge">Q4_K_M</code> variant</strong>: <a href="https://huggingface.co/unsloth/gpt-oss-120b-GGUF">Hugging Face</a>
+<code class="language-plaintext highlighter-rouge">unsloth</code> = the community re-packager (not OpenAI) · <code class="language-plaintext highlighter-rouge">gpt-oss-120b</code> = the source model (see #3) ·
+<code class="language-plaintext highlighter-rouge">GGUF</code> = llama.cpp’s container format · <code class="language-plaintext highlighter-rouge">Q4_K_M</code> = 4-bit K-quant, most error-sensitive tensors
+upgraded to Q6_K, 4.89 bits/weight. VRAM math: <code class="language-plaintext highlighter-rouge">117B × (4.89/8 bytes) ≈ 71.5 GB</code> weights alone.
+This is notably a re-quantization of a model whose MoE weights were already native ~4.25-bit
+MXFP4, so the precision loss versus the <em>original</em> checkpoint is smaller than a naive from-FP16
+conversion would suggest.</p>
+
+<hr />
+
+<h2 id="quick-reference">Quick reference</h2>
+
+<p>Every token and caveat on this page, in one table.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Token / pattern</th>
+      <th>Meaning</th>
+      <th>Example</th>
+      <th>Caveat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">&lt;N&gt;B</code></td>
+      <td>Total parameters, in billions</td>
+      <td><code class="language-plaintext highlighter-rouge">Llama-3.1-8B</code></td>
+      <td>Doesn’t tell you tokens-trained or generation, not comparable across labs/eras</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">&lt;N&gt;B-A&lt;M&gt;B</code></td>
+      <td>MoE: N total / M active</td>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-235B-A22B</code> <a href="https://qwenlm.github.io/blog/qwen3/">Qwen3 blog</a></td>
+      <td>VRAM scales with N, while speed/FLOPs scale with M</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">&lt;E&gt;x&lt;S&gt;B</code></td>
+      <td>E experts of S billion each, not simply E×S total</td>
+      <td><code class="language-plaintext highlighter-rouge">Mixtral-8x7B</code> = 47B, not 56B <a href="https://huggingface.co/mistralai/Mixtral-8x7B-v0.1">HF</a></td>
+      <td>Shared attention/embeddings make the multiplication misleading</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">E&lt;N&gt;B</code></td>
+      <td>MatFormer “effective” params after runtime tricks</td>
+      <td>Gemma 3n E4B/E2B <a href="https://ai.google.dev/gemma/docs/gemma-3n">Gemma docs</a></td>
+      <td>Not comparable to a plain <code class="language-plaintext highlighter-rouge">&lt;N&gt;B</code></td>
+    </tr>
+    <tr>
+      <td>MoE</td>
+      <td>Router activates a subset of experts per token</td>
+      <td>DeepSeek-V3, 8 of 256+ active <a href="https://arxiv.org/abs/2412.19437">arXiv:2412.19437</a></td>
+      <td>Tells you nothing about the active fraction alone. Look for the A-number</td>
+    </tr>
+    <tr>
+      <td>Mamba/Jamba/hybrid-SSM</td>
+      <td>Linear-recurrence blocks replacing/supplementing attention</td>
+      <td>Jamba <a href="https://arxiv.org/abs/2403.19887">arXiv:2403.19887</a></td>
+      <td>Naming doesn’t reveal the attention/SSM ratio</td>
+    </tr>
+    <tr>
+      <td>MTP</td>
+      <td>Predicts several future tokens per step, enabling speculative decoding</td>
+      <td>DeepSeek-V3, +14B module</td>
+      <td>A training/inference detail, rarely in the name</td>
+    </tr>
+    <tr>
+      <td>Sliding-window attention</td>
+      <td>Local attention window, occasional global layers</td>
+      <td>Gemma 3, 5:1 local:global <a href="https://huggingface.co/blog/gemma3">HF blog</a></td>
+      <td>Enables large context cheaply, no recall-quality guarantee</td>
+    </tr>
+    <tr>
+      <td>Chinchilla-optimal</td>
+      <td>~20 tokens/parameter for compute-optimal training</td>
+      <td>70B/1.4T <a href="https://arxiv.org/abs/2203.15556">arXiv:2203.15556</a></td>
+      <td>Deliberately abandoned since 2023 for cheaper inference</td>
+    </tr>
+    <tr>
+      <td>“Overtrained” model</td>
+      <td>Trained far past ~20:1 for a cheaper-to-serve model at matched quality</td>
+      <td>Llama 3 8B, ~15T tokens (secondary-sourced)</td>
+      <td>Tokens-trained figure lives only in the card</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Base</code></td>
+      <td>Pretraining only, no chat tuning</td>
+      <td><code class="language-plaintext highlighter-rouge">Llama-3.1-8B</code> (base)</td>
+      <td>Prompt as continuation, not chat</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Instruct</code>/<code class="language-plaintext highlighter-rouge">-It</code>/<code class="language-plaintext highlighter-rouge">Chat</code></td>
+      <td>SFT (+ usually RLHF/DPO) for instruction-following</td>
+      <td><code class="language-plaintext highlighter-rouge">Gemma-3-27B-IT</code> <a href="https://huggingface.co/blog/gemma3">HF blog</a></td>
+      <td>Different labs use different words for the same category</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">DPO</code></td>
+      <td>Closed-form preference optimization, no <em>separately trained</em> reward model</td>
+      <td><a href="https://arxiv.org/abs/2305.18290">arXiv:2305.18290</a></td>
+      <td>Comparable target quality to RLHF</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">RLHF</code>/<code class="language-plaintext highlighter-rouge">RLAIF</code></td>
+      <td>Reward model (human- or AI-labeled) + RL against it</td>
+      <td>Standard since ChatGPT</td>
+      <td>Drives helpfulness/refusal, invisible in a name</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Thinking</code>/<code class="language-plaintext highlighter-rouge">Reasoner</code></td>
+      <td>Extended chain-of-thought: sometimes a distinct checkpoint, sometimes a toggle</td>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-235B-A22B-Thinking-2507</code> <a href="https://huggingface.co/Qwen/Qwen3-235B-A22B-Thinking-2507">HF</a></td>
+      <td>Check whether it’s a separate model ID or a request parameter</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Distill</code></td>
+      <td>Small student imitating a larger teacher</td>
+      <td><code class="language-plaintext highlighter-rouge">DeepSeek-R1-Distill-Qwen-7B</code> <a href="https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B">HF</a></td>
+      <td>Teacher benchmarks are an upper bound, not a guarantee</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Abliterated</code>/<code class="language-plaintext highlighter-rouge">Uncensored</code></td>
+      <td>Refusal direction removed post-hoc, no retraining</td>
+      <td>Community-produced</td>
+      <td>No safety guardrails: research/red-team, not production</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Coder</code>/<code class="language-plaintext highlighter-rouge">Code</code></td>
+      <td>Heavy code pretraining, often + FIM + agentic RL</td>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-Coder-480B-A35B</code> <a href="https://qwenlm.github.io/blog/qwen3-coder/">blog</a></td>
+      <td>A different checkpoint from the chat sibling</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">FIM</code></td>
+      <td>Trained on prefix+suffix→middle, alongside next-token prediction</td>
+      <td>Qwen2.5-Coder <a href="https://arxiv.org/abs/2409.12186">arXiv:2409.12186</a></td>
+      <td>Chat-only models fake this via prompting, with worse quality</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">VL</code>/<code class="language-plaintext highlighter-rouge">Vision</code></td>
+      <td>Adds an image/video encoder</td>
+      <td>Qwen2.5-VL <a href="https://docs.cohere.com/docs/models">docs.cohere.com</a></td>
+      <td>Often a separate branch, not a strict superset</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Omni</code></td>
+      <td>“Many modalities in one model”</td>
+      <td>Used loosely</td>
+      <td>No fixed technical definition</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Audio</code></td>
+      <td>Speech in/out, often a separate model line</td>
+      <td>Mistral Voxtral <a href="https://docs.mistral.ai/getting-started/models/">docs.mistral.ai</a></td>
+      <td>Frequently not a general chat model</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Embed</code></td>
+      <td>Outputs a similarity vector, not text</td>
+      <td><code class="language-plaintext highlighter-rouge">text-embedding-3-large</code> vs <code class="language-plaintext highlighter-rouge">-small</code> <a href="https://developers.openai.com/api/docs/guides/embeddings">developers.openai.com</a></td>
+      <td>“small/large” tracks dimensions, not generative param count</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Rerank</code></td>
+      <td>Scores (query, doc) pairs, a retrieval filter</td>
+      <td>Cohere <code class="language-plaintext highlighter-rouge">rerank-v4.0-pro</code>/<code class="language-plaintext highlighter-rouge">-fast</code> <a href="https://docs.cohere.com/docs/models">docs.cohere.com</a></td>
+      <td>Not a generator</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Guard</code></td>
+      <td>Safety/moderation classifier</td>
+      <td>Llama Guard family</td>
+      <td>Classifier, not generator, regardless of vendor</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Math</code></td>
+      <td>Math-focused pretraining/RL</td>
+      <td>Qwen2.5-Math</td>
+      <td>Can regress general chat quality</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Flash</code>/<code class="language-plaintext highlighter-rouge">Flash-Lite</code></td>
+      <td>Google-only speed/cost tiers</td>
+      <td>Gemini 2.5 Flash, 1,048,576 context <a href="https://ai.google.dev/gemini-api/docs/pricing">ai.google.dev</a></td>
+      <td>Google-specific, no cross-vendor equivalence</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">mini</code>/<code class="language-plaintext highlighter-rouge">nano</code></td>
+      <td>OpenAI’s smaller/cheaper siblings</td>
+      <td>Renamed to Sol/Terra/Luna as of July 2026 <a href="https://developers.openai.com/api/docs/models">developers.openai.com</a></td>
+      <td>Naming actively in flux. Verify against live docs</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Air</code></td>
+      <td>Zhipu’s lighter MoE variant</td>
+      <td><code class="language-plaintext highlighter-rouge">GLM-4.5-Air</code></td>
+      <td>Zhipu-specific</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">small</code>/<code class="language-plaintext highlighter-rouge">medium</code>/<code class="language-plaintext highlighter-rouge">large</code> (Mistral)</td>
+      <td>A literal size ladder</td>
+      <td>Large 3, Medium 3.5, Small 4 <a href="https://docs.mistral.ai/getting-started/models/">docs.mistral.ai</a></td>
+      <td>Other vendors reuse these words on unrelated axes</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Pro</code>/<code class="language-plaintext highlighter-rouge">Max</code>/<code class="language-plaintext highlighter-rouge">Plus</code>/<code class="language-plaintext highlighter-rouge">Turbo</code>/<code class="language-plaintext highlighter-rouge">Ultra</code></td>
+      <td>No consistent cross-vendor meaning</td>
+      <td>“Claude Max” = a subscription plan, not a model</td>
+      <td>Near-zero information without that vendor’s own docs</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Preview</code>/<code class="language-plaintext highlighter-rouge">-exp</code></td>
+      <td>Unstable, may retire on short notice</td>
+      <td><code class="language-plaintext highlighter-rouge">gemini-3.1-pro-preview</code> <a href="https://ai.google.dev/gemini-api/docs/pricing">ai.google.dev</a></td>
+      <td>Don’t hardcode in production</td>
+    </tr>
+    <tr>
+      <td>Opus/Sonnet/Haiku/Fable/Mythos</td>
+      <td>Anthropic’s poetic tier ladder</td>
+      <td>Claude Opus 5, Fable 5 <a href="https://platform.claude.com/docs/en/docs/about-claude/models/overview">platform.claude.com</a></td>
+      <td>Proprietary. “Claude Max” is an unrelated subscription name</td>
+    </tr>
+    <tr>
+      <td>Date-stamped ID</td>
+      <td>Pinned, immutable snapshot</td>
+      <td><code class="language-plaintext highlighter-rouge">claude-sonnet-4-5-20250929</code></td>
+      <td>Safe to hardcode in production</td>
+    </tr>
+    <tr>
+      <td>Bare alias/<code class="language-plaintext highlighter-rouge">-latest</code></td>
+      <td>Can be silently repointed to a new snapshot</td>
+      <td><code class="language-plaintext highlighter-rouge">claude-opus-4-5</code> → resolves to a dated ID</td>
+      <td>Reproducibility/eval-attribution break on a silent swap</td>
+    </tr>
+    <tr>
+      <td>Reasoning/non-reasoning as separate IDs</td>
+      <td>Two model IDs, not one model with a toggle</td>
+      <td><code class="language-plaintext highlighter-rouge">grok-4.20-0309-reasoning</code>/<code class="language-plaintext highlighter-rouge">-non-reasoning</code> <a href="https://docs.x.ai/docs/models">docs.x.ai</a></td>
+      <td>Not a universal pattern. Check per vendor</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">128k</code>/<code class="language-plaintext highlighter-rouge">200k</code>/<code class="language-plaintext highlighter-rouge">1M</code> context</td>
+      <td>Max trained/extended input(+output) budget</td>
+      <td>Sonnet 5: 1M context / 128K max output <a href="https://platform.claude.com/docs/en/docs/about-claude/models/overview">platform.claude.com</a></td>
+      <td>Advertised ≠ effective. Reliable performance covers a fraction of it</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code>, <code class="language-plaintext highlighter-rouge">Q6_K</code>, <code class="language-plaintext highlighter-rouge">Q8_0</code></td>
+      <td>K-quant: <code class="language-plaintext highlighter-rouge">_S</code>/<code class="language-plaintext highlighter-rouge">_M</code>/<code class="language-plaintext highlighter-rouge">_L</code> selects which tensors get upgraded</td>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code> = 4.89 bits/weight <a href="https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/README.md">llama.cpp README</a></td>
+      <td>Not a global bit-width bump. Only the sensitive tensors move</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">IQ2_XS</code>, <code class="language-plaintext highlighter-rouge">IQ3_S</code>, etc.</td>
+      <td>I-quant: codebook-based, for very low bit-widths</td>
+      <td><code class="language-plaintext highlighter-rouge">IQ2_XS</code> = 2.59 bits/weight <a href="https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/README.md">llama.cpp README</a></td>
+      <td>Better than K-quants below ~3 bits, plausibly slower on CPU (single-sourced)</td>
+    </tr>
+    <tr>
+      <td>AWQ</td>
+      <td>Activation-aware per-channel scaling before INT4/INT3</td>
+      <td><a href="https://arxiv.org/abs/2306.00978">arXiv:2306.00978</a></td>
+      <td>Generalizes well across domains/modalities</td>
+    </tr>
+    <tr>
+      <td>GPTQ</td>
+      <td>Hessian-informed, one-shot layer-wise quantization</td>
+      <td><a href="https://arxiv.org/abs/2210.17323">arXiv:2210.17323</a></td>
+      <td>Predates AWQ/EXL2 as the GPU INT4 standard</td>
+    </tr>
+    <tr>
+      <td>EXL2/EXL3</td>
+      <td>Mixed-bitrate (EXL2) / lattice-codebook (EXL3) formats</td>
+      <td><a href="https://github.com/turboderp-org/exllamav2">exllamav2</a>, <a href="https://github.com/turboderp-org/exllamav3/blob/master/doc/exl3.md">exllamav3</a></td>
+      <td>Ship as plain <code class="language-plaintext highlighter-rouge">safetensors</code>, no custom container</td>
+    </tr>
+    <tr>
+      <td>NF4</td>
+      <td>Gaussian-equal-mass 4-bit levels, built for QLoRA</td>
+      <td><a href="https://arxiv.org/abs/2305.14314">arXiv:2305.14314</a></td>
+      <td>Also usable for plain inference</td>
+    </tr>
+    <tr>
+      <td>FP16/BF16</td>
+      <td>16-bit float, ~2 bytes/weight</td>
+      <td>Pre-2024 “full precision” baseline</td>
+      <td>BF16 trades mantissa bits for wider exponent range</td>
+    </tr>
+    <tr>
+      <td>FP8 (E4M3)</td>
+      <td>8-bit float, ~1 byte/weight</td>
+      <td>DeepSeek-V3 pretraining <a href="https://arxiv.org/abs/2412.19437">arXiv:2412.19437</a></td>
+      <td>First large validated FP8 <em>training</em> run at this scale</td>
+    </tr>
+    <tr>
+      <td>MXFP4</td>
+      <td>4-bit float, block-32 open spec</td>
+      <td>gpt-oss MoE weights, 4.25 bits/param <a href="https://github.com/openai/gpt-oss">OpenAI README</a></td>
+      <td>Fits gpt-oss-120b on one 80GB GPU</td>
+    </tr>
+    <tr>
+      <td>NVFP4</td>
+      <td>4-bit float, finer block-16 scale (NVIDIA)</td>
+      <td>Blackwell-class inference <a href="https://developer.nvidia.com/blog/introducing-nvfp4-for-efficient-and-accurate-low-precision-inference/">NVIDIA dev blog</a></td>
+      <td>~0.3-0.5 better perplexity than MXFP4, vendor-reported</td>
+    </tr>
+    <tr>
+      <td>INT8/INT4</td>
+      <td>Fixed-point integer quantization</td>
+      <td>Substrate for GPTQ/AWQ/bitsandbytes</td>
+      <td>INT4 ≈ 0.5 bytes/weight before group-scale overhead</td>
+    </tr>
+    <tr>
+      <td>QAT vs. PTQ</td>
+      <td>Training-time-simulated vs. one-shot post-training quantization</td>
+      <td>gpt-oss’s MXFP4 is PTQ-adjacent <a href="https://github.com/openai/gpt-oss">OpenAI README</a></td>
+      <td>QAT usually beats PTQ at equal bit-width, costs training compute</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<p>Next: <a href="/projects/dokidex/learn/open-vs-closed/">Open vs closed weights</a> puts numbers on what
+you give up, and gain, running a model whose weights you can quantize, prune, and requantize
+yourself instead of calling an API.</p>
+
+    </article>
+
+    
+    <nav class="pager" aria-label="Page navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/learn/advanced/">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">Advanced</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/learn/open-vs-closed/">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">Open vs closed weights</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="site-footer">
+  <div class="footer-main">
+    <p class="footer-line">
+      <strong>DokiDex</strong> v0.62.0:
+      a fully-local AI stack, and a field guide to the machines it runs on.
+    </p>
+    <p class="footer-line footer-dim">
+      Everything on this site is written against the real tree and the measured record. Where a
+      claim is a number, it was measured or sourced. Where it was a judgment call, the reasoning
+      is stated inline. Stale statements are bugs. File them like bugs.
+    </p>
+  </div>
+
+  <div class="footer-links">
+    <a href="/projects/dokidex/local-cli/">Run the CLIs</a>
+    <a href="/projects/dokidex/handbook/">Handbook</a>
+    <a href="/projects/dokidex/reference/">Quick reference</a>
+    <a href="/projects/dokidex/glossary/">Glossary</a>
+    <!-- Deliberately understated: last item in the row, same weight as the rest, no colour,
+         no badge, no image beacon. The ask was "inconspicuous". -->
+    <a class="footer-kofi" href="https://ko-fi.com/dougfessler" rel="noopener">Buy me a coffee</a>
+  </div>
+</footer>
+
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/dokidex.js"></script>
+</body>
+</html>

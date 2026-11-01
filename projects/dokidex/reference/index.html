@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quick reference · DokiDex</title>
+<meta name="description" content="Every table on the site, condensed into one page: DokiDex's own commands and model tiers, the model-name decoder, quantization and VRAM math, and the current closed- and open-weight landscape, for when you already understand the concept and just need the number.">
+
+<!-- Open Graph / Twitter, hand-rolled: jekyll-seo-tag is not available under the pinned
+     github-pages gem set used by actions/jekyll-build-pages. -->
+<meta property="og:site_name" content="DokiDex">
+<meta property="og:title" content="Quick reference">
+<meta property="og:description" content="Every table on the site, condensed into one page: DokiDex's own commands and model tiers, the model-name decoder, quantization and VRAM math, and the current closed- and open-weight landscape, for when you already understand the concept and just need the number.">
+<meta property="og:type" content="website">
+<!-- site_origin rather than absolute_url: see the comment in _config.yml. absolute_url would
+     emit http:// here, because the Pages API reports an http html_url while Enforce HTTPS is off. -->
+<meta property="og:url" content="https://dougfessler.com/projects/dokidex/reference/">
+<link rel="canonical" href="https://dougfessler.com/projects/dokidex/reference/">
+<!-- `summary`, not `summary_large_image`: no og:image or twitter:image is emitted anywhere on
+     this site, and the large-image card renders as a blank rectangle without one. Switch this back
+     the same day a 1200x630 share asset lands, not before. -->
+<meta name="twitter:card" content="summary">
+
+<!-- Same four families as the handbook, so the two halves of the site read as one product:
+     Marcellus (power words) · Kanit (headings, kickers, nav) · IBM Plex Mono (code, stats) ·
+     Figtree (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/dokidex.css">
+<link rel="icon" href="/projects/dokidex/assets/favicon.svg" type="image/svg+xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<!-- `wide: true` in a page's front matter opts it into --content-w-wide (assets/dokidex.css:51).
+     The CSS keys off `.page-wide` on an ancestor. Without the class emitted here the front-matter
+     flag silently does nothing. -->
+<body class="page-wide">
+<a class="skip-link" href="#content">Skip to content</a>
+
+<!-- CSS-only nav toggle. A checkbox beats a JS drawer here: the nav has to work on the mobile
+     read where the reader has scrolled 4000px into a reference table, and a checkbox cannot
+     desync from its own state the way a JS flag can. -->
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/">DokiDex</a>
+    <a class="topbar-cta" href="/projects/dokidex/download/"><svg class="dl-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><g class="dl-arrow"><path d="M8 2.2v6.5"/><path d="M5.2 5.9 8 8.7l2.8-2.8"/></g><path class="dl-tray" d="M3.2 11.3v2.5h9.6v-2.5"/></svg>
+Download</a>
+  </header>
+
+  <!-- Grouped navigation, driven by site.nav in _config.yml.
+
+     A page is "current" when its url matches exactly. The handbook is the one entry that also
+     needs to light up for its children (/handbook/03-serving.html), so it gets a prefix test —
+     without it, the sidebar would show nothing selected the moment a reader steps into a
+     chapter, which reads as "you have left the site". -->
+<nav class="sidebar" aria-label="Site sections">
+  <a class="sidebar-brand" href="/projects/dokidex/">
+    <span class="sidebar-mark" aria-hidden="true">&#9612;&#9608;&#9608;&#9616;</span>
+    <span class="sidebar-brand-text">DokiDex</span>
+  </a>
+
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Start</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/"
+             >Overview</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Use DokiDex</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/local-cli/"
+             >Run the CLIs locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/download/"
+             >Download the launchers</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/models/"
+             >Models it runs</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/games/"
+             >Games the models built</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/telemetry/"
+             >Performance data</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/qwen38/"
+             >Qwen3.8-27B, measured</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/architecture/"
+             >How it's built</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Learn AI</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/"
+             >Where to start</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/basics/"
+             >1 · Foundations</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/core/"
+             >2 · How models work</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/advanced/"
+             >3 · Advanced</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/naming/"
+             >Decoding model names</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/open-vs-closed/"
+             >Open vs closed weights</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/benchmarks/"
+             >Benchmarks</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/local/"
+             >Running models locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/agents/"
+             >Coding agents</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Context</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/state-of-ai/"
+             >State of AI, 2026</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link is-active"
+             href="/projects/dokidex/reference/"
+             aria-current="page">Quick reference</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/glossary/"
+             >Glossary</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Deep dive</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/handbook/"
+             >The Handbook</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+</nav>
+
+
+  <main class="main">
+    <div class="page-head">
+      <p class="kicker">:: LOOK IT UP</p>
+      <h1 class="page-title">Quick reference</h1>
+      <p class="page-desc">Every table on the site, condensed into one page: DokiDex's own commands and model tiers, the model-name decoder, quantization and VRAM math, and the current closed- and open-weight landscape, for when you already understand the concept and just need the number.</p>
+      
+    </div>
+
+    <article id="content" class="prose">
+      <p>This page introduces nothing new. Every figure below is lifted from a page elsewhere on this site,
+where the reasoning, the sourcing, and the caveats live in full. Come here when you already know
+what a term means and just need the exact flag, the exact number, or the exact row.</p>
+
+<h2 id="dokidex-at-a-glance">DokiDex at a glance</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>What it is</td>
+      <td>Anthropic’s and GitHub’s real CLIs, plus a harness-config set, all driving one local <code class="language-plaintext highlighter-rouge">llama-swap</code> model server</td>
+    </tr>
+    <tr>
+      <td>Hardware floor</td>
+      <td>NVIDIA RTX 5090, 32GB VRAM + 64GB DDR5, Windows 11: no smaller-card configuration ships</td>
+    </tr>
+    <tr>
+      <td>How you install it</td>
+      <td>Clone the checkout and run <code class="language-plaintext highlighter-rouge">setup.ps1</code>, which fetches the engine and the weights you select</td>
+    </tr>
+    <tr>
+      <td>First-run fetch</td>
+      <td>~81GB minimum (core install + <code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code>)</td>
+    </tr>
+    <tr>
+      <td>Server address</td>
+      <td><code class="language-plaintext highlighter-rouge">127.0.0.1:8080</code>, loopback-only, no cloud calls at inference time</td>
+    </tr>
+    <tr>
+      <td>Model rows behind that server</td>
+      <td>25, one <code class="language-plaintext highlighter-rouge">llama-swap</code> config, no translation proxy for either client</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul class="stat-row">
+  <li class="stat"><span class="stat-value">25</span><span class="stat-label">Model rows behind one llama-swap endpoint</span></li>
+  <li class="stat"><span class="stat-value">32 GB</span><span class="stat-label">VRAM the whole stack is designed around</span></li>
+  <li class="stat"><span class="stat-value">$0</span><span class="stat-label">Marginal cost per token</span></li>
+  <li class="stat"><span class="stat-value">0</span><span class="stat-label">Bytes of your code sent to a third party at runtime</span></li>
+</ul>
+
+<h3 id="key-commands">Key commands</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>Does</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">doki.ps1 up agent</code></td>
+      <td>Bring up chat/code (LLM) mode</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">doki.ps1 up coexist</code></td>
+      <td>LLM + FIM autocomplete sidecar, reduced context, editor and agent share the card</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">doki.ps1 status</code></td>
+      <td>List every managed service with port + health</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">doki.ps1 doctor</code></td>
+      <td>Full diagnostic pass: GPU/driver/VRAM, disk, toolchain, model files present</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">doki.ps1 verify</code></td>
+      <td>Smoke-test chat, autocomplete, codebase RAG, memory search and a real Claude Code round-trip</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">doki claude</code></td>
+      <td>Anthropic’s real Claude Code CLI on local weights (<code class="language-plaintext highlighter-rouge">doki.ps1:937</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">doki copilot</code></td>
+      <td>GitHub’s real Copilot CLI on local weights (<code class="language-plaintext highlighter-rouge">doki.ps1:949</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">.\setup.ps1</code></td>
+      <td>Bootstrap from a cloned checkout (<code class="language-plaintext highlighter-rouge">-CoderModels</code>, <code class="language-plaintext highlighter-rouge">-Vision</code>, <code class="language-plaintext highlighter-rouge">-Reasoning</code>, <code class="language-plaintext highlighter-rouge">-ModelSelection</code>, …)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Full treatment: <a href="/projects/dokidex/local-cli/">The CLI tutorial</a> ·
+<a href="/projects/dokidex/local-cli/">Claude Code and Copilot, local</a>.</p>
+
+<h2 id="the-local-cli-launchers">The local CLI launchers</h2>
+
+<p>This section used to be a full reference for <code class="language-plaintext highlighter-rouge">doki code</code>: its flag table, its ~60 slash commands and
+its permission modes. That agent was removed on 2026-09-02. What replaced it is not a smaller table
+but a different shape, because the clients are now Anthropic’s and GitHub’s own and their reference
+is theirs to publish. What this repo owns is the launcher in front of each one.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>Does</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">doki claude</code></td>
+      <td>Claude Code on the local seat. Any unrecognised flag is forwarded verbatim, so <code class="language-plaintext highlighter-rouge">--continue</code> and <code class="language-plaintext highlighter-rouge">--resume</code> work as normal</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">doki copilot</code></td>
+      <td>Copilot CLI on the same server. <code class="language-plaintext highlighter-rouge">-Offline</code> for zero network</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">doki-claude</code> / <code class="language-plaintext highlighter-rouge">doki-copilot</code></td>
+      <td>The same two, on your PATH, from any directory</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">zai-claude</code></td>
+      <td>Claude Code against z.ai GLM. Cloud, billed, opt-in, nothing local involved</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">doki-manager</code></td>
+      <td>The slow, occasional work: install clients, download models, warm one, check status</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-Model &lt;row&gt;</code></td>
+      <td>Seat a specific llama-swap row for this run rather than the default</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-OneSeat</code></td>
+      <td>Collapse every model slot to one row, so no background call can trigger a weight swap</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-NoWarm</code></td>
+      <td>Skip the preload. Useful when you know the seat is already resident</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-NoTelemetry</code></td>
+      <td>Do not record this session (or set <code class="language-plaintext highlighter-rouge">DOKI_TELEMETRY=0</code> permanently)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Full treatment: <a href="/projects/dokidex/local-cli/">Run the CLIs locally</a>.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Underlying model</th>
+      <th>Params (total / active)</th>
+      <th>Quant</th>
+      <th>VRAM</th>
+      <th>Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code></td>
+      <td>Qwen3-Coder-30B-A3B-Instruct</td>
+      <td>30B / 3B active</td>
+      <td><code class="language-plaintext highlighter-rouge">UD-Q4_K_XL</code></td>
+      <td>~26 GB</td>
+      <td>The fast daily driver</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [32k] (Coding, Light)</code></td>
+      <td>Same weights, 64k ctx</td>
+      <td>30B / 3B active</td>
+      <td><code class="language-plaintext highlighter-rouge">UD-Q4_K_XL</code></td>
+      <td>~21 GB</td>
+      <td>Quick, light-context coder. Coexists with the autocomplete server below 32 GB and is what crush’s <code class="language-plaintext highlighter-rouge">small</code> slot points at</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code></td>
+      <td>gpt-oss-120b</td>
+      <td>120B / 5.1B active</td>
+      <td><code class="language-plaintext highlighter-rouge">MXFP4</code></td>
+      <td>~27 GB GPU + ~40 GB system RAM</td>
+      <td>Heavy planner, on the <code class="language-plaintext highlighter-rouge">b10472</code> engine. What crush’s <code class="language-plaintext highlighter-rouge">large</code> slot points at</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-VL-8B [32k] (Vision, Light)</code></td>
+      <td>Qwen3-VL-8B-Instruct + mmproj</td>
+      <td>8B, dense</td>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code></td>
+      <td>~7 GB</td>
+      <td>Default vision tier for Describe/Verify</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-VL-32B [32k] (Vision, Standard)</code></td>
+      <td>Qwen3-VL-32B-Instruct + mmproj</td>
+      <td>32B, dense</td>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code></td>
+      <td>~21 GB weights, fits &lt;32 GB total with KV</td>
+      <td>Standalone high-accuracy A/B, not the default</td>
+    </tr>
+    <tr>
+      <td>Autocomplete (<code class="language-plaintext highlighter-rouge">fim</code>)</td>
+      <td>Qwen2.5-Coder-3B-Instruct</td>
+      <td>3B, dense</td>
+      <td><code class="language-plaintext highlighter-rouge">Q8_0</code></td>
+      <td>~4-6.6 GB (two repo estimates disagree)</td>
+      <td><code class="language-plaintext highlighter-rouge">/infill</code> autocomplete on <code class="language-plaintext highlighter-rouge">:8012</code>, independent of the <code class="language-plaintext highlighter-rouge">:8080</code> ring</td>
+    </tr>
+    <tr>
+      <td>Embeddings (<code class="language-plaintext highlighter-rouge">embed</code>)</td>
+      <td>nomic-embed-text-v1.5</td>
+      <td>small, dense</td>
+      <td><code class="language-plaintext highlighter-rouge">F16</code></td>
+      <td>~0 GB (CPU-only)</td>
+      <td>Embeddings for <code class="language-plaintext highlighter-rouge">code_search</code> on <code class="language-plaintext highlighter-rouge">:8090</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3.8-27B [256k] (Candidate, Standard)</code></td>
+      <td>Qwen3.8-27B</td>
+      <td>27B, dense</td>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code></td>
+      <td>~26 GB at <code class="language-plaintext highlighter-rouge">-c 262144</code></td>
+      <td>The Claude Code seat, on the <code class="language-plaintext highlighter-rouge">b10472</code> engine</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen2.5-3B-Instruct [32k] (Utility, Free)</code></td>
+      <td>Qwen2.5-3B-Instruct</td>
+      <td>3B, dense</td>
+      <td><code class="language-plaintext highlighter-rouge">Q5_K_M</code></td>
+      <td>2,987 MiB measured at <code class="language-plaintext highlighter-rouge">-c 8192</code>. Ships at <code class="language-plaintext highlighter-rouge">-c 32768</code>, the model’s own ceiling</td>
+      <td>Co-resident with the seat, so background calls never evict it</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Only one large tier is ever resident on the GPU at once: <code class="language-plaintext highlighter-rouge">llama-swap</code> evicts and swaps on request.
+The one exception is the <code class="language-plaintext highlighter-rouge">agent-seat</code> group, which pins the <code class="language-plaintext highlighter-rouge">Qwen3.8-27B [256k] (Candidate, Standard)</code> seat and its 3 GB sidecar
+together. The local-CLI skills (<code class="language-plaintext highlighter-rouge">doki-max</code>, <code class="language-plaintext highlighter-rouge">doki-think</code>, <code class="language-plaintext highlighter-rouge">doki-work</code>, <code class="language-plaintext highlighter-rouge">doki-cheap</code>) each name one
+of the four everyday models directly, no alias in between:
+<code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code>, <code class="language-plaintext highlighter-rouge">Qwen3.8-27B [256k] (Candidate, Standard)</code>, <code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code>, and
+<code class="language-plaintext highlighter-rouge">Qwen2.5-3B-Instruct [32k] (Utility, Free)</code>.
+<code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code> won the daily-driver seat over higher-scoring candidates because promotion requires
+<strong>both</strong> ≥91% on the golden suite <strong>and</strong> zero tool-call flakes on the native gate. A tied-on-suite
+candidate (Qwen3.6-35B-A3B) hangs the native gate and stays off the agentic path.</p>
+
+<p>Full treatment: <a href="/projects/dokidex/models/">The models DokiDex runs</a> ·
+<a href="/projects/dokidex/local-cli/">Claude Code and Copilot, local</a> for the last two rows.</p>
+
+<h2 id="model-name-decoder">Model name decoder</h2>
+
+<p>The single most useful table on the site: every naming token in one place, carried over in full.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Token / pattern</th>
+      <th>Meaning</th>
+      <th>Example</th>
+      <th>Caveat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">&lt;N&gt;B</code></td>
+      <td>Total parameters, in billions</td>
+      <td><code class="language-plaintext highlighter-rouge">Llama-3.1-8B</code></td>
+      <td>Doesn’t tell you tokens-trained or generation: not comparable across labs/eras</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">&lt;N&gt;B-A&lt;M&gt;B</code></td>
+      <td>MoE: N total / M active</td>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-235B-A22B</code></td>
+      <td>VRAM scales with N. Speed/FLOPs scale with M</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">&lt;E&gt;x&lt;S&gt;B</code></td>
+      <td>E experts of S billion each, not simply E×S total</td>
+      <td><code class="language-plaintext highlighter-rouge">Mixtral-8x7B</code> = 47B, not 56B</td>
+      <td>Shared attention/embeddings make the multiplication misleading</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">E&lt;N&gt;B</code></td>
+      <td>MatFormer “effective” params after runtime tricks</td>
+      <td>Gemma 3n E4B/E2B</td>
+      <td>Not comparable to a plain <code class="language-plaintext highlighter-rouge">&lt;N&gt;B</code></td>
+    </tr>
+    <tr>
+      <td>MoE</td>
+      <td>Router activates a subset of experts per token</td>
+      <td>DeepSeek-V3, 8 of 256+ active</td>
+      <td>Tells you nothing about the active fraction alone. Look for the A-number</td>
+    </tr>
+    <tr>
+      <td>Mamba/Jamba/hybrid-SSM</td>
+      <td>Linear-recurrence blocks replacing/supplementing attention</td>
+      <td>Jamba</td>
+      <td>Naming doesn’t reveal the attention/SSM ratio</td>
+    </tr>
+    <tr>
+      <td>MTP</td>
+      <td>Predicts several future tokens per step and enables speculative decoding</td>
+      <td>DeepSeek-V3, +14B module</td>
+      <td>A training/inference detail, rarely in the name</td>
+    </tr>
+    <tr>
+      <td>Sliding-window attention</td>
+      <td>Local attention window, occasional global layers</td>
+      <td>Gemma 3, 5:1 local:global</td>
+      <td>Enables large context cheaply: no recall-quality guarantee</td>
+    </tr>
+    <tr>
+      <td>Chinchilla-optimal</td>
+      <td>~20 tokens/parameter for compute-optimal training</td>
+      <td>70B/1.4T</td>
+      <td>Deliberately abandoned since 2023 for cheaper inference</td>
+    </tr>
+    <tr>
+      <td>“Overtrained” model</td>
+      <td>Trained far past ~20:1 for a cheaper-to-serve model at matched quality</td>
+      <td>Llama 3 8B, ~15T tokens (secondary-sourced)</td>
+      <td>Tokens-trained figure lives only in the card</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Base</code></td>
+      <td>Pretraining only, no chat tuning</td>
+      <td><code class="language-plaintext highlighter-rouge">Llama-3.1-8B</code> (base)</td>
+      <td>Prompt as continuation, not chat</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Instruct</code>/<code class="language-plaintext highlighter-rouge">-It</code>/<code class="language-plaintext highlighter-rouge">Chat</code></td>
+      <td>SFT (+ usually RLHF/DPO) for instruction-following</td>
+      <td><code class="language-plaintext highlighter-rouge">Gemma-3-27B-IT</code></td>
+      <td>Different labs use different words for the same category</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">DPO</code></td>
+      <td>Closed-form preference optimization, no <em>separately trained</em> reward model</td>
+      <td> </td>
+      <td>Comparable target quality to RLHF</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">RLHF</code>/<code class="language-plaintext highlighter-rouge">RLAIF</code></td>
+      <td>Reward model (human- or AI-labeled) + RL against it</td>
+      <td>Standard since ChatGPT</td>
+      <td>Drives helpfulness/refusal, invisible in a name</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Thinking</code>/<code class="language-plaintext highlighter-rouge">Reasoner</code></td>
+      <td>Extended chain-of-thought: sometimes a distinct checkpoint, sometimes a toggle</td>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-235B-A22B-Thinking-2507</code></td>
+      <td>Check whether it’s a separate model ID or a request parameter</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Distill</code></td>
+      <td>Small student imitating a larger teacher</td>
+      <td><code class="language-plaintext highlighter-rouge">DeepSeek-R1-Distill-Qwen-7B</code></td>
+      <td>Teacher benchmarks are an upper bound, not a guarantee</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Abliterated</code>/<code class="language-plaintext highlighter-rouge">Uncensored</code></td>
+      <td>Refusal direction removed post-hoc, no retraining</td>
+      <td>Community-produced</td>
+      <td>No safety guardrails: research/red-team, not production</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Coder</code>/<code class="language-plaintext highlighter-rouge">Code</code></td>
+      <td>Heavy code pretraining, often + FIM + agentic RL</td>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-Coder-480B-A35B</code></td>
+      <td>A different checkpoint from the chat sibling</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">FIM</code></td>
+      <td>Trained on prefix+suffix→middle, alongside next-token prediction</td>
+      <td>Qwen2.5-Coder</td>
+      <td>Chat-only models fake this via prompting, with worse quality</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">VL</code>/<code class="language-plaintext highlighter-rouge">Vision</code></td>
+      <td>Adds an image/video encoder</td>
+      <td>Qwen2.5-VL</td>
+      <td>Often a separate branch, not a strict superset</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Omni</code></td>
+      <td>“Many modalities in one model”</td>
+      <td>Used loosely</td>
+      <td>No fixed technical definition</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Audio</code></td>
+      <td>Speech in/out, often a separate model line</td>
+      <td>Mistral Voxtral</td>
+      <td>Frequently not a general chat model</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Embed</code></td>
+      <td>Outputs a similarity vector, not text</td>
+      <td><code class="language-plaintext highlighter-rouge">text-embedding-3-large</code> vs <code class="language-plaintext highlighter-rouge">-small</code></td>
+      <td>“small/large” tracks dimensions, not generative param count</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Rerank</code></td>
+      <td>Scores (query, doc) pairs, a retrieval filter</td>
+      <td>Cohere <code class="language-plaintext highlighter-rouge">rerank-v4.0-pro</code>/<code class="language-plaintext highlighter-rouge">-fast</code></td>
+      <td>Not a generator</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Guard</code></td>
+      <td>Safety/moderation classifier</td>
+      <td>Llama Guard family</td>
+      <td>Classifier, not generator, regardless of vendor</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Math</code></td>
+      <td>Math-focused pretraining/RL</td>
+      <td>Qwen2.5-Math</td>
+      <td>Can regress general chat quality</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Flash</code>/<code class="language-plaintext highlighter-rouge">Flash-Lite</code></td>
+      <td>Google-only speed/cost tiers</td>
+      <td>Gemini 2.5 Flash, 1,048,576 context</td>
+      <td>Google-specific: no cross-vendor equivalence</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">mini</code>/<code class="language-plaintext highlighter-rouge">nano</code></td>
+      <td>OpenAI’s smaller/cheaper siblings</td>
+      <td>Renamed to Sol/Terra/Luna as of July 2026</td>
+      <td>Naming actively in flux: verify against live docs</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Air</code></td>
+      <td>Zhipu’s lighter MoE variant</td>
+      <td><code class="language-plaintext highlighter-rouge">GLM-4.5-Air</code></td>
+      <td>Zhipu-specific</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">small</code>/<code class="language-plaintext highlighter-rouge">medium</code>/<code class="language-plaintext highlighter-rouge">large</code> (Mistral)</td>
+      <td>A literal size ladder</td>
+      <td>Large 3, Medium 3.5, Small 4</td>
+      <td>Other vendors reuse these words on unrelated axes</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Pro</code>/<code class="language-plaintext highlighter-rouge">Max</code>/<code class="language-plaintext highlighter-rouge">Plus</code>/<code class="language-plaintext highlighter-rouge">Turbo</code>/<code class="language-plaintext highlighter-rouge">Ultra</code></td>
+      <td>No consistent cross-vendor meaning</td>
+      <td>“Claude Max” = a subscription plan, not a model</td>
+      <td>Near-zero information without that vendor’s own docs</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Preview</code>/<code class="language-plaintext highlighter-rouge">-exp</code></td>
+      <td>Unstable, may retire on short notice</td>
+      <td><code class="language-plaintext highlighter-rouge">gemini-3.1-pro-preview</code></td>
+      <td>Don’t hardcode in production</td>
+    </tr>
+    <tr>
+      <td>Opus/Sonnet/Haiku/Fable/Mythos</td>
+      <td>Anthropic’s poetic tier ladder</td>
+      <td>Claude Opus 5, Fable 5</td>
+      <td>Proprietary: “Claude Max” is an unrelated subscription name</td>
+    </tr>
+    <tr>
+      <td>Date-stamped ID</td>
+      <td>Pinned, immutable snapshot</td>
+      <td><code class="language-plaintext highlighter-rouge">claude-sonnet-4-5-20250929</code></td>
+      <td>Safe to hardcode in production</td>
+    </tr>
+    <tr>
+      <td>Bare alias/<code class="language-plaintext highlighter-rouge">-latest</code></td>
+      <td>Can be silently repointed to a new snapshot</td>
+      <td><code class="language-plaintext highlighter-rouge">claude-opus-4-5</code> → resolves to a dated ID</td>
+      <td>Reproducibility/eval-attribution break on a silent swap</td>
+    </tr>
+    <tr>
+      <td>Reasoning/non-reasoning as separate IDs</td>
+      <td>Two model IDs, not one model with a toggle</td>
+      <td><code class="language-plaintext highlighter-rouge">grok-4.20-0309-reasoning</code>/<code class="language-plaintext highlighter-rouge">-non-reasoning</code></td>
+      <td>Not a universal pattern: check per vendor</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">128k</code>/<code class="language-plaintext highlighter-rouge">200k</code>/<code class="language-plaintext highlighter-rouge">1M</code> context</td>
+      <td>Max trained/extended input(+output) budget</td>
+      <td>Sonnet 5: 1M context / 128K max output</td>
+      <td>Advertised ≠ effective: reliable performance covers a fraction of it</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code>, <code class="language-plaintext highlighter-rouge">Q6_K</code>, <code class="language-plaintext highlighter-rouge">Q8_0</code></td>
+      <td>K-quant: <code class="language-plaintext highlighter-rouge">_S</code>/<code class="language-plaintext highlighter-rouge">_M</code>/<code class="language-plaintext highlighter-rouge">_L</code> = which tensors get upgraded</td>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code> = 4.89 bits/weight</td>
+      <td>Not a global bit-width bump: only the sensitive tensors move</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">IQ2_XS</code>, <code class="language-plaintext highlighter-rouge">IQ3_S</code>, etc.</td>
+      <td>I-quant: codebook-based, for very low bit-widths</td>
+      <td><code class="language-plaintext highlighter-rouge">IQ2_XS</code> = 2.59 bits/weight</td>
+      <td>Better than K-quants below ~3 bits, plausibly slower on CPU (single-sourced)</td>
+    </tr>
+    <tr>
+      <td>AWQ</td>
+      <td>Activation-aware per-channel scaling before INT4/INT3</td>
+      <td> </td>
+      <td>Generalizes well across domains/modalities</td>
+    </tr>
+    <tr>
+      <td>GPTQ</td>
+      <td>Hessian-informed, one-shot layer-wise quantization</td>
+      <td> </td>
+      <td>Predates AWQ/EXL2 as the GPU INT4 standard</td>
+    </tr>
+    <tr>
+      <td>EXL2/EXL3</td>
+      <td>Mixed-bitrate (EXL2) / lattice-codebook (EXL3) formats</td>
+      <td> </td>
+      <td>Ship as plain <code class="language-plaintext highlighter-rouge">safetensors</code>, no custom container</td>
+    </tr>
+    <tr>
+      <td>NF4</td>
+      <td>Gaussian-equal-mass 4-bit levels, built for QLoRA</td>
+      <td> </td>
+      <td>Also usable for plain inference</td>
+    </tr>
+    <tr>
+      <td>FP16/BF16</td>
+      <td>16-bit float, ~2 bytes/weight</td>
+      <td>Pre-2024 “full precision” baseline</td>
+      <td>BF16 trades mantissa bits for wider exponent range</td>
+    </tr>
+    <tr>
+      <td>FP8 (E4M3)</td>
+      <td>8-bit float, ~1 byte/weight</td>
+      <td>DeepSeek-V3 pretraining</td>
+      <td>First large validated FP8 <em>training</em> run at this scale</td>
+    </tr>
+    <tr>
+      <td>MXFP4</td>
+      <td>4-bit float, block-32 open spec</td>
+      <td>gpt-oss MoE weights, 4.25 bits/param</td>
+      <td>Fits gpt-oss-120b on one 80GB GPU</td>
+    </tr>
+    <tr>
+      <td>NVFP4</td>
+      <td>4-bit float, finer block-16 scale (NVIDIA)</td>
+      <td>Blackwell-class inference</td>
+      <td>~0.3-0.5 better perplexity than MXFP4, vendor-reported</td>
+    </tr>
+    <tr>
+      <td>INT8/INT4</td>
+      <td>Fixed-point integer quantization</td>
+      <td>Substrate for GPTQ/AWQ/bitsandbytes</td>
+      <td>INT4 ≈ 0.5 bytes/weight before group-scale overhead</td>
+    </tr>
+    <tr>
+      <td>QAT vs. PTQ</td>
+      <td>Training-time-simulated vs. one-shot post-training quantization</td>
+      <td>gpt-oss’s MXFP4 is PTQ-adjacent</td>
+      <td>QAT usually beats PTQ at equal bit-width, costs training compute</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Full treatment: <a href="/projects/dokidex/learn/naming/">Decoding model names</a>.</p>
+
+<h2 id="quantization">Quantization</h2>
+
+<h3 id="gguf-quantization-ladder">GGUF quantization ladder</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Format</th>
+      <th>Bits/weight</th>
+      <th>Perplexity vs. FP16 (one 2026 study, Llama-3.1-8B, baseline 7.32)</th>
+      <th>Use it when</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q8_0</code></td>
+      <td>8.50</td>
+      <td>~lossless</td>
+      <td>VRAM isn’t the constraint: “almost indistinguishable from float16”</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q6_K</code></td>
+      <td>6.56</td>
+      <td>~7.33-7.35 (effectively lossless)</td>
+      <td>Close to <code class="language-plaintext highlighter-rouge">Q8_0</code> quality at meaningfully smaller size</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q5_K_M</code></td>
+      <td>5.70</td>
+      <td>Not isolated in that study</td>
+      <td>The study itself reports 5-bit configs as the strongest quality/size trade-off in the K-quant family (single unreplicated paper)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q5_0</code> (legacy)</td>
+      <td>Not published in either source</td>
+      <td>7.43 (+0.11)</td>
+      <td>Superseded by K-quants at a comparable bit budget</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code></td>
+      <td>4.89</td>
+      <td>7.56 (+0.24)</td>
+      <td>The recommended llama.cpp default: DokiDex’s <code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code> tier runs a <code class="language-plaintext highlighter-rouge">UD-Q4_K_XL</code> variant of this family</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_S</code></td>
+      <td>4.67</td>
+      <td>GSM8K recovers to baseline (77.33)</td>
+      <td>Plain, no selective tensor upgrade</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q3_K_S</code></td>
+      <td>3.64</td>
+      <td>8.96 (+1.64). GSM8K -9.3 pts (68.31 vs 77.63): the study’s identified degradation threshold</td>
+      <td>Treat as a capability cut, not just a fidelity cut. Validate task behavior, not just perplexity</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">IQ2_XXS</code></td>
+      <td>2.38</td>
+      <td>Not tested in that study</td>
+      <td>Aggressive 2-3 bit compression: holds quality better than K-quants below ~3 bits, at more dequant compute</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p><strong>Note:</strong> the perplexity figures above trace to a single 2026 arXiv study (2601.14277) on one
+model. Treat them as “a single study reports,” not settled consensus. Perplexity is also a
+poor proxy for coding/agentic quality specifically.</p>
+</blockquote>
+
+<h3 id="other-formats">Other formats</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Format</th>
+      <th>Mechanism</th>
+      <th>Use it when</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>AWQ</td>
+      <td>Activation-aware channel scaling before INT4/INT3</td>
+      <td>vLLM-class serving: reported 5-15% higher throughput than GPTQ at comparable INT4 quality</td>
+    </tr>
+    <tr>
+      <td>GPTQ</td>
+      <td>One-shot, Hessian-informed layer-wise quantization</td>
+      <td>The long-standing GPU INT4 standard</td>
+    </tr>
+    <tr>
+      <td>EXL2</td>
+      <td>ExLlamaV2 mixed-bitrate (2-8 bit, non-uniform), plain <code class="language-plaintext highlighter-rouge">safetensors</code></td>
+      <td>Squeezing one NVIDIA card below a clean 4-bit K-quant cut</td>
+    </tr>
+    <tr>
+      <td>EXL3</td>
+      <td>ExLlamaV3 lattice-codebook format (QTIP-derived)</td>
+      <td>Reported coherent to ~1.6 bpw on a 70B-class model</td>
+    </tr>
+    <tr>
+      <td>NF4 (bitsandbytes)</td>
+      <td>Gaussian-equal-mass 4-bit levels</td>
+      <td>Built for QLoRA fine-tuning and also usable for inference</td>
+    </tr>
+    <tr>
+      <td>MXFP4</td>
+      <td>4-bit float, open OCP block-32 spec</td>
+      <td>gpt-oss’s MoE format at 4.25 bits/param: DokiDex’s <code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code> tier</td>
+    </tr>
+    <tr>
+      <td>NVFP4</td>
+      <td>4-bit float, NVIDIA block-16 scale</td>
+      <td>~0.3-0.5 better perplexity than MXFP4 at equal bitrate (vendor-reported)</td>
+    </tr>
+    <tr>
+      <td>FP8 (E4M3)</td>
+      <td>8-bit float, ~1 byte/weight</td>
+      <td>DeepSeek-V3’s full pretraining run: “near-lossless” on Hopper+ at ~2x FP16 throughput</td>
+    </tr>
+    <tr>
+      <td>FP16/BF16</td>
+      <td>~2 bytes/weight</td>
+      <td>Pre-2024 “full precision” baseline</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Full treatment: <a href="/projects/dokidex/learn/naming/">Decoding model names</a> ·
+<a href="/projects/dokidex/learn/local/">Running models locally</a>.</p>
+
+<h2 id="vram-estimation">VRAM estimation</h2>
+
+<blockquote>
+  <p><strong>Tip:</strong> <code class="language-plaintext highlighter-rouge">VRAM (GB) ≈ Total_Parameters(B) × Bytes_per_Weight × 1.05–1.20 + KV-cache overhead</code></p>
+</blockquote>
+
+<p>KV cache is a separate, context-length-dependent term:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GQA:  kv_bytes_per_token = 2 × n_layers × n_kv_heads × head_dim × bytes_per_element
+MLA:  kv_bytes_per_token = n_layers × (kv_lora_rank + qk_rope_head_dim) × bytes_per_element
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Key idea:</strong> for MoE, capacity sizing uses <strong>total</strong> parameters (every expert must be resident).
+Speed sizing uses <strong>active</strong> parameters only. A 671B/37B-active model needs VRAM for 671B and
+generates at roughly the speed of a 37B model.</p>
+</blockquote>
+
+<h3 id="worked-lookup-table">Worked lookup table</h3>
+
+<blockquote>
+  <p>Figures below are in <strong>GiB</strong> (2^30 bytes), not decimal GB (10^9 bytes), matching a graphics
+card’s own labeling (a “32GB” card is 32 GiB). Where a figure is shown in decimal GB instead
+(the two MoE rows below), it’s called out as GB explicitly, matching the source.</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Params (total/active)</th>
+      <th>Quant</th>
+      <th>Example context</th>
+      <th>Weights</th>
+      <th>KV cache</th>
+      <th>Total</th>
+      <th>Fits a 32GB card?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Llama-3.1-8B (dense, GQA)</td>
+      <td>8B</td>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code></td>
+      <td>32K</td>
+      <td>4.58 GiB</td>
+      <td>4.00 GiB</td>
+      <td>≈9.6 GiB</td>
+      <td>Yes, ~22 GiB to spare</td>
+    </tr>
+    <tr>
+      <td>Qwen2.5-32B (dense, GQA)</td>
+      <td>32.5B</td>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code></td>
+      <td>32K</td>
+      <td>18.5 GiB</td>
+      <td>8.00 GiB (fp16 KV)</td>
+      <td>≈27.5 GiB of 32 GiB</td>
+      <td>Snug but not saturating: 8-bit KV cache (<code class="language-plaintext highlighter-rouge">q8_0</code>, ~8.5 bits/element, ~53% of fp16, not a clean halving) brings it to ≈23.75 GiB</td>
+    </tr>
+    <tr>
+      <td>Llama-3.1-70B (dense, GQA)</td>
+      <td>70B</td>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code></td>
+      <td>N/A</td>
+      <td>≈39.9 GiB</td>
+      <td>N/A</td>
+      <td>Over 32 GiB before any KV cache</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td>Llama-3.1-70B (dense, GQA)</td>
+      <td>70B</td>
+      <td><code class="language-plaintext highlighter-rouge">IQ3_XXS</code></td>
+      <td>8K</td>
+      <td>26.5 GiB</td>
+      <td>2.5 GiB</td>
+      <td>≈30.0 GiB</td>
+      <td>Roughly 2 GiB spare, worth about 6,500 more tokens of context</td>
+    </tr>
+    <tr>
+      <td>Qwen3-235B-A22B (MoE)</td>
+      <td>235B/22B</td>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code></td>
+      <td>N/A</td>
+      <td>~155-165 GB (napkin estimate)</td>
+      <td>N/A</td>
+      <td>~155-165 GB</td>
+      <td>No, needs a multi-GPU or big-RAM rig</td>
+    </tr>
+    <tr>
+      <td>DeepSeek-V3 (MoE + MLA)</td>
+      <td>671B/37B</td>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code>-equivalent</td>
+      <td>32K</td>
+      <td>~410.5 GB</td>
+      <td>~2.3 GB (MLA)</td>
+      <td>~413 GB</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td>DeepSeek-V3 (MoE + MLA)</td>
+      <td>671B/37B</td>
+      <td><code class="language-plaintext highlighter-rouge">IQ2_XXS</code></td>
+      <td>N/A</td>
+      <td>~199.8 GB</td>
+      <td>N/A</td>
+      <td>~200 GB</td>
+      <td>No, still exceeds a 128GB unified-memory box</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Same 70B dense model, three precisions (weights only, no KV cache): <code class="language-plaintext highlighter-rouge">Q4_K_M</code> ≈ 39.9 GiB · <code class="language-plaintext highlighter-rouge">Q8_0</code> ≈ 69.3 GiB · <code class="language-plaintext highlighter-rouge">FP16</code> ≈ 130 GiB, computed from the bits-per-weight ladder above, in the same GiB the table uses.</p>
+
+<p>MLA’s KV cache is dramatically smaller than GQA’s at the same context: roughly 68.6 KB/token for
+DeepSeek-V3 versus 192-328 KB/token for GQA models of comparable class, a 2.7-4.7× reduction.
+DokiDex’s own agent sessions measure 92-99% of each turn’s prefill served from prefix cache, which
+is why a local agent stack feels responsive despite resending its whole context every turn.</p>
+
+<p>Full treatment: <a href="/projects/dokidex/learn/naming/">Decoding model names</a> ·
+<a href="/projects/dokidex/learn/local/">Running models locally</a>.</p>
+
+<h2 id="closed-weight-models">Closed-weight models</h2>
+
+<p>As of July 2026. Every Anthropic price row, deprecation date, and MoE pair independently
+re-verified. Treat any per-token comparison across tokenizer generations with caution. Claude 4.7+
+models use a tokenizer producing roughly 30% more tokens for the same text than earlier Claude
+generations.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Vendor</th>
+      <th>Model</th>
+      <th>Context</th>
+      <th>Max output</th>
+      <th>Reasoning</th>
+      <th>Price in/out per MTok</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Fable 5</td>
+      <td>1M</td>
+      <td>128K</td>
+      <td>Adaptive, always-on</td>
+      <td>$10 / $50</td>
+    </tr>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Opus 5</td>
+      <td>1M</td>
+      <td>128K</td>
+      <td>Adaptive (toggle)</td>
+      <td>$5 / $25</td>
+    </tr>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Sonnet 5</td>
+      <td>1M</td>
+      <td>128K</td>
+      <td>Adaptive</td>
+      <td>$3 / $15 (intro $2/$10 thru Aug 31, 2026)</td>
+    </tr>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Haiku 4.5</td>
+      <td>200K</td>
+      <td>N/A</td>
+      <td>Extended thinking only</td>
+      <td>$1 / $5</td>
+    </tr>
+    <tr>
+      <td>OpenAI</td>
+      <td>GPT-5.6 Sol</td>
+      <td>1.05M</td>
+      <td>128K</td>
+      <td>Configurable effort</td>
+      <td>$5 / $30</td>
+    </tr>
+    <tr>
+      <td>OpenAI</td>
+      <td>GPT-5.6 Terra</td>
+      <td>1.05M</td>
+      <td>128K</td>
+      <td>Configurable effort</td>
+      <td>$2.50 / $15</td>
+    </tr>
+    <tr>
+      <td>OpenAI</td>
+      <td>GPT-5.6 Luna</td>
+      <td>1.05M</td>
+      <td>128K</td>
+      <td>Configurable effort</td>
+      <td>$1 / $6</td>
+    </tr>
+    <tr>
+      <td>OpenAI</td>
+      <td>GPT-5.4 nano</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>Configurable effort</td>
+      <td>$0.20 / $1.25</td>
+    </tr>
+    <tr>
+      <td>Google</td>
+      <td>Gemini 3.1 Pro Preview</td>
+      <td>1,048,576</td>
+      <td>N/A</td>
+      <td>Thinking capability</td>
+      <td>$2-$4 in / $12-$18 out</td>
+    </tr>
+    <tr>
+      <td>Google</td>
+      <td>Gemini 3.5 Flash</td>
+      <td>1,048,576</td>
+      <td>N/A</td>
+      <td>Thinking capability</td>
+      <td>$1.50 / $9.00</td>
+    </tr>
+    <tr>
+      <td>Google</td>
+      <td>Gemini 3.1 Flash-Lite</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>Unconfirmed</td>
+      <td>$0.25 / $1.50</td>
+    </tr>
+    <tr>
+      <td>xAI</td>
+      <td>Grok 4.5</td>
+      <td>500K</td>
+      <td>N/A</td>
+      <td>Text</td>
+      <td>$2-$4 in / $6-$12 out</td>
+    </tr>
+    <tr>
+      <td>xAI</td>
+      <td>Grok 4.3</td>
+      <td>1M</td>
+      <td>N/A</td>
+      <td>Text</td>
+      <td>$1.25-$2.50 in / $2.50-$5 out</td>
+    </tr>
+    <tr>
+      <td>Amazon</td>
+      <td>Nova Micro</td>
+      <td>128K</td>
+      <td>N/A</td>
+      <td>No</td>
+      <td>$0.035 / $0.14</td>
+    </tr>
+    <tr>
+      <td>Amazon</td>
+      <td>Nova Premier</td>
+      <td>1M</td>
+      <td>N/A</td>
+      <td>No</td>
+      <td>$2.50 / $12.50</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>A tier’s marketing name isn’t its independent score. Claude Opus 5 (61, Artificial Analysis
+Intelligence Index, max effort) outscores the more expensive Fable 5 (60). On that same index,
+Gemini 3.1 Pro (46) trails Grok 4.5 (54), while Nova Premier brings up the rear at 13, below the
+~19 median for comparable non-reasoning models.</p>
+
+<p>Full treatment: <a href="/projects/dokidex/learn/open-vs-closed/">Open vs. closed weights</a>.</p>
+
+<h2 id="open-weight-models">Open-weight models</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Org</th>
+      <th>Total</th>
+      <th>Active</th>
+      <th>Context</th>
+      <th>Licence</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Qwen3-235B-A22B</td>
+      <td>Alibaba</td>
+      <td>235B</td>
+      <td>22B</td>
+      <td>256K-1M (2507 refresh)</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>Qwen3-30B-A3B</td>
+      <td>Alibaba</td>
+      <td>30B</td>
+      <td>3B</td>
+      <td>256K-1M</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>Qwen3-Coder-480B-A35B</td>
+      <td>Alibaba</td>
+      <td>480B</td>
+      <td>35B</td>
+      <td>256K (1M via YaRN)</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>DeepSeek-V3 / R1</td>
+      <td>DeepSeek</td>
+      <td>671B</td>
+      <td>37B</td>
+      <td>128K</td>
+      <td>MIT</td>
+    </tr>
+    <tr>
+      <td>DeepSeek-V4-Pro</td>
+      <td>DeepSeek</td>
+      <td>1.6T (card) / 862B (HF badge, unreconciled)</td>
+      <td>49B</td>
+      <td>1M</td>
+      <td>MIT</td>
+    </tr>
+    <tr>
+      <td>DeepSeek-R1-Distill-Qwen-32B</td>
+      <td>DeepSeek, on a Qwen2.5 base</td>
+      <td>32B</td>
+      <td>N/A</td>
+      <td>~32-131K</td>
+      <td><code class="language-plaintext highlighter-rouge">mit</code> (HF tag)</td>
+    </tr>
+    <tr>
+      <td>Llama 4 Maverick</td>
+      <td>Meta</td>
+      <td>400B</td>
+      <td>17B</td>
+      <td>1M</td>
+      <td>Llama 4 Community License</td>
+    </tr>
+    <tr>
+      <td>Llama 4 Scout</td>
+      <td>Meta</td>
+      <td>109B</td>
+      <td>17B</td>
+      <td>10M (marketing figure, not independently demonstrated)</td>
+      <td>Llama 4 Community License</td>
+    </tr>
+    <tr>
+      <td>Mistral Large 3</td>
+      <td>Mistral AI</td>
+      <td>675B</td>
+      <td>41B</td>
+      <td>256K</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>Ministral 8B</td>
+      <td>Mistral AI</td>
+      <td>8B</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>Mistral Research License: research only, not Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>Mistral Nemo</td>
+      <td>Mistral AI</td>
+      <td>12B</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>gpt-oss-120b</td>
+      <td>OpenAI</td>
+      <td>117B</td>
+      <td>5.1B</td>
+      <td>128K</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>gpt-oss-20b</td>
+      <td>OpenAI</td>
+      <td>21B</td>
+      <td>3.6B</td>
+      <td>128K</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>GLM-4.6</td>
+      <td>Z.ai (Zhipu)</td>
+      <td>357B</td>
+      <td>~32B (secondary estimate, not on the card)</td>
+      <td>200K</td>
+      <td>MIT</td>
+    </tr>
+    <tr>
+      <td>GLM-5.2</td>
+      <td>Z.ai (Zhipu)</td>
+      <td>753B</td>
+      <td>undisclosed</td>
+      <td>1M</td>
+      <td>MIT</td>
+    </tr>
+    <tr>
+      <td>Kimi K2.6</td>
+      <td>Moonshot AI</td>
+      <td>1T</td>
+      <td>32B</td>
+      <td>256K</td>
+      <td>Modified MIT</td>
+    </tr>
+    <tr>
+      <td>MiniMax-M2</td>
+      <td>MiniMax</td>
+      <td>230B</td>
+      <td>10B</td>
+      <td>128K</td>
+      <td>Modified-MIT</td>
+    </tr>
+    <tr>
+      <td>MiniMax-M2.7</td>
+      <td>MiniMax</td>
+      <td>230B</td>
+      <td>10B</td>
+      <td>N/A</td>
+      <td>Non-commercial</td>
+    </tr>
+    <tr>
+      <td>Nemotron 3 Ultra</td>
+      <td>NVIDIA</td>
+      <td>550B</td>
+      <td>55B</td>
+      <td>1M</td>
+      <td>OpenMDW-1.1</td>
+    </tr>
+    <tr>
+      <td>Gemma 4 26B-A4B</td>
+      <td>Google</td>
+      <td>25.2B</td>
+      <td>3.8B</td>
+      <td>256K</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>OLMo 3 (32B)</td>
+      <td>AI2</td>
+      <td>32B</td>
+      <td>N/A (dense)</td>
+      <td>Long-context mid-training</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>Phi-4-reasoning-vision-15B</td>
+      <td>Microsoft</td>
+      <td>15B</td>
+      <td>N/A (dense)</td>
+      <td>16,384</td>
+      <td>MIT</td>
+    </tr>
+    <tr>
+      <td>Falcon-H1-34B</td>
+      <td>TII</td>
+      <td>34B</td>
+      <td>N/A (dense)</td>
+      <td>262K</td>
+      <td>Falcon-LLM License (Apache-2.0-based)</td>
+    </tr>
+    <tr>
+      <td>Granite 4.1 (30B)</td>
+      <td>IBM</td>
+      <td>30B</td>
+      <td>N/A (dense)</td>
+      <td>131,072</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>Command A+</td>
+      <td>Cohere</td>
+      <td>218B</td>
+      <td>25B</td>
+      <td>128K in / 64K out</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>Seed-OSS-36B</td>
+      <td>ByteDance</td>
+      <td>36B</td>
+      <td>N/A (dense)</td>
+      <td>512K</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>Hy3</td>
+      <td>Tencent</td>
+      <td>295B</td>
+      <td>21B</td>
+      <td>256K</td>
+      <td>Apache-2.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Notable newcomers: Ant Group’s <strong>Ling-2.6-1T</strong> (non-reasoning) / <strong>Ring-2.6-1T</strong> (reasoning), ~1T
+total / ~63B active, MIT, 262,144-token context (not the 1M sometimes quoted). Baidu’s <strong>ERNIE
+4.5</strong> is Apache-2.0, though its newer <strong>ERNIE 5.1</strong> flagship stays API-only. xAI’s <strong>Grok-1</strong> (314B,
+Apache-2.0) and <strong>Grok-2</strong> are open, though no Grok-2.5 weights repository exists despite public
+claims. AI21’s <strong>Jamba</strong> (94B/12B active) ships under its own “Jamba Open Model License”. Don’t
+assume Apache-2.0 equivalence without checking.</p>
+
+<p>The single best open-weight model (GLM-5.2, Intelligence Index 51) trails the single best closed
+model (Claude Opus 5, 61) by 10 points on that one composite index, as of July 2026, narrower than
+the roughly one-year, multi-benchmark lag Epoch AI documented in the Llama-3.1 era, though the
+<em>broader</em> open ecosystem beyond the single leader may still be falling further behind on that
+older reading.</p>
+
+<p>Full treatment: <a href="/projects/dokidex/learn/open-vs-closed/">Open vs. closed weights</a>.</p>
+
+<h2 id="benchmarks">Benchmarks</h2>
+
+<p>Looking for a straight recommendation rather than a table? <a href="/projects/dokidex/learn/benchmarks/#short-answer">The short answer</a> gives picks by task, with the evidence behind each one and an explicit list of the questions nobody can currently answer.</p>
+
+<p>As of July 2026, leaderboards move. Check the live page before repeating a number from here.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Benchmark</th>
+      <th>What it measures</th>
+      <th>Live leaderboard</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SWE-bench Verified</td>
+      <td>Real GitHub issue → patch, scored by the repo’s own test suite (500-problem hand-filtered subset)</td>
+      <td><a href="https://www.vals.ai/benchmarks/swebench">vals.ai</a> (independent)</td>
+    </tr>
+    <tr>
+      <td>SWE-bench Pro</td>
+      <td>Harder, larger, partly non-public repo patching (1,865 problems, 41 repos): read the split before quoting</td>
+      <td><a href="https://labs.scale.com/leaderboard/swe_bench_pro_public">Scale AI public split</a></td>
+    </tr>
+    <tr>
+      <td>Terminal-Bench 2.x</td>
+      <td>Agent operating a real sandboxed terminal (sysadmin/security/ML tasks), severely scaffold-sensitive</td>
+      <td><a href="https://www.tbench.ai/">tbench.ai</a></td>
+    </tr>
+    <tr>
+      <td>LiveCodeBench</td>
+      <td>Date-filtered competitive programming, contamination-resistant by design</td>
+      <td><a href="https://llm-stats.com/benchmarks/livecodebench">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>Aider polyglot</td>
+      <td>Multi-language edit-format coding pass rate, stale since Nov 2025, historical only</td>
+      <td><a href="https://aider.chat/docs/leaderboards/">aider.chat/docs/leaderboards</a></td>
+    </tr>
+    <tr>
+      <td>HumanEval / MBPP</td>
+      <td>Retired: saturated and contaminated Python coding, no current leaderboard worth citing</td>
+      <td>background only</td>
+    </tr>
+    <tr>
+      <td>GPQA Diamond</td>
+      <td>PhD-vetted, “Google-proof” science multiple choice, near-ceiling, above the human baseline</td>
+      <td><a href="https://llm-stats.com/benchmarks/gpqa-diamond">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>AIME 2025</td>
+      <td>Olympiad math, integer answers, fully saturated, five models at 100%</td>
+      <td><a href="https://llm-stats.com/benchmarks/aime-2025">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>HMMT</td>
+      <td>The “next AIME” once a given year saturates</td>
+      <td>Not located this session: treat any 2026 score as unverified</td>
+    </tr>
+    <tr>
+      <td>FrontierMath</td>
+      <td>Unpublished, research-level math problems, private set</td>
+      <td><a href="https://epoch.ai/benchmarks/frontiermath">Epoch AI</a> · <a href="https://llm-stats.com/benchmarks/frontiermath">llm-stats.com</a> (trust the table, not the prose)</td>
+    </tr>
+    <tr>
+      <td>Humanity’s Last Exam</td>
+      <td>The hardest broad knowledge+reasoning test currently public: sources disagree by 15-20+ points</td>
+      <td><a href="https://agi.safe.ai/">agi.safe.ai</a> (official) · <a href="https://llm-stats.com/benchmarks/humanitys-last-exam">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>ARC-AGI-1</td>
+      <td>Retired: static puzzle generalization, saturated by its own creators</td>
+      <td><a href="https://arcprize.org/blog/oai-o3-pub-breakthrough">ARC Prize write-up</a></td>
+    </tr>
+    <tr>
+      <td>ARC-AGI-2</td>
+      <td>Harder static puzzle generalization, still active</td>
+      <td><a href="https://arcprize.org/">arcprize.org</a></td>
+    </tr>
+    <tr>
+      <td>ARC-AGI-3</td>
+      <td>Interactive, continuous-learning agent evaluation, scored across time</td>
+      <td><a href="https://arcprize.org/arc-agi/3">arcprize.org/arc-agi/3</a></td>
+    </tr>
+    <tr>
+      <td>MMLU-Pro</td>
+      <td>Broad knowledge, 10-option harder successor to MMLU, still discriminating</td>
+      <td><a href="https://llm-stats.com/benchmarks/mmlu-pro">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>MMMU / MMMU-Pro</td>
+      <td>Multimodal college-level reasoning across charts/diagrams/structures</td>
+      <td><a href="https://llm-stats.com/benchmarks/mmmu">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>tau-bench / tau2-bench</td>
+      <td>Multi-turn tool use with a simulated user: read the pass^k column for reliability</td>
+      <td><a href="https://llm-stats.com/benchmarks/tau-bench">llm-stats.com</a> (variant unclear)</td>
+    </tr>
+    <tr>
+      <td>BFCL</td>
+      <td>Function/tool-call correctness via AST comparison, sound method, unverifiable scraped numbers</td>
+      <td><a href="https://gorilla.cs.berkeley.edu/leaderboard.html">official, JS-rendered</a>, open it live</td>
+    </tr>
+    <tr>
+      <td>LMArena / Arena.ai</td>
+      <td>Human pairwise preference Elo, style, not correctness</td>
+      <td><a href="https://arena.ai/leaderboard/text">arena.ai/leaderboard/text</a></td>
+    </tr>
+    <tr>
+      <td>Artificial Analysis Intelligence Index</td>
+      <td>Composite of 9 evaluations, cost overlaid</td>
+      <td><a href="https://artificialanalysis.ai/models">artificialanalysis.ai/models</a></td>
+    </tr>
+    <tr>
+      <td>Vals Index</td>
+      <td>An independent org’s own composite, not vendor self-report</td>
+      <td><a href="https://www.vals.ai/">vals.ai</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Before repeating any score, ask: which effort tier, tools on or off, single attempt or best-of-n,
+which split, is the harness named, and is it independently re-run or vendor self-reported.</p>
+
+<p>Full treatment: <a href="/projects/dokidex/learn/benchmarks/">Benchmarks: how to read an AI score honestly</a>.</p>
+
+<h2 id="coding-agents">Coding agents</h2>
+
+<p>A cell reading <strong>“Not confirmed”</strong> below is a gap in this pass’s research, not a finding that the
+tool lacks the feature. Don’t read it as “no.”</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Tool</th>
+      <th>Surface</th>
+      <th>Models</th>
+      <th>MCP</th>
+      <th>Pricing model</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Claude Code</td>
+      <td>Terminal, IDE ext., SDK</td>
+      <td>Anthropic only (Opus/Sonnet/Haiku)</td>
+      <td>Yes, client + server</td>
+      <td>Pro bundles it. Code seats $100+/mo. API metered</td>
+    </tr>
+    <tr>
+      <td>OpenAI Codex CLI</td>
+      <td>Terminal, IDE ext., cloud</td>
+      <td>GPT-5.x-Codex, or any OpenAI model via key</td>
+      <td>Yes, destructive-call gating</td>
+      <td>Free/Go $8/Plus $20/Pro $100, or per-token</td>
+    </tr>
+    <tr>
+      <td>GitHub Copilot</td>
+      <td>IDE ext., CLI, cloud agent</td>
+      <td>Multi-vendor picker (GPT/Claude/Gemini)</td>
+      <td>Yes (CLI): cloud-agent firewall excludes MCP</td>
+      <td>Free/Pro $10/Pro+ $39/Max $100</td>
+    </tr>
+    <tr>
+      <td>Cursor</td>
+      <td>IDE (VS Code fork)</td>
+      <td>Multi-vendor + Cursor Tab</td>
+      <td>Yes, two-layer (connection + call)</td>
+      <td>Hobby free, Pro $20/Pro+ $60/Ultra $200</td>
+    </tr>
+    <tr>
+      <td>Windsurf (Cognition)</td>
+      <td>IDE fork, Cascade agent</td>
+      <td>Multi-model + Cognition’s SWE-1.5</td>
+      <td>Not confirmed</td>
+      <td>Free, Pro $20, Max $200</td>
+    </tr>
+    <tr>
+      <td>Cline</td>
+      <td>VS Code/JetBrains ext.</td>
+      <td>Any provider via key or OpenRouter</td>
+      <td>Yes, core differentiator</td>
+      <td>Free/OSS, pay only inference</td>
+    </tr>
+    <tr>
+      <td>Roo Code</td>
+      <td>VS Code ext. (Cline fork)</td>
+      <td>Multi-model via key</td>
+      <td>Yes (historical)</td>
+      <td>Discontinued May 2026</td>
+    </tr>
+    <tr>
+      <td>Aider</td>
+      <td>Terminal</td>
+      <td>Any via key or local Ollama</td>
+      <td>Not confirmed</td>
+      <td>Free/OSS (Apache-2.0), pay only inference</td>
+    </tr>
+    <tr>
+      <td>opencode</td>
+      <td>Terminal (TUI)</td>
+      <td>75+ providers via key</td>
+      <td>Yes, first-class, plus ACP</td>
+      <td>Free/OSS (MIT), pay only inference</td>
+    </tr>
+    <tr>
+      <td>Zed</td>
+      <td>IDE (native Rust)</td>
+      <td>Claude/GPT/Gemini/local via Ollama</td>
+      <td>Yes, Tools + Prompts only</td>
+      <td>Free (Personal), Pro $10, Business $30/seat</td>
+    </tr>
+    <tr>
+      <td>JetBrains Junie</td>
+      <td>IDE (IntelliJ) + CLI</td>
+      <td>GPT-5, Claude 4.5 Sonnet, Gemini 2.5 Pro built-in</td>
+      <td>Not confirmed</td>
+      <td>Free, Pro $10, Ultimate $30</td>
+    </tr>
+    <tr>
+      <td>Google Jules</td>
+      <td>Cloud async agent (GitHub)</td>
+      <td>Gemini 3.1 Pro (paid) / 3 Flash (free)</td>
+      <td>Not confirmed</td>
+      <td>Free (15 tasks/day), Pro $19.99, Ultra $124.99</td>
+    </tr>
+    <tr>
+      <td>Amp (Sourcegraph)</td>
+      <td>IDE ext. + CLI</td>
+      <td>Claude, GPT-5.x, Gemini 3</td>
+      <td>Not confirmed</td>
+      <td>Free tier, paid tiers unconfirmed</td>
+    </tr>
+    <tr>
+      <td>Devin (Cognition)</td>
+      <td>Cloud async agent (sandboxed VM)</td>
+      <td>Cognition’s SWE-1.6 + OpenAI/Claude/Gemini</td>
+      <td>Not confirmed</td>
+      <td>Free, Pro $20/seat, Max $200 (conflicting descriptions)</td>
+    </tr>
+    <tr>
+      <td>Replit Agent</td>
+      <td>Cloud IDE + agent</td>
+      <td>Undisclosed tier names</td>
+      <td>Not confirmed</td>
+      <td>Free, Core $25/mo, Teams $40/user</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Every price is dated to July 2026. This market moves in weeks, not quarters. Of the three products
+on the full <a href="/projects/dokidex/learn/agents/">coding agents</a> page that were discontinued or
+replaced in the roughly 60 days before it was written (Roo Code, the original Gemini CLI, Windsurf’s
+first credit system), only Roo Code appears as its own row here.</p>
+
+<p>Full treatment: <a href="/projects/dokidex/learn/agents/">Coding agents</a>.</p>
+
+<h2 id="glossary-and-where-to-go-next">Glossary and where to go next</h2>
+
+<p>Most terms used tersely above (<code class="language-plaintext highlighter-rouge">MoE</code>, <code class="language-plaintext highlighter-rouge">KV cache</code>, <code class="language-plaintext highlighter-rouge">RLHF</code>, <code class="language-plaintext highlighter-rouge">context window</code>, and the rest) get a
+full definition on the <a href="/projects/dokidex/glossary/">glossary</a>. A handful of single-use naming
+tokens in the decoder table (<code class="language-plaintext highlighter-rouge">Rerank</code>, <code class="language-plaintext highlighter-rouge">Guard</code>, <code class="language-plaintext highlighter-rouge">Omni</code>, and similar) don’t yet have their own entry.</p>
+
+<p>If a table above raised a question this page didn’t answer:</p>
+
+<ul class="card-grid">
+  <li><a class="card" href="/projects/dokidex/learn/naming/">
+    <span class="card-kicker">Reference</span>
+    <span class="card-title">Decoding model names</span>
+    <span class="card-desc">Full component-by-component grammar, ten real strings parsed end to end.</span>
+  </a></li>
+  <li><a class="card" href="/projects/dokidex/learn/local/">
+    <span class="card-kicker">Level 3</span>
+    <span class="card-title">Running models locally</span>
+    <span class="card-desc">The VRAM arithmetic worked in full, runtime tradeoffs, prefix caching.</span>
+  </a></li>
+  <li><a class="card" href="/projects/dokidex/learn/open-vs-closed/">
+    <span class="card-kicker">Level 3</span>
+    <span class="card-title">Open vs. closed weights</span>
+    <span class="card-desc">Licence-by-licence detail and the reasoning-ceiling gap, quantified.</span>
+  </a></li>
+  <li><a class="card" href="/projects/dokidex/learn/benchmarks/">
+    <span class="card-kicker">Level 3</span>
+    <span class="card-title">Benchmarks, honestly</span>
+    <span class="card-desc">Why the same benchmark name produces wildly different numbers.</span>
+  </a></li>
+  <li><a class="card" href="/projects/dokidex/models/">
+    <span class="card-kicker">The serving stack</span>
+    <span class="card-title">The models DokiDex runs</span>
+    <span class="card-desc">Why Qwen3-Coder-30B-A3B [128k] (Coding, Light) has the daily-driver seat, and what's parked and why.</span>
+  </a></li>
+  <li><a class="card" href="/projects/dokidex/local-cli/">
+    <span class="card-kicker">The terminal agents</span>
+    <span class="card-title">Run the CLIs locally</span>
+    <span class="card-desc">Claude Code and Copilot on your own GPU: setup, model seating, troubleshooting.</span>
+  </a></li>
+</ul>
+
+    </article>
+
+    
+    <nav class="pager" aria-label="Page navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/state-of-ai/">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">State of AI, 2026</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/glossary/">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">Glossary</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="site-footer">
+  <div class="footer-main">
+    <p class="footer-line">
+      <strong>DokiDex</strong> v0.62.0:
+      a fully-local AI stack, and a field guide to the machines it runs on.
+    </p>
+    <p class="footer-line footer-dim">
+      Everything on this site is written against the real tree and the measured record. Where a
+      claim is a number, it was measured or sourced. Where it was a judgment call, the reasoning
+      is stated inline. Stale statements are bugs. File them like bugs.
+    </p>
+  </div>
+
+  <div class="footer-links">
+    <a href="/projects/dokidex/local-cli/">Run the CLIs</a>
+    <a href="/projects/dokidex/handbook/">Handbook</a>
+    <a href="/projects/dokidex/reference/">Quick reference</a>
+    <a href="/projects/dokidex/glossary/">Glossary</a>
+    <!-- Deliberately understated: last item in the row, same weight as the rest, no colour,
+         no badge, no image beacon. The ask was "inconspicuous". -->
+    <a class="footer-kofi" href="https://ko-fi.com/dougfessler" rel="noopener">Buy me a coffee</a>
+  </div>
+</footer>
+
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/dokidex.js"></script>
+</body>
+</html>

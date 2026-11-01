@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Big Picture · DokiDex Handbook</title>
+<meta name="description" content="One machine, one GPU, one resident model. What runs where, and the budget that shapes all of it.">
+
+<!-- Marcellus (power word) · Kanit incl. italics 500-700 (headings/kickers/nav) ·
+     IBM Plex Mono 400/500 (code, stats) · Figtree 300-600 (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/site.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle chapter nav">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/handbook/">DokiDex Handbook</a>
+    <a class="topbar-up" href="/projects/dokidex/">&larr; DokiDex</a>
+  </header>
+
+  <nav class="sidebar" aria-label="Handbook chapters">
+    <a class="sidebar-title" href="/projects/dokidex/handbook/">DokiDex Handbook</a>
+    <ol class="nav-list">
+      
+      
+      <li class="nav-item">
+        <a class="nav-link is-active" href="/projects/dokidex/handbook/01-big-picture.html">
+          <span class="nav-kicker">:: THE FOUNDRY</span>
+          <span class="nav-title">The Big Picture</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/03-serving.html">
+          <span class="nav-kicker">:: THE FORGE</span>
+          <span class="nav-title">Serving Local Models</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/04-tools-and-safety.html">
+          <span class="nav-kicker">:: THE GATE</span>
+          <span class="nav-title">Tools, Permissions, Safety</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/07-evals.html">
+          <span class="nav-kicker">:: THE PROOF</span>
+          <span class="nav-title">Evals & the Parity Ledger</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/08-references.html">
+          <span class="nav-kicker">:: THE CODEX</span>
+          <span class="nav-title">References & Study Path</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/09-capabilities.html">
+          <span class="nav-kicker">:: THE ARSENAL</span>
+          <span class="nav-title">Capabilities</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/10-direction.html">
+          <span class="nav-kicker">:: THE COMPASS</span>
+          <span class="nav-title">Direction</span>
+        </a>
+      </li>
+      
+    </ol>
+  </nav>
+
+  <main class="main">
+    <div class="hero reveal-up">
+      <canvas class="token-stream" aria-hidden="true"></canvas>
+      <div class="hero-inner">
+        <p class="kicker">:: THE FOUNDRY</p>
+        <p class="power-word">FOUNDRY</p>
+        <h1 class="hero-title">The Big Picture</h1>
+        <p class="hero-desc">One machine, one GPU, one resident model. What runs where, and the budget that shapes all of it.</p>
+      </div>
+    </div>
+
+    <article id="content" class="prose">
+      <p>DokiDex is a <strong>Claude-Code-class AI stack that runs entirely on one machine</strong>: an RTX 5090
+(32 GB VRAM), 64 GB DDR5, Windows 11 native, with no Docker, no WSL, and no cloud AI at runtime. It does
+agentic coding, editor autocomplete, codebase search over local embeddings, and web search.
+Prompts and outputs never leave the box.</p>
+
+<p>If you’ve spent your career inside Unreal, here’s the frame that makes the rest of this handbook
+land: DokiDex is <strong>an engine, an editor, and a build farm for intelligence instead of rendering</strong>.
+There’s a runtime that executes the expensive core work (the inference engine), a set of
+authored assets it loads (the models), tooling surfaces that drive it (a CLI, the stock Claude Code
+and Copilot clients, your IDE), and a budget that dictates the entire architecture (VRAM, the way
+frame time dictates yours).</p>
+
+<h2 id="the-one-rule-that-shapes-everything">The one rule that shapes everything</h2>
+
+<p>32 GB of VRAM holds one seat at a time. Every GPU-resident service belongs to the <code class="language-plaintext highlighter-rouge">llm</code> group, and
+llama-swap evicts whatever is resident the moment a request names a different model. The CPU-only
+embedder costs the card nothing and runs throughout. A small GPU sidecar used to fit in the margin
+beside the seat too, and since 2026-08-26 it does not: the seat’s 256k window and its draft head
+take the margin.</p>
+
+<p>Until 2026-09-02 there was a second group. The image and video models lived in a <code class="language-plaintext highlighter-rouge">media</code> group that
+was mutually exclusive with <code class="language-plaintext highlighter-rouge">llm</code>, and switching between them was a hard mode switch, like
+exclusive fullscreen. That half of the stack is gone (see <code class="language-plaintext highlighter-rouge">archive.md</code>), which removed the switch
+but not the budget underneath it.</p>
+
+<p>That budget is what every architectural choice downstream is playing out. Which models are in the
+roster, why model swaps are a first-class operation, why a 256k window is a decision rather than a
+setting.
+Treat it the way you treat the frame budget: not a limitation to grumble about, but the design
+constraint that makes the system honest.</p>
+
+<h2 id="the-stack-top-to-bottom">The stack, top to bottom</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  you ──► Claude Code CLI · Copilot CLI · crush / opencode · your editor (llama.vscode)
+           │
+           │  OpenAI-compatible HTTP (chat completions + tools)
+           ▼
+  llama-swap :8080 ── one endpoint, hot-swaps llama.cpp server processes per model id
+           │
+           ├── the roster: Qwen3-Coder-30B · gpt-oss-120b · Qwen3-Coder-30B(32k) · Qwen3-VL-8B ·
+           │   Qwen3-VL-32B · Autocomplete · Embeddings
+           │   (each a GGUF model + a tuned llama-server command line)
+           ▼
+  llama.cpp llama-server ── the inference engine (native Windows CUDA build)
+           ▼
+  RTX 5090 32 GB · 64 GB DDR5
+</code></pre></div></div>
+
+<p>Alongside the seat: <strong>FIM autocomplete</strong> (<code class="language-plaintext highlighter-rouge">:8012</code>) and <strong>embeddings for code RAG</strong> (<code class="language-plaintext highlighter-rouge">:8090</code>), which
+runs CPU-only and so costs the card nothing. The whole fleet is managed by <code class="language-plaintext highlighter-rouge">doki.ps1</code>, a
+data-driven, docker-compose-shaped control plane with no Docker: services are entries in a
+<code class="language-plaintext highlighter-rouge">$Services</code> hashtable (launch script, health URL, GPU group, VRAM estimate), and profiles are
+named sets of those.</p>
+
+<h2 id="the-three-surfaces">The three surfaces</h2>
+
+<p>The same local brain is reachable three ways, and knowing which is which matters because two of
+them are <em>independent implementations</em>:</p>
+
+<ul>
+  <li><strong>The real vendor CLIs</strong> are the terminal agents. Anthropic’s Claude Code and GitHub’s Copilot
+CLI, both unmodified, pointed at <code class="language-plaintext highlighter-rouge">:8080</code> by thin launchers. <code class="language-plaintext highlighter-rouge">llama-server</code> implements the
+Anthropic Messages API natively, so nothing translates between the client and the model.
+DokiDex shipped its own C++17 agent here until 2026-09-02, tracked against a generated parity
+ledger. It was removed in favour of the real clients (see <code class="language-plaintext highlighter-rouge">archive.md</code>).</li>
+  <li><strong>Third-party harnesses</strong> (crush, opencode) drive the same endpoint from generated configs, so a
+model row cannot drift out of a client menu.</li>
+  <li><strong>Your editor</strong> reaches the FIM autocomplete sidecar on <code class="language-plaintext highlighter-rouge">:8012</code>, which is a different job from an
+agent turn and runs on a much smaller model.</li>
+</ul>
+
+<h2 id="why-local-and-what-it-costs">Why local, and what it costs</h2>
+
+<p>The trade is explicit and worth stating in gamedev terms. A frontier cloud model is a render farm:
+more capable per query than anything a single card can hold, but metered, remote, and reading your
+source. The local stack is your dev machine: a fixed capital cost, zero marginal cost per token,
+full privacy, no rate limits, works offline, running models that are genuinely good but not
+frontier. DokiDex’s bet is that <strong>a well-harnessed 30B beats a badly-harnessed frontier model for
+day-to-day coding work</strong>, and the harness is where the engineering went: grammar-constrained tool
+calls, prompt-cache-aware serving, eval-gated model selection, and a permission system that makes
+an imperfect model safe to run with real hands on your working tree.</p>
+
+<p>Two numbers to calibrate against. The daily-driver coder streams at <strong>~230 to 265 tok/s</strong>. The
+heavy planner, a 120B-parameter model that shouldn’t fit in 32 GB at all, runs at <strong>~27 tok/s</strong>
+by parking most of its weights in system RAM (chapter 3 explains the MoE trick that makes that
+usable rather than a slideshow).</p>
+
+<h2 id="the-discipline-underneath">The discipline underneath</h2>
+
+<p>Three habits run through every subsystem, and you’ll see them in every chapter:</p>
+
+<ul>
+  <li><strong>Eval-gated adoption.</strong> No model, quant, or serving flag ships on vibes. Candidates run a
+26-task golden eval suite, 8 of them Unreal-specific C++ tasks covering delegate wiring, UCLASS
+boilerplate, and Build.cs dependencies. The results ledger decides. Several shiny candidates
+measured <em>worse</em> and were rejected. The rejections are documented with the same care as the
+adoptions (chapter 7).</li>
+  <li><strong>Honesty as a feature.</strong> DokiDex’s own agent used to generate a parity ledger by probing its
+real binary: partial implementations were annotated with exactly what was missing, and
+deliberate divergences were named as deliberate. That ledger went with the agent on 2026-09-02,
+and the same discipline now lives in the golden-suite machinery chapter 7 covers. When a metric
+and reality disagree, the metric gets fixed, not the annotation.</li>
+  <li><strong>The smallest change that solves it.</strong> The repo’s standing rule for agents and humans alike.
+It’s why the architecture reads as a set of small, single-purpose seams rather than a
+framework.</li>
+</ul>
+
+<p>Next: the serving layer that turns one GPU into the roster this chapter described, and the tricks
+that make a 120B-parameter model fit in 32 GB at all.</p>
+
+    </article>
+
+    
+    
+    
+    
+
+    
+    <nav class="chapter-pager" aria-label="Chapter navigation">
+      
+      <span class="pager-link pager-empty"></span>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/handbook/03-serving.html">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">Serving Local Models</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="statusline">
+      <span>DokiDex Handbook</span>
+      <span class="statusline-sep">&middot;</span>
+      <span>The Big Picture</span>
+      <span class="statusline-sep">&middot;</span>
+      <span>generated from docs/site/handbook, DokiDex v0.62.0</span>
+    </footer>
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/foundry.js"></script>
+</body>
+</html>

@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foundations · DokiDex</title>
+<meta name="description" content="What a model actually is, why tokens aren't words, why the context window isn't memory, and why models hallucinate: the mechanics behind every chatbot, explained from zero.">
+
+<!-- Open Graph / Twitter, hand-rolled: jekyll-seo-tag is not available under the pinned
+     github-pages gem set used by actions/jekyll-build-pages. -->
+<meta property="og:site_name" content="DokiDex">
+<meta property="og:title" content="Foundations">
+<meta property="og:description" content="What a model actually is, why tokens aren't words, why the context window isn't memory, and why models hallucinate: the mechanics behind every chatbot, explained from zero.">
+<meta property="og:type" content="website">
+<!-- site_origin rather than absolute_url: see the comment in _config.yml. absolute_url would
+     emit http:// here, because the Pages API reports an http html_url while Enforce HTTPS is off. -->
+<meta property="og:url" content="https://dougfessler.com/projects/dokidex/learn/basics/">
+<link rel="canonical" href="https://dougfessler.com/projects/dokidex/learn/basics/">
+<!-- `summary`, not `summary_large_image`: no og:image or twitter:image is emitted anywhere on
+     this site, and the large-image card renders as a blank rectangle without one. Switch this back
+     the same day a 1200x630 share asset lands, not before. -->
+<meta name="twitter:card" content="summary">
+
+<!-- Same four families as the handbook, so the two halves of the site read as one product:
+     Marcellus (power words) · Kanit (headings, kickers, nav) · IBM Plex Mono (code, stats) ·
+     Figtree (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/dokidex.css">
+<link rel="icon" href="/projects/dokidex/assets/favicon.svg" type="image/svg+xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<!-- `wide: true` in a page's front matter opts it into --content-w-wide (assets/dokidex.css:51).
+     The CSS keys off `.page-wide` on an ancestor. Without the class emitted here the front-matter
+     flag silently does nothing. -->
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<!-- CSS-only nav toggle. A checkbox beats a JS drawer here: the nav has to work on the mobile
+     read where the reader has scrolled 4000px into a reference table, and a checkbox cannot
+     desync from its own state the way a JS flag can. -->
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/">DokiDex</a>
+    <a class="topbar-cta" href="/projects/dokidex/download/"><svg class="dl-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><g class="dl-arrow"><path d="M8 2.2v6.5"/><path d="M5.2 5.9 8 8.7l2.8-2.8"/></g><path class="dl-tray" d="M3.2 11.3v2.5h9.6v-2.5"/></svg>
+Download</a>
+  </header>
+
+  <!-- Grouped navigation, driven by site.nav in _config.yml.
+
+     A page is "current" when its url matches exactly. The handbook is the one entry that also
+     needs to light up for its children (/handbook/03-serving.html), so it gets a prefix test —
+     without it, the sidebar would show nothing selected the moment a reader steps into a
+     chapter, which reads as "you have left the site". -->
+<nav class="sidebar" aria-label="Site sections">
+  <a class="sidebar-brand" href="/projects/dokidex/">
+    <span class="sidebar-mark" aria-hidden="true">&#9612;&#9608;&#9608;&#9616;</span>
+    <span class="sidebar-brand-text">DokiDex</span>
+  </a>
+
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Start</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/"
+             >Overview</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Use DokiDex</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/local-cli/"
+             >Run the CLIs locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/download/"
+             >Download the launchers</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/models/"
+             >Models it runs</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/games/"
+             >Games the models built</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/telemetry/"
+             >Performance data</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/qwen38/"
+             >Qwen3.8-27B, measured</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/architecture/"
+             >How it's built</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Learn AI</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/"
+             >Where to start</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link is-active"
+             href="/projects/dokidex/learn/basics/"
+             aria-current="page">1 · Foundations</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/core/"
+             >2 · How models work</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/advanced/"
+             >3 · Advanced</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/naming/"
+             >Decoding model names</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/open-vs-closed/"
+             >Open vs closed weights</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/benchmarks/"
+             >Benchmarks</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/local/"
+             >Running models locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/agents/"
+             >Coding agents</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Context</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/state-of-ai/"
+             >State of AI, 2026</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/reference/"
+             >Quick reference</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/glossary/"
+             >Glossary</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Deep dive</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/handbook/"
+             >The Handbook</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+</nav>
+
+
+  <main class="main">
+    <div class="page-head">
+      <p class="kicker">:: TIER 1 · FOUNDATIONS</p>
+      <h1 class="page-title">Foundations</h1>
+      <p class="page-desc">What a model actually is, why tokens aren't words, why the context window isn't memory, and why models hallucinate: the mechanics behind every chatbot, explained from zero.</p>
+      
+      <p class="level-badges">
+        <span class="level-badge level-beginner">Beginner</span>
+      </p>
+      
+    </div>
+
+    <article id="content" class="prose">
+      <p>This page assumes nothing except that you’ve typed a message to a chatbot at some point. No
+math beyond arithmetic, no code. By the end you should be able to explain, correctly, what
+happens between you pressing Enter and text appearing on the screen, and why several of the
+things most people believe about that process are wrong in specific, useful-to-know ways.</p>
+
+<p>Each section below gives you the correct one-line definition, the misconception it replaces, and
+an analogy, including where the analogy stops being accurate. That last part matters as much as
+the analogy itself: a metaphor that’s wrong only 10% of the time is exactly the 10% that gets
+people in trouble later.</p>
+
+<h2 id="what-a-model-actually-is">What a model actually is</h2>
+
+<p><strong>A trained model is a large set of fixed numbers (weights) that turns an input into an output
+through repeated arithmetic, learned from data rather than written by a programmer.</strong> Nothing more
+mysterious than that sits underneath. There’s no sentence-retrieval engine, no indexed archive of
+everything it read.</p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> “The model looks things up in a database of things it was trained on.”
+There’s no retrievable copy of the training text sitting inside the weights. Nor is a model
+some kind of compressed search index. It typically can’t reproduce most of what it was trained
+on word-for-word.</p>
+</blockquote>
+
+<p>The best analogy: a model is like a student who read millions of books, closed every one of them,
+and now answers from a compressed <em>sense</em> of the patterns those books contained, not by flipping
+back to a remembered page. Where this breaks: a student can say “I don’t actually remember that
+one,” a calibrated admission of uncertainty spoken out loud. A model does compute a probability for
+every token it produces, and a pretrained model’s raw probabilities tend to be reasonably well
+calibrated. But it has no reliably-verbalized, separately reported confidence signal. The later
+RLHF fine-tuning stage that turns it into a helpful chatbot is well documented to degrade that
+calibration further. That gap between what the model computes and what it actually says is exactly
+what causes hallucination, covered later on this page.</p>
+
+<figure>
+<svg viewBox="0 0 720 292" role="img" aria-labelledby="dgm-model-title dgm-model-desc">
+<title id="dgm-model-title">What a model is: weights, not an archive</title>
+<desc id="dgm-model-desc">Input text flows into a box of frozen weight numbers and out as output
+text. A separate filing-cabinet icon, representing a searchable archive of training text, is
+crossed out beside it.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="276" rx="3" />
+<text class="dgm-title" x="28" y="38">A model at inference time</text>
+<rect class="dgm-panel" x="36" y="80" width="120" height="60" rx="3" />
+<text class="dgm-label" x="96" y="115" text-anchor="middle">Input text</text>
+<path class="dgm-flow" d="M156 110 L246 110" />
+<rect class="dgm-panel" x="250" y="70" width="180" height="80" rx="3" />
+<text class="dgm-label" x="340" y="105" text-anchor="middle">Weights</text>
+<text class="dgm-label-sm" x="340" y="124" text-anchor="middle">(fixed numbers)</text>
+<path class="dgm-flow" d="M430 110 L520 110" />
+<rect class="dgm-panel" x="524" y="80" width="150" height="60" rx="3" />
+<text class="dgm-label" x="599" y="115" text-anchor="middle">Output text</text>
+<g transform="translate(250,178)">
+  <rect class="dgm-panel" x="0" y="0" width="90" height="60" rx="2" />
+  <line class="dgm-line" x1="8" y1="8" x2="82" y2="52" />
+  <line class="dgm-line" x1="82" y1="8" x2="8" y2="52" />
+  <text class="dgm-label-sm" x="45" y="76" text-anchor="middle">NOT a searchable</text>
+  <text class="dgm-label-sm" x="45" y="90" text-anchor="middle">training-text archive</text>
+</g>
+</svg>
+<figcaption><strong>The weights are the entire model.</strong> There's no separate lookup step,
+just one box of numbers turning input into output. What that box doesn't contain is a browsable
+copy of what it read.</figcaption>
+</figure>
+
+<h2 id="training-vs-inference-two-different-activities">Training vs. inference: two different activities</h2>
+
+<p><strong>Training is the rare, expensive process of adjusting weights against a huge dataset. Inference is
+the constant, cheap process of running those now-fixed weights on your specific input.</strong> These are
+different jobs, running at different times, usually on different hardware, and confusing them is
+where a lot of chatbot folklore comes from.</p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> “The model keeps learning from every conversation I have with it.” Standard
+deployed models don’t update their weights from your chats in real time. The weights are frozen
+the moment training finishes. What feels like “picking up on” something mid-conversation is the
+model conditioning on the growing text in front of it, not a weight change.</p>
+</blockquote>
+
+<p>Training is like carving a statue over months. Inference is the finished statue standing in a
+museum, reacting to the light in the room (your prompt) without re-carving itself every time
+someone walks by. The metaphor has a limit, though: the <em>company</em> behind the model does
+periodically go back and carve a new statue (a new model version) after a fresh training run. The
+statue itself never changes. The museum occasionally swaps it for a newer one.</p>
+
+<figure>
+<svg viewBox="0 0 720 240" role="img" aria-labelledby="dgm-trainer-title dgm-trainer-desc">
+<title id="dgm-trainer-title">Training versus inference</title>
+<desc id="dgm-trainer-desc">Split panel. Left: training, shown as weights actively being edited,
+labeled rare and expensive. Right: inference, shown as the same weights behind a padlock, labeled
+constant and cheap.</desc>
+<rect class="dgm-panel" x="8" y="8" width="340" height="224" rx="3" />
+<rect class="dgm-panel" x="372" y="8" width="340" height="224" rx="3" />
+<text class="dgm-title" x="28" y="40">Training</text>
+<text class="dgm-label-sm" x="28" y="60">rare · expensive · weights change</text>
+<rect class="dgm-panel" x="60" y="90" width="220" height="70" rx="3" />
+<text class="dgm-label" x="170" y="130" text-anchor="middle">Weights (being adjusted)</text>
+<path class="dgm-line" d="M80 170 q20 -10 40 0 t40 0 t40 0 t40 0" />
+<text class="dgm-label-sm" x="170" y="200" text-anchor="middle">gradient updates, over and over</text>
+<text class="dgm-title" x="392" y="40">Inference</text>
+<text class="dgm-label-sm" x="392" y="60">constant · cheap · weights frozen</text>
+<rect class="dgm-panel" x="424" y="90" width="220" height="70" rx="3" />
+<text class="dgm-label" x="534" y="130" text-anchor="middle">Weights (frozen)</text>
+<g transform="translate(514,150)">
+  <rect class="dgm-panel" x="0" y="6" width="40" height="30" rx="3" />
+  <path class="dgm-line" d="M8 6 v-10 a12 12 0 0 1 24 0 v10" />
+</g>
+<text class="dgm-label-sm" x="534" y="200" text-anchor="middle">same forward pass, every request</text>
+</svg>
+<figcaption><strong>Two different activities, two different economics.</strong> Whatever "learning"
+seems to happen mid-conversation is text in the context window, not a weight update. The padlock
+side of this diagram never opens during a normal chat.</figcaption>
+</figure>
+
+<h2 id="tokens-why-word-is-the-wrong-unit">Tokens: why “word” is the wrong unit</h2>
+
+<p><strong>Before a model ever sees your text, a tokenizer splits it into tokens, sub-word chunks produced
+by an algorithm (commonly byte-pair encoding, BPE) that merges the most frequent adjacent symbol
+pairs in its training corpus until it hits a fixed vocabulary size.</strong> <a href="https://en.wikipedia.org/wiki/Byte_pair_encoding">Byte-pair
+encoding</a> A token can be a whole common word, a
+fragment of a rarer one, a single character, or a punctuation mark, whichever chunk the merge
+process happened to settle on.</p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> “A token is a word,” or “a token is some fixed unit like a syllable.” Neither
+is right. GPT-3.5/GPT-4-era tokenizers use vocabularies on the order of 100,000 entries and build
+each token by applying their learned merge rules (in the order those rules were learned)
+repeatedly, starting from raw bytes, until no learned pair remains to merge. That’s greedy over
+merge rank, not over span length, which is why the same text can tokenize to a different <em>count</em>
+of tokens under a different tokenizer version. <a href="https://en.wikipedia.org/wiki/Byte_pair_encoding">Byte-pair
+encoding</a> Anthropic notes that its
+Claude Opus 4.7-and-later tokenizer generation produces roughly 30% more tokens than earlier
+tokenizers for identical text (a vendor-reported figure, as of July 2026). <a href="https://platform.claude.com/docs/en/about-claude/models/overview">Claude models
+overview</a></p>
+</blockquote>
+
+<p>Tokenization is like a printer’s type case: it has pre-cast pieces for common whole words (“the”,
+“ing”) but falls back to spelling rare words letter-by-letter from individual character pieces.
+Here’s the edge of the metaphor: each type-case piece has one fixed meaning by design. A token’s
+<em>meaning</em> to the model depends entirely on the surrounding tokens instead. It’s the model, not the
+tokenizer, that supplies context. Byte-level BPE (used since GPT-2) also operates on raw bytes
+rather than human-legible characters, which means a chunk boundary can land mid-character for
+non-Latin scripts. <a href="https://en.wikipedia.org/wiki/Byte_pair_encoding">Byte-pair encoding</a></p>
+
+<p>This is also a major reason “how many R’s are in strawberry”-style questions trip models up. Part
+of it is that the word typically arrives as just a handful of token chunks (the exact split is
+tokenizer-dependent: three chunks is common in GPT-4-era tokenizers), never as individual letters,
+so asking it to count letters asks it to introspect on a decomposition it was never given at the
+input stage. But that’s not the whole story: models can spell a word out letter-by-letter on
+request and still miscount, even with the letters already separated. So tokenization makes the
+task needlessly hard without being the entire explanation. <a href="https://en.wikipedia.org/wiki/Byte_pair_encoding">Byte-pair
+encoding</a>; <a href="https://huggingface.co/learn/llm-course/chapter6/5">Hugging Face LLM course,
+BPE</a></p>
+
+<figure>
+<svg viewBox="0 0 720 260" role="img" aria-labelledby="dgm-token-title dgm-token-desc">
+<title id="dgm-token-title">Text becomes tokens, tokens become ids</title>
+<desc id="dgm-token-desc">The word strawberry is split into two illustrative sub-word chunks by a
+tokenizer, then each chunk is mapped to an integer id from a vocabulary. The exact split point
+depends on the specific tokenizer in use.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="244" rx="3" />
+<text class="dgm-title" x="28" y="38">Tokenization (illustrative — exact split varies by tokenizer)</text>
+<rect class="dgm-panel" x="250" y="56" width="220" height="42" rx="3" />
+<text class="dgm-mono" x="360" y="82" text-anchor="middle">strawberry</text>
+<path class="dgm-flow" d="M360 98 L360 128" />
+<text class="dgm-label-sm" x="380" y="118">tokenizer (BPE)</text>
+<rect class="dgm-panel" x="210" y="132" width="140" height="42" rx="3" />
+<text class="dgm-mono" x="280" y="158" text-anchor="middle">straw</text>
+<rect class="dgm-panel" x="360" y="132" width="140" height="42" rx="3" />
+<text class="dgm-mono" x="430" y="158" text-anchor="middle">berry</text>
+<path class="dgm-flow" d="M280 174 L280 200" />
+<path class="dgm-flow" d="M430 174 L430 200" />
+<text class="dgm-label-sm" x="490" y="192">vocabulary lookup</text>
+<rect class="dgm-panel" x="210" y="204" width="140" height="36" rx="3" />
+<text class="dgm-mono" x="280" y="227" text-anchor="middle">id 8199</text>
+<rect class="dgm-panel" x="360" y="204" width="140" height="36" rx="3" />
+<text class="dgm-mono" x="430" y="227" text-anchor="middle">id 15325</text>
+</svg>
+<figcaption><strong>The model never sees individual letters.</strong> It sees two chunks and two
+integer ids (shown here as illustrative examples, not a specific tokenizer's real output), which
+is exactly why letter-counting questions are hard, and unrelated to arithmetic ability generally.
+</figcaption>
+</figure>
+
+<h2 id="embeddings-meaning-as-geometry">Embeddings: meaning as geometry</h2>
+
+<p><strong>An embedding is a vector (a list of numbers, hundreds to thousands of entries long) assigned to
+a piece of text such that distance and direction in that space reflect learned relationships
+between meanings.</strong> Nothing is hand-labeled. The geometry emerges from training.</p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> “Embeddings just group synonyms together,” or “an embedding literally encodes a
+dictionary definition.” What embeddings actually capture is distributional and relational
+structure. The canonical demonstration is vector arithmetic: vector(“king”) − vector(“man”) +
+vector(“woman”) lands close to vector(“queen”), a relationship, not a definition. That
+demonstration also depends on excluding “king,” “man,” and “woman” themselves from the
+nearest-neighbor search. Without that exclusion, the nearest vector to the arithmetic is usually
+“king” again. <a href="https://pub.towardsai.net/king-man-woman-queen-43e5b33bc7c5">King − Man +
+Woman = Queen</a>; <a href="https://arxiv.org/abs/1606.07736">Linzen,
+2016</a>; <a href="https://arxiv.org/abs/1905.09866">Nissim et al.,
+2020</a></p>
+</blockquote>
+
+<p>Think of embeddings as GPS coordinates for meaning: the step from “France” to “Paris” points in the
+same direction, and roughly the same distance, as the step from “Japan” to “Tokyo”, without anyone
+hand-labelling a “capital-of” direction. Where this breaks, badly if taken literally: GPS coordinates are two numbers on a fixed map. Embedding
+space has hundreds or thousands of dimensions, most of which correspond to nothing a human can name.
+<a href="https://towardsdatascience.com/word2vec-explained-49c52b4ccb71/">Word2Vec Explained</a> And the
+king/queen example itself comes from an older, <em>static</em> style of embedding (word2vec). In a modern
+transformer, a token’s position in meaning-space shifts depending on the surrounding context.
+“Bank” near a river and “bank” near a loan application aren’t fixed at the same coordinates at
+all.</p>
+
+<figure>
+<svg viewBox="0 0 720 280" role="img" aria-labelledby="dgm-embed-title dgm-embed-desc">
+<title id="dgm-embed-title">Embedding space: an illustrative 2D slice</title>
+<desc id="dgm-embed-desc">A scatter plot showing four points, king, queen, man, and woman, with
+two parallel same-length arrows from man to king and from woman to queen. A separate small cluster
+of unrelated animal words sits apart, showing that related concepts land near each other.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="264" rx="3" />
+<text class="dgm-title" x="28" y="38">"(illustrative 2D slice of a much higher-dimensional space)"</text>
+<circle class="dgm-accent" cx="220" cy="90" r="5" />
+<text class="dgm-label" x="234" y="94">king</text>
+<circle class="dgm-accent" cx="320" cy="70" r="5" />
+<text class="dgm-label" x="334" y="74">queen</text>
+<circle class="dgm-accent-2" cx="220" cy="170" r="5" />
+<text class="dgm-label" x="234" y="174">man</text>
+<circle class="dgm-accent-2" cx="320" cy="150" r="5" />
+<text class="dgm-label" x="334" y="154">woman</text>
+<path class="dgm-flow" d="M223 165 L217 96" marker-end="url(#arrow1)" />
+<path class="dgm-flow" d="M323 145 L317 76" marker-end="url(#arrow1)" />
+<defs>
+  <marker id="arrow1" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+    <path class="dgm-accent" d="M0,0 L8,4 L0,8 z" />
+  </marker>
+</defs>
+<text class="dgm-label-sm" x="360" y="115">same direction, same length</text>
+<g transform="translate(540,180)">
+  <circle class="dgm-accent-3" cx="0" cy="0" r="4" />
+  <text class="dgm-label-sm" x="10" y="4">cat</text>
+  <circle class="dgm-accent-3" cx="30" cy="20" r="4" />
+  <text class="dgm-label-sm" x="40" y="24">dog</text>
+  <circle class="dgm-accent-3" cx="-10" cy="30" r="4" />
+  <text class="dgm-label-sm" x="0" y="46">wolf</text>
+  <text class="dgm-label-sm" x="-30" y="66">an unrelated cluster, nearby only to itself</text>
+</g>
+</svg>
+<figcaption><strong>Relationships, not definitions.</strong> The parallel arrows show a learned
+relationship. The animal cluster shows related things landing near each other. Real embedding
+space has far more dimensions than two, and in a transformer a word's coordinates shift with
+context. This picture is a simplified, static-style snapshot.</figcaption>
+</figure>
+
+<h2 id="next-token-prediction-the-whole-engine">Next-token prediction: the whole engine</h2>
+
+<p><strong>An autoregressive language model is trained to output a probability distribution over its entire
+vocabulary for “what token comes next,” given everything before it. Text is generated by
+repeatedly sampling one token from that distribution and appending it to the input.</strong> That loop,
+run one token at a time, is the entire generative mechanism. There’s no separate module underneath
+it doing something else.</p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> “The model plans out the whole sentence, or the whole answer, in advance, then
+writes it.” There’s no <em>designed</em> look-ahead module: the mechanism computes one distribution,
+samples one token, and feeds that choice back in to compute the <em>next</em> distribution, over and
+over. That doesn’t mean nothing resembling planning ever happens inside a single one of those
+steps: Anthropic’s interpretability research found Claude activating candidate rhyming words
+several tokens before writing the line that needed them when composing poetry. Any such planning
+is an emergent property of training, not a separate architectural feature. <a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html">On the Biology of a
+Large Language Model, Anthropic
+2025</a></p>
+</blockquote>
+
+<p>It’s like an extremely well-read person playing an extended game of “finish the sentence,” one word
+at a time, each guess conditioned on every word so far. The metaphor stops short here, though: a
+person playing that game can consciously narrate a plan to themselves before speaking. The base
+mechanism has no <em>designed</em> planning phase like that. Any foresight it exhibits is a side effect
+learned during training, surfacing inside the same single forward pass that produces the next
+token, not a separate step before it. Reasoning-trained models add explicit intermediate “thinking”
+tokens that function like scratch work, which is a real but separate technique covered on the next
+page.</p>
+
+<figure>
+<svg viewBox="0 0 720 260" role="img" aria-labelledby="dgm-nexttoken-title dgm-nexttoken-desc">
+<title id="dgm-nexttoken-title">Next-token prediction, one step</title>
+<desc id="dgm-nexttoken-desc">Given the partial sentence the cat sat on the, the model produces a
+probability bar chart over five candidate next tokens, one of which is sampled and looped back
+into the context for the next step.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="244" rx="3" />
+<text class="dgm-title" x="28" y="36">Context so far</text>
+<rect class="dgm-panel" x="28" y="50" width="230" height="50" rx="3" />
+<text class="dgm-mono" x="40" y="80">"The cat sat on the ___"</text>
+<text class="dgm-label-sm" x="28" y="122">probability distribution over the vocabulary (5 shown)</text>
+<g transform="translate(28,136)">
+  <rect class="dgm-ok" x="0" y="0" width="46" height="70" />
+  <text class="dgm-label-sm" x="23" y="-6" text-anchor="middle">46%</text>
+  <text class="dgm-label-sm" x="23" y="86" text-anchor="middle">mat</text>
+  <rect class="dgm-panel" x="56" y="42" width="46" height="28" />
+  <text class="dgm-label-sm" x="79" y="36" text-anchor="middle">18%</text>
+  <text class="dgm-label-sm" x="79" y="86" text-anchor="middle">floor</text>
+  <rect class="dgm-panel" x="112" y="51" width="46" height="19" />
+  <text class="dgm-label-sm" x="135" y="45" text-anchor="middle">12%</text>
+  <text class="dgm-label-sm" x="135" y="86" text-anchor="middle">rug</text>
+  <rect class="dgm-panel" x="168" y="56" width="46" height="14" />
+  <text class="dgm-label-sm" x="191" y="50" text-anchor="middle">9%</text>
+  <text class="dgm-label-sm" x="191" y="86" text-anchor="middle">chair</text>
+  <rect class="dgm-panel" x="224" y="68" width="46" height="2" />
+  <text class="dgm-label-sm" x="247" y="62" text-anchor="middle">1%</text>
+  <text class="dgm-label-sm" x="247" y="86" text-anchor="middle">moon</text>
+</g>
+<path class="dgm-flow" d="M300 60 L470 60" />
+<text class="dgm-label-sm" x="320" y="50">sampled</text>
+<rect class="dgm-panel" x="474" y="40" width="200" height="40" rx="3" />
+<text class="dgm-mono" x="574" y="65" text-anchor="middle">"...sat on the mat"</text>
+<path class="dgm-line" d="M474 90 q-220 60 -440 20" fill="none" />
+<text class="dgm-label-sm" x="330" y="180">appended, then the whole loop repeats for the next token</text>
+</svg>
+<figcaption><strong>One distribution, one sample, repeat.</strong> The percentages here are an
+illustrative example, not measured output from a specific model. The point is the loop, not the
+exact numbers.</figcaption>
+</figure>
+
+<h2 id="the-context-window-not-memory">The context window: not memory</h2>
+
+<p><strong>The context window is the maximum number of tokens (input and output combined, in most APIs)
+that a model can attend to in a single forward pass. Anything beyond that limit never reaches the
+model at all unless an application chunks or summarizes it first.</strong> As of July 2026, Anthropic’s
+current top-tier models (Claude Opus 5, Claude Sonnet 5, and Claude Fable 5) ship a 1,000,000
+token context window with up to 128,000 output tokens, while Claude Haiku 4.5 ships a smaller
+200,000 token window with up to 64,000 output tokens (vendor-reported figures). <a href="https://platform.claude.com/docs/en/about-claude/models/overview">Claude models
+overview</a></p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> “The context window is like long-term memory: the model remembers our past
+conversations.” A context window is only the text physically present in the current request.
+Nothing persists between separate calls unless the surrounding application explicitly re-sends
+prior text (or logs it to an external store) every single time.</p>
+</blockquote>
+
+<p>The context window is like the surface of a desk you can spread papers on while working: anything
+not currently on the desk is gone from view, even if it’s in a filing cabinet (the training data)
+or was on the desk five minutes ago (an earlier turn that scrolled out of the window). One place
+the desk analogy strains: unlike a desk, a bigger context window isn’t “free” comprehension.
+Independent research found a well-documented U-shaped performance drop for information placed in
+the <em>middle</em> of a long context compared with the start or end. A large window doesn’t guarantee
+the model uses everything in it equally well. <a href="https://arxiv.org/abs/2307.03172">Lost in the Middle (Liu et al., TACL
+2023)</a></p>
+
+<figure>
+<svg viewBox="0 0 720 220" role="img" aria-labelledby="dgm-context-title dgm-context-desc">
+<title id="dgm-context-title">The context window as a sliding frame</title>
+<desc id="dgm-context-desc">A strip of conversation turns runs left to right. A fixed-width frame
+covers only the most recent turns; turns to the left of the frame are faded out and marked as
+dropped by the surrounding application before this request was sent, not forgotten by the model on
+its own.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="204" rx="3" />
+<text class="dgm-title" x="28" y="36">One conversation, growing left to right</text>
+<g opacity="0.35">
+  <rect class="dgm-panel" x="28" y="60" width="90" height="50" rx="2" />
+  <text class="dgm-label-sm" x="73" y="88" text-anchor="middle">Turn 1</text>
+  <rect class="dgm-panel" x="124" y="60" width="90" height="50" rx="2" />
+  <text class="dgm-label-sm" x="169" y="88" text-anchor="middle">Turn 2</text>
+</g>
+<text class="dgm-label-sm" x="28" y="130">dropped by the application before sending — the model never</text>
+<text class="dgm-label-sm" x="28" y="144">sees these; nothing in the model itself did the dropping</text>
+<rect class="dgm-line" x="230" y="48" width="360" height="86" rx="3" fill="none" />
+<rect class="dgm-panel" x="244" y="60" width="90" height="50" rx="2" />
+<text class="dgm-label-sm" x="289" y="88" text-anchor="middle">Turn 3</text>
+<rect class="dgm-panel" x="340" y="60" width="90" height="50" rx="2" />
+<text class="dgm-label-sm" x="385" y="88" text-anchor="middle">Turn 4</text>
+<rect class="dgm-panel" x="436" y="60" width="120" height="50" rx="2" />
+<text class="dgm-label-sm" x="496" y="88" text-anchor="middle">Turn 5 (now)</text>
+<text class="dgm-label" x="410" y="160">Context window — the only text the model can see right now</text>
+</svg>
+<figcaption><strong>Only what's currently inside the frame exists to the model.</strong> The
+surrounding application (not the model) decides what stays inside the frame each turn. Until it
+drops a turn, that turn is still being re-sent, and re-billed, in full on every request. Nothing
+behind the frame is remembered on its own, and nothing ahead of it has happened yet.</figcaption>
+</figure>
+
+<h2 id="temperature-and-sampling">Temperature and sampling</h2>
+
+<p><strong>Temperature is a number that rescales the model’s output probabilities before a token is sampled:
+low temperature sharpens the distribution toward the most likely token, high temperature flattens
+it toward more uniform, more random selection.</strong> <a href="https://huyenchip.com/2024/01/16/sampling.html">Generation configurations: temperature, top-k,
+top-p</a> It changes <em>how</em> a token gets picked from a
+distribution the model already computed, nothing more.</p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> “Temperature 0 means the model is being more factual or careful,” or the
+opposite, “high temperature makes the model smarter or more creative in a meaningful way.”
+Temperature has no mechanism for checking truth. At temperature 0 the model deterministically
+outputs its single most-likely token. And that token can be confidently wrong. Temperature
+governs sampling randomness, not factual calibration: there’s no step anywhere in it that
+consults whether the chosen token is <em>true</em>. It doesn’t follow that error rates are identical at
+every setting (sampling further down the distribution does measurably change how often a model
+goes wrong), only that turning temperature down buys you consistency, not correctness.</p>
+</blockquote>
+
+<p>Temperature is a dial on how much you round toward the “safe favorite” versus roll dice among
+plausible options, like recommending the top restaurant every time (low temperature) versus
+picking randomly from a weighted list of the ten best (higher temperature). Where this breaks:
+“rolling dice among plausible options” implies every sampled option is reasonable, but raw
+temperature alone can still surface very unlikely, nonsensical tokens from the distribution’s long
+tail. That’s why nucleus (top-p) sampling is usually layered on top. It first truncates the
+candidate set to the smallest group whose combined probability exceeds a threshold (commonly
+0.9 to 0.95) before sampling from that narrowed set. <a href="https://en.wikipedia.org/wiki/Top-p_sampling">Top-p sampling,
+Wikipedia</a></p>
+
+<figure>
+<svg viewBox="0 0 720 260" role="img" aria-labelledby="dgm-temp-title dgm-temp-desc">
+<title id="dgm-temp-title">Temperature reshapes the same distribution</title>
+<desc id="dgm-temp-desc">Two side-by-side bar charts for the same five candidate tokens, using
+illustrative percentages rather than a specific model's measured output. At low temperature one bar
+dominates; at moderately raised temperature the bars are somewhat closer in height, though the
+dominant bar still clearly leads. The candidates are identical in both panels.</desc>
+<rect class="dgm-panel" x="8" y="8" width="340" height="244" rx="3" />
+<rect class="dgm-panel" x="372" y="8" width="340" height="244" rx="3" />
+<text class="dgm-title" x="28" y="38">temperature = 0.3</text>
+<g transform="translate(40,60)">
+  <rect class="dgm-ok" x="0" y="0" width="40" height="150" />
+  <rect class="dgm-panel" x="52" y="128" width="40" height="22" />
+  <rect class="dgm-panel" x="104" y="138" width="40" height="12" />
+  <rect class="dgm-panel" x="156" y="144" width="40" height="6" />
+  <rect class="dgm-panel" x="208" y="149" width="40" height="1" />
+  <text class="dgm-label-sm" x="20" y="168" text-anchor="middle">mat</text>
+  <text class="dgm-label-sm" x="72" y="168" text-anchor="middle">floor</text>
+  <text class="dgm-label-sm" x="124" y="168" text-anchor="middle">rug</text>
+  <text class="dgm-label-sm" x="176" y="168" text-anchor="middle">chair</text>
+  <text class="dgm-label-sm" x="228" y="168" text-anchor="middle">moon</text>
+</g>
+<text class="dgm-label-sm" x="28" y="240">sharper — dominant token almost always wins</text>
+<text class="dgm-title" x="392" y="38">temperature = 1.2</text>
+<g transform="translate(404,60)">
+  <rect class="dgm-accent-2" x="0" y="0" width="40" height="100" />
+  <rect class="dgm-panel" x="52" y="54" width="40" height="46" />
+  <rect class="dgm-panel" x="104" y="67" width="40" height="33" />
+  <rect class="dgm-panel" x="156" y="75" width="40" height="25" />
+  <rect class="dgm-panel" x="208" y="96" width="40" height="4" />
+  <text class="dgm-label-sm" x="20" y="118" text-anchor="middle">mat</text>
+  <text class="dgm-label-sm" x="72" y="118" text-anchor="middle">floor</text>
+  <text class="dgm-label-sm" x="124" y="118" text-anchor="middle">rug</text>
+  <text class="dgm-label-sm" x="176" y="118" text-anchor="middle">chair</text>
+  <text class="dgm-label-sm" x="228" y="118" text-anchor="middle">moon</text>
+</g>
+<text class="dgm-label-sm" x="392" y="240">flatter than 0.3 — top token still leads, others gain odds</text>
+</svg>
+<figcaption><strong>Same five candidates, same underlying model, different roll of the dice.</strong>
+Temperature reshapes existing probabilities. It never adds a candidate the model wasn't already
+considering, and it never checks whether "mat" is actually correct. The percentages are illustrative,
+chosen to show the shape of the effect at each temperature, not measurements from a real
+model.</figcaption>
+</figure>
+
+<h2 id="why-models-hallucinate">Why models hallucinate</h2>
+
+<p><strong>Hallucination is confident generation of false or unsupported content, and recent theoretical
+work argues it’s a predictable consequence of training and evaluation incentives rather than a
+mysterious glitch.</strong> The formal argument reduces text generation to a kind of classification
+problem (“is this candidate output valid or not”) and shows generation error is bounded below by
+error on that same classification task. <a href="https://arxiv.org/abs/2509.04664">Why Language Models Hallucinate (Kalai, Nachum, Vempala,
+Zhang), arXiv:2509.04664</a></p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> “Hallucination is a bug that better training data or a bigger model will simply
+fix.” The paper’s central argument is that standard evaluation <em>actively rewards guessing over
+expressing uncertainty</em>. Most benchmarks score a confident wrong answer exactly the same as an
+honest “I’m not sure,” both zero credit. A model optimized against those benchmarks learns to
+bluff rather than abstain instead of admitting doubt. The proposed fix is reworking evaluation
+incentives, not simply scaling up. <a href="https://openai.com/index/why-language-models-hallucinate/">Why Language Models Hallucinate, OpenAI</a></p>
+</blockquote>
+
+<p>A model forced to always answer is like a student penalized equally for “I don’t know” and a wrong
+guess on a multiple-choice test: the rational test-taking strategy is to always guess, never
+abstain, which is exactly the behavior that looks like hallucination once the stakes are open-ended
+factual claims instead of exam bubbles. But the comparison only goes so far: a human test-taker
+consciously chooses to guess. A model has no single internal “true belief” being suppressed.
+There’s no fact-checker being overridden. The hallucinated sentence and the correct sentence are
+produced by the identical mechanism described two sections up (next-token prediction). The model does compute a probability
+for every token, and a pretrained model’s raw probabilities tend to be reasonably well calibrated.
+But training gives it no reliable way to <em>report</em> that difference out loud, and RLHF, the stage that
+makes it conversational, is documented to degrade that calibration further.</p>
+
+<figure>
+<svg viewBox="0 0 720 260" role="img" aria-labelledby="dgm-hallu-title dgm-hallu-desc">
+<title id="dgm-hallu-title">Why the incentive produces confident wrong answers</title>
+<desc id="dgm-hallu-desc">Two columns. Left: a multiple-choice test where a wrong guess and a blank
+answer both score zero, so the rational strategy is to always guess. Right: the same always-guess
+strategy applied to an open-ended factual question, producing a confidently wrong sentence.</desc>
+<rect class="dgm-panel" x="8" y="8" width="340" height="244" rx="3" />
+<rect class="dgm-panel" x="372" y="8" width="340" height="244" rx="3" />
+<text class="dgm-title" x="28" y="38">Multiple-choice test</text>
+<text class="dgm-label-sm" x="28" y="62">guess (sometimes right) — scores 1 or 0</text>
+<text class="dgm-label-sm" x="28" y="82">leave blank — scores 0, always</text>
+<path class="dgm-flow" d="M60 100 L60 140" />
+<text class="dgm-label" x="80" y="130">rational strategy: never leave it blank</text>
+<rect class="dgm-panel" x="40" y="150" width="260" height="60" rx="3" />
+<text class="dgm-mono" x="170" y="185" text-anchor="middle">always guess</text>
+<text class="dgm-title" x="392" y="38">Open-ended factual claim</text>
+<text class="dgm-label-sm" x="392" y="62">same incentive, no "blank" option offered</text>
+<rect class="dgm-panel" x="404" y="150" width="260" height="60" rx="3" />
+<text class="dgm-mono" x="534" y="178" text-anchor="middle">a confident, fluent,</text>
+<text class="dgm-mono" x="534" y="196" text-anchor="middle">wrong sentence</text>
+</svg>
+<figcaption><strong>Same incentive, worse consequence.</strong> A test-taker who always guesses
+looks like a savvy strategist. A model that always guesses on an open-ended question looks like it
+is making things up, because, in the sense that matters, it is.</figcaption>
+</figure>
+
+<h2 id="prompting-basics-that-follow-from-the-mechanism">Prompting basics that follow from the mechanism</h2>
+
+<p><strong>A prompt is the entire text input given to the model at inference time (instructions, context,
+examples, and the actual question), and the model has no separate settings beyond what’s expressed
+in that text plus a handful of API parameters like temperature.</strong> Everything above on this page
+converges here: no memory (so state your context every time), no planning ahead (so ambiguity gets
+resolved by the model’s best local guess, not a clarifying question), and a next-token mechanism
+that conditions entirely on what’s literally in front of it.</p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> “There’s a single secret phrase or trick prompt that unlocks hidden
+capability.” Most reliable prompting gains come from unglamorous specificity: stating the desired
+format, giving concrete examples, separating instructions from data, and being explicit about
+constraints, not a magic incantation.</p>
+</blockquote>
+
+<p>Prompting is like giving instructions to a very capable new contractor who has read everything but
+knows nothing about <em>your</em> specific job. Vague instructions get generically plausible but often
+wrong-for-you results. A clear brief with examples and constraints gets a targeted one. Where this
+breaks: a human contractor asks clarifying questions when instructions are ambiguous, and remembers
+your preferences on the next job. A stateless model will confidently fill ambiguity with its own
+assumption instead of asking (unless you explicitly prompt it to ask). It remembers nothing
+next session, for exactly the reason covered in the context-window section above.</p>
+
+<p>Three habits fall directly out of the mechanics on this page, not out of folklore:</p>
+
+<ul>
+  <li><strong>Be explicit, because there’s no clarifying question by default.</strong> The model fills gaps with
+its own best guess rather than pausing to ask: say what you want the way you’d write it down for
+someone who can’t follow up.</li>
+  <li><strong>Show examples, because the model is completing a pattern.</strong> Next-token prediction means it’s
+extending whatever shape you’ve given it. Give it the shape you want extended.</li>
+  <li><strong>Repeat what matters across turns, because nothing persists automatically.</strong> If a constraint from
+three turns ago still applies, say so. It fell out of view exactly like anything else that
+scrolled past the edge of the context window.</li>
+</ul>
+
+<h2 id="faq">FAQ</h2>
+
+<p><strong>Is the model “thinking,” or just predicting the next word?</strong>
+Mechanically, the base process is next-token prediction: given everything so far, the model
+computes a probability distribution over possible next tokens and samples one, repeatedly.
+Reasoning-trained models add an extra step (generating explicit intermediate tokens before the
+final answer, which measurably helps on complex tasks). But that’s a distinct, later-stage
+technique covered on the next page, not a change to the base mechanism. <a href="https://arxiv.org/abs/2201.11903">Chain-of-Thought
+Prompting, arXiv:2201.11903</a></p>
+
+<p><strong>Does the model remember me between chats?</strong>
+Not by default. Each request is self-contained. Unless an application explicitly stores and
+re-sends prior conversation text, or uses a dedicated memory feature, nothing persists: the
+model’s weights don’t change from talking to you, and no session state is kept between separate
+calls.</p>
+
+<p><strong>Why does the model sometimes make things up so confidently?</strong>
+Because standard training and evaluation reward confident answers and score a wrong guess the same
+as an honest “I’m not sure” — both get zero credit — so the strategy that wins is to never abstain.
+<a href="https://arxiv.org/abs/2509.04664">Why Language Models Hallucinate, arXiv:2509.04664</a></p>
+
+<p><strong>If I set temperature to 0, will the model stop making mistakes?</strong>
+No. Temperature 0 just means the model always picks its single highest-probability next token
+instead of sampling — if that top token happens to be wrong, it will confidently and consistently
+produce the wrong answer. Temperature controls randomness in token choice, not factual accuracy.
+<a href="https://huyenchip.com/2024/01/16/sampling.html">Generation configurations</a></p>
+
+<p><strong>Why can’t the model reliably count the letters in a word?</strong>
+Because it typically never sees individual letters as separate units: a word is usually broken
+into just a few sub-word tokens before the model processes it, so a letter-counting question asks
+it to reason about a decomposition it was never given. Tokenization is a major reason this is
+needlessly hard, but it isn’t the whole story: models can still miscount even when asked to spell a
+word out letter-by-letter first. <a href="https://en.wikipedia.org/wiki/Byte_pair_encoding">Byte-pair encoding</a></p>
+
+<p><strong>What’s actually different between a “base model” and the assistant I chat with?</strong>
+A base, pretrained-only model just continues whatever pattern is in front of it: given an
+instruction, it’s just as likely to continue with <em>more instructions</em> as to follow the first one.
+The assistant you chat with went through additional training stages specifically aimed at following
+instructions reliably and matching preferred style. That training reshapes behavior and helpfulness
+far more than it adds new factual knowledge. The mechanics of exactly how are covered on the next
+page.</p>
+
+<p><strong>Why do bigger context windows sometimes not help as much as expected?</strong>
+Because supporting a longer window (a technical limit) and <em>reliably using</em> everything inside it
+are two separate problems. Independent measurement found a strong U-shaped pattern: notably worse
+recall for information placed in the middle of a long context than at the very start or end. Bigger
+doesn’t automatically mean evenly used. <a href="https://arxiv.org/abs/2307.03172">Lost in the Middle,
+arXiv:2307.03172</a></p>
+
+<p><strong>Why does the same prompt sometimes use a different number of tokens on different models?</strong>
+Because tokenization is model- and version-specific: different tokenizer vocabularies split the
+same text differently. Anthropic notes its Claude Opus 4.7-and-later tokenizer generation produces
+roughly 30% more tokens than the prior generation for identical text, as of July 2026: a tokenizer
+change, not a change in the text itself. <a href="https://platform.claude.com/docs/en/about-claude/models/overview">Claude models
+overview</a></p>
+
+<hr />
+
+<p>That’s the whole surface-level mechanism: weights, tokens, a probability distribution, and a loop.
+Everything past this point (attention, the transformer block, how training actually happens in
+stages, tool use, retrieval) is built directly on top of these nine ideas. The next page,
+<a href="/projects/dokidex/learn/core/">How models work</a>, opens up what’s inside that “weights” box.</p>
+
+    </article>
+
+    
+    <nav class="pager" aria-label="Page navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/learn/">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">Where to start</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/learn/core/">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">How models work</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="site-footer">
+  <div class="footer-main">
+    <p class="footer-line">
+      <strong>DokiDex</strong> v0.62.0:
+      a fully-local AI stack, and a field guide to the machines it runs on.
+    </p>
+    <p class="footer-line footer-dim">
+      Everything on this site is written against the real tree and the measured record. Where a
+      claim is a number, it was measured or sourced. Where it was a judgment call, the reasoning
+      is stated inline. Stale statements are bugs. File them like bugs.
+    </p>
+  </div>
+
+  <div class="footer-links">
+    <a href="/projects/dokidex/local-cli/">Run the CLIs</a>
+    <a href="/projects/dokidex/handbook/">Handbook</a>
+    <a href="/projects/dokidex/reference/">Quick reference</a>
+    <a href="/projects/dokidex/glossary/">Glossary</a>
+    <!-- Deliberately understated: last item in the row, same weight as the rest, no colour,
+         no badge, no image beacon. The ask was "inconspicuous". -->
+    <a class="footer-kofi" href="https://ko-fi.com/dougfessler" rel="noopener">Buy me a coffee</a>
+  </div>
+</footer>
+
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/dokidex.js"></script>
+</body>
+</html>

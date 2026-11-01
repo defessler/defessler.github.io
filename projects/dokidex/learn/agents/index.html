@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coding agents · DokiDex</title>
+<meta name="description" content="How Claude Code, Cursor, Codex and a dozen others compare, and the engineering patterns (agent loop, permissions, context, checkpoints) that matter more than any single product's marketing page.">
+
+<!-- Open Graph / Twitter, hand-rolled: jekyll-seo-tag is not available under the pinned
+     github-pages gem set used by actions/jekyll-build-pages. -->
+<meta property="og:site_name" content="DokiDex">
+<meta property="og:title" content="Coding agents">
+<meta property="og:description" content="How Claude Code, Cursor, Codex and a dozen others compare, and the engineering patterns (agent loop, permissions, context, checkpoints) that matter more than any single product's marketing page.">
+<meta property="og:type" content="website">
+<!-- site_origin rather than absolute_url: see the comment in _config.yml. absolute_url would
+     emit http:// here, because the Pages API reports an http html_url while Enforce HTTPS is off. -->
+<meta property="og:url" content="https://dougfessler.com/projects/dokidex/learn/agents/">
+<link rel="canonical" href="https://dougfessler.com/projects/dokidex/learn/agents/">
+<!-- `summary`, not `summary_large_image`: no og:image or twitter:image is emitted anywhere on
+     this site, and the large-image card renders as a blank rectangle without one. Switch this back
+     the same day a 1200x630 share asset lands, not before. -->
+<meta name="twitter:card" content="summary">
+
+<!-- Same four families as the handbook, so the two halves of the site read as one product:
+     Marcellus (power words) · Kanit (headings, kickers, nav) · IBM Plex Mono (code, stats) ·
+     Figtree (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/dokidex.css">
+<link rel="icon" href="/projects/dokidex/assets/favicon.svg" type="image/svg+xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<!-- `wide: true` in a page's front matter opts it into --content-w-wide (assets/dokidex.css:51).
+     The CSS keys off `.page-wide` on an ancestor. Without the class emitted here the front-matter
+     flag silently does nothing. -->
+<body class="page-wide">
+<a class="skip-link" href="#content">Skip to content</a>
+
+<!-- CSS-only nav toggle. A checkbox beats a JS drawer here: the nav has to work on the mobile
+     read where the reader has scrolled 4000px into a reference table, and a checkbox cannot
+     desync from its own state the way a JS flag can. -->
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/">DokiDex</a>
+    <a class="topbar-cta" href="/projects/dokidex/download/"><svg class="dl-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><g class="dl-arrow"><path d="M8 2.2v6.5"/><path d="M5.2 5.9 8 8.7l2.8-2.8"/></g><path class="dl-tray" d="M3.2 11.3v2.5h9.6v-2.5"/></svg>
+Download</a>
+  </header>
+
+  <!-- Grouped navigation, driven by site.nav in _config.yml.
+
+     A page is "current" when its url matches exactly. The handbook is the one entry that also
+     needs to light up for its children (/handbook/03-serving.html), so it gets a prefix test —
+     without it, the sidebar would show nothing selected the moment a reader steps into a
+     chapter, which reads as "you have left the site". -->
+<nav class="sidebar" aria-label="Site sections">
+  <a class="sidebar-brand" href="/projects/dokidex/">
+    <span class="sidebar-mark" aria-hidden="true">&#9612;&#9608;&#9608;&#9616;</span>
+    <span class="sidebar-brand-text">DokiDex</span>
+  </a>
+
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Start</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/"
+             >Overview</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Use DokiDex</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/local-cli/"
+             >Run the CLIs locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/download/"
+             >Download the launchers</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/models/"
+             >Models it runs</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/games/"
+             >Games the models built</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/telemetry/"
+             >Performance data</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/qwen38/"
+             >Qwen3.8-27B, measured</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/architecture/"
+             >How it's built</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Learn AI</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/"
+             >Where to start</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/basics/"
+             >1 · Foundations</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/core/"
+             >2 · How models work</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/advanced/"
+             >3 · Advanced</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/naming/"
+             >Decoding model names</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/open-vs-closed/"
+             >Open vs closed weights</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/benchmarks/"
+             >Benchmarks</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/local/"
+             >Running models locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link is-active"
+             href="/projects/dokidex/learn/agents/"
+             aria-current="page">Coding agents</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Context</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/state-of-ai/"
+             >State of AI, 2026</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/reference/"
+             >Quick reference</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/glossary/"
+             >Glossary</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Deep dive</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/handbook/"
+             >The Handbook</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+</nav>
+
+
+  <main class="main">
+    <div class="page-head">
+      <p class="kicker">:: THE AGENT LANDSCAPE</p>
+      <h1 class="page-title">Coding agents</h1>
+      <p class="page-desc">How Claude Code, Cursor, Codex and a dozen others compare, and the engineering patterns (agent loop, permissions, context, checkpoints) that matter more than any single product's marketing page.</p>
+      
+      <p class="level-badges">
+        <span class="level-badge level-intermediate">Intermediate</span>
+      </p>
+      
+    </div>
+
+    <article id="content" class="prose">
+      <p>A year ago “coding agent” mostly meant autocomplete with better taste. Now it means something
+that reads your repo, plans a change, edits multiple files, runs your tests, and asks permission
+(or doesn’t) before it touches anything destructive. That shift happened along genuinely different
+design axes: terminal versus IDE versus cloud, model-locked versus bring-your-own-key,
+ask-every-time versus full autonomy. This page maps that field, then teaches the patterns
+underneath it, because the patterns outlive any one product’s pricing page.</p>
+
+<p>DokiDex runs several of these against a local model rather than a cloud one, which is a deployment
+choice rather than a different category of tool. <a href="/projects/dokidex/local-cli/">Run the CLIs locally</a>
+covers that side. This page is about the field as a whole, and about why the underlying mechanics
+(the loop, the permission gate, the context budget) look so similar across nearly every tool here,
+regardless of who built it.</p>
+
+<blockquote>
+  <p><strong>Note:</strong> this market moves in weeks, not quarters. Three products in the table below (Roo
+Code, the original Gemini CLI, Windsurf’s first credit system) were discontinued or replaced in
+the roughly 60 days before this page was written. Every price is dated to July 2026. Treat
+anything you read here in six months as a starting point to re-check, not a current fact.</p>
+</blockquote>
+
+<h2 id="1-the-landscape-tool-by-tool">1. The landscape, tool by tool</h2>
+
+<p>A cell reading <strong>“Not confirmed”</strong> below means exactly that: we couldn’t verify the claim from
+public sources. It’s a gap in this page’s research, not a finding that the tool lacks the
+feature. Don’t read it as “no.”</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Tool</th>
+      <th>Surface</th>
+      <th>Models supported</th>
+      <th>BYOK</th>
+      <th>Pricing model</th>
+      <th>Distinguishing capability</th>
+      <th>Permission model</th>
+      <th>MCP</th>
+      <th>Extension mechanism</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Claude Code</strong></td>
+      <td>Terminal, IDE ext., SDK</td>
+      <td>Anthropic only (Opus/Sonnet/Haiku)</td>
+      <td>No</td>
+      <td>Pro bundles it, Code seats $100+/mo, API metered</td>
+      <td>Deepest checkpoint + subagent + plugin system here</td>
+      <td>Ask / auto-accept-edits / Plan Mode, Shift+Tab cycle</td>
+      <td>Yes, client + server</td>
+      <td>Plugins: skills, subagents, hooks, MCP/LSP</td>
+    </tr>
+    <tr>
+      <td><strong>OpenAI Codex CLI</strong></td>
+      <td>Terminal, IDE ext., cloud</td>
+      <td>GPT-5.x-Codex, any OpenAI model via key</td>
+      <td>Yes, via key</td>
+      <td>Free/Go $8/Plus $20/Pro $100 (ChatGPT), or per-token</td>
+      <td>Sandbox mode × approval policy, independently set + reviewer agent</td>
+      <td>OS-enforced sandbox mode × approval policy</td>
+      <td>Yes, destructive-call gating</td>
+      <td>AGENTS.md (originated here) + MCP</td>
+    </tr>
+    <tr>
+      <td><strong>GitHub Copilot</strong></td>
+      <td>IDE ext., CLI, cloud agent</td>
+      <td>Multi-vendor picker (GPT/Claude/Gemini)</td>
+      <td>CLI only, custom endpoints</td>
+      <td>Free/Pro $10/Pro+ $39/Max $100, org tiers per seat</td>
+      <td>Org-manageable egress firewall for the cloud agent</td>
+      <td>Per-command/session approval, allow/deny-tool flags</td>
+      <td>Yes (CLI). Firewall excludes it</td>
+      <td>Extensions, custom agents, hooks, skills</td>
+    </tr>
+    <tr>
+      <td><strong>Cursor</strong></td>
+      <td>IDE (VS Code fork)</td>
+      <td>Multi-vendor + Cursor Tab</td>
+      <td>Yes for chat/agent, Tab isn’t BYOK</td>
+      <td>Hobby free, Pro $20/Pro+ $60/Ultra $200, Teams $40</td>
+      <td>Cursor Tab, a separately-trained low-latency edit model</td>
+      <td>Run Modes: no OS sandbox, by Cursor’s own admission</td>
+      <td>Yes, two-layer (connection + call)</td>
+      <td><code class="language-plaintext highlighter-rouge">.cursor/rules</code>, MCP, VS Code ext.</td>
+    </tr>
+    <tr>
+      <td><strong>Windsurf</strong> (Cognition)</td>
+      <td>IDE fork, Cascade agent</td>
+      <td>Multi-model + Cognition’s SWE-1.5</td>
+      <td>Not confirmed</td>
+      <td>Free, Pro $20, Max $200, Teams $40</td>
+      <td>Roadmap now shared with Devin post-acquisition</td>
+      <td>Not independently confirmed</td>
+      <td>Not confirmed</td>
+      <td>Cascade rules/workflows</td>
+    </tr>
+    <tr>
+      <td><strong>Cline</strong></td>
+      <td>VS Code/JetBrains ext.</td>
+      <td>Any provider via key or OpenRouter</td>
+      <td>Yes, full</td>
+      <td>Free/OSS, pay only inference</td>
+      <td>Built-in, user-submittable MCP Marketplace</td>
+      <td>Approval-per-action, RBAC upcoming</td>
+      <td>Yes: core differentiator</td>
+      <td>MCP servers, as primary surface</td>
+    </tr>
+    <tr>
+      <td><strong>Roo Code</strong></td>
+      <td>VS Code ext. (Cline fork)</td>
+      <td>Multi-model via key</td>
+      <td>Yes (historical)</td>
+      <td>Was free/OSS, <strong>discontinued May 2026</strong></td>
+      <td>Four modes + parallel “Boomerang” sub-agents (historical)</td>
+      <td>Historical, no longer maintained</td>
+      <td>Yes (historical)</td>
+      <td>Discontinued</td>
+    </tr>
+    <tr>
+      <td><strong>Aider</strong></td>
+      <td>Terminal</td>
+      <td>Any via key or local Ollama</td>
+      <td>Yes, full</td>
+      <td>Free/OSS (Apache-2.0), pay only inference</td>
+      <td>Auto repo map + every edit its own git commit</td>
+      <td><code class="language-plaintext highlighter-rouge">--no-auto-commits</code> exists. Confirmation gate unconfirmed</td>
+      <td>Not confirmed</td>
+      <td>None beyond flags, repo map</td>
+    </tr>
+    <tr>
+      <td><strong>opencode</strong></td>
+      <td>Terminal (TUI)</td>
+      <td>75+ providers via key</td>
+      <td>Yes, full</td>
+      <td>Free/OSS (MIT), pay only inference</td>
+      <td>Plan-then-Build split + native LSP diagnostics</td>
+      <td>Config exists. Granular semantics unconfirmed</td>
+      <td>Yes, first-class, plus ACP</td>
+      <td>Plugin SDK</td>
+    </tr>
+    <tr>
+      <td><strong>Zed</strong></td>
+      <td>IDE (native Rust)</td>
+      <td>Claude/GPT/Gemini/local via Ollama</td>
+      <td>Yes, OpenAI-compatible endpoints</td>
+      <td>Free (Personal), Pro $10, Business $30/seat</td>
+      <td>Concurrent, independent-context agent threads, one editor</td>
+      <td><code class="language-plaintext highlighter-rouge">confirm</code>/<code class="language-plaintext highlighter-rouge">allow</code>/<code class="language-plaintext highlighter-rouge">deny</code>, per-tool override</td>
+      <td>Yes: Tools + Prompts only</td>
+      <td>Extensions marketplace</td>
+    </tr>
+    <tr>
+      <td><strong>JetBrains Junie</strong></td>
+      <td>IDE (IntelliJ) + CLI</td>
+      <td>GPT-5, Claude 4.5 Sonnet, Gemini 2.5 Pro built-in</td>
+      <td>CLI only, full</td>
+      <td>Free, Pro $10, Ultimate $30</td>
+      <td>Built on IntelliJ’s own structural code index</td>
+      <td>Explicit plan-before-edit gate</td>
+      <td>Not confirmed</td>
+      <td>Not confirmed</td>
+    </tr>
+    <tr>
+      <td><strong>Google Jules</strong></td>
+      <td>Cloud async agent (GitHub)</td>
+      <td>Gemini 3.1 Pro (paid) / 3 Flash (free)</td>
+      <td>No</td>
+      <td>Free (15 tasks/day), Pro $19.99, Ultra $124.99</td>
+      <td>Purpose-built async PR-in/PR-out on backlog work</td>
+      <td>Isolated cloud VM implies isolation. Undocumented</td>
+      <td>Not confirmed</td>
+      <td>GitHub integration only</td>
+    </tr>
+    <tr>
+      <td><strong>Amp</strong> (Sourcegraph)</td>
+      <td>IDE ext. + CLI</td>
+      <td>Claude, GPT-5.x, Gemini 3</td>
+      <td>Enterprise only. Individuals link own subscriptions</td>
+      <td>Free tier. Paid tiers reported, exact terms unconfirmed</td>
+      <td>Persistent parallel agent sessions + zero-training policy</td>
+      <td>Not confirmed</td>
+      <td>Not confirmed</td>
+      <td>Not confirmed</td>
+    </tr>
+    <tr>
+      <td><strong>Devin</strong> (Cognition)</td>
+      <td>Cloud async agent (sandboxed VM)</td>
+      <td>Cognition’s SWE-1.6 + OpenAI/Claude/Gemini</td>
+      <td>Partial: model choice, not raw keys</td>
+      <td>Free, Pro $20/seat, Max $200 (conflicting descriptions)</td>
+      <td>Sustained multi-step autonomy, minimal turn-taking</td>
+      <td>Plan review before compute commit: no per-action gate found</td>
+      <td>Not confirmed</td>
+      <td>GitHub/GitLab/Linear/Slack/Jira</td>
+    </tr>
+    <tr>
+      <td><strong>Replit Agent</strong></td>
+      <td>Cloud IDE + agent</td>
+      <td>Undisclosed tier names</td>
+      <td>No path found</td>
+      <td>Free, Core $25/mo, Teams $40/user</td>
+      <td>Owns the pipeline: editor, database, hosting, deploy</td>
+      <td>Checkpoint rollback + Plan Mode before building</td>
+      <td>Not confirmed</td>
+      <td>Agent Skills</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Every dollar figure above is sourced below, tool by tool. A cell without a number is a category
+description, not a verified fact: several read “not confirmed” rather than “no,” reflecting real
+gaps in this field’s public documentation as of July 2026, not an assumption of absence.</p>
+
+<p>The last row and the first one aren’t a choice you have to make, by the way. Anthropic’s own Claude
+Code CLI runs against DokiDex’s local weights unmodified, with no proxy and no fork. GitHub’s
+Copilot CLI does too. Same GPU, same model server, different agent.
+<a href="/projects/dokidex/local-cli/">Claude Code and Copilot, local</a> covers how, and what it costs
+you.</p>
+
+<p><strong>Claude Code</strong>: Pro ~$20/mo, team seats $100-125/mo
+(<a href="https://www.superblocks.com/blog/claude-code-pricing">Superblocks</a>). Checkpointing snapshots
+files pre-edit, not shell effects
+(<a href="https://code.claude.com/docs/en/agent-sdk/file-checkpointing">docs</a>). Plugins bundle skills,
+subagents, hooks, MCP/LSP via git marketplaces (<a href="https://code.claude.com/docs/en/plugins">docs</a>).</p>
+
+<p><strong>Codex CLI</strong>: free with ChatGPT sign-in. A $100/mo Pro tier arrived April 2026 to match Claude
+Code (<a href="https://www.morphllm.com/codex-pricing">Morphllm</a>). Sandbox mode × approval policy, both
+OS-enforced, plus an optional reviewer model: the most explicit safety design here
+(<a href="https://learn.chatgpt.com/docs/agent-approvals-security">OpenAI</a>).</p>
+
+<p><strong>GitHub Copilot</strong>: replaced request limits with token-metered “AI Credits” June 1, 2026
+(<a href="https://guickly.com/blogs/github-copilot-pricing-2026">Guickly</a>). Its cloud agent’s egress
+firewall explicitly excludes MCP traffic
+(<a href="https://docs.github.com/en/copilot/reference/copilot-allowlist-reference">allowlist</a>).</p>
+
+<p><strong>Cursor</strong>: paid tiers bill against a usage-pegged credit pool since June 2025
+(<a href="https://www.cloudzero.com/blog/cursor-ai-pricing/">CloudZero</a>). Its own docs call Run Modes
+“best-effort guardrails,” no OS-level sandbox
+(<a href="https://cursor.com/docs/agent/security">Cursor</a>).</p>
+
+<p><strong>Windsurf</strong>: dropped credits for the quota pricing shown above in March 2026
+(<a href="https://www.cloudzero.com/blog/windsurf-pricing/">CloudZero</a>), soon after Cognition acquired it
+for ~$250M
+(<a href="https://www.techcrunch.com/2025/07/14/cognition-maker-of-the-ai-coding-agent-devin-acquires-windsurf/">TechCrunch</a>).
+Permissions documentation was unreachable this pass (stated unconfirmed, not assumed).</p>
+
+<p><strong>Cline</strong>: genuinely free, inference only (~$0.50 light, $5-8 heavy session), with a
+user-submittable MCP Marketplace built in
+(<a href="https://cline.bot/pricing">pricing</a>, <a href="https://cline.bot/mcp-marketplace">marketplace</a>).</p>
+
+<p><strong>Roo Code</strong>, a Cline fork with four modes plus parallel “Boomerang” sub-agents, was shut down and
+archived May 15, 2026 (<a href="https://baeseokjae.github.io/posts/cline-vs-roo-code-2026/">source</a>). The
+simpler two-phase split it forked away from is what won adoption.</p>
+
+<p><strong>Aider</strong>: Apache-2.0, free beyond inference. Every edit is its own tagged git commit
+(<a href="https://aider.chat/docs/git.html">git docs</a>, <a href="https://aitoolfinder.org/tools/aider/">review</a>).</p>
+
+<p><strong>opencode</strong>: MIT-licensed, 75+ providers, pairs a Plan-then-Build gate with in-terminal LSP
+diagnostics (<a href="https://opencode.ai/docs/">docs</a>, <a href="https://aiwiki.ai/wiki/opencode">wiki</a>).</p>
+
+<p><strong>Zed</strong>: tiers and the +10% overage rate both from one review
+(<a href="https://aicoderscope.com/blog/zed-editor-ai-review-2026/">aicoderscope</a>). Permissions are a
+tiered setting with per-tool overrides, implementing only the Tools/Prompts half of MCP
+(<a href="https://zed.dev/docs/ai/mcp">docs</a>).</p>
+
+<p><strong>Junie</strong>: pricing from one source
+(<a href="https://aiproductivity.ai/blog/jetbrains-ai-assistant/">aiproductivity.ai</a>). Shows a file-by-file
+plan before editing, grounded in IntelliJ’s own structural index, not text guessing
+(<a href="https://vibecoding.app/blog/junie-review">review</a>).</p>
+
+<p><strong>Jules</strong>: clones your repo into a sandboxed cloud VM, plans, edits, opens a PR with no live
+session. It reported 140,000+ shipped improvements during its beta
+(<a href="https://www.morphllm.com/comparisons/jules-google-coding-agent">comparison</a>).</p>
+
+<p><strong>Amp</strong>’s own <a href="https://ampcode.com/pricing">pricing page</a> used terminology (“orbs,” “Megawatt,”
+“Gigawatt”) a second source couldn’t corroborate. Treat exact tier names as unverified, though a
+free tier plus roughly $20/$200 paid tiers check out.</p>
+
+<p><strong>Devin</strong>’s two most recent pricing descriptions disagree: flat subscription-quota versus
+ACU-metered, real usage reported ~50% above vendor estimates
+(<a href="https://www.digitalapplied.com/blog/devin-ai-autonomous-coding-complete-guide">digitalapplied</a>,
+<a href="https://automationatlas.io/tools/devin/">automationatlas</a>). This is plausibly a post-acquisition
+re-pricing, unconfirmed.</p>
+
+<p><strong>Replit Agent</strong>’s tiers are from one source
+(<a href="https://automationatlas.io/answers/replit-agent-pricing-explained-2026/">automationatlas</a>). It owns
+prompt-to-deployed-app end to end, and its cost has been the most volatile here: reports of spend
+spiking from $180-200/mo to $1,000 in a week after Agent 3
+(<a href="https://hackceleration.com/replit-review">hackceleration</a>).</p>
+
+<p><strong>Claude Code pointed at a local server</strong> talks to one endpoint, whatever <code class="language-plaintext highlighter-rouge">llama-swap</code> serves, so there is no cloud
+BYOK. What you “bring” is the local model itself, and it is swappable per run.
+See <a href="/projects/dokidex/local-cli/">Run the CLIs locally</a> to set it up yourself.</p>
+
+<blockquote>
+  <p><strong>Warning:</strong> the sharpest cautionary tale here isn’t a security bug. It’s Google’s original
+Gemini CLI: Apache-2.0, ~104,000 GitHub stars, a genuinely generous free tier. It was shut down
+effective June 18, 2026 with about six weeks’ notice, replaced by a closed-source binary with a
+far smaller free allowance
+(<a href="https://www.techtimes.com/articles/318660/20260618/gemini-cli-shutdown-takes-effect-ci-cd-pipelines-break-go-based-antigravity-cli-arrives.htm">TechTimes</a>).
+Open-source code doesn’t protect you from a <em>hosted service</em> being pulled by whoever operates it.
+That risk is structurally absent only for a tool running fully against your own local model.</p>
+</blockquote>
+
+<h2 id="2-the-patterns-underneath-the-products">2. The patterns underneath the products</h2>
+
+<p>Strip away branding and nearly every tool above is the same machine in different clothes. That’s
+worth understanding on its own, because it’s what you’re actually evaluating when you compare
+products.</p>
+
+<h3 id="21-the-agent-loop">2.1 The agent loop</h3>
+
+<p>Every entrant in this list implements some version of the same cycle: assemble context, let the
+model reason and pick a tool, execute that tool, stream the result back, and repeat until the model
+decides it’s done, with the user able to interrupt at any point without corrupting session state
+(<a href="https://arxiv.org/pdf/2604.03515">architecture taxonomy, arXiv 2604.03515</a>).</p>
+
+<figure>
+<svg viewBox="0 0 720 260" role="img" aria-labelledby="dgm-loop-title dgm-loop-desc">
+<title id="dgm-loop-title">The agent loop and its tool-call round trip</title>
+<desc id="dgm-loop-desc">Four stages in sequence (context assembly, reasoning and tool choice, tool execution, and streaming the result), with a short inner loop back to reasoning for more tool calls, a longer outer loop back to context assembly for the next user turn, and an interrupt path that can break in at any point.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="244" rx="3" />
+<text class="dgm-title" x="28" y="30">The agent loop</text>
+<text class="dgm-label-sm" x="450" y="48" text-anchor="middle">Esc / Ctrl+C: interrupt, any node</text>
+<path class="dgm-line" d="M450 52 L450 64" />
+<circle class="dgm-accent-3" cx="450" cy="66" r="4" />
+<rect class="dgm-panel" x="24" y="70" width="132" height="54" rx="3" />
+<text class="dgm-label" x="90" y="92" text-anchor="middle">Context assembly</text>
+<text class="dgm-label-sm" x="90" y="110" text-anchor="middle">CLAUDE.md / AGENTS.md, repo map</text>
+<rect class="dgm-panel" x="204" y="70" width="132" height="54" rx="3" />
+<text class="dgm-label" x="270" y="92" text-anchor="middle">Reason, choose a tool</text>
+<text class="dgm-label-sm" x="270" y="110" text-anchor="middle">typed schema: read/edit/bash/MCP</text>
+<rect class="dgm-panel" x="384" y="70" width="132" height="54" rx="3" />
+<text class="dgm-label" x="450" y="92" text-anchor="middle">Tool executes</text>
+<text class="dgm-label-sm" x="450" y="110" text-anchor="middle">diff, stdout, exit code</text>
+<rect class="dgm-panel" x="564" y="70" width="132" height="54" rx="3" />
+<text class="dgm-label" x="630" y="92" text-anchor="middle">Stream + verify</text>
+<text class="dgm-label-sm" x="630" y="110" text-anchor="middle">tests, lints, diff review</text>
+<path class="dgm-flow" d="M156 97 L200 97" />
+<polygon class="dgm-accent" points="200,97 190,91 190,103" />
+<path class="dgm-flow" d="M336 97 L380 97" />
+<polygon class="dgm-accent" points="380,97 370,91 370,103" />
+<path class="dgm-flow" d="M516 97 L560 97" />
+<polygon class="dgm-accent" points="560,97 550,91 550,103" />
+<path class="dgm-flow" d="M630 124 C 630 165, 270 165, 270 124" />
+<polygon class="dgm-accent" points="270,124 264,114 276,114" />
+<text class="dgm-label-sm" x="450" y="182" text-anchor="middle">repeats until the model stops calling tools</text>
+<path class="dgm-line" d="M660 124 C 660 225, 60 225, 60 124" />
+<polygon class="dgm-accent" points="60,124 54,114 66,114" />
+<text class="dgm-label-sm" x="360" y="240" text-anchor="middle">next user turn</text>
+</svg>
+<figcaption><strong>The inner loop is the tool-call round trip. The outer loop is the next turn.</strong>
+Nearly every tool in the table above implements exactly this shape: what differs between products
+is what fills "context assembly" and how much the user is asked before "tool executes" runs.</figcaption>
+</figure>
+
+<p>Tool schemas are what turn a chat model into an agent in the first place: actions like reading a
+file or running a shell command are exposed as typed function calls, not free-text conventions the
+model has to guess at. That same mechanism is also exactly what prompt injection abuses, because a
+tool’s <em>output</em> is just more text the model conditions on (§4 below).</p>
+
+<h3 id="22-permission-and-approval-the-hard-part">2.2 Permission and approval: the hard part</h3>
+
+<p>The interesting engineering isn’t the loop. It’s the gate that decides whether “tool executes” is
+allowed to happen. Every product above has converged on some version of ask-every-time /
+auto-accept-with-limits / fully autonomous, but the <em>mechanism</em> differs in ways that matter:</p>
+
+<ul>
+  <li><strong>True OS-level sandboxing</strong> (Codex CLI’s Seatbelt/<code class="language-plaintext highlighter-rouge">bwrap</code>+seccomp, GitHub’s cloud sandbox)
+constrains what a command <em>can</em> do, regardless of what the model <em>intends</em>.</li>
+  <li><strong>Approval-workflow-only</strong>, with no technical boundary behind it, is weaker. Cursor’s own docs
+concede this plainly.</li>
+  <li><strong>Two-layer MCP approval</strong> (connection-level, then per-call) is now typical, but gaps are common:
+GitHub’s own cloud firewall explicitly excludes MCP traffic.</li>
+  <li><strong>Destructive-action gating</strong>, where a tool self-declares a call destructive, is promising but
+trusts that declaration. A malicious server can simply lie about it.</li>
+</ul>
+
+<figure>
+<svg viewBox="0 0 720 500" role="img" aria-labelledby="dgm-perm-title dgm-perm-desc">
+<title id="dgm-perm-title">A permission-gate decision flow</title>
+<desc id="dgm-perm-desc">A tool call checks a deny rule first, then whether it touches a protected trust surface, then whether an allow rule or an auto/bypass mode applies. Anything left over is asked of the user, who can approve or deny.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="484" rx="3" />
+<text class="dgm-title" x="28" y="30">Deny wins first, always</text>
+<rect class="dgm-panel" x="165" y="14" width="130" height="40" rx="3" />
+<text class="dgm-label" x="230" y="38" text-anchor="middle">Tool call requested</text>
+<path class="dgm-flow" d="M230 54 L230 78" />
+<polygon class="dgm-accent" points="230,78 224,68 236,68" />
+<polygon class="dgm-panel" points="230,80 350,120 230,160 110,120" />
+<text class="dgm-label-sm" x="230" y="116" text-anchor="middle">Matches a</text>
+<text class="dgm-label-sm" x="230" y="130" text-anchor="middle">deny rule?</text>
+<rect class="dgm-panel" x="490" y="98" width="150" height="44" rx="3" />
+<circle class="dgm-accent-3" cx="512" cy="120" r="5" />
+<text class="dgm-label" x="565" y="124" text-anchor="middle">Blocked</text>
+<path class="dgm-flow" d="M350 120 L490 120" />
+<polygon class="dgm-accent-3" points="490,120 480,114 480,126" />
+<text class="dgm-label-sm" x="420" y="110">yes</text>
+<path class="dgm-flow" d="M230 160 L230 188" />
+<polygon class="dgm-accent" points="230,188 224,178 236,178" />
+<text class="dgm-label-sm" x="248" y="178">no</text>
+<polygon class="dgm-panel" points="230,188 350,230 230,272 110,230" />
+<text class="dgm-label-sm" x="230" y="226" text-anchor="middle">Touches a protected</text>
+<text class="dgm-label-sm" x="230" y="240" text-anchor="middle">trust surface?</text>
+<rect class="dgm-panel" x="490" y="208" width="150" height="44" rx="3" />
+<circle class="dgm-accent-3" cx="512" cy="230" r="5" />
+<text class="dgm-label-sm" x="565" y="226" text-anchor="middle">Blocked even</text>
+<text class="dgm-label-sm" x="565" y="238" text-anchor="middle">under --yolo</text>
+<path class="dgm-flow" d="M350 230 L490 230" />
+<polygon class="dgm-accent-3" points="490,230 480,224 480,236" />
+<text class="dgm-label-sm" x="420" y="220">yes</text>
+<path class="dgm-flow" d="M230 272 L230 298" />
+<polygon class="dgm-accent" points="230,298 224,288 236,288" />
+<text class="dgm-label-sm" x="248" y="288">no</text>
+<polygon class="dgm-panel" points="230,298 350,340 230,382 110,340" />
+<text class="dgm-label-sm" x="230" y="336" text-anchor="middle">Allow rule, or auto /</text>
+<text class="dgm-label-sm" x="230" y="350" text-anchor="middle">bypass mode?</text>
+<rect class="dgm-panel" x="490" y="318" width="150" height="44" rx="3" />
+<circle class="dgm-ok" cx="512" cy="340" r="5" />
+<text class="dgm-label" x="565" y="344" text-anchor="middle">Runs</text>
+<path class="dgm-flow" d="M350 340 L490 340" />
+<polygon class="dgm-ok" points="490,340 480,334 480,346" />
+<text class="dgm-label-sm" x="420" y="330">yes</text>
+<path class="dgm-flow" d="M230 382 L230 412" />
+<polygon class="dgm-accent" points="230,412 224,402 236,402" />
+<text class="dgm-label-sm" x="248" y="402">no</text>
+<rect class="dgm-panel" x="165" y="412" width="130" height="40" rx="3" />
+<text class="dgm-label" x="230" y="436" text-anchor="middle">Ask the user</text>
+<path class="dgm-flow" d="M195 452 L125 452" />
+<polygon class="dgm-ok" points="125,452 135,446 135,458" />
+<rect class="dgm-panel" x="40" y="452" width="170" height="32" rx="3" />
+<circle class="dgm-ok" cx="58" cy="468" r="4" />
+<text class="dgm-label-sm" x="130" y="472" text-anchor="middle">Approved &#8594; runs</text>
+<path class="dgm-flow" d="M265 452 L335 452" />
+<polygon class="dgm-accent-3" points="335,452 325,446 325,458" />
+<rect class="dgm-panel" x="330" y="452" width="170" height="32" rx="3" />
+<circle class="dgm-accent-3" cx="348" cy="468" r="4" />
+<text class="dgm-label-sm" x="420" y="472" text-anchor="middle">Denied &#8594; blocked</text>
+</svg>
+<figcaption><strong>A deny rule always wins, and a protected surface blocks even a "skip all
+prompts" flag.</strong> This shape (deny-first, then a small set of un-bypassable protections,
+only then autonomy) recurs across Claude Code, Codex and Cline alike, which is why it is drawn here
+as a general shape rather than as any one product's flowchart.</figcaption>
+</figure>
+
+<p><strong>Approval fatigue and race conditions are structural, not incidental</strong>, and that’s the genuinely
+hard part here, not drawing this flowchart. A user asked to approve every tool call habituates to
+clicking “allow,” and an editor’s auto-reload can execute a file write before a human has actually
+read the diff. No product in this list has fully solved that. The two most credible partial
+mitigations are an automated reviewer model pre-screening risky requests (Codex) and OS sandboxing
+that makes the approval moot for a whole class of actions in the first place.</p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> treating any approval prompt as a security boundary. Cursor’s own
+documentation states its guardrails are “best-effort,” not a hard boundary, and even a strict
+per-call approval flow can be worn down by habituation. A prompt you click through on autopilot
+protects you from nothing.</p>
+</blockquote>
+
+<h3 id="23-context-management-orientation-retrieval-compaction-subagents">2.3 Context management: orientation, retrieval, compaction, subagents</h3>
+
+<p><strong>Orientation files</strong> (<code class="language-plaintext highlighter-rouge">CLAUDE.md</code>, <code class="language-plaintext highlighter-rouge">AGENTS.md</code>) are a project-level
+instruction file re-read every session: build commands, conventions, security rules. <code class="language-plaintext highlighter-rouge">AGENTS.md</code>
+was formalized as an open spec in August 2025 by OpenAI/Codex, Cursor, Google’s Jules team, and
+Factory, then donated to the Linux Foundation’s Agentic AI Foundation by December 2025, with over
+60,000 projects and roughly 15 tools recognizing it
+(<a href="https://agents.md/">agents.md</a>, <a href="https://codersera.com/blog/agents-md-complete-guide-2026/">guide</a>).
+Most agents read whichever of <code class="language-plaintext highlighter-rouge">AGENTS.md</code> or <code class="language-plaintext highlighter-rouge">CLAUDE.md</code> exists, in a fixed precedence order.
+Maintaining more than one for different tools is usually redundant; pointing one at the other with
+a single include line is the cheap way to keep them honest.
+How much you should put in one has changed sharply with the current model generation. See
+<a href="#26-what-changed-with-the-claude-5-generation-fewer-rules-later-loading">2.6</a> before writing a long one.</p>
+
+<p>Two philosophies compete for <strong>what the model sees of your codebase</strong>: build a structural map up
+front (Aider’s repo map, LSP symbols) and let it request full files selectively, or lean on
+embedding-based retrieval for a very large monorepo. Full reads cost more tokens but eliminate
+“edited against a stale snippet” bugs. Retrieval scales further but reintroduces that risk.</p>
+
+<p>As a session runs long, tools summarize-and-restart rather than truncate: this is <strong>compaction</strong>.
+What a compaction summary <em>keeps</em> (architectural decisions, unresolved questions, key facts) matters
+far more than how aggressively it compresses. Naive truncation reliably reintroduces bugs the agent
+already fixed once (<a href="https://codex.danielvaughan.com/2026/04/14/context-compaction-deep-dive-codex-cli-claude-code-opencode/">compaction deep-dive</a>).</p>
+
+<figure>
+<svg viewBox="0 0 720 320" role="img" aria-labelledby="dgm-ctx-title dgm-ctx-desc">
+<title id="dgm-ctx-title">Context fills, compacts, and fills again</title>
+<desc id="dgm-ctx-desc">Token usage rises across turns in a session, hits a compaction threshold, drops partway back down as older history is summarized, and rises again, repeating twice more over the session, while a reserved band for orientation files stays constant at the bottom throughout.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="304" rx="3" />
+<text class="dgm-title" x="28" y="30">Context fills, compacts, and fills again</text>
+<rect class="dgm-accent" fill-opacity="0.15" x="60" y="210" width="620" height="50" />
+<path class="dgm-line" d="M60 260 L680 260" />
+<path class="dgm-line" d="M60 40 L60 260" />
+<path class="dgm-line" stroke-dasharray="4 4" d="M60 75 L680 75" />
+<text class="dgm-label-sm" x="600" y="68" text-anchor="middle">auto-compact threshold</text>
+<text class="dgm-label-sm" x="45" y="48" text-anchor="end">full</text>
+<text class="dgm-label-sm" x="45" y="264" text-anchor="end">0</text>
+<path class="dgm-flow" d="M60 230 L160 150 L260 70 L270 170 L400 90 L410 160 L560 75 L570 150 L680 100" />
+<circle class="dgm-accent-2" cx="260" cy="70" r="3" />
+<circle class="dgm-accent-2" cx="400" cy="90" r="3" />
+<circle class="dgm-accent-2" cx="560" cy="75" r="3" />
+<circle class="dgm-accent" cx="270" cy="170" r="3" />
+<circle class="dgm-accent" cx="410" cy="160" r="3" />
+<circle class="dgm-accent" cx="570" cy="150" r="3" />
+<text class="dgm-label-sm" x="370" y="292" text-anchor="middle">turns over one session &#8594;</text>
+<text class="dgm-label-sm" x="370" y="238" text-anchor="middle">reserved: orientation files survive compaction intact</text>
+</svg>
+<figcaption><strong>Compaction drops old history, not the orientation file.</strong> The sawtooth
+never resets to zero because a good compaction keeps decisions and open questions, not just fewer
+tokens: the drop is smaller than the rise, every time, in a well-behaved implementation.</figcaption>
+</figure>
+
+<p><strong>Subagents</strong> delegate work to a child agent running in its own, isolated context window, returning
+only a summary to the parent rather than its full transcript. The dominant “supervisor” pattern
+keeps one auditable decision-maker instead of peer agents coordinating directly
+(<a href="https://www.philschmid.de/subagent-patterns-2026">subagent patterns</a>). Claude Code’s <code class="language-plaintext highlighter-rouge">Task</code> tool
+implements the same shape, and on a single local card those subagents serialize through one seat
+rather than running in parallel.</p>
+
+<h3 id="24-checkpoints-undo-and-recovery">2.4 Checkpoints, undo, and recovery</h3>
+
+<p>Three recovery mechanisms exist across this list, and <strong>they are not interchangeable</strong>:</p>
+
+<ol>
+  <li><strong>File-level checkpointing</strong> (Claude Code, Cursor) snapshots file content before a
+write/edit call. It restores files, not the shell, so a stray <code class="language-plaintext highlighter-rouge">rm</code> isn’t covered by either tool
+(<a href="https://code.claude.com/docs/en/agent-sdk/file-checkpointing">Claude Code docs</a>).</li>
+  <li><strong>Git-commit-as-checkpoint</strong> (Aider) makes every edit its own real commit, coarser-grained but
+recoverable with ordinary git tooling, not a proprietary command.</li>
+  <li><strong>Platform/VM-level checkpointing</strong> (Replit, Devin) snapshots the whole sandboxed workspace:
+the only approach here that can capture dependency installs and shell side effects, at the cost
+of being tied to that platform’s own infrastructure.</li>
+</ol>
+
+<p>A tool that markets “checkpoints” without stating scope invites you to assume shell damage is
+recoverable when, in most implementations, it isn’t. Worth checking before you need it, not after.</p>
+
+<h3 id="25-plan-mode-act-mode-and-orchestration">2.5 Plan mode, act mode, and orchestration</h3>
+
+<p>The plan/act split (propose changes read-only, then execute in a separate, granted phase) is now
+close to universal (Claude Code, Codex, Cline’s original design, Junie, Replit, and most others’
+<code class="language-plaintext highlighter-rouge">/plan</code>/<code class="language-plaintext highlighter-rouge">/act</code>, which filter the model’s <em>tool schema itself</em> down to read-only calls, not just ask
+it nicely). Roo Code’s richer four-mode alternative was arguably more expressive. Its May 2026
+discontinuation is a real data point that the simpler split is what actually stuck.</p>
+
+<p>For orchestration beyond one agent, “supervisor” (one parent dispatching to isolated-context
+children) is reported as the production default for coding, because it keeps a single, auditable
+locus of decision-making, versus “swarm” patterns where auditability is harder to guarantee
+(<a href="https://amux.io/guides/ai-agent-orchestration-2026/">orchestration guide</a>).</p>
+
+<h3 id="26-what-changed-with-the-claude-5-generation-fewer-rules-later-loading">2.6 What changed with the Claude 5 generation: fewer rules, later loading</h3>
+
+<p>Most published advice on writing orientation files and system prompts was worked out against
+2024-2025 models, and a chunk of it is now counterproductive. In July 2026 Anthropic published its
+revised guidance alongside a concrete number: it removed <strong>over 80% of Claude Code’s system prompt</strong>
+for the Claude 5 generation with no degradation on coding evaluations
+(<a href="https://claude.com/blog/the-new-rules-of-context-engineering-for-claude-5-generation-models">The new rules of context engineering</a>).</p>
+
+<p>The through-line is that capable models no longer need to be fenced in, and the fencing itself was
+costing quality. Six specific reversals:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Old practice</th>
+      <th>Current guidance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Rigid rules: “never write multi-paragraph docstrings”, “default to no comments”</td>
+      <td>State the <em>goal</em> and trust judgment: “write code that reads like the surrounding code: match its comment density, naming, and idiom”</td>
+    </tr>
+    <tr>
+      <td>Teach a tool with usage examples</td>
+      <td>Design the tool’s <strong>interface</strong> so correct use is obvious: an explicit status enum (<code class="language-plaintext highlighter-rouge">pending</code>, <code class="language-plaintext highlighter-rouge">in_progress</code>, <code class="language-plaintext highlighter-rouge">completed</code>) does the teaching a paragraph of examples used to</td>
+    </tr>
+    <tr>
+      <td>Load all context up front</td>
+      <td><strong>Progressive disclosure</strong>: put detail in skills the model activates when relevant, and load tool definitions on demand rather than all at once</td>
+    </tr>
+    <tr>
+      <td>Repeat instructions in both the system prompt and the tool description</td>
+      <td>Say it once, in the tool definition</td>
+    </tr>
+    <tr>
+      <td>Manual note-taking into an orientation file</td>
+      <td>Automatic memory, where the harness supports it</td>
+    </tr>
+    <tr>
+      <td>Prose specs in markdown</td>
+      <td>Richer references: actual code, test suites, rubrics. Prefer the real artifact over a description of it</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Practically, for an orientation file today: keep it a <strong>lightweight repository summary plus the
+gotchas that are genuinely specific to this repo</strong>, and push everything else into skills or
+references. A long file restating general good practice is now a cost, not an investment. Claude
+Code ships <code class="language-plaintext highlighter-rouge">claude doctor</code> to rightsize existing skill and <code class="language-plaintext highlighter-rouge">CLAUDE.md</code> files.</p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> reading this as “context engineering is over.” It is the opposite: the
+guidance moved from <em>writing more instructions</em> to <em>designing what the model sees and when</em>.
+Interface design, progressive disclosure and choosing the right reference artifact are all
+context engineering, and they are harder than writing rules.</p>
+</blockquote>
+
+<blockquote>
+  <p><strong>Note: how much of this transfers to a local model is an open question. We won’t pretend
+otherwise.</strong> Every claim above was measured by Anthropic on frontier Claude models. The
+reversals are all bets on model judgment, and judgment is precisely what a 30B local model has
+less of. The explicit guardrails Claude 5 no longer needs are plausibly still load-bearing for
+<a href="/projects/dokidex/models/">the models DokiDex runs</a>. Our own experience points that way,
+since we chose the daily-driver tier over a higher-scoring candidate specifically because the
+alternative was less reliable at following tool-call structure. Treat “delete 80% of
+your prompt” as validated for frontier models and untested below them. If you run local, change
+one thing at a time and check it against your own evals.</p>
+</blockquote>
+
+<h2 id="3-does-it-actually-help">3. Does it actually help?</h2>
+
+<p>This is the section vendor pages skip, and it’s the one that tests whether a site like this one is
+worth trusting on anything else.</p>
+
+<p><strong>METR’s 2025 randomized controlled trial</strong> (16 experienced open-source developers, 246 real
+issues from their own backlogs, AI-allowed versus AI-disallowed) found developers took <strong>19%
+longer</strong> on issues when allowed to use AI (mostly Cursor with Claude 3.5/3.7 Sonnet). That’s the
+opposite of the expected direction. More striking was the perception gap: developers <em>forecast</em> a
+24% speedup beforehand, and even after experiencing the slowdown, still estimated AI had made them
+roughly 20% faster
+(<a href="https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/">METR blog</a>,
+<a href="https://arxiv.org/abs/2507.09089">arXiv 2507.09089</a>).</p>
+
+<p><strong>METR’s 2026 follow-up</strong> had to be redesigned mid-study, because developers increasingly refused
+the “no AI” condition and a pay cut compounded the bias. A returning-developer cohort came back
+with an estimated 18% slowdown, confidence interval spanning roughly −38% to +9% (wide, and it
+crosses zero). A newly-recruited cohort showed a 4% slowdown (CI −15% to +9%). METR called it
+“very weak evidence,” in either direction
+(<a href="https://metr.org/blog/2026-02-24-uplift-update/">2026 update</a>).</p>
+
+<p>Read together: a rigorous 2025 study found a real slowdown in one expert-developer setting.
+Developers were reliably overconfident about AI’s benefit, a pattern that replicated across the
+before/after measurement. And the 2026 re-run became uninterpretable due to who dropped out.
+<strong>There is currently no methodologically clean estimate of coding-agent productivity impact for
+2026</strong>: only weaker, self-selected evidence still trending negative, with intervals wide enough to
+cross zero.</p>
+
+<p><strong>Independent commit-history analysis</strong> points at an adjacent concern: quality. GitClear’s analysis
+of 623 million tracked code changes (2023-2026) finds cross-file reuse down 35%, refactoring
+activity collapsed to 3.8% of changed lines (down from 21% in 2022), and broad <code class="language-plaintext highlighter-rouge">try/catch</code>-style
+error-masking up 47% versus 2022 baselines, alongside a 15% rise in two-week churn
+(<a href="https://www.gitclear.com/the_ai_code_quality_maintainability_gap">GitClear</a>). A separate 211M-line
+cut reports AI usage correlating with up to 9x higher churn on some measures, though it attributes
+most heavy users’ raw output advantage to pre-existing differences between developers, not the
+tool: the AI-attributable gain, controlling for a developer’s own baseline, is closer to 25%
+(<a href="https://arc.dev/talent-blog/impact-of-ai-on-code/">Arc.dev</a>). GitClear is a code-analytics vendor
+with a commercial stake in this narrative, so treat its percentages as one lab’s methodology, not
+consensus. But the direction is worth taking seriously.</p>
+
+<blockquote>
+  <p><strong>Misconception:</strong> “this tool makes me Nx faster.” The best available randomized evidence
+doesn’t support a specific multiplier in either direction, and the one thing that <em>did</em> replicate
+is that developers overestimate the benefit whether or not it’s actually there. If you want your
+own number, time yourself on comparable tasks with the tool on and off.</p>
+</blockquote>
+
+<h2 id="4-security-prompt-injection-and-the-mcp-supply-chain">4. Security: prompt injection and the MCP supply chain</h2>
+
+<p><strong>Prompt injection against coding agents is demonstrated, not theoretical.</strong> A systematic review
+cited across multiple 2026 sources reports that all tested agents (including Claude Code, Cursor,
+and GitHub Copilot) showed some vulnerability to prompt injection across 78 surveyed studies
+(<a href="https://www.pillar.security/blog/new-vulnerability-in-github-copilot-and-cursor-how-hackers-can-weaponize-code-agents">Pillar Security</a>).</p>
+
+<figure>
+<svg viewBox="0 0 720 300" role="img" aria-labelledby="dgm-inj-title dgm-inj-desc">
+<title id="dgm-inj-title">The prompt-injection path through a tool result</title>
+<desc id="dgm-inj-desc">Untrusted content such as a PR title or issue comment returns to the model as an ordinary tool result, with no separate channel marking it as data rather than instruction. The model conditions on it and can issue a new, attacker-directed tool call, which either executes if unmitigated or is caught by a sandbox, firewall, or destructive-action gate.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="284" rx="3" />
+<text class="dgm-title" x="28" y="30">No boundary between data and instructions</text>
+<rect class="dgm-panel" x="24" y="50" width="132" height="56" rx="3" />
+<text class="dgm-label" x="90" y="72" text-anchor="middle">Untrusted content</text>
+<text class="dgm-label-sm" x="90" y="90" text-anchor="middle">PR title, comment, web page, MCP output</text>
+<rect class="dgm-panel" x="204" y="50" width="132" height="56" rx="3" />
+<text class="dgm-label" x="270" y="72" text-anchor="middle">Returned as a tool result</text>
+<text class="dgm-label-sm" x="270" y="90" text-anchor="middle">just text: no data/instruction channel</text>
+<rect class="dgm-panel" x="384" y="50" width="132" height="56" rx="3" />
+<text class="dgm-label" x="450" y="72" text-anchor="middle">Model conditions on it</text>
+<text class="dgm-label-sm" x="450" y="90" text-anchor="middle">reads it like your own instruction</text>
+<rect class="dgm-panel" x="564" y="50" width="132" height="56" rx="3" />
+<text class="dgm-label" x="630" y="72" text-anchor="middle">Issues a new tool call</text>
+<text class="dgm-label-sm" x="630" y="90" text-anchor="middle">e.g. read .env, post as a comment</text>
+<path class="dgm-flow" d="M156 78 L200 78" />
+<circle class="dgm-accent-3" cx="180" cy="78" r="4" />
+<text class="dgm-label-sm" x="180" y="42" text-anchor="middle">no trust boundary crosses here</text>
+<path class="dgm-flow" d="M336 78 L380 78" />
+<polygon class="dgm-accent" points="380,78 370,72 370,84" />
+<path class="dgm-flow" d="M516 78 L560 78" />
+<polygon class="dgm-accent" points="560,78 550,72 550,84" />
+<path class="dgm-line" d="M580 106 L465 190" />
+<polygon class="dgm-accent-3" points="465,190 470,178 478,188" />
+<text class="dgm-label-sm" x="500" y="150">if unmitigated</text>
+<rect class="dgm-panel" x="380" y="190" width="170" height="50" rx="3" />
+<circle class="dgm-accent-3" cx="398" cy="212" r="5" />
+<text class="dgm-label-sm" x="465" y="216" text-anchor="middle">Executed: secret</text>
+<text class="dgm-label-sm" x="465" y="230" text-anchor="middle">leaves the machine</text>
+<path class="dgm-line" d="M650 106 L635 190" />
+<polygon class="dgm-ok" points="635,190 630,178 640,180" />
+<text class="dgm-label-sm" x="665" y="150" text-anchor="middle">if gated</text>
+<rect class="dgm-panel" x="560" y="190" width="150" height="50" rx="3" />
+<circle class="dgm-ok" cx="578" cy="212" r="5" />
+<text class="dgm-label-sm" x="635" y="216" text-anchor="middle">Blocked: sandbox,</text>
+<text class="dgm-label-sm" x="635" y="230" text-anchor="middle">firewall, or gate</text>
+</svg>
+<figcaption><strong>The vulnerability isn't a missing check. It's a missing channel.</strong> A
+tool result carries no marker distinguishing "data to read" from "instruction to follow," so
+anything the agent reads that an attacker also controls is a candidate instruction. Defense has to
+happen at the next step (sandbox, firewall, gate), because it can't happen at this one.</figcaption>
+</figure>
+
+<p><strong>The flagship case study</strong>, disclosed around April 2026 under the name “Comment and Control,”
+demonstrated working exploits against three production integrations: Anthropic’s Claude Code
+Security Review GitHub Action (a malicious PR <em>title</em> triggered command execution), Google’s
+Gemini CLI GitHub Action (issue-comment payloads bypassed guardrails), and GitHub Copilot Agent
+(payloads hidden in HTML comments bypassed content filtering). All three abused content the agent
+was already reading as part of its normal job, achieving command execution and secret exfiltration
+into public PR comments. The Claude Code and Gemini CLI variants fired automatically through CI,
+no manual step needed. Anthropic rated it critical and disallowed the <code class="language-plaintext highlighter-rouge">ps</code> tool in that context.
+Google added guardrail prompting. <strong>GitHub classified it as a known architectural limitation
+rather than a fixable flaw.</strong> That’s a meaningfully different triage than the other two gave. The
+researchers’ own framing: any agent with powerful tool access, exposure to untrusted input, and a
+channel to communicate externally is exploitable by construction
+(<a href="https://www.securityweek.com/claude-code-gemini-cli-github-copilot-agents-vulnerable-to-prompt-injection-via-comments/">SecurityWeek</a>).</p>
+
+<p><strong>MCP supply-chain risk is now treated as the primary 2026 threat vector</strong>, ahead of prompt
+injection as its own category: the Cloud Security Alliance frames it as “a supply chain problem
+first, a prompt injection problem second,” since MCP servers run with broader permissions than the
+package-ecosystem attacks (typosquatting, marketplace poisoning) they otherwise resemble
+(<a href="https://labs.cloudsecurityalliance.org/research/csa-research-note-mcp-security-crisis-20260504-csa-styled/">CSA research note</a>).
+A formal taxonomy applying STRIDE/ATT&amp;CK modeling to MCP calls out <strong>tool poisoning</strong> (a
+compromised server silently executing a harmful action behind a legitimate-looking call) and
+<strong>“rug pull”</strong> (a trusted server changed or replaced by its maintainer, or an attacker) as most
+severe, and notes a tool’s <em>description</em> is visible to the model but often invisible in the
+user-facing UI, so an adversarial instruction can hide where no human looks
+(<a href="https://arxiv.org/pdf/2603.18063">arXiv 2603.18063</a>). Researchers also reported a
+command-execution vulnerability in Anthropic’s own reference MCP SDKs in 2026. Even a reference
+implementation isn’t automatically safe from this class of bug.</p>
+
+<p>Mitigations, ranked by how structural (versus cosmetic) each is: OS-level sandboxing of the whole
+execution environment. Egress firewalling with a default-deny allowlist (every implementation
+checked here excludes MCP traffic). Destructive-action gating at the tool-schema level (trusting
+the tool’s own self-declared schema). An automated model pre-screening risky requests. And
+bounty-driven disclosure, necessary but reactive. Defense-in-depth is the honest position in
+mid-2026. No single fix covers it. At least one credible vendor has stated some instances
+aren’t currently fixable, only mitigatable. Treat any agent with tool-execution rights and
+exposure to untrusted repository content as exploitable by default.</p>
+
+<h2 id="5-which-tool-fits-your-situation">5. Which tool fits your situation</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Your situation</th>
+      <th>Best-fit tool(s)</th>
+      <th>Why</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Already pay for Claude, want the deepest checkpoint/subagent/plugin system</td>
+      <td><strong>Claude Code</strong></td>
+      <td>Richest plugin ecosystem and most granular checkpointing here. Locked to Anthropic, $100+/mo for Code seats.</td>
+    </tr>
+    <tr>
+      <td>Need strict, auditable, two-axis sandboxing and approval, regulated or CI use</td>
+      <td><strong>Codex CLI</strong></td>
+      <td>Only tool with separately-configurable, OS-enforced sandbox × approval policy, plus a reviewer agent. But OpenAI-locked, and the sandbox adds friction.</td>
+    </tr>
+    <tr>
+      <td>Already on GitHub, want agent work as normal PRs under org-wide network policy</td>
+      <td><strong>GitHub Copilot coding agent</strong></td>
+      <td>Only entrant with an org-manageable, default-on cloud-agent firewall. Doesn’t cover MCP.</td>
+    </tr>
+    <tr>
+      <td>Want a full IDE with the agent in the editor core, usage-based billing is fine</td>
+      <td><strong>Cursor</strong></td>
+      <td>Deepest IDE-native integration plus the Tab model. No hard sandbox, pair with real version control.</td>
+    </tr>
+    <tr>
+      <td>Want BYOK with zero subscription lock-in, comfortable managing keys</td>
+      <td><strong>Cline</strong> or <strong>Aider</strong></td>
+      <td>Both free/OSS, pay only inference. Cline adds an MCP marketplace, and Aider adds the strongest git-commit discipline. But neither has an OS-level sandbox, while the page treats that as serious elsewhere.</td>
+    </tr>
+    <tr>
+      <td>Want a free, open-source terminal agent with the widest provider selection</td>
+      <td><strong>opencode</strong></td>
+      <td>75+ providers, MIT license, explicit plan gate. But permission semantics are unconfirmed and there’s no sandbox.</td>
+    </tr>
+    <tr>
+      <td>Deep in the JetBrains ecosystem, want behavior grounded in the IDE’s own semantic model</td>
+      <td><strong>Junie</strong></td>
+      <td>Built on IntelliJ’s structural analysis, not text guessing. Standalone CLI adds full BYOK. But JetBrains-only, and the table above lists its MCP support as “Not confirmed.”</td>
+    </tr>
+    <tr>
+      <td>Backlog of well-scoped, low-risk async tasks that shouldn’t consume live attention</td>
+      <td><strong>Google Jules</strong></td>
+      <td>Purpose-built PR-in/PR-out on an isolated cloud VM. Free tier usable for light triage. But your repository is cloned to Google’s cloud, it’s Gemini-locked, and the table above lists its permission model as undocumented.</td>
+    </tr>
+    <tr>
+      <td>Want maximum autonomy on multi-day work, will pay premium and cede turn-by-turn control</td>
+      <td><strong>Devin</strong></td>
+      <td>The only tool here built around sustained autonomy rather than an interactive loop.</td>
+    </tr>
+    <tr>
+      <td>Non-engineer or early founder who wants a full app shipped from a prompt, hosting included</td>
+      <td><strong>Replit Agent</strong></td>
+      <td>Owns editor, database, hosting, and deploy. But budget for reported cost volatility.</td>
+    </tr>
+    <tr>
+      <td>Want a near-frontier model inside an agent you already use, at a flat monthly price</td>
+      <td><strong>Claude Code / Cline / opencode pointed at a third-party endpoint</strong></td>
+      <td>Z.ai’s GLM Coding Plan starts at $18/mo and serves GLM-5.2 over an Anthropic-compatible API. The client stays the same, and only the base URL changes. See <a href="/projects/dokidex/learn/open-vs-closed/">Renting the best open model</a>. You are trusting a different provider with your code. Read their terms as carefully as you would the vendor’s</td>
+    </tr>
+    <tr>
+      <td>Want a terminal agent that never sends code off the machine, at no per-token cost</td>
+      <td><strong>Claude Code against a local server</strong></td>
+      <td>The real client, pointed at your own GPU, with no proxy in between (see <a href="/projects/dokidex/local-cli/">Run the CLIs locally</a>). Trade-off: hosted-model quality and cloud-scale sandboxing get left behind too.</td>
+    </tr>
+    <tr>
+      <td>Building an agent for a CI pipeline triggered by untrusted PR/issue content</td>
+      <td><strong>None of the above, as shipped by default</strong></td>
+      <td>“Comment and Control” showed Claude Code’s, Gemini CLI’s, and Copilot’s own CI integrations were all exploitable via ordinary PR/issue text as of April 2026. Apply defense-in-depth (§4).</td>
+    </tr>
+  </tbody>
+</table>
+
+    </article>
+
+    
+    <nav class="pager" aria-label="Page navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/learn/local/">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">Running models locally</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/state-of-ai/">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">State of AI, 2026</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="site-footer">
+  <div class="footer-main">
+    <p class="footer-line">
+      <strong>DokiDex</strong> v0.62.0:
+      a fully-local AI stack, and a field guide to the machines it runs on.
+    </p>
+    <p class="footer-line footer-dim">
+      Everything on this site is written against the real tree and the measured record. Where a
+      claim is a number, it was measured or sourced. Where it was a judgment call, the reasoning
+      is stated inline. Stale statements are bugs. File them like bugs.
+    </p>
+  </div>
+
+  <div class="footer-links">
+    <a href="/projects/dokidex/local-cli/">Run the CLIs</a>
+    <a href="/projects/dokidex/handbook/">Handbook</a>
+    <a href="/projects/dokidex/reference/">Quick reference</a>
+    <a href="/projects/dokidex/glossary/">Glossary</a>
+    <!-- Deliberately understated: last item in the row, same weight as the rest, no colour,
+         no badge, no image beacon. The ask was "inconspicuous". -->
+    <a class="footer-kofi" href="https://ko-fi.com/dougfessler" rel="noopener">Buy me a coffee</a>
+  </div>
+</footer>
+
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/dokidex.js"></script>
+</body>
+</html>

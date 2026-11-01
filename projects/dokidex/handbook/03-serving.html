@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Serving Local Models · DokiDex Handbook</title>
+<meta name="description" content="llama.cpp, GGUF, quantization as block compression, the MoE trick that fits 120B in 32 GB, and the roster that staffs the stack.">
+
+<!-- Marcellus (power word) · Kanit incl. italics 500-700 (headings/kickers/nav) ·
+     IBM Plex Mono 400/500 (code, stats) · Figtree 300-600 (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/site.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle chapter nav">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/handbook/">DokiDex Handbook</a>
+    <a class="topbar-up" href="/projects/dokidex/">&larr; DokiDex</a>
+  </header>
+
+  <nav class="sidebar" aria-label="Handbook chapters">
+    <a class="sidebar-title" href="/projects/dokidex/handbook/">DokiDex Handbook</a>
+    <ol class="nav-list">
+      
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/01-big-picture.html">
+          <span class="nav-kicker">:: THE FOUNDRY</span>
+          <span class="nav-title">The Big Picture</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link is-active" href="/projects/dokidex/handbook/03-serving.html">
+          <span class="nav-kicker">:: THE FORGE</span>
+          <span class="nav-title">Serving Local Models</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/04-tools-and-safety.html">
+          <span class="nav-kicker">:: THE GATE</span>
+          <span class="nav-title">Tools, Permissions, Safety</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/07-evals.html">
+          <span class="nav-kicker">:: THE PROOF</span>
+          <span class="nav-title">Evals & the Parity Ledger</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/08-references.html">
+          <span class="nav-kicker">:: THE CODEX</span>
+          <span class="nav-title">References & Study Path</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/09-capabilities.html">
+          <span class="nav-kicker">:: THE ARSENAL</span>
+          <span class="nav-title">Capabilities</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/10-direction.html">
+          <span class="nav-kicker">:: THE COMPASS</span>
+          <span class="nav-title">Direction</span>
+        </a>
+      </li>
+      
+    </ol>
+  </nav>
+
+  <main class="main">
+    <div class="hero reveal-up">
+      <canvas class="token-stream" aria-hidden="true"></canvas>
+      <div class="hero-inner">
+        <p class="kicker">:: THE FORGE</p>
+        <p class="power-word">FORGE</p>
+        <h1 class="hero-title">Serving Local Models</h1>
+        <p class="hero-desc">llama.cpp, GGUF, quantization as block compression, the MoE trick that fits 120B in 32 GB, and the roster that staffs the stack.</p>
+      </div>
+    </div>
+
+    <article id="content" class="prose">
+      <p>The serving layer is where the hardware constraint gets negotiated with. Everything in this
+chapter answers one question: <strong>how do you get frontier-adjacent capability out of one 32 GB
+card</strong>. The answers rhyme with rendering engineering more than anything else in the stack:
+compression formats, working-set management, streaming, and cache discipline.</p>
+
+<h2 id="the-engine-llamacpp">The engine: llama.cpp</h2>
+
+<p><strong>llama.cpp</strong> (<code class="language-plaintext highlighter-rouge">llama-server</code>) is the inference engine, a C/C++ runtime that executes
+transformer inference with CUDA acceleration, no Python in the hot path. DokiDex runs a native
+Windows CUDA build (<strong>b9878 / CUDA 13.3</strong>, pinned in <code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml</code>’s
+header) because native is the fastest single-user path on this hardware and WSL costs 20 to 40%.
+The flags that matter are load-bearing enough to name:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">--jinja</code> uses the model’s native chat/tool-call template with grammar-constrained decoding.
+This is the tool-call reliability story. Without it, agents built on local
+models degrade into prose-parsing hacks.</li>
+  <li><code class="language-plaintext highlighter-rouge">--flash-attn</code> + <code class="language-plaintext highlighter-rouge">--cache-type-k/v q8_0</code> pair an attention kernel with 8-bit KV cache
+quantization. That pair is what makes a 128k context fit the budget.</li>
+  <li><code class="language-plaintext highlighter-rouge">--cache-reuse</code> gives prompt-cache reuse across requests. Measured on this stack: <strong>92 to 99% of
+each agent turn’s prefill is served from cache</strong>, because every turn re-sends a history that’s
+identical except for the tail. Without this, a long session re-pays the whole prefill every
+turn. With it, turn latency is dominated by the new tokens only.</li>
+  <li><code class="language-plaintext highlighter-rouge">--n-cpu-moe N</code> is the 120B trick, below.</li>
+</ul>
+
+<p>There is more than one engine tree on disk. Mixing them up is a real failure mode. Three
+directories live under <code class="language-plaintext highlighter-rouge">serving/</code>: <code class="language-plaintext highlighter-rouge">llama.cpp</code> (the pinned tree, at b9878), <code class="language-plaintext highlighter-rouge">llama.cpp-b10472</code>,
+and <code class="language-plaintext highlighter-rouge">llama.cpp-v4</code>. Counting the real <code class="language-plaintext highlighter-rouge">cmd</code> lines in <code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml</code>, 17 model rows
+launch from the pinned tree, 4 from <code class="language-plaintext highlighter-rouge">llama.cpp-b10472</code>, and 1 from <code class="language-plaintext highlighter-rouge">llama.cpp-v4</code>, for 22 model
+keys in total. Note the folder names are what they are. Don’t write a build number as a path:
+the pinned tree is <code class="language-plaintext highlighter-rouge">serving/llama.cpp</code>, not <code class="language-plaintext highlighter-rouge">serving/llama.cpp-b9878</code>.</p>
+
+<h2 id="gguf-and-quantization-cooked-assets-and-block-compression">GGUF and quantization: cooked assets and block compression</h2>
+
+<p>A <strong>GGUF</strong> file is a cooked model: weights plus metadata (architecture, tokenizer, template) in
+one memory-mappable file, the <code class="language-plaintext highlighter-rouge">.pak</code> of the LLM world. The interesting engineering is
+<strong>quantization</strong>, meaning storing weights at reduced precision. The right mental model is
+texture block compression, almost exactly:</p>
+
+<ul>
+  <li><strong>Q4_K_XL</strong> (the daily-driver coder’s format) stores weights in blocks with per-block
+scales/offsets at ~4.5 bits per weight. It’s BC-style: quality loss is real but perceptually
+managed, and it’s the difference between a 30B model taking ~17 GB instead of ~60 GB in fp16.</li>
+  <li><strong>MXFP4</strong> (the heavy reasoner’s format) is a 4-bit floating-point microformat. The model was
+<em>trained</em> to tolerate it, which is why a 120B fits in ~63 GB total footprint.</li>
+  <li><strong>Q8_0 for the KV cache</strong> exists because activations tolerate less error than weights. The
+cache gets 8 bits, not 4.</li>
+</ul>
+
+<p>The discipline is empirical, not theoretical: when a Q5 quant of the daily driver was evaluated
+here, it <strong>never beat Q4 on the golden tasks</strong> (fidelity 99.3 vs 99.5, which is noise), while its VRAM
+footprint (94.3%) killed the headroom that autocomplete coexistence needs. Parked, with the
+numbers written down (<code class="language-plaintext highlighter-rouge">docs/decisions.md</code>). Compression settings are a shipping decision, and this
+repo treats them with shipping-decision rigor.</p>
+
+<h2 id="the-moe-trick-120b-parameters-3b-at-a-time">The MoE trick: 120B parameters, 3B at a time</h2>
+
+<p>Both flagship models are <strong>Mixture-of-Experts</strong>, which means the parameter count describes the
+library, not the working set. Qwen3-Coder-30B-A3B activates ~3B parameters per token. gpt-oss-120b
+similarly routes each token through a small subset of experts. If you’ve built virtual texturing, you
+already understand this: capability scales with the full library on disk, cost scales with the
+resident set.</p>
+
+<p>That’s what <code class="language-plaintext highlighter-rouge">--n-cpu-moe 22</code> exploits for <code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code>: park 22 layers’ worth of expert tensors in
+<strong>system RAM</strong> (~40 GB of DDR5) and keep attention plus the hot path in VRAM (~27 GB). Experts
+stream across the PCIe bus per token. The result: a 120B-parameter model on a 32 GB card at
+<strong>~27 tok/s</strong>. Not fast, but a completely different <em>quality tier</em> for planning and review work,
+and usable precisely because it’s cast in the planner seat, not the streaming-code seat.</p>
+
+<h2 id="llama-swap-level-streaming-for-models">llama-swap: level streaming for models</h2>
+
+<p>One model owns the card at a time (the Rule, chapter 1), but the stack needs many models. The
+answer is <strong>llama-swap</strong> (<code class="language-plaintext highlighter-rouge">:8080</code>), a proxy that exposes a single OpenAI-compatible endpoint and
+<strong>hot-swaps <code class="language-plaintext highlighter-rouge">llama-server</code> processes</strong> based on the <code class="language-plaintext highlighter-rouge">model</code> id in each request. Ask for <code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code>
+while <code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code> is loaded, and llama-swap stops one process, starts the other with its exact
+tuned command line, waits for health, and forwards the request. Model switching becomes level
+streaming: expensive (seconds), automatic, and invisible to every client.</p>
+
+<p>The config (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml</code>) is a template, where <code class="language-plaintext highlighter-rouge">__DOKI_ROOT__</code> placeholders are
+substituted at launch into <code class="language-plaintext highlighter-rouge">.run/llama-swap.generated.yaml</code>, so the whole stack survives a repo
+move. Model <em>acquisition</em> is a separate concern: <code class="language-plaintext highlighter-rouge">media-assets/llm-model-catalog.json</code> pins every
+download source with a SHA-256 (a hard-won rule after a truncated-weights incident), and
+<code class="language-plaintext highlighter-rouge">serving/model-manifest.json</code> drives the installer’s per-model opt-in checkboxes.</p>
+
+<h2 id="the-roster">The roster</h2>
+
+<p>Every tier’s name is its id, since the 2026-08-25 rename dropped the high-fantasy-sci-fi call-signs
+this table used to carry (<code class="language-plaintext highlighter-rouge">media-assets/llm-model-catalog.json</code>’s old <code class="language-plaintext highlighter-rouge">displayName</code> fields, retired
+along with the aliases they decorated). The real model, its per-request context window in brackets,
+then what it is and what it costs you in parens: read the name and you already know what it does.
+The autocomplete and embedding rows below are identified by role, not by a display name, because
+they aren’t <code class="language-plaintext highlighter-rouge">llama-swap</code> rows and never carried an alias to lose.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Footprint</th>
+      <th>Seat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code></td>
+      <td>~26 GB VRAM</td>
+      <td>daily-driver coder, ~230 to 265 tok/s</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code></td>
+      <td>~27 GB VRAM + ~40 GB RAM</td>
+      <td>heavy planner/reviewer, ~27 tok/s</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [32k] (Coding, Light)</code></td>
+      <td>~21 GB VRAM</td>
+      <td>the daily driver’s weights at 64k ctx, coexists with autocomplete</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-VL-8B [16k] (Vision, Light)</code></td>
+      <td>small</td>
+      <td>fast vision (screenshots → text)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-VL-32B [32k] (Vision, Standard)</code></td>
+      <td>large</td>
+      <td>opt-in HQ vision, fine UI text and telemetry plots</td>
+    </tr>
+    <tr>
+      <td>Autocomplete (<code class="language-plaintext highlighter-rouge">fim</code>)</td>
+      <td>~3 GB, <code class="language-plaintext highlighter-rouge">:8012</code></td>
+      <td>sub-200ms editor autocomplete (fill-in-middle)</td>
+    </tr>
+    <tr>
+      <td>Embeddings (<code class="language-plaintext highlighter-rouge">embed</code>)</td>
+      <td>tiny, <code class="language-plaintext highlighter-rouge">:8090</code></td>
+      <td>embeddings for codebase RAG</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3.8-27B [256k] (Candidate, Standard)</code></td>
+      <td>full GPU</td>
+      <td>the Claude Code seat until 2026-09-18, <code class="language-plaintext highlighter-rouge">-c 262144</code>. Scored 22/23 on the golden suite on 2026-08-18, on the stock weights: that score doesn’t carry past the 2026-08-29 abliterated swap</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen2.5-3B-Instruct [32k] (Utility, Free)</code></td>
+      <td>small, not resident beside the seat since 2026-08-26</td>
+      <td>the background/small-fast slot, when the <code class="language-plaintext highlighter-rouge">utility</code> preset is on</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">gpt-oss-20b [128k] (Reasoning, Light)</code></td>
+      <td>mid</td>
+      <td>the reasoning-effort tier and the verifier seat</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Plus the other <code class="language-plaintext highlighter-rouge">*candidate*</code> rows (Devstral-Small-2, Qwen3.6-35B variants, GLM-4.5-Air REAP prunes)
+that exist to be <strong>bake-off’d, not believed</strong>. None is promoted until it beats an incumbent on
+the golden tasks (chapter 7).</p>
+
+<p>That 32,768 on the sidecar is not a tuning choice. It’s the model’s own <code class="language-plaintext highlighter-rouge">qwen2.context_length</code>
+ceiling, which no larger <code class="language-plaintext highlighter-rouge">-c</code> raises.</p>
+
+<h2 id="the-four-everyday-models">The four everyday models</h2>
+
+<p>Four rows in <code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml</code> cover a job rather than a specific bake-off question, so a
+task can be routed to the right weight class just by naming the row. As of 2026-08-25 there’s no
+alias standing in front of any of them:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code>, the heaviest thing on the box.</li>
+  <li><code class="language-plaintext highlighter-rouge">Qwen3.6-35B-A3B-MTP [128k] (Thinking, Standard)</code>, the seat and the strongest coder here.</li>
+  <li><code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code>, the fast daily driver.</li>
+  <li><code class="language-plaintext highlighter-rouge">Qwen2.5-3B-Instruct [32k] (Utility, Free)</code>, the background slot. It was co-resident with the
+seat until 2026-08-26 and is not any more, so naming it evicts the seat unless you have switched
+to the <code class="language-plaintext highlighter-rouge">utility</code> preset.</li>
+</ul>
+
+<p>Four matching skills live in <code class="language-plaintext highlighter-rouge">harness/claude-skills/</code>, one per model. Every model row’s <code class="language-plaintext highlighter-rouge">name:</code>
+field is the row’s own key, which is why <code class="language-plaintext highlighter-rouge">/v1/models</code> reports back exactly the string you’d ask
+for, with nothing to decode.</p>
+
+<p>Two honesty notes baked into the tiers. The <code class="language-plaintext highlighter-rouge">/effort</code> dial maps to gpt-oss’s real reasoning
+rungs. There are three, so the CLI’s <code class="language-plaintext highlighter-rouge">xhigh</code>/<code class="language-plaintext highlighter-rouge">max</code> honestly reuse <code class="language-plaintext highlighter-rouge">high</code> and differentiate via
+tool-step and token budgets instead of pretending a fourth rung exists. And measurement showed
+<strong>high effort <em>loses</em> on <code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code> for coding tasks</strong>, because the
+extended reasoning starves the answer budget. The default stays <code class="language-plaintext highlighter-rouge">medium</code> by data, not by intuition.</p>
+
+<h2 id="coexistence-and-parallel-slots">Coexistence and parallel slots</h2>
+
+<p><code class="language-plaintext highlighter-rouge">coexist</code> mode is the one deliberate double-booking: the daily-driver coder drops to its 32k-ctx
+row (64k ctx frees ~5 GB) so <strong>the autocomplete server</strong> can live alongside it, giving you agent +
+editor autocomplete simultaneously. And the
+lite tier runs <code class="language-plaintext highlighter-rouge">-np 2</code>, meaning two parallel server slots, because fan-out requests (the desktop
+app’s background summarizers, batched evals) parallelize with <strong>99.98% prompt-cache reuse per
+slot</strong>. That was measured before adoption, like everything else here.</p>
+
+<p>The rest of the fleet follows the same pattern: FIM autocomplete on <code class="language-plaintext highlighter-rouge">:8012</code> and the CPU-only
+embedder on <code class="language-plaintext highlighter-rouge">:8090</code>. Own process, own health
+URL, one <code class="language-plaintext highlighter-rouge">$Services</code> entry each, group-tagged so the control plane can enforce the Rule.</p>
+
+<p>The other kind of coexistence is the seat and its sidecar. <code class="language-plaintext highlighter-rouge">Qwen2.5-3B-Instruct [32k] (Utility, Free)</code> is deliberately small
+enough to sit on the card <em>alongside</em> the <code class="language-plaintext highlighter-rouge">Qwen3.6-35B-A3B-MTP [128k] (Thinking, Standard)</code> seat. A background or
+small-fast call doesn’t evict the ~27 GB model you’re actually working with.</p>
+
+<p>Next: what happens between the model <em>asking</em> to edit your file and the file actually changing.</p>
+
+    </article>
+
+    
+    
+    
+    
+
+    
+    <nav class="chapter-pager" aria-label="Chapter navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/handbook/01-big-picture.html">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">The Big Picture</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/handbook/04-tools-and-safety.html">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">Tools, Permissions, Safety</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="statusline">
+      <span>DokiDex Handbook</span>
+      <span class="statusline-sep">&middot;</span>
+      <span>Serving Local Models</span>
+      <span class="statusline-sep">&middot;</span>
+      <span>generated from docs/site/handbook, DokiDex v0.62.0</span>
+    </footer>
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/foundry.js"></script>
+</body>
+</html>

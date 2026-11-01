@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tools, Permissions, Safety · DokiDex Handbook</title>
+<meta name="description" content="The authority model, and how an imperfect model gets real hands on your working tree without ever holding the keys.">
+
+<!-- Marcellus (power word) · Kanit incl. italics 500-700 (headings/kickers/nav) ·
+     IBM Plex Mono 400/500 (code, stats) · Figtree 300-600 (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/site.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle chapter nav">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/handbook/">DokiDex Handbook</a>
+    <a class="topbar-up" href="/projects/dokidex/">&larr; DokiDex</a>
+  </header>
+
+  <nav class="sidebar" aria-label="Handbook chapters">
+    <a class="sidebar-title" href="/projects/dokidex/handbook/">DokiDex Handbook</a>
+    <ol class="nav-list">
+      
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/01-big-picture.html">
+          <span class="nav-kicker">:: THE FOUNDRY</span>
+          <span class="nav-title">The Big Picture</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/03-serving.html">
+          <span class="nav-kicker">:: THE FORGE</span>
+          <span class="nav-title">Serving Local Models</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link is-active" href="/projects/dokidex/handbook/04-tools-and-safety.html">
+          <span class="nav-kicker">:: THE GATE</span>
+          <span class="nav-title">Tools, Permissions, Safety</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/07-evals.html">
+          <span class="nav-kicker">:: THE PROOF</span>
+          <span class="nav-title">Evals & the Parity Ledger</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/08-references.html">
+          <span class="nav-kicker">:: THE CODEX</span>
+          <span class="nav-title">References & Study Path</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/09-capabilities.html">
+          <span class="nav-kicker">:: THE ARSENAL</span>
+          <span class="nav-title">Capabilities</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/10-direction.html">
+          <span class="nav-kicker">:: THE COMPASS</span>
+          <span class="nav-title">Direction</span>
+        </a>
+      </li>
+      
+    </ol>
+  </nav>
+
+  <main class="main">
+    <div class="hero reveal-up">
+      <canvas class="token-stream" aria-hidden="true"></canvas>
+      <div class="hero-inner">
+        <p class="kicker">:: THE GATE</p>
+        <p class="power-word">GATE</p>
+        <h1 class="hero-title">Tools, Permissions, Safety</h1>
+        <p class="hero-desc">The authority model, and how an imperfect model gets real hands on your working tree without ever holding the keys.</p>
+      </div>
+    </div>
+
+    <article id="content" class="prose">
+      <p>Chapter 2 established the frame. The model is a client that <em>requests</em>. The harness holds
+authority. This chapter is that authority model in detail, because it’s the part that makes a
+local agent trustworthy enough to run against real source trees. It’s also where DokiDex’s
+engineering diverges most from “call an API in a loop” tutorials.</p>
+
+<p>The mechanisms below were built and measured in this stack’s own agent, which is gone. The shapes
+are the ones every serious coding agent converges on, so they are described here as patterns
+rather than as one implementation. Original sources were <code class="language-plaintext highlighter-rouge">tools.cpp</code> (dispatch and gates), <code class="language-plaintext highlighter-rouge">permissions.cpp</code>
+(rules and the approval UI), <code class="language-plaintext highlighter-rouge">checkpoints.cpp</code>, and <code class="language-plaintext highlighter-rouge">hooks.cpp</code>. The desktop’s C# agent
+implemented the same shape independently.</p>
+
+<h2 id="the-dispatch-pipeline">The dispatch pipeline</h2>
+
+<p>Every tool call the model emits passes through one chokepoint, <code class="language-plaintext highlighter-rouge">tools::dispatch()</code>. A mutating
+call (write, edit, notebook edit, shell) walks this gauntlet in order:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tool_call
+  → path containment      which root does the target live under? (or: none)
+  → rule evaluation       persisted allow/deny rules, deny evaluated first
+  → safety heuristics     destructive-pattern downgrades (can force Ask, never force Allow)
+  → doom-loop guard       3rd identical call this turn re-prompts even under Allow
+  → sensitive-target      permission-store/.doki writes: always interactive, even under bypass
+  → approval              auto-approve if the mode allows it, else the y/a/n gate
+  → checkpoint            snapshot the file before first mutation this turn
+  → execute
+  → undo journal          success-prefixed results push a single-step /undo entry
+</code></pre></div></div>
+
+<p>The ordering is the security argument. Deny rules are evaluated before allow rules and <strong>cannot
+be overridden by any mode, flag, or hook</strong>. A deny is a deny under <code class="language-plaintext highlighter-rouge">--yolo</code> too. Safety
+heuristics can only tighten a decision, never loosen one. And the sensitive-target check
+(anything that would rewrite the permission store itself, or the <code class="language-plaintext highlighter-rouge">.doki</code> config surfaces) refuses
+to be automated at all. The agent can’t grant itself permissions, the way a game client can’t
+grant itself authority by asking nicely over RPC.</p>
+
+<h2 id="where-a-path-is-allowed-to-point">Where a path is allowed to point</h2>
+
+<p>The workspace root is the process working directory, and every file-touching tool resolves its
+target against it. Relative paths resolve <em>only</em> against the primary root, with lexical <code class="language-plaintext highlighter-rouge">..</code>
+normalization and a case-insensitive strict-prefix containment check. The sibling-prefix trap,
+<code class="language-plaintext highlighter-rouge">D:\proj</code> against <code class="language-plaintext highlighter-rouge">D:\project</code>, is a unit-tested case, not an afterthought. A path that lands
+outside every declared root classifies as <code class="language-plaintext highlighter-rouge">external_directory</code>, a distinct prompt class with its
+own approval language.</p>
+
+<p>Multi-root is deliberate and narrow: <code class="language-plaintext highlighter-rouge">--add-dir &lt;path&gt;</code> (repeatable) declares extra working roots
+for a session. Extra roots grant <strong>file access only</strong>: no hooks, skills, or instructions are
+ever loaded from them, which is why they don’t need their own trust ceremony. There’s nothing for
+the trust gate to gate. The flag itself is the grant. Relative paths still resolve against the
+primary root only. You reach an extra root by absolute path, and the orientation tells the model
+the extra roots exist.</p>
+
+<h2 id="modes-the-four-postures">Modes: the four postures</h2>
+
+<p>The permission <em>mode</em> sets the default posture, and each mode owns a color that runs through the
+entire UI, across statusline, prompt and approval chrome. You always know the blast radius at a
+glance. This is the palette rule from the product’s design system doing safety work:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Mode</th>
+      <th>Color</th>
+      <th>Posture</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>ask</strong></td>
+      <td>grey-white</td>
+      <td>every mutation prompts (the default)</td>
+    </tr>
+    <tr>
+      <td><strong>plan</strong></td>
+      <td>cerulean</td>
+      <td>read-only exploration. The <code class="language-plaintext highlighter-rouge">exit_plan</code> tool presents a plan and offers the gate out</td>
+    </tr>
+    <tr>
+      <td><strong>auto</strong></td>
+      <td>orange</td>
+      <td>in-workspace, non-sensitive edits auto-approve. Shell still prompts</td>
+    </tr>
+    <tr>
+      <td><strong>bypass</strong></td>
+      <td>pink</td>
+      <td><code class="language-plaintext highlighter-rouge">--yolo</code>. Everything auto-approves except deny rules and sensitive targets, which survive even here</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The approval gate itself is richer than y/n: <strong>yes · yes-for-this-session · always (persist a
+rule) · no-with-a-reason</strong>. The reason is fed back to the model as a machine-readable
+refusal, so a “no” teaches rather than just blocks. “Always” echoes the exact rule pattern it’s
+about to persist before committing it. Rules live per-workspace and are managed with
+<code class="language-plaintext highlighter-rouge">/permissions</code>.</p>
+
+<h2 id="trust-the-first-open-gate">Trust: the first-open gate</h2>
+
+<p>A freshly cloned repo can carry hooks (auto-executing), skills, instruction files, and MCP server
+configs (<code class="language-plaintext highlighter-rouge">.mcp.json</code>, which spawns <em>processes</em>). A careful agent treats these as a <strong>trust surface</strong> and
+runs trust-on-first-use, the same instinct as an editor asking whether you trust a downloaded
+plugin before it loads:</p>
+
+<ul>
+  <li>On first open of a workspace whose trust surface is non-empty, an interactive gate asks. The
+decision persists per-root (keyed by a hash of the canonical path) in a store outside the
+workspace.</li>
+  <li>The hooks file’s hash is recorded at trust time: <strong>if hooks change, trust refires.</strong> A trusted
+repo doesn’t stay trusted through a hostile edit.</li>
+  <li>Non-interactive contexts (piped stdin, IDE sessions on first touch) <strong>fail closed</strong> to
+untrusted rather than guessing.</li>
+  <li><code class="language-plaintext highlighter-rouge">/teleport</code> (mid-session workspace switch) re-runs the full gate for the new root, never
+shortcutting off the old root’s cached answer.</li>
+</ul>
+
+<p>The <code class="language-plaintext highlighter-rouge">.mcp.json</code> line item is there because an audit round found it missing. A workspace-local
+file that spawns processes wasn’t part of the trust surface. Found, fixed, and now it’s a probe
+in the parity ledger. That’s the pattern for this whole layer: the safety property isn’t “we
+thought about it,” it’s “there’s a selftest pinning it.”</p>
+
+<h2 id="checkpoints-the-transaction-system">Checkpoints: the transaction system</h2>
+
+<p>Two independent recovery mechanisms, deliberately not unified:</p>
+
+<ul>
+  <li><strong>Checkpoints</strong> (<code class="language-plaintext highlighter-rouge">checkpoints.cpp</code>). Before a tool’s first mutation of a file each turn, the
+file is snapshotted into a session-scoped store. That store is git-independent, working in
+non-repos and surviving operations git would tangle. <code class="language-plaintext highlighter-rouge">/rewind</code> lists checkpoints and restores
+<strong>code, chat, or both</strong>, with supersede semantics so rewinding doesn’t orphan later states.
+Snapshots GC after 30 days (<code class="language-plaintext highlighter-rouge">kCheckpointGcMaxAgeDays</code>). If you’ve used Unreal’s transaction
+system, <code class="language-plaintext highlighter-rouge">GEditor-&gt;BeginTransaction</code> and the undo buffer, this is that, for an agent’s edits.</li>
+  <li><strong><code class="language-plaintext highlighter-rouge">/undo</code></strong> is a single-step revert of the last edit, journaled at dispatch time. Small,
+immediate, separate, and kept distinct from the checkpoint system on purpose. One is a scalpel,
+one is a time machine, and merging them historically produces tools that are neither.</li>
+</ul>
+
+<h2 id="hooks-lifecycle-delegates">Hooks: lifecycle delegates</h2>
+
+<p>Hooks are the extension seam: user-supplied handlers bound to agent lifecycle events, exactly the
+shape of engine delegates (<code class="language-plaintext highlighter-rouge">PreToolUse</code> ≈ a validating pre-save handler):</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Event</th>
+      <th>Power</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">PreToolUse</code></td>
+      <td>exit code 2 blocks the call. JSON stdout can allow/deny/ask or rewrite the tool’s input</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">PostToolUse</code></td>
+      <td>can append context to the result the model sees</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">UserPromptSubmit</code></td>
+      <td>can block a turn or inject context before it starts</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Stop</code></td>
+      <td>can force continuation with extra instructions at turn end</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Handlers are declared in <code class="language-plaintext highlighter-rouge">.doki/hooks.json</code>, which is <strong>workspace-local only, with no global root</strong>
+(a global hook that runs in every repo is an attack surface with no matching need), trust-gated as
+above. Three handler types ship: <code class="language-plaintext highlighter-rouge">command</code> (a process), <code class="language-plaintext highlighter-rouge">http</code> (loopback-only POST), and <code class="language-plaintext highlighter-rouge">prompt</code>
+(templated). A fourth, <code class="language-plaintext highlighter-rouge">agent</code>, parses and validates but is a documented v1 stub. It warns at
+fire time rather than pretending, because wiring a model-invoking hook without its own
+prompt-injection review would be exactly the kind of quiet hole this layer exists to prevent. A
+separate statusline script hook (<code class="language-plaintext highlighter-rouge">.doki/statusline*</code>) feeds one JSON-in/text-out call per turn
+into the row above the prompt.</p>
+
+<h2 id="why-this-much-machinery">Why this much machinery</h2>
+
+<p>Because the failure mode of agent tooling isn’t the model being dumb. It’s the harness being
+credulous. A local model <em>will</em> occasionally emit a destructive command, target the wrong
+directory, or loop on a broken edit. Every mechanism in this chapter exists because one of those
+actually happened, and each fix landed with a selftest so it stays fixed. See <code class="language-plaintext highlighter-rouge">--selftest-security</code>,
+<code class="language-plaintext highlighter-rouge">--selftest-checkpoints</code> and <code class="language-plaintext highlighter-rouge">--selftest-hooks</code>, because the binary carries its own test suite
+(chapter 7). The result reads paranoid until you’ve watched an agent work unsupervised for an
+hour. Then it reads like the minimum.</p>
+
+<p>Next: the evals and proof machinery that keeps a claim like any of these attached to a
+measurement.</p>
+
+    </article>
+
+    
+    
+    
+    
+
+    
+    <nav class="chapter-pager" aria-label="Chapter navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/handbook/03-serving.html">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">Serving Local Models</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/handbook/07-evals.html">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">Evals & the Parity Ledger</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="statusline">
+      <span>DokiDex Handbook</span>
+      <span class="statusline-sep">&middot;</span>
+      <span>Tools, Permissions, Safety</span>
+      <span class="statusline-sep">&middot;</span>
+      <span>generated from docs/site/handbook, DokiDex v0.62.0</span>
+    </footer>
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/foundry.js"></script>
+</body>
+</html>

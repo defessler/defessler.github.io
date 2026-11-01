@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>References & Study Path · DokiDex Handbook</title>
+<meta name="description" content="The papers, docs, and videos under this handbook, ordered as a study path, each with a reason to spend the time.">
+
+<!-- Marcellus (power word) · Kanit incl. italics 500-700 (headings/kickers/nav) ·
+     IBM Plex Mono 400/500 (code, stats) · Figtree 300-600 (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/site.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle chapter nav">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/handbook/">DokiDex Handbook</a>
+    <a class="topbar-up" href="/projects/dokidex/">&larr; DokiDex</a>
+  </header>
+
+  <nav class="sidebar" aria-label="Handbook chapters">
+    <a class="sidebar-title" href="/projects/dokidex/handbook/">DokiDex Handbook</a>
+    <ol class="nav-list">
+      
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/01-big-picture.html">
+          <span class="nav-kicker">:: THE FOUNDRY</span>
+          <span class="nav-title">The Big Picture</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/03-serving.html">
+          <span class="nav-kicker">:: THE FORGE</span>
+          <span class="nav-title">Serving Local Models</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/04-tools-and-safety.html">
+          <span class="nav-kicker">:: THE GATE</span>
+          <span class="nav-title">Tools, Permissions, Safety</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/07-evals.html">
+          <span class="nav-kicker">:: THE PROOF</span>
+          <span class="nav-title">Evals & the Parity Ledger</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link is-active" href="/projects/dokidex/handbook/08-references.html">
+          <span class="nav-kicker">:: THE CODEX</span>
+          <span class="nav-title">References & Study Path</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/09-capabilities.html">
+          <span class="nav-kicker">:: THE ARSENAL</span>
+          <span class="nav-title">Capabilities</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/10-direction.html">
+          <span class="nav-kicker">:: THE COMPASS</span>
+          <span class="nav-title">Direction</span>
+        </a>
+      </li>
+      
+    </ol>
+  </nav>
+
+  <main class="main">
+    <div class="hero reveal-up">
+      <canvas class="token-stream" aria-hidden="true"></canvas>
+      <div class="hero-inner">
+        <p class="kicker">:: THE CODEX</p>
+        <p class="power-word">CODEX</p>
+        <h1 class="hero-title">References & Study Path</h1>
+        <p class="hero-desc">The papers, docs, and videos under this handbook, ordered as a study path, each with a reason to spend the time.</p>
+      </div>
+    </div>
+
+    <article id="content" class="prose">
+      <p>Everything in the preceding chapters stands on public work. This is the curated version, not a
+bibliography dump, just the specific items worth their runtime, ordered as a study path for a
+senior engineer who wants the theory under the practice. Time estimates are honest.</p>
+
+<h2 id="start-here-the-mechanics-of-the-primitive-a-weekend">Start here: the mechanics of the primitive (a weekend)</h2>
+
+<ul>
+  <li><strong>Andrej Karpathy, “Deep Dive into LLMs like ChatGPT”</strong> (YouTube, ~3.5 h). The single best
+end-to-end treatment, covering pretraining, tokenization, fine-tuning, RLHF, hallucination and
+tool use, at exactly the depth a systems engineer wants. If you watch one thing, watch this.</li>
+  <li><strong>3Blue1Brown, “But what is a GPT?” + “Attention in transformers, visually explained”</strong>
+(YouTube, ~45 min total). The attention mechanism as animated linear algebra. Pairs with
+Karpathy the way a good diagram pairs with a good lecture.</li>
+  <li><strong>Andrej Karpathy, “Let’s build GPT: from scratch, in code”</strong> (YouTube, ~2 h). Optional but
+transformative, a transformer implemented line by line. You’re reading this handbook, which
+means you learn by writing code. This is the one that makes it stop being magic.</li>
+  <li><strong>Jay Alammar, “The Illustrated Transformer”</strong> (blog). The canonical visual walkthrough. It’s
+30 minutes. The diagrams stay in your head.</li>
+</ul>
+
+<h2 id="the-paper-trail-an-evening-each">The paper trail (an evening each)</h2>
+
+<ul>
+  <li><strong>“Attention Is All You Need”</strong>, Vaswani et al., 2017 (arXiv 1706.03762). The architecture
+everything in this stack runs on. Read after the videos, not before, because it’s terse.</li>
+  <li><strong>“ReAct: Synergizing Reasoning and Acting in Language Models”</strong>, Yao et al., 2022 (arXiv
+2210.03629). The agent loop, formalized: interleaved reasoning and tool use beats
+either alone. Short and readable.</li>
+  <li><strong>“Switch Transformers”</strong>, Fedus et al., 2021 (arXiv 2101.03961). The Mixture-of-Experts
+scaling result behind chapter 3’s “parameter count is the library, not the working set.”</li>
+  <li><strong>“Fast Inference from Transformers via Speculative Decoding”</strong>, Leviathan et al., 2022
+(arXiv 2211.17192). Why a draft model can 2× decoding without changing outputs, which is context
+for the self-drafting candidate rows in the roster.</li>
+</ul>
+
+<h2 id="the-practice-agents-and-harnesses-reference-not-cover-to-cover">The practice: agents and harnesses (reference, not cover-to-cover)</h2>
+
+<ul>
+  <li><strong>Anthropic, “Building Effective Agents”</strong> (anthropic.com/research/building-effective-agents).
+The best vendor-neutral-in-spirit writeup of agent patterns: workflows against agents, and when
+a loop beats a pipeline. DokiDex’s architecture agrees with most of it and the disagreements are
+deliberate.</li>
+  <li><strong>Anthropic, “Claude Code: Best Practices for Agentic Coding”</strong>
+(anthropic.com/engineering/claude-code-best-practices). The client this stack now drives directly,
+in its authors’ own words: instructions files, permission discipline, context habits.</li>
+  <li><strong>Model Context Protocol</strong>, modelcontextprotocol.io. The spec behind the memory and code_search servers.
+The concepts page is a 20-minute read.</li>
+  <li><strong>Agent Client Protocol</strong>, agentclientprotocol.com. Zed’s “LSP for agents,” the spec
+an IDE uses to drive an agent as a subprocess. This stack spoke it until 2026-09-02. The wire-format
+ground truth lives in <code class="language-plaintext highlighter-rouge">research/acp-protocol-notes-2026-07.md</code>.</li>
+  <li><strong>Aider, “Repository map”</strong> (aider.chat/docs/repomap.html). The PageRank-over-symbols
+approach to giving an agent repo awareness inside a token budget, and the reference design for
+this stack’s next arc (chapter 10).</li>
+</ul>
+
+<h2 id="the-machinery-local-serving">The machinery: local serving</h2>
+
+<ul>
+  <li><strong>llama.cpp</strong>, github.com/ggml-org/llama.cpp. The engine. The server README and the
+quantization discussions are the practical documentation of chapter 3’s flags.</li>
+  <li><strong>llama-swap</strong>, github.com/mostlygeek/llama-swap. The hot-swapping proxy, small enough to
+read in an afternoon.</li>
+  <li><strong>GGUF format spec</strong>, in the ggml repo (docs/gguf.md). The cooked-asset format, if you want
+the byte layout.</li>
+</ul>
+
+<h2 id="in-repo-the-primary-sources">In-repo: the primary sources</h2>
+
+<p>The deepest material isn’t external. <code class="language-plaintext highlighter-rouge">research/</code> holds the working corpus this stack was built
+from. These are the strongest entries for understanding how Claude-Code-class tools work:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">research/cli-improvement-research-2026-07.md</code> is a two-workflow study whose Part I alone ran 25
+agents, and which includes a mechanism-level deconstruction of the real Claude Code binary. The
+single richest document in the repo.</li>
+  <li><code class="language-plaintext highlighter-rouge">research/coding-clis-2026-07.md</code> is the build-vs-adopt landscape review of every serious open
+coding CLI (pi, aider, Crush, OpenCode…), and the reasoning behind which ones this stack drives.</li>
+  <li><code class="language-plaintext highlighter-rouge">research/ue-gamedev-models-2026-07.md</code> covers model specialization for UE5 C++ work
+specifically: which local models know the engine, where they fail, and the eval evidence.</li>
+  <li><code class="language-plaintext highlighter-rouge">docs/decisions.md</code> is the master decision log. Every adoption and rejection, with the gate
+results. When you wonder “why is X like this,” the answer is usually here, dated.</li>
+</ul>
+
+<p>Next: what all of this adds up to, the full capability inventory.</p>
+
+    </article>
+
+    
+    
+    
+    
+
+    
+    <nav class="chapter-pager" aria-label="Chapter navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/handbook/07-evals.html">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">Evals & the Parity Ledger</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/handbook/09-capabilities.html">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">Capabilities</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="statusline">
+      <span>DokiDex Handbook</span>
+      <span class="statusline-sep">&middot;</span>
+      <span>References & Study Path</span>
+      <span class="statusline-sep">&middot;</span>
+      <span>generated from docs/site/handbook, DokiDex v0.62.0</span>
+    </footer>
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/foundry.js"></script>
+</body>
+</html>

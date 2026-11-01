@@ -1,0 +1,804 @@
+/* ============================================================================
+   DokiDex site — public-facing pages.
+
+   Deliberately a separate stylesheet from assets/site.css (the nested handbook's). They share
+   the token block below verbatim so the two halves read as one product, but they do NOT share a
+   file: the handbook is a finished, deployed thing and every edit to a shared stylesheet would
+   risk regressing ten chapters to restyle a landing page. Thirty duplicated lines is the cheaper
+   side of that trade.
+
+   Dark-only, on purpose. The shipped app's own surfaces are dark, the handbook is dark, and a
+   light variant here would make stepping into /handbook/ feel like leaving the site.
+   ========================================================================= */
+
+:root {
+  /* --- shared with assets/site.css: keep byte-identical --- */
+  --void: #070b12;
+  --void-2: #0d1420;
+  --panel: rgba(18, 26, 40, .5);
+  --line: rgba(122, 160, 210, .16);
+
+  --cerulean: #00ACEB;
+  /* Cerulean brightened for a hover fill. Was the same magic hex duplicated in .btn-primary and
+     the download CTA, which is two places to miss when the accent ever moves. */
+  --cerulean-lit: #22c1f7;
+  --pink: #FF69B4;
+  --ember: #FF8A50;
+  --ok: #4CC38A;
+
+  --ink: #E6EEF6;
+  --ink-2: #AFBDD1;
+  --ink-dim: #7E8C99;
+
+  --f-arcane: 'Marcellus', Georgia, serif;
+  --f-display: 'Kanit', 'Segoe UI', sans-serif;
+  --f-mono: 'IBM Plex Mono', 'Consolas', monospace;
+  --f-body: 'Figtree', 'Segoe UI', sans-serif;
+
+  --ease-charge: cubic-bezier(.2, .7, .2, 1);
+
+  --sidebar-w: 17rem;
+  --content-w: 52rem;
+
+  /* --- new to this stylesheet --- */
+  --warn: #E8C77A;
+  --danger: #FF6B6B;
+  --panel-2: rgba(13, 20, 32, .78);
+  --line-strong: rgba(122, 160, 210, .28);
+  --topbar-h: 3.25rem;
+  /* Reference and comparison pages carry wide tables; they opt into this width via
+     `wide: true` in front matter rather than every page paying for the looser measure. */
+  --content-w-wide: 80rem;
+  /* How far a table or figure may extend past the prose column. Prose has an optimal measure --
+     past roughly 90 characters a line the eye loses its place returning to the left margin -- but
+     a comparison table has no such limit and is actively harmed by being squeezed. So the text
+     column stays readable and the data breaks out around it. */
+  --breakout: 7rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-weight: 300;
+  font-size: 1.0625rem;
+  line-height: 1.72;
+  -webkit-font-smoothing: antialiased;
+  /* A single wash of cerulean at the top-left keeps the void from reading as flat black
+     without costing an image request. */
+  background-image:
+    radial-gradient(1100px 620px at 12% -8%, rgba(0, 172, 235, .10), transparent 62%),
+    radial-gradient(900px 520px at 96% 4%, rgba(255, 105, 180, .05), transparent 58%);
+  background-attachment: fixed;
+}
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 100;
+  background: var(--cerulean); color: var(--void);
+  padding: .6rem 1rem; font-family: var(--f-display); font-weight: 600;
+}
+.skip-link:focus { left: 0; }
+
+:focus-visible { outline: 2px solid var(--cerulean); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------------------------------------------------------------- shell */
+
+.shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  grid-template-rows: var(--topbar-h) minmax(0, 1fr);
+  grid-template-areas: "topbar topbar" "sidebar main";
+  min-height: 100vh;
+}
+
+.topbar {
+  grid-area: topbar;
+  position: sticky; top: 0; z-index: 40;
+  display: flex; align-items: center; gap: .9rem;
+  padding: 0 1.25rem;
+  background: rgba(7, 11, 18, .86);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.topbar-title {
+  font-family: var(--f-display); font-weight: 700; font-size: 1.02rem;
+  letter-spacing: .04em; color: var(--ink); text-decoration: none;
+}
+.topbar-title:hover { color: var(--cerulean); }
+.topbar-up {
+  font-family: var(--f-display); font-size: .8rem; color: var(--ink-dim);
+  text-decoration: none; letter-spacing: .03em;
+}
+.topbar-up:hover { color: var(--cerulean); }
+/* The download control. Its glyph and its seam are shared with the page CTA and are defined once,
+   in the "download" section further down, so the whole concept lives in one place. */
+.topbar-cta {
+  margin-left: auto; position: relative;
+  display: inline-flex; align-items: center; gap: .45em;
+  font-family: var(--f-display); font-weight: 600; font-size: .82rem;
+  letter-spacing: .05em; text-transform: uppercase;
+  color: var(--cerulean); text-decoration: none;
+  border: 1px solid rgba(0, 172, 235, .42);
+  padding: .38rem .85rem; border-radius: 2px;
+  transition: background .18s var(--ease-charge), color .18s var(--ease-charge);
+}
+.topbar-cta:hover,
+.topbar-cta:focus-visible { background: var(--cerulean); color: var(--void); }
+
+/* ------------------------------------------------------------- sidebar */
+
+.sidebar {
+  grid-area: sidebar;
+  position: sticky; top: var(--topbar-h);
+  height: calc(100vh - var(--topbar-h));
+  overflow-y: auto; overscroll-behavior: contain;
+  padding: 1.5rem 1rem 3rem 1.4rem;
+  border-right: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(13, 20, 32, .5), rgba(7, 11, 18, .2));
+}
+.sidebar-brand { display: none; }
+
+.nav-group { margin-bottom: 1.6rem; }
+.nav-group-title {
+  margin: 0 0 .5rem; font-family: var(--f-display); font-weight: 600;
+  font-size: .68rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.nav-list { list-style: none; margin: 0; padding: 0; }
+.nav-item { margin: 0; }
+.nav-link {
+  display: block; padding: .3rem .6rem .3rem .7rem;
+  color: var(--ink-2); text-decoration: none;
+  font-size: .905rem; line-height: 1.45;
+  border-left: 2px solid transparent;
+  transition: color .15s var(--ease-charge), border-color .15s var(--ease-charge);
+}
+.nav-link:hover { color: var(--ink); border-left-color: var(--line-strong); }
+.nav-link.is-active {
+  color: var(--cerulean); border-left-color: var(--cerulean);
+  background: linear-gradient(90deg, rgba(0, 172, 235, .10), transparent 70%);
+}
+
+.nav-toggle-input { position: absolute; opacity: 0; pointer-events: none; }
+.nav-toggle-label { display: none; }
+
+/* ---------------------------------------------------------------- main */
+
+.main {
+  grid-area: main;
+  min-width: 0;
+  padding: 3rem 3rem 4rem;
+}
+
+.page-head {
+  max-width: var(--content-w);
+  margin-bottom: 2.4rem;
+  padding-bottom: 1.6rem;
+  border-bottom: 1px solid var(--line);
+}
+.kicker {
+  margin: 0 0 .5rem;
+  font-family: var(--f-display); font-style: italic; font-weight: 600;
+  font-size: .74rem; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--cerulean);
+}
+.page-title {
+  margin: 0; font-family: var(--f-display); font-weight: 700;
+  font-size: clamp(2rem, 4.2vw, 2.9rem); line-height: 1.1; letter-spacing: -.015em;
+}
+.page-desc {
+  margin: .85rem 0 0; max-width: 42rem;
+  font-size: 1.1rem; color: var(--ink-2); font-weight: 300;
+}
+
+.level-badges { margin: 1rem 0 0; display: flex; flex-wrap: wrap; gap: .45rem; }
+.level-badge {
+  font-family: var(--f-display); font-size: .68rem; font-weight: 600;
+  letter-spacing: .11em; text-transform: uppercase;
+  padding: .22rem .6rem; border-radius: 999px;
+  border: 1px solid var(--line-strong); color: var(--ink-dim);
+}
+.level-badge.level-beginner { color: var(--ok); border-color: rgba(76, 195, 138, .4); }
+.level-badge.level-intermediate { color: var(--cerulean); border-color: rgba(0, 172, 235, .4); }
+.level-badge.level-advanced { color: var(--ember); border-color: rgba(255, 138, 80, .4); }
+
+/* -------------------------------------------------------------- landing */
+
+.main-landing { padding-top: 0; }
+
+.landing-hero {
+  position: relative;
+  margin: 0 -3rem 3rem;
+  padding: 5rem 3rem 4.5rem;
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+}
+.token-stream {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: .5; pointer-events: none;
+}
+.landing-hero-inner { position: relative; max-width: 48rem; }
+.landing-title {
+  margin: .2rem 0 0;
+  font-family: var(--f-display); font-weight: 700;
+  font-size: clamp(2.8rem, 7vw, 4.6rem); line-height: 1; letter-spacing: -.03em;
+}
+.landing-tagline {
+  margin: 1rem 0 0; max-width: 34rem;
+  font-size: clamp(1.1rem, 2vw, 1.35rem); color: var(--ink-2); font-weight: 300;
+}
+.landing-actions { margin-top: 2rem; display: flex; flex-wrap: wrap; gap: .75rem; }
+.landing-subnote { margin: 1.1rem 0 0; font-size: .9rem; color: var(--ink-dim); }
+
+.btn {
+  display: inline-block; text-decoration: none;
+  font-family: var(--f-display); font-weight: 600; font-size: .9rem;
+  letter-spacing: .04em; padding: .7rem 1.4rem; border-radius: 2px;
+  transition: transform .16s var(--ease-charge), background .16s var(--ease-charge),
+              color .16s var(--ease-charge), border-color .16s var(--ease-charge);
+}
+.btn-primary { background: var(--cerulean); color: var(--void); border: 1px solid var(--cerulean); }
+.btn-primary:hover { background: var(--cerulean-lit); border-color: var(--cerulean-lit); }
+.btn-ghost { color: var(--ink); border: 1px solid var(--line-strong); }
+.btn-ghost:hover { border-color: var(--cerulean); color: var(--cerulean); }
+@media (prefers-reduced-motion: no-preference) {
+  .btn:hover { transform: translateY(-1px); }
+}
+
+/* --------------------------------------------------------------- prose */
+
+.prose { max-width: var(--content-w); }
+.prose-wide, .page-wide .prose, .page-wide .page-head { max-width: var(--content-w-wide); }
+
+.prose > * + * { margin-top: 1.15em; }
+
+.prose h2 {
+  margin: 3rem 0 1rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--line);
+  font-family: var(--f-display); font-weight: 600;
+  font-size: 1.65rem; line-height: 1.2; letter-spacing: -.01em;
+}
+.prose h3 {
+  margin: 2.2rem 0 .7rem;
+  font-family: var(--f-display); font-weight: 600; font-size: 1.22rem; line-height: 1.3;
+  color: var(--ink);
+}
+.prose h4 {
+  margin: 1.8rem 0 .5rem;
+  font-family: var(--f-display); font-weight: 600; font-size: 1.02rem;
+  letter-spacing: .02em; color: var(--ink-2);
+}
+
+.prose a { color: var(--cerulean); text-decoration-color: rgba(0, 172, 235, .35); text-underline-offset: .18em; }
+.prose a:hover { text-decoration-color: var(--cerulean); }
+
+.prose strong { color: var(--ink); font-weight: 600; }
+.prose em { color: var(--ink-2); }
+
+.prose ul, .prose ol { padding-left: 1.35rem; }
+.prose li + li { margin-top: .38em; }
+.prose li::marker { color: var(--ink-dim); }
+
+.prose blockquote {
+  margin-left: 0; margin-right: 0;
+  padding: .2rem 0 .2rem 1.2rem;
+  border-left: 2px solid var(--line-strong);
+  color: var(--ink-2); font-style: italic;
+}
+
+.prose hr { border: 0; border-top: 1px solid var(--line); margin: 2.5rem 0; }
+
+/* Anchor affordance on headings — kramdown auto_ids gives every heading an id, so deep links
+   already work; this just makes them discoverable without cluttering the reading view. */
+.prose h2, .prose h3 { position: relative; }
+@media (min-width: 900px) {
+  .prose h2:hover::before, .prose h3:hover::before {
+    content: "#"; position: absolute; left: -1.2rem;
+    color: var(--ink-dim); font-family: var(--f-mono); font-weight: 400;
+  }
+}
+
+/* ---------------------------------------------------------------- code */
+
+.prose code {
+  font-family: var(--f-mono); font-size: .875em;
+  background: rgba(122, 160, 210, .10);
+  border: 1px solid var(--line);
+  padding: .1em .38em; border-radius: 2px;
+  color: #CFE6F5;
+}
+.prose pre {
+  margin: 1.4rem 0;
+  padding: 1rem 1.1rem;
+  background: var(--void-2);
+  border: 1px solid var(--line);
+  border-left: 2px solid rgba(0, 172, 235, .45);
+  border-radius: 2px;
+  overflow-x: auto;
+  font-size: .86rem; line-height: 1.62;
+}
+.prose pre code {
+  background: none; border: 0; padding: 0; font-size: inherit; color: var(--ink);
+}
+
+/* Added by dokidex.js. Hidden until the block is hovered or the button itself is focused, so it
+   never sits on top of the code for keyboard-only and touch readers who aren't reaching for it. */
+.copy-btn {
+  position: absolute; top: .45rem; right: .45rem;
+  padding: .2rem .55rem;
+  font-family: var(--f-display); font-size: .68rem; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-dim); background: rgba(7, 11, 18, .9);
+  border: 1px solid var(--line); border-radius: 2px;
+  cursor: pointer; opacity: 0;
+  transition: opacity .15s var(--ease-charge), color .15s var(--ease-charge);
+}
+.prose pre:hover .copy-btn, .copy-btn:focus-visible { opacity: 1; }
+.copy-btn:hover { color: var(--cerulean); border-color: rgba(0, 172, 235, .45); }
+
+/* --------------------------------------------------------------- tables
+
+   Wrapped in .table-scroll by dokidex.js. A reference table that forces the whole page to scroll
+   sideways is the single most common way a docs site breaks on a phone, so the overflow is
+   pinned to the table's own container and never to <body>. */
+
+.table-scroll {
+  overflow-x: auto;
+  margin: 1.6rem 0;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--panel-2);
+}
+
+/* Breakout: let data outgrow the text column.
+   Prose has an optimal measure and a comparison table does not, so rather than widening the
+   whole page until paragraphs get hard to read, tables and figures extend to the right past the
+   prose edge. `width: auto` + a negative right margin keeps the left edge aligned with the text,
+   which is what makes it read as deliberate rather than broken.
+
+   The 1500px floor is measured, not guessed: at 1400px the main column has only ~125px of slack
+   past the prose measure and the breakout wants 119px, so a scrollbar alone would tip the page
+   into horizontal scroll. 1500px leaves ~100px of margin for error. Below it, data and text are
+   the same width again. */
+@media (min-width: 1500px) {
+  .prose > .table-scroll,
+  .prose > figure {
+    margin-right: calc(var(--breakout) * -1);
+  }
+  /* Pages already at the wide measure have no room left to borrow. */
+  .page-wide .prose > .table-scroll,
+  .page-wide .prose > figure { margin-right: 0; }
+}
+.table-scroll table { margin: 0; border: 0; }
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .9rem;
+  font-family: var(--f-body);
+}
+.prose thead th {
+  position: sticky; top: 0; z-index: 1;
+  background: #101827;
+  text-align: left;
+  font-family: var(--f-display); font-weight: 600;
+  font-size: .74rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ink-2);
+  padding: .7rem .85rem;
+  border-bottom: 1px solid var(--line-strong);
+  white-space: nowrap;
+}
+.prose tbody td {
+  padding: .62rem .85rem;
+  border-bottom: 1px solid rgba(122, 160, 210, .09);
+  vertical-align: top;
+}
+.prose tbody tr:last-child td { border-bottom: 0; }
+.prose tbody tr:hover { background: rgba(122, 160, 210, .045); }
+/* Numeric-looking cells read as data, not prose. */
+.prose td code { background: none; border: 0; padding: 0; color: #CFE6F5; }
+
+/* ------------------------------------------------------------ callouts
+
+   Authored in markdown as a blockquote whose first line is **Note** / **Key idea** / etc., then
+   upgraded by dokidex.js. Doing it in JS rather than with a Jekyll include keeps the markdown
+   readable in the repo and in GitHub's own renderer, which matters because these files are read
+   as source at least as often as they are read as a website. */
+
+.callout {
+  margin: 1.6rem 0;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--ink-dim);
+  border-radius: 2px;
+  background: var(--panel);
+  font-style: normal;
+  color: var(--ink-2);
+}
+.callout > :first-child { margin-top: 0; }
+.callout > :last-child { margin-bottom: 0; }
+.callout-label {
+  display: block;
+  font-family: var(--f-display); font-weight: 600;
+  font-size: .7rem; letter-spacing: .14em; text-transform: uppercase;
+  margin-bottom: .4rem;
+}
+.callout-key { border-left-color: var(--cerulean); }
+.callout-key .callout-label { color: var(--cerulean); }
+.callout-note { border-left-color: var(--ink-dim); }
+.callout-note .callout-label { color: var(--ink-dim); }
+.callout-warn { border-left-color: var(--warn); }
+.callout-warn .callout-label { color: var(--warn); }
+.callout-trap { border-left-color: var(--pink); }
+.callout-trap .callout-label { color: var(--pink); }
+.callout-tip { border-left-color: var(--ok); }
+.callout-tip .callout-label { color: var(--ok); }
+
+/* ----------------------------------------------------------------- toc
+
+   Built by dokidex.js from the page's own h2s, only on pages long enough to need it. Some of
+   these pages run 8,000 words; arriving at one with no sense of its shape is the single biggest
+   comprehension barrier the site has. A <details> element rather than a scripted toggle so it
+   still opens and closes with JS disabled, and so the browser's own find-in-page can reach
+   inside it. */
+.toc {
+  margin: 0 0 2.5rem;
+  padding: .9rem 1.15rem;
+  border: 1px solid var(--line);
+  border-left: 2px solid rgba(0, 172, 235, .45);
+  border-radius: 2px;
+  background: var(--panel);
+}
+.toc > summary {
+  cursor: pointer;
+  font-family: var(--f-display); font-weight: 600;
+  font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-dim);
+  list-style: none;
+}
+.toc > summary::-webkit-details-marker { display: none; }
+.toc > summary::before {
+  content: "▸"; display: inline-block; width: 1em;
+  transition: transform .15s var(--ease-charge);
+  color: var(--cerulean);
+}
+.toc[open] > summary::before { transform: rotate(90deg); }
+.toc > summary:hover { color: var(--ink); }
+.toc-list {
+  list-style: none; margin: .85rem 0 0; padding: 0;
+  columns: 2; column-gap: 2rem;
+}
+.toc-item { break-inside: avoid; margin-bottom: .3rem; }
+.toc-link {
+  display: block; padding: .12rem 0;
+  color: var(--ink-2); text-decoration: none; font-size: .9rem; line-height: 1.4;
+}
+.toc-link:hover { color: var(--cerulean); }
+.toc-count { color: var(--ink-dim); font-weight: 400; text-transform: none; letter-spacing: 0; }
+@media (max-width: 700px) { .toc-list { columns: 1; } }
+
+/* --------------------------------------------------------------- cards */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem;
+  margin: 1.8rem 0;
+  padding: 0; list-style: none;
+}
+.card {
+  display: block;
+  padding: 1.15rem 1.25rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  text-decoration: none; color: inherit;
+  transition: border-color .18s var(--ease-charge), transform .18s var(--ease-charge);
+}
+a.card:hover { border-color: rgba(0, 172, 235, .45); }
+@media (prefers-reduced-motion: no-preference) { a.card:hover { transform: translateY(-2px); } }
+.card-kicker {
+  display: block; font-family: var(--f-display); font-weight: 600;
+  font-size: .66rem; letter-spacing: .15em; text-transform: uppercase;
+  color: var(--cerulean); margin-bottom: .4rem;
+}
+.card-title {
+  display: block; font-family: var(--f-display); font-weight: 600;
+  font-size: 1.05rem; margin-bottom: .35rem; color: var(--ink);
+}
+.card-desc { display: block; font-size: .9rem; color: var(--ink-dim); line-height: 1.55; }
+
+/* --------------------------------------------------------- stat tiles */
+
+.stat-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: .8rem; margin: 1.8rem 0; padding: 0; list-style: none;
+}
+.stat {
+  padding: .9rem 1rem;
+  border: 1px solid var(--line); border-radius: 2px; background: var(--panel);
+}
+.stat-value {
+  display: block; font-family: var(--f-mono); font-weight: 500;
+  font-size: 1.5rem; line-height: 1.1; color: var(--cerulean);
+}
+.stat-label {
+  display: block; margin-top: .3rem;
+  font-size: .78rem; color: var(--ink-dim); line-height: 1.4;
+}
+
+/* ---------------------------------------------------------- download
+
+   The download page's call to action. It lives here rather than in a <style> block on the page
+   itself, which is how the previous download page did it: check_voice reads a page's raw text and
+   counted that inline stylesheet's 29 CSS declarations as prose semicolons, burying a real warning
+   in noise. Shared stylesheet, no inline CSS, no false positives.
+
+   Built from .topbar-cta's idiom (uppercase display face, hairline cerulean border, fill on hover)
+   at a size that carries a page rather than a nav bar. */
+
+/* THE GLYPH, shared by the topbar chip and the page CTA.
+
+   An arrow falling into an open tray. It carries the meaning on its own, which is what lets the
+   rest of the treatment stay quiet: a reader scanning for two seconds reads the mark before the
+   word, and never has to hover to learn what the control does. Butt caps and mitered joins,
+   because every corner on this site is square.
+
+   Sized in `em`, so one mark serves a .82rem chip and a 1rem button with no second copy. */
+.dl-glyph {
+  width: 1.05em; height: 1.05em; flex: none;
+  fill: none; stroke: currentColor; stroke-width: 1.6;
+  stroke-linecap: butt; stroke-linejoin: miter;
+  overflow: visible;
+}
+.dl-glyph .dl-tray { opacity: .62; transition: opacity .18s var(--ease-charge); }
+.dl-glyph .dl-arrow { transition: transform .22s var(--ease-charge); }
+.topbar-cta:hover .dl-tray,
+.download-cta .button:hover .dl-tray { opacity: 1; }
+
+/* THE SEAM. One gradient runs cerulean through pink into ember along the bottom edge.
+
+   This is the site's only chromatic control, and deliberately so. Pink and ember are already in
+   the token block and already wash the page background, but no button has ever used them, so the
+   download control gets to be the one thing wearing all three. It is painted at rest rather than
+   on hover, because a signal that only exists under the cursor is invisible to someone scanning. */
+.topbar-cta::after,
+.download-cta .button::after {
+  content: ""; position: absolute; left: -1px; right: -1px; bottom: -1px; height: 1px;
+  background: linear-gradient(90deg, var(--cerulean), var(--pink) 58%, var(--ember));
+  opacity: .6; transition: opacity .18s var(--ease-charge);
+}
+.topbar-cta:hover::after,
+.topbar-cta:focus-visible::after { opacity: 1; }
+
+.download-cta {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem;
+  margin: 1.6rem 0 1.9rem;
+}
+
+/* The page CTA is filled rather than outlined, unlike the chip. It is the whole point of the page
+   it sits on, and .btn-primary on the landing page already establishes "filled cerulean" as this
+   site's primary action, so an outlined one here would have made the download weaker than the
+   button that merely points at the setup guide. */
+.download-cta .button {
+  position: relative;
+  display: inline-flex; align-items: center; gap: .55em;
+  font-family: var(--f-display); font-weight: 600; font-size: 1rem;
+  letter-spacing: .05em; text-transform: uppercase;
+  background: var(--cerulean); color: var(--void); text-decoration: none;
+  border: 1px solid var(--cerulean);
+  padding: .72rem 1.4rem; border-radius: 2px;
+  transition: background .18s var(--ease-charge), border-color .18s var(--ease-charge),
+              box-shadow .18s var(--ease-charge), transform .16s var(--ease-charge);
+}
+.download-cta .button::after { height: 2px; opacity: .85; }
+.download-cta .button:hover,
+.download-cta .button:focus-visible {
+  background: var(--cerulean-lit); border-color: var(--cerulean-lit);
+  /* Inset, low alpha. The outset coloured bloom this wanted to be is the generic SaaS CTA, and it
+     is not what this family does: the sibling stylesheet answers "how does a control glow" twice,
+     inset at .25 and .08, and this sits inside that band. */
+  box-shadow: inset 0 0 22px rgba(7, 11, 18, .18);
+}
+.download-cta .button:hover::after,
+.download-cta .button:focus-visible::after { opacity: 1; }
+
+.download-meta {
+  font-family: var(--f-mono); font-size: .8rem; color: var(--ink-dim);
+}
+
+/* Motion is opt-in, as everywhere else here, and it is hover-triggered rather than ambient. The
+   arrow drops the short distance into its tray, which performs the verb instead of decorating it.
+   Nothing loops: this is a documentation site, and a control that pulses while you read is a
+   control that has to be ignored. No keyframe rules were added, so this stylesheet still has none. */
+@media (prefers-reduced-motion: no-preference) {
+  .topbar-cta:hover .dl-arrow,
+  .topbar-cta:focus-visible .dl-arrow { transform: translateY(1.6px); }
+  .download-cta .button:hover .dl-arrow,
+  .download-cta .button:focus-visible .dl-arrow { transform: translateY(2.2px); }
+  .download-cta .button:hover,
+  .download-cta .button:focus-visible { transform: translateY(-1px); }
+}
+
+/* ------------------------------------------------------------- figures
+
+   Every diagram on this site is inline SVG in a <figure>. No external image requests, no
+   layout shift, and the text inside a diagram stays selectable and searchable. */
+
+.prose figure {
+  margin: 2rem 0;
+  padding: 1.4rem;
+  background: var(--void-2);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+}
+.prose figure svg { display: block; width: 100%; height: auto; max-width: 100%; }
+.prose figure img { display: block; width: 100%; height: auto; border-radius: 2px; }
+.prose figcaption {
+  margin-top: .9rem; padding-top: .75rem;
+  border-top: 1px solid var(--line);
+  font-size: .84rem; color: var(--ink-dim); line-height: 1.55;
+}
+.prose figcaption strong { color: var(--ink-2); }
+
+/* Diagram primitives, so every SVG on the site speaks one visual language and picks up the
+   palette from CSS rather than hard-coding hexes into a hundred inline documents. */
+.dgm-bg { fill: var(--void-2); }
+.dgm-panel { fill: var(--panel); stroke: var(--line); stroke-width: 1; }
+.dgm-line { stroke: var(--line-strong); stroke-width: 1.5; fill: none; }
+.dgm-flow { stroke: var(--cerulean); stroke-width: 1.75; fill: none; }
+.dgm-accent { fill: var(--cerulean); }
+.dgm-accent-2 { fill: var(--ember); }
+.dgm-accent-3 { fill: var(--pink); }
+.dgm-ok { fill: var(--ok); }
+.dgm-label { fill: var(--ink-2); font-family: var(--f-display); font-size: 13px; font-weight: 500; }
+.dgm-label-sm { fill: var(--ink-dim); font-family: var(--f-display); font-size: 11px; }
+.dgm-mono { fill: var(--ink); font-family: var(--f-mono); font-size: 12px; }
+.dgm-title { fill: var(--ink); font-family: var(--f-display); font-size: 14px; font-weight: 600; }
+
+/* ------------------------------------------------------ terminal frames
+
+   CLI captures are real ANSI output converted to SVG, so they stay crisp at any zoom and the
+   text stays selectable. The chrome around them is CSS, not part of the SVG. */
+
+.terminal {
+  margin: 2rem 0;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+  background: #0a0e14;
+}
+.terminal-bar {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .5rem .8rem;
+  background: #121826;
+  border-bottom: 1px solid var(--line);
+}
+.terminal-dot { width: .62rem; height: .62rem; border-radius: 50%; background: #2a3646; }
+.terminal-title {
+  margin-left: .4rem; font-family: var(--f-mono); font-size: .74rem; color: var(--ink-dim);
+}
+.terminal-body { padding: .9rem 1rem; overflow-x: auto; }
+.terminal-body svg { display: block; height: auto; }
+.terminal + figcaption { margin-top: -1.2rem; }
+
+/* --------------------------------------------------------------- pager */
+
+.pager {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+  max-width: var(--content-w);
+  margin: 4rem 0 0; padding-top: 2rem;
+  border-top: 1px solid var(--line);
+}
+.pager-link {
+  display: block; padding: .9rem 1.1rem;
+  border: 1px solid var(--line); border-radius: 2px;
+  text-decoration: none; color: var(--ink);
+  transition: border-color .18s var(--ease-charge);
+}
+.pager-link:hover { border-color: rgba(0, 172, 235, .45); }
+.pager-next { text-align: right; }
+.pager-empty { border: 0; }
+.pager-label {
+  display: block; font-family: var(--f-display); font-size: .7rem;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--ink-dim);
+}
+.pager-title { display: block; margin-top: .25rem; font-weight: 500; font-size: .95rem; }
+
+/* -------------------------------------------------------------- footer */
+
+.site-footer {
+  max-width: var(--content-w-wide);
+  margin-top: 5rem; padding-top: 2rem;
+  border-top: 1px solid var(--line);
+  font-size: .88rem;
+}
+.footer-line { margin: 0 0 .6rem; color: var(--ink-2); }
+.footer-dim { color: var(--ink-dim); max-width: 44rem; font-size: .84rem; }
+.footer-links {
+  margin-top: 1.4rem;
+  display: flex; flex-wrap: wrap; gap: 1.4rem;
+}
+.footer-links a {
+  color: var(--ink-dim); text-decoration: none; font-size: .84rem;
+}
+.footer-links a:hover { color: var(--cerulean); }
+/* The coffee link is styled exactly like its neighbours on purpose. */
+.footer-kofi { margin-left: auto; }
+
+/* --------------------------------------------------------- responsive */
+
+@media (max-width: 1100px) {
+  :root { --sidebar-w: 14.5rem; }
+  .main { padding: 2.5rem 2rem 3.5rem; }
+  .landing-hero { margin: 0 -2rem 2.5rem; padding: 4rem 2rem 3.5rem; }
+}
+
+@media (max-width: 860px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "topbar" "main";
+  }
+  .nav-toggle-label {
+    display: flex; flex-direction: column; justify-content: center; gap: 4px;
+    width: 1.6rem; height: 1.6rem; cursor: pointer;
+  }
+  .nav-toggle-label span {
+    display: block; height: 2px; background: var(--ink-2); border-radius: 1px;
+    transition: background .15s var(--ease-charge);
+  }
+  .nav-toggle-label:hover span { background: var(--cerulean); }
+
+  .sidebar {
+    position: fixed; top: var(--topbar-h); left: 0; z-index: 35;
+    width: min(20rem, 84vw); height: calc(100vh - var(--topbar-h));
+    background: #0a0f18;
+    transform: translateX(-102%);
+    transition: transform .22s var(--ease-charge);
+    box-shadow: 0 0 40px rgba(0, 0, 0, .6);
+  }
+  .nav-toggle-input:checked ~ .shell .sidebar { transform: translateX(0); }
+  .sidebar-brand {
+    display: flex; align-items: center; gap: .6rem;
+    margin-bottom: 1.6rem; text-decoration: none; color: var(--ink);
+  }
+  .sidebar-mark { color: var(--ember); font-family: var(--f-mono); }
+  .sidebar-brand-text { font-family: var(--f-display); font-weight: 700; letter-spacing: .04em; }
+
+  .main { padding: 2rem 1.35rem 3rem; }
+  .landing-hero { margin: 0 -1.35rem 2rem; padding: 3rem 1.35rem 2.75rem; }
+  .pager { grid-template-columns: 1fr; }
+  .footer-kofi { margin-left: 0; }
+}
+
+@media (max-width: 460px) {
+  body { font-size: 1rem; }
+  .main { padding: 1.5rem 1rem 2.5rem; }
+  .landing-hero { margin: 0 -1rem 1.75rem; padding: 2.5rem 1rem 2.25rem; }
+  .prose pre { font-size: .78rem; }
+  .prose table { font-size: .82rem; }
+  .landing-actions .btn { width: 100%; text-align: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  .token-stream { display: none; }
+}
+
+@media print {
+  .sidebar, .topbar, .pager, .token-stream { display: none !important; }
+  body { background: #fff; color: #000; }
+  .shell { display: block; }
+  .main { padding: 0; }
+  .prose { max-width: none; }
+}

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conway's Game of Life</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 16px;
+    color: #00d4ff;
+    text-shadow: 0 0 10px rgba(0,212,255,0.3);
+    letter-spacing: 2px;
+  }
+  #controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  button {
+    padding: 10px 22px;
+    border: 1px solid #00d4ff44;
+    border-radius: 6px;
+    background: #16213e;
+    color: #e0e0e0;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 90px;
+  }
+  button:hover {
+    background: #0f3460;
+    border-color: #00d4ff;
+    box-shadow: 0 0 8px rgba(0,212,255,0.3);
+  }
+  button.active {
+    background: #00d4ff;
+    color: #1a1a2e;
+    font-weight: bold;
+  }
+  .speed-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 8px;
+  }
+  .speed-control label {
+    font-size: 0.85rem;
+    color: #aaa;
+  }
+  input[type="range"] {
+    width: 120px;
+    accent-color: #00d4ff;
+  }
+  #speed-val {
+    font-size: 0.85rem;
+    color: #00d4ff;
+    min-width: 50px;
+  }
+  #stats {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 20px;
+  }
+  #stats span { color: #00d4ff; font-weight: bold; }
+  canvas {
+    border: 2px solid #0f3460;
+    border-radius: 4px;
+    cursor: crosshair;
+    background: #0a0a1a;
+    box-shadow: 0 0 30px rgba(0,212,255,0.08);
+  }
+  #info {
+    margin-top: 14px;
+    font-size: 0.8rem;
+    color: #555;
+    text-align: center;
+  }
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+
+<h1>CONWAY'S GAME OF LIFE</h1>
+
+<div id="controls">
+  <button id="btn-start">Start</button>
+  <button id="btn-step">Step</button>
+  <button id="btn-clear">Clear</button>
+  <button id="btn-random">Random</button>
+  <div class="speed-control">
+    <label for="speed">Speed:</label>
+    <input type="range" id="speed" min="1" max="60" value="12">
+    <span id="speed-val">12 gen/s</span>
+  </div>
+</div>
+
+<div id="stats">
+  Generation: <span id="gen-count">0</span> &nbsp;|&nbsp;
+  Population: <span id="pop-count">0</span>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<div id="info">Click or drag to draw cells · B3/S23 rules · Grid wraps at edges</div>
+
+<script>
+(function() {
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const btnStart = document.getElementById('btn-start');
+  const btnStep = document.getElementById('btn-step');
+  const btnClear = document.getElementById('btn-clear');
+  const btnRandom = document.getElementById('btn-random');
+  const speedSlider = document.getElementById('speed');
+  const speedVal = document.getElementById('speed-val');
+  const genCountEl = document.getElementById('gen-count');
+  const popCountEl = document.getElementById('pop-count');
+
+  const CELL_SIZE = 10;
+  const COLS = 80;
+  const ROWS = 50;
+  const WIDTH = COLS * CELL_SIZE;
+  const HEIGHT = ROWS * CELL_SIZE;
+
+  canvas.width = WIDTH;
+  canvas.height = HEIGHT;
+
+  let grid = createGrid();
+  let running = false;
+  let generation = 0;
+  let animId = null;
+  let lastTime = 0;
+  let isMouseDown = false;
+  let paintMode = null; // true = paint alive, false = paint dead, null = no paint
+
+  function createGrid() {
+    return Array.from({ length: ROWS }, () => new Uint8Array(COLS));
+  }
+
+  function countNeighbors(g, r, c) {
+    let count = 0;
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        if (dr === 0 && dc === 0) continue;
+        const nr = (r + dr + ROWS) % ROWS;
+        const nc = (c + dc + COLS) % COLS;
+        count += g[nr][nc];
+      }
+    }
+    return count;
+  }
+
+  function nextGeneration() {
+    const next = createGrid();
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const n = countNeighbors(grid, r, c);
+        if (grid[r][c]) {
+          next[r][c] = (n === 2 || n === 3) ? 1 : 0;
+        } else {
+          next[r][c] = (n === 3) ? 1 : 0;
+        }
+      }
+    }
+    grid = next;
+    generation++;
+  }
+
+  function drawGrid() {
+    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+    // Draw grid lines
+    ctx.strokeStyle = '#1a1a3e';
+    ctx.lineWidth = 0.5;
+    for (let c = 0; c <= COLS; c++) {
+      ctx.beginPath();
+      ctx.moveTo(c * CELL_SIZE, 0);
+      ctx.lineTo(c * CELL_SIZE, HEIGHT);
+      ctx.stroke();
+    }
+    for (let r = 0; r <= ROWS; r++) {
+      ctx.beginPath();
+      ctx.moveTo(0, r * CELL_SIZE);
+      ctx.lineTo(WIDTH, r * CELL_SIZE);
+      ctx.stroke();
+    }
+
+    // Draw alive cells
+    let pop = 0;
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        if (grid[r][c]) {
+          pop++;
+          const x = c * CELL_SIZE;
+          const y = r * CELL_SIZE;
+          const pad = 1;
+
+          // Gradient-like fill
+          const brightness = 0.7 + 0.3 * ((r * 7 + c * 13) % 10) / 10;
+          ctx.fillStyle = `rgba(0, ${Math.floor(180 * brightness)}, ${Math.floor(255 * brightness)}, 0.9)`;
+          ctx.fillRect(x + pad, y + pad, CELL_SIZE - pad * 2, CELL_SIZE - pad * 2);
+
+          // Glow effect
+          ctx.shadowColor = '#00d4ff';
+          ctx.shadowBlur = 4;
+          ctx.fillStyle = 'rgba(0, 212, 255, 0.15)';
+          ctx.fillRect(x + pad, y + pad, CELL_SIZE - pad * 2, CELL_SIZE - pad * 2);
+          ctx.shadowBlur = 0;
+        }
+      }
+    }
+
+    genCountEl.textContent = generation;
+    popCountEl.textContent = pop;
+  }
+
+  function getCellFromMouse(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    const c = Math.floor(x / CELL_SIZE);
+    const r = Math.floor(y / CELL_SIZE);
+    if (r >= 0 && r < ROWS && c >= 0 && c < COLS) return { r, c };
+    return null;
+  }
+
+  function toggleCell(r, c) {
+    grid[r][c] = grid[r][c] ? 0 : 1;
+    drawGrid();
+  }
+
+  function paintCell(r, c, mode) {
+    grid[r][c] = mode ? 1 : 0;
+    drawGrid();
+  }
+
+  // Mouse events
+  canvas.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    isMouseDown = true;
+    const cell = getCellFromMouse(e);
+    if (cell) {
+      paintMode = grid[cell.r][cell.c] ? 0 : 1;
+      paintCell(cell.r, cell.c, paintMode);
+    }
+  });
+
+  canvas.addEventListener('mousemove', (e) => {
+    if (!isMouseDown) return;
+    const cell = getCellFromMouse(e);
+    if (cell) {
+      paintCell(cell.r, cell.c, paintMode);
+    }
+  });
+
+  window.addEventListener('mouseup', () => {
+    isMouseDown = false;
+    paintMode = null;
+  });
+
+  // Touch support
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    isMouseDown = true;
+    const touch = e.touches[0];
+    const cell = getCellFromMouse(touch);
+    if (cell) {
+      paintMode = grid[cell.r][cell.c] ? 0 : 1;
+      paintCell(cell.r, cell.c, paintMode);
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (!isMouseDown) return;
+    const touch = e.touches[0];
+    const cell = getCellFromMouse(touch);
+    if (cell) {
+      paintCell(cell.r, cell.c, paintMode);
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', () => {
+    isMouseDown = false;
+    paintMode = null;
+  });
+
+  // Controls
+  function getInterval() {
+    const fps = parseInt(speedSlider.value);
+    return fps > 0 ? Math.round(1000 / fps) : 10000;
+  }
+
+  speedSlider.addEventListener('input', () => {
+    speedVal.textContent = speedSlider.value + ' gen/s';
+    if (running) {
+      running = false;
+      cancelAnimationFrame(animId);
+      running = true;
+      lastTime = performance.now();
+      loop(lastTime);
+    }
+  });
+
+  btnClear.addEventListener('click', () => {
+    grid = createGrid();
+    generation = 0;
+    drawGrid();
+  });
+
+  btnRandom.addEventListener('click', () => {
+    grid = createGrid();
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        grid[r][c] = Math.random() < 0.3 ? 1 : 0;
+      }
+    }
+    generation = 0;
+    drawGrid();
+  });
+
+  btnStep.addEventListener('click', () => {
+    nextGeneration();
+    drawGrid();
+  });
+
+  btnStart.addEventListener('click', () => {
+    running = !running;
+    if (running) {
+      btnStart.textContent = 'Pause';
+      btnStart.classList.add('active');
+      lastTime = performance.now();
+      loop(lastTime);
+    } else {
+      btnStart.textContent = 'Start';
+      btnStart.classList.remove('active');
+      cancelAnimationFrame(animId);
+    }
+  });
+
+  function loop(timestamp) {
+    if (!running) return;
+    const fps = parseInt(speedSlider.value);
+    const interval = fps > 0 ? 1000 / fps : 1000;
+
+    if (timestamp - lastTime >= interval) {
+      nextGeneration();
+      drawGrid();
+      lastTime = timestamp;
+    }
+
+    animId = requestAnimationFrame(loop);
+  }
+
+  // Initial draw
+  drawGrid();
+})();
+</script>
+
+</body>
+</html>

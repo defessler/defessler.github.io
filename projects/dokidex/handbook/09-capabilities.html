@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capabilities · DokiDex Handbook</title>
+<meta name="description" content="The full inventory. Everything the stack does today, by surface, with the honest caveats attached.">
+
+<!-- Marcellus (power word) · Kanit incl. italics 500-700 (headings/kickers/nav) ·
+     IBM Plex Mono 400/500 (code, stats) · Figtree 300-600 (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/site.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle chapter nav">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/handbook/">DokiDex Handbook</a>
+    <a class="topbar-up" href="/projects/dokidex/">&larr; DokiDex</a>
+  </header>
+
+  <nav class="sidebar" aria-label="Handbook chapters">
+    <a class="sidebar-title" href="/projects/dokidex/handbook/">DokiDex Handbook</a>
+    <ol class="nav-list">
+      
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/01-big-picture.html">
+          <span class="nav-kicker">:: THE FOUNDRY</span>
+          <span class="nav-title">The Big Picture</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/03-serving.html">
+          <span class="nav-kicker">:: THE FORGE</span>
+          <span class="nav-title">Serving Local Models</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/04-tools-and-safety.html">
+          <span class="nav-kicker">:: THE GATE</span>
+          <span class="nav-title">Tools, Permissions, Safety</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/07-evals.html">
+          <span class="nav-kicker">:: THE PROOF</span>
+          <span class="nav-title">Evals & the Parity Ledger</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/08-references.html">
+          <span class="nav-kicker">:: THE CODEX</span>
+          <span class="nav-title">References & Study Path</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link is-active" href="/projects/dokidex/handbook/09-capabilities.html">
+          <span class="nav-kicker">:: THE ARSENAL</span>
+          <span class="nav-title">Capabilities</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/10-direction.html">
+          <span class="nav-kicker">:: THE COMPASS</span>
+          <span class="nav-title">Direction</span>
+        </a>
+      </li>
+      
+    </ol>
+  </nav>
+
+  <main class="main">
+    <div class="hero reveal-up">
+      <canvas class="token-stream" aria-hidden="true"></canvas>
+      <div class="hero-inner">
+        <p class="kicker">:: THE ARSENAL</p>
+        <p class="power-word">ARSENAL</p>
+        <h1 class="hero-title">Capabilities</h1>
+        <p class="hero-desc">The full inventory. Everything the stack does today, by surface, with the honest caveats attached.</p>
+      </div>
+    </div>
+
+    <article id="content" class="prose">
+      <p>The complete inventory as of this writing, organized by surface. Where a capability has a caveat,
+the caveat is part of the entry, because an arsenal you can’t trust the labels on is worse than a
+smaller one. (Feature-level detail lives in the generated ledgers and per-surface docs. This is
+the commander’s view.)</p>
+
+<h2 id="the-coding-agents-terminal">The coding agents (terminal)</h2>
+
+<ul>
+  <li><strong>Two real, unmodified clients, not a clone.</strong> Anthropic’s Claude Code CLI and GitHub’s Copilot
+CLI both run against the local server, launched by <code class="language-plaintext highlighter-rouge">scripts/claude-local.ps1</code> and
+<code class="language-plaintext highlighter-rouge">scripts/copilot-local.ps1</code> (or the <code class="language-plaintext highlighter-rouge">doki claude</code> / <code class="language-plaintext highlighter-rouge">doki copilot</code> verbs and the
+<code class="language-plaintext highlighter-rouge">doki-claude</code> / <code class="language-plaintext highlighter-rouge">doki-copilot</code> PATH shims). <code class="language-plaintext highlighter-rouge">llama-server</code> implements the Anthropic Messages API
+and the OpenAI chat-completions API natively, so neither client needs a translation proxy.</li>
+  <li><strong>A seating ladder instead of a hardcoded model list.</strong> Claude Code’s <code class="language-plaintext highlighter-rouge">/model</code> picker offers the
+tiers the server actually reports resident rather than a table baked into the launcher, which in
+practice is the seat plus whatever cheaper model is loaded beside it. Background calls (session
+titles, one-shot helpers) route to that cheaper model automatically. <code class="language-plaintext highlighter-rouge">-SonnetModel</code> /
+<code class="language-plaintext highlighter-rouge">-FableModel</code> point a tier at a different llama-swap key when you want a real menu instead, at
+the cost of a weight swap on every switch, and <code class="language-plaintext highlighter-rouge">-OneSeat</code> puts every tier back on one model with
+none.</li>
+  <li><strong>Config isolation, in both directions.</strong> A local run never touches your real
+<code class="language-plaintext highlighter-rouge">%USERPROFILE%\.claude</code> (or Copilot’s own config directory). The whole per-user surface
+redirects to an isolated home for the run, one that shares <code class="language-plaintext highlighter-rouge">CLAUDE.md</code>, skills, and agents with
+the global one but never sessions, history, or credentials. An ambient <code class="language-plaintext highlighter-rouge">ANTHROPIC_API_KEY</code> and a
+parent session’s identity are cleared before the client starts, so a local run can’t inherit a
+cloud credential or another session’s id by accident.</li>
+  <li><strong>A telemetry session per run</strong>, tapped from llama-swap so nothing client-side has to cooperate.
+Skip it with <code class="language-plaintext highlighter-rouge">-NoTelemetry</code> for one run or <code class="language-plaintext highlighter-rouge">DOKI_TELEMETRY=0</code> for good.</li>
+  <li><strong>Four tier skills</strong> (<code class="language-plaintext highlighter-rouge">/doki-cheap</code>, <code class="language-plaintext highlighter-rouge">/doki-work</code>, <code class="language-plaintext highlighter-rouge">/doki-think</code>, <code class="language-plaintext highlighter-rouge">/doki-max</code>, in
+<code class="language-plaintext highlighter-rouge">harness/claude-skills/</code>), one per seat, so a task can ask for a specific tier without changing
+the session’s default model.</li>
+</ul>
+
+<h2 id="the-serving-layer">The serving layer</h2>
+
+<ul>
+  <li><strong>One endpoint</strong> (<code class="language-plaintext highlighter-rouge">:8080</code>) over hot-swapped llama.cpp processes, covering the named model roster,
+the Claude Code seat and the small utility row that used to sit beside it, and the eval-only candidates
+(chapter 3’s table). Alongside it: FIM autocomplete (<code class="language-plaintext highlighter-rouge">:8012</code>) and embeddings/code-RAG (<code class="language-plaintext highlighter-rouge">:8090</code>).</li>
+  <li><strong>Four everyday models</strong> (<code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code>, <code class="language-plaintext highlighter-rouge">Qwen3.8-27B [256k] (Candidate, Standard)</code>, <code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code>, <code class="language-plaintext highlighter-rouge">Qwen2.5-3B-Instruct [32k] (Utility, Free)</code>), no alias in front of any of them, with four matching skills in <code class="language-plaintext highlighter-rouge">harness/claude-skills/</code>.</li>
+  <li><strong>Prompt-cache discipline</strong>: 92 to 99% prefill reuse on agent turns, <code class="language-plaintext highlighter-rouge">-np 2</code> parallel slots on
+the lite tier, and KV-quant plus flash-attention fitting 128k context in budget.</li>
+  <li><strong>SHA-256-pinned model acquisition</strong>, per-model installer opt-in, template-generated
+llama-swap config that survives repo moves.</li>
+</ul>
+
+<h2 id="the-control-plane--distribution">The control plane &amp; distribution</h2>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">doki.ps1</code> carries fifteen verbs in one <code class="language-plaintext highlighter-rouge">ValidateSet</code>: <code class="language-plaintext highlighter-rouge">up</code>, <code class="language-plaintext highlighter-rouge">down</code>, <code class="language-plaintext highlighter-rouge">status</code>, <code class="language-plaintext highlighter-rouge">restart</code>,
+<code class="language-plaintext highlighter-rouge">logs</code>, <code class="language-plaintext highlighter-rouge">verify</code>, <code class="language-plaintext highlighter-rouge">start</code>, <code class="language-plaintext highlighter-rouge">stop</code>, <code class="language-plaintext highlighter-rouge">test</code>, <code class="language-plaintext highlighter-rouge">doctor</code>, <code class="language-plaintext highlighter-rouge">index</code>, <code class="language-plaintext highlighter-rouge">claude</code>, <code class="language-plaintext highlighter-rouge">copilot</code>, <code class="language-plaintext highlighter-rouge">version</code>,
+<code class="language-plaintext highlighter-rouge">help</code>. That covers per-profile lifecycle, health-gated detached service
+starts, <code class="language-plaintext highlighter-rouge">status json</code> as the single machine-readable truth, <code class="language-plaintext highlighter-rouge">doctor</code> diagnostics, <code class="language-plaintext highlighter-rouge">verify</code>
+full-stack live smoke, and <code class="language-plaintext highlighter-rouge">test</code> as the no-GPU unit layer.</li>
+  <li><strong>Four PATH commands</strong> ship alongside it: <code class="language-plaintext highlighter-rouge">doki-claude</code>, <code class="language-plaintext highlighter-rouge">doki-copilot</code>, and <code class="language-plaintext highlighter-rouge">doki-manager</code> on
+the local weights, plus <code class="language-plaintext highlighter-rouge">zai-claude</code> as the one cloud path (Claude Code on z.ai’s GLM models,
+billed, opt-in), backed by <code class="language-plaintext highlighter-rouge">scripts/*.ps1</code> and the shims in <code class="language-plaintext highlighter-rouge">scripts/shims/</code>.</li>
+  <li><strong>Distribution</strong>: a cloned checkout and <code class="language-plaintext highlighter-rouge">setup.ps1</code>, idempotent, with per-model selection driven
+by <code class="language-plaintext highlighter-rouge">serving/model-manifest.json</code> and a relocatable data root. The NSIS installer and its
+auto-update feed went with the Electron shell on 2026-09-02.</li>
+  <li><strong>Test surface</strong>: PowerShell and Python suites for the installer, the memory store and the code
+RAG, plus the golden-task eval harness. (Exact counts drift with the tree. Run the suites for
+the live number rather than trusting any doc, including this one.)</li>
+</ul>
+
+<h2 id="the-evidence-layer">The evidence layer</h2>
+
+<ul>
+  <li>26-task golden eval suite (8 UE C++ tasks), append-only results ledger, trend analysis,
+per-run scorecards, and the master decision log. That’s chapter 7’s machinery, listed here
+because <em>the evidence discipline is itself a capability</em>. It’s what lets this stack adopt or
+reject a model in an afternoon with a defensible answer. A generated parity scorecard used to be
+part of this list too, probing DokiDex’s own agent against Claude Code. It went with the agent
+on 2026-09-02.</li>
+</ul>
+
+<h2 id="what-it-deliberately-does-not-do">What it deliberately does not do</h2>
+
+<p>Honest edges, stated as scope rather than apology: no cloud model fallback (the point is local,
+and adding one kills the privacy story quietly) · no Linux/macOS (native-Windows performance
+choices are load-bearing) · no multi-user tenancy (one owner, one box) · no image, video, music or
+speech generation, and no desktop app: all of it worked and shipped, and all of it was removed on
+2026-09-02 to put the whole card behind agentic coding (<code class="language-plaintext highlighter-rouge">archive.md</code> names the commit) · subagents
+don’t parallelize inference on one card, they serialize through one seat.</p>
+
+<p>Next, the last chapter: what to build from here, framed as an actual decision.</p>
+
+    </article>
+
+    
+    
+    
+    
+
+    
+    <nav class="chapter-pager" aria-label="Chapter navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/handbook/08-references.html">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">References & Study Path</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/handbook/10-direction.html">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">Direction</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="statusline">
+      <span>DokiDex Handbook</span>
+      <span class="statusline-sep">&middot;</span>
+      <span>Capabilities</span>
+      <span class="statusline-sep">&middot;</span>
+      <span>generated from docs/site/handbook, DokiDex v0.62.0</span>
+    </footer>
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/foundry.js"></script>
+</body>
+</html>

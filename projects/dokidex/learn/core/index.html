@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How models work · DokiDex</title>
+<meta name="description" content="Open the box. What a transformer actually does to a token as it flows through the network, why attention is not what most explainers claim it is, and what pretraining, SFT, and RLHF each can and cannot change.">
+
+<!-- Open Graph / Twitter, hand-rolled: jekyll-seo-tag is not available under the pinned
+     github-pages gem set used by actions/jekyll-build-pages. -->
+<meta property="og:site_name" content="DokiDex">
+<meta property="og:title" content="How models work">
+<meta property="og:description" content="Open the box. What a transformer actually does to a token as it flows through the network, why attention is not what most explainers claim it is, and what pretraining, SFT, and RLHF each can and cannot change.">
+<meta property="og:type" content="website">
+<!-- site_origin rather than absolute_url: see the comment in _config.yml. absolute_url would
+     emit http:// here, because the Pages API reports an http html_url while Enforce HTTPS is off. -->
+<meta property="og:url" content="https://dougfessler.com/projects/dokidex/learn/core/">
+<link rel="canonical" href="https://dougfessler.com/projects/dokidex/learn/core/">
+<!-- `summary`, not `summary_large_image`: no og:image or twitter:image is emitted anywhere on
+     this site, and the large-image card renders as a blank rectangle without one. Switch this back
+     the same day a 1200x630 share asset lands, not before. -->
+<meta name="twitter:card" content="summary">
+
+<!-- Same four families as the handbook, so the two halves of the site read as one product:
+     Marcellus (power words) · Kanit (headings, kickers, nav) · IBM Plex Mono (code, stats) ·
+     Figtree (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/dokidex.css">
+<link rel="icon" href="/projects/dokidex/assets/favicon.svg" type="image/svg+xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<!-- `wide: true` in a page's front matter opts it into --content-w-wide (assets/dokidex.css:51).
+     The CSS keys off `.page-wide` on an ancestor. Without the class emitted here the front-matter
+     flag silently does nothing. -->
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<!-- CSS-only nav toggle. A checkbox beats a JS drawer here: the nav has to work on the mobile
+     read where the reader has scrolled 4000px into a reference table, and a checkbox cannot
+     desync from its own state the way a JS flag can. -->
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/">DokiDex</a>
+    <a class="topbar-cta" href="/projects/dokidex/download/"><svg class="dl-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><g class="dl-arrow"><path d="M8 2.2v6.5"/><path d="M5.2 5.9 8 8.7l2.8-2.8"/></g><path class="dl-tray" d="M3.2 11.3v2.5h9.6v-2.5"/></svg>
+Download</a>
+  </header>
+
+  <!-- Grouped navigation, driven by site.nav in _config.yml.
+
+     A page is "current" when its url matches exactly. The handbook is the one entry that also
+     needs to light up for its children (/handbook/03-serving.html), so it gets a prefix test —
+     without it, the sidebar would show nothing selected the moment a reader steps into a
+     chapter, which reads as "you have left the site". -->
+<nav class="sidebar" aria-label="Site sections">
+  <a class="sidebar-brand" href="/projects/dokidex/">
+    <span class="sidebar-mark" aria-hidden="true">&#9612;&#9608;&#9608;&#9616;</span>
+    <span class="sidebar-brand-text">DokiDex</span>
+  </a>
+
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Start</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/"
+             >Overview</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Use DokiDex</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/local-cli/"
+             >Run the CLIs locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/download/"
+             >Download the launchers</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/models/"
+             >Models it runs</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/games/"
+             >Games the models built</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/telemetry/"
+             >Performance data</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/qwen38/"
+             >Qwen3.8-27B, measured</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/architecture/"
+             >How it's built</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Learn AI</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/"
+             >Where to start</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/basics/"
+             >1 · Foundations</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link is-active"
+             href="/projects/dokidex/learn/core/"
+             aria-current="page">2 · How models work</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/advanced/"
+             >3 · Advanced</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/naming/"
+             >Decoding model names</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/open-vs-closed/"
+             >Open vs closed weights</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/benchmarks/"
+             >Benchmarks</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/local/"
+             >Running models locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/agents/"
+             >Coding agents</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Context</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/state-of-ai/"
+             >State of AI, 2026</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/reference/"
+             >Quick reference</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/glossary/"
+             >Glossary</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Deep dive</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/handbook/"
+             >The Handbook</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+</nav>
+
+
+  <main class="main">
+    <div class="page-head">
+      <p class="kicker">:: TIER 2 · MECHANICS</p>
+      <h1 class="page-title">How models work</h1>
+      <p class="page-desc">Open the box. What a transformer actually does to a token as it flows through the network, why attention is not what most explainers claim it is, and what pretraining, SFT, and RLHF each can and cannot change.</p>
+      
+      <p class="level-badges">
+        <span class="level-badge level-intermediate">Intermediate</span>
+      </p>
+      
+    </div>
+
+    <article id="content" class="prose">
+      <p>Foundations covered tokens, embeddings, and the idea that a model is just repeatedly predicting
+the next token. This page opens the box between “input tokens” and “output distribution.” It
+looks at the machinery that does the predicting: the transformer block, the attention mechanism
+inside it, the caching trick that makes generation fast enough to use, and the three-stage
+training pipeline that turns a raw next-token predictor into something you can hold a
+conversation with.</p>
+
+<p>None of this requires calculus. You need shapes, not proofs: a vector is a list of numbers, a
+matrix multiply is a structured way of combining two lists of numbers, and “learning” is a
+long sequence of very small, very repetitive nudges to those numbers.</p>
+
+<h2 id="neural-networks-and-gradient-descent-briefly">Neural networks and gradient descent, briefly</h2>
+
+<p>A neural network is a stack of layers. Each layer takes in a vector, multiplies it by a matrix
+of learned weights, adds a learned bias, and passes the result through a nonlinear function
+(something that bends the output instead of just scaling it. Without this bend, stacking ten
+layers would mathematically collapse into one layer, because ten linear steps in a row is still
+just one linear step). Stack enough of these bent layers and the network can approximate
+extremely complicated functions: not because any single layer is smart, but because composing
+many simple, bent transformations is a surprisingly powerful trick.</p>
+
+<p>“Training” is the process of finding good values for every weight in every layer. It works like
+this: run an example forward through the network, compare the output to what you wanted (this
+gap is the <em>loss</em>), then work backward through every layer computing how much each individual
+weight contributed to that gap. That backward pass (an application of the chain rule from
+calculus, mechanized so a computer can do it for billions of weights) is called
+<strong>backpropagation</strong>. It tells you the <em>direction</em> each weight should move to reduce the loss a
+little. <strong>Gradient descent</strong> is the separate step that actually moves the weight a small amount
+in that direction, then the whole cycle repeats on the next batch of examples, millions of times.
+Backpropagation computes the direction. Gradient descent takes the step. They’re often mentioned
+in the same breath. But they are not the same thing.
+<a href="https://en.wikipedia.org/wiki/Backpropagation">Backpropagation (Wikipedia)</a></p>
+
+<blockquote>
+  <p><strong>Key idea:</strong> training is not one event. It’s an enormous number of tiny weight nudges, each
+one computed from how wrong the model’s last guess was on one small batch of examples.</p>
+</blockquote>
+
+<p>A useful, limited picture: imagine standing on a hillside in fog, feeling which direction slopes
+downward under your feet, and taking a small step that way, repeatedly, hoping to end up in a
+low valley. That’s gradient descent. It breaks as a picture almost immediately at real scale: a
+production model’s “hillside” has billions of dimensions, not two. There’s no single lowest
+valley to find, only many different valleys that turn out to be roughly equally good. And the
+step size itself is adjusted over the course of training by a schedule, not held fixed. Don’t
+lean on the hillside image past “take a small step downhill, repeat.” Everything past that is a
+different picture.</p>
+
+<p>Two more things worth knowing before the transformer specifics: a modern LLM’s layers aren’t
+literally “detects cats” style units. Most individual neurons respond to a tangled mix of
+unrelated concepts (a property researchers call <em>polysemantic</em>), which is exactly why
+understanding what a trained network is doing usually requires specialized techniques rather than
+reading a neuron’s activity directly, a research area covered on the
+<a href="/projects/dokidex/learn/advanced/">Advanced</a> page.
+<a href="https://transformer-circuits.pub/2024/scaling-monosemanticity/">Scaling Monosemanticity (Anthropic)</a></p>
+
+<h2 id="the-transformer-block-what-happens-to-a-token-layer-by-layer">The transformer block: what happens to a token, layer by layer</h2>
+
+<p>The repeating unit of a modern LLM is the <strong>transformer block</strong>. Every block does two things to
+every token’s representation, in order. First, a <em>self-attention</em> sublayer lets each token
+position exchange information with every other position in the sequence. Second, a <em>feed-forward</em>
+sublayer transforms each token’s representation on its own, with no cross-token mixing at all.
+Both sublayers are wrapped in a <strong>residual connection</strong>: the sublayer’s output is <em>added to</em> its
+input rather than replacing it, so information from earlier in the stack has a direct path
+forward even if a given sublayer contributes little for a particular token. Stack this two-step
+block dozens of times and you have a modern LLM.
+<a href="https://papers.neurips.cc/paper/7181-attention-is-all-you-need.pdf">Attention Is All You Need (Vaswani et al., 2017)</a></p>
+
+<figure>
+<svg viewBox="0 0 700 400" role="img" aria-labelledby="dgm-block-title dgm-block-desc">
+<title id="dgm-block-title">One transformer block, from a token's point of view</title>
+<desc id="dgm-block-desc">A token representation enters at the bottom, passes through a self-attention sublayer with a residual connection, then a feed-forward sublayer with its own residual connection, and the whole two-step block repeats many times before producing a refined representation.</desc>
+<rect class="dgm-panel" x="8" y="8" width="684" height="384" rx="3" />
+<text class="dgm-title" x="28" y="36">What one block does to the token "sat"</text>
+
+<rect class="dgm-panel" x="250" y="326" width="200" height="42" rx="3" />
+<text class="dgm-mono" x="350" y="352" text-anchor="middle">token: "sat" (+ position)</text>
+
+<path class="dgm-flow" d="M350 326 L350 296" />
+<polygon class="dgm-accent" points="343,298 357,298 350,286" />
+
+<rect class="dgm-panel" x="210" y="232" width="280" height="58" rx="3" />
+<text class="dgm-accent" x="350" y="256" text-anchor="middle" style="font-family:var(--f-display);font-size:14px;font-weight:600">Self-attention</text>
+<text class="dgm-label-sm" x="350" y="276" text-anchor="middle">mixes information ACROSS token positions</text>
+<path class="dgm-line" d="M490 261 C 535 261 535 315 490 315" />
+<text class="dgm-label-sm" x="500" y="230">+ residual</text>
+
+<path class="dgm-flow" d="M350 232 L350 202" />
+<polygon class="dgm-accent" points="343,204 357,204 350,192" />
+
+<rect class="dgm-panel" x="210" y="142" width="280" height="58" rx="3" />
+<text class="dgm-accent-2" x="350" y="166" text-anchor="middle" style="font-family:var(--f-display);font-size:14px;font-weight:600">Feed-forward</text>
+<text class="dgm-label-sm" x="350" y="186" text-anchor="middle">transforms information WITHIN this one position</text>
+<path class="dgm-line" d="M490 171 C 535 171 535 225 490 225" />
+<text class="dgm-label-sm" x="500" y="140">+ residual</text>
+
+<path class="dgm-flow" d="M350 142 L350 112" />
+<polygon class="dgm-accent" points="343,114 357,114 350,102" />
+
+<rect class="dgm-panel" x="250" y="66" width="200" height="40" rx="3" />
+<text class="dgm-mono" x="350" y="91" text-anchor="middle">refined representation of "sat"</text>
+
+<path class="dgm-line" d="M120 300 L100 300 L100 100 L120 100" />
+<text class="dgm-label-sm" x="72" y="204" text-anchor="middle" transform="rotate(-90 72 204)">stacked &#215; N (often dozens)</text>
+</svg>
+<figcaption><strong>Attention moves information between token positions. Feed-forward reshapes information within one position.</strong> Both steps run for every token, at every layer, stacked many times over: there's no single "final answer" moment inside one block, only after the whole stack has run. Most of a transformer's raw parameter count sits in the feed-forward sublayers, not attention, which is why mixture-of-experts (<a href="/projects/dokidex/learn/advanced/">Advanced</a>) specifically targets that sublayer.</figcaption>
+</figure>
+
+<p>That “mixes information across positions” line is doing a lot of work, and it’s the part worth
+slowing down for.</p>
+
+<h2 id="attention-and-self-attention">Attention and self-attention</h2>
+
+<p>Self-attention is the mechanism that lets a token’s representation be informed by the other
+tokens in the sequence, weighted by how relevant each one is judged to be, automatically and
+freshly, at every layer. Mechanically, every token position produces three vectors from its
+current representation: a <strong>Query</strong> (what this position is looking for), a <strong>Key</strong> (what this
+position offers, for other positions to match against), and a <strong>Value</strong> (the actual content this
+position contributes once it’s been matched). A token’s new representation is built by comparing
+its Query against every position’s Key to get a set of match scores, turning those scores into
+weights that sum to one, and then taking a weighted blend of every position’s Value using those
+weights.
+<a href="https://papers.neurips.cc/paper/7181-attention-is-all-you-need.pdf">Attention Is All You Need</a>,
+<a href="https://jalammar.github.io/illustrated-transformer/">The Illustrated Transformer</a></p>
+
+<p>A library-lookup picture is useful here, carefully bounded: your Query is the question you’re
+holding, each book’s Key is a short tag you compare your question against, and the Value is the
+content you actually walk away with, weighted by how well each book’s tag matched. Where the
+picture breaks matters: a library lookup is one deliberate search by a conscious searcher. Self-
+attention runs this exact comparison for <em>every</em> token, simultaneously, automatically, inside every
+layer: there’s no searcher deciding what’s relevant, just a learned scoring function applied
+uniformly.</p>
+
+<p>One restriction is doing enormous work here, and it’s easy to miss. In a decoder-only model
+(which every model this site discusses is), attention is <strong>causal</strong>: a <strong>mask</strong> blocks each
+position from attending to any position after it. In “The cat sat down”, the query issued from
+<code class="language-plaintext highlighter-rouge">sat</code> can look at <code class="language-plaintext highlighter-rouge">The</code>, <code class="language-plaintext highlighter-rouge">cat</code>, and itself, and <em>never</em> at <code class="language-plaintext highlighter-rouge">down</code>. The attention matrix is
+lower-triangular.</p>
+
+<p>That is not a detail. It is what makes next-token training possible at all: if a position could see
+the tokens that come after it, the answer would leak into the input and the model would learn
+nothing. It is also what makes the KV cache further down this page valid: cached Keys and Values
+for earlier positions stay correct precisely because nothing later can change them.</p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> “attention lets every token see every other token.” True for encoder models
+like BERT, false for the generative models people actually mean. Reading a bidirectional picture
+onto a decoder-only LLM makes both its training and its caching behaviour impossible to explain.</p>
+</blockquote>
+
+<figure>
+<svg viewBox="0 0 700 300" role="img" aria-labelledby="dgm-qkv-title dgm-qkv-desc">
+<title id="dgm-qkv-title">Tracing one query token's attention computation</title>
+<desc id="dgm-qkv-desc">The token "sat" in the sentence "The cat sat down" issues a Query compared against the Keys of "The", "cat" and itself, producing match weights used to blend those tokens' Values. The later token "down" is blocked by the causal mask and contributes nothing.</desc>
+<rect class="dgm-panel" x="8" y="8" width="684" height="284" rx="3" />
+<text class="dgm-title" x="28" y="34">Sentence: "The cat sat down" — tracing the query from "sat"</text>
+
+<rect class="dgm-panel" x="40" y="54" width="120" height="40" rx="3" />
+<text class="dgm-mono" x="100" y="79" text-anchor="middle">The</text>
+<rect class="dgm-panel" x="200" y="54" width="120" height="40" rx="3" />
+<text class="dgm-mono" x="260" y="79" text-anchor="middle">cat</text>
+<rect class="dgm-panel" x="360" y="54" width="120" height="40" rx="3" />
+<text class="dgm-mono" x="420" y="79" text-anchor="middle">sat</text>
+<rect class="dgm-panel" x="520" y="54" width="120" height="40" rx="3" />
+<text class="dgm-mono" x="580" y="79" text-anchor="middle">down</text>
+<text class="dgm-label-sm" x="420" y="110" text-anchor="middle">Query, issued from "sat"</text>
+
+<path class="dgm-flow" d="M420 118 L100 176" />
+<text class="dgm-accent" x="150" y="168" style="font-family:var(--f-mono);font-size:11px">0.15</text>
+<path class="dgm-flow" d="M420 118 L260 176" />
+<text class="dgm-accent" x="290" y="168" style="font-family:var(--f-mono);font-size:11px">0.55</text>
+<path class="dgm-flow" d="M420 118 L420 176" />
+<text class="dgm-accent" x="430" y="168" style="font-family:var(--f-mono);font-size:11px">0.30</text>
+<path class="dgm-line" d="M420 118 L580 176" stroke-dasharray="4 4" />
+<text class="dgm-label-sm" x="556" y="152" text-anchor="middle">masked</text>
+<line class="dgm-line" x1="566" y1="160" x2="594" y2="176" />
+<line class="dgm-line" x1="594" y1="160" x2="566" y2="176" />
+
+<text class="dgm-label-sm" x="100" y="196" text-anchor="middle">Key</text>
+<text class="dgm-label-sm" x="260" y="196" text-anchor="middle">Key</text>
+<text class="dgm-label-sm" x="420" y="196" text-anchor="middle">Key</text>
+<text class="dgm-label-sm" x="580" y="196" text-anchor="middle">Key (future)</text>
+
+<path class="dgm-line" d="M100 196 L340 240" />
+<path class="dgm-line" d="M260 196 L340 240" />
+<path class="dgm-line" d="M420 196 L360 240" />
+<rect class="dgm-panel" x="270" y="240" width="180" height="40" rx="3" />
+<text class="dgm-mono" x="360" y="265" text-anchor="middle">weighted blend of Values</text>
+</svg>
+<figcaption><strong>The match weights (0.15 / 0.55 / 0.30) are an illustrative pattern for this toy sentence, not a measurement from a real model run.</strong> Note what they sum over: only <code>The</code>, <code>cat</code> and <code>sat</code> itself. <code>down</code> comes later in the sentence. The causal mask removes it before the weights are computed, which means it cannot contribute. The remaining weights still sum to one.</figcaption>
+</figure>
+
+<blockquote>
+  <p><strong>Common trap:</strong> “the attention weights show you what the model is paying attention to, or
+explain why it answered the way it did.” This is the single most common overclaim about
+transformers. It is not true in the way people mean it. A controlled study specifically
+testing this found that learned attention weights are frequently uncorrelated with
+gradient-based measures of what actually influenced a prediction, and that noticeably different
+attention patterns can be found that produce the <em>same</em> output: meaning the weight pattern
+does not uniquely determine, and does not reliably reveal, the decision. Attention weights are a
+mathematically real part of the computation. They are not, on their own, a trustworthy
+explanation of it.
+<a href="https://arxiv.org/abs/1902.10186">Attention is not Explanation (Jain &amp; Wallace, 2019), arXiv:1902.10186</a></p>
+
+  <p>Two honest caveats on that citation, since this page elsewhere polices exactly this kind of
+overreach: the study predates transformers (it tested attention in RNN-based classifiers), and
+it drew a direct published rebuttal,
+<a href="https://arxiv.org/abs/1908.04626">Attention is not not Explanation (Wiegreffe &amp; Pinter, 2019)</a>,
+arguing its adversarial-attention method sets the bar in the wrong place. The conclusion has
+held up in later work on transformers. It just isn’t settled by this one paper.</p>
+</blockquote>
+
+<p>The diagram below makes the same point a different way: a full weight matrix for a short toy
+sentence looks informative (and it’s a real, load-bearing part of the computation), but reading
+it as “here is the model’s reasoning” goes further than the evidence supports.</p>
+
+<figure>
+<svg viewBox="0 0 520 340" role="img" aria-labelledby="dgm-heatmap-title dgm-heatmap-desc">
+<title id="dgm-heatmap-title">A full attention-weight matrix for one toy sentence</title>
+<desc id="dgm-heatmap-desc">A four-by-four grid where each row is a query token and each column is a key token in the sentence "The cat sat down". Only the lower triangle is filled: cell shading represents an illustrative attention-weight magnitude, and the empty upper triangle is the causal mask blocking each token from attending to later tokens.</desc>
+<rect class="dgm-panel" x="8" y="8" width="504" height="324" rx="3" />
+<text class="dgm-title" x="28" y="34">One head's weight pattern, "The cat sat down"</text>
+
+<text class="dgm-label-sm" x="180" y="60" text-anchor="middle">key: The</text>
+<text class="dgm-label-sm" x="260" y="60" text-anchor="middle">key: cat</text>
+<text class="dgm-label-sm" x="340" y="60" text-anchor="middle">key: sat</text>
+<text class="dgm-label-sm" x="420" y="60" text-anchor="middle">key: down</text>
+
+<text class="dgm-label-sm" x="60" y="98" text-anchor="end">query: The</text>
+<rect class="dgm-accent" x="140" y="80" width="60" height="34" fill-opacity="0.9" />
+<rect class="dgm-panel" x="220" y="80" width="60" height="34" />
+<rect class="dgm-panel" x="300" y="80" width="60" height="34" />
+<rect class="dgm-panel" x="380" y="80" width="60" height="34" />
+
+<text class="dgm-label-sm" x="60" y="140" text-anchor="end">query: cat</text>
+<rect class="dgm-accent" x="140" y="122" width="60" height="34" fill-opacity="0.25" />
+<rect class="dgm-accent" x="220" y="122" width="60" height="34" fill-opacity="0.75" />
+<rect class="dgm-panel" x="300" y="122" width="60" height="34" />
+<rect class="dgm-panel" x="380" y="122" width="60" height="34" />
+
+<text class="dgm-label-sm" x="60" y="182" text-anchor="end">query: sat</text>
+<rect class="dgm-accent" x="140" y="164" width="60" height="34" fill-opacity="0.15" />
+<rect class="dgm-accent" x="220" y="164" width="60" height="34" fill-opacity="0.55" />
+<rect class="dgm-accent" x="300" y="164" width="60" height="34" fill-opacity="0.3" />
+<rect class="dgm-panel" x="380" y="164" width="60" height="34" />
+
+<text class="dgm-label-sm" x="60" y="224" text-anchor="end">query: down</text>
+<rect class="dgm-accent" x="140" y="206" width="60" height="34" fill-opacity="0.05" />
+<rect class="dgm-accent" x="220" y="206" width="60" height="34" fill-opacity="0.15" />
+<rect class="dgm-accent" x="300" y="206" width="60" height="34" fill-opacity="0.55" />
+<rect class="dgm-accent" x="380" y="206" width="60" height="34" fill-opacity="0.25" />
+
+<text class="dgm-label-sm" x="28" y="268">Lighter cell = lower weight, darker = higher (illustrative shading, one head).</text>
+<text class="dgm-label-sm" x="28" y="288">Empty cells are masked: a token may never attend to one that comes after it.</text>
+<text class="dgm-label-sm" x="28" y="308">That blank upper triangle is the causal mask — every decoder-only LLM has it.</text>
+</svg>
+<figcaption><strong>A weight pattern is not an explanation.</strong> This grid is illustrative, sized for a toy sentence. Production attention matrices span dozens of tokens across dozens of heads. They aren't something you'd want to eyeball at full scale anyway. The shape, though, is real: that staircase of filled cells is what causal attention looks like. The first row having exactly one non-empty cell is why the first token of a sequence has nothing to attend to but itself.</figcaption>
+</figure>
+
+<h3 id="multi-head-attention-why-not-just-one-attention-computation">Multi-head attention: why not just one attention computation?</h3>
+
+<p>Rather than computing attention once, a transformer layer runs several attention computations in
+parallel, called <strong>heads</strong>, each with its own independently learned Query, Key, and Value
+projections, on the same input. The original paper used 8 heads per layer. The outputs of all
+heads are concatenated and projected back down to the model’s working dimension before moving on
+to the feed-forward sublayer. Running several smaller attention computations side by side, rather
+than one large one, lets different heads specialize in picking up on different kinds of
+relationships between tokens.
+<a href="https://papers.neurips.cc/paper/7181-attention-is-all-you-need.pdf">Attention Is All You Need</a></p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> it’s tempting to assume each head cleanly corresponds to one interpretable
+linguistic role: “the syntax head,” “the coreference head.” Some heads, on inspection, do show
+identifiable specialization. That is not guaranteed or universal across heads, layers, or
+models. Heads are optimized purely to reduce the training loss, and a legible role is a
+possible emergent outcome, never a designed one. Treat any specific “this head does X” claim
+about a specific model as an empirical finding about that model, not a general property of
+multi-head attention itself.</p>
+</blockquote>
+
+<figure>
+<svg viewBox="0 0 700 280" role="img" aria-labelledby="dgm-multihead-title dgm-multihead-desc">
+<title id="dgm-multihead-title">Multiple attention heads running in parallel</title>
+<desc id="dgm-multihead-desc">Three attention heads process the same sentence independently, each producing a different weight pattern, before their outputs are concatenated and projected back down to one representation.</desc>
+<rect class="dgm-panel" x="8" y="8" width="684" height="264" rx="3" />
+<text class="dgm-title" x="28" y="34">Three heads, same sentence, different patterns</text>
+
+<rect class="dgm-panel" x="30" y="56" width="150" height="110" rx="3" />
+<text class="dgm-accent" x="105" y="76" text-anchor="middle" style="font-family:var(--f-display);font-size:13px;font-weight:600">Head 1</text>
+<rect class="dgm-accent" x="45" y="86" width="30" height="24" fill-opacity="0.7" />
+<rect class="dgm-accent" x="80" y="86" width="30" height="24" fill-opacity="0.1" />
+<rect class="dgm-accent" x="115" y="86" width="30" height="24" fill-opacity="0.1" />
+<rect class="dgm-accent" x="45" y="114" width="30" height="24" fill-opacity="0.1" />
+<rect class="dgm-accent" x="80" y="114" width="30" height="24" fill-opacity="0.65" />
+<rect class="dgm-accent" x="115" y="114" width="30" height="24" fill-opacity="0.1" />
+<text class="dgm-label-sm" x="105" y="156" text-anchor="middle">nearby tokens</text>
+
+<rect class="dgm-panel" x="200" y="56" width="150" height="110" rx="3" />
+<text class="dgm-accent-2" x="275" y="76" text-anchor="middle" style="font-family:var(--f-display);font-size:13px;font-weight:600">Head 2</text>
+<rect class="dgm-accent-2" x="215" y="86" width="30" height="24" fill-opacity="0.6" />
+<rect class="dgm-accent-2" x="250" y="86" width="30" height="24" fill-opacity="0.6" />
+<rect class="dgm-accent-2" x="285" y="86" width="30" height="24" fill-opacity="0.55" />
+<rect class="dgm-accent-2" x="215" y="114" width="30" height="24" fill-opacity="0.5" />
+<rect class="dgm-accent-2" x="250" y="114" width="30" height="24" fill-opacity="0.1" />
+<rect class="dgm-accent-2" x="285" y="114" width="30" height="24" fill-opacity="0.1" />
+<text class="dgm-label-sm" x="275" y="156" text-anchor="middle">early tokens</text>
+
+<rect class="dgm-panel" x="370" y="56" width="150" height="110" rx="3" />
+<text class="dgm-accent-3" x="445" y="76" text-anchor="middle" style="font-family:var(--f-display);font-size:13px;font-weight:600">Head 3</text>
+<rect class="dgm-accent-3" x="385" y="86" width="30" height="24" fill-opacity="0.1" />
+<rect class="dgm-accent-3" x="420" y="86" width="30" height="24" fill-opacity="0.1" />
+<rect class="dgm-accent-3" x="455" y="86" width="30" height="24" fill-opacity="0.7" />
+<rect class="dgm-accent-3" x="385" y="114" width="30" height="24" fill-opacity="0.7" />
+<rect class="dgm-accent-3" x="420" y="114" width="30" height="24" fill-opacity="0.1" />
+<rect class="dgm-accent-3" x="455" y="114" width="30" height="24" fill-opacity="0.1" />
+<text class="dgm-label-sm" x="445" y="156" text-anchor="middle">long-range pair</text>
+
+<path class="dgm-flow" d="M180 110 L560 110" />
+<path class="dgm-flow" d="M350 110 L560 130" />
+<path class="dgm-flow" d="M520 110 L560 150" />
+<rect class="dgm-panel" x="560" y="86" width="120" height="90" rx="3" />
+<text class="dgm-label-sm" x="620" y="116" text-anchor="middle">concatenate</text>
+<text class="dgm-label-sm" x="620" y="136" text-anchor="middle">+</text>
+<text class="dgm-label-sm" x="620" y="156" text-anchor="middle">project down</text>
+
+<text class="dgm-label-sm" x="28" y="240">Shown: 3 heads for legibility. Production models commonly run 8 or more per layer.</text>
+</svg>
+<figcaption><strong>Different heads can pick up on different relationship types. But that specialization is emergent, not designed, and not universal.</strong> Three heads are drawn here purely so each pattern stays readable. The underlying mechanism (independent Q/K/V, concatenate, project) is identical whether a layer has 3 heads or 32.</figcaption>
+</figure>
+
+<h2 id="positional-encoding-why-order-has-to-be-injected-on-purpose">Positional encoding: why order has to be injected on purpose</h2>
+
+<p>Self-attention, as described above, is a comparison between every token and every other token:
+nothing in that comparison inherently knows <em>where</em> any token sits in the sequence. Left
+unmodified, self-attention would treat a sentence the same as any shuffled ordering of its words.
+Position has to be added in deliberately. The original transformer did this by adding a fixed
+wave-shaped (sinusoidal) vector to each token’s embedding based on its position. Most current
+models instead use <strong>Rotary Position Embedding (RoPE)</strong>, which rotates the Query and Key vectors
+by an angle proportional to their position before the attention comparison happens.
+<a href="https://papers.neurips.cc/paper/7181-attention-is-all-you-need.pdf">Attention Is All You Need</a>;
+<a href="https://arxiv.org/abs/2104.09864">RoFormer / RoPE (Su et al.), arXiv:2104.09864</a></p>
+
+<p>The reason RoPE is worth naming specifically: rotating both a Query and a Key by the same offset
+leaves their comparison unchanged. What that means in practice is that RoPE doesn’t give a token
+an absolute coordinate the model reads off: it encodes <em>relative</em> distance, how far apart two
+tokens are, directly through the angle between their rotated vectors. A clock-hand picture works
+for the core idea (comparing two hands tells you a time difference, regardless of what absolute
+time it is), and it’s worth stopping the picture there. RoPE’s actual rotation happens across
+many vector dimensions at different frequencies simultaneously, and extending a model to handle
+sequences longer than it was trained on (a technique called YaRN, among others) specifically
+means reworking those rotation frequencies, which is Advanced-tier material.
+<a href="https://arxiv.org/abs/2104.09864">RoFormer, arXiv:2104.09864</a></p>
+
+<blockquote>
+  <p><strong>Misconception:</strong> “position is a tag added once, and the model reads it off like a page
+number.” What actually gets used in the comparison is relative distance between two positions,
+not an absolute address (a subtle but important difference), because it’s <em>why</em> stretching a
+model past its trained context length is a real engineering problem rather than a non-issue.</p>
+</blockquote>
+
+<h2 id="the-kv-cache-why-generation-would-be-quadratic-without-it">The KV cache: why generation would be quadratic without it</h2>
+
+<p>Generation happens one token at a time: compute a distribution over the vocabulary, sample a
+token, append it, repeat. Naively, computing attention for the newest token would mean recomputing
+Keys and Values for <em>every</em> previous token in the sequence, at every layer, on every single step,
+work that grows with the square of the sequence length as the conversation gets longer.</p>
+
+<p>The fix is the <strong>KV cache</strong>: once a token’s Key and Value vectors are computed at a given layer,
+they’re stored. Generating the next token only requires computing a fresh Query for the new
+position and comparing it against the <em>already-cached</em> Keys and Values: no recomputation of
+anything earlier. This turns what would be roughly quadratic work into linear, incremental work
+per step.</p>
+
+<figure>
+<svg viewBox="0 0 700 320" role="img" aria-labelledby="dgm-kv-title dgm-kv-desc">
+<title id="dgm-kv-title">Per-step cost with and without a KV cache</title>
+<desc id="dgm-kv-desc">A bar chart comparing the compute cost of each generation step across five steps: without caching, cost grows every step because earlier keys and values are recomputed; with caching, cost per step stays flat because only the newest token's key and value are computed, while the cache's memory footprint still grows with every step.</desc>
+<rect class="dgm-panel" x="8" y="8" width="684" height="304" rx="3" />
+<text class="dgm-title" x="28" y="34">Cost per generation step, five steps in</text>
+
+<text class="dgm-label-sm" x="28" y="60">Without a cache — recompute everything so far, every step</text>
+<rect class="dgm-accent-2" x="40" y="70" width="40" height="16" fill-opacity="0.9" />
+<rect class="dgm-accent-2" x="100" y="66" width="40" height="20" fill-opacity="0.9" />
+<rect class="dgm-accent-2" x="160" y="62" width="40" height="24" fill-opacity="0.9" />
+<rect class="dgm-accent-2" x="220" y="58" width="40" height="28" fill-opacity="0.9" />
+<rect class="dgm-accent-2" x="280" y="54" width="40" height="32" fill-opacity="0.9" />
+<text class="dgm-label-sm" x="60" y="102">1</text>
+<text class="dgm-label-sm" x="120" y="102">2</text>
+<text class="dgm-label-sm" x="180" y="102">3</text>
+<text class="dgm-label-sm" x="240" y="102">4</text>
+<text class="dgm-label-sm" x="300" y="102">5</text>
+
+<text class="dgm-label-sm" x="28" y="150">With a cache — only the newest token's Key/Value computed, every step</text>
+<rect class="dgm-accent" x="40" y="166" width="40" height="10" fill-opacity="0.9" />
+<rect class="dgm-accent" x="100" y="165" width="40" height="11" fill-opacity="0.9" />
+<rect class="dgm-accent" x="160" y="164" width="40" height="12" fill-opacity="0.9" />
+<rect class="dgm-accent" x="220" y="163" width="40" height="13" fill-opacity="0.9" />
+<rect class="dgm-accent" x="280" y="162" width="40" height="14" fill-opacity="0.9" />
+<text class="dgm-label-sm" x="60" y="192">1</text>
+<text class="dgm-label-sm" x="120" y="192">2</text>
+<text class="dgm-label-sm" x="180" y="192">3</text>
+<text class="dgm-label-sm" x="240" y="192">4</text>
+<text class="dgm-label-sm" x="300" y="192">5</text>
+
+<text class="dgm-label-sm" x="28" y="234">...but the cache itself still grows every step (it never shrinks mid-conversation):</text>
+<rect class="dgm-accent-3" x="40" y="248" width="20" height="10" fill-opacity="0.9" />
+<rect class="dgm-accent-3" x="100" y="244" width="20" height="14" fill-opacity="0.9" />
+<rect class="dgm-accent-3" x="160" y="240" width="20" height="18" fill-opacity="0.9" />
+<rect class="dgm-accent-3" x="220" y="236" width="20" height="22" fill-opacity="0.9" />
+<rect class="dgm-accent-3" x="280" y="232" width="20" height="26" fill-opacity="0.9" />
+<text class="dgm-label-sm" x="470" y="250">memory held, step by step</text>
+</svg>
+<figcaption><strong>The cache turns quadratic recomputation into linear per-step work, by spending memory that keeps growing for as long as the conversation does.</strong> Note that the cached bars still rise: each new token is compared against every key already in the cache, and streaming that growing cache back out of memory becomes the dominant cost. Cheap per step, but not flat, which is why long conversations slow down even with a cache, and why the attention variants on the <a href="/projects/dokidex/learn/advanced/">Advanced</a> page exist. It is also not automatically persistent: it is discarded when the request ends, unless the server deliberately retains a shared prefix (the prompt-caching optimization Advanced covers).</figcaption>
+</figure>
+
+<blockquote>
+  <p><strong>Common trap:</strong> “the KV cache is the model’s memory of the conversation.” It’s purely a
+compute-saving mechanism tied one-to-one to the current context window, not anything like human
+memory. It holds no meaning on its own. It’s thrown away when the request ends unless the server
+is deliberately holding a shared prefix for reuse, and its size
+grows linearly with how much text has been generated. A model advertising a
+one-million-token context window (Claude Opus 5, Sonnet 5, and Fable 5 all ship this as of
+July 2026) can in principle hold a correspondingly enormous cache, which is precisely why
+serving very long contexts is as much a memory-engineering problem as a modeling one. That
+tradeoff, and the techniques used to shrink it (grouped-query attention, compressed latent
+caches), is exactly what
+<a href="/projects/dokidex/learn/local/">Running models locally</a> turns into a concrete VRAM
+budget, and what <a href="/projects/dokidex/learn/advanced/">Advanced</a> covers mechanically.
+<a href="https://platform.claude.com/docs/en/about-claude/models/overview">Claude models overview</a></p>
+</blockquote>
+
+<h2 id="three-training-stages-pretraining-sft-and-rlhf">Three training stages: pretraining, SFT, and RLHF</h2>
+
+<p>A released chat model is the product of three distinct training stages, each changing something
+different, and none of them able to fix what the others got wrong.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Stage</th>
+      <th>What it does</th>
+      <th>What it changes</th>
+      <th>What it cannot fix</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Pretraining</strong></td>
+      <td>Next-token prediction over a massive raw text/code corpus</td>
+      <td>Builds broad world knowledge and language ability from scratch</td>
+      <td>Doesn’t teach the model to follow instructions rather than just continue text</td>
+    </tr>
+    <tr>
+      <td><strong>Supervised fine-tuning (SFT)</strong></td>
+      <td>Further training on curated (prompt, ideal-response) demonstration pairs</td>
+      <td>Teaches instruction-following behavior and response format</td>
+      <td>Doesn’t reliably add new facts the pretraining data didn’t contain</td>
+    </tr>
+    <tr>
+      <td><strong>RLHF</strong></td>
+      <td>A reward model trained on human rankings of outputs, used to further optimize the policy</td>
+      <td>Reshapes style, helpfulness, tone, and preference-alignment</td>
+      <td>Doesn’t make the model “know more”: it’s a preference effect, not a knowledge effect</td>
+    </tr>
+  </tbody>
+</table>
+
+<figure>
+<svg viewBox="0 0 700 300" role="img" aria-labelledby="dgm-stages-title dgm-stages-desc">
+<title id="dgm-stages-title">Pretraining, SFT, and RLHF on one timeline</title>
+<desc id="dgm-stages-desc">Three sequential training stages shown left to right with relative dataset size, alongside two tracked lines showing that factual knowledge stays roughly flat across all three stages while style and instruction-following ability changes substantially during SFT and RLHF.</desc>
+<rect class="dgm-panel" x="8" y="8" width="684" height="284" rx="3" />
+<text class="dgm-title" x="28" y="34">One pipeline, three very different jobs</text>
+
+<rect class="dgm-panel" x="30" y="54" width="200" height="70" rx="3" />
+<text class="dgm-accent" x="130" y="78" text-anchor="middle" style="font-family:var(--f-display);font-size:13px;font-weight:600">Pretraining</text>
+<text class="dgm-label-sm" x="130" y="98" text-anchor="middle">huge raw text/code corpus</text>
+<text class="dgm-label-sm" x="130" y="114" text-anchor="middle">→ base model, broad knowledge</text>
+
+<rect class="dgm-panel" x="250" y="54" width="200" height="70" rx="3" />
+<text class="dgm-accent-2" x="350" y="78" text-anchor="middle" style="font-family:var(--f-display);font-size:13px;font-weight:600">SFT</text>
+<text class="dgm-label-sm" x="350" y="98" text-anchor="middle">curated demonstration pairs</text>
+<text class="dgm-label-sm" x="350" y="114" text-anchor="middle">→ follows instructions</text>
+
+<rect class="dgm-panel" x="470" y="54" width="200" height="70" rx="3" />
+<text class="dgm-accent-3" x="570" y="78" text-anchor="middle" style="font-family:var(--f-display);font-size:13px;font-weight:600">RLHF</text>
+<text class="dgm-label-sm" x="570" y="98" text-anchor="middle">reward model + human rankings</text>
+<text class="dgm-label-sm" x="570" y="114" text-anchor="middle">→ matches human preference</text>
+
+<path class="dgm-flow" d="M230 89 L250 89" />
+<path class="dgm-flow" d="M450 89 L470 89" />
+
+<text class="dgm-label-sm" x="28" y="160">Knowledge (mostly set in pretraining)</text>
+<path class="dgm-line" d="M40 175 L660 175" />
+
+<text class="dgm-label-sm" x="28" y="210">Style / instruction-following / helpfulness</text>
+<path class="dgm-flow" d="M40 245 L250 240 L470 205 L660 190" />
+
+<text class="dgm-label-sm" x="28" y="272">A flat knowledge line next to a rising style line is the whole rebuttal to "RLHF makes it smarter."</text>
+</svg>
+<figcaption><strong>Knowledge is set overwhelmingly during pretraining. SFT and RLHF reshape behavior, not facts.</strong> The clearest evidence for this: outputs from a 1.3-billion-parameter RLHF'd model were preferred by human raters over outputs from the 100-times-larger, non-RLHF'd 175B GPT-3, a preference result, not a knowledge result.</figcaption>
+</figure>
+
+<blockquote>
+  <p><strong>Common trap:</strong> “RLHF is what makes the model smarter or more accurate.” The foundational
+RLHF paper’s headline finding is specifically a <em>preference</em> effect: a 1.3B-parameter model
+trained with RLHF produced outputs human raters preferred over a 175B-parameter base model with
+no RLHF, because RLHF reshapes style, helpfulness, and instruction-following, not the
+underlying factual knowledge laid down in pretraining. Fine-tuning in general is much more
+reliable at changing <em>behavior</em> than at reliably injecting new, precise facts. If you need a
+model to use specific, current information, retrieval (below) is the more dependable tool.
+<a href="https://arxiv.org/abs/2203.02155">Training language models to follow instructions with human feedback (Ouyang et al., “InstructGPT”), arXiv:2203.02155</a></p>
+</blockquote>
+
+<h2 id="instruction-following-system-prompts-and-chat-templates">Instruction following, system prompts, and chat templates</h2>
+
+<p><strong>Instruction following</strong> (the ability to read “write a haiku about rain” and actually write a
+haiku, instead of continuing the sentence with more instructions) is primarily an SFT/RLHF
+product, not a pretraining one. A raw pretrained (“base”) model is just as likely to continue a
+list of instructions as to follow the first one, because both patterns appear in its training
+data. Instruction-following specifically has to be trained in.
+<a href="https://arxiv.org/abs/2203.02155">InstructGPT, arXiv:2203.02155</a></p>
+
+<p>A <strong>system prompt</strong> is a block of instructions (persona, rules, available tools, formatting
+constraints) placed ahead of the user’s messages that the model is trained to weight more
+durably than an ordinary turn. It’s a strong steering signal, not a hard sandbox boundary: a
+system prompt is still just text the model attends to, and determined adversarial prompting can
+sometimes get a model to deviate from or leak it. Treat it as raising the bar substantially, not
+as an unbreakable rule enforced outside the model.</p>
+
+<p>A <strong>chat template</strong> is the exact string format (specific role markers, specific special tokens,
+specific whitespace) that a given model’s training pipeline used to represent a conversation.
+Every model family is trained on one particular template. Using a different, “reasonable-looking”
+format (say, plain <code class="language-plaintext highlighter-rouge">User:</code> / <code class="language-plaintext highlighter-rouge">Bot:</code> labels) instead of the model’s actual template is a common,
+silent way to degrade a self-hosted model’s output.</p>
+
+<blockquote>
+  <p><strong>Note:</strong> a chat-template mismatch usually fails <em>quietly</em>. A garbled printer driver fails
+loudly: a blank or scrambled page. A wrong chat template doesn’t: the model still produces
+fluent, plausible-looking text, just measurably worse than it would with the correct template,
+which is exactly why it’s easy to miss when running an open model locally and blame the model
+itself instead of the formatting. <a href="/projects/dokidex/learn/local/">Running models locally</a>
+covers the practical side of getting this right.</p>
+</blockquote>
+
+<h2 id="function-calling-how-a-text-model-calls-anything-at-all">Function calling: how a text model “calls” anything at all</h2>
+
+<p>A model has no way to directly run code. It only ever generates text. <strong>Tool use</strong> works by
+having the calling application describe available functions (name, and a schema for the
+arguments) to the model up front. Mid-response, the model can emit a structured request (a tool
+name plus JSON arguments matching that schema) instead of ordinary prose. The application reads
+that request, actually executes the real function, and sends the result back as a new message,
+which the model then incorporates into what it says next.
+<a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview">Tool use with Claude</a></p>
+
+<figure>
+<svg viewBox="0 0 700 300" role="img" aria-labelledby="dgm-toolcall-title dgm-toolcall-desc">
+<title id="dgm-toolcall-title">The tool-call round trip</title>
+<desc id="dgm-toolcall-desc">Four steps: a user asks a question, the model emits a tool-use request, the calling application executes the real function on its own side of a boundary, and the result is returned to the model to produce a final answer.</desc>
+<rect class="dgm-panel" x="8" y="8" width="684" height="284" rx="3" />
+<text class="dgm-title" x="28" y="34">Model proposes, application executes</text>
+
+<rect class="dgm-panel" x="30" y="120" width="140" height="56" rx="3" />
+<text class="dgm-label-sm" x="100" y="144" text-anchor="middle">1. User asks a</text>
+<text class="dgm-label-sm" x="100" y="160" text-anchor="middle">question</text>
+<path class="dgm-flow" d="M170 148 L200 148" />
+
+<rect class="dgm-panel" x="200" y="120" width="140" height="56" rx="3" />
+<text class="dgm-label-sm" x="270" y="140" text-anchor="middle">2. Model emits</text>
+<text class="dgm-label-sm" x="270" y="156" text-anchor="middle">tool_use: name +</text>
+<text class="dgm-label-sm" x="270" y="170" text-anchor="middle">JSON arguments</text>
+<path class="dgm-flow" d="M340 148 L370 148" />
+
+<rect class="dgm-panel" x="370" y="120" width="140" height="56" rx="3" />
+<text class="dgm-label-sm" x="440" y="140" text-anchor="middle">3. Application</text>
+<text class="dgm-label-sm" x="440" y="156" text-anchor="middle">executes the real</text>
+<text class="dgm-label-sm" x="440" y="170" text-anchor="middle">function</text>
+<path class="dgm-flow" d="M510 148 L540 148" />
+
+<rect class="dgm-panel" x="540" y="120" width="140" height="56" rx="3" />
+<text class="dgm-label-sm" x="610" y="140" text-anchor="middle">4. tool_result</text>
+<text class="dgm-label-sm" x="610" y="156" text-anchor="middle">returned; model</text>
+<text class="dgm-label-sm" x="610" y="170" text-anchor="middle">gives final answer</text>
+
+<path class="dgm-line" d="M355 100 L355 220" stroke-dasharray="4 4" />
+<text class="dgm-label-sm" x="270" y="230" text-anchor="middle">model: text only</text>
+<text class="dgm-label-sm" x="440" y="230" text-anchor="middle">application: real side effects happen here</text>
+</svg>
+<figcaption><strong>The model only ever proposes a call. The calling application is what actually executes it.</strong> The dashed line is the trust boundary: the model has no way to verify a tool's result independent of what the application chooses to hand back, which is a real limitation of agentic systems, not a detail to wave away.</figcaption>
+</figure>
+
+<blockquote>
+  <p><strong>Note:</strong> most tools run on the caller’s own infrastructure (your code, your servers), but a
+handful of server-run tools (Anthropic’s own web search, for example) execute on the
+provider’s infrastructure instead. The distinction matters for what you’re actually trusting
+when a tool result comes back. <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview">Tool use with Claude</a></p>
+</blockquote>
+
+<h2 id="rag-and-vector-search-retrieval-is-not-memory">RAG and vector search: retrieval is not memory</h2>
+
+<p><strong>Retrieval-Augmented Generation (RAG)</strong> pairs a pretrained generator with a search step: at query
+time, the query is embedded (Foundations covered embeddings) and compared against a vector index
+of candidate passages. The closest matches are inserted directly into the prompt, so generation
+is conditioned on that retrieved text rather than purely on whatever the model happened to absorb
+during pretraining. The original RAG paper found this measurably produces more specific and
+factual language than a purely parametric baseline.
+<a href="https://arxiv.org/abs/2005.11401">Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks (Lewis et al., 2020), arXiv:2005.11401</a></p>
+
+<p>Two things RAG is often described as, that it isn’t. First, it’s not giving the model memory.
+Retrieved passages are inserted into the same context window covered in Foundations, on this one
+call, and vanish exactly like everything else in the context once the request ends. Nothing about
+RAG changes the model’s weights or gives it a persistent store of anything. Second, it doesn’t
+eliminate hallucination. It changes what information is available to condition on, which reduces
+one specific failure mode (inventing facts with no source at all), but the model can still
+misread, ignore, or misquote a retrieved passage. And the retriever itself can hand back an
+irrelevant or wrong passage in the first place.</p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> “RAG gives the model memory” and “RAG solves hallucination” are two separate
+overclaims that tend to travel together. RAG is a retrieval step feeding text into the prompt,
+nothing more. It shifts which failure modes are likely. It doesn’t remove failure. Handing a
+model the right source doesn’t guarantee it reads that source correctly. And if the retriever
+hands back the <em>wrong</em> source, having “citations” at all can make a wrong answer look more
+credible, not less.
+<a href="https://arxiv.org/abs/2005.11401">RAG, arXiv:2005.11401</a></p>
+</blockquote>
+
+<h2 id="evaluation-basics">Evaluation basics</h2>
+
+<p>A benchmark score is a number produced by running a model against a fixed set of test questions
+under a fixed scoring rule. It’s only as meaningful as that construction. Two cautions carry
+over directly from Foundations’ discussion of hallucination: a scoring rule that credits a
+confident wrong answer the same as an honest “I’m not sure” (both zero) structurally rewards
+guessing over calibrated uncertainty, so a model can be shaped to score better on an eval in ways
+that make it a worse, more overconfident conversational partner in practice.
+<a href="https://arxiv.org/abs/2509.04664">Why Language Models Hallucinate, arXiv:2509.04664</a></p>
+
+<p>Benchmarks have also driven real, useful course-corrections: comparisons showing that a
+280-billion-parameter model (Gopher) was undertrained relative to its size, and that a
+properly data-matched, far smaller 70B model (Chinchilla) beat it at the same training compute
+budget, are what shifted the field away from treating raw parameter count as a quality proxy on
+its own.
+<a href="https://arxiv.org/abs/2203.15556">Training Compute-Optimal Large Language Models (“Chinchilla”), arXiv:2203.15556</a></p>
+
+<p>This page only needs you to know evaluation exists and what it’s for. The actual landscape of
+benchmarks (what they measure, where the well-known ones disagree, and how to read a leaderboard
+without being misled by it) is its own page:
+<a href="/projects/dokidex/learn/benchmarks/">Benchmarks</a>.</p>
+
+<h2 id="whats-next">What’s next</h2>
+
+<p>You now have the mechanical picture: tokens flow through stacked attention-plus-feed-forward
+blocks, and attention is a real but non-explanatory weighting mechanism. Position and the KV cache
+are both engineering answers to gaps in the base mechanism, and three distinct training stages
+shaped what the model in front of you actually does. Two directions from here:</p>
+
+<p><a href="/projects/dokidex/learn/advanced/">Advanced</a> goes further into the machinery: mixture-of-
+experts routing, the attention-variant tricks (GQA, MQA, MLA) that shrink the KV cache you just
+read about, quantization, speculative decoding, and the reinforcement-learning algorithms (PPO,
+DPO, GRPO) that sit inside the RLHF stage.</p>
+
+<p><a href="/projects/dokidex/learn/local/">Running models locally</a> turns the KV cache and the
+model’s weights into an actual VRAM budget for hardware you own, the memory maths this page set
+up, made concrete.</p>
+
+    </article>
+
+    
+    <nav class="pager" aria-label="Page navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/learn/basics/">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">Foundations</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/learn/advanced/">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">Advanced</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="site-footer">
+  <div class="footer-main">
+    <p class="footer-line">
+      <strong>DokiDex</strong> v0.62.0:
+      a fully-local AI stack, and a field guide to the machines it runs on.
+    </p>
+    <p class="footer-line footer-dim">
+      Everything on this site is written against the real tree and the measured record. Where a
+      claim is a number, it was measured or sourced. Where it was a judgment call, the reasoning
+      is stated inline. Stale statements are bugs. File them like bugs.
+    </p>
+  </div>
+
+  <div class="footer-links">
+    <a href="/projects/dokidex/local-cli/">Run the CLIs</a>
+    <a href="/projects/dokidex/handbook/">Handbook</a>
+    <a href="/projects/dokidex/reference/">Quick reference</a>
+    <a href="/projects/dokidex/glossary/">Glossary</a>
+    <!-- Deliberately understated: last item in the row, same weight as the rest, no colour,
+         no badge, no image beacon. The ask was "inconspicuous". -->
+    <a class="footer-kofi" href="https://ko-fi.com/dougfessler" rel="noopener">Buy me a coffee</a>
+  </div>
+</footer>
+
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/dokidex.js"></script>
+</body>
+</html>

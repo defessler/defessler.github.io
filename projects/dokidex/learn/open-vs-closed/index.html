@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open vs. Closed Weights · DokiDex</title>
+<meta name="description" content="Who actually ships open weights versus a locked API, what each licence really permits, and how the best of each side compares on coding, reasoning, and cost, as of July 2026.">
+
+<!-- Open Graph / Twitter, hand-rolled: jekyll-seo-tag is not available under the pinned
+     github-pages gem set used by actions/jekyll-build-pages. -->
+<meta property="og:site_name" content="DokiDex">
+<meta property="og:title" content="Open vs. Closed Weights">
+<meta property="og:description" content="Who actually ships open weights versus a locked API, what each licence really permits, and how the best of each side compares on coding, reasoning, and cost, as of July 2026.">
+<meta property="og:type" content="website">
+<!-- site_origin rather than absolute_url: see the comment in _config.yml. absolute_url would
+     emit http:// here, because the Pages API reports an http html_url while Enforce HTTPS is off. -->
+<meta property="og:url" content="https://dougfessler.com/projects/dokidex/learn/open-vs-closed/">
+<link rel="canonical" href="https://dougfessler.com/projects/dokidex/learn/open-vs-closed/">
+<!-- `summary`, not `summary_large_image`: no og:image or twitter:image is emitted anywhere on
+     this site, and the large-image card renders as a blank rectangle without one. Switch this back
+     the same day a 1200x630 share asset lands, not before. -->
+<meta name="twitter:card" content="summary">
+
+<!-- Same four families as the handbook, so the two halves of the site read as one product:
+     Marcellus (power words) · Kanit (headings, kickers, nav) · IBM Plex Mono (code, stats) ·
+     Figtree (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/dokidex.css">
+<link rel="icon" href="/projects/dokidex/assets/favicon.svg" type="image/svg+xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<!-- `wide: true` in a page's front matter opts it into --content-w-wide (assets/dokidex.css:51).
+     The CSS keys off `.page-wide` on an ancestor. Without the class emitted here the front-matter
+     flag silently does nothing. -->
+<body class="page-wide">
+<a class="skip-link" href="#content">Skip to content</a>
+
+<!-- CSS-only nav toggle. A checkbox beats a JS drawer here: the nav has to work on the mobile
+     read where the reader has scrolled 4000px into a reference table, and a checkbox cannot
+     desync from its own state the way a JS flag can. -->
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/">DokiDex</a>
+    <a class="topbar-cta" href="/projects/dokidex/download/"><svg class="dl-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><g class="dl-arrow"><path d="M8 2.2v6.5"/><path d="M5.2 5.9 8 8.7l2.8-2.8"/></g><path class="dl-tray" d="M3.2 11.3v2.5h9.6v-2.5"/></svg>
+Download</a>
+  </header>
+
+  <!-- Grouped navigation, driven by site.nav in _config.yml.
+
+     A page is "current" when its url matches exactly. The handbook is the one entry that also
+     needs to light up for its children (/handbook/03-serving.html), so it gets a prefix test —
+     without it, the sidebar would show nothing selected the moment a reader steps into a
+     chapter, which reads as "you have left the site". -->
+<nav class="sidebar" aria-label="Site sections">
+  <a class="sidebar-brand" href="/projects/dokidex/">
+    <span class="sidebar-mark" aria-hidden="true">&#9612;&#9608;&#9608;&#9616;</span>
+    <span class="sidebar-brand-text">DokiDex</span>
+  </a>
+
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Start</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/"
+             >Overview</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Use DokiDex</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/local-cli/"
+             >Run the CLIs locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/download/"
+             >Download the launchers</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/models/"
+             >Models it runs</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/games/"
+             >Games the models built</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/telemetry/"
+             >Performance data</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/qwen38/"
+             >Qwen3.8-27B, measured</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/architecture/"
+             >How it's built</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Learn AI</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/"
+             >Where to start</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/basics/"
+             >1 · Foundations</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/core/"
+             >2 · How models work</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/advanced/"
+             >3 · Advanced</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/naming/"
+             >Decoding model names</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link is-active"
+             href="/projects/dokidex/learn/open-vs-closed/"
+             aria-current="page">Open vs closed weights</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/benchmarks/"
+             >Benchmarks</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/local/"
+             >Running models locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/agents/"
+             >Coding agents</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Context</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/state-of-ai/"
+             >State of AI, 2026</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/reference/"
+             >Quick reference</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/glossary/"
+             >Glossary</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Deep dive</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/handbook/"
+             >The Handbook</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+</nav>
+
+
+  <main class="main">
+    <div class="page-head">
+      <p class="kicker">:: THE TWO FRONTIERS</p>
+      <h1 class="page-title">Open vs. Closed Weights</h1>
+      <p class="page-desc">Who actually ships open weights versus a locked API, what each licence really permits, and how the best of each side compares on coding, reasoning, and cost, as of July 2026.</p>
+      
+      <p class="level-badges">
+        <span class="level-badge level-intermediate">Intermediate</span>
+      </p>
+      
+    </div>
+
+    <article id="content" class="prose">
+      <p>“Open” and “closed” sound like two teams. In practice they’re two different business models that
+both ship you a file of numbers. The file doesn’t tell you which team it came from. What
+differs is what else you get alongside the weights, what you’re legally allowed to do with them,
+and how much you pay per token versus per GPU-hour. This page tries to put a number on every one
+of those differences, dated, so you can make the call for your own situation rather than take
+either side’s marketing at face value.</p>
+
+<h2 id="three-different-promises-open-weight-open-source-open-data">Three different promises: open weight, open source, open data</h2>
+
+<p>Almost every model people call “open source” in casual conversation is, more precisely, <strong>open
+weight</strong>: the publisher hands you the trained parameters and lets you download and run them. That
+promise is real and valuable. No other permission is required to run, fine-tune, or quantize the
+model. It’s also, on its own, a much smaller promise than “open source” usually implies for
+regular software.</p>
+
+<p>The <a href="https://opensource.org/ai/open-source-ai-definition">Open Source Initiative</a>’s Open Source AI
+Definition sets a higher bar. To call an AI system “open source,” it wants three things released
+with no permission needed to use, study, modify, or share: sufficiently detailed information about
+the training data (description and provenance, not necessarily the raw data itself), the complete
+source code used to train and run the system, and the parameters, the “preferred form to make
+modifications.” Almost nothing in this document clears that bar.</p>
+
+<figure>
+<svg viewBox="0 0 700 250" role="img" aria-labelledby="dgm-tiers-title dgm-tiers-desc">
+<title id="dgm-tiers-title">What "open" actually ships</title>
+<desc id="dgm-tiers-desc">A two-row table comparing a typical open-weight model against AI2's OLMo 3 across three columns: weights, training data, and training/inference code. The typical model ships weights only; OLMo 3 ships all three.</desc>
+<rect class="dgm-panel" x="8" y="8" width="684" height="234" rx="3" />
+<text class="dgm-title" x="28" y="36">What "open" actually ships</text>
+<line class="dgm-line" x1="28" y1="54" x2="672" y2="54" />
+<text class="dgm-label-sm" x="350" y="76" text-anchor="middle">Weights</text>
+<text class="dgm-label-sm" x="480" y="76" text-anchor="middle">Training data</text>
+<text class="dgm-label-sm" x="610" y="76" text-anchor="middle">Training + inference code</text>
+<line class="dgm-line" x1="28" y1="88" x2="672" y2="88" />
+<text class="dgm-label" x="28" y="134">Typical open-weight model</text>
+<text class="dgm-label-sm" x="28" y="152">(Qwen, DeepSeek, Llama, GLM, Kimi&#8230;)</text>
+<text class="dgm-mono" x="350" y="138" text-anchor="middle">Yes</text>
+<text class="dgm-mono" x="480" y="138" text-anchor="middle">No</text>
+<text class="dgm-mono" x="610" y="138" text-anchor="middle">No</text>
+<line class="dgm-line" x1="28" y1="164" x2="672" y2="164" />
+<text class="dgm-label" x="28" y="210">AI2's OLMo 3</text>
+<text class="dgm-label-sm" x="28" y="228">(Dolma corpus, every checkpoint, full pipeline)</text>
+<text class="dgm-mono dgm-ok" x="350" y="214" text-anchor="middle">Yes</text>
+<text class="dgm-mono dgm-ok" x="480" y="214" text-anchor="middle">Yes</text>
+<text class="dgm-mono dgm-ok" x="610" y="214" text-anchor="middle">Yes</text>
+</svg>
+<figcaption><strong>Weights are the shallow end of "open."</strong> [AI2's OLMo
+3](https://allenai.org/blog/olmo3) is the standout in this whole landscape: it ships the actual
+Dolma pretraining corpus (up to 6 trillion tokens), every intermediate training checkpoint, logs,
+eval suites, and the training/inference code, the "preferred form to make modifications" the OSI
+definition asks for. Everyone else in this document, however permissive the licence, hands you a
+binary and a technical report describing what they did, not the means to reproduce it.</figcaption>
+</figure>
+
+<p>License permissiveness and openness-of-process are independent axes. A model can be Apache-2.0
+(maximally permissive to <em>use</em>) while remaining completely closed-process: no data, no training
+code, just a HuggingFace repo of tensors. That describes nearly every model on this page. Keep the
+two questions separate: <strong>“Can I legally ship a product with this?”</strong> is a licence question,
+answered below. <strong>“Can I inspect or reproduce how this was made?”</strong> is a process question. For
+all but one model here, the honest answer is no.</p>
+
+<h2 id="licences-taken-seriously">Licences, taken seriously</h2>
+
+<p>This is where people get burned: treat every row here as load-bearing. A licence name isn’t
+decoration, since it determines whether you can put a model in a commercial product at all.
+Vendors frequently ship different licences for models that look like siblings.</p>
+
+<blockquote>
+  <p><strong>Warning</strong>: “Apache-2.0” and “MIT” are genuinely permissive: commercial use, modification, and
+redistribution with no revenue cap. “Modified MIT,” “Community” licences, and anything with
+“Research” or “Non-Production” in the name aren’t the same thing, even when the base text reads
+similarly. Read the actual LICENSE file on the model’s own card before shipping.</p>
+</blockquote>
+
+<figure>
+<svg viewBox="0 0 700 250" role="img" aria-labelledby="dgm-lic-title dgm-lic-desc">
+<title id="dgm-lic-title">What each licence family actually permits</title>
+<desc id="dgm-lic-desc">A three-by-three grid comparing Apache-2.0/MIT, Modified-MIT/community-capped licences, and research-only/non-commercial licences against three permissions: commercial use, free modification and redistribution, and whether that permission holds at any scale.</desc>
+<rect class="dgm-panel" x="8" y="8" width="684" height="234" rx="3" />
+<text class="dgm-title" x="28" y="34">Permission by licence family</text>
+<line class="dgm-line" x1="28" y1="50" x2="672" y2="50" />
+<text class="dgm-label-sm" x="330" y="70" text-anchor="middle">Apache-2.0 / MIT</text>
+<text class="dgm-label-sm" x="470" y="70" text-anchor="middle">Modified-MIT / community cap</text>
+<text class="dgm-label-sm" x="610" y="70" text-anchor="middle">Research-only / non-commercial</text>
+<line class="dgm-line" x1="28" y1="82" x2="672" y2="82" />
+<text class="dgm-label" x="28" y="112">Commercial use</text>
+<text class="dgm-mono dgm-ok" x="330" y="112" text-anchor="middle">Yes</text>
+<text class="dgm-mono dgm-accent-2" x="470" y="112" text-anchor="middle">Below a cap</text>
+<text class="dgm-mono dgm-accent-3" x="610" y="112" text-anchor="middle">No</text>
+<line class="dgm-line" x1="28" y1="128" x2="672" y2="128" />
+<text class="dgm-label" x="28" y="158">Modify &amp; redistribute</text>
+<text class="dgm-mono dgm-ok" x="330" y="158" text-anchor="middle">Yes</text>
+<text class="dgm-mono dgm-accent-2" x="470" y="158" text-anchor="middle">Yes, w/ attribution</text>
+<text class="dgm-mono dgm-accent-3" x="610" y="158" text-anchor="middle">Eval only</text>
+<line class="dgm-line" x1="28" y1="174" x2="672" y2="174" />
+<text class="dgm-label" x="28" y="204">Free at any scale</text>
+<text class="dgm-mono dgm-ok" x="330" y="204" text-anchor="middle">Yes</text>
+<text class="dgm-mono dgm-accent-3" x="470" y="204" text-anchor="middle">No — cap applies</text>
+<text class="dgm-mono dgm-accent-3" x="610" y="204" text-anchor="middle">No</text>
+</svg>
+<figcaption><strong>The middle column is where products get surprised.</strong> A "Modified MIT"
+model reads like MIT until your product crosses whatever revenue or user-count threshold the
+licence text sets, at which point you owe attribution or a negotiated agreement. The metaphor
+breaks at the exact cap number, which varies per model and per release. Treat any specific
+threshold you've read online as unconfirmed until you check that model's own current LICENSE
+file.</figcaption>
+</figure>
+
+<p>The corrections that matter most, checked directly against model cards:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Actual licence</th>
+      <th>What it means</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://huggingface.co/mistralai/Ministral-8B-Instruct-2410">Ministral 8B</a></td>
+      <td><strong>Mistral Research License (<code class="language-plaintext highlighter-rouge">mrl</code>)</strong></td>
+      <td>Research/evaluation only. Commercial use needs a separate paid agreement with Mistral. It’s <em>not</em> Apache-2.0, despite that claim circulating.</td>
+    </tr>
+    <tr>
+      <td>Mistral Nemo</td>
+      <td>Apache-2.0</td>
+      <td>Genuinely permissive. Don’t blanket Ministral and Nemo together. They’re licensed differently despite being similar-sized siblings.</td>
+    </tr>
+    <tr>
+      <td><a href="https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B">DeepSeek-R1-Distill-Qwen-32B</a> (and the other Qwen-based R1 distills)</td>
+      <td><strong><code class="language-plaintext highlighter-rouge">mit</code></strong>, per the Hugging Face license metadata tag</td>
+      <td>The card’s prose mentions the Qwen2.5 lineage, but tooling and legal review read the license <em>tag</em>, not the prose. The Llama-based distills (8B, 70B) weren’t independently reconfirmed this session. Check each one’s own tag, since Meta’s Llama licence is normally “sticky” across derivatives and may not simplify to MIT the same way.</td>
+    </tr>
+    <tr>
+      <td><a href="https://huggingface.co/mistralai/Mistral-Large-3">Mistral Large 3</a></td>
+      <td><strong>Apache-2.0</strong>, stated plainly on the card</td>
+      <td>Some secondary summaries hedge this as research/non-commercial. That’s wrong and would needlessly scare a team off using it commercially.</td>
+    </tr>
+    <tr>
+      <td><a href="https://huggingface.co/CohereLabs/c4ai-command-r-plus">Command R+</a></td>
+      <td><code class="language-plaintext highlighter-rouge">cc-by-nc-4.0</code></td>
+      <td>Weights are downloadable, but non-commercial. Production use requires Cohere’s separate enterprise licence. Its successor, Command A+, reversed this (below).</td>
+    </tr>
+    <tr>
+      <td>Codestral-22B-v0.1</td>
+      <td><code class="language-plaintext highlighter-rouge">MNPL-0.1</code> (Mistral Non-Production License)</td>
+      <td>Explicitly evaluation-only. Mistral’s own Codestral Mamba, by contrast, ships Apache-2.0. Even within one vendor’s one product line, check every release.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Other licences worth knowing by name, all confirmed against their own model cards: <strong>Gemma 4</strong>
+<code class="language-plaintext highlighter-rouge">apache-2.0</code> (a real upgrade from Gemma 3’s custom Gemma Terms of Use) · <strong>Command A+</strong>
+<code class="language-plaintext highlighter-rouge">apache-2.0</code> · <strong>MiniMax-M2.7</strong> non-commercial (a regression from M2 and M2.1’s Modified-MIT) ·
+<strong>MiniMax-M2 / M2.1</strong> <code class="language-plaintext highlighter-rouge">modified-mit</code> · <strong>Kimi K2 / K2.6</strong> Modified MIT (permissive below a
+revenue/user-scale threshold Moonshot sets in the licence text. The exact figures circulating for
+that threshold weren’t confirmable against either model’s own card, so treat any specific number
+you read as unverified) · <strong>Devstral 2</strong> Modified MIT · <strong>Nemotron 3 Ultra</strong> <code class="language-plaintext highlighter-rouge">openmdw-1.1</code>
+(NVIDIA hasn’t published a confirmed licence for the Nano or Super tiers specifically. Don’t
+assume they match Ultra) · <strong>Hy3</strong> (Tencent) <code class="language-plaintext highlighter-rouge">apache-2.0</code> · <strong>Granite 4.1</strong> <code class="language-plaintext highlighter-rouge">apache-2.0</code> ·
+<strong>Seed-OSS</strong> <code class="language-plaintext highlighter-rouge">apache-2.0</code> · <strong>Falcon-H1R</strong> <code class="language-plaintext highlighter-rouge">falcon-llm-license</code> · <strong>Phi-4-reasoning-vision</strong>
+<code class="language-plaintext highlighter-rouge">MIT</code> · <strong>Ling-2.6-1T</strong> <code class="language-plaintext highlighter-rouge">MIT</code> · <strong>GLM</strong> family <code class="language-plaintext highlighter-rouge">MIT</code> · <strong>DeepSeek V4</strong> <code class="language-plaintext highlighter-rouge">MIT</code>.</p>
+
+<h2 id="the-closed-frontier-as-of-july-2026">The closed frontier, as of July 2026</h2>
+
+<p>Six vendors, each with a real strategic difference in how they slice pricing and reasoning tiers.
+All figures below are the vendor’s own published list price and were independently re-verified
+against the primary docs.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Vendor</th>
+      <th>Model</th>
+      <th>Context</th>
+      <th>Modality</th>
+      <th>Reasoning</th>
+      <th>Price in / out per MTok</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Fable 5</td>
+      <td>1M</td>
+      <td>Text + image → text</td>
+      <td>Adaptive, always-on</td>
+      <td>$10 / $50</td>
+    </tr>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Opus 5</td>
+      <td>1M</td>
+      <td>Text + image → text</td>
+      <td>Adaptive (toggle)</td>
+      <td>$5 / $25</td>
+    </tr>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Sonnet 5</td>
+      <td>1M</td>
+      <td>Text + image → text</td>
+      <td>Adaptive</td>
+      <td>$3 / $15 (intro $2/$10 thru Aug 31, 2026)</td>
+    </tr>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Haiku 4.5</td>
+      <td>200K</td>
+      <td>Text + image → text</td>
+      <td>Extended thinking only</td>
+      <td>$1 / $5</td>
+    </tr>
+    <tr>
+      <td>OpenAI</td>
+      <td>GPT-5.6 Sol</td>
+      <td>1.05M</td>
+      <td>Text + image → text</td>
+      <td>Configurable effort</td>
+      <td>$5 / $30</td>
+    </tr>
+    <tr>
+      <td>OpenAI</td>
+      <td>GPT-5.6 Terra</td>
+      <td>1.05M</td>
+      <td>Text + image → text</td>
+      <td>Configurable effort</td>
+      <td>$2.50 / $15</td>
+    </tr>
+    <tr>
+      <td>OpenAI</td>
+      <td>GPT-5.6 Luna</td>
+      <td>1.05M</td>
+      <td>Text + image → text</td>
+      <td>Configurable effort</td>
+      <td>$1 / $6</td>
+    </tr>
+    <tr>
+      <td>OpenAI</td>
+      <td>GPT-5.4 nano</td>
+      <td>-</td>
+      <td>Text + image → text</td>
+      <td>Configurable effort</td>
+      <td>$0.20 / $1.25</td>
+    </tr>
+    <tr>
+      <td>Google</td>
+      <td>Gemini 3.1 Pro Preview</td>
+      <td>1,048,576</td>
+      <td>Text/image/video/audio/PDF → text</td>
+      <td>Thinking capability</td>
+      <td>$2-$4 in / $12-$18 out</td>
+    </tr>
+    <tr>
+      <td>Google</td>
+      <td>Gemini 3.5 Flash</td>
+      <td>1,048,576</td>
+      <td>Multimodal → text</td>
+      <td>Thinking capability</td>
+      <td>$1.50 / $9.00</td>
+    </tr>
+    <tr>
+      <td>Google</td>
+      <td>Gemini 3.1 Flash-Lite</td>
+      <td>-</td>
+      <td>Text/image/video → text</td>
+      <td>unconfirmed</td>
+      <td>$0.25 / $1.50</td>
+    </tr>
+    <tr>
+      <td>xAI</td>
+      <td>Grok 4.5</td>
+      <td>500K</td>
+      <td>Text</td>
+      <td>Text</td>
+      <td>$2-$4 in / $6-$12 out</td>
+    </tr>
+    <tr>
+      <td>xAI</td>
+      <td>Grok 4.3</td>
+      <td>1M</td>
+      <td>Text</td>
+      <td>Text</td>
+      <td>$1.25-$2.50 in / $2.50-$5 out</td>
+    </tr>
+    <tr>
+      <td>Amazon</td>
+      <td>Nova Micro</td>
+      <td>128K</td>
+      <td>Text → text</td>
+      <td>No</td>
+      <td>$0.035 / $0.14</td>
+    </tr>
+    <tr>
+      <td>Amazon</td>
+      <td>Nova Premier</td>
+      <td>1M</td>
+      <td>Text/image/video → text</td>
+      <td>No</td>
+      <td>$2.50 / $12.50</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Sources: <a href="https://platform.claude.com/docs/en/about-claude/pricing">Anthropic pricing docs</a> ·
+<a href="https://platform.claude.com/docs/en/about-claude/models/overview">Anthropic models overview</a> ·
+<a href="https://developers.openai.com/api/docs/pricing">OpenAI pricing</a> ·
+<a href="https://ai.google.dev/gemini-api/docs/pricing">Gemini API pricing</a> ·
+<a href="https://docs.x.ai/docs/models">xAI models docs</a> ·
+<a href="https://docs.aws.amazon.com/nova/latest/userguide/what-is-nova.html">AWS Nova user guide</a>, with
+Nova Premier’s price cross-checked against
+<a href="https://artificialanalysis.ai/models/nova-premier">Artificial Analysis</a> since AWS’s own pricing
+page renders client-side.</p>
+
+<blockquote>
+  <p><strong>Common trap</strong>: a per-token price comparison across these vendors is quietly misleading in one
+specific way. Anthropic’s pricing docs note that <strong>Claude 4.7 and later use a tokenizer that
+produces roughly 30% more tokens for the same text</strong> than earlier Claude generations. A “$5 vs
+$5” sticker-price match against an older Claude price, or against a vendor on a different
+tokenizer, isn’t apples to apples. The same document costs more real tokens to process on the
+newer tokenizer. Anthropic also charges a separate cache-<em>write</em> fee on top of input pricing,
+where OpenAI and DeepSeek typically charge only cache-hit pricing with no write fee, another
+structural difference no headline number captures.</p>
+</blockquote>
+
+<p><strong>xAI’s exact current model IDs matter here too</strong>: the 4.20 generation ships as three distinct
+model names rather than one model with a setting:
+<a href="https://docs.x.ai/docs/models"><code class="language-plaintext highlighter-rouge">grok-4.20-0309-reasoning</code></a>, <code class="language-plaintext highlighter-rouge">grok-4.20-0309-non-reasoning</code>, and
+<code class="language-plaintext highlighter-rouge">grok-4.20-multi-agent-0309</code>, a different pattern from Anthropic/OpenAI/Google’s single-model
+effort-dial approach.</p>
+
+<p><strong>Cohere is the interesting exception to “closed frontier.”</strong> Its older Command R and Command R+
+(<code class="language-plaintext highlighter-rouge">cc-by-nc-4.0</code>, above) are effectively closed for production use despite being downloadable.
+Cohere’s closed, hosted-API-only tier today is the rest of the Command A family (Command A
+Reasoning, Command A Vision, Command A Translate, Command R7B), for which current per-token
+pricing wasn’t published on Cohere’s live pricing page at the time of this research (a real gap,
+not a $0 price). Its new flagship, <strong>Command A+, flipped to Apache-2.0</strong> and belongs on the open
+side of this page (see below).</p>
+
+<p><strong>Marketing tier names don’t always track the independent benchmark.</strong> Anthropic’s own docs
+describe Claude Fable 5 as its “most capable widely released model,” but on the independent
+<a href="https://artificialanalysis.ai/models">Artificial Analysis Intelligence Index</a>, plain <strong>Claude
+Opus 5 at max effort scores 61, a point higher than Fable 5’s 60</strong> at matched effort. Fable
+appears optimized for long-running agent endurance rather than raw single-shot score. Google
+markets Gemini 3.1 Pro as its flagship reasoning model. On that same index it scores <strong>46</strong>,
+behind Grok 4.5 (54) and well behind the tight Claude/GPT-5.6 cluster at 59-61. Amazon calls Nova
+“frontier intelligence,” but Nova Premier scores <strong>13</strong>, below the roughly-19 median for comparable
+non-reasoning models, the widest marketing-to-measurement gap in this research. A tier’s <em>name</em>
+is marketing copy. An independent score is the thing to actually compare.</p>
+
+<h2 id="the-open-frontier-as-of-july-2026">The open frontier, as of July 2026</h2>
+
+<p>MoE (“Mixture of Experts”) models route each token through only a fraction of their parameters.
+“Active” below is that fraction. <strong>VRAM to load the model is driven by the total, not the active
+figure</strong>: every expert has to sit in memory even though only a handful compute per token. The
+<a href="/projects/dokidex/learn/naming/">naming page</a> covers this in more depth, while the
+<a href="/projects/dokidex/learn/local/">local inference page</a> turns it into concrete hardware
+requirements.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Org</th>
+      <th>Total</th>
+      <th>Active</th>
+      <th>Context</th>
+      <th>Licence</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Qwen3-235B-A22B</td>
+      <td>Alibaba</td>
+      <td>235B</td>
+      <td>22B</td>
+      <td>256K-1M (2507 refresh)</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>Qwen3-30B-A3B</td>
+      <td>Alibaba</td>
+      <td>30B</td>
+      <td>3B</td>
+      <td>256K-1M</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>Qwen3-Coder-480B-A35B</td>
+      <td>Alibaba</td>
+      <td>480B</td>
+      <td>35B</td>
+      <td>256K (1M via YaRN)</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>DeepSeek-V3 / R1</td>
+      <td>DeepSeek</td>
+      <td>671B</td>
+      <td>37B</td>
+      <td>128K</td>
+      <td>MIT</td>
+    </tr>
+    <tr>
+      <td>DeepSeek-V4-Pro</td>
+      <td>DeepSeek</td>
+      <td>1.6T (card) / 862B (HF org badge, unreconciled)</td>
+      <td>49B</td>
+      <td>1M</td>
+      <td>MIT</td>
+    </tr>
+    <tr>
+      <td>DeepSeek-R1-Distill-Qwen-32B</td>
+      <td>DeepSeek, on a Qwen2.5 base</td>
+      <td>32B</td>
+      <td>-</td>
+      <td>~32-131K</td>
+      <td><code class="language-plaintext highlighter-rouge">mit</code> (HF tag)</td>
+    </tr>
+    <tr>
+      <td>Llama 4 Maverick</td>
+      <td>Meta</td>
+      <td>400B</td>
+      <td>17B</td>
+      <td>1M</td>
+      <td>Llama 4 Community License</td>
+    </tr>
+    <tr>
+      <td>Llama 4 Scout</td>
+      <td>Meta</td>
+      <td>109B</td>
+      <td>17B</td>
+      <td>10M (marketing figure, see Long context below)</td>
+      <td>Llama 4 Community License</td>
+    </tr>
+    <tr>
+      <td>Mistral Large 3</td>
+      <td>Mistral AI</td>
+      <td>675B</td>
+      <td>41B</td>
+      <td>256K</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>Ministral 8B</td>
+      <td>Mistral AI</td>
+      <td>8B</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Mistral Research License, research only</td>
+    </tr>
+    <tr>
+      <td>Mistral Nemo</td>
+      <td>Mistral AI</td>
+      <td>12B</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>gpt-oss-120b</td>
+      <td>OpenAI</td>
+      <td>117B</td>
+      <td>5.1B</td>
+      <td>128K</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>gpt-oss-20b</td>
+      <td>OpenAI</td>
+      <td>21B</td>
+      <td>3.6B</td>
+      <td>128K</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>GLM-4.6</td>
+      <td>Z.ai (Zhipu)</td>
+      <td>357B</td>
+      <td>~32B (secondary estimate, not on the card)</td>
+      <td>200K</td>
+      <td>MIT</td>
+    </tr>
+    <tr>
+      <td>GLM-5.2</td>
+      <td>Z.ai (Zhipu)</td>
+      <td>753B</td>
+      <td>undisclosed</td>
+      <td>1M</td>
+      <td>MIT</td>
+    </tr>
+    <tr>
+      <td>Kimi K2.6</td>
+      <td>Moonshot AI</td>
+      <td>1T</td>
+      <td>32B</td>
+      <td>256K</td>
+      <td>Modified MIT</td>
+    </tr>
+    <tr>
+      <td>MiniMax-M2</td>
+      <td>MiniMax</td>
+      <td>230B</td>
+      <td>10B</td>
+      <td>128K</td>
+      <td>Modified-MIT</td>
+    </tr>
+    <tr>
+      <td>MiniMax-M2.7</td>
+      <td>MiniMax</td>
+      <td>230B</td>
+      <td>10B</td>
+      <td>-</td>
+      <td>Non-commercial</td>
+    </tr>
+    <tr>
+      <td>Nemotron 3 Ultra</td>
+      <td>NVIDIA</td>
+      <td>550B</td>
+      <td>55B</td>
+      <td>1M</td>
+      <td>OpenMDW-1.1</td>
+    </tr>
+    <tr>
+      <td>Gemma 4 26B-A4B</td>
+      <td>Google</td>
+      <td>25.2B</td>
+      <td>3.8B</td>
+      <td>256K</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>OLMo 3 (32B)</td>
+      <td>AI2</td>
+      <td>32B</td>
+      <td>- (dense)</td>
+      <td>long-context mid-training</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>Phi-4-reasoning-vision-15B</td>
+      <td>Microsoft</td>
+      <td>15B</td>
+      <td>- (dense)</td>
+      <td>16,384</td>
+      <td>MIT</td>
+    </tr>
+    <tr>
+      <td>Falcon-H1-34B</td>
+      <td>TII</td>
+      <td>34B</td>
+      <td>- (dense)</td>
+      <td>262K</td>
+      <td>Falcon-LLM License (Apache-2.0-based)</td>
+    </tr>
+    <tr>
+      <td>Granite 4.1 (30B)</td>
+      <td>IBM</td>
+      <td>30B</td>
+      <td>- (dense)</td>
+      <td>131,072</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>Command A+</td>
+      <td>Cohere</td>
+      <td>218B</td>
+      <td>25B</td>
+      <td>128K in / 64K out</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>Seed-OSS-36B</td>
+      <td>ByteDance</td>
+      <td>36B</td>
+      <td>- (dense)</td>
+      <td>512K</td>
+      <td>Apache-2.0</td>
+    </tr>
+    <tr>
+      <td>Hy3</td>
+      <td>Tencent</td>
+      <td>295B</td>
+      <td>21B</td>
+      <td>256K</td>
+      <td>Apache-2.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Sources: individual Hugging Face model cards linked in the licence section above, plus
+<a href="https://github.com/QwenLM/Qwen3">Qwen3 GitHub</a> ·
+<a href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro">DeepSeek-V4-Pro card</a> ·
+<a href="https://ai.meta.com/blog/llama-4-multimodal-intelligence/">Meta AI blog on Llama 4</a> ·
+<a href="https://huggingface.co/openai/gpt-oss-120b">gpt-oss-120b card</a> ·
+<a href="https://huggingface.co/zai-org/GLM-4.6">GLM-4.6 card</a> ·
+<a href="https://huggingface.co/moonshotai/Kimi-K2.6">Kimi K2.6 card</a> ·
+<a href="https://huggingface.co/google/gemma-4-26B-A4B-it">Gemma-4-26B-A4B card</a> ·
+<a href="https://allenai.org/blog/olmo3">Ai2 OLMo 3 blog</a> ·
+<a href="https://cohere.com/blog/command-a-plus">Cohere Command A+ blog</a>.</p>
+
+<p><strong>Notable newcomers not in the table above:</strong> Ant Group’s paired <strong>Ling-2.6-1T</strong> (non-reasoning)
+and <strong>Ring-2.6-1T</strong> (reasoning) sit around 1T total / ~63B active, MIT, with Ling’s context at
+<strong>262,144 tokens</strong> (not the 1M sometimes quoted for it). Baidu open-sourced <strong>ERNIE 4.5</strong>
+end-to-end under Apache-2.0 but keeps its newer flagship, <strong>ERNIE 5.1</strong>, API-only, the same
+“open the good one, keep the best one closed” pattern Alibaba runs with Qwen3 versus the
+proprietary Qwen-Max tier. xAI open-sourced <strong>Grok-1</strong> (314B, Apache-2.0) in 2024. Grok-2 weights
+were later posted to Hugging Face. But despite public claims of an open Grok-2.5, <strong>no Grok-2.5
+weights repository exists on Hugging Face</strong> as of this research: only <code class="language-plaintext highlighter-rouge">xai-org/grok-1</code> and
+<code class="language-plaintext highlighter-rouge">xai-org/grok-2</code>. AI21’s <strong>Jamba</strong> line (94B/12B active, hybrid Transformer+Mamba+MoE) ships under
+AI21’s own “Jamba Open Model License,” a custom permissive text. Don’t assume it’s Apache-2.0
+equivalent without checking it directly. One more caution on attribution: <strong>Cursor’s Composer 2.5</strong>
+is reported to be built on <strong>Kimi K2.5 with additional reinforcement learning</strong>, not an in-house
+frontier model Cursor trained from scratch, worth knowing before citing it as evidence that
+application-layer companies are now training their own frontier weights.</p>
+
+<h2 id="how-they-actually-compare">How they actually compare</h2>
+
+<p>Every claim below is labeled <strong>vendor-reported</strong> (from a lab’s own card or blog) or
+<strong>independent</strong> (an evaluator with no stake in the result). The
+<a href="/projects/dokidex/learn/benchmarks/">benchmarks page</a> goes much deeper into why the <em>same</em>
+benchmark name routinely produces wildly different numbers depending on harness, split, and
+tracker staleness. Read it before trusting any single score too far. This section sticks to the
+handful of comparisons that held up cleanest.</p>
+
+<h3 id="coding-and-agentic-tool-use">Coding and agentic tool use</h3>
+
+<p>On <strong>SWE-bench Verified</strong> (a real GitHub issue, a real patch, the repo’s own test suite deciding
+pass/fail, using a 500-problem hand-filtered set), the independent evaluator
+<a href="https://www.vals.ai/benchmarks/swebench">vals.ai</a> (dated Jul 22, 2026) put the frontier within a
+tight band: Claude Opus 5 97.0%, GPT-5.6 Sol 96.2%, Claude Fable 5 95.0%, then Kimi K3 at 93.4%,
+GPT-5.6 Luna 93.0%, Claude Opus 4.8 88.6%, Grok 4.5 86.6%, and Gemini 3.1 Pro at 80.6% (a
+vendor-reported single-attempt figure from
+<a href="https://deepmind.google/models/gemini/pro/">Google’s own card</a>). The benchmark is close to
+saturated at the top. Those numbers don’t discriminate much between the leaders anymore.</p>
+
+<p>The harder <strong>SWE-bench Pro</strong> illustrates why a bare score is often meaningless: depending on which
+split you read, the same model generation scores anywhere from the high 40s to the low 80s. Scale
+AI’s standardized public split puts GPT-5.4 at 59.1%, while its harder private/commercial split
+scores Claude Opus 4.6 at just 47.1%. A different tracker (benchlm.ai) reports Claude Opus 5 at
+79.2% on what’s likely the easier public split. These aren’t disagreements about the same thing. They’re
+different measurement conditions sharing one benchmark name.</p>
+
+<p>On the vendor side: Alibaba’s own card for <strong>Qwen3-Coder-480B-A35B</strong> describes results
+“comparable to Claude Sonnet” on agentic coding and browser-use, a vendor comparison, stated as
+such. Zhipu’s own comparison for <strong>GLM</strong> is more candid: it explicitly <strong>admits GLM-4.6 still lags
+Claude Sonnet 4.5 on coding</strong>, a rare instance of a vendor citing its own shortfall directly.
+Cohere reports its <strong>Command A+</strong> jumping from 3% to 25% on Terminal-Bench Hard agentic coding
+versus its prior model, vendor-reported, and it’s worth noting that even the improved number is
+modest in absolute terms.</p>
+
+<p>On agentic tool use specifically, Artificial Analysis’s composite index has a dedicated sub-score:
+<strong>Grok 4.5 is reported #1 on that one component</strong> even though it ranks well behind the leaders
+overall (54 vs. 59-61), evidence that a single overall “smartest model” number can hide real
+category-specific strengths.</p>
+
+<h3 id="math-and-reasoning">Math and reasoning</h3>
+
+<p><strong>AIME 2025</strong> is fully saturated: on <a href="https://llm-stats.com/benchmarks/aime-2025">llm-stats.com’s tracker</a>,
+five models hit a perfect 1.000: Grok-4 Heavy, GPT-5.2, Gemini 3 Pro, GPT-5.2 Pro, and the
+<strong>open-weight</strong> Kimi K2-Thinking-0905, with Claude Opus 4.6 at 0.998. A perfect score on a fixed,
+public contest paper says more about that paper being exhausted than about remaining headroom.</p>
+
+<p><strong>GPQA Diamond</strong> (198 PhD-vetted questions across biology, physics, chemistry, the hardest subset
+of the 448-question full GPQA set) is close behind:
+GPT-5.6 Sol and Claude Mythos Preview tie at 94.6%, against a <strong>human PhD baseline of 65-74%</strong>.
+Frontier models now score <em>above</em> the expert baseline, which raises the question of whether the
+remaining gains reflect better reasoning or exploitation of the dataset’s known answer-key errors.
+Every number in this specific tracker is vendor self-reported. None are independently re-run.</p>
+
+<p>Harder math benchmarks (FrontierMath, Humanity’s Last Exam) have far messier, contested numbers
+across sources right now (one tracker’s own leaderboard table directly contradicts its own
+descriptive prose). Rather than repeat a number likely to be stale or mismeasured, the
+<a href="/projects/dokidex/learn/benchmarks/">benchmarks page</a> walks through exactly why, and what to
+trust instead.</p>
+
+<h3 id="long-context">Long context</h3>
+
+<p>Headline context windows and <em>reliable</em> use of that window are two different claims. A growing
+body of independent research says so directly. Chroma Research’s “Context Rot” study ran 18 models
+across Anthropic, OpenAI, Google, and Alibaba and found performance <strong>degrades non-uniformly well
+before the model’s stated context limit</strong>, that semantically-similar (not just lexically exact)
+needle/question pairs make it much worse than the classic test suggests, that a single
+topically-related distractor hurts meaningfully, and, counterintuitively, that <strong>shuffling a
+coherent document into randomized sentences sometimes <em>improved</em> retrieval</strong>. On a synthetic
+repeat-this-sequence task, models began drifting into unrelated words starting around <strong>500-750
+tokens</strong>, far below any advertised window. Claude models tended to abstain (“I don’t have that
+information”) even when the answer was present. GPT models hallucinated instead. Both failure
+modes worsen with length. (<a href="https://www.trychroma.com/research/context-rot">trychroma.com/research/context-rot</a>)</p>
+
+<p>Against that backdrop, <strong>Nemotron 3 (all three tiers), MiniMax-M1/M3, DeepSeek-V4, and GLM-5.2 all
+claim native or extended 1M-token context</strong>. Llama 4 Scout’s marketed <strong>10M-token</strong> figure is
+the single largest number in this whole landscape. But no independent long-context recall
+evaluation of Scout at that length was found. Treat it as an architectural ceiling, not a
+demonstrated usable length. Frontier labs have started shipping harder successor tests instead of
+plain needle-in-a-haystack: Google reports <strong>Gemini 3.1 Pro at 84.9% on MRCR v2</strong>, a test that
+requires tracking references across a long multi-turn conversation rather than retrieving one
+lexically distinctive fact, a meaningfully harder and more honest test of what long context is
+actually for.</p>
+
+<h3 id="multilingual">Multilingual</h3>
+
+<p>Meta’s own blog claims <strong>Llama 4</strong> pretrained on 200 languages, over 100 with more than a billion
+tokens each: “10x more multilingual tokens than Llama 3,” a vendor claim. Google’s <strong>Gemma 3</strong>
+supports 140+ languages, while TII’s <strong>Falcon-H1</strong> natively supports 18 languages, scalable to
+100+. Cohere’s <strong>Command A+</strong> rounds out the group at 48 languages, consistent with Cohere’s
+long-standing enterprise/translation focus (the company also ships a dedicated Command A
+Translate model).</p>
+
+<h3 id="vision">Vision</h3>
+
+<p>Alibaba’s <strong>Qwen3-VL</strong> architecture supports native 256K interleaved text/image/video context
+across both dense and MoE tiers. AI2’s <strong>Molmo</strong> line is built specifically around <em>pointing and
+grounding</em>: identifying exact pixel locations for objects, not just describing images in prose.
+Pointing and grounding like that is a genuinely distinguishing capability against most
+vision-language models. On <strong>MMMU-Pro</strong>: Cohere reports Command A+ at 63% while Google reports
+Gemini 3.1 Pro at <strong>80.5%</strong>, both vendor-reported, each on its own harness. Two vendor-reported
+scores on two different harnesses hit the same trap flagged above with SWE-bench Pro: a shared
+benchmark name isn’t a shared measurement condition. So this isn’t a legitimate direct
+closed-vs-open comparison either, however clean the two numbers look side by side.</p>
+
+<h2 id="the-gap-quantified-and-dated">The gap, quantified and dated</h2>
+
+<p>Two honest readings exist. They say different things. Don’t average them or pick
+whichever one flatters the side you already prefer.</p>
+
+<figure>
+<svg viewBox="0 0 700 240" role="img" aria-labelledby="dgm-gap-title dgm-gap-desc">
+<title id="dgm-gap-title">Best open-weight model vs. best closed model, one snapshot</title>
+<desc id="dgm-gap-desc">A two-bar chart on the Artificial Analysis Intelligence Index: GLM-5.2 at max effort scores 51 as the highest open-weight model; Claude Opus 5 at max effort scores 61 as the highest closed model — a 10-point gap on this one index, as of July 2026.</desc>
+<rect class="dgm-panel" x="8" y="8" width="684" height="224" rx="3" />
+<text class="dgm-title" x="28" y="34">Best-of-each-side, one index, Jul 2026</text>
+<line class="dgm-line" x1="40" y1="200" x2="660" y2="200" />
+<rect class="dgm-ok" x="220" y="78" width="100" height="122" />
+<text class="dgm-mono" x="270" y="70" text-anchor="middle">51</text>
+<text class="dgm-label-sm" x="270" y="218" text-anchor="middle">Best open</text>
+<text class="dgm-label-sm" x="270" y="232" text-anchor="middle">GLM-5.2 (max)</text>
+<rect class="dgm-accent" x="420" y="54" width="100" height="146" />
+<text class="dgm-mono" x="470" y="46" text-anchor="middle">61</text>
+<text class="dgm-label-sm" x="470" y="218" text-anchor="middle">Best closed</text>
+<text class="dgm-label-sm" x="470" y="232" text-anchor="middle">Claude Opus 5 (max)</text>
+</svg>
+<figcaption><strong>This is one snapshot on one composite index, not a trend line.</strong> A
+broader look (either at each side's next several models, or backward to 2024-2025) tells a
+different, less flattering story for the open side. Read on before concluding the gap has simply
+"closed."</figcaption>
+</figure>
+
+<p><strong>Current snapshot</strong> (Artificial Analysis Intelligence Index v4.1, July 2026): the highest-scoring
+open-weight model is <strong>GLM-5.2 at max effort, 51</strong>. The highest-scoring model overall is <strong>Claude
+Opus 5 at max effort, 61</strong>, a <strong>10-point gap</strong> on this one aggregate benchmark, independently
+measured rather than vendor self-reported. Within “open” there’s a wide spread too: NVIDIA’s
+Nemotron 3 Ultra is vendor-cited around 48 (not independently re-verified), MiniMax-M3 scores 44,
+and Cohere’s Command A+ scores 37. So GLM-5.2 leading its own field by a wide margin is itself
+informative.</p>
+
+<p><strong>Historical reading</strong> (<a href="https://epoch.ai/blog/open-models-report">Epoch AI</a>, an analysis from the
+Llama-3.1 era, i.e. well before this snapshot): the best open models lagged the best closed models
+by roughly <strong>one year</strong>, a 5-to-22-month lag across specific benchmarks (MMLU, GPQA, GSM1k, BBH)
+and about a 15-month training-compute lag for the largest models. Meta’s Llama 3.1 405B was cited
+as closing the <em>compute</em> gap with GPT-4 roughly 16 months after GPT-4 shipped. The same analysis
+found a real nuance: looking only at each side’s single best model, training compute grew at
+essentially the same rate on both sides: <strong>4.6×/year for open and 4.6×/year for closed</strong>, with
+that ~15-month lag holding steady. So the top-1 gap reads as roughly <em>constant</em>, not narrowing.
+But looking at the <strong>top 10 models on each side</strong>, closed labs were scaling training compute faster
+(5.0×/year) than open releases (3.6×/year), i.e. a <em>widening</em> lag once you look past the single
+leader.</p>
+
+<p><strong>Why the two readings differ:</strong> these aren’t measuring the same thing. The 2026 snapshot is a
+single-index, single-leader comparison at one moment. The Epoch analysis is a multi-benchmark,
+whole-ecosystem comparison over time. Put together: <strong>the gap between the single best open model
+and the single best closed model appears to have compressed since 2024-2025</strong>: 10 points on one
+index reads smaller than a documented ~1-year, multi-benchmark lag. <strong>But the broader open
+ecosystem, beyond that one leading model, may still be falling further behind.</strong> No source found
+this research connects those two readings into one continuous line. So neither should be quoted
+as if it settles the question alone.</p>
+
+<h2 id="renting-the-best-open-model-instead-of-running-it">Renting the best open model, instead of running it</h2>
+
+<p>An awkward gap sits between the two halves of this page: GLM-5.2 is the strongest open-weight model
+measured here. At 753B parameters, essentially nobody is running it at home. Open weights answer
+“may I”, not “can I afford the hardware”.</p>
+
+<p>Z.ai sells the middle option: API access to its own open-weight models, priced as a subscription
+rather than per token. The <strong>GLM Coding Plan</strong> starts at <strong>$18/month</strong> for a Lite tier, with Pro and
+Max above it, and works by pointing an existing agent at an Anthropic-compatible endpoint rather
+than shipping its own client
+(<a href="https://docs.z.ai/devpack/overview">overview</a>, <a href="https://docs.z.ai/devpack/tool/claude">setup</a>).</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>Lite</th>
+      <th>Pro</th>
+      <th>Max</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Prompts per 5-hour window</td>
+      <td>~80</td>
+      <td>~400</td>
+      <td>~1,600</td>
+    </tr>
+    <tr>
+      <td>Prompts per week</td>
+      <td>~400</td>
+      <td>~2,000</td>
+      <td>~8,000</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>GLM-5.2 itself is documented at a <strong>1M-token context with 128K max output</strong>, and exposes a
+<code class="language-plaintext highlighter-rouge">reasoning_effort</code> parameter for trading latency against depth, the same dial Anthropic and
+OpenAI now expose, and a sign of how quickly that control became table stakes
+(<a href="https://docs.z.ai/guides/llm/glm-5.2">model docs</a>). Z.ai’s own comparisons against GLM-5.1 are
+vendor-reported and should be read as such.</p>
+
+<p>The quota unit is a <em>prompt</em>, not a token. Z.ai states one prompt triggers roughly <strong>15-20 model
+invocations</strong>, an agentic turn, not a chat message. It puts the plans at “approximately 15-30× the
+monthly subscription fee” in equivalent API value. GLM-5.2 and GLM-5-Turbo draw <strong>3× quota during
+peak hours</strong> (14:00-18:00 UTC+8) and 2× off-peak. Plans include GLM-5.2, GLM-5-Turbo and GLM-4.7.</p>
+
+<p>Configuration is three environment variables in <code class="language-plaintext highlighter-rouge">~/.claude/settings.json</code>: an auth token, a base
+URL of <code class="language-plaintext highlighter-rouge">https://api.z.ai/api/anthropic</code>, and a raised timeout, after which Claude Code, Cline or
+OpenCode talks to GLM instead of its native models.</p>
+
+<blockquote>
+  <p><strong>Note</strong>: this is worth understanding as a category, not just a product. Because Claude Code
+reads its endpoint from configuration, <em>any</em> provider exposing an Anthropic-compatible API can
+host it. Several now do. The agent and the model behind it have come apart: a tool’s name no
+longer tells you whose weights answered. That’s good for switching costs and bad for reasoning
+about where your code went. Check the base URL before assuming.</p>
+</blockquote>
+
+<p>What it’s not: a route to running GLM-5.2 yourself. You’re renting inference from Z.ai under its
+terms and privacy policy, on the same trust footing as any other API. The weights being MIT-licensed
+means you <em>could</em> self-host given roughly 400GB of accelerator memory at 4-bit. It doesn’t mean
+this subscription is local. For what actually runs on one consumer GPU, see
+<a href="/projects/dokidex/learn/local/">Running models locally</a>.</p>
+
+<h2 id="what-each-side-is-genuinely-good-at">What each side is genuinely good at</h2>
+
+<p><strong>Closed wins on:</strong> the absolute reasoning ceiling, day-one access to whatever is newest, the
+deepest agentic-coding and tool-use track record, and the broadest first-party tooling. That last
+one covers realtime voice, image and video generation, and enterprise SLAs no self-hosted stack
+can offer.</p>
+
+<p>Two of those deserve their numbers. The reasoning ceiling is a 10-point gap on the current
+best-vs-best index, or a 5-to-22-month historical time lag by the other reading, and the two
+don’t average into one figure. On the coding record, SWE-bench Verified’s top <strong>three</strong> are all
+closed models clustered in the mid-90s%. The fourth-place model, Kimi K3 at 93.4%, has weights
+that are announced but not yet released, per Moonshot’s own release-countdown page dated
+2026-07-27. So the best score below that closed top three currently belongs to a model nobody can
+actually run.</p>
+
+<p><strong>Open wins on:</strong> zero marginal cost once you own the hardware, complete data privacy (nothing
+leaves the machine, by construction, not a policy promise), no rate limits and no deprecation
+notice retiring the model a workflow was built around, full control to modify, quantize,
+fine-tune, or prune, and genuine competitiveness at coding specifically: Qwen3-Coder, GLM, Kimi,
+and DeepSeek all sit within the top tier on SWE-bench Verified even without leading it. Some open
+models are also directly rentable far below frontier-closed prices: MiniMax-M3’s own hosted API,
+for instance, runs $0.30/$1.20 per MTok for inputs under 512K (a fraction of any Fable-tier
+closed price) for anyone who wants the licence flexibility of open weights without buying a GPU.</p>
+
+<p><strong>Where local/open genuinely loses:</strong> the reasoning ceiling on the hardest problems, full stop.
+Nobody should pretend a 30B model on a consumer card matches a frontier reasoning model on novel,
+research-level tasks. Most of the current open frontier (everything at 100B+ total parameters,
+which by mid-2026 is most of the field) needs serious multi-GPU hardware or a hosted provider,
+not a single gaming GPU. The <a href="/projects/dokidex/learn/local/">local inference page</a> puts
+exact VRAM numbers on that. Long-context reliability is a shared weakness (see Context Rot, above)
+rather than an open-specific one. But closed labs currently publish more evidence of working around
+it (MRCR-style harder tests) than most open labs do. And there’s no self-hosted equivalent of an
+enterprise SLA: if the model misbehaves at 3am, that’s your on-call rotation, not a vendor’s.</p>
+
+<figure>
+<svg viewBox="0 0 700 360" role="img" aria-labelledby="dgm-tree-title dgm-tree-desc">
+<title id="dgm-tree-title">A decision tree for picking a side</title>
+<desc id="dgm-tree-desc">A flowchart: first ask whether the data or workload must stay fully under your control; if yes, choose open weights, self-hosted. If no, ask whether this is the hardest slice of tasks requiring frontier reasoning; if yes, choose a closed frontier flagship; if no, either a self-hosted open model or a mid-tier closed model works.</desc>
+<rect class="dgm-panel" x="8" y="8" width="684" height="344" rx="3" />
+<rect class="dgm-panel" x="170" y="20" width="360" height="56" rx="3" />
+<text class="dgm-label" x="350" y="44" text-anchor="middle">Must the data or workload stay</text>
+<text class="dgm-label" x="350" y="62" text-anchor="middle">fully under your control?</text>
+<path class="dgm-flow" d="M260 76 L155 140" />
+<text class="dgm-label-sm" x="175" y="110">Yes</text>
+<path class="dgm-flow" d="M440 76 L505 140" />
+<text class="dgm-label-sm" x="470" y="110">No</text>
+<rect class="dgm-panel" x="40" y="140" width="230" height="70" rx="3" />
+<text class="dgm-label" x="155" y="166" text-anchor="middle">Open weights, self-hosted</text>
+<text class="dgm-label-sm" x="155" y="184" text-anchor="middle">pick a size by your</text>
+<text class="dgm-label-sm" x="155" y="200" text-anchor="middle">VRAM budget</text>
+<rect class="dgm-panel" x="340" y="140" width="330" height="70" rx="3" />
+<text class="dgm-label" x="505" y="162" text-anchor="middle">Is this the hardest slice of tasks —</text>
+<text class="dgm-label" x="505" y="180" text-anchor="middle">frontier reasoning, novel research-level</text>
+<text class="dgm-label" x="505" y="198" text-anchor="middle">problems?</text>
+<path class="dgm-flow" d="M440 210 L415 250" />
+<text class="dgm-label-sm" x="400" y="235">Yes</text>
+<path class="dgm-flow" d="M570 210 L595 250" />
+<text class="dgm-label-sm" x="580" y="235">No</text>
+<rect class="dgm-panel" x="330" y="250" width="170" height="90" rx="3" />
+<text class="dgm-label" x="415" y="276" text-anchor="middle">Closed frontier</text>
+<text class="dgm-label" x="415" y="294" text-anchor="middle">flagship</text>
+<text class="dgm-label-sm" x="415" y="314" text-anchor="middle">Opus 5 / GPT-5.6 Sol tier</text>
+<rect class="dgm-panel" x="510" y="250" width="170" height="90" rx="3" />
+<text class="dgm-label" x="595" y="270" text-anchor="middle">Either works</text>
+<text class="dgm-label-sm" x="595" y="288" text-anchor="middle">self-host if you have</text>
+<text class="dgm-label-sm" x="595" y="302" text-anchor="middle">the GPU, else a</text>
+<text class="dgm-label-sm" x="595" y="316" text-anchor="middle">mid-tier closed model</text>
+</svg>
+<figcaption><strong>Privacy and control decide the question before capability does.</strong> Only
+after "does this have to stay local" is answered "no" does the harder reasoning-ceiling question
+even come up. The tree breaks down for the many real cases that are genuinely borderline: a
+task that's *usually* mid-difficulty but occasionally hard is a judgment call, not a clean branch.</figcaption>
+</figure>
+
+<ul class="stat-row">
+  <li class="stat"><span class="stat-value">10 pts</span><span class="stat-label">Gap between the single best open and single best closed model, one index, Jul 2026</span></li>
+  <li class="stat"><span class="stat-value">$0.03</span><span class="stat-label">Cheapest blended price per MTok on Artificial Analysis, a three-way tie: Nova Micro, Sarvam 30B, and the open-weight Gemma 4 E4B</span></li>
+  <li class="stat"><span class="stat-value">~30%</span><span class="stat-label">More tokens Claude 4.7+ produces for the same text vs. earlier tokenizers, which breaks naive price comparisons</span></li>
+</ul>
+
+<p>The practical takeaway: cost, privacy, latency, and control are the axes where open genuinely wins
+outright, not just “wins for now until closed gets cheap too.” The reasoning ceiling is the axis
+where closed genuinely wins, and probably will keep winning at the frontier for a while. The
+compute and data budgets involved in training the very largest closed models aren’t something a
+consumer GPU stack replicates. Pick the side that matches which axis actually matters for the task
+in front of you and revisit the pick when the numbers on this page are inevitably stale. Check
+the dates.</p>
+
+    </article>
+
+    
+    <nav class="pager" aria-label="Page navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/learn/naming/">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">Decoding model names</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/learn/benchmarks/">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">Benchmarks</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="site-footer">
+  <div class="footer-main">
+    <p class="footer-line">
+      <strong>DokiDex</strong> v0.62.0:
+      a fully-local AI stack, and a field guide to the machines it runs on.
+    </p>
+    <p class="footer-line footer-dim">
+      Everything on this site is written against the real tree and the measured record. Where a
+      claim is a number, it was measured or sourced. Where it was a judgment call, the reasoning
+      is stated inline. Stale statements are bugs. File them like bugs.
+    </p>
+  </div>
+
+  <div class="footer-links">
+    <a href="/projects/dokidex/local-cli/">Run the CLIs</a>
+    <a href="/projects/dokidex/handbook/">Handbook</a>
+    <a href="/projects/dokidex/reference/">Quick reference</a>
+    <a href="/projects/dokidex/glossary/">Glossary</a>
+    <!-- Deliberately understated: last item in the row, same weight as the rest, no colour,
+         no badge, no image beacon. The ask was "inconspicuous". -->
+    <a class="footer-kofi" href="https://ko-fi.com/dougfessler" rel="noopener">Buy me a coffee</a>
+  </div>
+</footer>
+
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/dokidex.js"></script>
+</body>
+</html>

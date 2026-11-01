@@ -1,0 +1,18 @@
+%%{init: {"flowchart": {"rankSpacing": 34, "nodeSpacing": 26, "wrappingWidth": 420}}}%%
+%% What a model swap actually costs, and what survives it.
+%% Sources: serving/llama-swap.yaml:10 (healthCheckTimeout 900), :14-42 (the daily-driver coder plus
+%% --cache-ram 24576), :81-99 (the quality tier), docs/site/models.md (the shipped tier table).
+flowchart TB
+    REQ["POST /v1/chat/completions asking for model: gpt-oss-120b [128k] (Reasoning, Heavy)"]
+    Q["llama-swap :8080: is that tier already resident?"]
+    STOP["Stop the current llama-server, release its VRAM"]
+    START["Start the tier's own command line. Weights page in, then a health check, up to 900 s on a cold gpt-oss-120b [128k] (Reasoning, Heavy)"]
+    FWD["Forward the request and stream the reply back"]
+    RAM["Host RAM prompt cache, --cache-ram 24576 MiB"]
+
+    REQ --> Q
+    Q -- yes --> FWD
+    Q -- no --> STOP
+    STOP --> START
+    START --> FWD
+    RAM -. an evicted KV prefix survives here .-> START

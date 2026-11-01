@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DokiDex Handbook</title>
+<meta name="description" content="How a fully-local, Claude-Code-class AI stack actually works, written for a senior gameplay programmer.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/site.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body class="is-home">
+<a class="skip-link" href="#content">Skip to content</a>
+
+<div class="shell shell-home">
+  <header class="home-hero">
+    <canvas class="token-stream" aria-hidden="true"></canvas>
+    <a class="hero-up" href="/projects/dokidex/">&larr; DokiDex</a>
+    <div class="home-hero-inner reveal-up">
+      <p class="power-word power-word-home">FOUNDRY</p>
+      <h1 class="home-title">DokiDex Handbook</h1>
+    </div>
+  </header>
+
+  <main id="content" class="main main-home">
+    <div class="home-content prose">
+      <blockquote>
+  <p><strong>The chapter numbers have gaps, and they are deliberate.</strong> Chapters 2 (the agent loop), 5
+(protocols) and 6 (the desktop app) were removed on 2026-09-02 along with the code they
+documented: DokiDex’s own C++ agent and its Electron app. The surviving chapters kept their
+numbers so every published URL still resolves. <code class="language-plaintext highlighter-rouge">archive.md</code> in the repo names the commit.</p>
+</blockquote>
+
+<p>This is the engineering handbook for <strong>DokiDex</strong>, a fully-local agentic coding stack running on
+one RTX 5090, Windows 11 native, no cloud AI at runtime. It exists to answer two questions
+properly:</p>
+
+<ol>
+  <li><strong>How does this actually work?</strong> Not at the press-release level. At the level a senior C++
+gameplay programmer expects: the memory budget, the serialization format, the authority model,
+the failure modes. Chapters 1, 3 and 4, with Unreal-native analogies where they’re <em>precise</em> and
+dropped where they’d be decoration. Quantization really is block compression.</li>
+  <li><strong>How do we know any of that is true, and where do the ideas come from?</strong> Chapters 7 and 8: the
+evals and proof machinery that keeps a claim attached to a measurement, then a curated study
+path for the theory underneath.</li>
+  <li><strong>What can it do, and what should it become next?</strong> Chapters 9 and 10: the full capability
+inventory, then the strategic options laid out for a decision, not a wishlist.</li>
+</ol>
+
+<p>Everything here is written against the real tree (paths and line references point into the repo)
+and the measured record (<code class="language-plaintext highlighter-rouge">docs/decisions.md</code>, <code class="language-plaintext highlighter-rouge">evals/results.jsonl</code>). Where a
+claim is a number, it was measured. Where a choice was a judgment call, the why is stated inline.
+Stale statements are bugs. File them like bugs.</p>
+
+<p>Start at <strong>The Big Picture</strong> if you’re new. If you already know what a context window is and just
+want the serving layer, start at <strong>Serving Local Models</strong> and read forward. The <strong>References</strong>
+chapter is a curated study path if you want the theory under the practice: papers, docs, and
+videos worth their runtime.</p>
+
+    </div>
+
+    <ol class="chapters-grid">
+      
+      
+      <li class="chapter-card reveal-up">
+        <a href="/projects/dokidex/handbook/01-big-picture.html">
+          <span class="nav-kicker">:: THE FOUNDRY</span>
+          <span class="chapter-card-title">The Big Picture</span>
+          <span class="chapter-card-desc">One machine, one GPU, one resident model. What runs where, and the budget that shapes all of it.</span>
+        </a>
+      </li>
+      
+      <li class="chapter-card reveal-up">
+        <a href="/projects/dokidex/handbook/03-serving.html">
+          <span class="nav-kicker">:: THE FORGE</span>
+          <span class="chapter-card-title">Serving Local Models</span>
+          <span class="chapter-card-desc">llama.cpp, GGUF, quantization as block compression, the MoE trick that fits 120B in 32 GB, and the roster that staffs the stack.</span>
+        </a>
+      </li>
+      
+      <li class="chapter-card reveal-up">
+        <a href="/projects/dokidex/handbook/04-tools-and-safety.html">
+          <span class="nav-kicker">:: THE GATE</span>
+          <span class="chapter-card-title">Tools, Permissions, Safety</span>
+          <span class="chapter-card-desc">The authority model, and how an imperfect model gets real hands on your working tree without ever holding the keys.</span>
+        </a>
+      </li>
+      
+      <li class="chapter-card reveal-up">
+        <a href="/projects/dokidex/handbook/07-evals.html">
+          <span class="nav-kicker">:: THE PROOF</span>
+          <span class="chapter-card-title">Evals & the Parity Ledger</span>
+          <span class="chapter-card-desc">Golden tasks, bake-offs, in-binary selftests, and a generated parity scorecard. How anything here earns the word "done."</span>
+        </a>
+      </li>
+      
+      <li class="chapter-card reveal-up">
+        <a href="/projects/dokidex/handbook/08-references.html">
+          <span class="nav-kicker">:: THE CODEX</span>
+          <span class="chapter-card-title">References & Study Path</span>
+          <span class="chapter-card-desc">The papers, docs, and videos under this handbook, ordered as a study path, each with a reason to spend the time.</span>
+        </a>
+      </li>
+      
+      <li class="chapter-card reveal-up">
+        <a href="/projects/dokidex/handbook/09-capabilities.html">
+          <span class="nav-kicker">:: THE ARSENAL</span>
+          <span class="chapter-card-title">Capabilities</span>
+          <span class="chapter-card-desc">The full inventory. Everything the stack does today, by surface, with the honest caveats attached.</span>
+        </a>
+      </li>
+      
+      <li class="chapter-card reveal-up">
+        <a href="/projects/dokidex/handbook/10-direction.html">
+          <span class="nav-kicker">:: THE COMPASS</span>
+          <span class="chapter-card-title">Direction</span>
+          <span class="chapter-card-desc">The forward options, framed for a decision. What each avenue costs, what it buys, and what kind of stack it makes DokiDex become.</span>
+        </a>
+      </li>
+      
+    </ol>
+
+    <footer class="statusline">
+      <span>DokiDex Handbook</span>
+      <span class="statusline-sep">&middot;</span>
+      <span>index</span>
+      <span class="statusline-sep">&middot;</span>
+      <span>generated from docs/site/handbook, DokiDex v0.62.0</span>
+    </footer>
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/foundry.js"></script>
+</body>
+</html>

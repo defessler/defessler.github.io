@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Models DokiDex Runs · DokiDex</title>
+<meta name="description" content="What actually loads onto the GPU when you run DokiDex, why each model got the seat it has, and what's still being tested: straight from the serving config, not the marketing copy.">
+
+<!-- Open Graph / Twitter, hand-rolled: jekyll-seo-tag is not available under the pinned
+     github-pages gem set used by actions/jekyll-build-pages. -->
+<meta property="og:site_name" content="DokiDex">
+<meta property="og:title" content="The Models DokiDex Runs">
+<meta property="og:description" content="What actually loads onto the GPU when you run DokiDex, why each model got the seat it has, and what's still being tested: straight from the serving config, not the marketing copy.">
+<meta property="og:type" content="website">
+<!-- site_origin rather than absolute_url: see the comment in _config.yml. absolute_url would
+     emit http:// here, because the Pages API reports an http html_url while Enforce HTTPS is off. -->
+<meta property="og:url" content="https://dougfessler.com/projects/dokidex/models/">
+<link rel="canonical" href="https://dougfessler.com/projects/dokidex/models/">
+<!-- `summary`, not `summary_large_image`: no og:image or twitter:image is emitted anywhere on
+     this site, and the large-image card renders as a blank rectangle without one. Switch this back
+     the same day a 1200x630 share asset lands, not before. -->
+<meta name="twitter:card" content="summary">
+
+<!-- Same four families as the handbook, so the two halves of the site read as one product:
+     Marcellus (power words) · Kanit (headings, kickers, nav) · IBM Plex Mono (code, stats) ·
+     Figtree (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/dokidex.css">
+<link rel="icon" href="/projects/dokidex/assets/favicon.svg" type="image/svg+xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<!-- `wide: true` in a page's front matter opts it into --content-w-wide (assets/dokidex.css:51).
+     The CSS keys off `.page-wide` on an ancestor. Without the class emitted here the front-matter
+     flag silently does nothing. -->
+<body class="page-wide">
+<a class="skip-link" href="#content">Skip to content</a>
+
+<!-- CSS-only nav toggle. A checkbox beats a JS drawer here: the nav has to work on the mobile
+     read where the reader has scrolled 4000px into a reference table, and a checkbox cannot
+     desync from its own state the way a JS flag can. -->
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/">DokiDex</a>
+    <a class="topbar-cta" href="/projects/dokidex/download/"><svg class="dl-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><g class="dl-arrow"><path d="M8 2.2v6.5"/><path d="M5.2 5.9 8 8.7l2.8-2.8"/></g><path class="dl-tray" d="M3.2 11.3v2.5h9.6v-2.5"/></svg>
+Download</a>
+  </header>
+
+  <!-- Grouped navigation, driven by site.nav in _config.yml.
+
+     A page is "current" when its url matches exactly. The handbook is the one entry that also
+     needs to light up for its children (/handbook/03-serving.html), so it gets a prefix test —
+     without it, the sidebar would show nothing selected the moment a reader steps into a
+     chapter, which reads as "you have left the site". -->
+<nav class="sidebar" aria-label="Site sections">
+  <a class="sidebar-brand" href="/projects/dokidex/">
+    <span class="sidebar-mark" aria-hidden="true">&#9612;&#9608;&#9608;&#9616;</span>
+    <span class="sidebar-brand-text">DokiDex</span>
+  </a>
+
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Start</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/"
+             >Overview</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Use DokiDex</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/local-cli/"
+             >Run the CLIs locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/download/"
+             >Download the launchers</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link is-active"
+             href="/projects/dokidex/models/"
+             aria-current="page">Models it runs</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/games/"
+             >Games the models built</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/telemetry/"
+             >Performance data</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/qwen38/"
+             >Qwen3.8-27B, measured</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/architecture/"
+             >How it's built</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Learn AI</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/"
+             >Where to start</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/basics/"
+             >1 · Foundations</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/core/"
+             >2 · How models work</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/advanced/"
+             >3 · Advanced</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/naming/"
+             >Decoding model names</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/open-vs-closed/"
+             >Open vs closed weights</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/benchmarks/"
+             >Benchmarks</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/local/"
+             >Running models locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/agents/"
+             >Coding agents</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Context</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/state-of-ai/"
+             >State of AI, 2026</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/reference/"
+             >Quick reference</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/glossary/"
+             >Glossary</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Deep dive</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/handbook/"
+             >The Handbook</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+</nav>
+
+
+  <main class="main">
+    <div class="page-head">
+      <p class="kicker">:: THE SERVING STACK</p>
+      <h1 class="page-title">The Models DokiDex Runs</h1>
+      <p class="page-desc">What actually loads onto the GPU when you run DokiDex, why each model got the seat it has, and what's still being tested: straight from the serving config, not the marketing copy.</p>
+      
+      <p class="level-badges">
+        <span class="level-badge level-intermediate">Intermediate</span>
+      </p>
+      
+    </div>
+
+    <article id="content" class="prose">
+      <p>Every claim on this page traces to a file in the repository: <code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml</code> (the config
+that actually runs), <code class="language-plaintext highlighter-rouge">media-assets/llm-model-catalog.json</code> (display names and hashes), and a set of
+dated bake-off scorecards under <code class="language-plaintext highlighter-rouge">docs/scorecards/</code>. Where a doc and the running config disagree,
+the config wins. That happens more than once on this very page. We call each one out rather than
+smooth it over.</p>
+
+<ul class="stat-row">
+  <li class="stat"><span class="stat-value">272.7 tok/s</span><span class="stat-label">warm decode, the daily-driver coder (<code>docs/model-guide.md:436</code>)</span></li>
+  <li class="stat"><span class="stat-value">&ge;91%</span><span class="stat-label">golden-suite bar + zero tool-call flakes, to promote a candidate (<code>docs/decisions.md:1488</code>)</span></li>
+  <li class="stat"><span class="stat-value">32 GB</span><span class="stat-label">the VRAM ceiling every tier is sized against (one RTX 5090)</span></li>
+  <li class="stat"><span class="stat-value">1</span><span class="stat-label">big coder or vision tier resident on the card at a time (one 3 GB utility model is the sole exception)</span></li>
+</ul>
+
+<h2 id="the-serving-architecture">The serving architecture</h2>
+
+<p>DokiDex doesn’t run “a model.” It runs <strong>llama-swap</strong>, a small Go binary that exposes one
+OpenAI-compatible endpoint on <code class="language-plaintext highlighter-rouge">:8080</code> and swaps the underlying <code class="language-plaintext highlighter-rouge">llama-server</code> process to match
+whatever model name a request asks for (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:1-2</code>, <code class="language-plaintext highlighter-rouge">docs/wiki/10-how-it-works.md:98</code>). The pinned engine is
+llama.cpp build <code class="language-plaintext highlighter-rouge">b9878</code> (CUDA 13.3) behind llama-swap <code class="language-plaintext highlighter-rouge">v235</code> (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:3</code>,
+confirmed site-wide in <code class="language-plaintext highlighter-rouge">docs/CAPABILITIES.md:75</code>).</p>
+
+<p>That header line is now only part of the picture, and the config is what says so. FOUR engine
+trees are in play, not one:</p>
+
+<ul>
+  <li><strong>17 keys</strong> launch the pinned <code class="language-plaintext highlighter-rouge">b9878</code> binary under <code class="language-plaintext highlighter-rouge">serving/llama.cpp\</code>.</li>
+  <li><strong>5 keys</strong> launch <code class="language-plaintext highlighter-rouge">serving/llama.cpp-b10472\</code>: <code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code>,
+<code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B b10472 [128k] (Candidate, Light)</code>,
+<code class="language-plaintext highlighter-rouge">Qwen3.8-27B f16 [104k] (Candidate, Standard)</code>, and <code class="language-plaintext highlighter-rouge">Qwen2.5-3B-Instruct [32k] (Utility, Free)</code>.
+The tree is not a stray experiment: it held the seat from 2026-08-18 and its rows stay
+runnable by name, covered in <a href="/projects/dokidex/local-cli/">Claude Code and Copilot, local</a>.
+<code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code> joined it on 2026-08-20 for a concrete reason: gpt-oss
+needs grammar-constrained tool decoding, and b9878 could not compile the regex in one of Claude
+Code’s 26 tool schemas, so every request came back “failed to parse grammar”. b10472 compiles it.</li>
+  <li><strong>2 keys</strong> launch <code class="language-plaintext highlighter-rouge">serving/llama.cpp-b11026\</code>: the <code class="language-plaintext highlighter-rouge">Qwen3.6-35B-A3B-MTP [128k] (Thinking,
+Standard)</code> seat itself (since 2026-09-18, its CUDA-graph MTP fix measured +10.5% decode on this
+card), and the <code class="language-plaintext highlighter-rouge">Qwen3.8-27B [256k] (Candidate, Standard)</code> row that held the seat before it,
+kept runnable by name with its 256k window, vision and a full tool-call gate.</li>
+  <li><strong>1 key</strong> launches <code class="language-plaintext highlighter-rouge">serving/llama.cpp-v4\</code>: <code class="language-plaintext highlighter-rouge">DeepSeek-V4-Flash [16k] (Reasoning, Heavy)</code>, built from the
+<code class="language-plaintext highlighter-rouge">cchuter/llama.cpp</code> fork because DeepSeek-V4 needs kernels the pinned build does not have.</li>
+</ul>
+
+<p>Those four trees account for 24 of the 25 model rows. The 25th, <code class="language-plaintext highlighter-rouge">GitHub Copilot Cloud [32k] (Cloud,
+Billed)</code>, launches no llama-server at all. Its <code class="language-plaintext highlighter-rouge">cmd</code> runs <code class="language-plaintext highlighter-rouge">serving/copilot-shim.ps1</code>, which wraps the
+real GitHub Copilot CLI instead.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">b9878</code> line at <code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:3</code> predates all of that and has not been amended.</p>
+
+<p>The reason it swaps instead of running everything at once is arithmetic, not preference: the box
+has one 32 GB card. The interesting models here don’t fit two-at-a-time.
+<code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code> alone holds roughly 26 GB (weights plus a 128k-token
+KV cache). <code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code> needs its own 27 GB of GPU plus 40 GB of system
+RAM for the experts that don’t fit. There’s no combination of “useful coder” plus “useful heavy
+planner” that clears 32 GB together. Only one of them is ever loaded. Deciding which is llama-swap’s
+whole job.</p>
+
+<figure>
+<svg viewBox="0 0 720 300" role="img" aria-labelledby="dgm-swap-title dgm-swap-desc">
+<title id="dgm-swap-title">One endpoint, one resident model</title>
+<desc id="dgm-swap-desc">llama-swap listens on port 8080 and can start any of five coder/vision
+tiers. Only one of them runs on the GPU at a time. Requesting a different tier evicts the current
+one. Two small independent servers, the FIM autocomplete and the embedding server, run alongside on
+their own ports and are never evicted by a swap.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="284" rx="3" />
+<text class="dgm-title" x="28" y="34">llama-swap: one endpoint, one model on the GPU</text>
+<rect class="dgm-panel" x="280" y="52" width="160" height="40" rx="4" />
+<text class="dgm-label" x="360" y="77" text-anchor="middle">llama-swap :8080</text>
+<path class="dgm-flow" d="M360 92 L360 118 L100 118 L100 140" />
+<path class="dgm-line" d="M360 92 L360 118 L280 118 L280 140" stroke-dasharray="3 3" />
+<path class="dgm-line" d="M360 92 L360 118 L455 118 L455 140" stroke-dasharray="3 3" />
+<path class="dgm-line" d="M360 92 L360 118 L620 118 L620 140" stroke-dasharray="3 3" />
+<rect class="dgm-accent" x="30" y="140" width="140" height="50" rx="4" />
+<text class="dgm-label" x="100" y="161" text-anchor="middle">Qwen3-Coder-30B</text>
+<text class="dgm-label-sm" x="100" y="177" text-anchor="middle">loaded now</text>
+<rect class="dgm-panel" x="215" y="140" width="130" height="50" rx="4" />
+<text class="dgm-label" x="280" y="161" text-anchor="middle">gpt-oss-120b</text>
+<text class="dgm-label-sm" x="280" y="177" text-anchor="middle">swapped out</text>
+<rect class="dgm-panel" x="390" y="140" width="130" height="50" rx="4" />
+<text class="dgm-label" x="455" y="161" text-anchor="middle">Coder, 32k ctx</text>
+<text class="dgm-label-sm" x="455" y="177" text-anchor="middle">swapped out</text>
+<rect class="dgm-panel" x="550" y="140" width="140" height="50" rx="4" />
+<text class="dgm-label" x="620" y="161" text-anchor="middle">Qwen3-VL-8B</text>
+<text class="dgm-label-sm" x="620" y="177" text-anchor="middle">swapped out</text>
+<text class="dgm-label-sm" x="360" y="214" text-anchor="middle">Independent utility models, never evicted by a swap</text>
+<rect class="dgm-panel" x="180" y="224" width="160" height="46" rx="4" />
+<text class="dgm-label" x="260" y="245" text-anchor="middle">Autocomplete :8012</text>
+<text class="dgm-label-sm" x="260" y="261" text-anchor="middle">FIM, independent of :8080</text>
+<rect class="dgm-panel" x="380" y="224" width="160" height="46" rx="4" />
+<text class="dgm-label" x="460" y="245" text-anchor="middle">Embeddings :8090</text>
+<text class="dgm-label-sm" x="460" y="261" text-anchor="middle">code_search, CPU-only</text>
+</svg>
+<figcaption><strong>Only one big model is ever resident.</strong> Requesting a different tier from
+`:8080` evicts the current one and loads the new one from disk. The config's
+`healthCheckTimeout: 900` exists specifically because `gpt-oss-120b [128k] (Reasoning, Heavy)` pages
+roughly 60 GB off disk on a cold load (`serving/llama-swap.yaml:10`). The autocomplete and embedding
+servers sit outside this ring entirely: they're tiny enough to stay loaded permanently without
+contending for the card.</figcaption>
+</figure>
+
+<p>Three more pieces of that architecture matter:</p>
+
+<p><strong><code class="language-plaintext highlighter-rouge">--cache-ram</code> holds evicted context in host RAM, not VRAM.</strong>
+<code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code> and <code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [32k] (Coding, Light)</code>
+(the two tiers that actually swap in and out across a normal session) carry
+<code class="language-plaintext highlighter-rouge">--cache-ram 24576</code>, raising llama-server’s prompt-cache allowance from its 8192 MiB default to 24
+GiB of <em>system</em> RAM (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:93-99</code>). The point: when one of those two tiers gets
+evicted mid-session and swapped back in later, its old KV prefix can still be served back from host
+RAM instead of re-processing the whole prompt from scratch. Every other tier in the file, including
+every bake-off candidate, is deliberately left without this flag. It’s scoped to the two seats that
+actually swap.</p>
+
+<p><strong>One group gets to break the one-model rule.</strong> A llama-swap group named <code class="language-plaintext highlighter-rouge">agent-seat</code> carries
+<code class="language-plaintext highlighter-rouge">swap: false</code>, which pins both its members at once instead of evicting one for the other
+(<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:78-85</code>). Its members are the <code class="language-plaintext highlighter-rouge">Qwen3.6-35B-A3B-MTP [128k] (Thinking, Standard)</code> seat and the zero-VRAM <code class="language-plaintext highlighter-rouge">GitHub Copilot Cloud [32k] (Cloud, Billed)</code> row. The 3 GB <code class="language-plaintext highlighter-rouge">Qwen2.5-3B-Instruct [32k] (Utility, Free)</code> sat here too until 2026-08-26.
+The reason is specific rather than general: Claude Code fires small background calls constantly,
+and on a one-model card each of those used to evict roughly 27 GB of coding weights and pay a full
+reload. Measured on this box across a 43-request concurrent soak, the pair peaks at 30,912 MiB of
+32,607 MiB with 1,695 MiB free (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:30-32</code>). Read that pair with its
+conditions attached. It was taken at seat <code class="language-plaintext highlighter-rouge">-c 131072</code> and utility model <code class="language-plaintext highlighter-rouge">-c 8192</code>
+(<code class="language-plaintext highlighter-rouge">docs/scorecards/2026-08-19-sidecar-vram.md:103-107</code>), neither of which is what ships today. Treat
+1,695 MiB as the shape of the margin rather than a current reading. The exception costs most of the
+remaining headroom either way. There’s no room for a second one.
+<a href="/projects/dokidex/local-cli/">Claude Code and Copilot, local</a> walks through what that buys
+a reader in practice.</p>
+
+<p><strong>There used to be a coarser split above this one, and it is worth knowing it is gone.</strong> Until
+2026-09-02 the whole card belonged to one of two mutually exclusive groups at any moment, <code class="language-plaintext highlighter-rouge">llm</code> or
+<code class="language-plaintext highlighter-rouge">media</code>, and <code class="language-plaintext highlighter-rouge">doki up media</code> evicted the coding models to make room for image, video and audio
+generation. That half of the stack was removed (see <code class="language-plaintext highlighter-rouge">archive.md</code>), and with it the <code class="language-plaintext highlighter-rouge">media</code> profile.
+Every service is in the <code class="language-plaintext highlighter-rouge">llm</code> group now. <code class="language-plaintext highlighter-rouge">doki up agent</code> loads the seat plus the always-on embedding
+server, which is CPU-only and costs the card nothing. Run <code class="language-plaintext highlighter-rouge">doki up coexist</code> instead and you also get
+the FIM autocomplete model, at a reduced context so an editor and the agent can share the card.
+None of that’s this page’s subject (see the <a href="/projects/dokidex/local-cli/">CLI tutorial</a> for the
+commands). What survived the removal is the budget underneath it: one 32 GB card, pick one occupant.</p>
+
+<h2 id="the-shipped-tiers">The shipped tiers</h2>
+
+<p>Since the 2026-08-25 rename, a tier’s name IS its id. There’s no display name sitting apart from a
+key for the two to drift out of sync, and no alias standing between what you ask for and what
+answers. Read the name itself and it tells you what you need: the real model, its per-request
+context window in brackets, then what kind of work it does and what it costs you in parens, from a
+two closed sets. Nature is one of <code class="language-plaintext highlighter-rouge">Thinking</code>, <code class="language-plaintext highlighter-rouge">Coding</code>, <code class="language-plaintext highlighter-rouge">Reasoning</code>, <code class="language-plaintext highlighter-rouge">Vision</code>, <code class="language-plaintext highlighter-rouge">Utility</code>, <code class="language-plaintext highlighter-rouge">Candidate</code>
+or <code class="language-plaintext highlighter-rouge">Cloud</code>. Cost is one of <code class="language-plaintext highlighter-rouge">Free</code>, <code class="language-plaintext highlighter-rouge">Light</code>, <code class="language-plaintext highlighter-rouge">Standard</code>, <code class="language-plaintext highlighter-rouge">Heavy</code> or <code class="language-plaintext highlighter-rouge">Billed</code>. <code class="language-plaintext highlighter-rouge">Free</code> means it costs no GPU budget of its own to serve, not that it is
+loaded beside the seat. Only the <code class="language-plaintext highlighter-rouge">Utility</code> row carries it, and since 2026-08-26 that row is not
+co-resident, so asking for it evicts whatever is. <code class="language-plaintext highlighter-rouge">Billed</code> means real money leaves your account, and nothing routes there without you
+naming it by hand.</p>
+
+<p>Before the rename, the CLI’s subagent seats and the local-CLI skills bound to specific tiers as
+aliases, so a bake-off promotion re-pointed a seat by editing one alias line rather than touching
+harness config. That indirection is gone. Re-seating a tier now means editing the model a skill or a
+harness names directly (<code class="language-plaintext highlighter-rouge">harness/claude-skills/</code>, <code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml</code>), which is one edit
+either way, just without a second name to keep in sync.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Underlying model</th>
+      <th>Params (total / active)</th>
+      <th>Quant</th>
+      <th>VRAM</th>
+      <th>Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code></td>
+      <td>Qwen3-Coder-30B-A3B-Instruct</td>
+      <td>30B / 3B active</td>
+      <td><code class="language-plaintext highlighter-rouge">UD-Q4_K_XL</code></td>
+      <td>~26 GB</td>
+      <td>the everyday fast coder, and the OpenAI-side default (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [32k] (Coding, Light)</code></td>
+      <td>same weights, 64k ctx split <code class="language-plaintext highlighter-rouge">-np 2</code></td>
+      <td>30B / 3B active</td>
+      <td><code class="language-plaintext highlighter-rouge">UD-Q4_K_XL</code></td>
+      <td>~21 GB</td>
+      <td>the quick, light-context coder: coexists with the autocomplete server below 32 GB, and is what crush’s <code class="language-plaintext highlighter-rouge">small</code> slot points at (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:122-135</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code></td>
+      <td>gpt-oss-120b</td>
+      <td>120B / 5.1B active</td>
+      <td><code class="language-plaintext highlighter-rouge">MXFP4</code></td>
+      <td>~27 GB GPU + ~40 GB system RAM</td>
+      <td>the heavy planner: what crush’s <code class="language-plaintext highlighter-rouge">large</code> slot points at, on the <code class="language-plaintext highlighter-rouge">b10472</code> engine (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:160-169</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-VL-8B [32k] (Vision, Light)</code></td>
+      <td>Qwen3-VL-8B-Instruct + mmproj</td>
+      <td>8B, dense</td>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code></td>
+      <td>~7 GB</td>
+      <td>default vision tier for Describe/Verify (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:210-212</code>). The ~7 GB figure is stated at <code class="language-plaintext highlighter-rouge">:225</code> for the <code class="language-plaintext highlighter-rouge">Qwen3-VL-8B [16k] (Vision, Light)</code> sibling row, which is the same weights at a different context length. This row itself gives no VRAM figure</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-VL-32B [32k] (Vision, Standard)</code></td>
+      <td>Qwen3-VL-32B-Instruct + mmproj</td>
+      <td>32B, dense</td>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code></td>
+      <td>~21 GB weights, fits &lt;32 GB total with KV</td>
+      <td>standalone high-accuracy A/B, not the default (see Parked, below)</td>
+    </tr>
+    <tr>
+      <td>Autocomplete (<code class="language-plaintext highlighter-rouge">fim</code>, not a <code class="language-plaintext highlighter-rouge">llama-swap</code> tier)</td>
+      <td>Qwen2.5-Coder-3B-Instruct</td>
+      <td>3B, dense</td>
+      <td><code class="language-plaintext highlighter-rouge">Q8_0</code></td>
+      <td>~4 to 6.6 GB (repo estimates disagree, see caveats)</td>
+      <td><code class="language-plaintext highlighter-rouge">/infill</code> autocomplete on <code class="language-plaintext highlighter-rouge">:8012</code>, independent of the <code class="language-plaintext highlighter-rouge">:8080</code> ring</td>
+    </tr>
+    <tr>
+      <td>Embeddings (<code class="language-plaintext highlighter-rouge">embed</code>, not a <code class="language-plaintext highlighter-rouge">llama-swap</code> tier)</td>
+      <td>nomic-embed-text-v1.5</td>
+      <td>small, dense</td>
+      <td><code class="language-plaintext highlighter-rouge">F16</code></td>
+      <td>~0 GB (CPU-only)</td>
+      <td>embeddings for <code class="language-plaintext highlighter-rouge">code_search</code> on <code class="language-plaintext highlighter-rouge">:8090</code> (<code class="language-plaintext highlighter-rouge">serving/start-embed.ps1:5-16</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3.8-27B [256k] (Candidate, Standard)</code></td>
+      <td>Qwen3.8-27B</td>
+      <td>27B, dense</td>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code></td>
+      <td>~24 GB (24,499 MiB measured solo 2026-08-26 at -c 262144, q4_0 cache)</td>
+      <td>the Claude Code seat until 2026-09-18, on the <code class="language-plaintext highlighter-rouge">b11026</code> engine, at <code class="language-plaintext highlighter-rouge">-c 262144</code>. Runnable by name; naming it evicts the seat. <code class="language-plaintext highlighter-rouge">opus</code> resolves here, and <code class="language-plaintext highlighter-rouge">sonnet</code>/<code class="language-plaintext highlighter-rouge">fable</code> do too unless something cheaper or dearer is resident beside it (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:690-695</code>, <code class="language-plaintext highlighter-rouge">:705-711</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen2.5-3B-Instruct [32k] (Utility, Free)</code></td>
+      <td>Qwen2.5-3B-Instruct</td>
+      <td>3B, dense</td>
+      <td><code class="language-plaintext highlighter-rouge">Q5_K_M</code></td>
+      <td>2,987 MiB measured solo at <code class="language-plaintext highlighter-rouge">-c 8192</code>. Ships at <code class="language-plaintext highlighter-rouge">-c 32768</code>, unmeasured at that size</td>
+      <td>servable by name, but <strong>not resident beside the seat</strong>. It left the <code class="language-plaintext highlighter-rouge">agent-seat</code> group on 2026-08-26 when the seat took a 256k window and an MTP draft head, so naming it now evicts the seat. <code class="language-plaintext highlighter-rouge">scripts\doki-preset.ps1</code>’s <code class="language-plaintext highlighter-rouge">utility</code> preset puts it back at the cost of the draft head</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The two rows above are identified by role rather than by a display name, because they aren’t
+<code class="language-plaintext highlighter-rouge">llama-swap</code> rows at all and never carried a llama-swap alias to lose. Every other row above is
+exactly the string <code class="language-plaintext highlighter-rouge">/v1/models</code> reports back, and exactly the string you’d type to ask for it.</p>
+
+<p>Two numbers on those rows are both hard ceilings now, though one of them only became one recently.</p>
+
+<p>The seat runs <code class="language-plaintext highlighter-rouge">-c 262144</code>, which is <code class="language-plaintext highlighter-rouge">qwen35.context_length</code> in its own GGUF: the model’s actual
+ceiling, not a fraction of it (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:872</code>). That’s been true since 2026-08-26.
+Before that date the row ran <code class="language-plaintext highlighter-rouge">-c 106496</code>, about 40% of the ceiling, and that older configuration is
+still on disk as the control row, <code class="language-plaintext highlighter-rouge">Qwen3.8-27B f16 [104k] (Candidate, Standard)</code>
+(<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:1227</code>), kept for A/B against older scorecards. The bigger window didn’t
+cost more to reach. A <code class="language-plaintext highlighter-rouge">q4_0</code> KV cache is a quarter the size of the <code class="language-plaintext highlighter-rouge">f16</code> cache the 104k row still
+carries, so the seat holds 2.5x the tokens at 910 MiB LESS memory than the row it replaced
+(<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:844-846</code>). What the extra room actually buys is the compaction floor.
+Claude Code’s compaction trigger is <code class="language-plaintext highlighter-rouge">Max(100000, window x 0.75)</code>, so the retired 106,496 window
+compacted at exactly 100,000 tokens and the shipping 262,144 window compacts at 196,608. That’s the
+whole user-visible difference between the two rows. The utility model’s <code class="language-plaintext highlighter-rouge">-c 32768</code> is a hard ceiling
+for a different reason. It’s <code class="language-plaintext highlighter-rouge">qwen2.context_length</code> in the GGUF, which llama.cpp clamps to. A larger
+<code class="language-plaintext highlighter-rouge">-c</code> is silently ignored. Measured 2026-08-20, a row launched at <code class="language-plaintext highlighter-rouge">-c 49152</code> still answered a
+41,638-token request with “exceeds the available context size (32768 tokens)”
+(<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:763-773</code>). A rare oversized background call fails loudly there rather
+than corrupting anything.</p>
+
+<figure>
+<svg viewBox="0 0 720 320" role="img" aria-labelledby="dgm-vram-title dgm-vram-desc">
+<title id="dgm-vram-title">Each tier's VRAM against the 32 GB ceiling</title>
+<desc id="dgm-vram-desc">Horizontal bar chart of approximate VRAM per tier: the daily-driver coder
+about 26GB, its 32k-ctx sibling about 21GB, the heavy reasoner about 27GB of GPU plus 40GB of
+system RAM offloaded, the 8B vision model about 7GB, the 32B vision model about 21GB, the
+autocomplete server about 5GB, the embedding server effectively zero. A dashed line marks the 32GB
+ceiling. Every single tier fits under it alone.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="304" rx="3" />
+<text class="dgm-title" x="28" y="32">VRAM per tier vs. the 32 GB card</text>
+<line class="dgm-line" x1="633" y1="50" x2="633" y2="290" stroke-dasharray="4 3" />
+<text class="dgm-label-sm" x="633" y="44" text-anchor="middle">32 GB ceiling</text>
+<text class="dgm-label-sm" x="20" y="70">Coder-30B</text>
+<rect class="dgm-accent" x="200" y="58" width="352" height="18" rx="2" />
+<text class="dgm-label-sm" x="560" y="72">~26 GB</text>
+<text class="dgm-label-sm" x="20" y="104">Coder-30B (32k)</text>
+<rect class="dgm-accent" x="200" y="92" width="284" height="18" rx="2" />
+<text class="dgm-label-sm" x="492" y="106">~21 GB</text>
+<text class="dgm-label-sm" x="20" y="138">gpt-oss-120b</text>
+<rect class="dgm-accent-2" x="200" y="126" width="365" height="18" rx="2" />
+<text class="dgm-label-sm" x="573" y="140">~27 GB + ~40 GB RAM</text>
+<text class="dgm-label-sm" x="20" y="172">Qwen3-VL-8B</text>
+<rect class="dgm-accent" x="200" y="160" width="95" height="18" rx="2" />
+<text class="dgm-label-sm" x="303" y="174">~7 GB</text>
+<text class="dgm-label-sm" x="20" y="206">Qwen3-VL-32B</text>
+<rect class="dgm-accent" x="200" y="194" width="284" height="18" rx="2" />
+<text class="dgm-label-sm" x="492" y="208">~21 GB (+KV)</text>
+<text class="dgm-label-sm" x="20" y="240">Autocomplete</text>
+<rect class="dgm-accent" x="200" y="228" width="68" height="18" rx="2" />
+<text class="dgm-label-sm" x="276" y="242">~4-6.6 GB</text>
+<text class="dgm-label-sm" x="20" y="274">Embeddings</text>
+<rect class="dgm-ok" x="200" y="262" width="6" height="18" rx="1" />
+<text class="dgm-label-sm" x="214" y="276">~0 GB, CPU-only</text>
+</svg>
+<figcaption><strong>Every tier fits alone. Almost none fit two-at-a-time.</strong> The heavy
+reasoner's GPU number looks small next to the daily-driver coder's. But its 40 GB of CPU-offloaded
+experts are the reason it's slow to swap in. The RAM bar isn't drawn to the same 32 GB ceiling
+because it isn't competing for it. The metaphor breaks for the embedding server, whose CPU-only
+design means it never touches this ceiling at all. It's plotted as a sliver only for
+completeness.</figcaption>
+</figure>
+
+<p>Two things worth naming as tradeoffs, not just facts. The autocomplete server runs a 3B model
+rather than a 7B one specifically because the smaller model still measured “excellent”
+fill-in-the-middle quality at 292 tok/s. Unlike a 7B, it comfortably coexists with
+<code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [32k] (Coding, Light)</code> in 32 GB (<code class="language-plaintext highlighter-rouge">docs/decisions.md:1323</code>). And the embedding
+server is deliberately built with no GPU visibility at all (<code class="language-plaintext highlighter-rouge">CUDA_VISIBLE_DEVICES=-1</code> scoped to its
+launch, <code class="language-plaintext highlighter-rouge">serving/start-embed.ps1:12-16</code>). A CUDA-built <code class="language-plaintext highlighter-rouge">llama-server</code> still grabs 100 to 300 MB of
+VRAM just for a CUDA context even at <code class="language-plaintext highlighter-rouge">-ngl 0</code>. The whole point of the embedding server is that it
+costs the coder tier <em>nothing</em>.</p>
+
+<h2 id="why-the-daily-driver-coder-holds-its-seat">Why the daily-driver coder holds its seat</h2>
+
+<p>The 2026-07-05 bake-off (<code class="language-plaintext highlighter-rouge">docs/model-guide.md</code>) is the most instructive result on this
+page, because the winner wasn’t the highest scorer.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Warm tok/s</th>
+      <th>Native tool-call gate</th>
+      <th>Golden suite</th>
+      <th>Verdict</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code></td>
+      <td><strong>272.7</strong></td>
+      <td>pass</td>
+      <td><strong>14/15 = 93%</strong></td>
+      <td><strong>Default.</strong></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3.6-35B-A3B [128k] (Candidate, Standard)</code></td>
+      <td>218.4</td>
+      <td><strong>hangs</strong> (killed at 27 min)</td>
+      <td><strong>14/15 = 93%</strong></td>
+      <td>Not wired as an agentic default.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">GLM-4.7-Flash [128k] (Candidate, Standard)</code></td>
+      <td>224.2</td>
+      <td>pass (needs GLM sampling)</td>
+      <td>13/15 = 87%</td>
+      <td>Below the bar. Menu pick.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code></td>
+      <td>39.7 (load ~53s)</td>
+      <td>pass</td>
+      <td>not suite-run (heavy)</td>
+      <td>Heavy/quality tier, not fast-class.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><em>(<code class="language-plaintext highlighter-rouge">docs/model-guide.md:436-439</code>, measured against the installed instance on <code class="language-plaintext highlighter-rouge">:8080</code>, warm
+tok/s on an identical 256-token prompt.)</em></p>
+
+<p><code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code> and <code class="language-plaintext highlighter-rouge">Qwen3.6-35B-A3B [128k] (Candidate, Standard)</code> tie
+exactly on the 15-task golden suite: 93% each. If promotion ran on suite score alone, it would be a
+coin flip. It isn’t a coin flip, because the promotion bar has two conditions, not one: <strong>≥91% on
+the golden suite AND zero tool-call flakes on the native gate</strong> (<code class="language-plaintext highlighter-rouge">docs/decisions.md:1488</code>).
+<code class="language-plaintext highlighter-rouge">Qwen3.6-35B-A3B [128k] (Candidate, Standard)</code> fails the second condition outright. Sent the exact
+same native tool-call probe that <code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code> passes cleanly, it
+hangs instead of returning, a known interaction with an unmerged llama.cpp fix
+(<code class="language-plaintext highlighter-rouge">serving/test-toolcall.ps1</code>, issue class <code class="language-plaintext highlighter-rouge">#22684</code>, still <code class="language-plaintext highlighter-rouge">mergeable_state: blocked</code> as of the
+2026-07-06 research pass, <code class="language-plaintext highlighter-rouge">research/model-lane-2026-07-06.md:42</code>).
+<code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code> wins the tiebreak decisively on the one axis that
+actually gates production use, not on the shared suite score (<code class="language-plaintext highlighter-rouge">docs/model-guide.md:460-462</code>).</p>
+
+<blockquote>
+  <p><strong>Key idea</strong>: the a3b split verdict (93% golden, hangs on the native probe) is called out in the
+bake-off’s own method notes as its single most useful finding: harness scaffolding (like the crush
+harness the suite runs through) can mask a model’s raw tool-call instability. Gate a candidate both
+ways (native probe and full harness) before trusting either number alone
+(<code class="language-plaintext highlighter-rouge">docs/model-guide.md:471-472</code>).</p>
+</blockquote>
+
+<figure>
+<svg viewBox="0 0 720 380" role="img" aria-labelledby="dgm-gate-title dgm-gate-desc">
+<title id="dgm-gate-title">The promotion gate</title>
+<desc id="dgm-gate-desc">Flowchart: a candidate model first faces the native tool-call gate, which
+requires zero flakes. Failing that routes it to a menu-pick-only outcome, as happened to the
+Qwen3.6-35B-A3B candidate, which hangs on this gate. Passing continues to the golden suite, which
+requires 91 percent or higher. Failing that also routes to staying a candidate, as happened to
+GLM-4.7-Flash at 87 percent. Passing both leads to promotion review, which the daily-driver coder
+cleared at 93 percent with a clean gate.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="364" rx="3" />
+<text class="dgm-title" x="28" y="32">From candidate to default tier</text>
+<rect class="dgm-panel" x="280" y="44" width="160" height="36" rx="4" />
+<text class="dgm-label" x="360" y="67" text-anchor="middle">Candidate model</text>
+<path class="dgm-flow" d="M360 80 L360 106" />
+<rect class="dgm-panel" x="250" y="106" width="220" height="52" rx="4" />
+<text class="dgm-label" x="360" y="128" text-anchor="middle">Native tool-call gate</text>
+<text class="dgm-label-sm" x="360" y="146" text-anchor="middle">zero flakes required</text>
+<path class="dgm-line" d="M250 140 L60 140 L60 190" />
+<text class="dgm-label-sm" x="60" y="182" text-anchor="middle">fail</text>
+<rect class="dgm-panel" x="20" y="190" width="200" height="60" rx="4" />
+<text class="dgm-label-sm" x="120" y="212" text-anchor="middle">Menu pick only:</text>
+<text class="dgm-label-sm" x="120" y="228" text-anchor="middle">a3b hangs here</text>
+<text class="dgm-label-sm" x="120" y="244" text-anchor="middle">(llama.cpp #22684)</text>
+<path class="dgm-flow" d="M360 158 L360 190" />
+<text class="dgm-label-sm" x="378" y="178">pass</text>
+<rect class="dgm-panel" x="250" y="190" width="220" height="52" rx="4" />
+<text class="dgm-label" x="360" y="212" text-anchor="middle">Golden suite</text>
+<text class="dgm-label-sm" x="360" y="230" text-anchor="middle">&ge;91% required</text>
+<path class="dgm-line" d="M470 224 L660 224 L660 190" />
+<text class="dgm-label-sm" x="660" y="182" text-anchor="middle">fail</text>
+<rect class="dgm-panel" x="500" y="190" width="200" height="60" rx="4" />
+<text class="dgm-label-sm" x="600" y="212" text-anchor="middle">Stays a candidate:</text>
+<text class="dgm-label-sm" x="600" y="228" text-anchor="middle">GLM-4.7-Flash: 87%</text>
+<text class="dgm-label-sm" x="600" y="244" text-anchor="middle">(below the bar)</text>
+<path class="dgm-flow" d="M360 242 L360 276" />
+<text class="dgm-label-sm" x="378" y="264">pass</text>
+<rect class="dgm-ok" x="250" y="276" width="220" height="60" rx="4" />
+<text class="dgm-label" x="360" y="299" text-anchor="middle">Promoted to default:</text>
+<text class="dgm-label-sm" x="360" y="317" text-anchor="middle">daily-driver coder: 93% + clean gate</text>
+</svg>
+<figcaption><strong>Two gates, both required.</strong> A high suite score alone promotes nothing.
+a3b proves that. And a clean tool-call gate alone isn't enough either. GLM-4.7-Flash proves that.
+Only a model that clears both becomes a default. Everything else stays reachable but off the
+beaten path.</figcaption>
+</figure>
+
+<p><code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code> earns its seat on a related but different axis: at 39.7
+tok/s with a roughly 53-second cold load, it’s the slowest tier on this page by a wide margin. But
+it’s also the only large model here that passes the native tool-call gate cleanly, at roughly four
+times the decode speed of the other heavy candidates that were only tested near or above 10 tok/s
+(<code class="language-plaintext highlighter-rouge">docs/model-guide.md:439-441</code>). Because a full swap-in is expensive, DokiDex doesn’t call it
+per-turn. The one routing change worth making per the research is <strong>plan-on-big</strong>: it drafts the
+plan, <code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code> executes it. That way the ~53-second swap cost
+hides behind the human’s plan-approval pause instead of landing on every message
+(<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:166</code>, <code class="language-plaintext highlighter-rouge">docs/model-guide.md:463-464</code>).</p>
+
+<h2 id="the-2026-09-17-games-bake-off">The 2026-09-17 games bake-off</h2>
+
+<p>The newest measured result on this page asked a different question than the promotion gate: not
+“can it drive an agent” but “can it build a working thing in one shot.” Five configs got the same
+three prompts, Conway’s Game of Life, Tetris, and a Mario-style platformer, two draws each, as
+single self-contained HTML files at the registered 450 W cap
+(<code class="language-plaintext highlighter-rouge">docs/scorecards/2026-09-17-games-bakeoff.md</code>). The bar was fully playable by a human, graded by
+referee agents that read every file end to end with a default verdict of broken. Decode speeds
+are llama-server’s own per-request timings on real generations.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Config</th>
+      <th>Playable</th>
+      <th>Real-work decode</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3.6-35B-A3B [128k] (Candidate, Standard)</code></td>
+      <td><strong>5/6</strong></td>
+      <td>220-231 tok/s</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3.6-35B-A3B-MTP [128k] (Thinking, Standard)</code> (now the seat)</td>
+      <td>4/6</td>
+      <td><strong>340 tok/s mean building games</strong> on the <code class="language-plaintext highlighter-rouge">b11026</code> engine at n-max 5 (min 328.6, max 348.9, six sustained builds)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code></td>
+      <td>2/5</td>
+      <td>234-247 tok/s</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">GLM-4.7-Flash [128k] (Candidate, Standard)</code></td>
+      <td>2/6</td>
+      <td>200-209 tok/s</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3.8-27B [256k] (Candidate, Standard)</code> (the seat when measured)</td>
+      <td>0/6</td>
+      <td>87-103 tok/s, all thinking</td>
+    </tr>
+    <tr>
+      <td>Muse Glimmer-30B + DFlash (challenger)</td>
+      <td>3/6</td>
+      <td>135-145 tok/s. Passes the native tool-call gate, quality and speed below the 35B class</td>
+    </tr>
+    <tr>
+      <td>Tiel-Coder-35B-A3B + MTP (challenger)</td>
+      <td>3/5</td>
+      <td>229-298 tok/s. Fails the gate (ignores <code class="language-plaintext highlighter-rouge">tool_choice=required</code>)</td>
+    </tr>
+    <tr>
+      <td>Signal-3.8-27B (challenger)</td>
+      <td>0/6 saved</td>
+      <td>66 tok/s. Fails the gate and the thinking budget</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Three findings carry past the table. The seat’s 0/6 is a protocol artifact worth knowing: its
+thinking block consumed the whole <code class="language-plaintext highlighter-rouge">max_tokens</code> budget on all six generations and emitted zero
+content. Multi-turn agent work doesn’t hit this, because the client controls thinking there, but
+one-shot long-form generation on the seat config needs a no-think variant or a much bigger
+budget. Second, a five-call multi-agent protocol (plan, ideate, build, critic, fix, in the GVS5H
+shape) did not lift the smaller models: 1/3 each, at the same cost for the coder and 3.1x the
+tokens for the MTP model. Its critic stage burned the thinking model’s whole budget reasoning
+and returned no verdict, and the coder shipped the same invisible-board Tetris defect before and
+after its repair round. Two plain draws from the 35B beat all of it. Third, none of this promotes
+anything: the native tool-call gate above still governs agentic tiers, and
+<code class="language-plaintext highlighter-rouge">Qwen3.6-35B-A3B [128k] (Candidate, Standard)</code> still hangs that probe.</p>
+
+<p>The games themselves are playable on <a href="/projects/dokidex/games/">Games the models built</a>.
+This section is re-measured rather than maintained: each campaign replaces the table and stamps
+its date, and since 2026-09-17 every doki-bench row records the card’s power limit, so numbers
+taken at different power states can’t be silently compared.</p>
+
+<h2 id="under-test">Under test</h2>
+
+<p>These are wired into <code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml</code> today, downloadable, and either mid-gate or already
+measured below the promotion bar. Most carry <code class="language-plaintext highlighter-rouge">Candidate</code> as their nature word, which is the signal
+now for a coding-seat hopeful: a name reading <code class="language-plaintext highlighter-rouge">(Candidate, ...)</code> means “still being judged” for that
+role. A few rows below are chat and reasoning models judged on a different axis entirely, and their
+nature word says so (<code class="language-plaintext highlighter-rouge">Reasoning</code>) rather than pretending to be coding candidates.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Candidate</th>
+      <th>What it is</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">GLM-4.7-Flash [128k] (Candidate, Standard)</code></td>
+      <td>GLM-4.7-Flash 30B-A3B</td>
+      <td>Passes the native gate (with GLM-specific sampling). 87% golden, below the 91% bar: a strong #2 coder, kept as a menu pick (<code class="language-plaintext highlighter-rouge">docs/model-guide.md:437</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3.6-35B-A3B [128k] (Candidate, Standard)</code> / <code class="language-plaintext highlighter-rouge">Qwen3.6-35B-A3B-MTP [128k] (Candidate, Standard)</code></td>
+      <td>Qwen3.6-35B-A3B, plain and self-drafting (MTP)</td>
+      <td>Ties the daily driver on suite score but hangs the native gate. The MTP variant additionally needs <code class="language-plaintext highlighter-rouge">n_parallel=1</code>, which collides with the <code class="language-plaintext highlighter-rouge">-np</code> subagent concurrency this stack relies on. Kept out of agentic tiers either way (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:293-321</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Devstral-Small-2-24B [128k] (Candidate, Standard)</code></td>
+      <td>Devstral-Small-2-24B-Instruct-2512</td>
+      <td>Misconfigured, not yet judged on quality (see caveats below)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-Coder-REAP-25B-A3B [128k] (Candidate, Light)</code></td>
+      <td>Cerebras REAP-pruned 25B-A3B cut of <code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code>’s own base</td>
+      <td>One <code class="language-plaintext highlighter-rouge">claw</code>-harness run scored 7/15 (47%): a real red flag, not yet run through the reference <code class="language-plaintext highlighter-rouge">crush</code>-harness suite the numbers above use (<code class="language-plaintext highlighter-rouge">docs/scorecards/2026-07-06-claw-Qwen3-Coder-REAP-25B-A3B [128k] (Candidate, Light).md</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">gpt-oss-20b [128k] (Reasoning, Light)</code></td>
+      <td>gpt-oss-20b</td>
+      <td>Already passed its native gate 2026-06-21 (4/4, zero flakes, ~359 tok/s, <code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:489</code>) and scored 93% golden on a dev tree. Carries the <code class="language-plaintext highlighter-rouge">gpt-oss-20b [128k] (Reasoning, Light)</code> verifier seat, though the ≥91% golden half of that gate is still unmeasured (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:496-498</code>, <code class="language-plaintext highlighter-rouge">docs/model-guide.md:449</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">DeepSeek-R1-Distill-Qwen-32B [32k] (Reasoning, Standard)</code> / <code class="language-plaintext highlighter-rouge">DeepSeek-R1-0528-Qwen3-8B [64k] (Reasoning, Light)</code></td>
+      <td>DeepSeek R1-distills, dense 32B and 8B</td>
+      <td>Fail the native gate structurally (0/15 and 4/15 golden): genuinely useful for visible-thinking chat, “zero agentic value… that’s structural to R1 distills, not a config bug” (<code class="language-plaintext highlighter-rouge">docs/model-guide.md:442-443</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">GLM-4.5-Air [32k] (Candidate, Heavy)</code> / <code class="language-plaintext highlighter-rouge">GLM-4.5-Air-REAP-82B-A12B [32k] (Candidate, Heavy)</code> / <code class="language-plaintext highlighter-rouge">Qwen3-Coder-Next-80B-A3B [128k] (Candidate, Heavy)</code></td>
+      <td>GLM-4.5-Air (plain + REAP-82B) and Qwen3-Coder-Next-80B</td>
+      <td>Gate timed out at 10 to 20 tok/s against a fixed 1200s window: a measurement artifact, not a proven flake. Needs a rescaled timeout before it’s a real verdict (<code class="language-plaintext highlighter-rouge">docs/model-guide.md:440-441</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">DeepSeek-V4-Flash [16k] (Reasoning, Heavy)</code></td>
+      <td>DeepSeek V4-Flash 284B-A37B</td>
+      <td>Needs a second <code class="language-plaintext highlighter-rouge">llama.cpp</code> engine built from a CUDA source fork. Not installed by default, estimated 3 to 8 tok/s</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B b10472 [128k] (Candidate, Light)</code></td>
+      <td><code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code>’s exact weights and flags, on the <code class="language-plaintext highlighter-rouge">b10472</code> engine</td>
+      <td>The engine is the only variable under test. Scored 18/23 (78%) on the Claude Code coding suite against the seat’s 22/23, both measured before the suite grew from 23 tasks to 26 (three image tasks added around 2026-08-30). Stays a candidate (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:647-650</code>, <code class="language-plaintext highlighter-rouge">:692-694</code>)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="parked-with-reasons">Parked, with reasons</h2>
+
+<p>This is the section where the decisions that look wrong on paper get explained. Every one of these
+is a model that measured <em>better</em> on some axis and was still kept out.</p>
+
+<p><strong>Nemotron 3 Nano 30B-A3B (not yet a catalog entry).</strong> NVIDIA’s own benchmarks show it ahead of a
+comparable Qwen3-30B-A3B-Thinking model on several axes: SWE-bench 38.8 vs 22.0, BFCL v4 53.8 vs
+46.4 (vendor-reported, <code class="language-plaintext highlighter-rouge">research/nemotron-evaluation-2026-07.md:24-29</code>). It’s parked anyway, because
+it’s a hybrid Mamba-Transformer architecture, and llama.cpp can’t partially truncate recurrent
+state the way it can a plain transformer’s KV cache. Every request reprocesses the <em>entire</em>
+context from scratch, even with an identical system prompt
+(<code class="language-plaintext highlighter-rouge">research/nemotron-evaluation-2026-07.md:44-48</code>). That would zero out the 92% to 99% per-turn cache
+reuse this stack’s agent economics are built on. <strong>We rejected a model that benchmarks better
+because it would be slower in practice, every single turn.</strong> Unblock condition: llama.cpp’s hybrid
+checkpoint-restore work (issue <code class="language-plaintext highlighter-rouge">#22384</code>) landing for append-only agent loops, re-checked roughly
+monthly (<code class="language-plaintext highlighter-rouge">research/nemotron-evaluation-2026-07.md:69-71</code>).</p>
+
+<p><strong>EAGLE3 speculative decoding on the quality tier.</strong> EAGLE3 (draft cheap, verify with the real model) merged
+into llama.cpp mainline as a way to speed up exactly the tier that’s slowest to swap in. It was the
+leading lever under consideration until the merged PRs’ own benchmark data came back: gpt-oss MoE
+EAGLE3 measures <strong>at or below 1×</strong>: <code class="language-plaintext highlighter-rouge">0.89×</code>, <code class="language-plaintext highlighter-rouge">0.95×</code>, <code class="language-plaintext highlighter-rouge">1.06×</code> across three prompts on the reference
+20B speculator. The two available 120B heads are explicitly tagged by their own authors with “a
+performance issue due to its MoE arch” (<code class="language-plaintext highlighter-rouge">research/model-lane-2026-07-06.md:39</code>). The verdict flipped
+from “the one lever that speeds the quality tier (1.3× to 2×)” to “likely no-win, measure-first, don’t
+build routing on it” (<code class="language-plaintext highlighter-rouge">research/model-lane-2026-07-06.md:25</code>).</p>
+
+<p><strong><code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B Q5 [128k] (Candidate, Light)</code>: the daily driver’s own base, one quant step
+up.</strong> This is the most concrete parked result on the page, with a dated scorecard. The idea: the
+daily driver’s only known soft spot is an occasional tool-call-as-prose leak. The straightforward
+lever for that is more bits per weight: <code class="language-plaintext highlighter-rouge">UD-Q4_K_XL</code> → <code class="language-plaintext highlighter-rouge">UD-Q5_K_XL</code>. Gated 2026-07-07, both the
+native probe (twice) and the 15-task golden suite. <strong>Verdict: PARK.</strong> Pass-rate came in below
+<code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code>’s own baseline under every accounting tried in the
+report (from 66.7% to 73.3% against a baseline of 80.0% to 86.7%,
+depending on how flaky first-shot failures get counted). And tool-call fidelity was a razor-thin,
+sign-flipping call depending on methodology
+(<code class="language-plaintext highlighter-rouge">docs/scorecards/2026-07-07-coder-q5-gate.md</code>). The genuinely interesting part: the defect the
+quant bump targeted (tool-calls leaking as prose) produced <strong>zero incidents for either model</strong>
+across all 30 task runs in this sample. The extra ~4 GB (94.3% of the card at full 128k context)
+bought no measurable reliability win, and cost some correctness.</p>
+
+<p><strong>Vision, repointed from 32B back to 8B.</strong> On 2026-06-21, an eval gate showed the 32B decisively
+out-reading the 8B on fine UI text and telemetry: a real quality win. A 2026-07-05 audit (P1.1)
+found that the 32B’s GGUF had never actually been wired into the installer: no manifest row, no
+setup switch. Every real install’s default <code class="language-plaintext highlighter-rouge">Qwen3-VL-8B [32k] (Vision, Light)</code> tier tried to load a
+file that was never fetched, which made Describe/Verify 404 on every clean machine
+(<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:197-201</code>). The fix repointed the default vision tier back to the 8B
+(which <em>is</em> fetched) and split the 32B out as a separately opt-in
+<code class="language-plaintext highlighter-rouge">Qwen3-VL-32B [32k] (Vision, Standard)</code> tier (<code class="language-plaintext highlighter-rouge">setup.ps1 -VisionHQ</code>), which now has a real fetch
+path and a SHA-pinned manifest row (manifest id <code class="language-plaintext highlighter-rouge">vision-hq</code> in <code class="language-plaintext highlighter-rouge">serving/model-manifest.json</code>, a separate
+namespace this rename doesn’t touch). It stays non-default because the 2026-06-21 quality win was
+measured on the old <code class="language-plaintext highlighter-rouge">b9616</code> engine, since re-pinned to
+<code class="language-plaintext highlighter-rouge">b9878</code>. The comparison needs to be re-run on the current engine before the default vision tier
+would repoint to it again (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:206-209</code>).</p>
+
+<h2 id="honest-caveats">Honest caveats</h2>
+
+<p>A few things in the repository don’t agree with each other. We source this page from the config
+rather than the docs specifically so we can say so plainly instead of quietly picking one.</p>
+
+<p><strong>Two files disagree on the autocomplete server’s running VRAM.</strong> <code class="language-plaintext highlighter-rouge">serving/start-fim.ps1:5</code>
+estimates the FIM server at “~4GB”. The <code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [32k] (Coding, Light)</code> comment in
+<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:123</code> estimates the same 3B Q8_0 model at “~6.6GB” for the coexistence
+math. The one solid number is the file size on disk, 3.29 GB
+(<code class="language-plaintext highlighter-rouge">media-assets/llm-model-catalog.json:139</code>). Either estimate still leaves the 64k-context
+<code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [32k] (Coding, Light)</code> plus the autocomplete server under 32 GB. Nobody has
+reconciled the two comments.</p>
+
+<blockquote>
+  <p><strong>Note</strong>: figures on this page marked <code class="language-plaintext highlighter-rouge">[vendor]</code> elsewhere in the research corpus (Cerebras’s
+REAP pruning claims, for instance) are the pruner’s own numbers, not something measured on this
+stack. The scorecards above are what this project actually ran.</p>
+</blockquote>
+
+<p><strong><code class="language-plaintext highlighter-rouge">Devstral-Small-2-24B [128k] (Candidate, Standard)</code> has two separate, unrelated problems, and one stale note about a third
+that’s already fixed.</strong> First: it’s still genuinely misconfigured. Its <code class="language-plaintext highlighter-rouge">cmd</code> in
+<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:282-285</code> carries no sampling row. It runs at llama-server’s default
+temperature (0.8) instead of the model card’s recommended ~0.15. And the bartowski build’s chat
+template mis-renders Mistral’s tool-call token on the pinned engine. Tool calls leak as roughly
+112,000 tokens of prose until the request hits its cap. The resulting 0/15 golden score is a
+serving bug, not a verdict on the model (<code class="language-plaintext highlighter-rouge">docs/model-guide.md:455</code>). Second: it has no
+installer fetch path at all (no <code class="language-plaintext highlighter-rouge">setup.ps1</code> switch, no row in <code class="language-plaintext highlighter-rouge">serving/model-manifest.json</code>). So
+today it only runs if someone hand-places the GGUF. Third, and this one is fixed even though the
+note claiming otherwise is still there: the catalog’s own inline comment warns that the yaml
+“currently points at an unsloth <code class="language-plaintext highlighter-rouge">UD-Q4_K_XL</code> filename, not this bartowski <code class="language-plaintext highlighter-rouge">Q4_K_M</code> file… before
+activating that tier” (<code class="language-plaintext highlighter-rouge">media-assets/llm-model-catalog.json:175</code>). It doesn’t anymore. The current
+<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:284</code> points at the exact same <code class="language-plaintext highlighter-rouge">Devstral-Small-2-24B-Instruct-2512-Q4_K_M.gguf</code>
+the catalog’s own download row fetches. The filename mismatch the comment warns about was already
+resolved when the tier was enabled. Nobody deleted the stale warning.</p>
+
+<p><strong>A comment can contradict the block sitting three lines under it, and the fix can outlive the bug
+it named.</strong> The example here used to be the seat’s own comment, which claimed <code class="language-plaintext highlighter-rouge">opus</code>, <code class="language-plaintext highlighter-rouge">sonnet</code> and
+<code class="language-plaintext highlighter-rouge">haiku</code> “ALL resolve here on purpose” long after the launcher’s actual ladder had quietly moved
+<code class="language-plaintext highlighter-rouge">sonnet</code> and <code class="language-plaintext highlighter-rouge">fable</code> onto different models chosen by capability, each one hardcoded by name. The
+2026-08-25 rename didn’t just fix that comment. It deleted the hardcoded ladder the comment was
+describing. <code class="language-plaintext highlighter-rouge">claude-local.ps1</code> no longer carries a table of names that mean “the seat”: it asks
+<code class="language-plaintext highlighter-rouge">GET /running</code> which models are resident right now and seats <code class="language-plaintext highlighter-rouge">sonnet</code>, <code class="language-plaintext highlighter-rouge">haiku</code> and <code class="language-plaintext highlighter-rouge">fable</code> from
+that, falling back to <code class="language-plaintext highlighter-rouge">-Model</code> when nothing else is loaded. There’s no ladder left for a comment to
+misdescribe.</p>
+
+<p>This is the version of the caveat above that keeps recurring. A comment sitting right next to the
+code goes stale the moment neighboring code changes. It goes stale silently, because nothing tests
+a comment. This page used to cite two other yaml comments disagreeing about whether
+<code class="language-plaintext highlighter-rouge">Qwen3-VL-32B [32k] (Vision, Standard)</code> was live. Both have since been reconciled in the file itself
+(<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:205</code> and <code class="language-plaintext highlighter-rouge">:249-253</code> now agree it’s a standalone A/B tier you request by
+name), which is what the fix looks like when someone gets to it. When a comment and a running
+config disagree, the config wins.</p>
+
+<p><strong><code class="language-plaintext highlighter-rouge">Qwen3-Coder-REAP-25B-A3B [128k] (Candidate, Light)</code>’s 47% isn’t directly comparable to the 91%/93%/87% figures above.</strong> Its
+one completed gate run used the <code class="language-plaintext highlighter-rouge">claw</code> harness (<code class="language-plaintext highlighter-rouge">docs/scorecards/2026-07-06-claw-Qwen3-Coder-REAP-25B-A3B [128k] (Candidate, Light).md</code>),
+not the <code class="language-plaintext highlighter-rouge">crush</code> harness the daily-driver comparison table uses. Harness choice moves the number: the
+<code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B Q5 [128k] (Candidate, Light)</code> gate re-measured
+<code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code> itself under <code class="language-plaintext highlighter-rouge">claw</code> and got 86.7%
+(<code class="language-plaintext highlighter-rouge">docs/scorecards/2026-07-07-coder-q5-gate.md</code>), versus the 93% <code class="language-plaintext highlighter-rouge">crush</code> measured for the same model
+on the same day elsewhere in this page’s sources. Treat REAP25B’s 47% as a real signal that it’s
+struggling, not as a number on the same scale as the tiers above.</p>
+
+<blockquote>
+  <p><strong>Common trap</strong>: a model’s presence as a keyed block in <code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml</code> doesn’t mean
+it will answer a request. <code class="language-plaintext highlighter-rouge">start-serving.ps1</code> silently drops any tier whose weight file isn’t
+actually on disk before handing the config to llama-swap, specifically so a missing GGUF produces
+a clean “not offered” instead of an HTTP 500 (<code class="language-plaintext highlighter-rouge">serving/start-serving.ps1:101-193</code>). This is
+working as designed. <code class="language-plaintext highlighter-rouge">Qwen3-Coder-Next-80B-A3B [128k] (Candidate, Heavy)</code> was confirmed dropped this way on 2026-07-07,
+mid an unrelated gate run, simply because its weights weren’t fetched yet
+(<code class="language-plaintext highlighter-rouge">docs/scorecards/2026-07-07-coder-q5-gate.md</code>). But it means the yaml above is the <em>possible</em>
+roster, not necessarily what a given install can actually serve.</p>
+
+  <p>Dropping a model turned out not to be enough on its own. A <code class="language-plaintext highlighter-rouge">members:</code> list naming a pruned model
+is fatal to llama-swap: it exits 1 with <code class="language-plaintext highlighter-rouge">creating group router: no model config for
+"Qwen2.5-3B-Instruct [32k] (Utility, Free)"</code> and binds nothing at all. One absent 3 GB utility model GGUF used to take the whole
+stack down that way. Reproduced on 2026-08-19 with only that one file marked missing. The repair is
+<code class="language-plaintext highlighter-rouge">Remove-DokiDanglingGroupMembers</code> at <code class="language-plaintext highlighter-rouge">serving/start-serving.ps1:195</code>, which drops a pruned model
+from every <code class="language-plaintext highlighter-rouge">members:</code> list and drops any group left with fewer than two members
+(<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:65-73</code>).</p>
+</blockquote>
+
+<p><strong>The same underlying model has three different IDs across three files.</strong> The gpt-oss-20b tier is
+<code class="language-plaintext highlighter-rouge">"reasoning"</code> in the catalog, <code class="language-plaintext highlighter-rouge">"reasoning-gptoss20b"</code> in the installer manifest, and
+<code class="language-plaintext highlighter-rouge">"gpt-oss-20b [128k] (Reasoning, Light)"</code> in the yaml that actually serves it. None of these is wrong (they’re
+each file’s own namespace). But it’s worth knowing before cross-referencing them by name. Relatedly,
+that tier’s fetch switch (<code class="language-plaintext highlighter-rouge">setup.ps1 -Reasoning</code>) didn’t exist at all when the 2026-07-05 bake-off
+first ran into its missing weights. It exists now, but defaults to off
+(<code class="language-plaintext highlighter-rouge">serving/model-manifest.json</code> id <code class="language-plaintext highlighter-rouge">reasoning-gptoss20b</code>, <code class="language-plaintext highlighter-rouge">defaultOn: false</code>). Installing DokiDex
+today still won’t fetch it unless you ask for it by name.</p>
+
+<h2 id="where-to-go-next">Where to go next</h2>
+
+<p>For the arithmetic behind the VRAM numbers on this page (why <code class="language-plaintext highlighter-rouge">Q4_K_XL</code> costs what it costs, how a
+KV cache grows with context, what “A3B” buys you over a dense model of the same size), see
+<a href="/projects/dokidex/learn/local/">Running models locally</a>. Curious what the model names themselves
+are telling you (<code class="language-plaintext highlighter-rouge">30B-A3B</code>, <code class="language-plaintext highlighter-rouge">Q4_K_M</code>, <code class="language-plaintext highlighter-rouge">Instruct</code> vs <code class="language-plaintext highlighter-rouge">Thinking</code>, and the rest of it)?
+<a href="/projects/dokidex/learn/naming/">Decoding model names</a> covers that.</p>
+
+    </article>
+
+    
+    <nav class="pager" aria-label="Page navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/download/">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">Download the launchers</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/games/">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">Games the models built</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="site-footer">
+  <div class="footer-main">
+    <p class="footer-line">
+      <strong>DokiDex</strong> v0.62.0:
+      a fully-local AI stack, and a field guide to the machines it runs on.
+    </p>
+    <p class="footer-line footer-dim">
+      Everything on this site is written against the real tree and the measured record. Where a
+      claim is a number, it was measured or sourced. Where it was a judgment call, the reasoning
+      is stated inline. Stale statements are bugs. File them like bugs.
+    </p>
+  </div>
+
+  <div class="footer-links">
+    <a href="/projects/dokidex/local-cli/">Run the CLIs</a>
+    <a href="/projects/dokidex/handbook/">Handbook</a>
+    <a href="/projects/dokidex/reference/">Quick reference</a>
+    <a href="/projects/dokidex/glossary/">Glossary</a>
+    <!-- Deliberately understated: last item in the row, same weight as the rest, no colour,
+         no badge, no image beacon. The ask was "inconspicuous". -->
+    <a class="footer-kofi" href="https://ko-fi.com/dougfessler" rel="noopener">Buy me a coffee</a>
+  </div>
+</footer>
+
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/dokidex.js"></script>
+</body>
+</html>

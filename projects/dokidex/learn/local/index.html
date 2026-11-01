@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Running models locally · DokiDex</title>
+<meta name="description" content="What you can actually run on hardware you own: runtimes, the VRAM arithmetic worked in full, quantization cliffs, prefix caching, and where local genuinely beats a frontier API.">
+
+<!-- Open Graph / Twitter, hand-rolled: jekyll-seo-tag is not available under the pinned
+     github-pages gem set used by actions/jekyll-build-pages. -->
+<meta property="og:site_name" content="DokiDex">
+<meta property="og:title" content="Running models locally">
+<meta property="og:description" content="What you can actually run on hardware you own: runtimes, the VRAM arithmetic worked in full, quantization cliffs, prefix caching, and where local genuinely beats a frontier API.">
+<meta property="og:type" content="website">
+<!-- site_origin rather than absolute_url: see the comment in _config.yml. absolute_url would
+     emit http:// here, because the Pages API reports an http html_url while Enforce HTTPS is off. -->
+<meta property="og:url" content="https://dougfessler.com/projects/dokidex/learn/local/">
+<link rel="canonical" href="https://dougfessler.com/projects/dokidex/learn/local/">
+<!-- `summary`, not `summary_large_image`: no og:image or twitter:image is emitted anywhere on
+     this site, and the large-image card renders as a blank rectangle without one. Switch this back
+     the same day a 1200x630 share asset lands, not before. -->
+<meta name="twitter:card" content="summary">
+
+<!-- Same four families as the handbook, so the two halves of the site read as one product:
+     Marcellus (power words) · Kanit (headings, kickers, nav) · IBM Plex Mono (code, stats) ·
+     Figtree (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/dokidex.css">
+<link rel="icon" href="/projects/dokidex/assets/favicon.svg" type="image/svg+xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<!-- `wide: true` in a page's front matter opts it into --content-w-wide (assets/dokidex.css:51).
+     The CSS keys off `.page-wide` on an ancestor. Without the class emitted here the front-matter
+     flag silently does nothing. -->
+<body class="page-wide">
+<a class="skip-link" href="#content">Skip to content</a>
+
+<!-- CSS-only nav toggle. A checkbox beats a JS drawer here: the nav has to work on the mobile
+     read where the reader has scrolled 4000px into a reference table, and a checkbox cannot
+     desync from its own state the way a JS flag can. -->
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/">DokiDex</a>
+    <a class="topbar-cta" href="/projects/dokidex/download/"><svg class="dl-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><g class="dl-arrow"><path d="M8 2.2v6.5"/><path d="M5.2 5.9 8 8.7l2.8-2.8"/></g><path class="dl-tray" d="M3.2 11.3v2.5h9.6v-2.5"/></svg>
+Download</a>
+  </header>
+
+  <!-- Grouped navigation, driven by site.nav in _config.yml.
+
+     A page is "current" when its url matches exactly. The handbook is the one entry that also
+     needs to light up for its children (/handbook/03-serving.html), so it gets a prefix test —
+     without it, the sidebar would show nothing selected the moment a reader steps into a
+     chapter, which reads as "you have left the site". -->
+<nav class="sidebar" aria-label="Site sections">
+  <a class="sidebar-brand" href="/projects/dokidex/">
+    <span class="sidebar-mark" aria-hidden="true">&#9612;&#9608;&#9608;&#9616;</span>
+    <span class="sidebar-brand-text">DokiDex</span>
+  </a>
+
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Start</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/"
+             >Overview</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Use DokiDex</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/local-cli/"
+             >Run the CLIs locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/download/"
+             >Download the launchers</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/models/"
+             >Models it runs</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/games/"
+             >Games the models built</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/telemetry/"
+             >Performance data</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/qwen38/"
+             >Qwen3.8-27B, measured</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/architecture/"
+             >How it's built</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Learn AI</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/"
+             >Where to start</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/basics/"
+             >1 · Foundations</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/core/"
+             >2 · How models work</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/advanced/"
+             >3 · Advanced</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/naming/"
+             >Decoding model names</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/open-vs-closed/"
+             >Open vs closed weights</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/benchmarks/"
+             >Benchmarks</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link is-active"
+             href="/projects/dokidex/learn/local/"
+             aria-current="page">Running models locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/agents/"
+             >Coding agents</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Context</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/state-of-ai/"
+             >State of AI, 2026</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/reference/"
+             >Quick reference</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/glossary/"
+             >Glossary</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Deep dive</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/handbook/"
+             >The Handbook</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+</nav>
+
+
+  <main class="main">
+    <div class="page-head">
+      <p class="kicker">:: LOCAL INFERENCE</p>
+      <h1 class="page-title">Running models locally</h1>
+      <p class="page-desc">What you can actually run on hardware you own: runtimes, the VRAM arithmetic worked in full, quantization cliffs, prefix caching, and where local genuinely beats a frontier API.</p>
+      
+      <p class="level-badges">
+        <span class="level-badge level-intermediate">Intermediate</span><span class="level-badge level-advanced">Advanced</span>
+      </p>
+      
+    </div>
+
+    <article id="content" class="prose">
+      <p>Everything here is written against one reference machine: a single NVIDIA RTX 5090 (32GB GDDR7)
+with 64GB of system DDR5, on Windows (the machine DokiDex itself targets). It’s a useful anchor
+because it sits at an honest middle point: big enough for real coding models, small enough that
+every gigabyte has to be accounted for. If your hardware differs, the arithmetic still applies.
+Only the numbers change, and <a href="#consumer-hardware-current">the hardware section below</a> covers the other common classes
+(Apple Silicon, unified-memory mini-PCs, multi-GPU rigs).</p>
+
+<p>The goal is narrow and practical: by the end, you should be able to work out what a given model
+costs you in VRAM at a given quantization and context length, and pick a runtime without guessing.</p>
+
+<h2 id="the-runtime-landscape">The runtime landscape</h2>
+
+<p>These tools solve overlapping problems. But each one has a shape it’s actually built for.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Runtime</th>
+      <th>What it’s for</th>
+      <th>Hardware target</th>
+      <th>Quantization</th>
+      <th>Throughput character</th>
+      <th>Ergonomics</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong><a href="https://github.com/ggml-org/llama.cpp">llama.cpp</a></strong></td>
+      <td>General-purpose local inference, the GGUF ecosystem</td>
+      <td>Any: NVIDIA CUDA, Apple Metal, AMD HIP/Vulkan, Intel SYCL, CPU</td>
+      <td>GGUF legacy quants, K-quants (<code class="language-plaintext highlighter-rouge">Q2_K</code> through <code class="language-plaintext highlighter-rouge">Q6_K</code>), I-quants (<code class="language-plaintext highlighter-rouge">IQ1_S</code> through <code class="language-plaintext highlighter-rouge">IQ4_XS</code>)</td>
+      <td>Tuned for single-stream latency. Batching exists but isn’t the focus</td>
+      <td>Single static <code class="language-plaintext highlighter-rouge">llama-server</code> binary, the widest quant zoo on Hugging Face, <code class="language-plaintext highlighter-rouge">--n-gpu-layers</code> partial offload</td>
+    </tr>
+    <tr>
+      <td><strong><a href="https://ollama.com/blog/mlx">Ollama</a></strong></td>
+      <td>Turnkey local model management</td>
+      <td>Same span as its backend</td>
+      <td>GGUF via a llama.cpp backend, plus MLX on Apple Silicon since March 2026</td>
+      <td>Convenience-first. v0.30 added roughly a 20% NVIDIA speedup and Vulkan-by-default on AMD/Intel (<a href="https://localaimaster.com/blog/ollama-version-history">release notes</a>)</td>
+      <td><code class="language-plaintext highlighter-rouge">ollama run &lt;model&gt;</code>, Modelfile packaging, an OpenAI-compatible API, now pluggable into Claude Code / Codex / OpenCode via <code class="language-plaintext highlighter-rouge">ollama launch</code></td>
+    </tr>
+    <tr>
+      <td><strong><a href="https://lmstudio.ai/changelog">LM Studio</a></strong></td>
+      <td>GUI-first local runner + OpenAI-compatible server</td>
+      <td>GGUF everywhere via llama.cpp, plus MLX on Apple Silicon</td>
+      <td>Whatever the underlying engine supports</td>
+      <td>Its MLX backend is reported roughly 30-50% faster than its own llama.cpp/Metal path on the same Mac hardware (<a href="https://codersera.com/blog/lm-studio-complete-guide-2026/">source</a>)</td>
+      <td>Best point-and-click UX here. v0.4.x added stable multi-model management and MCP OAuth</td>
+    </tr>
+    <tr>
+      <td><strong><a href="https://github.com/vllm-project/vllm">vLLM</a></strong></td>
+      <td>High-throughput serving under concurrent load</td>
+      <td>NVIDIA primarily, plus AMD, Intel, TPU, and others</td>
+      <td>FP8, MXFP4/NVFP4, INT8/INT4, GPTQ, AWQ, GGUF, compressed-tensors</td>
+      <td>PagedAttention + continuous batching optimize <em>aggregate</em> throughput. Single-stream latency isn’t the selling point</td>
+      <td>OpenAI-compatible server, the most complex to tune of this group. Now genuinely viable on one consumer GPU since it accepts GGUF, though that GGUF path is narrow and generally slower than llama.cpp on the same file (a compatibility bridge rather than vLLM’s strength)</td>
+    </tr>
+    <tr>
+      <td><strong><a href="https://particula.tech/blog/sglang-vs-vllm-inference-engine-comparison">SGLang</a></strong></td>
+      <td>High-throughput serving for agentic/structured workloads</td>
+      <td>Similar NVIDIA-first footprint to vLLM</td>
+      <td>FP8/INT4/AWQ/GPTQ class</td>
+      <td>RadixAttention (a prefix tree of KV states). See <a href="#prompt-and-prefix-caching-locally">prefix caching</a> below for the measured cache-hit gap over vLLM</td>
+      <td>Comparable operational complexity to vLLM. The right choice specifically when traffic shares a long prefix</td>
+    </tr>
+    <tr>
+      <td><strong><a href="https://nvidia.github.io/TensorRT-LLM/overview.html">TensorRT-LLM</a></strong></td>
+      <td>Maximum-throughput, lowest-latency NVIDIA serving</td>
+      <td>NVIDIA only: FP8 needs Hopper+, NVFP4 needs Blackwell</td>
+      <td>FP8, NVFP4 (block-quantized), MXFP8, INT4/INT8 via Model Optimizer</td>
+      <td>Generally the fastest NVIDIA path, once built</td>
+      <td>Requires an ahead-of-time compile per model+shape. Highest setup friction here, and a poor fit for a desktop that swaps models</td>
+    </tr>
+    <tr>
+      <td><strong><a href="https://github.com/turboderp-org/exllamav3/blob/master/README.md">ExLlamaV2 / V3</a></strong></td>
+      <td>Hand-tuned consumer-GPU inference, the GPTQ/EXL2/EXL3 lineage</td>
+      <td>NVIDIA CUDA 12.4+ consumer cards specifically (no ROCm)</td>
+      <td>EXL2, and the newer <strong>EXL3</strong> trellis/Hadamard codebook format spanning 1-8 bits/weight</td>
+      <td>Tensor-core-tiled execution built to be fast on RTX-class cards. EXL3 is reported coherent to ~1.6 bpw on Llama-3.1-70B (<a href="https://github.com/turboderp-org/exllamav3/blob/master/doc/exl3.md">doc</a>)</td>
+      <td>Quantizing a model takes minutes to a few hours on one RTX-class GPU, a narrower hardware target than GGUF</td>
+    </tr>
+    <tr>
+      <td><strong><a href="https://yage.ai/share/mlx-apple-silicon-en-20260331.html">MLX</a></strong></td>
+      <td>Apple’s own array framework + LLM serving layer</td>
+      <td>Apple Silicon only, unified-memory-native</td>
+      <td>Native int-based quantization, 4/8-bit common, with ~4,800 quantized models on the <code class="language-plaintext highlighter-rouge">mlx-community</code> HF org as of WWDC 2026</td>
+      <td>Zero-copy CPU/GPU tensor sharing, the yardstick other Apple-Silicon paths are measured against</td>
+      <td>Becoming the default “serious local AI on Mac” stack, irrelevant off Apple hardware</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><code class="language-plaintext highlighter-rouge">llama.cpp</code>’s own bundled fork, <strong><a href="https://github.com/LostRuins/koboldcpp">KoboldCpp</a></strong>, is worth
+a one-line mention: same engine underneath, packaged as a single no-install executable with a
+built-in UI, popular in the creative-writing community rather than the agentic-coding one this
+site is built around.</p>
+
+<h3 id="which-one-on-your-desktop">Which one, on your desktop</h3>
+
+<p>The decision tree below is the short version. In prose: <strong>default to llama.cpp</strong>: it covers
+every quant family on Hugging Face natively on Windows+CUDA, and <code class="language-plaintext highlighter-rouge">--n-gpu-layers</code> is the sane way
+to exceed 32GB by spilling into system DDR5. That default has a real cost, easy to overlook:
+llama.cpp is tuned for single-stream latency, not raw throughput, and ships no ahead-of-time-compiled
+kernel path the way TensorRT-LLM does. You’re trading peak speed for format coverage and
+flexibility, not getting both for free.</p>
+
+<p>Reach for <strong>Ollama or LM Studio</strong> only when “running
+in two minutes” outweighs controlling every flag. <strong>vLLM or SGLang</strong> earn their setup cost when
+<em>concurrency</em> (several simultaneous sessions on one GPU) is the actual problem. A single
+interactive user mostly leaves their throughput advantage unused. Between the two, SGLang wins
+when traffic shares a long common prefix (an agent harness, a big system prompt). vLLM wins on
+broader model/quant support. <strong>TensorRT-LLM</strong>’s per-model compile step is a bad fit for frequent
+swapping. Reserve it for one model settled on long-term. <strong>ExLlamaV2/V3</strong> earns its place when
+GGUF’s K-quants don’t hit a bit-width cleanly on one NVIDIA card (a 70B model at 3-4 bpw, say).
+<strong>MLX</strong> only matters on an Apple Silicon Mac instead of this page’s reference PC. See <a href="#consumer-hardware-current">the hardware section</a> below.</p>
+
+<figure>
+<svg viewBox="0 0 720 410" role="img" aria-labelledby="dgm-tree-title dgm-tree-desc">
+<title id="dgm-tree-title">Decision tree for picking a local runtime</title>
+<desc id="dgm-tree-desc">Four yes/no questions route from llama.cpp as the default down to Ollama/LM Studio, vLLM/SGLang, ExLlamaV2/V3, or TensorRT-LLM depending on setup priority, concurrency, VRAM squeeze, and compile tolerance.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="394" rx="3" />
+<text class="dgm-title" x="28" y="34">Picking a runtime for a single desktop GPU</text>
+
+<rect class="dgm-panel" x="40" y="54" width="280" height="46" rx="4" />
+<text class="dgm-label" x="52" y="72">Need it running in minutes,</text>
+<text class="dgm-label" x="52" y="88">not hand-tuned per flag?</text>
+<rect class="dgm-accent" x="372" y="54" width="4" height="46" />
+<rect class="dgm-panel" x="376" y="54" width="304" height="46" rx="4" />
+<text class="dgm-label" x="388" y="72">Ollama or LM Studio</text>
+<text class="dgm-label-sm" x="388" y="88">(wraps llama.cpp, or MLX on Mac)</text>
+<path class="dgm-flow" d="M320 77 L372 77" />
+<text class="dgm-label-sm" x="326" y="70">yes</text>
+
+<path class="dgm-line" d="M180 100 L180 120" />
+<text class="dgm-label-sm" x="186" y="114">no</text>
+
+<rect class="dgm-panel" x="40" y="120" width="280" height="46" rx="4" />
+<text class="dgm-label" x="52" y="138">Many concurrent requests</text>
+<text class="dgm-label" x="52" y="154">hitting one GPU at once?</text>
+<rect class="dgm-accent-2" x="372" y="120" width="4" height="46" />
+<rect class="dgm-panel" x="376" y="120" width="304" height="46" rx="4" />
+<text class="dgm-label" x="388" y="138">vLLM (varied loads) or</text>
+<text class="dgm-label" x="388" y="154">SGLang (shared long prefix)</text>
+<path class="dgm-flow" d="M320 143 L372 143" />
+<text class="dgm-label-sm" x="326" y="136">yes</text>
+
+<path class="dgm-line" d="M180 166 L180 186" />
+<text class="dgm-label-sm" x="186" y="180">no</text>
+
+<rect class="dgm-panel" x="40" y="186" width="280" height="46" rx="4" />
+<text class="dgm-label" x="52" y="204">Squeezing one NVIDIA card</text>
+<text class="dgm-label" x="52" y="220">below 4-bit K-quants?</text>
+<rect class="dgm-accent-3" x="372" y="186" width="4" height="46" />
+<rect class="dgm-panel" x="376" y="186" width="304" height="46" rx="4" />
+<text class="dgm-label" x="388" y="212">ExLlamaV2 / ExLlamaV3</text>
+<path class="dgm-flow" d="M320 209 L372 209" />
+<text class="dgm-label-sm" x="326" y="202">yes</text>
+
+<path class="dgm-line" d="M180 232 L180 252" />
+<text class="dgm-label-sm" x="186" y="246">no</text>
+
+<rect class="dgm-panel" x="40" y="252" width="280" height="46" rx="4" />
+<text class="dgm-label" x="52" y="270">One model, fixed long-term,</text>
+<text class="dgm-label" x="52" y="286">Hopper/Blackwell, compile OK?</text>
+<rect class="dgm-accent" x="372" y="252" width="4" height="46" />
+<rect class="dgm-panel" x="376" y="252" width="304" height="46" rx="4" />
+<text class="dgm-label" x="388" y="278">TensorRT-LLM</text>
+<path class="dgm-flow" d="M320 275 L372 275" />
+<text class="dgm-label-sm" x="326" y="268">yes</text>
+
+<path class="dgm-line" d="M180 298 L180 308 L360 308 L360 318" />
+<text class="dgm-label-sm" x="186" y="312">no</text>
+
+<rect class="dgm-ok" x="160" y="318" width="4" height="46" />
+<rect class="dgm-panel" x="164" y="318" width="396" height="46" rx="4" />
+<text class="dgm-label" x="182" y="338">llama.cpp</text>
+<text class="dgm-label-sm" x="182" y="354">the default — every quant format, every backend, single binary</text>
+</svg>
+<figcaption><strong>llama.cpp is the correct default. The other tools earn their place by
+solving a specific problem</strong>: turnkey setup, concurrency, a VRAM squeeze, or a fixed
+production deployment. If none of those apply, stop here.</figcaption>
+</figure>
+
+<h2 id="model-swapping-and-multi-model-serving">Model swapping and multi-model serving</h2>
+
+<p>A 32GB card holds one large model’s weights plus its KV cache, or several small models, but not
+several large models at once. There’s no VRAM overcommit for GPU inference that doesn’t fall
+back to catastrophic host-RAM paging. This makes model swapping mandatory on a single-GPU desktop:
+something has to own the “one model resident at a time” state machine and load/unload
+transparently as requests arrive.</p>
+
+<p><strong><a href="https://github.com/mostlygeek/llama-swap">llama-swap</a></strong> is the standard tool: a single Go
+binary, one YAML config, no dependencies. It sits in front of <code class="language-plaintext highlighter-rouge">llama-server</code> (or vLLM, TabbyAPI,
+any OpenAI-compatible backend) behind one endpoint. On each request it reads the <code class="language-plaintext highlighter-rouge">model</code> field
+and, if the running backend doesn’t match, stops the current process and starts the requested one
+with its exact configured command. Useful features: a <code class="language-plaintext highlighter-rouge">groups</code> mechanism for holding more than one
+model resident when VRAM allows, TTL-based auto-unload of idle models, and <code class="language-plaintext highlighter-rouge">/health</code>/<code class="language-plaintext highlighter-rouge">/metrics</code>.</p>
+
+<p>DokiDex runs exactly this pattern: one llama-swap endpoint in front of a roster of tiers, each
+with its own tuned flags, swapping in on demand. Full detail, the actual roster, and per-tier
+VRAM footprints live on the <a href="/projects/dokidex/models/">models page</a>. Two patterns from that
+setup generalize to any single-GPU desktop: a <strong>small model held warm in a <code class="language-plaintext highlighter-rouge">groups</code> slot</strong>
+alongside the swappable large model (embeddings, fill-in-middle autocomplete, a speculative-decoding
+draft model), sized so both fit the budget at once. The second is <strong>TTL auto-unload</strong>, which frees
+VRAM after idle periods without a human remembering to kill the process.</p>
+
+<p>The cost of cold-swapping is a load-time stall (seconds to tens of seconds, depending on model
+size and OS page-cache state) on every switch between models outside the same warm group. That
+stall is the real price of running more model capability than fits in VRAM at once, which is why
+the arithmetic below matters: the better you fit inside one budget, the fewer swaps a session needs.</p>
+
+<h2 id="the-vram-math-worked">The VRAM math, worked</h2>
+
+<p>This is the arithmetic that decides what you can run. It has three terms: weights, KV cache, and
+a smaller overhead term. Each behaves differently as you change quantization, context length,
+and batch size.</p>
+
+<p>One unit choice, stated up front: the totals below use <strong>GiB</strong> (2^30 bytes = 1,073,741,824 B), not
+decimal GB (10^9 bytes). This matches both llama.cpp’s own reported sizes and how VRAM is labeled
+on a graphics-card box (a “32GB” card is 32 GiB. In decimal terms that’s 34.36 GB). The formulas
+below produce raw bytes. Converting to GiB means dividing by 2^30, not by 1,000,000,000. Where a
+figure is shown in decimal GB instead, it’s called out as GB explicitly.</p>
+
+<p><strong>Weights:</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>weights_bytes ≈ total_params × (bits_per_weight / 8)
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">bits_per_weight</code> (bpw) comes from the quantization scheme, not the model: GGUF K-quants and
+I-quants publish near-constant bpw figures because the encoding is per-block, largely independent
+of overall model size. From llama.cpp’s own quantize reference (measured on Llama-3.1-8B, but the
+bpw column generalizes to any model at that format):</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Format</th>
+      <th>bits/weight</th>
+      <th>Format</th>
+      <th>bits/weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">IQ1_S</code></td>
+      <td>2.004</td>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_S</code></td>
+      <td>4.667</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">IQ2_XXS</code></td>
+      <td>2.382</td>
+      <td><code class="language-plaintext highlighter-rouge">Q4_K_M</code></td>
+      <td>4.894</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q2_K</code></td>
+      <td>3.159</td>
+      <td><code class="language-plaintext highlighter-rouge">Q5_K_S</code></td>
+      <td>5.570</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">IQ3_XXS</code></td>
+      <td>3.255</td>
+      <td><code class="language-plaintext highlighter-rouge">Q5_K_M</code></td>
+      <td>5.704</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q3_K_S</code></td>
+      <td>3.643</td>
+      <td><code class="language-plaintext highlighter-rouge">Q6_K</code></td>
+      <td>6.563</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Q3_K_M</code></td>
+      <td>3.996</td>
+      <td><code class="language-plaintext highlighter-rouge">Q8_0</code></td>
+      <td>8.501</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">IQ4_XS</code></td>
+      <td>4.460</td>
+      <td><code class="language-plaintext highlighter-rouge">F16</code></td>
+      <td>16.000</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>This table is a representative subset. The <a href="https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/README.md">full table</a>
+covers every K-quant and I-quant llama.cpp ships.</p>
+
+<p><strong>KV cache, standard multi-head or grouped-query attention (GQA):</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kv_bytes_per_token = 2 (K and V) × n_layers × n_kv_heads × head_dim × bytes_per_element
+kv_bytes_total     = kv_bytes_per_token × context_length × batch_size
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">n_kv_heads</code> equals <code class="language-plaintext highlighter-rouge">n_heads</code> for plain multi-head attention and is smaller under GQA: the
+cache-size reduction from GQA is exactly the ratio <code class="language-plaintext highlighter-rouge">n_heads / n_kv_heads</code>. Sources: <a href="https://medium.com/@liu.peng.uppsala/key-value-kv-cache-size-calculations-in-grouped-query-attention-gqa-e090d3037ab3">KV-cache/GQA
+sizing writeup</a>,
+<a href="https://pyimagesearch.com/2025/10/06/introduction-to-kv-cache-optimization-using-grouped-query-attention/">PyImageSearch GQA cache guide</a>.</p>
+
+<p><strong>KV cache under Multi-Head Latent Attention (MLA, the DeepSeek-V3/R1 family):</strong> instead of
+caching per-head K and V, MLA caches one shared compressed latent per token per layer:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kv_bytes_per_token = n_layers × (kv_lora_rank + qk_rope_head_dim) × bytes_per_element
+</code></pre></div></div>
+
+<p>No ×2 term: a single latent reconstructs both K and V at inference time. Sources: <a href="https://pyimagesearch.com/2025/10/13/kv-cache-optimization-via-multi-head-latent-attention/">MLA
+KV-cache mechanism</a>,
+<a href="https://medium.com/foundation-models-deep-dive/deepseeks-multi-head-latent-attention-mla-is-shrinking-the-kv-cache-27328f7dda27">DeepSeek MLA overview</a>.</p>
+
+<p><strong>Activation/overhead:</strong> a smaller, less standardized term: attention-kernel scratch space, CUDA
+graph buffers, framework bookkeeping. It doesn’t scale with context the way KV cache does, and it
+isn’t zero either. Budget a few hundred MB to a couple of GB of slack on top of weights + KV cache
+rather than trusting a formula, since it’s framework- and kernel-dependent.</p>
+
+<p><strong>Mixture-of-Experts, the term that changes shape:</strong> <code class="language-plaintext highlighter-rouge">weights_bytes</code> has to be computed from
+<strong>total</strong> parameters, because every expert must be resident in memory (routing is data-dependent:
+any expert might be selected on any token), while compute and throughput track <strong>active</strong>
+parameters only. This is the single biggest thing MoE changes: <strong>capacity sizing uses the big
+number. Speed sizing uses the small number.</strong> Source: <a href="https://huggingface.co/deepseek-ai/DeepSeek-V3">DeepSeek-V3 model card</a>
+(671B total / 37B activated per token).</p>
+
+<blockquote>
+  <p><strong>Key idea</strong>: a 671B-parameter MoE model that activates 37B per token needs VRAM for 671B and
+generates tokens at roughly the speed of a 37B model. Neither number alone describes the model.
+You need both.</p>
+</blockquote>
+
+<h3 id="four-worked-examples">Four worked examples</h3>
+
+<p><strong>1. Llama-3.1-8B, dense, GQA (small).</strong> 32 layers, hidden 4096, 32 heads, 8 KV heads (4:1 GQA),
+head_dim 128. (<a href="https://huggingface.co/unsloth/Meta-Llama-3.1-8B-Instruct">config source</a>)</p>
+<ul>
+  <li>Weights at <code class="language-plaintext highlighter-rouge">Q4_K_M</code> (4.894 bpw): llama.cpp’s own table gives this exact model at <strong>4.58 GiB</strong>.</li>
+  <li>KV cache/token (fp16): <code class="language-plaintext highlighter-rouge">2 × 32 × 8 × 128 × 2 = 131,072 bytes = 128 KiB/token</code>.</li>
+  <li>At 32K context, batch 1: <code class="language-plaintext highlighter-rouge">131,072 × 32,768 = 4,294,967,296 bytes ≈ 4.295 GB = 4.00 GiB</code>.</li>
+  <li><strong>Total ≈ 4.58 + 4.00 + ~1 GiB overhead ≈ 9.6 GiB</strong>: comfortably inside a 32 GiB card, with
+roughly 22 GiB left over for a second concurrently-loaded model, a bigger batch, or a much longer
+context.</li>
+</ul>
+
+<p><strong>2. Qwen2.5-32B, dense, GQA (where a single 32GB card starts to feel it).</strong> 64 layers, hidden
+5120, 40 heads, 8 KV heads (5:1 GQA), head_dim 128, 32.5B params. (<a href="https://huggingface.co/Qwen/Qwen2.5-32B-Instruct">config</a>)</p>
+<ul>
+  <li>Weights at <code class="language-plaintext highlighter-rouge">Q4_K_M</code> (4.894 bpw): <code class="language-plaintext highlighter-rouge">32.5e9 × 4.894 / 8 = 19.88e9 B ≈ 18.5 GiB</code>.</li>
+  <li>KV cache/token (fp16): <code class="language-plaintext highlighter-rouge">2 × 64 × 8 × 128 × 2 = 262,144 bytes = 256 KiB/token</code>.</li>
+  <li>At 32K context, batch 1: <code class="language-plaintext highlighter-rouge">262,144 × 32,768 = 8,589,934,592 bytes ≈ 8.59 GB = 8.00 GiB</code>.</li>
+  <li><strong>Total ≈ 18.5 + 8.0 + ~1 GiB overhead ≈ 27.5 GiB of 32 GiB</strong>: snug but not saturating, at a
+single 32K-context conversation. Quantizing the KV cache to 8-bit (<code class="language-plaintext highlighter-rouge">--cache-type-k q8_0
+--cache-type-v q8_0</code> in llama.cpp) doesn’t cleanly halve it: <code class="language-plaintext highlighter-rouge">q8_0</code> packs 8.5 bits/element (34
+bytes per 32 values) against fp16’s 16. So the cache shrinks to roughly 53% of its size (about
+4.25 GiB), bringing the total to ≈23.75 GiB, real headroom for a bigger batch or a longer
+context. It isn’t free, though: 8-bit KV is measurably lossier than 8-bit weights at the same
+width, and in llama.cpp, quantizing the V-cache specifically requires flash attention to be
+enabled.</li>
+</ul>
+
+<p><strong>3. Llama-3.1-70B, dense, GQA (where a single 32GB card hits a wall).</strong> 80 layers, hidden 8192,
+64 heads, 8 KV heads (8:1 GQA), head_dim 128, 70B params. (<a href="https://huggingface.co/unsloth/Meta-Llama-3.1-70B-Instruct">config</a>)</p>
+<ul>
+  <li>Weights at <code class="language-plaintext highlighter-rouge">Q4_K_M</code> (4.894 bpw): <code class="language-plaintext highlighter-rouge">70e9 × 4.894 / 8 ≈ 42.82e9 B ≈ 39.9 GiB</code>: <strong>already over a
+32 GiB card before any KV cache.</strong> A dense 70B model at Q4 doesn’t fit on this card alone.</li>
+  <li>Dropping to <code class="language-plaintext highlighter-rouge">IQ3_XXS</code> (3.255 bpw): <code class="language-plaintext highlighter-rouge">70e9 × 3.255 / 8 = 28.48e9 B ≈ 26.5 GiB</code>.</li>
+  <li>KV cache/token (fp16): <code class="language-plaintext highlighter-rouge">2 × 80 × 8 × 128 × 2 = 327,680 bytes = 320 KiB/token</code>. At a modest 8K
+context: <code class="language-plaintext highlighter-rouge">327,680 × 8,192 = 2,684,354,560 bytes ≈ 2.68 GB = 2.50 GiB</code>.</li>
+  <li><strong>Total ≈ 26.5 + 2.5 + ~1 GiB overhead ≈ 30.0 GiB of 32 GiB</strong>. Close to the ceiling, but not the
+zero-headroom situation it can look like: roughly 2 GiB spare, worth about 6,500 more tokens of
+context at this KV rate before the card is genuinely full. It’s tighter in practice than that
+math implies: driver and display overhead typically leave only ~31 GiB usable, and real
+<code class="language-plaintext highlighter-rouge">IQ3_XXS</code> 70B GGUF files tend to land nearer 27 GiB than the theoretical 26.5, which eats most of
+that margin back. This quantization level is also past the point <a href="#quantization-quality-where-the-real-cliff-is">the quantization section
+below</a> flags for measurable reasoning-task loss on
+aggressive 3-bit K-quants. The realistic options: a low-bit format specifically tuned for it
+(EXL3, or an I-quant), partial CPU offload of some layers (steep latency cost, see
+<a href="#consumer-hardware-current">below</a>), or treating a dense 70B-class model on one 32GB card as
+workable only at reduced context on an aggressive quant, not a comfortable everyday setup.</li>
+</ul>
+
+<p><strong>4. DeepSeek-V3, MoE + MLA (where the MoE math flips).</strong> 61 layers, hidden 7168, 128 heads, MLA
+with <code class="language-plaintext highlighter-rouge">kv_lora_rank=512</code> and <code class="language-plaintext highlighter-rouge">qk_rope_head_dim=64</code>, 256 routed experts + 1 shared expert, 8 experts
+active per token, 671B total / 37B active. (<a href="https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/config.json">config</a>)</p>
+<ul>
+  <li><strong>Capacity uses total params:</strong> at <code class="language-plaintext highlighter-rouge">Q4_K_M</code>-equivalent (4.894 bpw): <code class="language-plaintext highlighter-rouge">671e9 × 4.894 / 8 ≈ 410.5 GB</code>
+of weights alone. That’s impossible on any single consumer box, and beyond even a 128GB
+unified-memory machine. Even at an aggressive <code class="language-plaintext highlighter-rouge">IQ2_XXS</code> (2.382 bpw): <code class="language-plaintext highlighter-rouge">671e9 × 2.382 / 8 ≈ 199.8 GB</code>:
+still larger than one NVIDIA DGX Spark’s 128GB, but it <em>fits</em> inside the 256GB two networked
+Sparks pool together, in line with NVIDIA’s own stated 405B-parameter envelope for that dual
+configuration (405B at 4-bit ≈ 203GB, essentially the same byte budget as DeepSeek-V3’s 199.8GB
+here). One Spark can’t hold it. Two, pooled, can. (<a href="https://www.nvidia.com/en-us/products/workstations/dgx-spark/">DGX Spark specs</a>)</li>
+  <li><strong>Compute tracks active params (~37B)</strong>: roughly the decode cost of a dense ~37B model, which
+is why DeepSeek-class MoE models generate far faster than their total size implies, <em>if</em> you
+can find enough memory to hold every expert.</li>
+  <li><strong>KV cache under MLA is dramatically smaller than GQA would predict:</strong> <code class="language-plaintext highlighter-rouge">61 × (512+64) × 2 = 70,272
+bytes ≈ 68.6 KB/token</code>. This is independently corroborated by a third-party estimate of roughly 70
+KB/token for DeepSeek-V3 versus 192-328 KB/token for GQA models of comparable class, a 2.7-4.7×
+reduction. (<a href="https://dataturbo.medium.com/deepseek-technical-analysis-2-mla-74bdb87d4ad2">source</a>)
+At 32K context: <code class="language-plaintext highlighter-rouge">68.6 KB × 32,768 ≈ 2.3 GB</code>, smaller than the 70B dense model’s cache at <em>8K</em>
+context in example 3, despite DeepSeek-V3 being roughly 10× larger.</li>
+  <li><strong>Bottom line:</strong> the practical way non-hyperscalers run DeepSeek-class models at all is a
+heavily-quantized (often sub-2-bit-average, mixed-precision) GGUF on a big-RAM CPU+partial-GPU
+rig, not a single 32GB GPU. Total-parameter accounting is unforgiving even though the
+active-parameter compute cost feels cheap. Smaller MoE models (30B-120B total-param class) are
+the realistic MoE tier for a single-GPU desktop or a 128GB unified-memory box.</li>
+</ul>
+
+<figure>
+<svg viewBox="0 0 720 380" role="img" aria-labelledby="dgm-kv-title dgm-kv-desc">
+<title id="dgm-kv-title">KV cache growth vs. context length: GQA versus MLA</title>
+<desc id="dgm-kv-desc">Line chart from 8K to 128K context tokens comparing Llama-3.1-70B's GQA KV cache, which reaches about 43GB at 128K, against DeepSeek-V3's MLA KV cache, which reaches about 9GB at the same context length.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="364" rx="3" />
+<text class="dgm-title" x="28" y="34">KV cache growth: GQA vs. MLA, same context lengths</text>
+
+<line class="dgm-line" x1="50" y1="60" x2="690" y2="60" />
+<text class="dgm-label-sm" x="35" y="64">45GB</text>
+<line class="dgm-line" x1="50" y1="146.7" x2="690" y2="146.7" />
+<text class="dgm-label-sm" x="35" y="150.7">30GB</text>
+<line class="dgm-line" x1="50" y1="233.3" x2="690" y2="233.3" />
+<text class="dgm-label-sm" x="35" y="237.3">15GB</text>
+<line class="dgm-line" x1="50" y1="320" x2="690" y2="320" />
+
+<polyline class="dgm-flow" points="60,304.5 215,289.0 370,257.9 525,195.9 680,71.8" />
+<circle class="dgm-accent" cx="60" cy="304.5" r="4" />
+<circle class="dgm-accent" cx="215" cy="289.0" r="4" />
+<circle class="dgm-accent" cx="370" cy="257.9" r="4" />
+<circle class="dgm-accent" cx="525" cy="195.9" r="4" />
+<circle class="dgm-accent" cx="680" cy="71.8" r="4" />
+
+<polyline class="dgm-line" stroke-dasharray="5 4" points="60,316.7 215,313.3 370,306.7 525,293.4 680,266.8" />
+<circle class="dgm-accent-3" cx="60" cy="316.7" r="4" />
+<circle class="dgm-accent-3" cx="215" cy="313.3" r="4" />
+<circle class="dgm-accent-3" cx="370" cy="306.7" r="4" />
+<circle class="dgm-accent-3" cx="525" cy="293.4" r="4" />
+<circle class="dgm-accent-3" cx="680" cy="266.8" r="4" />
+
+<text class="dgm-label-sm" x="60" y="336" text-anchor="middle">8K</text>
+<text class="dgm-label-sm" x="215" y="336" text-anchor="middle">16K</text>
+<text class="dgm-label-sm" x="370" y="336" text-anchor="middle">32K</text>
+<text class="dgm-label-sm" x="525" y="336" text-anchor="middle">64K</text>
+<text class="dgm-label-sm" x="680" y="336" text-anchor="middle">128K</text>
+
+<circle class="dgm-accent" cx="470" cy="24" r="4" />
+<text class="dgm-label-sm" x="482" y="28">Llama-3.1-70B (GQA, 8 KV heads)</text>
+<circle class="dgm-accent-3" cx="470" cy="42" r="4" />
+<text class="dgm-label-sm" x="482" y="46">DeepSeek-V3 (MLA)</text>
+</svg>
+<figcaption><strong>At the same 128K context, plain GQA needs roughly 43GB of KV cache for a 70B
+model (already more than a 32GB card's total VRAM) while MLA needs roughly 9GB for a model
+about ten times larger.</strong> MLA compresses K and V into one shared latent per token. GQA
+still keeps a per-head cache that grows with every retained KV head.</figcaption>
+</figure>
+
+<figure>
+<svg viewBox="0 0 720 380" role="img" aria-labelledby="dgm-vram-title dgm-vram-desc">
+<title id="dgm-vram-title">VRAM at 32K context across six quant levels, one model</title>
+<desc id="dgm-vram-desc">Stacked bar chart of Qwen2.5-32B's weights plus a fixed 8.0 GiB fp16 KV cache at 32K context, for Q8_0, Q6_K, Q5_K_M, Q4_K_M, Q3_K_M, and IQ2_XXS, against a 32 GiB card ceiling.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="364" rx="3" />
+<text class="dgm-title" x="28" y="34">One model, six quant levels (Qwen2.5-32B, 32K context)</text>
+
+<line class="dgm-line" x1="40" y1="145" x2="660" y2="145" stroke-dasharray="4 3" />
+<text class="dgm-label-sm" x="586" y="140">32 GiB card ceiling</text>
+
+<rect class="dgm-accent" x="50" y="144.1" width="80" height="185.9" />
+<rect class="dgm-accent-3" x="50" y="97.8" width="80" height="46.3" />
+<text class="dgm-mono" x="90" y="92" text-anchor="middle">40.2</text>
+<text class="dgm-label-sm" x="90" y="345" text-anchor="middle">Q8_0</text>
+
+<rect class="dgm-accent" x="154" y="186.4" width="80" height="143.6" />
+<rect class="dgm-accent-3" x="154" y="140.1" width="80" height="46.3" />
+<text class="dgm-mono" x="194" y="134" text-anchor="middle">32.8</text>
+<text class="dgm-label-sm" x="194" y="345" text-anchor="middle">Q6_K</text>
+
+<rect class="dgm-accent" x="258" y="205.2" width="80" height="124.8" />
+<rect class="dgm-accent-3" x="258" y="158.9" width="80" height="46.3" />
+<text class="dgm-mono" x="298" y="153" text-anchor="middle">29.6</text>
+<text class="dgm-label-sm" x="298" y="345" text-anchor="middle">Q5_K_M</text>
+
+<rect class="dgm-accent" x="362" y="223.0" width="80" height="107.0" />
+<rect class="dgm-accent-3" x="362" y="176.7" width="80" height="46.3" />
+<text class="dgm-mono" x="402" y="171" text-anchor="middle">26.5</text>
+<text class="dgm-label-sm" x="402" y="345" text-anchor="middle">Q4_K_M</text>
+
+<rect class="dgm-accent" x="466" y="242.6" width="80" height="87.4" />
+<rect class="dgm-accent-3" x="466" y="196.3" width="80" height="46.3" />
+<text class="dgm-mono" x="506" y="190" text-anchor="middle">23.1</text>
+<text class="dgm-label-sm" x="506" y="345" text-anchor="middle">Q3_K_M</text>
+
+<rect class="dgm-accent" x="570" y="277.9" width="80" height="52.1" />
+<rect class="dgm-accent-3" x="570" y="231.6" width="80" height="46.3" />
+<text class="dgm-mono" x="610" y="226" text-anchor="middle">17.0</text>
+<text class="dgm-label-sm" x="610" y="345" text-anchor="middle">IQ2_XXS</text>
+
+<line class="dgm-line" x1="40" y1="330" x2="660" y2="330" />
+
+<rect class="dgm-accent" x="480" y="20" width="10" height="10" />
+<text class="dgm-label-sm" x="496" y="29">Weights</text>
+<rect class="dgm-accent-3" x="560" y="20" width="10" height="10" />
+<text class="dgm-label-sm" x="576" y="29">KV cache (fp16, 32K ctx)</text>
+</svg>
+<figcaption><strong>Weights dominate at high bit-width. KV cache stays fixed while weights
+shrink.</strong> Bars are GiB, matching this page's unit convention. Values are weights + KV cache
+only. Add roughly a gigabyte of runtime overhead on top of every bar. Q8_0 and Q6_K don't fit
+this model on a 32 GiB card at this context length at all. Q5_K_M clears the bar as drawn but
+turns borderline once that overhead lands, at roughly 30.6 of 32 GiB. Q4_K_M is the comfortable
+middle, matching worked example 2 above.</figcaption>
+</figure>
+
+<figure>
+<svg viewBox="0 0 720 260" role="img" aria-labelledby="dgm-moe-title dgm-moe-desc">
+<title id="dgm-moe-title">MoE capacity vs. compute for DeepSeek-V3</title>
+<desc id="dgm-moe-desc">Two horizontal bars on the same scale: total parameters (671B, what VRAM must hold) versus active parameters per token (37B, what determines throughput).</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="244" rx="3" />
+<text class="dgm-title" x="28" y="34">MoE: capacity and compute read different numbers</text>
+
+<text class="dgm-label" x="90" y="82">VRAM sizing — must hold every expert</text>
+<rect class="dgm-accent-2" x="90" y="90" width="560" height="40" />
+<text class="dgm-mono" x="662" y="115">671B</text>
+
+<text class="dgm-label" x="90" y="152">Compute — only the routed experts run</text>
+<rect class="dgm-ok" x="90" y="160" width="31" height="40" />
+<text class="dgm-mono" x="133" y="185">37B</text>
+</svg>
+<figcaption><strong>DeepSeek-V3 needs VRAM for 671B parameters but only computes ~37B worth of
+work per token</strong>: an 18× gap between what sizes the card and what sets the speed. This is
+why MoE throughput feels far cheaper than the model's footprint implies.</figcaption>
+</figure>
+
+<h2 id="quantization-quality-where-the-real-cliff-is">Quantization quality: where the real cliff is</h2>
+
+<p>The most directly relevant primary source here is a single 2026 arXiv evaluation of 13 llama.cpp
+GGUF formats against Llama-3.1-8B-Instruct at an FP16 baseline (perplexity 7.32). <a href="https://arxiv.org/html/2601.14277v1">Source:
+“Which Quantization Should I Use? A Unified Evaluation of llama.cpp Quantization on
+Llama-3.1-8B-Instruct,” arXiv 2601.14277</a>.</p>
+
+<blockquote>
+  <p><strong>Note</strong>: every specific number in this section traces to that one paper. It hasn’t been
+independently replicated this session. So treat it as <strong>a single 2026 study reports…</strong>, not as
+settled consensus across the field.</p>
+</blockquote>
+
+<p>That study’s perplexity deltas: <code class="language-plaintext highlighter-rouge">Q3_K_S</code> at 8.96 (+1.64 over baseline), <code class="language-plaintext highlighter-rouge">Q4_K_M</code> at 7.56 (+0.24),
+<code class="language-plaintext highlighter-rouge">Q5_0</code> at 7.43 (+0.11), and <code class="language-plaintext highlighter-rouge">Q6_K</code>/<code class="language-plaintext highlighter-rouge">Q8_0</code> at roughly 7.33-7.35 (effectively lossless). But
+perplexity alone is a blunt instrument. Task-level scores tell a sharper story:</p>
+
+<ul>
+  <li><strong>Math reasoning (GSM8K)</strong>, the most sensitive benchmark tested: <code class="language-plaintext highlighter-rouge">Q3_K_S</code> dropped 9.3 points
+(68.31 vs. a 77.63 baseline), while <code class="language-plaintext highlighter-rouge">Q4_K_S</code> recovered to essentially baseline (77.33).</li>
+  <li><strong>Commonsense reasoning (HellaSwag)</strong> stayed flat, 71-73.5, across every format, largely
+quantization-insensitive.</li>
+  <li><strong>Instruction-following (IFEval)</strong> varied non-monotonically: <code class="language-plaintext highlighter-rouge">Q4_K_S</code> actually <em>exceeded</em> FP16
+(80.26 vs. 78.93), a sign that small deltas at moderate quantization are noisy, not a clean curve.</li>
+  <li><strong>Knowledge (MMLU)</strong> showed modest 1-4 point variance, worst at <code class="language-plaintext highlighter-rouge">Q3_K_S</code> (59.31 vs. 63.50).</li>
+</ul>
+
+<p>The paper identifies <strong>3-bit quantization (<code class="language-plaintext highlighter-rouge">Q3_K_S</code> specifically) as the critical degradation
+threshold</strong>, with the largest aggregate loss concentrated there and driven overwhelmingly by the
+math-reasoning collapse rather than broad degradation. It reports <strong>5-bit configurations
+(<code class="language-plaintext highlighter-rouge">Q5_0</code>/<code class="language-plaintext highlighter-rouge">Q5_K_M</code>) as the strongest quality/size trade-off</strong>, in one case slightly exceeding
+aggregate baseline performance at roughly 65% of FP16’s size.</p>
+
+<blockquote>
+  <p><strong>Common trap</strong>: perplexity isn’t a good proxy for coding, agentic tool-use, or multi-step
+reasoning quality, which are exactly the workloads a local coding agent stresses. A quant that
+looks fine on a perplexity chart can still fail at the tasks you actually care about.</p>
+</blockquote>
+
+<p><strong>Practical rule:</strong> <code class="language-plaintext highlighter-rouge">Q4_K_M</code> is a reasonable floor for a model expected to do real reasoning or
+coding work. Treat anything at <code class="language-plaintext highlighter-rouge">Q3</code> or below as a capability cut, not just a fidelity cut, and
+validate task-specific behavior, not just perplexity, before shipping a quant that low.
+Consistent secondary framing: <a href="https://runaihome.com/blog/quantization-q4-q5-q6-q8-quality-loss-2026/">runaihome.com</a>,
+<a href="https://presenc.ai/research/local-llm-quantization-quality-benchmarks-2026">presenc.ai</a>.</p>
+
+<p>For vLLM-side weight-only formats, third-party reporting states <strong>AWQ typically delivers 5-15%
+higher throughput than GPTQ</strong> due to more optimized kernels, with comparable quality at INT4.
+<strong>FP8 on Hopper-class GPUs is described as “near-lossless” with roughly 2× throughput over FP16</strong>,
+though this is a vendor/aggregator characterization, not an independently-run perplexity study, and is
+flagged as such here. Sources: <a href="https://vrlatech.com/llm-quantization-explained-int4-int8-fp8-awq-and-gptq-in-2026/">vLLM quantization performance discussion</a>,
+<a href="https://docs.gpustack.ai/2.0/performance-lab/references/the-impact-of-quantization-on-vllm-inference-performance/">GPUStack quantization writeup</a>.</p>
+
+<h2 id="prompt-and-prefix-caching-locally">Prompt and prefix caching, locally</h2>
+
+<p>This is central to local agent economics: an agent harness resends a large, mostly-unchanged
+system prompt, tool schema, and conversation history on every turn. Without prefix reuse, every
+turn re-pays full prefill cost for that entire prefix.</p>
+
+<p><strong>llama.cpp (<code class="language-plaintext highlighter-rouge">llama-server</code>)</strong> compares each new prompt to the previous completion via
+<code class="language-plaintext highlighter-rouge">cache_prompt</code> (default true) and evaluates only the “unseen” suffix: a longest-common-prefix
+match reusing already-computed KV states. <code class="language-plaintext highlighter-rouge">--cache-ram</code> (default 8192 MiB, <code class="language-plaintext highlighter-rouge">-1</code> = no limit) caps
+host RAM for the mechanism. <code class="language-plaintext highlighter-rouge">--cache-reuse</code> (default 0) sets the minimum chunk size for reuse via
+KV shifting: reusing tokens even after they’ve moved position, which matters when earlier turns
+get truncated or summarized. Source: <a href="https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md">llama.cpp server README</a>.</p>
+
+<p><strong>vLLM’s</strong> Automatic Prefix Caching hashes each KV-cache block by the tokens inside it plus every
+token preceding it, storing blocks in a hash table. A new request sharing a cached prefix reuses
+those blocks directly. Eviction under memory pressure uses LRU that evicts the end of the
+<em>longest</em> prefix chain first, preserving shorter, more broadly-shared prefixes longer. Source:
+<a href="https://docs.vllm.ai/en/stable/design/prefix_caching/">vLLM Automatic Prefix Caching design doc</a>.</p>
+
+<p><strong>SGLang’s RadixAttention</strong> generalizes the same idea into a radix tree shared across <em>all</em>
+requests, not just one session. Third-party benchmarking found its hit rate reaching <strong>71%</strong> on a
+shared-prefix multi-turn workload versus <strong>18%</strong> for vLLM without sticky routing, with
+time-to-first-token dropping from a reported 1.4s to 380ms in that comparison. That’s a third-party
+benchmark, not a vendor claim, and the magnitude will vary by workload, but it’s directionally why
+SGLang gets recommended for shared-system-prompt agent traffic. <a href="https://n4n.ai/blog/benchmarking-sglangs-radixattention-for-multi-turn-chat/">Source</a>.</p>
+
+<p><strong>What breaks the cache, concretely:</strong> any edit to the prompt before its end. Both llama.cpp’s
+longest-common-prefix matching and vLLM/SGLang’s block-hash schemes derive validity from exact
+token-sequence identity up to that point. A single changed token anywhere in the prefix
+invalidates everything after it, even if 99% of the text is unchanged (editing message 2 of a
+50-message history invalidates the cache for messages 3-50). Also, non-deterministic content
+injected early (timestamps, random IDs, templating that varies an otherwise-static system prompt)
+defeats caching for the whole prefix. Context-shift/eviction (llama.cpp) discards older tokens’
+KV state, so a later request that needs them re-pays full prefill. Cache pressure under
+<code class="language-plaintext highlighter-rouge">--cache-ram</code> limits or vLLM block-eviction can also thrash a cold multi-tenant workload faster than
+it’s populated.</p>
+
+<p><strong>Practical rule:</strong> keep the shared prefix (system prompt, tool schemas, few-shot scaffolding)
+byte-identical and append-only for as long as possible. Put anything that changes per call as late
+in the prompt as the API allows. That keeps the invalidated region as small as possible, instead
+of wiping out the whole prefix.</p>
+
+<p>DokiDex’s own agent sessions measure <strong>92-99% of each turn’s prefill served from cache</strong>, because
+every turn resends a history that’s identical except for the tail, documented in the <a href="/projects/dokidex/handbook/03-serving.html">serving
+chapter of the engineering handbook</a>. That
+number is the reason a local agent stack can feel responsive turn-to-turn despite resending its
+entire context every time.</p>
+
+<figure>
+<svg viewBox="0 0 720 340" role="img" aria-labelledby="dgm-cache-title dgm-cache-desc">
+<title id="dgm-cache-title">Prefix-cache reuse across a session, until something edits history</title>
+<desc id="dgm-cache-desc">Schematic bar chart across six turns of an agent session: cache-hit tokens grow each turn while new tokens stay small, until turn 5 where a mid-history edit forces a full re-prefill, after which the pattern resumes from the new baseline.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="324" rx="3" />
+<text class="dgm-title" x="28" y="34">Illustrative session (schematic, not measured turn-by-turn)</text>
+
+<rect class="dgm-accent-2" x="60" y="180" width="80" height="120" />
+<text class="dgm-label-sm" x="100" y="316" text-anchor="middle">Turn 1</text>
+
+<rect class="dgm-ok" x="160" y="180" width="80" height="120" />
+<rect class="dgm-accent-2" x="160" y="156" width="80" height="24" />
+<text class="dgm-label-sm" x="200" y="316" text-anchor="middle">Turn 2</text>
+
+<rect class="dgm-ok" x="260" y="156" width="80" height="144" />
+<rect class="dgm-accent-2" x="260" y="132" width="80" height="24" />
+<text class="dgm-label-sm" x="300" y="316" text-anchor="middle">Turn 3</text>
+
+<rect class="dgm-ok" x="360" y="132" width="80" height="168" />
+<rect class="dgm-accent-2" x="360" y="108" width="80" height="24" />
+<text class="dgm-label-sm" x="400" y="316" text-anchor="middle">Turn 4</text>
+
+<rect class="dgm-accent-3" x="460" y="108" width="80" height="192" />
+<text class="dgm-label-sm" x="500" y="98" text-anchor="middle">history edited</text>
+<text class="dgm-label-sm" x="500" y="316" text-anchor="middle">Turn 5</text>
+
+<rect class="dgm-ok" x="560" y="108" width="80" height="192" />
+<rect class="dgm-accent-2" x="560" y="84" width="80" height="24" />
+<text class="dgm-label-sm" x="600" y="316" text-anchor="middle">Turn 6</text>
+
+<line class="dgm-line" x1="50" y1="300" x2="650" y2="300" />
+
+<rect class="dgm-ok" x="440" y="20" width="10" height="10" />
+<text class="dgm-label-sm" x="456" y="29">reused (cache hit)</text>
+<rect class="dgm-accent-2" x="560" y="20" width="10" height="10" />
+<text class="dgm-label-sm" x="576" y="29">new tokens (miss)</text>
+</svg>
+<figcaption><strong>An append-only prefix keeps the miss sliver small every turn. Editing earlier
+history forces a full-cost turn.</strong> This diagram is illustrative, scaled for legibility, not
+a measured trace. The real, measured aggregate figure on this stack is 92-99% prefill reuse per
+turn (source linked above).</figcaption>
+</figure>
+
+<h2 id="speculative-decoding-and-draft-models">Speculative decoding and draft models</h2>
+
+<p>A small, fast “draft” model proposes several tokens ahead. The large “target” model verifies them
+in a single batched forward pass, accepting the longest correct prefix and discarding the rest.
+Because verification is exact, a correctly-implemented speculative decoder produces the <em>same</em>
+output distribution as the target model alone. It changes speed, not quality, by construction.
+Net speedup depends on the draft’s per-token acceptance rate and how many tokens get speculated
+per round.</p>
+
+<p>Third-party benchmarks (not vendor marketing): at an acceptance rate ≥0.6 with ≥5 speculated
+tokens, <strong>2-3× speedups</strong> over baseline autoregressive decoding are reported as the general
+pattern. Specific figures: <strong>Llama-3.1-70B with a 1B draft model, 2.31× on vLLM</strong>, and <strong>Llama-3.1-8B
+on a single A100, 1.8×</strong>. On llama.cpp/Apple Silicon, one reported case reached <strong>3.2× (64 → 206
+tok/s)</strong>, with a general cited range of <strong>1.5-3×</strong> depending on acceptance rate. Sources:
+<a href="https://www.spheron.network/blog/speculative-decoding-production-guide/">speculative decoding production guide</a>,
+<a href="https://bentoml.com/llm/inference-optimization/speculative-decoding">BentoML overview</a>,
+<a href="https://hiesch.eu/blog/llamacpp-benchmarks-speculative-decoding/">llama.cpp Apple Silicon benchmarks</a>.</p>
+
+<p>Newer method variants (EAGLE-family, PARD-2) claim larger gains: one source reports 4-5× over
+standard decoding, and NVIDIA reports 3.6× on H200 with its own method. Read these as upper bounds
+under favorable conditions, not typical desktop-GGUF results. <a href="https://arxiv.org/pdf/2605.08632">Source</a>.</p>
+
+<p><strong>When it actually buys you something on a single desktop GPU:</strong></p>
+<ul>
+  <li><strong>Best case:</strong> low-temperature, deterministic-leaning tasks (code completion, structured
+output, translation) where a small same-family draft model (sharing a tokenizer with the
+target) agrees with the target most of the time.</li>
+  <li><strong>Worst case:</strong> creative, high-temperature generation, where the draft’s guesses are frequently
+wrong and acceptance rate collapses. At that point the extra draft-model forward passes are
+pure overhead, and speculative decoding can be a net <em>slowdown</em>. One production write-up notes
+real-world acceptance rates were “likely in the 0.6-0.8 range, not the near-perfect values used
+in theory.” Plan around the low end, not the demo numbers.</li>
+  <li><strong>VRAM cost:</strong> the draft model needs to be resident alongside the target, on a 32GB card
+competing with a large target model’s weights and KV cache. That’s a real constraint, and
+exactly the “small model always warm” use case llama-swap’s <code class="language-plaintext highlighter-rouge">groups</code> feature is built for.</li>
+</ul>
+
+<h2 id="consumer-hardware-current">Consumer hardware, current</h2>
+
+<blockquote>
+  <p><strong>Warning</strong>: GPU and mini-PC prices move fast and vary heavily by retailer. Everything below is
+reported as of mid-2026. Treat it as directional, not as a quote.</p>
+</blockquote>
+
+<p><strong>Discrete NVIDIA GPUs.</strong> The RTX 5090 (32GB GDDR7, ~1.79 TB/s, 575W) launched at $1,999 in
+January 2025. Mid-2026 street prices are reported as high as $4,000-$8,000+, one tracker citing
+“$4,329, topping $5,000 for premium cards,” attributed to GDDR7 memory cost inflation (~15-20%
+quarter-over-quarter by Q2 2026) as AI demand drains global memory supply. So the VRAM-heavy card
+is disproportionately exposed to a memory-market shock. Sources: <a href="https://www.runpod.io/articles/guides/nvidia-rtx-5090">RTX 5090 pricing analysis</a>,
+<a href="https://www.pgrid.app/us/gpus/geforce-rtx-5090">pricing guide</a>. The workstation <strong>RTX PRO 6000
+Blackwell</strong> (96GB GDDR7 ECC, 1,792 GB/s, 600W) sidesteps the ceiling entirely, at a price NVIDIA’s
+<a href="https://www.nvidia.com/en-us/products/workstations/professional-desktop-gpus/rtx-pro-6000/">own product page</a>
+didn’t disclose this session. RTX 5080/5070 Ti/5070 are commonly cited at 16/16/12GB but weren’t
+re-confirmed against a live spec page. Treat cautiously. A used RTX 3090 (24GB) is a commonly-
+cited budget option with no confirmed current price.</p>
+
+<p><strong>Multi-GPU:</strong> NVIDIA removed NVLink from GeForce starting with the 40-series. The last consumer
+cards that have it are the <strong>RTX 3090 and 3090 Ti</strong>, where NVIDIA’s own spec table lists
+“NVIDIA NVLink (SLI-Ready): Yes” and the GA102 whitepaper gives 112.5 GB/s of total bandwidth
+between two GPUs. Compare that against a PCIe 4.0 x16 slot’s 64 GB/s and it’s about 1.76x, not the
+3.5x you get by accidentally comparing an aggregate figure against a one-direction one. The 4090
+and 5090 spec pages both say “No”, so a pair of those talks over PCIe only.</p>
+
+<p>Either way, the interconnect matters less than it sounds. It’s only the bottleneck for
+tensor-parallel or row-split serving, which does cross-GPU reductions on every layer. The usual
+default, splitting layers across cards, barely touches the link at all. llama.cpp also gates
+peer-to-peer behind a <code class="language-plaintext highlighter-rouge">GGML_CUDA_P2P</code> opt-in and warns that driver support is usually restricted to
+workstation and datacenter cards, and there are unresolved reports of 3090 peer-to-peer reading as
+present but inactive. So on a desktop, multi-GPU mainly buys aggregate VRAM (two 5090s pool to
+64GB), not proportionally faster single-stream generation.</p>
+
+<p><strong>Apple Silicon (unified memory).</strong> Mac Studio M4 Max ships 410-546 GB/s depending on
+configuration, starting at 36GB. M3 Ultra reaches 819 GB/s, starting at 96GB. Secondary trackers
+report Apple pulled the 512GB configuration in March 2026 and the 256GB configuration in May 2026,
+both attributed to the memory-chip shortage. But neither cut is confirmed on Apple’s own product
+page. So treat the resulting ceiling as unsettled rather than assuming a specific number
+(<a href="/projects/dokidex/state-of-ai/">State of AI</a> covers the supply picture behind it).
+<a href="https://www.apple.com/mac-studio/specs/">Apple specs</a>.
+The advantage is architectural, not just bandwidth: CPU and GPU share physical memory with
+zero-copy access, skipping the PCIe transfer a discrete-GPU system pays every time, and since
+decode is memory-bandwidth-bound, bandwidth predicts tokens/sec more than capacity does. A
+third-party comparison reports the M3 Ultra at up to 23× more tokens-per-joule than an RTX 5090,
+an efficiency claim, not a speed one. The 5090’s ~1.79 TB/s is still over double the M3 Ultra’s
+819 GB/s in absolute terms. <a href="https://mljourney.com/apple-silicon-for-llms-m3-vs-m4-max-vs-m4-ultra-benchmarks-and-real-world-performance/">Source</a>,
+third-party-reported. Mac Studio pricing wasn’t captured with confidence this session.</p>
+
+<p><strong>Strix Halo / AMD Ryzen AI Max class.</strong> The Ryzen AI Max+ 395 pairs a 16-core Zen 5 CPU, a 40-CU
+Radeon 8060S iGPU, and an XDNA 2 NPU sharing up to 128GB of LPDDR5X on a 256-bit bus: theoretical
+256 GB/s, real-world ~212-215 GB/s, roughly 115-120GB usable after OS reservation. Reported
+throughput: MoE models in the 30B-120B range at 50-70+ tok/s, and the platform can <em>load</em> (not
+necessarily run fast) models up to ~200B params, beyond any single consumer discrete GPU. Mini-PCs
+on this chip are reported at $1,499-$1,999, undercutting a comparable Mac Studio by roughly 3×.
+Chip identity is corroborated by <a href="https://www.amd.com/en/developer/resources/technical-articles/2025/amd-ryzen-ai-max-395--a-leap-forward-in-generative-ai-performanc.html">AMD’s developer article</a>.
+Throughput/price figures are third-party blog reporting.</p>
+
+<p><strong>DGX Spark class.</strong> NVIDIA’s DGX Spark (GB10 Grace Blackwell Superchip) packs 128GB LPDDR5x
+unified memory, 273 GB/s bandwidth, up to 1 PFLOP FP4, a 20-core Grace ARM CPU, and ConnectX-7 for
+networking two units: NVIDIA states dual-configuration support up to 405B params, <em>below</em>
+DeepSeek-V3’s 671B from worked example 4. Price is reported at $4,699 as of mid-2026, up from an
+initial $3,999, though not disclosed on NVIDIA’s own pages this session. <a href="https://www.nvidia.com/en-us/products/workstations/dgx-spark/">Specs</a>,
+<a href="https://intuitionlabs.ai/articles/nvidia-dgx-spark-review">price reporting</a>. The tension is in
+its own spec sheet: huge FP4 compute paired with modest bandwidth: strong at prefill-heavy work
+(batch, long-document ingestion), bandwidth-limited on the token-by-token decode that dominates
+chat latency, similar in kind to Strix Halo’s ceiling.</p>
+
+<p><strong>CPU offload.</strong> llama.cpp’s <code class="language-plaintext highlighter-rouge">--n-gpu-layers</code> splits layers between VRAM and system RAM when a
+model doesn’t fit in VRAM alone: the mechanism behind worked example 3’s “barely fits at IQ3”
+surviving even when it doesn’t quite fit. The cost is steep: CPU-executed layers are bottlenecked
+by system-RAM bandwidth (tens of GB/s on DDR5) versus the GPU’s ~1.79 TB/s, plus a PCIe round-trip
+per layer. Treat this as a capability-of-last-resort lever, not a sizing strategy (no single
+verified per-layer multiplier is given here, since it’s too hardware- and model-specific), and
+prefer fitting fully in VRAM at a lower quant when that’s available.</p>
+
+<h2 id="where-local-genuinely-wins-and-where-a-frontier-api-wins-outright">Where local genuinely wins, and where a frontier API wins outright</h2>
+
+<p>No local-maximalist framing here: the gap is real in both directions, and it’s workload-shaped,
+not model-shaped.</p>
+
+<p><strong>Where local wins outright:</strong></p>
+<ul>
+  <li><strong>Bulk, well-specified tasks</strong>: classification, extraction, semantic search, RAG retrieval,
+summarization at scale. Third-party pricing analysis notes open-weight models “trail frontier
+models on hard reasoning, agentic tool use, and frontier-grade coding” but are “dramatically
+cheaper… sometimes by 10-100×,” with an imperceptible quality gap for these task shapes.
+Sources: <a href="https://www.cloudzero.com/blog/llm-api-pricing-comparison/">CloudZero</a>,
+<a href="https://inference.net/content/llm-api-pricing-comparison/">inference.net</a>.</li>
+  <li><strong>Latency-critical loops with no network round-trip tolerance</strong>: no WAN hop, no provider
+queueing, no rate-limit backoff. For tight tool-use loops this can dominate wall-clock time
+regardless of raw tokens/sec.</li>
+  <li><strong>Anything where the data can’t leave the machine.</strong> The one argument here with no break-even
+point: if the requirement is “this data must never be sent to a third party,” no amount of API
+cost efficiency substitutes for it.</li>
+  <li><strong>Sustained, high-volume usage against a sunk hardware cost</strong>: once the GPU is bought,
+additional tokens are close to free, which favors local specifically for heavy ongoing usage,
+not occasional use.</li>
+</ul>
+
+<p><strong>Where a frontier API still wins outright:</strong></p>
+<ul>
+  <li><strong>Hard reasoning, agentic tool-use, and frontier-grade coding.</strong> The direction is consistent
+across every source touched for this page, including Artificial Analysis’s own <a href="https://artificialanalysis.ai/models/open-source">open-source
+leaderboard</a>, which shows its strongest
+open-weight models (GLM-5.2 at Intelligence Index 51, MiniMax-M3 and DeepSeek V4 Pro at 44)
+without a directly comparable closed-model score extractable from that page. The qualitative
+direction is stated here, not a specific numeric gap.</li>
+  <li><strong>Novel, one-off hard problems</strong>, where a bigger frontier model’s ceiling matters more than
+per-token cost: the API cost of one hard query is trivial regardless of provider.</li>
+  <li><strong>Multimodal and agentic breadth</strong> (computer use, complex tool orchestration, very long-context
+reasoning) where frontier providers ship capabilities without a mature local equivalent yet.</li>
+  <li><strong>Zero-maintenance reliability</strong>: no GPU driver issues, no VRAM OOM, no model-swap latency, no
+“which quant of which fork” decision fatigue.</li>
+</ul>
+
+<p><strong>The cost argument, precisely, not as a slogan.</strong> Local cost is hardware amortization plus
+electricity, roughly fixed regardless of volume above the idle floor. API cost is linear per token
+with zero fixed cost. As one illustration, using Anthropic’s published pricing (as of July 2026):
+Claude Sonnet 5 at an introductory $2/$10 per MTok input/output through August 31, 2026, moving to
+$3/$15 standard from September 1. Haiku 4.5 at $1/$5. Opus 5 at $5/$25. <a href="https://platform.claude.com/docs/en/about-claude/pricing">Anthropic pricing docs</a>.
+A workload of 50M input + 10M output tokens/month at Sonnet 5’s post-September rate costs
+<code class="language-plaintext highlighter-rouge">50 × $3 + 10 × $15 = $300/month</code>. Payback is against the <strong>card itself</strong>, not a markup over MSRP.
+Using this page’s own cited street prices, that’s <code class="language-plaintext highlighter-rouge">$4,329 / $300 ≈ 14.4 months</code>. At the top of the
+cited $4,000-$8,000+ range, it stretches to <code class="language-plaintext highlighter-rouge">$8,000 / $300 ≈ 26.7 months</code>, roughly <strong>1.2 to 2.2
+years</strong> to break even, before counting the 575W of extra electricity draw the card carries. That
+payback holds <strong>if and only if the local model actually meets the task’s quality bar.</strong> That
+condition carries the whole argument. At lower volumes, or for task classes only a frontier model
+can do, the API’s zero-fixed-cost structure wins outright. A hardware purchase isn’t justified
+on cost alone in that case. The same caveat covers multi-user or bursty-concurrency workloads,
+where a single desktop GPU’s fixed throughput ceiling is the bottleneck against an API’s elastic
+capacity, and rapidly-improving-model workloads, where a purchased GPU is a sunk cost against an
+API price curve that keeps falling.</p>
+
+<h2 id="fine-tuning-locally-lora-and-qlora-in-practice">Fine-tuning locally: LoRA and QLoRA in practice</h2>
+
+<p><strong>LoRA</strong> freezes the base model’s weights and trains small low-rank adapter matrices injected into
+attention/MLP layers. <strong>QLoRA</strong> additionally loads the frozen base model in 4-bit (typically NF4)
+while keeping the trainable adapters in higher precision, cutting base-model memory further at a
+small compute cost from the dequantize-on-the-fly step.</p>
+
+<p><strong>VRAM and cost, current figures (third-party/vendor-blog reporting, not independently re-derived).</strong>
+QLoRA fine-tuning of Llama-3.1-8B needs roughly <strong>10GB VRAM</strong>, fitting a 24GB card (RTX 4090/3090)
+with headroom. Full fine-tuning of the same model is reported at ~69GB versus LoRA’s ~18GB, a gap
+large enough to be the whole reason consumer-GPU fine-tuning of this model class is viable at all.
+A 24GB-class card is reported viable for QLoRA on 7B models at batch size 4-8 and 13B models at
+2-4. A 32GB card implies meaningful headroom above that baseline (QLoRA through the 30B-class
+dense range should fit), though no source gave 32GB-specific figures directly. Treat the 24GB
+numbers as a conservative lower bound. On cost: a LoRA fine-tune of Llama-3.1-8B on a 50K-sample
+dataset on a rented RTX 4090 is reported at $2.64-$3.96, QLoRA at $1.76-$2.64, roughly 6-13×
+cheaper than full fine-tuning, needing ~6× less VRAM, for a reported 1-3% quality trade-off on most
+benchmarks. On owned hardware the marginal cost is just electricity for a few GPU-hours, since the
+card is already sunk. Sources: <a href="https://www.spheron.network/blog/gpu-vram-requirements-fine-tune-llm-2026/">VRAM sizing guide</a>,
+<a href="https://lyceum.technology/magazine/lora-vs-full-fine-tuning-memory-cost/">LoRA vs full fine-tune memory</a>,
+<a href="https://www.compute-market.com/blog/best-gpu-for-fine-tuning-llm-2026">GPU-for-fine-tuning guide</a>,
+<a href="https://www.stratagem-systems.com/blog/lora-fine-tuning-cost-analysis-2026">cost analysis</a>.</p>
+
+<p><strong>When fine-tuning beats prompting or RAG</strong> (a synthesis judgment call, flagged as such rather
+than a single sourced fact): fine-tuning wins for a consistent, low-variance output format, style,
+or voice across huge volumes of near-identical requests. It also wins when the target is a
+<em>behavior pattern</em> (a tone, a decision policy, a classification boundary) rather than a
+retrievable fact.</p>
+
+<p>RAG or prompting wins in the opposite cases: when the underlying facts change over time
+(fine-tuning bakes in a snapshot that goes stale), when the answer needs to cite specific
+documents, or when iteration speed matters more than steady-state efficiency. A prompt change is
+instant and free. A fine-tune run is a QLoRA job plus an eval cycle, even at the cheap end above.</p>
+
+<p>For an agent/coding-tool stack, the strongest fine-tuning case is a narrow, high-volume sub-task
+inside the loop (a classification or routing step, a consistent tool-call format), not the agent’s
+core reasoning. The local-vs-frontier gap above argues for a bigger local model or a frontier call
+there, not a fine-tuned small model pretending to reason.</p>
+
+<hr />
+
+<p>The throughline across all of this: a local stack is a series of explicit trade-offs, bits per
+weight against task quality, KV cache size against context length, one resident model against
+several, hardware cost against per-token API cost. Every one of them is arithmetic you can do
+yourself with the formulas above. What you build on top of a serving stack like this (the agent
+loop, the tool calls, the approval model) is the <a href="/projects/dokidex/learn/agents/">next page</a>.</p>
+
+    </article>
+
+    
+    <nav class="pager" aria-label="Page navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/learn/benchmarks/">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">Benchmarks</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/learn/agents/">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">Coding agents</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="site-footer">
+  <div class="footer-main">
+    <p class="footer-line">
+      <strong>DokiDex</strong> v0.62.0:
+      a fully-local AI stack, and a field guide to the machines it runs on.
+    </p>
+    <p class="footer-line footer-dim">
+      Everything on this site is written against the real tree and the measured record. Where a
+      claim is a number, it was measured or sourced. Where it was a judgment call, the reasoning
+      is stated inline. Stale statements are bugs. File them like bugs.
+    </p>
+  </div>
+
+  <div class="footer-links">
+    <a href="/projects/dokidex/local-cli/">Run the CLIs</a>
+    <a href="/projects/dokidex/handbook/">Handbook</a>
+    <a href="/projects/dokidex/reference/">Quick reference</a>
+    <a href="/projects/dokidex/glossary/">Glossary</a>
+    <!-- Deliberately understated: last item in the row, same weight as the rest, no colour,
+         no badge, no image beacon. The ask was "inconspicuous". -->
+    <a class="footer-kofi" href="https://ko-fi.com/dougfessler" rel="noopener">Buy me a coffee</a>
+  </div>
+</footer>
+
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/dokidex.js"></script>
+</body>
+</html>

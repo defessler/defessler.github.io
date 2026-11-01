@@ -1,0 +1,629 @@
+/* DokiDex Handbook — "Astral Foundry" design system.
+   Contract: docs/handbook-site-design.md. Every color is a custom property from the
+   :root block below — no raw hex anywhere past this point. Original CSS, no framework. */
+
+:root {
+  /* ---- surfaces ---- */
+  --void:    #070b12;
+  --void-2:  #0d1420;
+  --panel:   rgba(18, 26, 40, .5);
+  --line:    rgba(122, 160, 210, .16);
+
+  /* ---- accents (discipline: one dominates per section — see prose rules below) ---- */
+  --cerulean: #00ACEB;
+  --pink:     #FF69B4;
+  --ember:    #FF8A50;
+  --ok:       #4CC38A;
+
+  /* ---- text ---- */
+  --ink:     #E6EEF6;
+  --ink-2:   #AFBDD1;
+  --ink-dim: #7E8C99;
+  /* Verified: --ink-dim on --void = 5.72:1 (WCAG relative-luminance formula, own calc,
+     not a library) — clears AA 4.5:1 for normal text with margin. No brighten needed. */
+
+  /* ---- type ---- */
+  --f-arcane:  'Marcellus', Georgia, serif;
+  --f-display: 'Kanit', 'Segoe UI', sans-serif;
+  --f-mono:    'IBM Plex Mono', 'Consolas', monospace;
+  --f-body:    'Figtree', 'Segoe UI', sans-serif;
+
+  /* ---- motion ---- */
+  --ease-charge: cubic-bezier(.2, .7, .2, 1);
+
+  /* ---- layout ---- */
+  --sidebar-w: 17rem;
+  --content-w: 46rem;
+}
+
+/* ============================== reset + base ============================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { color-scheme: dark; }
+body {
+  margin: 0;
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+img, svg, canvas { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: var(--void-2);
+  color: var(--ink);
+  padding: .6rem 1rem;
+  border: 1px solid var(--line);
+  z-index: 100;
+}
+.skip-link:focus { left: .5rem; top: .5rem; }
+
+/* ============================== kicker + power word ============================== */
+
+.kicker {
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: .78rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin: 0 0 .9rem;
+}
+.nav-kicker {
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: .68rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  display: block;
+}
+
+/* Marcellus is display-scale only, once per page — never body, nav, or twice-used. */
+.power-word {
+  font-family: var(--f-arcane);
+  font-weight: 400;
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  line-height: 1;
+  color: var(--ink);
+  margin: 0 0 .3rem;
+  letter-spacing: .01em;
+}
+
+/* ============================== shell layout ============================== */
+
+/* .sidebar is position:fixed (out of flow), so the second column is reserved with a
+   plain margin-left on .main rather than a grid track — a fixed child doesn't reliably
+   size a grid track across browsers. */
+.shell {
+  min-height: 100vh;
+}
+
+.topbar {
+  display: none;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-w);
+  overflow-y: auto;
+  padding: 1.75rem 1.25rem;
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  backdrop-filter: blur(10px);
+}
+.sidebar-title {
+  display: block;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 1.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.nav-item { margin: 0; }
+.nav-link {
+  display: block;
+  padding: .55rem .6rem;
+  margin: 0 -0.6rem;
+  border-radius: 3px;
+  border-left: 2px solid transparent;
+  transition: background-color .2s var(--ease-charge), border-color .2s var(--ease-charge);
+}
+.nav-link:hover { background: rgba(122, 160, 210, .07); }
+.nav-link.is-active {
+  border-left-color: var(--cerulean);
+  background: rgba(0, 172, 235, .08);
+}
+.nav-link.is-active .nav-title,
+.nav-link.is-active .nav-kicker { color: var(--cerulean); }
+.nav-title {
+  display: block;
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: .92rem;
+  color: var(--ink-2);
+  margin-top: .15rem;
+}
+
+.main {
+  margin-left: var(--sidebar-w);
+  min-width: 0;
+  padding: 0 2rem 4rem;
+}
+
+/* ============================== hero band (chapter) ============================== */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 3.5rem 0 2.5rem;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid var(--line);
+}
+.hero .token-stream {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: var(--content-w);
+}
+.hero-title {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  color: var(--ink);
+  margin: 0 0 .6rem;
+}
+.hero-desc {
+  font-family: var(--f-body);
+  font-weight: 400;
+  color: var(--ink-2);
+  font-size: 1.05rem;
+  max-width: 38rem;
+  margin: 0;
+}
+
+/* ============================== prose ============================== */
+
+.prose {
+  max-width: var(--content-w);
+}
+.prose > * + * { margin-top: 1.25rem; }
+.prose p {
+  color: var(--ink-2);
+  line-height: 1.75;
+}
+.prose h2 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--ink);
+  margin-top: 2.75rem;
+  padding-top: .25rem;
+}
+.prose h3 {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--ink);
+  margin-top: 2rem;
+}
+.prose h2:first-child, .prose h3:first-child { margin-top: 0; }
+.prose ul, .prose ol {
+  color: var(--ink-2);
+  padding-left: 1.4rem;
+  line-height: 1.75;
+}
+.prose li + li { margin-top: .35rem; }
+.prose strong { color: var(--ink); font-weight: 600; }
+.prose em { font-style: italic; }
+.prose a {
+  color: var(--cerulean);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color .2s var(--ease-charge);
+}
+.prose a:hover, .prose a:focus-visible { border-bottom-color: var(--cerulean); }
+
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 2.5rem 0;
+}
+
+.prose blockquote {
+  margin: 0;
+  padding: .1rem 0 .1rem 1.1rem;
+  border-left: 2px solid var(--line);
+  color: var(--ink-2);
+  font-style: italic;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--f-mono);
+  font-size: .88rem;
+}
+.prose th, .prose td {
+  border: 1px solid var(--line);
+  padding: .55rem .75rem;
+  text-align: left;
+  color: var(--ink-2);
+}
+.prose th {
+  font-family: var(--f-display);
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--void-2);
+}
+
+/* inline code */
+.prose code {
+  font-family: var(--f-mono);
+  font-size: .88em;
+  background: var(--void-2);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: .1em .35em;
+  color: var(--ink-2);
+}
+
+/* ============================== terminal frames (fenced code) ============================== */
+/* kramdown only wraps a fenced block in div.highlighter-rouge > div.highlight when it has a
+   ```language tag (routing it through Rouge); a plain ``` fence — what every chapter in this
+   handbook actually uses today — renders as bare <pre><code>, no wrapper at all. The frame is
+   therefore drawn on `pre` itself so both shapes get identical chrome; any wrapping div from
+   the tagged case is reset to a transparent pass-through rather than a second box. */
+
+.prose div.highlighter-rouge,
+.prose div.highlight {
+  margin: 0;
+}
+
+.prose pre {
+  position: relative;
+  margin: 0;
+  background: var(--void-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 2rem 1.1rem 1.1rem;
+  overflow-x: auto;
+  font-family: var(--f-mono);
+  font-size: .86rem;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+/* chrome bar: flat rectangle at the top, radius-matched so it aligns with `pre` without
+   needing overflow:hidden (which would also clip horizontal code scrolling) */
+.prose pre::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2rem;
+  background: rgba(122, 160, 210, .05);
+  border-bottom: 1px solid var(--line);
+  border-radius: 6px 6px 0 0;
+}
+/* three dim dots, drawn as a repeating radial gradient so no extra markup is needed */
+.prose pre::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: .9rem;
+  width: 4.2rem;
+  height: 2rem;
+  background-image:
+    radial-gradient(circle, var(--ink-dim) 3px, transparent 3.5px),
+    radial-gradient(circle, var(--ink-dim) 3px, transparent 3.5px),
+    radial-gradient(circle, var(--ink-dim) 3px, transparent 3.5px);
+  background-position: 0 50%, 1.3rem 50%, 2.6rem 50%;
+  background-repeat: no-repeat;
+  opacity: .55;
+  pointer-events: none;
+}
+.prose pre code {
+  position: relative;
+  display: block;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 1em;
+  color: inherit;
+}
+
+/* Rouge token palette — restrained, one dominant accent (cerulean), pink used rarely
+   for numeric literals only, ember withheld entirely (reserved for the backdrop/model-swap
+   motif, not code voice). Everything unlisted falls back to --ink-2. */
+.prose .highlight .c, .prose .highlight .c1, .prose .highlight .cm, .prose .highlight .cp { color: var(--ink-dim); font-style: italic; }
+.prose .highlight .k, .prose .highlight .kd, .prose .highlight .kn,
+.prose .highlight .kr, .prose .highlight .kt, .prose .highlight .kc { color: var(--cerulean); }
+.prose .highlight .s, .prose .highlight .s1, .prose .highlight .s2,
+.prose .highlight .sb, .prose .highlight .sc, .prose .highlight .sd,
+.prose .highlight .se, .prose .highlight .sh, .prose .highlight .si,
+.prose .highlight .sx, .prose .highlight .ss { color: var(--cerulean); opacity: .85; }
+.prose .highlight .mi, .prose .highlight .mf, .prose .highlight .il, .prose .highlight .m { color: var(--pink); }
+.prose .highlight .nf, .prose .highlight .nc, .prose .highlight .nn { color: var(--ink); }
+.prose .highlight .o, .prose .highlight .p { color: var(--ink-dim); }
+.prose .highlight .err { color: var(--pink); background: none; }
+
+/* ============================== reveal-on-scroll ============================== */
+/* Base state: fully visible, no animation — reduced-motion users (and any browser where
+   the observer never runs) always see content. The hidden/animated state only exists
+   inside the no-preference media query, per the design contract's "no exceptions" rule. */
+.reveal-up { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal-up {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity .6s var(--ease-charge), transform .6s var(--ease-charge);
+  }
+  .reveal-up.is-visible { opacity: 1; transform: none; }
+}
+
+/* ============================== chapter pager + statusline ============================== */
+
+.chapter-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  max-width: var(--content-w);
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+.pager-link {
+  flex: 1;
+  padding: .9rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  transition: border-color .2s var(--ease-charge), box-shadow .2s var(--ease-charge);
+}
+.pager-link:not(.pager-empty):hover {
+  border-color: var(--cerulean);
+  box-shadow: inset 0 0 0 1px rgba(0, 172, 235, .25);
+}
+.pager-next { text-align: right; }
+.pager-label {
+  display: block;
+  font-family: var(--f-display);
+  font-size: .7rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.pager-title {
+  display: block;
+  font-family: var(--f-display);
+  font-weight: 600;
+  color: var(--ink-2);
+  margin-top: .25rem;
+}
+
+.statusline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  max-width: var(--content-w);
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  font-family: var(--f-mono);
+  font-size: .78rem;
+  color: var(--ink-dim);
+}
+.statusline-sep { opacity: .6; }
+
+/* ============================== home layout ============================== */
+
+.main-home {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+
+.home-hero {
+  position: relative;
+  overflow: hidden;
+  min-height: 72vh;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+}
+.home-hero .token-stream {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.home-hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 2rem;
+  width: 100%;
+}
+.power-word-home { font-size: clamp(3.5rem, 10vw, 8rem); }
+.home-title {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(1.3rem, 2.4vw, 1.75rem);
+  color: var(--ink-2);
+  margin: 0;
+  letter-spacing: .01em;
+}
+
+.home-content {
+  max-width: var(--content-w);
+  margin: 3.5rem auto 0;
+}
+.home-content.prose { max-width: var(--content-w); }
+
+.chapters-grid {
+  list-style: none;
+  margin: 3rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.chapter-card {
+  background: var(--void);
+}
+.chapter-card a {
+  display: block;
+  height: 100%;
+  padding: 1.4rem;
+  border: 1px solid transparent;
+  transition: border-color .2s var(--ease-charge), box-shadow .2s var(--ease-charge);
+}
+.chapter-card a:hover, .chapter-card a:focus-visible {
+  border-color: var(--cerulean);
+  box-shadow: inset 0 0 24px rgba(0, 172, 235, .08);
+}
+.chapter-card-title {
+  display: block;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--ink);
+  margin-top: .4rem;
+}
+.chapter-card-desc {
+  display: block;
+  font-family: var(--f-body);
+  font-size: .9rem;
+  color: var(--ink-dim);
+  margin-top: .5rem;
+  line-height: 1.5;
+}
+
+.main-home .statusline { max-width: none; margin-top: 4rem; }
+
+/* ============================== mobile ============================== */
+
+.nav-toggle-input { display: none; }
+
+@media (max-width: 760px) {
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: .9rem 1.1rem;
+    background: var(--void);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar-title {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: .95rem;
+  }
+  .nav-toggle-label {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 1.4rem;
+    cursor: pointer;
+  }
+  .nav-toggle-label span {
+    display: block;
+    height: 2px;
+    background: var(--ink-2);
+  }
+  .sidebar {
+    position: static;
+    width: auto;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 1.1rem;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    transition: max-height .3s var(--ease-charge);
+  }
+  .sidebar-title { display: none; }
+  .nav-toggle-input:checked + .shell .sidebar {
+    max-height: 70vh;
+    padding: 1rem 1.1rem 1.5rem;
+    overflow-y: auto;
+  }
+  .main { margin-left: 0; padding: 0 1.1rem 3rem; }
+  .main-home { padding: 0 1.1rem 3rem; }
+  .hero { padding: 2rem 0 1.75rem; }
+  .home-hero { min-height: 56vh; }
+  .chapter-pager { flex-direction: column; }
+}
+
+/* ============================== print (nice-to-have) ============================== */
+
+@media print {
+  .sidebar, .topbar, .token-stream, .chapter-pager, .statusline { display: none; }
+  .main { margin-left: 0; padding: 0; }
+  body { background: #fff; color: #000; }
+  .prose p, .prose li, .prose td, .prose th { color: #000; }
+  .prose a { color: #000; text-decoration: underline; }
+}
+
+/* ============================== games page ============================== */
+
+/* One card per playable build on /games/. The iframe holds model-generated HTML that brings its
+   own light background, so the card keeps a white well inside the dark page on purpose. */
+.game-card {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  margin: 2.25rem 0;
+  overflow: hidden;
+}
+.game-card h3 {
+  font-family: var(--f-display);
+  font-size: 1.02rem;
+  letter-spacing: .01em;
+  margin: 0;
+  padding: .85rem 1.1rem .15rem;
+}
+.game-by {
+  color: var(--ink-dim);
+  font-family: var(--f-mono);
+  font-size: .74rem;
+  margin: 0;
+  padding: 0 1.1rem .7rem;
+}
+.game-hint {
+  color: var(--ink-dim);
+  font-size: .85rem;
+  margin: 0;
+  padding: .6rem 1.1rem .75rem;
+  border-top: 1px solid var(--line);
+}
+.game-card iframe { display: block; width: 100%; border: 0; background: #fff; }

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Games the Models Built · DokiDex</title>
+<meta name="description" content="Six playable games written by local models on one RTX 5090, from the September 2026 games bake-off: the same three prompts, five model configs, and a referee that only calls a game playable when it survives an attempt to break it.">
+
+<!-- Open Graph / Twitter, hand-rolled: jekyll-seo-tag is not available under the pinned
+     github-pages gem set used by actions/jekyll-build-pages. -->
+<meta property="og:site_name" content="DokiDex">
+<meta property="og:title" content="Games the Models Built">
+<meta property="og:description" content="Six playable games written by local models on one RTX 5090, from the September 2026 games bake-off: the same three prompts, five model configs, and a referee that only calls a game playable when it survives an attempt to break it.">
+<meta property="og:type" content="website">
+<!-- site_origin rather than absolute_url: see the comment in _config.yml. absolute_url would
+     emit http:// here, because the Pages API reports an http html_url while Enforce HTTPS is off. -->
+<meta property="og:url" content="https://dougfessler.com/projects/dokidex/games/">
+<link rel="canonical" href="https://dougfessler.com/projects/dokidex/games/">
+<!-- `summary`, not `summary_large_image`: no og:image or twitter:image is emitted anywhere on
+     this site, and the large-image card renders as a blank rectangle without one. Switch this back
+     the same day a 1200x630 share asset lands, not before. -->
+<meta name="twitter:card" content="summary">
+
+<!-- Same four families as the handbook, so the two halves of the site read as one product:
+     Marcellus (power words) · Kanit (headings, kickers, nav) · IBM Plex Mono (code, stats) ·
+     Figtree (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/dokidex.css">
+<link rel="icon" href="/projects/dokidex/assets/favicon.svg" type="image/svg+xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<!-- `wide: true` in a page's front matter opts it into --content-w-wide (assets/dokidex.css:51).
+     The CSS keys off `.page-wide` on an ancestor. Without the class emitted here the front-matter
+     flag silently does nothing. -->
+<body class="page-wide">
+<a class="skip-link" href="#content">Skip to content</a>
+
+<!-- CSS-only nav toggle. A checkbox beats a JS drawer here: the nav has to work on the mobile
+     read where the reader has scrolled 4000px into a reference table, and a checkbox cannot
+     desync from its own state the way a JS flag can. -->
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/">DokiDex</a>
+    <a class="topbar-cta" href="/projects/dokidex/download/"><svg class="dl-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><g class="dl-arrow"><path d="M8 2.2v6.5"/><path d="M5.2 5.9 8 8.7l2.8-2.8"/></g><path class="dl-tray" d="M3.2 11.3v2.5h9.6v-2.5"/></svg>
+Download</a>
+  </header>
+
+  <!-- Grouped navigation, driven by site.nav in _config.yml.
+
+     A page is "current" when its url matches exactly. The handbook is the one entry that also
+     needs to light up for its children (/handbook/03-serving.html), so it gets a prefix test —
+     without it, the sidebar would show nothing selected the moment a reader steps into a
+     chapter, which reads as "you have left the site". -->
+<nav class="sidebar" aria-label="Site sections">
+  <a class="sidebar-brand" href="/projects/dokidex/">
+    <span class="sidebar-mark" aria-hidden="true">&#9612;&#9608;&#9608;&#9616;</span>
+    <span class="sidebar-brand-text">DokiDex</span>
+  </a>
+
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Start</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/"
+             >Overview</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Use DokiDex</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/local-cli/"
+             >Run the CLIs locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/download/"
+             >Download the launchers</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/models/"
+             >Models it runs</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link is-active"
+             href="/projects/dokidex/games/"
+             aria-current="page">Games the models built</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/telemetry/"
+             >Performance data</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/qwen38/"
+             >Qwen3.8-27B, measured</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/architecture/"
+             >How it's built</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Learn AI</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/"
+             >Where to start</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/basics/"
+             >1 · Foundations</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/core/"
+             >2 · How models work</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/advanced/"
+             >3 · Advanced</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/naming/"
+             >Decoding model names</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/open-vs-closed/"
+             >Open vs closed weights</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/benchmarks/"
+             >Benchmarks</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/local/"
+             >Running models locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/agents/"
+             >Coding agents</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Context</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/state-of-ai/"
+             >State of AI, 2026</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/reference/"
+             >Quick reference</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/glossary/"
+             >Glossary</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Deep dive</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/handbook/"
+             >The Handbook</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+</nav>
+
+
+  <main class="main">
+    <div class="page-head">
+      <p class="kicker">:: MEASURED RESULTS</p>
+      <h1 class="page-title">Games the Models Built</h1>
+      <p class="page-desc">Six playable games written by local models on one RTX 5090, from the September 2026 games bake-off: the same three prompts, five model configs, and a referee that only calls a game playable when it survives an attempt to break it.</p>
+      
+      <p class="level-badges">
+        <span class="level-badge level-beginner">Beginner</span><span class="level-badge level-intermediate">Intermediate</span>
+      </p>
+      
+    </div>
+
+    <article id="content" class="prose">
+      <p>On 2026-09-17 we asked five model configurations on one RTX 5090 to build the same three games:
+Conway’s Game of Life, Tetris, and a Super Mario-style platformer. One request per game, one
+self-contained HTML file per answer, decode speed taken from the server’s own per-request
+timings. Then referee agents read every file end to end and tried to break the claim that a
+human could play it. The default verdict was broken, and only code that survived that attempt
+gets called playable here. Click any game and use its keyboard controls.</p>
+
+<p>The full scoreboard, including the multi-agent arm and every concrete failure the referees
+found, lives on <a href="/projects/dokidex/models/">The Models DokiDex Runs</a> and in
+<code class="language-plaintext highlighter-rouge">docs/scorecards/2026-09-17-games-bakeoff.md</code>.</p>
+
+<div class="game-card">
+<h3>Game of Life</h3>
+<p class="game-by">Qwen3.6-35B-A3B, the quality winner at 5 of 6 playable. One request, 3.5k tokens, 220-231 tok/s.</p>
+<iframe src="/projects/dokidex/assets/games/qwen36-life.html" title="Game of Life, built by Qwen3.6-35B-A3B" style="width:100%;height:540px;border:0;background:#fff"></iframe>
+<p class="game-hint">Click cells to toggle them. Start, Pause, Step and Clear buttons, plus a speed slider.</p>
+</div>
+
+<div class="game-card">
+<h3>Tetris</h3>
+<p class="game-by">Qwen3.6-35B-A3B. The only config whose Tetris survived the referee both draws.</p>
+<iframe src="/projects/dokidex/assets/games/qwen36-tetris.html" title="Tetris, built by Qwen3.6-35B-A3B" style="width:100%;height:700px;border:0;background:#fff"></iframe>
+<p class="game-hint">Arrow keys move and rotate. Space hard-drops. Lines clear and score.</p>
+</div>
+
+<div class="game-card">
+<h3>Platformer</h3>
+<p class="game-by">Qwen3.6-35B-A3B, 10.6k tokens in one request.</p>
+<iframe src="/projects/dokidex/assets/games/qwen36-mario.html" title="Platformer, built by Qwen3.6-35B-A3B" style="width:100%;height:580px;border:0;background:#fff"></iframe>
+<p class="game-hint">Arrow keys to run and jump. Stomp the enemy, collect coins, reach the flag.</p>
+</div>
+
+<div class="game-card">
+<h3>Platformer, the speed champion's build</h3>
+<p class="game-by">Qwen3.6-35B-A3B-MTP with a baked-in draft head: 275-315 tok/s during generation.</p>
+<iframe src="/projects/dokidex/assets/games/qwen36mtp-mario.html" title="Platformer, built by Qwen3.6-35B-A3B-MTP" style="width:100%;height:580px;border:0;background:#fff"></iframe>
+<p class="game-hint">Same spec, same card, roughly 1.3x the decode speed of its non-MTP sibling.</p>
+</div>
+
+<div class="game-card">
+<h3>Game of Life, the coder's build</h3>
+<p class="game-by">Qwen3-Coder-30B-A3B, the daily-driver coder. It nails Life and broke Tetris math in both draws.</p>
+<iframe src="/projects/dokidex/assets/games/coder-life.html" title="Game of Life, built by Qwen3-Coder-30B-A3B" style="width:100%;height:540px;border:0;background:#fff"></iframe>
+<p class="game-hint">A clean 1.8k-token build from the coder that ships as the everyday default.</p>
+</div>
+
+<div class="game-card">
+<h3>Game of Life, the multi-agent build</h3>
+<p class="game-by">Qwen3.6-35B-A3B-MTP through a five-call plan, ideate, build, critic, fix protocol.</p>
+<iframe src="/projects/dokidex/assets/games/ma-life.html" title="Game of Life, built through the multi-agent protocol" style="width:100%;height:540px;border:0;background:#fff"></iframe>
+<p class="game-hint">Five fresh contexts coordinating through files. It worked here and cost 3.1x the tokens.</p>
+</div>
+
+<h2 id="how-these-were-graded">How these were graded</h2>
+
+<p>Every file went through two independent passes. An inspector extracted the JavaScript and ran it
+through <code class="language-plaintext highlighter-rouge">node --check</code>, rendered the page headlessly with five seconds of virtual time so the
+game loop actually ran, and checked a fixed mechanics list per game. Then a referee read the
+entire source and tried to refute playability: wrong neighbor counts, collision indexing slips,
+rotation built from the wrong matrix dimension, spawn points over pits, restart buttons that
+call a function that was never in scope. A game appears on this page only if it survived both.</p>
+
+<p>The one finding worth carrying beyond this page: the multi-agent protocol didn’t lift the
+smaller models. Two draws from the plain 35B model beat five orchestrated calls from either
+smaller config, at a fraction of the tokens. When a model systematically writes a bug, its own
+critic round ships the same bug twice.</p>
+
+    </article>
+
+    
+    <nav class="pager" aria-label="Page navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/models/">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">The models DokiDex runs</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/telemetry/">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">Performance data</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="site-footer">
+  <div class="footer-main">
+    <p class="footer-line">
+      <strong>DokiDex</strong> v0.62.0:
+      a fully-local AI stack, and a field guide to the machines it runs on.
+    </p>
+    <p class="footer-line footer-dim">
+      Everything on this site is written against the real tree and the measured record. Where a
+      claim is a number, it was measured or sourced. Where it was a judgment call, the reasoning
+      is stated inline. Stale statements are bugs. File them like bugs.
+    </p>
+  </div>
+
+  <div class="footer-links">
+    <a href="/projects/dokidex/local-cli/">Run the CLIs</a>
+    <a href="/projects/dokidex/handbook/">Handbook</a>
+    <a href="/projects/dokidex/reference/">Quick reference</a>
+    <a href="/projects/dokidex/glossary/">Glossary</a>
+    <!-- Deliberately understated: last item in the row, same weight as the rest, no colour,
+         no badge, no image beacon. The ask was "inconspicuous". -->
+    <a class="footer-kofi" href="https://ko-fi.com/dougfessler" rel="noopener">Buy me a coffee</a>
+  </div>
+</footer>
+
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/dokidex.js"></script>
+</body>
+</html>

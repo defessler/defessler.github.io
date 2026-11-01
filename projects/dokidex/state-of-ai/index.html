@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>State of AI, 2026 · DokiDex</title>
+<meta name="description" content="Where the field actually stands in mid-2026: capability, agents, economics, hardware, and regulation, with every number dated, sourced, and separated from opinion.">
+
+<!-- Open Graph / Twitter, hand-rolled: jekyll-seo-tag is not available under the pinned
+     github-pages gem set used by actions/jekyll-build-pages. -->
+<meta property="og:site_name" content="DokiDex">
+<meta property="og:title" content="State of AI, 2026">
+<meta property="og:description" content="Where the field actually stands in mid-2026: capability, agents, economics, hardware, and regulation, with every number dated, sourced, and separated from opinion.">
+<meta property="og:type" content="website">
+<!-- site_origin rather than absolute_url: see the comment in _config.yml. absolute_url would
+     emit http:// here, because the Pages API reports an http html_url while Enforce HTTPS is off. -->
+<meta property="og:url" content="https://dougfessler.com/projects/dokidex/state-of-ai/">
+<link rel="canonical" href="https://dougfessler.com/projects/dokidex/state-of-ai/">
+<!-- `summary`, not `summary_large_image`: no og:image or twitter:image is emitted anywhere on
+     this site, and the large-image card renders as a blank rectangle without one. Switch this back
+     the same day a 1200x630 share asset lands, not before. -->
+<meta name="twitter:card" content="summary">
+
+<!-- Same four families as the handbook, so the two halves of the site read as one product:
+     Marcellus (power words) · Kanit (headings, kickers, nav) · IBM Plex Mono (code, stats) ·
+     Figtree (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/dokidex.css">
+<link rel="icon" href="/projects/dokidex/assets/favicon.svg" type="image/svg+xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<!-- `wide: true` in a page's front matter opts it into --content-w-wide (assets/dokidex.css:51).
+     The CSS keys off `.page-wide` on an ancestor. Without the class emitted here the front-matter
+     flag silently does nothing. -->
+<body class="page-wide">
+<a class="skip-link" href="#content">Skip to content</a>
+
+<!-- CSS-only nav toggle. A checkbox beats a JS drawer here: the nav has to work on the mobile
+     read where the reader has scrolled 4000px into a reference table, and a checkbox cannot
+     desync from its own state the way a JS flag can. -->
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/">DokiDex</a>
+    <a class="topbar-cta" href="/projects/dokidex/download/"><svg class="dl-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><g class="dl-arrow"><path d="M8 2.2v6.5"/><path d="M5.2 5.9 8 8.7l2.8-2.8"/></g><path class="dl-tray" d="M3.2 11.3v2.5h9.6v-2.5"/></svg>
+Download</a>
+  </header>
+
+  <!-- Grouped navigation, driven by site.nav in _config.yml.
+
+     A page is "current" when its url matches exactly. The handbook is the one entry that also
+     needs to light up for its children (/handbook/03-serving.html), so it gets a prefix test —
+     without it, the sidebar would show nothing selected the moment a reader steps into a
+     chapter, which reads as "you have left the site". -->
+<nav class="sidebar" aria-label="Site sections">
+  <a class="sidebar-brand" href="/projects/dokidex/">
+    <span class="sidebar-mark" aria-hidden="true">&#9612;&#9608;&#9608;&#9616;</span>
+    <span class="sidebar-brand-text">DokiDex</span>
+  </a>
+
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Start</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/"
+             >Overview</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Use DokiDex</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/local-cli/"
+             >Run the CLIs locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/download/"
+             >Download the launchers</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/models/"
+             >Models it runs</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/games/"
+             >Games the models built</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/telemetry/"
+             >Performance data</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/qwen38/"
+             >Qwen3.8-27B, measured</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/architecture/"
+             >How it's built</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Learn AI</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/"
+             >Where to start</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/basics/"
+             >1 · Foundations</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/core/"
+             >2 · How models work</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/advanced/"
+             >3 · Advanced</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/naming/"
+             >Decoding model names</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/open-vs-closed/"
+             >Open vs closed weights</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/benchmarks/"
+             >Benchmarks</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/local/"
+             >Running models locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/agents/"
+             >Coding agents</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Context</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link is-active"
+             href="/projects/dokidex/state-of-ai/"
+             aria-current="page">State of AI, 2026</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/reference/"
+             >Quick reference</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/glossary/"
+             >Glossary</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Deep dive</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/handbook/"
+             >The Handbook</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+</nav>
+
+
+  <main class="main">
+    <div class="page-head">
+      <p class="kicker">:: DATED SNAPSHOT</p>
+      <h1 class="page-title">State of AI, 2026</h1>
+      <p class="page-desc">Where the field actually stands in mid-2026: capability, agents, economics, hardware, and regulation, with every number dated, sourced, and separated from opinion.</p>
+      
+      <p class="level-badges">
+        <span class="level-badge level-advanced">Advanced</span>
+      </p>
+      
+    </div>
+
+    <article id="content" class="prose">
+      <blockquote>
+  <p><strong>Note:</strong> Everything below is dated <strong>as of July 2026</strong>. This field moves in weeks, not
+quarters. Six named Anthropic model releases landed between November 2025 and this writing,
+and OpenAI shipped a comparable number of GPT-5.x variants in the same window. Treat every
+number here as a timestamped snapshot, not a durable ranking, and follow the linked source
+before repeating it later in the year.</p>
+</blockquote>
+
+<p>This page is a synthesis, not a discovery. It draws on vendor model and system cards, official
+protocol and pricing documentation, Stanford’s AI Index, Epoch AI’s research, METR’s and Apollo
+Research’s independent evaluations, and third-party benchmark trackers, cross-checked against each
+other where they overlap. Where two sources disagree and neither is clearly wrong, both readings
+are given rather than picked for you. Where a claim rests on a marketing blog rather than a
+primary source, it’s labeled as such.</p>
+
+<h2 id="1-the-capability-frontier-and-its-jagged-edges">1. The capability frontier, and its jagged edges</h2>
+
+<p>The current top tier, by generally-available release date:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Vendor</th>
+      <th>GA / release</th>
+      <th>Context</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Claude Opus 5</td>
+      <td>Anthropic</td>
+      <td>Jul 24, 2026</td>
+      <td>1M tokens</td>
+      <td>Anthropic’s latest step change for long-running agents and coding. <a href="https://www.anthropic.com/news">anthropic.com/news</a></td>
+    </tr>
+    <tr>
+      <td>Claude Fable 5</td>
+      <td>Anthropic</td>
+      <td>GA Jun 9, 2026</td>
+      <td>1M tokens</td>
+      <td>Marketed by Anthropic as its most capable <em>generally released</em> model: see Section 7 for how that framing holds up against an independent index. <a href="https://platform.claude.com/docs/en/about-claude/models/overview">platform.claude.com</a></td>
+    </tr>
+    <tr>
+      <td>Claude Sonnet 5</td>
+      <td>Anthropic</td>
+      <td>Jun 30, 2026</td>
+      <td>1M tokens</td>
+      <td>Mid tier. Intro pricing runs through Aug 31, 2026. <a href="https://www.anthropic.com/news">anthropic.com/news</a></td>
+    </tr>
+    <tr>
+      <td>GPT-5.6 (Luna / Terra / Sol)</td>
+      <td>OpenAI</td>
+      <td>Public Jul 9, 2026</td>
+      <td>N/A</td>
+      <td>Three-tier family. Sol is the top rung. <a href="https://en.wikipedia.org/wiki/GPT-5.6">Wikipedia: GPT-5.6</a> and <a href="https://www.cnbc.com/2026/07/08/openai-expanding-gpt-5point6-ai-model-release-ending-government-limits.html">cnbc.com</a></td>
+    </tr>
+    <tr>
+      <td>GPT-5.5</td>
+      <td>OpenAI</td>
+      <td>Apr 23, 2026</td>
+      <td>N/A</td>
+      <td>82.7% Terminal-Bench 2.0. 51.7%/35.4% FrontierMath Tiers 1-3/4. <a href="https://en.wikipedia.org/wiki/GPT-5.5">Wikipedia: GPT-5.5</a></td>
+    </tr>
+    <tr>
+      <td>Gemini 3.1 Pro</td>
+      <td>Google DeepMind</td>
+      <td>Preview Feb 19, 2026</td>
+      <td>1M tokens</td>
+      <td>Current GA flagship. Native multimodal input. <a href="https://deepmind.google/models/gemini/pro/">DeepMind model card</a></td>
+    </tr>
+    <tr>
+      <td>Grok 4.5</td>
+      <td>xAI (“SpaceXAI” in some coverage)</td>
+      <td>Jul 8, 2026</td>
+      <td>N/A</td>
+      <td><a href="https://techcrunch.com/2026/07/08/spacexai-releases-grok-4-5-which-elon-describes-as-an-opus-class-model/">TechCrunch</a></td>
+    </tr>
+    <tr>
+      <td>DeepSeek V4 (preview)</td>
+      <td>DeepSeek</td>
+      <td>Apr 2026</td>
+      <td>1M tokens</td>
+      <td>284B “Flash” + 1.6T “Pro” MoE variants. <a href="https://en.wikipedia.org/wiki/DeepSeek">Wikipedia: DeepSeek</a></td>
+    </tr>
+    <tr>
+      <td>Qwen3.8-Max (preview)</td>
+      <td>Alibaba</td>
+      <td>Jul 2026</td>
+      <td>N/A</td>
+      <td>2.4T-param flagship, preview status. <a href="https://en.wikipedia.org/wiki/Qwen">Wikipedia: Qwen</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Anthropic also runs an invitation-only line, Claude Mythos 5, under a cyber-defense research
+program (“Project Glasswing”), real but not generally available. <a href="https://platform.claude.com/docs/en/about-claude/models/overview">platform.claude.com</a>
+The pace itself is worth noting before any capability claim. OpenAI’s live deprecations page
+(fetched 2026-07-26) shows a retirement wave dated <strong>July 23, 2026</strong> (several GPT-5/5.1 chat
+variants, the o3/o4-mini deep-research models, the original computer-use preview), plus a further
+wave on <strong>November 30, 2026</strong> taking down the Reusable Prompts API, Evals platform, and Agent
+Builder. <a href="https://developers.openai.com/api/docs/deprecations">developers.openai.com</a> “State of
+the art” has a shelf life measured in weeks. Increasingly, so does last quarter’s integration.</p>
+
+<h3 id="headline-jumps-dated">Headline jumps, dated</h3>
+
+<ul>
+  <li><strong>SWE-bench Verified</strong>: from roughly 60% to “near 100%” in about a year, per Stanford’s 2026 AI
+Index. vals.ai’s July 22, 2026 run puts the top six within 8.4 points, four above 93% (Claude
+Opus 5 97.0%, GPT-5.6 Sol 96.2%, Claude Fable 5 95.0%, Kimi K3 93.4%). <a href="https://hai.stanford.edu/ai-index/2026-ai-index-report">Stanford HAI 2026 AI Index</a> and <a href="https://www.vals.ai/benchmarks/swebench">vals.ai</a></li>
+  <li><strong>Computer-use (OSWorld)</strong>: field-wide success climbed from 12% to about 66% over roughly the
+same period. <a href="https://hai.stanford.edu/ai-index/2026-ai-index-report">Stanford HAI 2026 AI Index</a></li>
+  <li><strong>AIME 2025</strong> is fully saturated (five models at a perfect 1.000). Once a contest year saturates,
+evaluators rotate to the next fresh one. Freshness resists contamination, not the name. <a href="https://llm-stats.com/benchmarks/aime-2025">llm-stats.com</a></li>
+</ul>
+
+<h3 id="failure-modes-that-persist">Failure modes that persist</h3>
+
+<p>Stanford’s AI Index frames 2026 as a <strong>“jagged frontier”</strong>: models that medal at the International
+Math Olympiad and clear 50%+ on graduate-level exams can still fail basic perceptual tasks. One
+frontier model read analog clock faces correctly only <strong>50.1%</strong> of the time. <a href="https://hai.stanford.edu/ai-index/2026-ai-index-report">Stanford HAI 2026 AI Index</a></p>
+
+<figure>
+<svg viewBox="0 0 720 310" role="img" aria-labelledby="dgm-jagged-title dgm-jagged-desc">
+<title id="dgm-jagged-title">The jagged frontier: one model generation, five very different scores</title>
+<desc id="dgm-jagged-desc">Horizontal bar chart showing mid-2026 frontier scores across five different benchmarks, ranging from about 44 percent on Humanity's Last Exam without tools to 97 percent on SWE-bench Verified.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="294" rx="3" />
+<text class="dgm-title" x="28" y="34">Same generation of models, wildly different scores</text>
+
+<line class="dgm-line" x1="200" y1="48" x2="200" y2="290" />
+<line class="dgm-line" x1="620" y1="48" x2="620" y2="290" opacity="0.4" />
+<text class="dgm-label-sm" x="196" y="300" text-anchor="middle">0%</text>
+<text class="dgm-label-sm" x="620" y="300" text-anchor="middle">100%</text>
+
+<text class="dgm-label" x="20" y="58">SWE-bench Verified &middot; Claude Opus 5</text>
+<rect class="dgm-accent" x="200" y="64" width="407" height="20" />
+<text class="dgm-mono" x="615" y="79">97.0%</text>
+
+<text class="dgm-label" x="20" y="108">GPQA Diamond &middot; GPT-5.6 Sol / Mythos Preview</text>
+<rect class="dgm-accent" x="200" y="114" width="397" height="20" />
+<text class="dgm-mono" x="605" y="129">94.6%</text>
+
+<text class="dgm-label" x="20" y="158">ARC-AGI-2 &middot; Gemini 3.1 Pro</text>
+<rect class="dgm-accent" x="200" y="164" width="324" height="20" />
+<text class="dgm-mono" x="532" y="179">77.1%</text>
+
+<text class="dgm-label" x="20" y="208">Clock-reading &middot; an unnamed frontier model</text>
+<rect class="dgm-accent-2" x="200" y="214" width="210" height="20" />
+<text class="dgm-mono" x="418" y="229">50.1%</text>
+
+<text class="dgm-label" x="20" y="258">HLE, no tools &middot; Gemini 3.1 Pro</text>
+<rect class="dgm-accent" x="200" y="264" width="187" height="20" />
+<text class="dgm-mono" x="395" y="279">44.4%</text>
+</svg>
+<figcaption><strong>The frontier is jagged, not uniform.</strong> The same models that clear 97%
+on a saturating coding benchmark and beat PhD baselines on graduate science questions still read
+an analog clock face correctly barely half the time. No single "how smart is it" number captures
+this. Sources in the surrounding text.</figcaption>
+</figure>
+
+<p>Hallucination has no agreed measurement, and reasoning compute doesn’t obviously fix it. The AI
+Index reports rates ranging <strong>22%-94% across 26 top models</strong>. On Vectara’s HHEM-2.3
+faithful-summarization test, the best performer is Antgroup’s Finix S1 32B at 1.8%. Among the
+worst is <strong>o3-pro at 23.3%</strong>, a full frontier reasoning model, which suggests extra test-time compute
+doesn’t straightforwardly reduce ungrounded elaboration. <a href="https://hai.stanford.edu/ai-index/2026-ai-index-report">Stanford HAI 2026 AI Index</a> and <a href="https://github.com/vectara/hallucination-leaderboard">Vectara</a>
+Apple’s “Illusion of Thinking” study, using logic puzzles with adjustable difficulty, found three
+regimes: plain LLMs beat reasoning models on easy problems, reasoning models win in the middle, and
+<strong>both collapse to zero at high complexity</strong>, with reasoning effort itself peaking mid-difficulty
+and then declining as problems keep getting harder. <a href="https://machinelearning.apple.com/research/illusion-of-thinking">Apple ML Research</a></p>
+
+<h3 id="how-to-read-these-numbers">How to read these numbers</h3>
+
+<p>Humanity’s Last Exam is the starkest “which number do you mean” case found in this research: the
+exam’s official site (dataset marked updated April 3, 2025) puts Gemini 3 Pro at 38.3% with no
+tools. Google’s newer card reports 44.4% no-tools / 51.4% with search-and-code. A tracker dated
+mid-2026 shows Fable 5, Opus 5, and Mythos Preview all around 64.5-64.7%, tool-use condition
+unstated. That’s likely a mix of real generational gains and an unlabeled tools split. <a href="https://agi.safe.ai/">agi.safe.ai</a>, <a href="https://deepmind.google/models/gemini/pro/">deepmind.google</a>, and <a href="https://llm-stats.com/benchmarks/humanitys-last-exam">llm-stats.com</a>
+Scaffolding matters just as much: Terminal-Bench 2.x scores for similar-tier models span 68.5% to
+91.9% depending on harness, and Arena-style Elo measures stylistic preference, not correctness.
+The <a href="/projects/dokidex/learn/benchmarks/">benchmarks page</a> goes deeper on reading a
+leaderboard critically, including denominator and effort-setting traps this page doesn’t have
+room for.</p>
+
+<h2 id="2-the-reasoning-era-what-test-time-compute-buys-and-what-rl-post-training-doesnt">2. The reasoning era: what test-time compute buys, and what RL post-training doesn’t</h2>
+
+<blockquote>
+  <p><strong>Key idea:</strong> Through 2023-2024, labs mostly scaled parameters and pretraining data. Since,
+the marginal dollar increasingly buys <strong>inference-time computation</strong>: long reasoning chains
+before an answer, shaped post-training by RL. Two different knobs: “the model got smarter”
+often means only the second one turned.</p>
+</blockquote>
+
+<p>OpenAI’s o3 is the clearest documented case, on ARC-AGI-1’s semi-private 100-task evaluation set
+(ARC-AGI-2 didn’t yet exist). A low-compute configuration (6 samples) scored 75.7% for about 33.5M
+tokens across the whole set (roughly $26/task). A high-compute configuration (1,024 samples, about
+172x the compute) scored 87.5%, but spent about 5.7B tokens across the set, roughly 57M tokens and
+<strong>~$4,560 per task</strong>. ARC Prize itself notes o3 was trained on 75% of the ARC-AGI-1
+Public Training set, which complicates treating the eval as memorization-proof. o3 also hit 71.7%
+on SWE-bench Verified, over 20 points above predecessor o1, using roughly 10x o1’s training
+compute. <a href="https://arcprize.org/blog/oai-o3-pub-breakthrough">ARC Prize</a> and <a href="https://www.webpronews.com/openais-o3-reasoning-model-how-test-time-compute-redefines-ai-capabilities/">WebProNews</a>
+<strong>DeepSeek-R1</strong> (Jan 20, 2025, MIT license) matched o1 on many public reasoning benchmarks using
+RL <em>without</em> supervised chain-of-thought data, arguably the pivotal open-weight proof that
+RL-on-verifiable-rewards is reproducible and cheap, not an OpenAI-only technique. <a href="https://en.wikipedia.org/wiki/DeepSeek">Wikipedia: DeepSeek</a></p>
+
+<figure>
+<svg viewBox="0 0 720 260" role="img" aria-labelledby="dgm-era-title dgm-era-desc">
+<title id="dgm-era-title">The reasoning-model era, by primary release date</title>
+<desc id="dgm-era-desc">Timeline from January 2025 to July 2026 marking six dated events in the shift toward test-time reasoning compute, from DeepSeek-R1 through Claude Opus 5.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="244" rx="3" />
+<text class="dgm-title" x="28" y="34">Six dated points in eighteen months</text>
+
+<line class="dgm-line" x1="40" y1="150" x2="680" y2="150" />
+
+<circle class="dgm-accent" cx="50" cy="150" r="6" />
+<text class="dgm-label-sm" x="50" y="118" text-anchor="middle">Jan 2025</text>
+<text class="dgm-label" x="50" y="180" text-anchor="middle">DeepSeek-R1</text>
+
+<circle class="dgm-accent" cx="174" cy="150" r="6" />
+<text class="dgm-label-sm" x="174" y="118" text-anchor="middle">Apr 2025</text>
+<text class="dgm-label" x="174" y="180" text-anchor="middle">OpenAI o3 GA</text>
+
+<circle class="dgm-accent" cx="298" cy="150" r="6" />
+<text class="dgm-label-sm" x="298" y="118" text-anchor="middle">Dec 2025</text>
+<text class="dgm-label" x="298" y="180" text-anchor="middle">Gemini 3 Deep Think</text>
+
+<circle class="dgm-accent" cx="422" cy="150" r="6" />
+<text class="dgm-label-sm" x="422" y="118" text-anchor="middle">Jan 2026</text>
+<text class="dgm-label" x="422" y="180" text-anchor="middle">METR Horizon 1.1</text>
+
+<circle class="dgm-accent" cx="546" cy="150" r="6" />
+<text class="dgm-label-sm" x="546" y="118" text-anchor="middle">Apr 2026</text>
+<text class="dgm-label" x="546" y="180" text-anchor="middle">GPT-5.5 GA</text>
+
+<circle class="dgm-accent" cx="670" cy="150" r="6" />
+<text class="dgm-label-sm" x="670" y="118" text-anchor="middle">Jul 2026</text>
+<text class="dgm-label" x="668" y="180" text-anchor="end">Opus 5 GA</text>
+</svg>
+<figcaption><strong>This compresses several parallel tracks onto one line.</strong> Each lab shipped
+multiple point releases between these markers. The timeline shows the arc of the era, not a
+complete release log. Dates and sources in the surrounding text.</figcaption>
+</figure>
+
+<h3 id="does-rl-post-training-generalize-or-does-it-just-resample">Does RL post-training generalize, or does it just resample?</h3>
+
+<p>This is genuinely contested. A widely-discussed analysis (arXiv 2504.13837) found that RLVR
+(reinforcement learning with verifiable rewards)-trained models beat their base models at
+<strong>pass@1</strong>, but the <strong>base model wins at pass@k for large k</strong>. The base model already contained
+the correct-answer trajectory somewhere in its sampling distribution. RL mainly made the <em>most
+likely</em> sample better without expanding underlying coverage. Six different RLVR algorithms
+behaved similarly. By contrast, <strong>distillation from a stronger teacher</strong> did introduce genuinely
+new reasoning patterns absent from the student’s base distribution. <a href="https://arxiv.org/abs/2504.13837">arXiv 2504.13837</a>
+This dovetails with the Illusion of Thinking findings. Both point toward current “reasoning”
+training sharpening an existing capability envelope rather than producing open-ended
+generalization, an active research question, not a settled one.</p>
+
+<h3 id="cost-consequences">Cost consequences</h3>
+
+<p>Test-time compute inverts the usual falling-cost story. Per-token prices keep dropping (Section 7),
+but reasoning models spend vastly more tokens per query, so cost-per-<em>task</em> can rise even as
+cost-per-<em>token</em> falls. o3’s high-compute ARC-AGI-1 configuration, at roughly 57 million tokens
+and ~$4,560 per task, is the extreme case documented above. <a href="https://arcprize.org/blog/oai-o3-pub-breakthrough">ARC Prize</a>
+Separately, Epoch AI’s inference-price-trend research found the price to match a fixed capability
+level falls roughly 9x-900x per year depending on the benchmark, median around 50x/year, driven
+by smaller models reaching the same capability and cheaper hardware, not shrinking margins. <a href="https://epoch.ai/data-insights/llm-inference-price-trends">Epoch AI</a></p>
+
+<h2 id="3-agents-where-they-work-where-they-fail">3. Agents: where they work, where they fail</h2>
+
+<h3 id="where-they-genuinely-work">Where they genuinely work</h3>
+
+<p>The OSWorld climb (12% → ~66%, Section 1) is real, though the three major labs took different
+bets to get there: Anthropic ships a portable screenshot-plus-mouse/keyboard tool, OpenAI shipped
+“Codex Background Computer Use” (Apr 16, 2026) as a desktop-native background agent, and Google’s
+approach is browser-anchored. <a href="https://hai.stanford.edu/ai-index/2026-ai-index-report">Stanford HAI 2026 AI Index</a>
+SWE-bench Verified’s climb to “near 100%” is real progress on its specific task shape (bounded,
+verifiable GitHub issues), and a sign the benchmark is nearing the end of its useful life. That’s
+why the harder, partly-private SWE-bench Pro now does the real comparison work.</p>
+
+<h3 id="where-they-fail-long-horizon-coherence">Where they fail: long-horizon coherence</h3>
+
+<p><strong>METR’s “time horizon”</strong> measures the task duration, timed against human experts, at which a
+model succeeds 50% of the time. The latest release (Time Horizon 1.1, Jan 29, 2026):</p>
+
+<figure>
+<svg viewBox="0 0 720 320" role="img" aria-labelledby="dgm-horizon-title dgm-horizon-desc">
+<title id="dgm-horizon-title">METR 50%-success time horizon, three models</title>
+<desc id="dgm-horizon-desc">Horizontal bar chart of the task duration at which each model succeeds half the time, with 95 percent confidence interval whiskers, for Claude Opus 4.5, GPT-5, and o3.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="304" rx="3" />
+<text class="dgm-title" x="28" y="34">How long a task can it carry through, half the time</text>
+
+<line class="dgm-line" x1="210" y1="50" x2="210" y2="250" />
+<text class="dgm-label-sm" x="210" y="292" text-anchor="middle">0</text>
+<text class="dgm-label-sm" x="310" y="292" text-anchor="middle">200</text>
+<text class="dgm-label-sm" x="410" y="292" text-anchor="middle">400</text>
+<text class="dgm-label-sm" x="510" y="292" text-anchor="middle">600</text>
+<text class="dgm-label-sm" x="610" y="292" text-anchor="middle">800</text>
+<text class="dgm-label-sm" x="410" y="306" text-anchor="middle">minutes (50%-success time horizon)</text>
+
+<text class="dgm-label" x="20" y="78">Claude Opus 4.5</text>
+<rect class="dgm-accent" x="210" y="64" width="160" height="20" />
+<text class="dgm-mono" x="376" y="79">320 min</text>
+<line class="dgm-flow" x1="295" y1="98" x2="575" y2="98" />
+<line class="dgm-flow" x1="295" y1="92" x2="295" y2="104" />
+<line class="dgm-flow" x1="575" y1="92" x2="575" y2="104" />
+<text class="dgm-label-sm" x="435" y="114" text-anchor="middle">95% CI 170&ndash;729</text>
+
+<text class="dgm-label" x="20" y="158">GPT-5</text>
+<rect class="dgm-accent" x="210" y="144" width="107" height="20" />
+<text class="dgm-mono" x="323" y="159">214 min</text>
+<line class="dgm-flow" x1="269" y1="178" x2="450" y2="178" />
+<line class="dgm-flow" x1="269" y1="172" x2="269" y2="184" />
+<line class="dgm-flow" x1="450" y1="172" x2="450" y2="184" />
+<text class="dgm-label-sm" x="359" y="194" text-anchor="middle">95% CI 117&ndash;480</text>
+
+<text class="dgm-label" x="20" y="238">o3</text>
+<rect class="dgm-accent" x="210" y="224" width="61" height="20" />
+<text class="dgm-mono" x="277" y="239">121 min</text>
+<line class="dgm-flow" x1="247" y1="258" x2="311" y2="258" />
+<line class="dgm-flow" x1="247" y1="252" x2="247" y2="264" />
+<line class="dgm-flow" x1="311" y1="252" x2="311" y2="264" />
+<text class="dgm-label-sm" x="279" y="274" text-anchor="middle">95% CI 74&ndash;201</text>
+</svg>
+<figcaption><strong>Point estimates look tidy. The confidence intervals don't.</strong> The upper
+bound on Opus 4.5's own estimate runs to more than twice its midpoint, and METR states its own
+methodology saturates above roughly 16 hours (960 minutes) of task length. Read the whisker, not
+just the bar. [METR, Time Horizon 1.1](https://metr.org/blog/2026-1-29-time-horizon-1-1/)</figcaption>
+</figure>
+
+<p>METR’s own caveats matter more than the headline curve. Human baselines exist for only 5 of the
+suite’s 31 “long” (8h+) tasks. CIs for the newest models run up to 2.3x the point estimate. The
+trend is “somewhat sensitive to task composition.” Switching evaluation infrastructure
+(Vivaria → Inspect) changed scores for at least two models: some measured “progress” is
+scaffolding change, not model change. <a href="https://metr.org/blog/2026-1-29-time-horizon-1-1/">METR, Time Horizon 1.1</a></p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> A fast-doubling time horizon reads easily as “AGI soon.” Two framings of this
+same METR release give the doubling time as <strong>131 days</strong> (down from 165 under the prior
+methodology) in one summary and <strong>109 days falling to 89</strong> in another, reported here as both,
+not reconciled or averaged. A separate critique, citing METR’s own staff, suspects
+<strong>measurement noise</strong> in the newest datapoint (its growth rate exceeds all historical
+precedent), notes the 80%/50%-success curves have recently diverged, and notes the suite
+measures <strong>coding tasks specifically</strong>, which may not generalize. That author’s own read: the
+acceleration is “likely temporary.” Whether the trend is a real predictive law or an artifact of
+a narrow, fast-saturating suite is unresolved. Both readings are live. <a href="https://metr.org/blog/2026-1-29-time-horizon-1-1/">METR</a> and <a href="https://www.lesswrong.com/posts/EYb2K9acKfyG2bome/metr-time-horizons-now-10x-year">LessWrong</a></p>
+</blockquote>
+
+<h3 id="real-world-evidence-anthropics-project-vend">Real-world evidence: Anthropic’s Project Vend</h3>
+
+<p>Anthropic and Andon Labs had Claude run a small automated store in Anthropic’s office (“Claudius”).
+Phase 1 (Sonnet 3.7): Claudius refused a $100 offer for $15 of merchandise, gave products away
+below cost, hallucinated a nonexistent payment account, and briefly claimed to be a human employee.
+The business lost money overall. <a href="https://www.anthropic.com/research/project-vend-1">Anthropic, Project Vend</a>
+Phase 2 (better scaffolding: CRM access, a “CEO” sub-agent): losing weeks were largely eliminated
+and the business became profitable. But the system nearly entered an “illegal onion futures
+contract” and accepted a vote from an impersonating “CEO” without verification. Anthropic’s own
+framing: helpfulness training works against hard-nosed judgment. The model behaves “more like a
+friend who wants to be nice” than a fiduciary actor. <a href="https://www.anthropic.com/news/project-vend-2">Anthropic, Project Vend 2</a></p>
+
+<p>Vending-Bench ran multiple models past 20 million simulated tokens. Every model had runs that
+derailed into “meltdown” loops. <strong>These breakdowns didn’t correlate with context-window
+saturation.</strong> The mechanism behind sustained-task coherence failure isn’t simply “running out of
+context,” and remains unexplained. <a href="https://arxiv.org/abs/2502.15840">arXiv</a> See
+<a href="/projects/dokidex/learn/agents/">Coding agents</a> for where scaffolding does and doesn’t paper
+over this.</p>
+
+<h2 id="4-protocols-and-plumbing">4. Protocols and plumbing</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Protocol</th>
+      <th>Purpose</th>
+      <th>Origin</th>
+      <th>Governance (2026)</th>
+      <th>Adoption signal</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Model Context Protocol (MCP)</td>
+      <td>Model-to-tool/data connector (the “N×M” problem)</td>
+      <td>Anthropic, Nov 2024</td>
+      <td>Agentic AI Foundation, a Linux Foundation directed fund, since Dec 2025</td>
+      <td>9,652 latest server records / 28,959 total in the official Registry as of May 24, 2026</td>
+    </tr>
+    <tr>
+      <td>Agent2Agent (A2A)</td>
+      <td>Agent-to-agent task exchange (Agent Cards, Tasks, signed identity)</td>
+      <td>Google, Apr 2025</td>
+      <td>Linux Foundation, since Jun 2025</td>
+      <td>~150 organizations reported running it in production by 2026, protocol v1.2</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><a href="https://en.wikipedia.org/wiki/Model_Context_Protocol">Wikipedia: MCP</a>, <a href="https://blog.modelcontextprotocol.io/posts/2026-mcp-roadmap/">MCP 2026 Roadmap</a>, <a href="https://en.wikipedia.org/wiki/Agent2Agent">Wikipedia: A2A</a>, and <a href="https://developers.googleblog.com/en/google-cloud-donates-a2a-to-linux-foundation/">Google Developers Blog</a></p>
+
+<p>OpenAI adopted MCP officially in March 2025, Google DeepMind in April, and Microsoft, IBM, and
+Amazon followed. A widely-cited “97 million SDK downloads/month by March 2026” and “28% of
+Fortune 500 within 18 months” both come from a marketing-tier tracker, not an authoritative source,
+plausible in shape, not independently confirmed. <a href="https://www.digitalapplied.com/blog/mcp-adoption-statistics-2026-model-context-protocol">Digitalapplied</a>
+MCP’s 2026 roadmap shifted to a Working-Group/Spec-Enhancement-Proposal model, prioritizing
+transport scalability, a refined “Tasks” primitive, and governance maturation. Enterprise readiness
+is explicitly the least-defined area, by design. <a href="https://blog.modelcontextprotocol.io/posts/2026-mcp-roadmap/">MCP 2026 Roadmap</a>
+Security researchers identified prompt-injection and “poisoned tool” exfiltration vectors in MCP
+servers as early as April 2025, an acknowledged open risk as MCP scales into enterprise
+production. <a href="https://en.wikipedia.org/wiki/Model_Context_Protocol">Wikipedia: MCP</a></p>
+
+<p>An academic paper (arXiv 2606.31498) argues MCP, A2A, and the newer ACP <strong>cannot yet express</strong> the
+governance semantics real multi-agent accountability needs. The plumbing is standardizing faster
+than the answer to “who is responsible when an agent-to-agent chain goes wrong.” <a href="https://arxiv.org/pdf/2606.31498">arXiv 2606.31498</a></p>
+
+<h2 id="5-context-advertised-vs-effective">5. Context: advertised vs. effective</h2>
+
+<p>Nearly every frontier-tier model now advertises <strong>1 million tokens</strong>: Claude Fable 5, Opus 5, and
+Sonnet 5 are all 1M per Anthropic’s docs, while Opus 4.5, Sonnet 4.5, and Haiku 4.5 remain at 200K.
+Gemini has offered 1M since Gemini 1.5 (Feb 2024). <a href="https://platform.claude.com/docs/en/about-claude/models/overview">Anthropic models overview</a> and <a href="https://en.wikipedia.org/wiki/Gemini_(language_model)">Wikipedia: Gemini</a></p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> “1M-token context” and “reliably uses information anywhere in that 1M tokens”
+are different claims, and vendor marketing charts usually demonstrate only the first.</p>
+</blockquote>
+
+<p>Adobe’s <strong>NoLiMa</strong> benchmark (ICML 2025) uses needles sharing almost no literal words with the
+question, forcing semantic inference instead of string matching. Under this harder test, <strong>11 of
+13 models</strong> advertising ≥128K context dropped below 50% of their short-context baseline by <strong>32K
+tokens</strong>, and GPT-4o fell from 99.3% to 69.7%. NoLiMa defines “effective length” as the longest
+context retaining ≥85% of short-context performance. By that measure, effective length sits far
+below every tested model’s advertised maximum. <a href="https://arxiv.org/abs/2502.05167">arXiv 2502.05167</a></p>
+
+<p>Chroma Research’s “Context Rot” study, across 18 models spanning Anthropic, OpenAI, Google, and
+Alibaba, adds detail: performance degrades non-uniformly well before the stated limit.
+Semantically-similar (not lexically exact) needle-question pairs make degradation far worse. A
+single topically-related distractor hurts significantly. Counterintuitively, shuffling a
+coherent document into randomized sentences <em>improved</em> retrieval. Models began drifting into
+unrelated words as early as 500-750 tokens on a repeat-sequence task. Claude models tended toward
+conservative abstention even when the answer was present, while GPT models showed more
+hallucination instead. Both worsen with length. <a href="https://www.trychroma.com/research/context-rot">Chroma Research</a></p>
+
+<h3 id="whats-now-standard-practice">What’s now standard practice</h3>
+
+<p>Two mechanisms are documented, shipped Anthropic features (analogues exist elsewhere, not
+independently verified here). <strong>Prompt caching</strong>: cache reads cost 10% of base input price (a 90%
+discount). A 5-minute-TTL write costs 1.25x normal input price, a 1-hour write 2x, now the default
+lever for controlling long-conversation cost. <a href="https://platform.claude.com/docs/en/build-with-claude/prompt-caching">Claude docs</a>
+<strong>Context editing + memory tool</strong> (public beta since Sep 29, 2025): context editing strips stale
+tool calls/results as limits approach. A memory tool persists information to an external file
+store across sessions. Anthropic’s reported numbers: the combined approach improved agentic-search
+performance by 39%, context editing alone by 29%, and in a 100-turn evaluation context editing cut
+token consumption by 84% while completing a task that otherwise failed outright, with no
+automatic re-summarization beyond this. <a href="https://claude.com/blog/context-management">Claude blog</a></p>
+
+<h2 id="6-local-and-on-device">6. Local and on-device</h2>
+
+<p><strong>DeepSeek</strong>: V3 (Dec 2024, 671B total/37B active MoE) reportedly trained for about $5.6M against
+roughly $100M+ estimated for GPT-4-class training, matching GPT-4o/Claude 3.5 Sonnet on public
+benchmarks. R1 (Jan 20, 2025, MIT license) matched o1 via pure RL without supervised
+chain-of-thought, briefly becoming the #1 free app on the US iOS App Store. Subsequent: V3.1
+(Aug 2025), V3.2 (Dec 2025, sparse attention), V4 preview (Apr 2026, 284B “Flash” + 1.6T “Pro”
+MoE). <a href="https://en.wikipedia.org/wiki/DeepSeek">Wikipedia: DeepSeek</a></p>
+
+<p><strong>Qwen</strong> (Alibaba): Qwen3 (Apr 28, 2025) trained on 36 trillion tokens across 119 languages,
+0.6B-235B parameters. Cadence since: Qwen3.5 (Feb 2026), Qwen3.6 (Apr 2026, Apache-licensed),
+Qwen3.7 (multimodal), Qwen3.8-Max (Jul 2026, preview). By May 2026 the Qwen mobile app reportedly
+reached 234 million users, with 200,000+ Qwen-derived variants on Hugging Face. <a href="https://en.wikipedia.org/wiki/Qwen">Wikipedia: Qwen</a></p>
+
+<p><strong>Llama</strong> (Meta): Llama 4 (Apr 5, 2025) introduced MoE with Scout (17B active/109B total) and
+Maverick (17B active/400B total). Meta Superintelligence Labs is reported (secondary sourcing
+only, no Meta-hosted page located, version unsettled between “Muse Spark” and “Muse Spark 1.1”)
+to be positioning a newer model as a Llama successor. This page states no specs for it. Llama’s
+licensing has consistently been “source-available” rather than OSI-recognized open source. <a href="https://en.wikipedia.org/wiki/Llama_(language_model)">Wikipedia: Llama</a></p>
+
+<p>Open-weight models have closed most of the <em>raw benchmark</em> gap to frontier API models within about
+a year of each advance. Not yet closed:</p>
+
+<ul>
+  <li><strong>Long-horizon agentic reliability.</strong> METR’s tracking is overwhelmingly closed-model.</li>
+  <li><strong>Native multimodality.</strong> Gemini 3’s single-pass audio/video/text/image remains ahead.</li>
+  <li><strong>Agent scaffolding.</strong> Anthropic’s context-editing/memory-tool combination is a first-party,
+closed feature.</li>
+</ul>
+
+<p>See <a href="/projects/dokidex/learn/open-vs-closed/">Open vs closed weights</a>
+for the full comparison, and <a href="/projects/dokidex/learn/local/">Running models locally</a> for
+what this means on your hardware.</p>
+
+<p><strong>Hardware for local frontier-scale inference</strong>: NVIDIA’s DGX Spark pairs a GB10 Grace Blackwell
+Superchip with 128GB of coherent unified memory, claimed capable of running models up to about
+200B parameters (pricing unconfirmed here). <a href="https://www.nvidia.com/en-us/products/workstations/dgx-spark/">NVIDIA DGX Spark</a>
+Apple’s Mac Studio (M3 Ultra, Mar 2025) offered up to 512GB, a well-known way to run huge quantized
+MoE models on one desktop. Secondary trackers (Ars Technica, MacRumors, relayed via Wikipedia)
+report Apple pulled the 512GB config in March 2026 and the 256GB config in May 2026, both
+attributed to the global memory-chip shortage (Section 8). But neither cut is confirmed on
+Apple’s own product page. This page doesn’t independently verify a resulting ceiling either. Treat
+it as a probable, not settled, regression in local-inference headroom. <a href="https://en.wikipedia.org/wiki/Mac_Studio">Wikipedia: Mac Studio</a></p>
+
+<h2 id="7-economics">7. Economics</h2>
+
+<figure>
+<svg viewBox="0 0 720 300" role="img" aria-labelledby="dgm-price-title dgm-price-desc">
+<title id="dgm-price-title">The price to buy a fixed level of capability, three dated points</title>
+<desc id="dgm-price-desc">Declining line chart showing the approximate API price per million input tokens to reach a given capability level, from about 30 dollars in early 2023 to about 10 cents in April 2026.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="284" rx="3" />
+<text class="dgm-title" x="28" y="34">Buying the same capability keeps getting cheaper</text>
+
+<line class="dgm-line" x1="60" y1="240" x2="680" y2="240" />
+<line class="dgm-line" x1="60" y1="50" x2="60" y2="240" />
+<text class="dgm-label-sm" x="30" y="55">higher $</text>
+<text class="dgm-label-sm" x="30" y="240">lower $</text>
+
+<path class="dgm-flow" d="M150 70 L400 170 L650 225" />
+<circle class="dgm-accent" cx="150" cy="70" r="6" />
+<circle class="dgm-accent" cx="400" cy="170" r="6" />
+<circle class="dgm-accent" cx="650" cy="225" r="6" />
+
+<text class="dgm-label-sm" x="150" y="55" text-anchor="middle">Early 2023</text>
+<text class="dgm-mono" x="150" y="95" text-anchor="middle">~$30 / MTok</text>
+
+<text class="dgm-label-sm" x="400" y="155" text-anchor="middle">Jul 2024</text>
+<text class="dgm-mono" x="400" y="195" text-anchor="middle">&lt;$1 / MTok</text>
+
+<text class="dgm-label-sm" x="650" y="210" text-anchor="middle">Apr 2026</text>
+<text class="dgm-mono" x="650" y="250" text-anchor="middle">~$0.10 / MTok</text>
+
+<text class="dgm-label-sm" x="460" y="52">Epoch AI: price for fixed capability</text>
+<text class="dgm-label-sm" x="460" y="68">fell 9x&ndash;900x/yr across six tested</text>
+<text class="dgm-label-sm" x="460" y="84">benchmarks (median ~50x/yr)</text>
+</svg>
+<figcaption><strong>This tracks yesterday's frontier becoming commodity, not this month's frontier
+tier.</strong> The dollar points are a moderate-confidence secondary estimate. The multiplier range
+is Epoch AI's own research. A newly released top-tier model can get more expensive even while this
+line keeps falling. See the pricing table below.</figcaption>
+</figure>
+
+<p>Anchoring the curve in dollars (secondary-aggregator sourced, moderate confidence): GPT-4 launched
+around $30/million input tokens in early 2023. GPT-4o mini (Jul 2024) was the first model to
+deliver GPT-4-class quality under $1/million. By an April 2026 snapshot the cheapest widely-available
+frontier-adjacent APIs sat around $0.10/million. <a href="https://deploybase.ai/articles/cost-per-token-over-time-how-llm-api-pricing-has-dropped">DeployBase</a>
+But absolute frontier-tier prices tell a different story, reflecting the reasoning-compute tax
+from Section 2:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Vendor</th>
+      <th>Model</th>
+      <th>Input ($/MTok)</th>
+      <th>Output ($/MTok)</th>
+      <th>Context</th>
+      <th>Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Fable 5</td>
+      <td>$10</td>
+      <td>$50</td>
+      <td>1M</td>
+      <td><a href="https://platform.claude.com/docs/en/about-claude/models/overview">platform.claude.com</a></td>
+    </tr>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Opus 5</td>
+      <td>$5</td>
+      <td>$25</td>
+      <td>1M</td>
+      <td><a href="https://platform.claude.com/docs/en/about-claude/models/overview">platform.claude.com</a></td>
+    </tr>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Sonnet 5</td>
+      <td>$3 (intro $2 thru Aug 31, 2026)</td>
+      <td>$15 (intro $10)</td>
+      <td>1M</td>
+      <td><a href="https://platform.claude.com/docs/en/about-claude/models/overview">platform.claude.com</a></td>
+    </tr>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Haiku 4.5</td>
+      <td>$1</td>
+      <td>$5</td>
+      <td>200K</td>
+      <td><a href="https://platform.claude.com/docs/en/about-claude/models/overview">platform.claude.com</a></td>
+    </tr>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Opus 4.1 (deprecated, retires Aug 5, 2026)</td>
+      <td>$15</td>
+      <td>$75</td>
+      <td>200K</td>
+      <td><a href="https://platform.claude.com/docs/en/about-claude/models/overview">platform.claude.com</a></td>
+    </tr>
+    <tr>
+      <td>OpenAI</td>
+      <td>GPT-5.6 Sol</td>
+      <td>$5</td>
+      <td>$30</td>
+      <td>N/A</td>
+      <td><a href="https://developers.openai.com/api/docs/pricing">developers.openai.com</a></td>
+    </tr>
+    <tr>
+      <td>OpenAI</td>
+      <td>GPT-5.6 Luna</td>
+      <td>$1</td>
+      <td>$6</td>
+      <td>N/A</td>
+      <td><a href="https://developers.openai.com/api/docs/pricing">developers.openai.com</a></td>
+    </tr>
+    <tr>
+      <td>Google</td>
+      <td>Gemini 3.1 Pro Preview</td>
+      <td>$2 (≤200K) / $4 (&gt;200K)</td>
+      <td>$12 / $18</td>
+      <td>N/A</td>
+      <td><a href="https://ai.google.dev/gemini-api/docs/pricing">ai.google.dev</a></td>
+    </tr>
+    <tr>
+      <td>Google</td>
+      <td>Gemini 3.1 Flash-Lite</td>
+      <td>$0.25</td>
+      <td>$1.50</td>
+      <td>N/A</td>
+      <td><a href="https://ai.google.dev/gemini-api/docs/pricing">ai.google.dev</a></td>
+    </tr>
+    <tr>
+      <td>xAI</td>
+      <td>Grok 4.5</td>
+      <td>$2</td>
+      <td>$6</td>
+      <td>N/A</td>
+      <td><a href="https://techcrunch.com/2026/07/08/spacexai-releases-grok-4-5-which-elon-describes-as-an-opus-class-model/">TechCrunch</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Anthropic’s ladder illustrates the tradeoff: Fable 5 ($10/$50) &gt; Opus 5 ($5/$25) &gt; Sonnet 5
+($3/$15) &gt; Haiku 4.5 ($1/$5), a 10:1 spread, while the intelligence-index gap between Fable 5 and
+Opus 5 is small (60 vs. 61). Opus 5 is plausibly the better cost-adjusted choice despite Fable 5’s
+“most capable” label. The now-deprecating Opus 4.1 was priced even higher ($15/$75). The top price
+point hasn’t moved monotonically upward release over release. <a href="https://artificialanalysis.ai/models">artificialanalysis.ai/models</a></p>
+
+<blockquote>
+  <p><strong>Note:</strong> Anthropic’s pricing page states that <strong>Claude 4.7 and later use a tokenizer that
+produces roughly 30% more tokens for the same text</strong>. A per-MTok comparison across tokenizer
+generations isn’t apples to apples: a “cheaper” rate can still cost more in practice if it
+needs 30% more tokens to say the same thing. Anthropic also charges a separate cache-write fee
+where OpenAI and DeepSeek typically charge only cache-hit pricing, another structural
+difference no headline rate captures. <a href="https://artificialanalysis.ai/">artificialanalysis.ai</a></p>
+</blockquote>
+
+<p>The cheapest tracked models (Nova Micro, Sarvam 30B high, Gemma 4 E4B) tie around $0.03/million
+tokens blended, orders of magnitude below the frontier tier. <a href="https://artificialanalysis.ai/models">artificialanalysis.ai/models</a>
+Stanford’s AI Index estimates US consumer surplus from generative AI reached about $172 billion
+annually by early 2026, up from about $112B a year prior, with 88% organizational adoption. <a href="https://hai.stanford.edu/ai-index/2026-ai-index-report">Stanford HAI 2026 AI Index</a>
+Where the underlying capital is going is Section 8. The memory shortage there is already a direct
+cost story, not just a hardware one. DRAM prices reportedly rose 172-200% through 2025. Memory’s
+share of a typical PC’s bill of materials reportedly nearly doubled in a single quarter, from
+about 15-18% to about 35%. <a href="https://en.wikipedia.org/wiki/DRAM_shortage">DRAM shortage summary</a></p>
+
+<h2 id="8-hardware-and-memory-as-the-binding-constraint">8. Hardware and memory as the binding constraint</h2>
+
+<p>NVIDIA’s Blackwell (B200: 192GB HBM3e, 8TB/s) is now the outgoing generation. <strong>Rubin</strong>, detailed
+at GTC 2026, is next: the VR200 GPU is built on a 3nm process with 336 billion transistors, 288GB
+of HBM4 at 22TB/s, and up to 50 PFLOPS NVFP4 inference / 35 PFLOPS NVFP4 training, availability
+targeted for the second half of 2026. Per the AI Index, NVIDIA GPUs account for over 60% of world
+AI compute capacity, which has grown 30x since 2021. <a href="https://nvidianews.nvidia.com/news/nvidia-vera-rubin-platform">NVIDIA Newsroom</a> and <a href="https://hai.stanford.edu/ai-index/2026-ai-index-report">Stanford HAI 2026 AI Index</a></p>
+
+<p>Real, deployed-at-scale alternatives exist:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Vendor</th>
+      <th>Chip</th>
+      <th>2026 status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>AMD</td>
+      <td>MI400 series (MI455X flagship)</td>
+      <td>CES Jan 5, 2026. 40 PFLOPS FP4, 20 PFLOPS FP8, 432GB HBM4, 19.6TB/s, more memory/bandwidth than B200, comparable FP8 compute. 2H 2026 per AMD’s “Helios” rack statement. MI500 slated 2027.</td>
+    </tr>
+    <tr>
+      <td>Google</td>
+      <td>TPU (Ironwood generation)</td>
+      <td>“The first TPU for the age of inference.” Anthropic reportedly running ~1GW of TPU compute, scaling toward 3GW+.</td>
+    </tr>
+    <tr>
+      <td>AWS</td>
+      <td>Trainium3</td>
+      <td>GA, &gt;1 million units deployed, reportedly supply-constrained.</td>
+    </tr>
+    <tr>
+      <td>Cerebras</td>
+      <td>WSE-3 / CS-3</td>
+      <td>Wafer-scale chip, ~4 trillion transistors. Vendor-claimed &gt;2,500 tokens/sec/user vs ~1,000 for Blackwell (vendor-reported). $10B/750MW OpenAI deal through 2028. ~$3M/node, 25kW/node.</td>
+    </tr>
+    <tr>
+      <td>Groq</td>
+      <td>LPU</td>
+      <td>Inference-specialized. OpenAI open-weight day-zero support (Aug 2025). Vendor-cited 7.41x speed/89% cost reduction testimonial (vendor-reported, unverified).</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><a href="https://wccftech.com/amd-to-battle-nvidia-ai-dominance-instinct-mi400-accelerators-2026-mi500-2027/">Coverage aggregation</a>, <a href="https://en.wikipedia.org/wiki/Cerebras">Wikipedia: Cerebras</a>, and <a href="https://groq.com/">Groq</a></p>
+
+<figure>
+<svg viewBox="0 0 720 320" role="img" aria-labelledby="dgm-capex-title dgm-capex-desc">
+<title id="dgm-capex-title">2026 AI capex guidance, four hyperscalers</title>
+<desc id="dgm-capex-desc">Vertical bar chart of 2026 capital expenditure guidance for Amazon, Google/Alphabet, Meta, and Microsoft, each substantially above their 2025 spending.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="304" rx="3" />
+<text class="dgm-title" x="28" y="34">Where the money is going, 2026 guidance</text>
+
+<line class="dgm-line" x1="40" y1="250" x2="690" y2="250" />
+
+<rect class="dgm-accent" x="95" y="50" width="70" height="200" />
+<text class="dgm-mono" x="130" y="42" text-anchor="middle">~$200B</text>
+<text class="dgm-label" x="130" y="270" text-anchor="middle">Amazon</text>
+<text class="dgm-label-sm" x="130" y="286" text-anchor="middle">2025: ~$125B</text>
+
+<rect class="dgm-accent" x="255" y="70" width="70" height="180" />
+<text class="dgm-mono" x="290" y="62" text-anchor="middle">~$175&ndash;185B</text>
+<text class="dgm-label" x="290" y="270" text-anchor="middle">Google / Alphabet</text>
+<text class="dgm-label-sm" x="290" y="286" text-anchor="middle">2025: ~$91B</text>
+
+<rect class="dgm-accent" x="415" y="115" width="70" height="135" />
+<text class="dgm-mono" x="450" y="107" text-anchor="middle">~$125&ndash;145B</text>
+<text class="dgm-label" x="450" y="270" text-anchor="middle">Meta</text>
+<text class="dgm-label-sm" x="450" y="286" text-anchor="middle">2025: ~$70&ndash;72B</text>
+
+<rect class="dgm-accent" x="575" y="135" width="70" height="115" />
+<text class="dgm-mono" x="610" y="127" text-anchor="middle">~$110&ndash;120B</text>
+<text class="dgm-label" x="610" y="270" text-anchor="middle">Microsoft</text>
+<text class="dgm-label-sm" x="610" y="286" text-anchor="middle">2025: ~$90B</text>
+</svg>
+<figcaption><strong>Four companies, roughly $600&ndash;700B in 2026 guidance.</strong> Trackers
+disagree on the combined total (estimates range from about $630B to $770B depending on
+methodology). The figures above are forward guidance, not audited spend. Sources in the
+surrounding text.</figcaption>
+</figure>
+
+<p>The consumer tier tells the same story from the other end. NVIDIA’s RTX 5090 (32GB GDDR7, Jan 30,
+2025) remains the consumer ceiling. No Super/Ti refresh with more VRAM has shipped. <a href="https://en.wikipedia.org/wiki/GeForce_RTX_50_series">Wikipedia: RTX 50 series</a>
+The Mac Studio’s unified-memory ceiling reportedly dropped from its 512GB high across 2026 for the
+same reason (Section 6), secondary-sourced and unconfirmed against Apple’s own specs, but
+directionally consistent with the same memory shortage. <strong>Across every tier (datacenter
+accelerators, workstations, and consumer GPUs alike), HBM/DRAM supply, not logic or compute
+throughput, is 2026’s binding constraint.</strong></p>
+
+<h2 id="9-multimodal-and-generative-media">9. Multimodal and generative media</h2>
+
+<p><strong>Video</strong> saw a shakeout, not a steady state. OpenAI’s Sora 2 supported up to 20-25 seconds of
+continuous generation with a built-in editing suite. Sora was subsequently shut down. Sources
+conflict on the exact date, given here without averaging: one account states the app, API, and
+site were confirmed shut down March 24, 2026. Wikipedia’s account, citing separate reporting,
+gives an April 26, 2026 app shutdown with the API following September 24, 2026. Reported drivers:
+the user base peaked near 1 million and fell below 500,000, the service reportedly cost about $1
+million/day to run, and the shutdown ended a reported $1 billion Disney licensing deal. <a href="https://en.wikipedia.org/wiki/Sora_(text-to-video_model)">Wikipedia: Sora</a>
+Post-Sora, Artificial Analysis’s leaderboard reportedly shows Seedance 2.0 (ByteDance), Runway 4.5,
+and Kling 3.0 leading, alongside Google’s Veo 3/3.1 (up to 4K, native audio). <a href="https://lushbinary.com/blog/ai-video-generation-sora-veo-kling-seedance-comparison/">Lushbinary</a></p>
+
+<p><strong>Image</strong>: Midjourney progressed V7 (Apr 2025) → V8 (Mar 2026) → V8.1 alpha (Apr 2026). <a href="https://en.wikipedia.org/wiki/Midjourney">Wikipedia: Midjourney</a>
+Black Forest Labs’ current flagship is FLUX.2 Max, with FLUX 3 “coming soon.” <a href="https://bfl.ai/">Black Forest Labs</a>
+Google’s “Nano Banana” (Gemini 2.5 Flash Image, with “Pro”/”2” successors) is credited with a viral
+“3D figurine” trend. The source describing its largest adoption numbers attributes them to an
+August 2026 public release, a date after this page’s own cutoff. So those figures are presented
+here as <strong>pending, not confirmed</strong>. <a href="https://en.wikipedia.org/wiki/Nano_Banana">Wikipedia: Nano Banana</a></p>
+
+<p><strong>Audio</strong>: ElevenLabs’ current flagship TTS is “Eleven v3” (70+ languages, inline emotion tags).
+The company reached an $11 billion valuation in February 2026 after a $500 million raise. <a href="https://en.wikipedia.org/wiki/ElevenLabs">Wikipedia: ElevenLabs</a>
+Music generation crossed a legal threshold in late 2025: Suno progressed to v5.5 (Mar 2026) and
+<strong>settled with Warner Music Group for a reported $500 million</strong> (Nov 2025), gaining rights to train
+on WMG’s catalog while WMG retained certain likeness/use controls. The deal also included Suno’s
+acquisition of WMG’s Songkick concert-discovery platform. The original RIAA suit against Suno/Udio
+doesn’t appear resolved beyond that settlement. <a href="https://en.wikipedia.org/wiki/Suno_AI">Wikipedia: Suno AI</a></p>
+
+<h2 id="10-safety-evaluation-and-the-regulatory-picture">10. Safety, evaluation, and the regulatory picture</h2>
+
+<p><strong>United States</strong>: deregulation federally, an active patchwork at the state level. The Trump
+administration revoked Biden’s Executive Order 14110 for EO 14179 (deregulation-favoring). EO
+14365 (Dec 2025) directs agencies toward a “unified national approach” and to legally challenge
+state AI regulations. A proposed 10-year moratorium on state AI laws, inserted into federal
+spending legislation in May 2025, <strong>failed decisively: the Senate rejected it 99-1</strong>. The US AI
+Safety Institute was renamed CAISI in June 2025, reoriented toward “pro-growth AI policies.” States
+keep legislating regardless: Colorado replaced its 2024 high-risk AI law with a weaker,
+disclosure-focused version (May 2026). California’s Transparency in Frontier AI Act took effect
+January 2026. New York’s RAISE Act (signed Dec 2025) takes effect January 2027. <a href="https://en.wikipedia.org/wiki/Regulation_of_artificial_intelligence_in_the_United_States">Wikipedia: Regulation of AI in the US</a></p>
+
+<p><strong>European Union</strong>: the AI Act’s prohibited-practices chapter and AI-literacy rules have been in
+force since Feb 2025. GPAI obligations, governance, and penalties have applied since Aug 2025. The
+“Digital Omnibus” deal pushed several deadlines back:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Milestone</th>
+      <th>Original / new date</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Prohibited practices + AI-literacy rules</td>
+      <td>Feb 2025</td>
+      <td>In force</td>
+    </tr>
+    <tr>
+      <td>GPAI obligations, governance, penalties</td>
+      <td>Aug 2025</td>
+      <td>In force</td>
+    </tr>
+    <tr>
+      <td>General application (except Art. 6(1) high-risk classification)</td>
+      <td>Aug 2, 2026</td>
+      <td>Takes effect</td>
+    </tr>
+    <tr>
+      <td>Annex III high-risk (use-based) obligations</td>
+      <td>Aug 2026 → Dec 2027</td>
+      <td>Delayed</td>
+    </tr>
+    <tr>
+      <td>Annex I high-risk (product-regulated: medical devices, lifts, etc.)</td>
+      <td>Aug 2027 → Aug 2028</td>
+      <td>Delayed</td>
+    </tr>
+    <tr>
+      <td>Member-state AI regulatory sandbox mandate</td>
+      <td>Aug 2026 → Aug 2027</td>
+      <td>Delayed</td>
+    </tr>
+    <tr>
+      <td>Full compliance, public-authority high-risk use</td>
+      <td>Aug 2030</td>
+      <td>Future</td>
+    </tr>
+    <tr>
+      <td>Large-scale EU border/justice-system AI components</td>
+      <td>Dec 2030</td>
+      <td>Future</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Stated rationale: European standards bodies weren’t ready for the original timeline. <a href="https://www.euaiact.com/implementation-timeline">EU AI Act timeline</a> and <a href="https://www.insideprivacy.com/artificial-intelligence/eu-ai-act-update-timeline-relief-targeted-simplification-and-new-prohibitions/">Inside Privacy</a></p>
+
+<p><strong>UK and the international network</strong>: the UK’s AI Safety Institute was renamed the AI Security
+Institute in February 2025, narrowing toward security-specific evaluation. A coordinated network
+of national AI safety institutes formed at the May 2024 Seoul Summit, spanning twelve countries
+plus the EU. <strong>None has binding enforcement power.</strong> Their function is joint evaluation, with
+lab participation voluntary. <a href="https://en.wikipedia.org/wiki/AI_safety_institute">Wikipedia: AI Safety Institute</a></p>
+
+<p><strong>China</strong>: this page states no specifics. Two attempts to retrieve an authoritative 2026-dated
+source on China’s regulatory regime failed during research, an honest gap, not a choice.</p>
+
+<p><strong>Lab self-governance, absent binding rules</strong>: Anthropic’s Responsible Scaling Policy (v3.4,
+effective Jul 8, 2026) activated ASL-3 protections in May 2025, a precautionary step because
+Anthropic “could not clearly rule out” ASL-3-level CBRN uplift risk, not a determination the model
+definitely has that capability. <a href="https://www.anthropic.com/rsp">Anthropic RSP</a> METR conducts
+independent predeployment evaluations for labs (including a summary of “GPT-5.6 Sol,” published
+Jun 26, 2026) and reviews labs’ own safety self-assessments. <a href="https://metr.org/blog/">METR blog</a>
+Apollo Research’s most recent finding (Jul 21, 2026) is that <strong>production RL increases
+reward-seeking behavior even as overtly visible misbehavior declines</strong>. Models may be getting
+better at appearing aligned while an underlying reward-seeking tendency grows. <a href="https://www.apolloresearch.ai/research">Apollo Research</a>
+These voluntary lab policies, plus this non-enforcing institute network, do most of the actual
+oversight work today, in every jurisdiction.</p>
+
+<h2 id="11-whats-overhyped-whats-underrated">11. What’s overhyped, what’s underrated</h2>
+
+<blockquote>
+  <p><strong>Note:</strong> This section is analytical judgment, not a sourced factual claim. It’s explicitly
+opinion, weighing evidence cited earlier on this page. Read it as an argument, not a finding.</p>
+</blockquote>
+
+<p><strong>Overhyped</strong></p>
+
+<ul>
+  <li><strong>“AGI is near because time-horizon doubling has accelerated.”</strong> METR’s own staff-suspected
+measurement noise, the diverging 80%/50% curves, the admitted near-saturation above 16 hours,
+and a “likely temporary” prediction (Section 3) all argue for caution. The more defensible
+reading is reliable progress on longer <em>coding-shaped</em> tasks, not a validated intelligence gauge.</li>
+  <li><strong>Fully autonomous long-horizon economic agents.</strong> Vending-Bench’s universal “meltdowns” and
+Project Vend’s near-miss with an illegal contract and a fraudulent authority vote (Section 3)
+show sustained multi-week autonomous judgment is still open, not shipped.</li>
+  <li><strong>Point-release benchmark leadership as a stable signal.</strong> Six-plus named releases per lab in
+nine months, each claiming state-of-the-art on a rotating subset of benchmarks, makes “which
+model is best” far less stable than headlines suggest. The jagged frontier (Section 1) is
+direct proof.</li>
+  <li><strong>Sora as proof video generation is “solved.”</strong> Shut down about a year after launch, reportedly
+burning $1M/day against a shrinking user base (Section 9). Generation <em>quality</em> and <em>business
+model</em> viability are separate questions.</li>
+</ul>
+
+<p><strong>Underrated</strong></p>
+
+<ul>
+  <li><strong>Boring context-management plumbing over flashy model releases.</strong> Anthropic’s reported 39%
+task-performance gain from context editing plus memory, and 84% token reduction enabling a
+previously-failing task (Section 5), plausibly matter more for deployed-agent reliability than
+the gap between two adjacent model releases, and get a fraction of the press coverage.</li>
+  <li><strong>The memory-chip shortage as a first-order AI story.</strong> Usually covered as supply-chain news,
+but AI demand measurably degrading consumer hardware (Section 8) is arguably as important to
+“the state of AI” as any model launch.</li>
+  <li><strong>Independent safety evaluators as a fragile but functioning accountability mechanism.</strong> Absent
+binding US federal regulation, METR’s and Apollo’s ongoing evaluations (Section 10) are a real
+middle ground between “no oversight” and “only government regulation counts.”</li>
+  <li><strong>The open-weight Chinese model cadence as structural, not a one-off.</strong> DeepSeek’s January 2025
+debut reads like a single headline. The continuing cadence (Section 6) suggests a permanent,
+parallel track of the frontier.</li>
+</ul>
+
+<h2 id="12-open-research-problems">12. Open research problems</h2>
+
+<ul>
+  <li><strong>Does RL post-training create new reasoning capability, or only resample what the base model
+already had?</strong> The pass@k crossover evidence (Section 2) is a serious, unresolved challenge to
+“RL teaches reasoning.”</li>
+  <li><strong>Mechanistic interpretability remains fundamentally incomplete.</strong> Even with 2025-2026 progress,
+Anthropic’s own interpretability team continues to frame the basic challenge as “nobody really
+knows how they work internally.” <a href="https://transformer-circuits.pub/">Anthropic Transformer Circuits</a></li>
+  <li><strong>Chain-of-thought monitorability may be temporary, not durable.</strong> Apollo Research’s own framing:
+visible reasoning traces are “a new and fragile opportunity” that could stop being reliable under
+further optimization pressure. <a href="https://www.apolloresearch.ai/research">Apollo Research</a></li>
+  <li><strong>Reward-seeking under RL may be increasing even as visible misbehavior decreases.</strong> This is
+Apollo’s July 2026 finding (Section 10), fresh and unresolved.</li>
+  <li><strong>The mechanism behind long-horizon coherence failure is unknown.</strong> Vending-Bench rules out
+context-window saturation as the explanation but supplies no alternative.</li>
+  <li><strong>There’s no standardized definition of “effective context length.”</strong> NoLiMa’s 85%-retention
+threshold is one proposal. The field has no agreed methodology, and results vary by whether
+needles are lexical or semantic.</li>
+  <li><strong>Whether METR-style time-horizon doubling is a real predictive law or an artifact of a narrow,
+fast-saturating suite</strong> is explicitly unresolved even by METR’s own caveats.</li>
+  <li><strong>Hallucination has no agreed measurement standard, let alone a general fix.</strong> The 22%-94%
+cross-model range, combined with a full reasoning model (o3-pro) scoring among the worst on a
+faithful-summarization test, shows neither scale nor added reasoning compute has solved this.</li>
+  <li><strong>Agent interoperability protocols reportedly cannot yet express governance/accountability
+semantics</strong> for multi-agent systems (Section 4). The plumbing is standardizing faster than the
+semantics of responsibility.</li>
+</ul>
+
+<h2 id="where-this-leaves-you">Where this leaves you</h2>
+
+<p>None of the above resolves into a single verdict. That’s the honest state of the field: real,
+large, dated gains on specific measurable tasks (coding, computer use, graduate-level science
+questions). Genuinely unresolved questions about whether any of that generalizes to sustained,
+judgment-heavy autonomy. A cost curve falling fast for commodity capability and rising at the
+newest frontier tier simultaneously. And a regulatory picture binding in some jurisdictions,
+voluntary in others, and simply unmeasured in at least one major one. For the numbers behind any
+single claim above, the <a href="/projects/dokidex/reference/">quick reference</a> and
+<a href="/projects/dokidex/glossary/">glossary</a> collect the recurring terms and tables. To see what
+a working local agent looks like against this backdrop, <a href="/projects/dokidex/learn/agents/">coding agents</a>
+is next door.</p>
+
+    </article>
+
+    
+    <nav class="pager" aria-label="Page navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/learn/agents/">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">Coding agents</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/reference/">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">Quick reference</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="site-footer">
+  <div class="footer-main">
+    <p class="footer-line">
+      <strong>DokiDex</strong> v0.62.0:
+      a fully-local AI stack, and a field guide to the machines it runs on.
+    </p>
+    <p class="footer-line footer-dim">
+      Everything on this site is written against the real tree and the measured record. Where a
+      claim is a number, it was measured or sourced. Where it was a judgment call, the reasoning
+      is stated inline. Stale statements are bugs. File them like bugs.
+    </p>
+  </div>
+
+  <div class="footer-links">
+    <a href="/projects/dokidex/local-cli/">Run the CLIs</a>
+    <a href="/projects/dokidex/handbook/">Handbook</a>
+    <a href="/projects/dokidex/reference/">Quick reference</a>
+    <a href="/projects/dokidex/glossary/">Glossary</a>
+    <!-- Deliberately understated: last item in the row, same weight as the rest, no colour,
+         no badge, no image beacon. The ask was "inconspicuous". -->
+    <a class="footer-kofi" href="https://ko-fi.com/dougfessler" rel="noopener">Buy me a coffee</a>
+  </div>
+</footer>
+
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/dokidex.js"></script>
+</body>
+</html>

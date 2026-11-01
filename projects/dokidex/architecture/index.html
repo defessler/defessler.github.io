@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How DokiDex is built · DokiDex</title>
+<meta name="description" content="A systems-level tour of the stack: the real vendor CLIs over one local model server over one GPU, how a model gets seated and evicted, and the context economics that shape every other decision.">
+
+<!-- Open Graph / Twitter, hand-rolled: jekyll-seo-tag is not available under the pinned
+     github-pages gem set used by actions/jekyll-build-pages. -->
+<meta property="og:site_name" content="DokiDex">
+<meta property="og:title" content="How DokiDex is built">
+<meta property="og:description" content="A systems-level tour of the stack: the real vendor CLIs over one local model server over one GPU, how a model gets seated and evicted, and the context economics that shape every other decision.">
+<meta property="og:type" content="website">
+<!-- site_origin rather than absolute_url: see the comment in _config.yml. absolute_url would
+     emit http:// here, because the Pages API reports an http html_url while Enforce HTTPS is off. -->
+<meta property="og:url" content="https://dougfessler.com/projects/dokidex/architecture/">
+<link rel="canonical" href="https://dougfessler.com/projects/dokidex/architecture/">
+<!-- `summary`, not `summary_large_image`: no og:image or twitter:image is emitted anywhere on
+     this site, and the large-image card renders as a blank rectangle without one. Switch this back
+     the same day a 1200x630 share asset lands, not before. -->
+<meta name="twitter:card" content="summary">
+
+<!-- Same four families as the handbook, so the two halves of the site read as one product:
+     Marcellus (power words) · Kanit (headings, kickers, nav) · IBM Plex Mono (code, stats) ·
+     Figtree (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/dokidex.css">
+<link rel="icon" href="/projects/dokidex/assets/favicon.svg" type="image/svg+xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<!-- `wide: true` in a page's front matter opts it into --content-w-wide (assets/dokidex.css:51).
+     The CSS keys off `.page-wide` on an ancestor. Without the class emitted here the front-matter
+     flag silently does nothing. -->
+<body class="page-wide">
+<a class="skip-link" href="#content">Skip to content</a>
+
+<!-- CSS-only nav toggle. A checkbox beats a JS drawer here: the nav has to work on the mobile
+     read where the reader has scrolled 4000px into a reference table, and a checkbox cannot
+     desync from its own state the way a JS flag can. -->
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/">DokiDex</a>
+    <a class="topbar-cta" href="/projects/dokidex/download/"><svg class="dl-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><g class="dl-arrow"><path d="M8 2.2v6.5"/><path d="M5.2 5.9 8 8.7l2.8-2.8"/></g><path class="dl-tray" d="M3.2 11.3v2.5h9.6v-2.5"/></svg>
+Download</a>
+  </header>
+
+  <!-- Grouped navigation, driven by site.nav in _config.yml.
+
+     A page is "current" when its url matches exactly. The handbook is the one entry that also
+     needs to light up for its children (/handbook/03-serving.html), so it gets a prefix test —
+     without it, the sidebar would show nothing selected the moment a reader steps into a
+     chapter, which reads as "you have left the site". -->
+<nav class="sidebar" aria-label="Site sections">
+  <a class="sidebar-brand" href="/projects/dokidex/">
+    <span class="sidebar-mark" aria-hidden="true">&#9612;&#9608;&#9608;&#9616;</span>
+    <span class="sidebar-brand-text">DokiDex</span>
+  </a>
+
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Start</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/"
+             >Overview</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Use DokiDex</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/local-cli/"
+             >Run the CLIs locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/download/"
+             >Download the launchers</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/models/"
+             >Models it runs</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/games/"
+             >Games the models built</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/telemetry/"
+             >Performance data</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/qwen38/"
+             >Qwen3.8-27B, measured</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link is-active"
+             href="/projects/dokidex/architecture/"
+             aria-current="page">How it's built</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Learn AI</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/"
+             >Where to start</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/basics/"
+             >1 · Foundations</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/core/"
+             >2 · How models work</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/advanced/"
+             >3 · Advanced</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/naming/"
+             >Decoding model names</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/open-vs-closed/"
+             >Open vs closed weights</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/benchmarks/"
+             >Benchmarks</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/local/"
+             >Running models locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/agents/"
+             >Coding agents</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Context</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/state-of-ai/"
+             >State of AI, 2026</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/reference/"
+             >Quick reference</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/glossary/"
+             >Glossary</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Deep dive</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/handbook/"
+             >The Handbook</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+</nav>
+
+
+  <main class="main">
+    <div class="page-head">
+      <p class="kicker">:: THE ARCHITECTURE</p>
+      <h1 class="page-title">How DokiDex is built</h1>
+      <p class="page-desc">A systems-level tour of the stack: the real vendor CLIs over one local model server over one GPU, how a model gets seated and evicted, and the context economics that shape every other decision.</p>
+      
+      <p class="level-badges">
+        <span class="level-badge level-intermediate">Intermediate</span>
+      </p>
+      
+    </div>
+
+    <article id="content" class="prose">
+      <p>This page is meant as a systems-level tour of DokiDex: what the pieces are, how a request moves
+through them, and which single constraint is really doing the shaping. It’s the visual overview.
+The <a href="/projects/dokidex/handbook/">engineering handbook</a> goes deeper on each layer. This page
+links into it rather than restating it.</p>
+
+<p>Every architectural claim below traces to a file you can open. Citations are <code class="language-plaintext highlighter-rouge">file:line</code> against
+the tree at time of writing. Where a design note and the running code disagree, the code wins. We
+say so instead of smoothing it over. Where something is reasoned off the source rather than
+measured, the page marks it as inferred.</p>
+
+<ul class="stat-row">
+  <li class="stat"><span class="stat-value">1</span><span class="stat-label">model resident at a time. Since 2026-08-26 nothing shares the card with the seat</span></li>
+  <li class="stat"><span class="stat-value">0</span><span class="stat-label">translation proxies between a CLI and the server: llama-server speaks the Anthropic Messages API natively</span></li>
+  <li class="stat"><span class="stat-value">92-99%</span><span class="stat-label">of a warm turn's prefill served from the KV cache</span></li>
+  <li class="stat"><span class="stat-value">256k</span><span class="stat-label">context window on the seat, gated on retrieval depth rather than on fitting</span></li>
+</ul>
+
+<h2 id="the-whole-system-in-one-picture">The Whole System in One Picture</h2>
+
+<p>There are three surfaces, and none of them was written here. That is the point of the current
+design: the clients are the vendors’ own, and this repo owns the server underneath them.</p>
+
+<ul>
+  <li>Anthropic’s Claude Code CLI and GitHub’s Copilot CLI - the real clients, unmodified, pointed at the
+same <code class="language-plaintext highlighter-rouge">:8080</code> by <code class="language-plaintext highlighter-rouge">scripts/claude-local.ps1</code> and <code class="language-plaintext highlighter-rouge">scripts/copilot-local.ps1</code>. No proxy sits between
+them and the server: llama-server speaks the Anthropic Messages API natively.</li>
+  <li>The harness configs - crush and opencode, generated from the same llama-swap roster by
+<code class="language-plaintext highlighter-rouge">scripts/sync-harness-models.ps1</code>, so a model row can never drift out of a client menu.</li>
+</ul>
+
+<figure>
+<svg aria-label="arch system diagram" id="my-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" viewBox="0 0 1186.46875 463" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#my-svg{font-family:Kanit,Segoe UI,sans-serif;font-size:15px;fill:#E6EEF6;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#FF6B6B;}#my-svg .error-text{fill:#070b12;stroke:#070b12;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:#00ACEB;stroke:#00ACEB;}#my-svg .marker.cross{stroke:#00ACEB;}#my-svg svg{font-family:Kanit,Segoe UI,sans-serif;font-size:15px;}#my-svg p{margin:0;}#my-svg .label{font-family:Kanit,Segoe UI,sans-serif;color:#E6EEF6;}#my-svg .cluster-label text{fill:#E6EEF6;}#my-svg .cluster-label span{color:#E6EEF6;}#my-svg .cluster-label span p{background-color:transparent;}#my-svg .label text,#my-svg span{fill:#E6EEF6;color:#E6EEF6;}#my-svg .node rect,#my-svg .node circle,#my-svg .node ellipse,#my-svg .node polygon,#my-svg .node path{fill:#121a28;stroke:#2a3a52;stroke-width:1px;}#my-svg .rough-node .label text,#my-svg .node .label text,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-anchor:middle;}#my-svg .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#my-svg .rough-node .label,#my-svg .node .label,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-align:center;}#my-svg .node.clickable{cursor:pointer;}#my-svg .root .anchor path{fill:#00ACEB!important;stroke-width:0;stroke:#00ACEB;}#my-svg .arrowheadPath{fill:rgba(255, 255, 255, 0);}#my-svg .edgePath .path{stroke:#00ACEB;stroke-width:1px;}#my-svg .flowchart-link{stroke:#00ACEB;fill:none;}#my-svg .edgeLabel{background-color:#070b12;text-align:center;}#my-svg .edgeLabel p{background-color:#070b12;}#my-svg .edgeLabel rect{opacity:0.5;background-color:#070b12;fill:#070b12;}#my-svg .labelBkg{background-color:rgba(7, 11, 18, 0.5);}#my-svg .cluster rect{fill:#0b111c;stroke:#243140;stroke-width:1px;}#my-svg .cluster text{fill:#E6EEF6;}#my-svg .cluster span{color:#E6EEF6;}#my-svg div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:Kanit,Segoe UI,sans-serif;font-size:12px;background:#070b12;border:1px solid #2a3a52;border-radius:2px;pointer-events:none;z-index:100;}#my-svg .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#E6EEF6;}#my-svg rect.text{fill:none;stroke-width:0;}#my-svg .icon-shape,#my-svg .image-shape{background-color:#070b12;text-align:center;}#my-svg .icon-shape p,#my-svg .image-shape p{background-color:#070b12;padding:2px;}#my-svg .icon-shape .label rect,#my-svg .image-shape .label rect{opacity:0.5;background-color:#070b12;fill:#070b12;}#my-svg .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#my-svg .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#my-svg .node .neo-node{stroke:#2a3a52;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#my-svg [data-look="neo"].node path{stroke:url(#my-svg-gradient);stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#2a3a52;filter:none;}#my-svg [data-look="neo"].node circle{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node circle .state-start{fill:#E6EEF6;}#my-svg [data-look="neo"].icon-shape .icon{fill:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="my-svg_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;" /></marker><marker id="my-svg_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;" /></marker><g class="root"><g class="clusters" /><g class="edgePaths"><path d="M117.227,83L117.227,87.708C117.227,92.417,117.227,101.833,150.11,114.187C182.993,126.54,248.759,141.83,281.643,149.475L314.526,157.12" id="my-svg-L_CC_SWAP_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_CC_SWAP_0" data-points="W3sieCI6MTE3LjIyNjU2MjUsInkiOjgzfSx7IngiOjExNy4yMjY1NjI1LCJ5IjoxMTEuMjV9LHsieCI6MzE4LjQyMTg3NSwieSI6MTU4LjAyNjE0MjI4NzY0MTgyfV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M352.602,83L352.602,87.708C352.602,92.417,352.602,101.833,357.941,110.832C363.281,119.831,373.959,128.413,379.299,132.704L384.638,136.994" id="my-svg-L_CP_SWAP_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_CP_SWAP_0" data-points="W3sieCI6MzUyLjYwMTU2MjUsInkiOjgzfSx7IngiOjM1Mi42MDE1NjI1LCJ5IjoxMTEuMjV9LHsieCI6Mzg3Ljc1NjQxNzQxMDcxNDMsInkiOjEzOS41fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M578.742,83L578.742,87.708C578.742,92.417,578.742,101.833,571.347,110.911C563.953,119.988,549.163,128.727,541.768,133.096L534.374,137.465" id="my-svg-L_HA_SWAP_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_HA_SWAP_0" data-points="W3sieCI6NTc4Ljc0MjE4NzUsInkiOjgzfSx7IngiOjU3OC43NDIxODc1LCJ5IjoxMTEuMjV9LHsieCI6NTMwLjkyOTg2NTA1NjgxODIsInkiOjEzOS41fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M702.102,225.75L702.102,230.458C702.102,235.167,702.102,244.583,728.549,255.632C754.996,266.68,807.891,279.361,834.339,285.701L860.786,292.041" id="my-svg-L_IDE_FIM_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_IDE_FIM_0" data-points="W3sieCI6NzAyLjEwMTU2MjUsInkiOjIyNS43NX0seyJ4Ijo3MDIuMTAxNTYyNSwieSI6MjU0fSx7IngiOjg2NC42NzU3ODEyNSwieSI6MjkyLjk3MzU0MTIyNDU1OTU0fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M448.422,237L448.422,239.833C448.422,242.667,448.422,248.333,448.422,253.333C448.422,258.333,448.422,262.667,448.422,264.833L448.422,267" id="my-svg-L_SWAP_SRV_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_SWAP_SRV_0" data-points="W3sieCI6NDQ4LjQyMTg3NSwieSI6MjM3fSx7IngiOjQ0OC40MjE4NzUsInkiOjI1NH0seyJ4Ijo0NDguNDIxODc1LCJ5IjoyNzF9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M448.422,368.5L448.422,371.333C448.422,374.167,448.422,379.833,489.33,387.634C530.239,395.435,612.056,405.369,652.964,410.337L693.873,415.304" id="my-svg-L_SRV_GPU_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_SRV_GPU_0" data-points="W3sieCI6NDQ4LjQyMTg3NSwieSI6MzY4LjV9LHsieCI6NDQ4LjQyMTg3NSwieSI6Mzg1LjV9LHsieCI6Njk3Ljg0Mzc1LCJ5Ijo0MTUuNzg2MDA0MTIzNTMwNDZ9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M976.371,357.25L976.371,361.958C976.371,366.667,976.371,376.083,965.765,383.462C955.16,390.841,933.948,396.182,923.342,398.853L912.737,401.523" id="my-svg-L_FIM_GPU_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_FIM_GPU_0" data-points="W3sieCI6OTc2LjM3MTA5Mzc1LCJ5IjozNTcuMjV9LHsieCI6OTc2LjM3MTA5Mzc1LCJ5IjozODUuNX0seyJ4Ijo5MDguODU3ODE3MDE1ODk2LCJ5Ijo0MDIuNX1d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M835.055,70.577L807.104,77.356C779.154,84.135,723.253,97.692,681.109,109.463C638.966,121.233,610.581,131.217,596.388,136.209L582.195,141.2" id="my-svg-L_CTL_SWAP_0" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_CTL_SWAP_0" data-points="W3sieCI6ODM1LjA1NDY4NzUsInkiOjcwLjU3NzEyMzEzNzY2MTc0fSx7IngiOjY2Ny4zNTE1NjI1LCJ5IjoxMTEuMjV9LHsieCI6NTc4LjQyMTg3NSwieSI6MTQyLjUyNzU1NzcyMDQ0MzkyfV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M1041.852,81.692L1055.926,86.618C1070,91.545,1098.148,101.397,1112.223,119.157C1126.297,136.917,1126.297,162.583,1126.297,186.375C1126.297,210.167,1126.297,232.083,1116.171,247.482C1106.046,262.881,1085.794,271.762,1075.669,276.203L1065.543,280.643" id="my-svg-L_CTL_FIM_0" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_CTL_FIM_0" data-points="W3sieCI6MTA0MS44NTE1NjI1LCJ5Ijo4MS42OTIwMzMzNTU1MTQ5fSx7IngiOjExMjYuMjk2ODc1LCJ5IjoxMTEuMjV9LHsieCI6MTEyNi4yOTY4NzUsInkiOjE4OC4yNX0seyJ4IjoxMTI2LjI5Njg3NSwieSI6MjU0fSx7IngiOjEwNjEuODgwMDk0NDYyOTI3NywieSI6MjgyLjI1fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M938.453,83L938.453,87.708C938.453,92.417,938.453,101.833,938.453,112.458C938.453,123.083,938.453,134.917,938.453,140.833L938.453,146.75" id="my-svg-L_CTL_EMB_0" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_CTL_EMB_0" data-points="W3sieCI6OTM4LjQ1MzEyNSwieSI6ODN9LHsieCI6OTM4LjQ1MzEyNSwieSI6MTExLjI1fSx7IngiOjkzOC40NTMxMjUsInkiOjE1MC43NX1d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_CC_SWAP_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_CP_SWAP_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_HA_SWAP_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_IDE_FIM_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_SWAP_SRV_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_SRV_GPU_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_FIM_GPU_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(705.39622, 102.02307)"><g class="label" data-id="L_CTL_SWAP_0" transform="translate(-52.171875, -11.25)"><foreignObject width="104.34375" height="22.5"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>starts and stops</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1126.296875, 188.25)"><g class="label" data-id="L_CTL_FIM_0" transform="translate(-52.171875, -11.25)"><foreignObject width="104.34375" height="22.5"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>starts and stops</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(938.453125, 111.25)"><g class="label" data-id="L_CTL_EMB_0" transform="translate(-52.171875, -11.25)"><foreignObject width="104.34375" height="22.5"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>starts and stops</p></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default" id="my-svg-flowchart-CC-0" data-look="classic" transform="translate(117.2265625, 45.5)"><rect class="basic label-container" style="" x="-109.2265625" y="-37.5" width="218.453125" height="75" /><g class="label" style="" transform="translate(-79.2265625, -22.5)"><rect /><foreignObject width="158.453125" height="45"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>Claude Code CLI<br />Anthropic's, unmodified</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-CP-1" data-look="classic" transform="translate(352.6015625, 45.5)"><rect class="basic label-container" style="" x="-100.1484375" y="-37.5" width="200.296875" height="75" /><g class="label" style="" transform="translate(-70.1484375, -22.5)"><rect /><foreignObject width="140.296875" height="45"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>Copilot CLI<br />GitHub's, unmodified</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-HA-2" data-look="classic" transform="translate(578.7421875, 45.5)"><rect class="basic label-container" style="" x="-99.9921875" y="-37.5" width="199.984375" height="75" /><g class="label" style="" transform="translate(-69.9921875, -22.5)"><rect /><foreignObject width="139.984375" height="45"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>crush / opencode<br />third-party harnesses</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-IDE-3" data-look="classic" transform="translate(702.1015625, 188.25)"><rect class="basic label-container" style="" x="-97.6796875" y="-37.5" width="195.359375" height="75" /><g class="label" style="" transform="translate(-67.6796875, -22.5)"><rect /><foreignObject width="135.359375" height="45"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>llama.vscode<br />editor autocomplete</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-SWAP-4" data-look="classic" transform="translate(448.421875, 188.25)"><rect class="basic label-container" style="" x="-130" y="-48.75" width="260" height="97.5" /><g class="label" style="" transform="translate(-100, -33.75)"><rect /><foreignObject width="200" height="67.5"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>llama-swap :8080<br />OpenAI + Anthropic compatible</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-SRV-5" data-look="classic" transform="translate(448.421875, 319.75)"><rect class="basic label-container" style="" x="-130" y="-48.75" width="260" height="97.5" /><g class="label" style="" transform="translate(-100, -33.75)"><rect /><foreignObject width="200" height="67.5"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>llama-server<br />one llama.cpp process resident</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-FIM-6" data-look="classic" transform="translate(976.37109375, 319.75)"><rect class="basic label-container" style="" x="-111.6953125" y="-37.5" width="223.390625" height="75" /><g class="label" style="" transform="translate(-81.6953125, -22.5)"><rect /><foreignObject width="163.390625" height="45"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>fim :8012<br />fill-in-the-middle sidecar</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-EMB-7" data-look="classic" transform="translate(938.453125, 188.25)"><rect class="basic label-container" style="" x="-112.671875" y="-37.5" width="225.34375" height="75" /><g class="label" style="" transform="translate(-82.671875, -22.5)"><rect /><foreignObject width="165.34375" height="45"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>embed :8090<br />CPU-only, codebase RAG</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-GPU-8" data-look="classic" transform="translate(804.609375, 428.75)"><rect class="basic label-container" style="" x="-106.765625" y="-26.25" width="213.53125" height="52.5" /><g class="label" style="" transform="translate(-76.765625, -11.25)"><rect /><foreignObject width="153.53125" height="22.5"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>RTX 5090, 32 GB VRAM</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-CTL-9" data-look="classic" transform="translate(938.453125, 45.5)"><rect class="basic label-container" style="" x="-103.3984375" y="-37.5" width="206.796875" height="75" /><g class="label" style="" transform="translate(-73.3984375, -22.5)"><rect /><foreignObject width="146.796875" height="45"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>doki.ps1 control plane<br />agent / coexist</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000" /></filter></defs><defs><filter id="my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000" /></filter></defs><linearGradient id="my-svg-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#2a3a52" stop-opacity="1" /><stop offset="100%" stop-color="#2a3a52" stop-opacity="1" /></linearGradient></svg>
+<figcaption><strong>Everything narrows to one card.</strong> Every client surface speaks the same
+OpenAI-compatible HTTP to llama-swap, and `doki.ps1` is the only thing that starts or stops it.
+The picture leaves out the sidecars that don't contend for VRAM (embeddings on `:8090` runs
+CPU-only), and your editor, which reaches the autocomplete sidecar on `:8012` rather than the
+seat.</figcaption>
+</figure>
+
+<p>Your editor is a fourth way in rather than a fourth implementation. <code class="language-plaintext highlighter-rouge">llama.vscode</code> drives the FIM
+sidecar on <code class="language-plaintext highlighter-rouge">:8012</code> for inline completion, which is a different job from an agent turn and runs on a
+much smaller model. The <code class="language-plaintext highlighter-rouge">coexist</code> profile exists to fit both on the card at once, at the cost of a
+reduced context window on the seat. There used to be an ACP path here too, where an IDE drove
+DokiDex’s own agent as a JSON-RPC server over stdio. It went with that agent on 2026-09-02.</p>
+
+<p>Underneath all of it sits <code class="language-plaintext highlighter-rouge">doki.ps1</code>, a control plane shaped like docker-compose with no Docker
+anywhere. Services are entries in a <code class="language-plaintext highlighter-rouge">$Services</code> hashtable (<code class="language-plaintext highlighter-rouge">doki.ps1:124-155</code>), each carrying a
+launch script, a health URL, a port, a GPU group, and a VRAM estimate. Profiles are named sets of
+those services. Adding a service means adding a row, which is why <code class="language-plaintext highlighter-rouge">doki status json</code> and
+<code class="language-plaintext highlighter-rouge">doki doctor</code> both pick up a new service without either one being taught about it.</p>
+
+<h2 id="one-gpu-one-resident-model">One GPU, One Resident Model</h2>
+
+<p>Here’s the constraint the whole architecture is negotiating with. <code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code> on its own is
+roughly 26 GB of VRAM: about 17.7 GB of Q4_K_XL weights plus about 6.4 GB of 8-bit KV cache at a
+128k context (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:89</code>). The image and video models are budgeted at 18 GB
+(<code class="language-plaintext highlighter-rouge">doki.ps1:146</code>). The card holds 32 GB. Two of those don’t fit at once. No amount of
+cleverness changes that.</p>
+
+<p>So every GPU-resident service carries a <code class="language-plaintext highlighter-rouge">group</code> tag, <code class="language-plaintext highlighter-rouge">llm</code> or <code class="language-plaintext highlighter-rouge">media</code>, and <code class="language-plaintext highlighter-rouge">doki up &lt;profile&gt;</code>
+stops every running service outside the group you asked for before it starts anything
+(<code class="language-plaintext highlighter-rouge">doki.ps1:416-418</code>). It’s a hard mode switch, closer to exclusive fullscreen than to
+multitasking.</p>
+
+<figure>
+<svg aria-label="arch gpu modes diagram" id="my-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" viewBox="0 0 829.78125 485.5" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#my-svg{font-family:Kanit,Segoe UI,sans-serif;font-size:15px;fill:#E6EEF6;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#FF6B6B;}#my-svg .error-text{fill:#070b12;stroke:#070b12;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:#00ACEB;stroke:#00ACEB;}#my-svg .marker.cross{stroke:#00ACEB;}#my-svg svg{font-family:Kanit,Segoe UI,sans-serif;font-size:15px;}#my-svg p{margin:0;}#my-svg .label{font-family:Kanit,Segoe UI,sans-serif;color:#E6EEF6;}#my-svg .cluster-label text{fill:#E6EEF6;}#my-svg .cluster-label span{color:#E6EEF6;}#my-svg .cluster-label span p{background-color:transparent;}#my-svg .label text,#my-svg span{fill:#E6EEF6;color:#E6EEF6;}#my-svg .node rect,#my-svg .node circle,#my-svg .node ellipse,#my-svg .node polygon,#my-svg .node path{fill:#121a28;stroke:#2a3a52;stroke-width:1px;}#my-svg .rough-node .label text,#my-svg .node .label text,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-anchor:middle;}#my-svg .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#my-svg .rough-node .label,#my-svg .node .label,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-align:center;}#my-svg .node.clickable{cursor:pointer;}#my-svg .root .anchor path{fill:#00ACEB!important;stroke-width:0;stroke:#00ACEB;}#my-svg .arrowheadPath{fill:rgba(255, 255, 255, 0);}#my-svg .edgePath .path{stroke:#00ACEB;stroke-width:1px;}#my-svg .flowchart-link{stroke:#00ACEB;fill:none;}#my-svg .edgeLabel{background-color:#070b12;text-align:center;}#my-svg .edgeLabel p{background-color:#070b12;}#my-svg .edgeLabel rect{opacity:0.5;background-color:#070b12;fill:#070b12;}#my-svg .labelBkg{background-color:rgba(7, 11, 18, 0.5);}#my-svg .cluster rect{fill:#0b111c;stroke:#243140;stroke-width:1px;}#my-svg .cluster text{fill:#E6EEF6;}#my-svg .cluster span{color:#E6EEF6;}#my-svg div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:Kanit,Segoe UI,sans-serif;font-size:12px;background:#070b12;border:1px solid #2a3a52;border-radius:2px;pointer-events:none;z-index:100;}#my-svg .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#E6EEF6;}#my-svg rect.text{fill:none;stroke-width:0;}#my-svg .icon-shape,#my-svg .image-shape{background-color:#070b12;text-align:center;}#my-svg .icon-shape p,#my-svg .image-shape p{background-color:#070b12;padding:2px;}#my-svg .icon-shape .label rect,#my-svg .image-shape .label rect{opacity:0.5;background-color:#070b12;fill:#070b12;}#my-svg .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#my-svg .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#my-svg .node .neo-node{stroke:#2a3a52;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#my-svg [data-look="neo"].node path{stroke:url(#my-svg-gradient);stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#2a3a52;filter:none;}#my-svg [data-look="neo"].node circle{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node circle .state-start{fill:#E6EEF6;}#my-svg [data-look="neo"].icon-shape .icon{fill:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="my-svg_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;" /></marker><marker id="my-svg_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;" /></marker><g class="root"><g class="clusters" /><g class="edgePaths"><path d="M424,83L424,85.833C424,88.667,424,94.333,424,99.333C424,104.333,424,108.667,424,110.833L424,113" id="my-svg-L_CMD_EVICT_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_CMD_EVICT_0" data-points="W3sieCI6NDI0LCJ5Ijo4M30seyJ4Ijo0MjQsInkiOjEwMH0seyJ4Ijo0MjQsInkiOjExN31d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M294,195.636L268,201.614C242,207.591,190,219.545,164,229.564C138,239.583,138,247.667,138,251.708L138,255.75" id="my-svg-L_EVICT_AGENT_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_EVICT_AGENT_0" data-points="W3sieCI6Mjk0LCJ5IjoxOTUuNjM2MzYzNjM2MzYzNjN9LHsieCI6MTM4LCJ5IjoyMzEuNX0seyJ4IjoxMzgsInkiOjI1OS43NX1d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M424,214.5L424,217.333C424,220.167,424,225.833,424,230.833C424,235.833,424,240.167,424,242.333L424,244.5" id="my-svg-L_EVICT_CO_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_EVICT_CO_0" data-points="W3sieCI6NDI0LCJ5IjoyMTQuNX0seyJ4Ijo0MjQsInkiOjIzMS41fSx7IngiOjQyNCwieSI6MjQ4LjV9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M554,196.62L578.482,202.433C602.964,208.246,651.927,219.873,676.409,229.728C700.891,239.583,700.891,247.667,700.891,251.708L700.891,255.75" id="my-svg-L_EVICT_MED_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_EVICT_MED_0" data-points="W3sieCI6NTU0LCJ5IjoxOTYuNjE5NTg5NzUyMjcxM30seyJ4Ijo3MDAuODkwNjI1LCJ5IjoyMzEuNX0seyJ4Ijo3MDAuODkwNjI1LCJ5IjoyNTkuNzV9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M138,334.75L138,339.458C138,344.167,138,353.583,138,360.458C138,367.333,138,371.667,138,373.833L138,376" id="my-svg-L_AGENT_A1_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_AGENT_A1_0" data-points="W3sieCI6MTM4LCJ5IjozMzQuNzV9LHsieCI6MTM4LCJ5IjozNjN9LHsieCI6MTM4LCJ5IjozODB9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M424,346L424,348.833C424,351.667,424,357.333,424,362.333C424,367.333,424,371.667,424,373.833L424,376" id="my-svg-L_CO_C1_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_CO_C1_0" data-points="W3sieCI6NDI0LCJ5IjozNDZ9LHsieCI6NDI0LCJ5IjozNjN9LHsieCI6NDI0LCJ5IjozODB9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M700.891,334.75L700.891,339.458C700.891,344.167,700.891,353.583,700.891,362.333C700.891,371.083,700.891,379.167,700.891,383.208L700.891,387.25" id="my-svg-L_MED_M1_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_MED_M1_0" data-points="W3sieCI6NzAwLjg5MDYyNSwieSI6MzM0Ljc1fSx7IngiOjcwMC44OTA2MjUsInkiOjM2M30seyJ4Ijo3MDAuODkwNjI1LCJ5IjozOTEuMjV9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_CMD_EVICT_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_EVICT_AGENT_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_EVICT_CO_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_EVICT_MED_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_AGENT_A1_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_CO_C1_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_MED_M1_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default" id="my-svg-flowchart-CMD-0" data-look="classic" transform="translate(424, 45.5)"><rect class="basic label-container" style="" x="-130" y="-37.5" width="260" height="75" /><g class="label" style="" transform="translate(-100, -22.5)"><rect /><foreignObject width="200" height="45"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>doki up agent / coexist / media</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-EVICT-1" data-look="classic" transform="translate(424, 165.75)"><rect class="basic label-container" style="" x="-130" y="-48.75" width="260" height="97.5" /><g class="label" style="" transform="translate(-100, -33.75)"><rect /><foreignObject width="200" height="67.5"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>Stop every service whose group<br />is not the one you asked for</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-AGENT-3" data-look="classic" transform="translate(138, 297.25)"><rect class="basic label-container" style="" x="-118" y="-37.5" width="236" height="75" /><g class="label" style="" transform="translate(-88, -22.5)"><rect /><foreignObject width="176" height="45"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>agent<br />llama-swap + embeddings</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-CO-5" data-look="classic" transform="translate(424, 297.25)"><rect class="basic label-container" style="" x="-130" y="-48.75" width="260" height="97.5" /><g class="label" style="" transform="translate(-100, -33.75)"><rect /><foreignObject width="200" height="67.5"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>coexist<br />llama-swap + autocomplete + embeddings</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-MED-7" data-look="classic" transform="translate(700.890625, 297.25)"><rect class="basic label-container" style="" x="-120.890625" y="-37.5" width="241.78125" height="75" /><g class="label" style="" transform="translate(-90.890625, -22.5)"><rect /><foreignObject width="181.78125" height="45"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>media<br />SwarmUI + prompt rewriter</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-A1-9" data-look="classic" transform="translate(138, 428.75)"><rect class="basic label-container" style="" x="-130" y="-48.75" width="260" height="97.5" /><g class="label" style="" transform="translate(-100, -33.75)"><rect /><foreignObject width="200" height="67.5"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>Qwen3-Coder-30B-A3B at 128k ctx<br />roughly 26 GB</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-C1-11" data-look="classic" transform="translate(424, 428.75)"><rect class="basic label-container" style="" x="-130" y="-48.75" width="260" height="97.5" /><g class="label" style="" transform="translate(-100, -33.75)"><rect /><foreignObject width="200" height="67.5"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>Qwen3-Coder-30B-A3B at 64k ctx plus FIM<br />roughly 28 GB</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-M1-13" data-look="classic" transform="translate(700.890625, 428.75)"><rect class="basic label-container" style="" x="-111.40625" y="-37.5" width="222.8125" height="75" /><g class="label" style="" transform="translate(-81.40625, -22.5)"><rect /><foreignObject width="162.8125" height="45"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>image and video models<br />budgeted at 18 GB</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000" /></filter></defs><defs><filter id="my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000" /></filter></defs><linearGradient id="my-svg-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#2a3a52" stop-opacity="1" /><stop offset="100%" stop-color="#2a3a52" stop-opacity="1" /></linearGradient></svg>
+<figcaption><strong>Asking for one profile is what evicts the other.</strong> The eviction isn't a
+side effect. It's the first thing <code>DoUp</code> does. The VRAM figures are sizing estimates
+carried in the configs rather than live measurements. They disagree with each other by a gigabyte
+or two across files. Read them as budgets rather than as readings.</figcaption>
+</figure>
+
+<p><code class="language-plaintext highlighter-rouge">coexist</code> is the one deliberate double-booking on the card. Point the harness at
+<code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [32k] (Coding, Light)</code>, which is the same weights at a 64k context for roughly 21 GB. The
+fill-in-middle autocomplete sidecar then fits in what that frees (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:122-125</code>).
+The full 128k tier can’t coexist with it. That trade, five gigabytes of context window for live
+editor autocomplete, is the sort of decision this constraint forces constantly.</p>
+
+<h3 id="what-holds-the-card">What Holds the Card</h3>
+
+<p><code class="language-plaintext highlighter-rouge">doki up</code> is coarse and manual, and since 2026-09-02 it is also the whole story. The finer
+mechanism that used to sit under it, a process-wide <code class="language-plaintext highlighter-rouge">GpuLease</code> inside the desktop backend, went
+with that backend when the non-coding stack was removed (see <code class="language-plaintext highlighter-rouge">archive.md</code>). It existed because one
+process could drive both sides of the card at once: a chat or code turn starting mid-render made
+llama-swap auto-evict the renderer’s resident model. With one group left there is no other side to
+arbitrate against.</p>
+
+<p>What still coordinates is deliberately smaller and honest about its scope. <code class="language-plaintext highlighter-rouge">scripts/claude-local.ps1</code>
+drops a lease file for the lifetime of a Claude Code session, and <code class="language-plaintext highlighter-rouge">doki.ps1</code> reads it to warn you
+before a <code class="language-plaintext highlighter-rouge">down</code> or a <code class="language-plaintext highlighter-rouge">restart</code> unloads the models under a live turn. It is advisory, never blocking.</p>
+
+<h2 id="model-serving-one-endpoint-many-seats">Model Serving: One Endpoint, Many Seats</h2>
+
+<p><code class="language-plaintext highlighter-rouge">llama-swap</code> sits on <code class="language-plaintext highlighter-rouge">:8080</code> exposing one OpenAI-compatible endpoint and hot-swapping
+<code class="language-plaintext highlighter-rouge">llama-server</code> processes underneath it based on the <code class="language-plaintext highlighter-rouge">model</code> id in each request. The engine pin is
+llama.cpp build <code class="language-plaintext highlighter-rouge">b9878</code> on CUDA 13.3 behind llama-swap <code class="language-plaintext highlighter-rouge">v235</code> (<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml:3</code>). Every
+client just asks for a model name. None of them know a swap happened.</p>
+
+<p>That header line is no longer the whole story, though nothing has amended it. Counted off the real
+<code class="language-plaintext highlighter-rouge">cmd</code> rows, 17 of the 24 rows that launch a llama-server use the pinned <code class="language-plaintext highlighter-rouge">b9878</code> binary, six launch
+<code class="language-plaintext highlighter-rouge">serving/llama.cpp-b10472\</code> (<code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code>, the Claude Code seat, its
+sidecar, the retired <code class="language-plaintext highlighter-rouge">f16 [104k]</code> control row it replaced, and two engine-only bake-off
+candidates), and one launches <code class="language-plaintext highlighter-rouge">serving/llama.cpp-v4\</code> for DeepSeek-V4, which needs kernels the
+pinned build doesn’t have. The 25th row, <code class="language-plaintext highlighter-rouge">GitHub Copilot Cloud [32k] (Cloud, Billed)</code>, launches no
+llama-server at all: its <code class="language-plaintext highlighter-rouge">cmd</code> runs <code class="language-plaintext highlighter-rouge">serving/copilot-shim.ps1</code>, wrapping the real GitHub Copilot
+CLI instead. Those are directory names, not build numbers you can substitute into a path. The
+<a href="/projects/dokidex/models/">models page</a> has the per-key breakdown.</p>
+
+<figure>
+<svg aria-label="arch model swap diagram" id="my-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" viewBox="0 0 984.984375 549.5" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#my-svg{font-family:Kanit,Segoe UI,sans-serif;font-size:15px;fill:#E6EEF6;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#FF6B6B;}#my-svg .error-text{fill:#070b12;stroke:#070b12;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:#00ACEB;stroke:#00ACEB;}#my-svg .marker.cross{stroke:#00ACEB;}#my-svg svg{font-family:Kanit,Segoe UI,sans-serif;font-size:15px;}#my-svg p{margin:0;}#my-svg .label{font-family:Kanit,Segoe UI,sans-serif;color:#E6EEF6;}#my-svg .cluster-label text{fill:#E6EEF6;}#my-svg .cluster-label span{color:#E6EEF6;}#my-svg .cluster-label span p{background-color:transparent;}#my-svg .label text,#my-svg span{fill:#E6EEF6;color:#E6EEF6;}#my-svg .node rect,#my-svg .node circle,#my-svg .node ellipse,#my-svg .node polygon,#my-svg .node path{fill:#121a28;stroke:#2a3a52;stroke-width:1px;}#my-svg .rough-node .label text,#my-svg .node .label text,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-anchor:middle;}#my-svg .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#my-svg .rough-node .label,#my-svg .node .label,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-align:center;}#my-svg .node.clickable{cursor:pointer;}#my-svg .root .anchor path{fill:#00ACEB!important;stroke-width:0;stroke:#00ACEB;}#my-svg .arrowheadPath{fill:rgba(255, 255, 255, 0);}#my-svg .edgePath .path{stroke:#00ACEB;stroke-width:1px;}#my-svg .flowchart-link{stroke:#00ACEB;fill:none;}#my-svg .edgeLabel{background-color:#070b12;text-align:center;}#my-svg .edgeLabel p{background-color:#070b12;}#my-svg .edgeLabel rect{opacity:0.5;background-color:#070b12;fill:#070b12;}#my-svg .labelBkg{background-color:rgba(7, 11, 18, 0.5);}#my-svg .cluster rect{fill:#0b111c;stroke:#243140;stroke-width:1px;}#my-svg .cluster text{fill:#E6EEF6;}#my-svg .cluster span{color:#E6EEF6;}#my-svg div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:Kanit,Segoe UI,sans-serif;font-size:12px;background:#070b12;border:1px solid #2a3a52;border-radius:2px;pointer-events:none;z-index:100;}#my-svg .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#E6EEF6;}#my-svg rect.text{fill:none;stroke-width:0;}#my-svg .icon-shape,#my-svg .image-shape{background-color:#070b12;text-align:center;}#my-svg .icon-shape p,#my-svg .image-shape p{background-color:#070b12;padding:2px;}#my-svg .icon-shape .label rect,#my-svg .image-shape .label rect{opacity:0.5;background-color:#070b12;fill:#070b12;}#my-svg .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#my-svg .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#my-svg .node .neo-node{stroke:#2a3a52;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#my-svg [data-look="neo"].node path{stroke:url(#my-svg-gradient);stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#2a3a52;filter:none;}#my-svg [data-look="neo"].node circle{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node circle .state-start{fill:#E6EEF6;}#my-svg [data-look="neo"].icon-shape .icon{fill:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="my-svg_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;" /></marker><marker id="my-svg_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;" /></marker><marker id="my-svg_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;" /></marker><g class="root"><g class="clusters" /><g class="edgePaths"><path d="M248,83L248,85.833C248,88.667,248,94.333,248,99.333C248,104.333,248,108.667,248,110.833L248,113" id="my-svg-L_REQ_Q_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_REQ_Q_0" data-points="W3sieCI6MjQ4LCJ5Ijo4M30seyJ4IjoyNDgsInkiOjEwMH0seyJ4IjoyNDgsInkiOjExN31d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M197.814,169.5L188.813,174.208C179.811,178.917,161.808,188.333,152.806,202.125C143.805,215.917,143.805,234.083,143.805,254.125C143.805,274.167,143.805,296.083,143.805,321.75C143.805,347.417,143.805,376.833,143.805,402.5C143.805,428.167,143.805,450.083,163.486,463.82C183.167,477.556,222.529,483.112,242.21,485.89L261.891,488.668" id="my-svg-L_Q_FWD_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Q_FWD_0" data-points="W3sieCI6MTk3LjgxNDE4NDM0NjMzMDI4LCJ5IjoxNjkuNX0seyJ4IjoxNDMuODA0Njg3NSwieSI6MTk3Ljc1fSx7IngiOjE0My44MDQ2ODc1LCJ5IjoyNTIuMjV9LHsieCI6MTQzLjgwNDY4NzUsInkiOjMxOH0seyJ4IjoxNDMuODA0Njg3NSwieSI6NDA2LjI1fSx7IngiOjE0My44MDQ2ODc1LCJ5Ijo0NzJ9LHsieCI6MjY1Ljg1MTU2MjUsInkiOjQ4OS4yMjY3NzkwMjE0NDI2fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M311.337,169.5L322.698,174.208C334.058,178.917,356.779,188.333,368.14,197.083C379.5,205.833,379.5,213.917,379.5,217.958L379.5,222" id="my-svg-L_Q_STOP_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Q_STOP_0" data-points="W3sieCI6MzExLjMzNzE1NTk2MzMwMjczLCJ5IjoxNjkuNX0seyJ4IjozNzkuNSwieSI6MTk3Ljc1fSx7IngiOjM3OS41LCJ5IjoyMjZ9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M379.5,278.5L379.5,285.083C379.5,291.667,379.5,304.833,393.974,317.733C408.448,330.633,437.397,343.267,451.871,349.583L466.345,355.9" id="my-svg-L_STOP_START_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_STOP_START_0" data-points="W3sieCI6Mzc5LjUsInkiOjI3OC41fSx7IngiOjM3OS41LCJ5IjozMTh9LHsieCI6NDcwLjAxMTUwODQ5ODU4MzU3LCJ5IjozNTcuNX1d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M581.719,455L581.719,457.833C581.719,460.667,581.719,466.333,573.737,471.792C565.756,477.25,549.793,482.5,541.812,485.125L533.831,487.75" id="my-svg-L_START_FWD_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_START_FWD_0" data-points="W3sieCI6NTgxLjcxODc1LCJ5Ijo0NTV9LHsieCI6NTgxLjcxODc1LCJ5Ijo0NzJ9LHsieCI6NTMwLjAzMDg4ODcyODMyMzcsInkiOjQ4OX1d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /><path d="M783.938,278.5L783.938,285.083C783.938,291.667,783.938,304.833,769.463,317.733C754.989,330.633,726.041,343.267,711.566,349.583L697.092,355.9" id="my-svg-L_RAM_START_0" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_RAM_START_0" data-points="W3sieCI6NzgzLjkzNzUsInkiOjI3OC41fSx7IngiOjc4My45Mzc1LCJ5IjozMTh9LHsieCI6NjkzLjQyNTk5MTUwMTQxNjQsInkiOjM1Ny41fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)" /></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_REQ_Q_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(143.8046875, 318)"><g class="label" data-id="L_Q_FWD_0" transform="translate(-10.734375, -11.25)"><foreignObject width="21.46875" height="22.5"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>yes</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(379.5, 197.75)"><g class="label" data-id="L_Q_STOP_0" transform="translate(-8.640625, -11.25)"><foreignObject width="17.28125" height="22.5"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>no</p></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_STOP_START_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_START_FWD_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(783.9375, 318)"><g class="label" data-id="L_RAM_START_0" transform="translate(-100, -22.5)"><foreignObject width="200" height="45"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="edgeLabel"><p>an evicted KV prefix survives here</p></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default" id="my-svg-flowchart-REQ-0" data-look="classic" transform="translate(248, 45.5)"><rect class="basic label-container" style="" x="-240" y="-37.5" width="480" height="75" /><g class="label" style="" transform="translate(-210, -22.5)"><rect /><foreignObject width="420" height="45"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 420px; text-align: center; width: 420px;"><span class="nodeLabel"><p>POST /v1/chat/completions asking for model: gpt-oss-120b [128k] (Reasoning, Heavy)</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-Q-1" data-look="classic" transform="translate(248, 143.25)"><rect class="basic label-container" style="" x="-182.375" y="-26.25" width="364.75" height="52.5" /><g class="label" style="" transform="translate(-152.375, -11.25)"><rect /><foreignObject width="304.75" height="22.5"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 420px; text-align: center;"><span class="nodeLabel"><p>llama-swap :8080: is that tier already resident?</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-STOP-2" data-look="classic" transform="translate(379.5, 252.25)"><rect class="basic label-container" style="" x="-185.390625" y="-26.25" width="370.78125" height="52.5" /><g class="label" style="" transform="translate(-155.390625, -11.25)"><rect /><foreignObject width="310.78125" height="22.5"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 420px; text-align: center;"><span class="nodeLabel"><p>Stop the current llama-server, release its VRAM</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-START-3" data-look="classic" transform="translate(581.71875, 406.25)"><rect class="basic label-container" style="" x="-240" y="-48.75" width="480" height="97.5" /><g class="label" style="" transform="translate(-210, -33.75)"><rect /><foreignObject width="420" height="67.5"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 420px; text-align: center; width: 420px;"><span class="nodeLabel"><p>Start the tier's own command line. Weights page in, then a health check, up to 900 s on a cold gpt-oss-120b [128k] (Reasoning, Heavy)</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-FWD-4" data-look="classic" transform="translate(450.21875, 515.25)"><rect class="basic label-container" style="" x="-184.3671875" y="-26.25" width="368.734375" height="52.5" /><g class="label" style="" transform="translate(-154.3671875, -11.25)"><rect /><foreignObject width="308.734375" height="22.5"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 420px; text-align: center;"><span class="nodeLabel"><p>Forward the request and stream the reply back</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-RAM-5" data-look="classic" transform="translate(783.9375, 252.25)"><rect class="basic label-container" style="" x="-193.046875" y="-26.25" width="386.09375" height="52.5" /><g class="label" style="" transform="translate(-163.046875, -11.25)"><rect /><foreignObject width="326.09375" height="22.5"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 420px; text-align: center;"><span class="nodeLabel"><p>Host RAM prompt cache, --cache-ram 24576 MiB</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000" /></filter></defs><defs><filter id="my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000" /></filter></defs><linearGradient id="my-svg-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#2a3a52" stop-opacity="1" /><stop offset="100%" stop-color="#2a3a52" stop-opacity="1" /></linearGradient></svg>
+<figcaption><strong>A swap is a process restart that costs seconds.</strong> The
+<code>healthCheckTimeout: 900</code> in the config exists specifically because <code>gpt-oss-120b [128k] (Reasoning, Heavy)</code>
+pages roughly 60 GB off disk on a cold load (<code>serving/llama-swap.yaml:10</code>). What survives
+the swap is the host-RAM prompt cache, not the VRAM KV cache, which is a different thing living in a
+different place.</figcaption>
+</figure>
+
+<p>Two details in that config are worth pulling out, because they’re where the single-GPU reasoning
+shows up as configuration.</p>
+
+<p><strong>A model’s name is what a harness asks for, with nothing standing in between.</strong> Before 2026-08-25,
+a harness requested a named seat and the yaml decided which weights answered it, through an alias.
+That indirection is gone: <code class="language-plaintext highlighter-rouge">crush</code>’s <code class="language-plaintext highlighter-rouge">large</code> and <code class="language-plaintext highlighter-rouge">small</code> roles now point at
+<code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code> and <code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [32k] (Coding, Light)</code> directly
+(<code class="language-plaintext highlighter-rouge">serving/llama-swap.yaml</code>, <code class="language-plaintext highlighter-rouge">harness/crush.json</code>). Re-seating a model after a bake-off means editing
+the name a harness carries, which is one edit either way, just without a second name to keep in
+sync. <code class="language-plaintext highlighter-rouge">crush</code>’s <code class="language-plaintext highlighter-rouge">small</code> role, which used to share one llama-swap entry across two seat names, now
+just names <code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [32k] (Coding, Light)</code> once.</p>
+
+<p><strong><code class="language-plaintext highlighter-rouge">--cache-ram 24576</code> is host RAM, not VRAM.</strong> It’s set on <code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code> and <code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [32k] (Coding, Light)</code> only,
+the two seats that actually swap in and out across a session, raising llama-server’s prompt-cache
+allowance from its 8192 MiB default to 24 GiB of system memory. The stated intent is that an
+evicted tier’s KV prefix can be served back from host RAM on the next swap-in instead of paying
+full prefill again. Every other tier in the file is deliberately left without it. The
+<a href="/projects/dokidex/models/">models page</a> has the full roster, the footprints, and which
+candidates are still under test.</p>
+
+<h2 id="how-a-cli-attaches">How a CLI Attaches</h2>
+
+<p>This is the part that surprises people, so it is worth stating plainly: <strong>there is no adapter.</strong>
+Anthropic’s Claude Code CLI is the real, unmodified client from npm. It speaks the Anthropic
+Messages API, and <code class="language-plaintext highlighter-rouge">llama-server</code> implements that API natively, so <code class="language-plaintext highlighter-rouge">scripts/claude-local.ps1</code> just
+points <code class="language-plaintext highlighter-rouge">ANTHROPIC_BASE_URL</code> at <code class="language-plaintext highlighter-rouge">127.0.0.1:8080</code> and gets out of the way. Nothing translates, nothing
+proxies, and nothing rewrites a request in the middle. The same is true of GitHub’s Copilot CLI
+through <code class="language-plaintext highlighter-rouge">scripts/copilot-local.ps1</code>, which uses that client’s own BYOK provider setting.</p>
+
+<p>What the launchers actually do is smaller and more careful than a proxy would be:</p>
+
+<ul>
+  <li><strong>Neutralise the environment.</strong> An ambient <code class="language-plaintext highlighter-rouge">ANTHROPIC_API_KEY</code> or GitHub PAT in your shell would
+be inherited by the client and could send your prompt to a cloud endpoint. The launchers clear
+those before spawning, and <code class="language-plaintext highlighter-rouge">tests/local-cli-isolation.test.ps1</code> proves it by injecting fake
+credentials and reading the environment the child process actually received.</li>
+  <li><strong>Redirect client state.</strong> <code class="language-plaintext highlighter-rouge">CLAUDE_CONFIG_DIR</code> and <code class="language-plaintext highlighter-rouge">COPILOT_HOME</code> are pointed at
+<code class="language-plaintext highlighter-rouge">%LOCALAPPDATA%\DokiDex\</code>, so a local run never writes your global client config. The same test
+hashes the global files before and after a run to prove it.</li>
+  <li><strong>Decide what each model slot resolves to.</strong> Claude Code asks for opus, sonnet and haiku. There is
+one card, so by default all of them resolve to the seat. The launcher reads <code class="language-plaintext highlighter-rouge">GET /running</code> and
+only seats a different tier on a model that is already resident alongside the seat, because a
+background haiku call that triggers a multi-gigabyte weight swap is a bad trade nobody asked for.
+Since 2026-08-26 nothing is resident alongside it, so in practice every slot lands on the seat.</li>
+</ul>
+
+<p>The practical consequence is that these are the vendors’ own clients with the vendors’ own
+behaviour. When Claude Code ships a feature, it works here the next time you update it. Nothing in
+this repo has to be taught about it.</p>
+
+<blockquote>
+  <p><strong>Until 2026-09-02 this page also documented an agent implementation.</strong> DokiDex shipped its own
+C++17 terminal agent, <code class="language-plaintext highlighter-rouge">doki code</code>, and three sections here walked its turn loop, its permission
+gate and its context assembly by <code class="language-plaintext highlighter-rouge">file:line</code>, with a diagram each. It was removed to put
+everything behind the real clients instead. The <a href="/projects/dokidex/handbook/">handbook</a>
+covers what survives, and <code class="language-plaintext highlighter-rouge">archive.md</code> in the repo names the commit that removed the rest.</p>
+</blockquote>
+
+<h2 id="what-goes-up-every-turn">What Goes Up Every Turn</h2>
+
+<p>Whichever client is driving, the economics are the same, and they are the reason context is the
+scarce resource rather than tokens per second.</p>
+
+<p>Every hop sends the <strong>entire</strong> conversation. Not a delta. The model is stateless between requests,
+so a turn that has read four files and run a build is re-sending all of that on the fifth hop. What
+makes this affordable is the KV cache: <code class="language-plaintext highlighter-rouge">llama-server</code> keeps the attention state for the prefix it
+already processed, so a warm turn re-uses 92 to 99% of its prefill instead of recomputing it.</p>
+
+<p>That number is the whole ballgame, and it has a sharp edge. The cache is keyed on an exact prefix
+match, so anything that changes early in the conversation invalidates everything after it. A
+timestamp in a system prompt, a re-ordered tool list, a model swap: each one turns a 99% reuse into
+a cold prefill of the whole window. Measured on this box, cross-session cold re-prefill was 87% of
+all prefill work, which is why the telemetry tap in front of llama-swap exists at all.</p>
+
+<h2 id="where-to-go-next">Where to Go Next</h2>
+
+<p>The <a href="/projects/dokidex/models/">models page</a> has the full roster, the footprints, and the
+bake-off results behind each seat. The <a href="/projects/dokidex/local-cli/">CLI tutorial</a> is the
+hands-on version of the turn loop and the permission gate.
+<a href="/projects/dokidex/local-cli/">Claude Code and Copilot, local</a> covers the two agents on this
+same server that were not written here. For the reasoning rather than
+the shape, the handbook’s
+<a href="/projects/dokidex/handbook/01-big-picture.html">big picture</a>,
+<a href="/projects/dokidex/handbook/03-serving.html">serving</a>, and
+<a href="/projects/dokidex/handbook/04-tools-and-safety.html">tools and safety</a> chapters are where
+each of these decisions gets argued out.</p>
+
+    </article>
+
+    
+    <nav class="pager" aria-label="Page navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/qwen38/">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">Qwen3.8-27B, measured</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/learn/">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">Where to start</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="site-footer">
+  <div class="footer-main">
+    <p class="footer-line">
+      <strong>DokiDex</strong> v0.62.0:
+      a fully-local AI stack, and a field guide to the machines it runs on.
+    </p>
+    <p class="footer-line footer-dim">
+      Everything on this site is written against the real tree and the measured record. Where a
+      claim is a number, it was measured or sourced. Where it was a judgment call, the reasoning
+      is stated inline. Stale statements are bugs. File them like bugs.
+    </p>
+  </div>
+
+  <div class="footer-links">
+    <a href="/projects/dokidex/local-cli/">Run the CLIs</a>
+    <a href="/projects/dokidex/handbook/">Handbook</a>
+    <a href="/projects/dokidex/reference/">Quick reference</a>
+    <a href="/projects/dokidex/glossary/">Glossary</a>
+    <!-- Deliberately understated: last item in the row, same weight as the rest, no colour,
+         no badge, no image beacon. The ask was "inconspicuous". -->
+    <a class="footer-kofi" href="https://ko-fi.com/dougfessler" rel="noopener">Buy me a coffee</a>
+  </div>
+</footer>
+
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/dokidex.js"></script>
+</body>
+</html>

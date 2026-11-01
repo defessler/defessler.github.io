@@ -1,0 +1,29 @@
+%%{init: {"flowchart": {"rankSpacing": 34, "nodeSpacing": 26}}}%%
+%% The whole system: the real vendor CLIs over one model server over one GPU.
+%% Redrawn 2026-09-02. It previously showed three surfaces, two of which are gone: the Electron
+%% desktop app over a .NET backend on :5111, and a SwarmUI media foundry on :7801. DokiDex's own
+%% C++ agent, doki code, went the same day. See archive.md.
+%% Sources: doki.ps1 ($Services / $Profiles), serving/llama-swap.yaml:1-13,
+%% scripts/claude-local.ps1, scripts/copilot-local.ps1, harness/crush.json.
+flowchart TB
+    CC["Claude Code CLI<br/>Anthropic's, unmodified"]
+    CP["Copilot CLI<br/>GitHub's, unmodified"]
+    HA["crush / opencode<br/>third-party harnesses"]
+    IDE["llama.vscode<br/>editor autocomplete"]
+    SWAP["llama-swap :8080<br/>OpenAI + Anthropic compatible"]
+    SRV["llama-server<br/>one llama.cpp process resident"]
+    FIM["fim :8012<br/>fill-in-the-middle sidecar"]
+    EMB["embed :8090<br/>CPU-only, codebase RAG"]
+    GPU["RTX 5090, 32 GB VRAM"]
+    CTL["doki.ps1 control plane<br/>agent / coexist"]
+
+    CC --> SWAP
+    CP --> SWAP
+    HA --> SWAP
+    IDE --> FIM
+    SWAP --> SRV
+    SRV --> GPU
+    FIM --> GPU
+    CTL -. starts and stops .-> SWAP
+    CTL -. starts and stops .-> FIM
+    CTL -. starts and stops .-> EMB

@@ -1,0 +1,12 @@
+%%{init: {"flowchart": {"rankSpacing": 34, "nodeSpacing": 26}}}%%
+%% One GPU, three mutually exclusive profiles.
+%% Sources: doki.ps1:131 ($Profiles), doki.ps1:314-331 (DoUp evicts the other group first),
+%% serving/llama-swap.yaml:15-17 and 44-48 (the 128k and 64k VRAM arithmetic).
+flowchart TB
+    CMD["doki up agent / coexist / media"] --> EVICT["Stop every service whose group<br/>is not the one you asked for"]
+    EVICT --> AGENT["agent<br/>llama-swap + embeddings"]
+    EVICT --> CO["coexist<br/>llama-swap + autocomplete + embeddings"]
+    EVICT --> MED["media<br/>SwarmUI + prompt rewriter"]
+    AGENT --> A1["Qwen3-Coder-30B-A3B at 128k ctx<br/>roughly 26 GB"]
+    CO --> C1["Qwen3-Coder-30B-A3B at 64k ctx plus FIM<br/>roughly 28 GB"]
+    MED --> M1["image and video models<br/>budgeted at 18 GB"]

@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glossary · DokiDex</title>
+<meta name="description" content="Every term this site uses, defined correctly and briefly. The one page to check when a word anywhere else on the site stops you.">
+
+<!-- Open Graph / Twitter, hand-rolled: jekyll-seo-tag is not available under the pinned
+     github-pages gem set used by actions/jekyll-build-pages. -->
+<meta property="og:site_name" content="DokiDex">
+<meta property="og:title" content="Glossary">
+<meta property="og:description" content="Every term this site uses, defined correctly and briefly. The one page to check when a word anywhere else on the site stops you.">
+<meta property="og:type" content="website">
+<!-- site_origin rather than absolute_url: see the comment in _config.yml. absolute_url would
+     emit http:// here, because the Pages API reports an http html_url while Enforce HTTPS is off. -->
+<meta property="og:url" content="https://dougfessler.com/projects/dokidex/glossary/">
+<link rel="canonical" href="https://dougfessler.com/projects/dokidex/glossary/">
+<!-- `summary`, not `summary_large_image`: no og:image or twitter:image is emitted anywhere on
+     this site, and the large-image card renders as a blank rectangle without one. Switch this back
+     the same day a 1200x630 share asset lands, not before. -->
+<meta name="twitter:card" content="summary">
+
+<!-- Same four families as the handbook, so the two halves of the site read as one product:
+     Marcellus (power words) · Kanit (headings, kickers, nav) · IBM Plex Mono (code, stats) ·
+     Figtree (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/dokidex.css">
+<link rel="icon" href="/projects/dokidex/assets/favicon.svg" type="image/svg+xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<!-- `wide: true` in a page's front matter opts it into --content-w-wide (assets/dokidex.css:51).
+     The CSS keys off `.page-wide` on an ancestor. Without the class emitted here the front-matter
+     flag silently does nothing. -->
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<!-- CSS-only nav toggle. A checkbox beats a JS drawer here: the nav has to work on the mobile
+     read where the reader has scrolled 4000px into a reference table, and a checkbox cannot
+     desync from its own state the way a JS flag can. -->
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/">DokiDex</a>
+    <a class="topbar-cta" href="/projects/dokidex/download/"><svg class="dl-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><g class="dl-arrow"><path d="M8 2.2v6.5"/><path d="M5.2 5.9 8 8.7l2.8-2.8"/></g><path class="dl-tray" d="M3.2 11.3v2.5h9.6v-2.5"/></svg>
+Download</a>
+  </header>
+
+  <!-- Grouped navigation, driven by site.nav in _config.yml.
+
+     A page is "current" when its url matches exactly. The handbook is the one entry that also
+     needs to light up for its children (/handbook/03-serving.html), so it gets a prefix test —
+     without it, the sidebar would show nothing selected the moment a reader steps into a
+     chapter, which reads as "you have left the site". -->
+<nav class="sidebar" aria-label="Site sections">
+  <a class="sidebar-brand" href="/projects/dokidex/">
+    <span class="sidebar-mark" aria-hidden="true">&#9612;&#9608;&#9608;&#9616;</span>
+    <span class="sidebar-brand-text">DokiDex</span>
+  </a>
+
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Start</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/"
+             >Overview</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Use DokiDex</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/local-cli/"
+             >Run the CLIs locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/download/"
+             >Download the launchers</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/models/"
+             >Models it runs</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/games/"
+             >Games the models built</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/telemetry/"
+             >Performance data</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/qwen38/"
+             >Qwen3.8-27B, measured</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/architecture/"
+             >How it's built</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Learn AI</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/"
+             >Where to start</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/basics/"
+             >1 · Foundations</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/core/"
+             >2 · How models work</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/advanced/"
+             >3 · Advanced</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/naming/"
+             >Decoding model names</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/open-vs-closed/"
+             >Open vs closed weights</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/benchmarks/"
+             >Benchmarks</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/local/"
+             >Running models locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/agents/"
+             >Coding agents</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Context</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/state-of-ai/"
+             >State of AI, 2026</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/reference/"
+             >Quick reference</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link is-active"
+             href="/projects/dokidex/glossary/"
+             aria-current="page">Glossary</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Deep dive</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/handbook/"
+             >The Handbook</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+</nav>
+
+
+  <main class="main">
+    <div class="page-head">
+      <p class="kicker">:: THE VOCABULARY</p>
+      <h1 class="page-title">Glossary</h1>
+      <p class="page-desc">Every term this site uses, defined correctly and briefly. The one page to check when a word anywhere else on the site stops you.</p>
+      
+    </div>
+
+    <article id="content" class="prose">
+      <p>This site uses precise words for precise reasons. Precise words are exactly the ones popular
+usage blurs. If a term anywhere else on the site stopped you, it’s defined here: correctly, not
+approximately, with a note on what it’s <em>not</em> wherever that’s the part people get wrong.</p>
+
+<h2 id="a">A</h2>
+
+<h3 id="acp-agent-client-protocol">ACP (Agent Client Protocol)</h3>
+<p>An open JSON-RPC 2.0 protocol, co-maintained by Zed and JetBrains, that lets an IDE talk to a
+coding agent as a subprocess speaking a standard message format instead of a vendor-specific
+plugin API: “Zed’s LSP for coding agents.” Rider, Zed and neovim can each launch a conforming
+agent as a subprocess. DokiDex spoke ACP through its own agent until 2026-09-02. The CLIs it ships
+now integrate with editors through their own mechanisms instead.</p>
+
+<h3 id="acceptance-rate">Acceptance rate</h3>
+<p>In speculative decoding, the share of drafted tokens the target model keeps. It decides how much
+speed a draft buys and nothing else, because a rejected token is simply regenerated. Our Qwen3.8-27B
+seat measured 0.50 to 0.54 with its MTP head in August 2026, so about half of every draft
+survived. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="active-parameters">Active parameters</h3>
+<p>The subset of a model’s total parameters that actually run the multiply-add math for a given
+token: the number that determines speed, not memory footprint. Not the same axis as total
+parameters, which determines whether the model fits in VRAM at all. A Mixture-of-Experts model can
+have active parameters a tenth the size of its total. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="agent">Agent</h3>
+<p>A system that interleaves model generation with real tool calls in a loop (reading files, running
+commands, calling APIs) rather than only producing text. It’s not a separate reasoning module
+bolted onto a chat model. The same next-token mechanism drives it, wired into a loop by code
+outside the model. <a href="/projects/dokidex/learn/agents/">Full treatment</a>.</p>
+
+<h3 id="agent-loop">Agent loop</h3>
+<p>The repeating cycle a coding agent implements: assemble context, let the model reason and pick a
+tool, execute that tool, stream the result back, and repeat until the model stops calling tools.
+The permission gate that decides whether a mutating tool call may run sits inside this loop.
+<a href="/projects/dokidex/learn/agents/">Full treatment</a>.</p>
+
+<h3 id="agentsmd">AGENTS.md</h3>
+<p>An open orientation-file spec (project-level build commands, conventions, and rules re-read every
+session) originated by OpenAI/Codex, Cursor, and Google’s Jules team, later donated to the Linux
+Foundation. Claude Code reads it, and so does every agent this stack drives.</p>
+
+<h3 id="aime">AIME</h3>
+<p>The American Invitational Mathematics Examination, repurposed as an olympiad-level math benchmark.
+Recent years are fully saturated by frontier models, which is why evaluators rotate to the newest
+available contest rather than an old one: freshness resists contamination, not the benchmark’s
+brand name. <a href="/projects/dokidex/learn/benchmarks/">Full treatment</a>.</p>
+
+<h3 id="alibi">ALiBi</h3>
+<p>Attention with Linear Biases: a positional-encoding alternative that penalizes attention scores by
+a fixed, distance-based amount rather than rotating or adding to the embeddings, letting a model
+trained on short sequences extrapolate to longer ones at inference. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="alignment-research">Alignment (research)</h3>
+<p>The effort to keep increasingly capable AI systems pursuing goals compatible with human interests,
+especially once a system exceeds the competence of the humans checking its work. Genuinely
+unresolved as a research problem: not “basically solved by RLHF” and not “provably impossible,”
+despite both claims circulating. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="arc-agi">ARC-AGI</h3>
+<p>A benchmark family (versions 1 through 3) testing abstract puzzle generalization rather than
+memorized knowledge. ARC-AGI-1 is now considered saturated by its own creators. ARC-AGI-2 is a
+harder static-puzzle successor. ARC-AGI-3 replaces static puzzles with interactive game
+environments scored over time. “ARC-AGI” without a version number names three different tests.
+<a href="/projects/dokidex/learn/benchmarks/">Full treatment</a>.</p>
+
+<h3 id="arenaai--lmarena">Arena.ai / LMArena</h3>
+<p>A leaderboard built from anonymized human pairwise preference votes, aggregated into an Elo-style
+rating (<code class="language-plaintext highlighter-rouge">lmarena.ai</code> now redirects to <code class="language-plaintext highlighter-rouge">arena.ai</code>). It measures blind stylistic preference under
+real usage, not correctness: a longer, more confidently-formatted wrong answer can still win
+votes. <a href="/projects/dokidex/learn/benchmarks/">Full treatment</a>.</p>
+
+<h3 id="attention-self-attention">Attention (self-attention)</h3>
+<p>The mechanism letting every token’s representation be updated by every <strong>preceding</strong> token in the
+sequence, and by itself, weighted by a learned relevance score computed from Query, Key, and Value
+vectors. A <strong>causal mask</strong> blocks any token from attending to ones that come after it, which is
+what makes next-token training possible in the first place, and what makes the KV cache (below)
+valid, since an earlier token’s cached Key/Value can never be invalidated by a token that comes
+later. It’s a real, load-bearing part of the computation. But a controlled study found attention
+weights are frequently uncorrelated with what actually drove a prediction. So they’re not a
+reliable explanation of “why” a model answered the way it did. <a href="/projects/dokidex/learn/core/">Full treatment</a>.</p>
+
+<h3 id="autoregressive">Autoregressive</h3>
+<p>Describes a model that generates output by repeatedly predicting one token at a time from
+everything generated so far, feeding each new token back in as input for the next step. There’s
+no separate module planning the whole answer in advance: any appearance of long-range planning is
+an emergent property of training. <a href="/projects/dokidex/learn/basics/">Full treatment</a>.</p>
+
+<h3 id="awq">AWQ</h3>
+<p>Activation-aware Weight Quantization: a scheme that finds the small fraction of weight channels
+most important to output quality (by looking at activation magnitude, not weight magnitude) and
+protects them, instead of rounding every weight the same way. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="anb-notation">A&lt;n&gt;B notation</h3>
+<p>The active-parameter suffix in a Mixture-of-Experts model name: <code class="language-plaintext highlighter-rouge">235B-A22B</code> means 235 billion
+total (stored) parameters and roughly 22 billion active (computed) per token. VRAM sizing uses the
+first number. Speed estimates use the second. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h2 id="b">B</h2>
+
+<h3 id="b-size-suffix">B (size suffix)</h3>
+<p>The <code class="language-plaintext highlighter-rouge">B</code> in <code class="language-plaintext highlighter-rouge">20B</code>, <code class="language-plaintext highlighter-rouge">27B</code> or <code class="language-plaintext highlighter-rouge">35B</code> is billions of parameters. For a dense model it’s a fair guide to
+both quality and speed. For a Mixture-of-Experts model it’s the <em>total</em>, which sets memory but not
+speed (see <em>A&lt;n&gt;B notation</em>). A rough memory rule at 4-bit: a little over half a gigabyte per
+billion, so a 27B model is about 16 to 17 GB before the KV cache. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="backpropagation">Backpropagation</h3>
+<p>The algorithm that computes, for every weight in a network, the direction it should move to reduce
+the gap between the model’s output and the desired output (the loss). It computes the <em>direction</em>.
+Gradient descent takes the <em>step</em>. The two are often mentioned together but aren’t the same
+operation. <a href="/projects/dokidex/learn/core/">Full treatment</a>.</p>
+
+<h3 id="bake-off">Bake-off</h3>
+<p>DokiDex’s own term for a dated, scored comparison we run between candidate models on the same
+hardware. A candidate only gets promoted to a default serving tier once it clears both a golden
+suite score and a native tool-call check. <a href="/projects/dokidex/models/">Full treatment</a>.</p>
+
+<h3 id="base-model">Base model</h3>
+<p>A model after pretraining only, with no instruction-tuning stage applied. Given an instruction, a
+base model is just as likely to continue it with more instructions as to follow it:
+instruction-following has to be trained in afterward. It isn’t a pretraining property. <a href="/projects/dokidex/learn/core/">Full treatment</a>.</p>
+
+<h3 id="benchmark">Benchmark</h3>
+<p>A score produced by running a model against a fixed set of test questions under a fixed scoring
+rule. That score isn’t a fact about the model alone. It’s a fact about a model, a prompt template,
+a tool-access setting, a reasoning-effort tier, and an attempt-counting rule, all together.
+<a href="/projects/dokidex/learn/benchmarks/">Full treatment</a>.</p>
+
+<h3 id="bfcl-berkeley-function-calling-leaderboard">BFCL (Berkeley Function-Calling Leaderboard)</h3>
+<p>A benchmark scoring the accuracy of function/tool-call generation against ground truth, checked by
+comparing abstract syntax trees rather than exact text. Its official leaderboard is
+JavaScript-rendered. Scraped copies have been caught showing years-stale data under a fresh
+“last updated” timestamp. <a href="/projects/dokidex/learn/benchmarks/">Full treatment</a>.</p>
+
+<h3 id="bf16--fp16">BF16 / FP16</h3>
+<p>16-bit floating-point formats, roughly 2 bytes per weight: the “full precision” baseline before
+8-bit and 4-bit quantization became standard. BF16 trades some mantissa precision for a wider
+exponent range than FP16, making it more resistant to overflow during training. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="bits-per-weight-bpw">Bits per weight (bpw)</h3>
+<p>The average number of bits a quantization format spends storing each parameter: the figure that
+multiplies directly into a model’s VRAM footprint. It’s a property of the quantization scheme, not
+of the model itself, and stays nearly constant across model sizes for a given format. <a href="/projects/dokidex/learn/local/">Full treatment</a>.</p>
+
+<h3 id="box">Box</h3>
+<p>DokiDex’s word for a second GPU machine that serves its card to the rest of the LAN, behind a key
+and with billed rows stripped. Another machine’s router or eval run can then send work to it by
+id. In October 2026 that’s how a laptop-class RTX 3080 hands big jobs to an RTX 5090 across the
+room.</p>
+
+<h3 id="bpe-byte-pair-encoding">BPE (byte-pair encoding)</h3>
+<p>The algorithm behind most modern tokenizers: starting from individual bytes or characters, it
+repeatedly merges the most frequent adjacent pair until it reaches a target vocabulary size. It
+operates on raw bytes, not human-legible characters, which is why a token boundary can land
+mid-character in non-Latin scripts. <a href="/projects/dokidex/learn/basics/">Full treatment</a>.</p>
+
+<h2 id="c">C</h2>
+
+<h3 id="chain-of-thought-cot">Chain-of-thought (CoT)</h3>
+<p>Prompting or training a model to generate intermediate reasoning steps before its final answer,
+which measurably helps on arithmetic, symbolic, and multi-step tasks. It’s not necessarily a
+faithful transcript of the model’s real internal computation: controlled studies have found
+models sometimes use a hint without ever mentioning it in their visible reasoning trace. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="chat-template">Chat template</h3>
+<p>The exact string format (role markers, special tokens, whitespace) a specific model’s training
+pipeline used to represent a conversation. Using a different, “reasonable-looking” format instead
+of a model’s actual template is a common, silent way to degrade a self-hosted model’s output: it
+still produces fluent text, just measurably worse. <a href="/projects/dokidex/learn/core/">Full treatment</a>.</p>
+
+<h3 id="checkpoint">Checkpoint</h3>
+<p>In an agent, a saved snapshot that lets you undo: Claude Code’s <code class="language-plaintext highlighter-rouge">/rewind</code> restores file content and
+conversation from a prior turn. This is a different sense from a <em>training</em> checkpoint (an
+intermediate saved state of a model’s weights during training). Context determines which one
+applies.</p>
+
+<h3 id="chinchilla--chinchilla-optimal">Chinchilla / Chinchilla-optimal</h3>
+<p>The finding that, for a fixed training-compute budget, model size and training-token count should
+scale together rather than favoring size alone. A properly token-matched smaller model
+outperformed a far larger, undertrained one at equal compute. Most current models are deliberately
+trained well past this ratio anyway, because it optimizes training cost only, not the cost of
+serving the model afterward. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="claudemd">CLAUDE.md</h3>
+<p>An orientation file used by Claude Code for project-level instructions re-read every session. In
+this repo it is a single line, <code class="language-plaintext highlighter-rouge">@AGENTS.md</code>, so both files stay in step.</p>
+
+<h3 id="compaction">Compaction</h3>
+<p>Summarizing older conversation history to free context-window space, rather than truncating it
+outright. What a compaction summary <em>keeps</em> (architectural decisions, open questions) matters
+more than how aggressively it compresses. Naive truncation reliably reintroduces bugs an agent
+already fixed once. <a href="/projects/dokidex/local-cli/">Full treatment</a>.</p>
+
+<h3 id="context-cap">Context cap</h3>
+<p>A blunter alternative to compaction: if a turn’s prompt exceeds a configured token limit, the next
+turn drops the single oldest whole conversation turn outright, with no attempt to preserve its
+meaning. <a href="/projects/dokidex/local-cli/">Full treatment</a>.</p>
+
+<h3 id="context-editing">Context editing</h3>
+<p>An Anthropic feature that strips stale tool calls and results out of a long conversation as the
+context limit approaches, paired with a memory tool that persists facts to an external store across
+sessions. Not the same mechanism as compaction, which summarizes rather than strips. <a href="/projects/dokidex/state-of-ai/">Full treatment</a>.</p>
+
+<h3 id="context-rot">Context rot</h3>
+<p>The empirically observed, non-uniform degradation of model performance as context length grows,
+well before the model’s stated limit, and worse for semantically-similar (not just lexically
+exact) information than the classic needle-in-a-haystack test suggests. Not the same claim as “the
+context window is too small”: it happens inside windows that technically fit the content. <a href="/projects/dokidex/state-of-ai/">Full treatment</a>.</p>
+
+<h3 id="context-window">Context window</h3>
+<p>The maximum number of tokens (input and output combined, in most APIs) a model can attend to in
+a single request. It is <strong>not memory</strong>: nothing persists between separate API calls unless an
+application explicitly re-sends or stores the text itself. <a href="/projects/dokidex/learn/basics/">Full treatment</a>.</p>
+
+<h3 id="contamination">Contamination</h3>
+<p>The risk that a benchmark’s test questions appeared, verbatim or near-verbatim, in a model’s
+training data, inflating scores on anything built from public sources like GitHub issues or old
+contest archives. It’s the primary reason several older benchmarks are considered “dead” today.
+<a href="/projects/dokidex/learn/benchmarks/">Full treatment</a>.</p>
+
+<h3 id="cross-family-review">Cross-family review</h3>
+<p>Having a model from a different vendor family check another model’s work. Models trained the same
+way tend to share blind spots, so a Qwen reviewing Qwen misses what a Qwen wrote wrong more often
+than a Gemini or a gpt-oss would. It still ranks below an executable check: a compiler or a test
+suite doesn’t share anyone’s blind spots.</p>
+
+<h2 id="d">D</h2>
+
+<h3 id="decode">Decode</h3>
+<p>The second phase of answering: writing the reply one token at a time, each step reading the whole
+KV cache. Speed here is limited by memory bandwidth, and it’s the number most people quote as
+“tokens per second”. On a deep agent session it’s most of the wall clock. Our seat measured decode
+at 96.9% and prefill at 3.1% past 100k tokens of context, in August 2026. Compare <em>Prefill</em>.</p>
+
+<h3 id="dense-model">Dense model</h3>
+<p>A model that runs every parameter on every token, as opposed to a Mixture-of-Experts model, which
+routes each token through only a subset of its parameters. Classic GPT, Llama, and Mistral-7B-style
+architectures are dense. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="distillation">Distillation</h3>
+<p>Training a smaller “student” model to reproduce a larger “teacher” model’s full output probability
+distribution, not just its single best answer. What transfers is the graded shape of the teacher’s
+near-misses, not an explanation of why the teacher answered that way. In practice, though, a
+shipped <code class="language-plaintext highlighter-rouge">Distill</code> suffix usually marks something narrower: supervised fine-tuning on <em>teacher-generated
+output text</em>, not logit-level distribution matching. <code class="language-plaintext highlighter-rouge">DeepSeek-R1-Distill-Qwen-7B</code>, the site’s own
+worked example, was SFT’d on ~800K R1-generated reasoning traces, sequence-level imitation rather
+than distribution matching.</p>
+
+<p>Community uploads stretch the word further. A name like <code class="language-plaintext highlighter-rouge">Qwen3.6-35B-A3B-Claude-Opus-Reasoning-Distilled</code>
+usually means a LoRA fine-tune on a few thousand answers collected from a closed model, and some
+model cards admit the reasoning traces were rebuilt by another model rather than copied. Treat the
+teacher’s name as a claim about the training data, not about the result. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="dokigen-studio">DokiGen Studio</h3>
+<p>DokiDex’s former generative front end, where image, video and audio generation lived. Removed on
+2026-09-02 with the rest of the non-coding stack. The term survives here because it appears
+throughout the project history and the older measurement records.</p>
+
+<h3 id="dpo-direct-preference-optimization">DPO (Direct Preference Optimization)</h3>
+<p>A post-training method that reformulates preference-pair data as a classification-style loss,
+solving the same objective RLHF solves in one supervised-style stage instead of training a separate
+reward model and running an RL sampling loop. It removes the <em>separately trained</em> reward model, not
+the underlying concept of a reward. That concept just becomes implicit in the policy itself.
+<a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="draft-model">Draft model</h3>
+<p>The small, fast model in speculative decoding that proposes several tokens ahead for a larger
+target model to verify in one parallel pass. A weak draft model only costs speed, never
+correctness: a bad guess is simply rejected and regenerated by the target model. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h2 id="e">E</h2>
+
+<h3 id="effort">Effort</h3>
+<p>A per-request dial (Low/Medium/High/XHigh/Max, in DokiDex’s UI) controlling how much reasoning
+depth and tool-call budget a model gets, never which model runs. The same underlying model can
+score meaningfully differently on a benchmark depending only on this setting.</p>
+
+<h3 id="embedding">Embedding</h3>
+<p>A vector (a list of numbers, hundreds to thousands of entries long) assigned to a piece of text
+such that distance and direction in that space reflect learned relationships between meanings. It
+doesn’t encode a dictionary definition. A modern transformer’s embeddings also shift with
+surrounding context rather than sitting at one fixed coordinate per word. <a href="/projects/dokidex/learn/basics/">Full treatment</a>.</p>
+
+<h3 id="embed-marker">Embed (marker)</h3>
+<p>A model-name marker meaning the model outputs a fixed-size similarity vector rather than text: a
+retrieval component, not a generator. DokiDex’s embedding server (<code class="language-plaintext highlighter-rouge">:8090</code>) is this kind of model. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="exl2--exl3">EXL2 / EXL3</h3>
+<p>Quantization formats from the ExLlamaV2/V3 project. EXL2 is a mixed-bitrate format shipped as plain
+<code class="language-plaintext highlighter-rouge">safetensors</code>. EXL3 is a newer lattice-codebook format spanning very low bit-widths, closer in
+spirit to I-quants than to GPTQ’s linear scaling. <a href="/projects/dokidex/learn/local/">Full treatment</a>.</p>
+
+<h3 id="expert-offload">Expert offload</h3>
+<p>Keeping a Mixture-of-Experts model’s expert weights in system RAM while attention and the shared
+layers stay on the GPU (<code class="language-plaintext highlighter-rouge">--n-cpu-moe N</code> in llama.cpp, which offloads the experts of the first N
+layers). Since only a few experts run per token, the CPU side stays tolerable. It’s how a 35B MoE
+runs on a 10 GB card: our RTX 3080 seat holds 8.1 GB of VRAM this way and decodes at about 28 tokens
+a second, as of October 2026. It doesn’t help a dense model, where every weight runs every token.</p>
+
+<h2 id="f">F</h2>
+
+<h3 id="feed-forward-layer">Feed-forward layer</h3>
+<p>The sublayer inside a transformer block that transforms each token’s representation on its own,
+with no mixing across token positions. Attention does the cross-token mixing. The feed-forward
+layer does the per-token transformation. Most of a dense transformer’s raw parameter count sits
+here, which is exactly the sublayer Mixture-of-Experts replaces with parallel experts. <a href="/projects/dokidex/learn/core/">Full treatment</a>.</p>
+
+<h3 id="fine-tuning">Fine-tuning</h3>
+<p>Further training an already-pretrained model on a smaller, curated dataset to change its behavior,
+format, or style. It reliably teaches <em>behavior</em>. It’s comparatively unreliable at injecting new,
+precise facts. For that, retrieval (RAG) is the more dependable lever. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="fim-fill-in-the-middle">FIM (fill-in-the-middle)</h3>
+<p>Training a model on <code class="language-plaintext highlighter-rouge">&lt;prefix&gt;&lt;suffix&gt;</code> → <code class="language-plaintext highlighter-rouge">&lt;middle&gt;</code> examples alongside ordinary next-token
+prediction, so it can complete code from both directions at once: the shape IDE autocomplete
+actually needs. A chat-only model can fake this via prompting, with materially worse completion
+quality. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="flashattention">FlashAttention</h3>
+<p>An exact (not approximate) algorithm for computing self-attention that reorders the computation to
+minimize data movement between a GPU’s slow main memory and its fast on-chip memory, rather than
+changing what gets computed. It targets the same underlying bottleneck as GQA and MLA: memory
+bandwidth, not raw arithmetic. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="flash-tier-word">Flash (tier word)</h3>
+<p>Google’s name for its lower-latency, lower-cost tier below “Pro”, still a genuinely distinct
+model, not a rate-limited version of the flagship. The word carries no meaning outside Google’s own
+lineup. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="fp8">FP8</h3>
+<p>An 8-bit floating-point format, roughly 1 byte per weight, that some frontier models now use for
+their entire pretraining run rather than only for post-training quantization. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h2 id="g">G</h2>
+
+<h3 id="gguf">GGUF</h3>
+<p>llama.cpp’s model container format: the file type most local, quantized models ship in, spanning
+legacy, K-quant, and I-quant families at bit-widths from roughly 1 to 8 bits per weight. <a href="/projects/dokidex/learn/local/">Full treatment</a>.</p>
+
+<h3 id="golden-suite">Golden suite</h3>
+<p>DokiDex’s own fixed set of hand-checked tasks that gates a candidate model’s promotion to a default
+serving tier. We don’t promote a model on a high score alone. It also has to pass the native
+tool-call gate cleanly. <a href="/projects/dokidex/models/">Full treatment</a>.</p>
+
+<h3 id="gpqa-diamond">GPQA Diamond</h3>
+<p>A PhD-vetted, multiple-choice benchmark across biology, physics, and chemistry, built specifically
+to resist a skilled non-expert solving it with a web search. Near-saturated at the frontier as of
+mid-2026, with leading models scoring above the human expert baseline. <a href="/projects/dokidex/learn/benchmarks/">Full treatment</a>.</p>
+
+<h3 id="gptq">GPTQ</h3>
+<p>A one-shot, Hessian-informed, layer-wise quantization method that minimizes output error: the
+long-standing GPU-side INT4 quantization standard, predating AWQ. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="gpu-mode">GPU mode</h3>
+<p>DokiDex’s own term for which profile currently owns the single GPU: <code class="language-plaintext highlighter-rouge">agent</code> (the seat plus the
+CPU-only embedder) or <code class="language-plaintext highlighter-rouge">coexist</code> (the same, plus a reduced-context FIM autocomplete sidecar). A
+third mode, <code class="language-plaintext highlighter-rouge">media</code>, held the image and video models and was mutually exclusive with both. It was
+removed on 2026-09-02 along with the stack it served.</p>
+
+<h3 id="gradient-descent">Gradient descent</h3>
+<p>The optimization step that nudges each weight a small amount in the direction backpropagation
+computes will reduce the loss, then repeats on the next batch of examples, millions of times. It
+computes the <em>step</em>. Backpropagation computes the <em>direction</em>. <a href="/projects/dokidex/learn/core/">Full treatment</a>.</p>
+
+<h3 id="gqa-grouped-query-attention">GQA (Grouped-Query Attention)</h3>
+<p>A KV-cache-shrinking scheme where several query heads share one key/value head, rather than every
+head keeping its own (the middle ground between full multi-head attention and Multi-Query
+Attention, which takes the sharing to its extreme). It shrinks the KV cache’s memory footprint, not
+the attention computation’s arithmetic cost. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h2 id="h">H</h2>
+
+<h3 id="hallucination">Hallucination</h3>
+<p>Confident generation of false or unsupported content. Current theoretical work argues it’s a
+predictable consequence of how models are evaluated: most benchmarks score a confident wrong
+answer the same as an honest “I don’t know” (both zero credit), which structurally rewards guessing
+over calibrated uncertainty. <strong>It is not simply a bug</strong> that more training data or a bigger model
+straightforwardly fixes. <a href="/projects/dokidex/learn/basics/">Full treatment</a>.</p>
+
+<h3 id="head--multi-head-attention">Head / multi-head attention</h3>
+<p>Running several independent attention computations in parallel within one layer, each with its own
+learned Query/Key/Value projections, then combining their outputs. Some heads show identifiable
+specialization on inspection. But this is an emergent, not a designed, property. <a href="/projects/dokidex/learn/core/">Full treatment</a>.</p>
+
+<h3 id="hle-humanitys-last-exam">HLE (Humanity’s Last Exam)</h3>
+<p>An expert-written benchmark across math, humanities, and science, built as a successor once
+MMLU-class tests saturated. Reported scores for the same models vary enormously across sources
+depending on dataset snapshot date and whether tool use was permitted: never trust an HLE number
+without its source, date, and tool-use condition. <a href="/projects/dokidex/learn/benchmarks/">Full treatment</a>.</p>
+
+<h3 id="hmmt">HMMT</h3>
+<p>The Harvard-MIT Math Tournament: the benchmark evaluators rotate to once a given year’s AIME
+saturates, because a brand-new contest has had no time to leak into training data. <a href="/projects/dokidex/learn/benchmarks/">Full treatment</a>.</p>
+
+<h3 id="humaneval">HumanEval</h3>
+<p>An early Python coding benchmark, now considered retired: near-saturated, contaminated by years of
+public exposure, and narrow in construct (short, interview-style, purely algorithmic problems that
+say nothing about repo-scale work). Current frontier model cards typically no longer report a score
+on it. <a href="/projects/dokidex/learn/benchmarks/">Full treatment</a>.</p>
+
+<h3 id="hybrid-model">Hybrid model</h3>
+<p>A model that mixes ordinary attention layers with linear-time recurrent layers, so most layers
+carry a small fixed-size state instead of a KV cache that grows with every token. Qwen3.8 is built
+this way. It makes long windows cheaper. The catch is that the engine has to support the layer type
+properly.
+Qwen3.8 on llama.cpp builds older than about b10450 produced corrupted output at full speed, with no
+error at all.</p>
+
+<h2 id="i">I</h2>
+
+<h3 id="inference">Inference</h3>
+<p>Running a model’s already-fixed weights on a specific input to produce an output: the constant,
+comparatively cheap counterpart to training. Nothing about a normal inference call changes the
+model’s weights. <a href="/projects/dokidex/learn/basics/">Full treatment</a>.</p>
+
+<h3 id="inference-optimal--overtrained-scaling">Inference-optimal / overtrained scaling</h3>
+<p>Deliberately training a model on far more tokens than the Chinchilla-optimal ratio would prescribe,
+trading extra one-time training compute for a smaller, cheaper-to-serve model: rational once you
+account for a model being queried far more times than it’s trained. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="instruct">Instruct</h3>
+<p>A model-name suffix (also <code class="language-plaintext highlighter-rouge">-It</code>, <code class="language-plaintext highlighter-rouge">Chat</code>) meaning the model went through supervised fine-tuning
+(usually plus RLHF or DPO) for instruction-following, as opposed to a raw <code class="language-plaintext highlighter-rouge">Base</code> checkpoint. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="int4--int8">INT4 / INT8</h3>
+<p>Fixed-point integer quantization formats: the substrate underneath GPTQ, AWQ, and
+bitsandbytes-style quantization. INT4 is roughly 0.5 bytes per weight before block-scale overhead.
+<a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="interpretability-mechanistic">Interpretability (mechanistic)</h3>
+<p>Research trying to reverse-engineer what a trained network’s internal components actually compute.
+Most individual neurons respond to a tangled mix of unrelated concepts rather than one clean idea,
+which is why techniques like sparse autoencoders exist, and why even the field’s best current
+tools give only a partial, not a complete, account of a model’s behavior. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="i-quant">I-quant</h3>
+<p>A GGUF quantization family (<code class="language-plaintext highlighter-rouge">IQ1_S</code> through <code class="language-plaintext highlighter-rouge">IQ4_XS</code>) using non-uniform, codebook-based encoding
+rather than simple per-block scaling: built for aggressive 1-to-3-bit compression, where it holds
+quality better than K-quants at the cost of more dequantization compute. <a href="/projects/dokidex/learn/local/">Full treatment</a>.</p>
+
+<h2 id="j">J</h2>
+
+<h3 id="jamba">Jamba</h3>
+<p>AI21’s hybrid architecture (literally “Joint Attention and Mamba”) interleaving standard
+attention blocks with linear-time Mamba (State Space Model) blocks plus Mixture-of-Experts, trading
+some quality for much cheaper long-context inference. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h2 id="k">K</h2>
+
+<h3 id="k-quant">K-quant</h3>
+<p>A GGUF quantization family (<code class="language-plaintext highlighter-rouge">Q2_K</code> through <code class="language-plaintext highlighter-rouge">Q6_K</code>) using 256-value super-blocks with per-sub-block
+scaling. The <code class="language-plaintext highlighter-rouge">_S</code>/<code class="language-plaintext highlighter-rouge">_M</code>/<code class="language-plaintext highlighter-rouge">_L</code> suffix marks which tensors get selectively bumped to higher precision
+within that bit family, not an independent size class. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="knowledge-cutoff">Knowledge cutoff</h3>
+<p>The date after which a model has no reliable knowledge of events: a separate figure from the
+<em>training-data</em> cutoff (the date training data was gathered up to), which is typically later. A
+model’s release date is a third, different figure again. None of the three should be assumed
+equal. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="kv-cache">KV cache</h3>
+<p>Stored Key and Value vectors from every previous token, at every layer, kept so that generating
+each new token only requires computing a fresh Query rather than recomputing everything before it,
+turning what would be quadratic work into linear, incremental work per step. <strong>It is not the
+model’s memory of a conversation</strong>: it’s discarded the moment the request ends. It grows
+continuously with every token generated. <a href="/projects/dokidex/learn/core/">Full treatment</a>.</p>
+
+<h3 id="kv-cache-quantization">KV cache quantization</h3>
+<p>Storing the KV cache in fewer bits (<code class="language-plaintext highlighter-rouge">--cache-type-k q4_0</code> and <code class="language-plaintext highlighter-rouge">--cache-type-v q4_0</code> in llama.cpp),
+the same idea as weight quantization applied to the context. It buys room, not speed. Our seat fit
+a 256k window in less memory than a 104k window had needed at f16. Per cached token, attention was
+no faster: f16 measured 37.0 ns, q8_0 57.8 and q4_0 53.3, in August 2026.</p>
+
+<h2 id="l">L</h2>
+
+<h3 id="livecodebench">LiveCodeBench</h3>
+<p>A competitive-programming benchmark continuously scraped from LeetCode, AtCoder, and Codeforces,
+with each problem tagged by release date so evaluators can score only on problems published after a
+model’s training cutoff: a contamination control built into the dataset itself. <a href="/projects/dokidex/learn/benchmarks/">Full treatment</a>.</p>
+
+<h3 id="llamacpp">llama.cpp</h3>
+<p>The general-purpose local inference engine behind the GGUF ecosystem: runs on NVIDIA, Apple Metal,
+AMD, Intel, or CPU alone, and is the default choice for a single desktop GPU because it covers every
+quant format natively. <a href="/projects/dokidex/learn/local/">Full treatment</a>.</p>
+
+<h3 id="llama-swap">llama-swap</h3>
+<p>A small Go binary that exposes one OpenAI-compatible endpoint and swaps the underlying
+<code class="language-plaintext highlighter-rouge">llama-server</code> process to match whichever model a request asks for: the mechanism that lets one
+GPU serve many different model tiers without holding them all in memory at once. DokiDex’s entire
+serving stack runs behind one. <a href="/projects/dokidex/models/">Full treatment</a>.</p>
+
+<h3 id="lora-low-rank-adaptation">LoRA (Low-Rank Adaptation)</h3>
+<p>A fine-tuning method that freezes a model’s pretrained weights entirely and trains a much smaller
+pair of low-rank matrices added on top of specific weight layers. Because the learned update can be
+mathematically merged back into the base weights, a LoRA fine-tune adds zero inference latency once
+training is done. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="long-context-advertised-vs-effective">Long context (advertised vs. effective)</h3>
+<p>The gap between a model’s advertised maximum context length and the length at which it actually
+retains reliable recall. Independent research consistently finds effective length sits well below
+the advertised figure: a live, measured phenomenon, not a rare edge case. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h2 id="m">M</h2>
+
+<h3 id="mamba--state-space-model-ssm">Mamba / State Space Model (SSM)</h3>
+<p>An architecture family using a linear-time recurrent scan instead of (or alongside) attention,
+trading some quality for much cheaper long-context inference (critically, no KV cache that grows
+with sequence length). Hybrid designs like Jamba interleave Mamba blocks with a minority of
+attention layers. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="matformer">MatFormer</h3>
+<p>Google’s technique for training one large model that contains several smaller,
+independently-usable submodels nested inside it, yielding multiple deployable sizes from one
+training run with no separate distillation pass. The resulting “effective” parameter count
+(<code class="language-plaintext highlighter-rouge">E&lt;n&gt;B</code>) isn’t the same axis as an ordinary <code class="language-plaintext highlighter-rouge">&lt;n&gt;B</code> size figure. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="mcp-model-context-protocol">MCP (Model Context Protocol)</h3>
+<p>An open protocol, originated by Anthropic, that lets a model connect to external tools and data
+sources through a standard client/server interface rather than a bespoke integration per tool.
+DokiDex serves two of its own over stdio: a persistent project memory and <code class="language-plaintext highlighter-rouge">code_search</code>, semantic
+retrieval over the repo. Both are wired in <code class="language-plaintext highlighter-rouge">harness/crush.json</code>.</p>
+
+<h3 id="mini--nano-tier-words">mini / nano (tier words)</h3>
+<p>OpenAI’s historical naming for progressively smaller, cheaper siblings within a generation, exact
+size undisclosed. As of July 2026 OpenAI’s frontier lineup has moved to codenames (Sol/Terra/Luna)
+instead, so treat <code class="language-plaintext highlighter-rouge">mini</code>/<code class="language-plaintext highlighter-rouge">nano</code> as legacy wording still used elsewhere, not a stable, portable size
+signal. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="mla-multi-head-latent-attention">MLA (Multi-head Latent Attention)</h3>
+<p>A KV-cache-shrinking scheme that compresses Keys and Values into one small, shared low-rank latent
+vector per token instead of caching them per head: reported to exceed GQA’s quality at an even
+smaller cache footprint, not merely a lesser trade-off. Used by the DeepSeek-V3/R1 family. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="mmlu--mmlu-pro">MMLU / MMLU-Pro</h3>
+<p>MMLU is a broad-knowledge, multiple-choice benchmark spanning 57 subjects, now considered saturated
+with frontier models exceeding 90%. MMLU-Pro is its harder successor (more options per question,
+trivial questions removed, skewed toward reasoning-heavy items) and still shows meaningful score
+spread across models. <a href="/projects/dokidex/learn/benchmarks/">Full treatment</a>.</p>
+
+<h3 id="mmmu">MMMU</h3>
+<p>A multimodal, college-level benchmark spanning charts, diagrams, and chemical structures, requiring
+genuine joint image-and-text reasoning rather than OCR-plus-guessing. “MMMU-Pro” is a distinct,
+harder variant, not directly comparable to plain MMMU scores. <a href="/projects/dokidex/learn/benchmarks/">Full treatment</a>.</p>
+
+<h3 id="mmproj-vision-projector">mmproj (vision projector)</h3>
+<p>The small extra GGUF file that lets a text model read images, by turning an image into tokens the
+model understands. llama.cpp loads it with <code class="language-plaintext highlighter-rouge">--mmproj</code>. Without it, a request carrying an image fails
+outright, even if the model was trained for vision. Qwen3.8-27B’s is about 600 MB at Q8_0.</p>
+
+<h3 id="moe-mixture-of-experts">MoE (Mixture of Experts)</h3>
+<p>An architecture where a layer’s single feed-forward block is replaced by many smaller parallel
+“expert” blocks plus a learned router that activates only a small subset per token. <strong>It saves
+compute, not memory</strong>: every expert must still sit resident in VRAM, because routing is decided
+per token and a real request sweeps across most or all experts over time. It’s not a
+document-level or topic-level classifier. Routing is a per-token, per-layer decision, and there’s
+no evidence experts map onto human categories like “the math expert.” <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="mqa-multi-query-attention">MQA (Multi-Query Attention)</h3>
+<p>The most aggressive KV-cache-sharing scheme: every query head shares a single key/value head,
+maximizing cache savings at the largest quality risk. GQA is the commonly-used middle ground
+between MQA and full multi-head attention. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="mtp-multi-token-prediction">MTP (Multi-token prediction)</h3>
+<p>Training a model to predict several future tokens from one hidden state instead of just the next
+one, densifying the training signal and enabling speculative decoding. Models that keep the extra
+head ship it as a built-in draft model, and some uploads now put <code class="language-plaintext highlighter-rouge">MTP</code> in the name
+(<code class="language-plaintext highlighter-rouge">Qwen3.6-35B-A3B-MTP</code>). llama.cpp runs it with <code class="language-plaintext highlighter-rouge">--spec-type draft-mtp</code>. Like any draft, it changes
+speed and never the output. It’s worth it on a GPU with fast memory: our Qwen3.8-27B seat went from
+44.1 to 54.7 tokens a second on an RTX 5090. With the experts offloaded to system RAM on an RTX
+3080, it fell to 2.4, so it’s off there. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h2 id="n">N</h2>
+
+<h3 id="next-token-prediction">Next-token prediction</h3>
+<p>The core generative mechanism of an autoregressive language model: compute a probability
+distribution over the entire vocabulary for what comes next, sample one token, append it, and
+repeat. There’s no separate module planning a whole sentence in advance. <a href="/projects/dokidex/learn/basics/">Full treatment</a>.</p>
+
+<h3 id="nf4">NF4</h3>
+<p>“4-bit NormalFloat”: a quantization format that places its representable values for equal
+probability mass under a Gaussian weight-distribution assumption, built specifically for QLoRA
+fine-tuning (though usable for plain inference too). <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="nolima">NoLiMa</h3>
+<p>A long-context benchmark that deliberately chooses “needle” facts sharing almost no literal wording
+with the test question, forcing genuine semantic inference instead of simple string matching: a
+harder, more honest test than classic needle-in-a-haystack. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="nvfp4--mxfp4">NVFP4 / MXFP4</h3>
+<p>Two 4-bit floating-point quantization formats. MXFP4 is an open OCP-spec format using a shared
+block-32 scale. NVFP4 is NVIDIA-specific, with a finer block-16 scale reported to edge out MXFP4 in
+accuracy at the same bitrate. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h2 id="o">O</h2>
+
+<h3 id="open-data">Open data</h3>
+<p>Release of a model’s actual training corpus (or a detailed description of its provenance), not
+just the trained weights. Almost no model marketed as “open source” clears this bar: releasing
+weights alone says nothing about what the model was trained on. <a href="/projects/dokidex/learn/open-vs-closed/">Full treatment</a>.</p>
+
+<h3 id="open-source-ai">Open source (AI)</h3>
+<p>Under the Open Source Initiative’s stricter definition, a model qualifies only if the training
+data’s provenance, the full training/inference code, and the weights are all released with no
+permission needed to use, study, modify, or share. Almost every model casually called “open source”
+is, more precisely, only open-weight. <a href="/projects/dokidex/learn/open-vs-closed/">Full treatment</a>.</p>
+
+<h3 id="open-weight">Open weight</h3>
+<p>A model whose trained parameters are downloadable and runnable with no further permission
+required. That’s a real and valuable promise, but a much smaller one than “open source” implies for
+regular software, since it says nothing about training data or training code. License terms still
+vary hugely even among open-weight models, from permissive (Apache-2.0, MIT) to research-only or
+revenue-capped. <a href="/projects/dokidex/learn/open-vs-closed/">Full treatment</a>.</p>
+
+<h3 id="orientation-file">Orientation file</h3>
+<p>A project-level instructions file (<code class="language-plaintext highlighter-rouge">AGENTS.md</code> or <code class="language-plaintext highlighter-rouge">CLAUDE.md</code>) that a coding agent
+re-reads every session (build commands, conventions, security rules). An agent checks for them in a
+fixed precedence order and uses whichever it finds first.</p>
+
+<h3 id="oss-in-a-model-name">OSS (in a model name)</h3>
+<p>Short for open source, used loosely. <code class="language-plaintext highlighter-rouge">gpt-oss-20b</code> and <code class="language-plaintext highlighter-rouge">gpt-oss-120b</code> are OpenAI’s open-weight
+models, Apache 2.0 licensed and runnable locally, unlike the models behind ChatGPT. By the stricter
+definition above they’re open weight rather than open source. Both are Mixture-of-Experts: the 20B
+runs about 3.6B parameters per token, which is why it’s the fastest model on our RTX 3080.</p>
+
+<h2 id="p">P</h2>
+
+<h3 id="parameters">Parameters</h3>
+<p>The learned numeric values (see <em>Weights</em>) that a trained model uses to turn an input into an
+output. The count in a model’s name (<code class="language-plaintext highlighter-rouge">7B</code>, <code class="language-plaintext highlighter-rouge">235B</code>) refers to these. For a dense model, that count
+is also how many run per token. For a Mixture-of-Experts model it’s not: the number in a name is
+almost always <strong>total</strong> parameters, the figure that determines VRAM footprint, a different axis
+from <em>active parameters</em> (see <em>A&lt;n&gt;B notation</em>), the much smaller subset that actually
+computes for a given token and determines speed. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="peft-parameter-efficient-fine-tuning">PEFT (Parameter-Efficient Fine-Tuning)</h3>
+<p>An umbrella term for fine-tuning methods (LoRA foremost among them) that train only a small added
+set of parameters while leaving the pretrained weights frozen, instead of updating every weight in
+the model. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="permission-mode">Permission mode</h3>
+<p>The gate deciding whether a mutating tool call (a file write, an edit, a shell command) is allowed
+to run without asking first. We name four: <code class="language-plaintext highlighter-rouge">ask</code> (default, every mutation stops and asks),
+<code class="language-plaintext highlighter-rouge">auto</code> (mutations auto-approve), <code class="language-plaintext highlighter-rouge">plan</code> (read-only, mutating tools are filtered out of the model’s
+toolset entirely), and <code class="language-plaintext highlighter-rouge">bypass</code> (everything auto-approves, no exceptions, reachable only by a
+deliberate act, never a stray keypress). <a href="/projects/dokidex/local-cli/">Full treatment</a>.</p>
+
+<h3 id="perplexity">Perplexity</h3>
+<p>A measure of how well a model predicts a held-out piece of text (lower is better). It is a blunt
+instrument for judging quantization quality specifically: a quant can look fine on a perplexity
+chart and still measurably regress on coding, tool-use, or multi-step reasoning tasks. <a href="/projects/dokidex/learn/local/">Full treatment</a>.</p>
+
+<h3 id="plan-mode--act-mode">Plan mode / Act mode</h3>
+<p>The now near-universal agent pattern of proposing changes read-only in one phase, then executing
+them only after an explicit switch to a granted phase, implemented across Claude Code and Codex. The
+implementations worth trusting filter the model’s tool schema down to read-only calls rather than
+just asking it nicely not to write. <a href="/projects/dokidex/learn/agents/">Full treatment</a>.</p>
+
+<h3 id="ppo-proximal-policy-optimization">PPO (Proximal Policy Optimization)</h3>
+<p>The original RLHF algorithm: optimize a policy against a separately trained reward model, using a
+clipped objective that permits several safe update steps per batch. It inherits the generic risk of
+any proxy-optimization setup: a policy can find outputs that score well on the reward model
+without being genuinely better. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="pretraining">Pretraining</h3>
+<p>The first, most expensive training stage: next-token prediction over a massive raw text/code
+corpus, building broad world knowledge and language ability from scratch. It sets the great
+majority of a model’s factual knowledge: later stages (SFT, RLHF) reshape behavior and style far
+more than they add facts. <a href="/projects/dokidex/learn/core/">Full treatment</a>.</p>
+
+<h3 id="preview---exp-suffix">Preview / -exp suffix</h3>
+<p>A model-name marker signaling an unstable, possibly short-lived release with looser rate limits and
+faster deprecation than a GA (generally available) release under the same base name. Don’t
+hardcode a <code class="language-plaintext highlighter-rouge">-preview</code> or <code class="language-plaintext highlighter-rouge">-exp</code> model ID in production. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="prefill">Prefill</h3>
+<p>The first phase of answering: reading the whole prompt in one parallel pass to fill the KV cache.
+It’s compute-bound and much faster per token than decode, often thousands of tokens a second. It’s
+the wait before the first word appears, and it’s what prefix caching saves. Compare <em>Decode</em>.</p>
+
+<h3 id="prefix-caching-prompt-caching">Prefix caching (prompt caching)</h3>
+<p>Reusing an already-computed KV cache for a shared prefix (a repeated system prompt, tool schema,
+or earlier conversation turns) across multiple requests, so unchanged text isn’t reprocessed from
+scratch every time. It’s exact-match: a single changed token anywhere in the prefix invalidates
+everything cached after that point. This is the mechanism agent economics depend on, since an agent
+resends a large, mostly-static prefix on nearly every turn. <a href="/projects/dokidex/learn/local/">Full treatment</a>.</p>
+
+<h3 id="ptq--qat">PTQ / QAT</h3>
+<p>Post-Training Quantization compresses an already-trained model afterward, as a cheap, one-shot
+conversion. Nearly everything discussed on this site is PTQ. Quantization-Aware Training bakes
+simulated quantization noise into training itself, generally yielding higher quality at a given
+bit-width, at the cost of needing training compute rather than a quick conversion. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h2 id="q">Q</h2>
+
+<h3 id="quantization">Quantization</h3>
+<p>Storing model weights (and sometimes activations or the KV cache) using fewer bits per number than
+the original training precision, shrinking memory footprint and often raising throughput, at some
+cost to precision. Quality doesn’t degrade uniformly across all weights. Practical schemes protect
+the small fraction of weights that matter most. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="quantization-suffix-q4_k_m-q5_k_s-etc">Quantization suffix (<code class="language-plaintext highlighter-rouge">Q4_K_M</code>, <code class="language-plaintext highlighter-rouge">Q5_K_S</code>, etc.)</h3>
+<p>Three related but distinct GGUF naming grammars, not one shared template. <strong>K-quants</strong>:
+<code class="language-plaintext highlighter-rouge">Q&lt;bits&gt;_K</code> plus an optional <code class="language-plaintext highlighter-rouge">_S</code>/<code class="language-plaintext highlighter-rouge">_M</code>/<code class="language-plaintext highlighter-rouge">_L</code> suffix marking how many of the most error-sensitive
+tensors get selectively upgraded within that same bit family (<code class="language-plaintext highlighter-rouge">Q4_K_M</code>, <code class="language-plaintext highlighter-rouge">Q5_K_S</code>, or suffix-less
+<code class="language-plaintext highlighter-rouge">Q6_K</code>), not an independent size class. <strong>Legacy quants</strong>: <code class="language-plaintext highlighter-rouge">Q&lt;bits&gt;_0</code> (<code class="language-plaintext highlighter-rouge">Q8_0</code>, <code class="language-plaintext highlighter-rouge">Q5_0</code>), plain
+per-block round-to-nearest with no K-quant super-blocks and no <code class="language-plaintext highlighter-rouge">_S</code>/<code class="language-plaintext highlighter-rouge">_M</code>/<code class="language-plaintext highlighter-rouge">_L</code> slot at all. <strong>I-quants</strong>:
+<code class="language-plaintext highlighter-rouge">IQ</code> is a <em>prefix</em>, not a letter code slotted after the number (<code class="language-plaintext highlighter-rouge">IQ4_XS</code>, <code class="language-plaintext highlighter-rouge">IQ2_XXS</code>, never
+<code class="language-plaintext highlighter-rouge">Q4_IQ_XS</code>), naming a non-uniform, codebook-based family with its own size codes (<code class="language-plaintext highlighter-rouge">XXS</code>/<code class="language-plaintext highlighter-rouge">XS</code>/<code class="language-plaintext highlighter-rouge">S</code>/<code class="language-plaintext highlighter-rouge">M</code>).
+<code class="language-plaintext highlighter-rouge">Q4_K_M</code> is a commonly cited reasonable floor for real reasoning or coding work. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h2 id="r">R</h2>
+
+<h3 id="rag-retrieval-augmented-generation">RAG (Retrieval-Augmented Generation)</h3>
+<p>Pairing a model with a search step: at query time, relevant passages are found via embedding
+similarity and inserted directly into the prompt. The model’s answer is conditioned on that
+retrieved text. <strong>It does not give a model memory</strong> (retrieved text lives in the same context
+window as everything else and vanishes when the request ends), and <strong>it does not eliminate
+hallucination</strong>, since the model can still misread a passage, or the retriever can hand back the
+wrong one. <a href="/projects/dokidex/learn/core/">Full treatment</a>.</p>
+
+<h3 id="react">ReAct</h3>
+<p>The canonical agent-loop pattern: alternate a Thought (reasoning about what to do), an Action (a
+tool call), and an Observation (the real result fed back in), repeating until done. It’s still the
+same underlying next-token model: the “reasoning” step isn’t a separate planning module. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="reasoning--reasoner-tier-word">Reasoning / Reasoner (tier word)</h3>
+<p>A model-name marker for extended chain-of-thought: sometimes a genuinely separate checkpoint
+(Qwen’s <code class="language-plaintext highlighter-rouge">-Thinking</code> variants), sometimes just a toggle on one model (Anthropic’s Claude Opus 5
+turns extended thinking on or off via a request parameter, same model ID either way). xAI takes the
+opposite, least-ambiguous approach: reasoning and non-reasoning ship as separate model IDs, not a
+toggle on one. Check which one a specific vendor means before assuming. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="residual-connection">Residual connection</h3>
+<p>A design where a sublayer’s output is added to its input rather than replacing it, giving
+information from earlier in the network a direct path forward even when a given sublayer
+contributes little for a particular token. Both sublayers in a transformer block are wrapped in
+one. <a href="/projects/dokidex/learn/core/">Full treatment</a>.</p>
+
+<h3 id="rlaif">RLAIF</h3>
+<p>Reinforcement Learning from AI Feedback: the same mechanism as RLHF, except the reward model is
+trained on AI-generated preference judgments instead of human ones, reported to reach comparable
+quality at lower labeling cost. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="rlhf-reinforcement-learning-from-human-feedback">RLHF (Reinforcement Learning from Human Feedback)</h3>
+<p>Training a reward model on human preference rankings of model outputs, then further training the
+policy to optimize against that reward model. Its headline demonstrated effect is a <em>preference</em>
+effect (a much smaller RLHF’d model was preferred by human raters over a far larger non-RLHF’d
+base model), <strong>not a knowledge effect</strong>. RLHF reshapes style and helpfulness, not what a model
+factually knows. <a href="/projects/dokidex/learn/core/">Full treatment</a>.</p>
+
+<h3 id="rlvr-rl-with-verifiable-rewards">RLVR (RL with Verifiable Rewards)</h3>
+<p>Reinforcement learning where the reward comes from an automatically checkable outcome (a passing
+test, a correct final number) rather than a human or AI preference judgment: the technique behind
+most current “reasoning” post-training. Whether it teaches genuinely new reasoning ability or
+mostly resamples what the base model could already do is a live, contested research question. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="rope-rotary-position-embedding">RoPE (Rotary Position Embedding)</h3>
+<p>The positional-encoding scheme used by most current models: it rotates the Query and Key vectors
+by an angle proportional to their position before the attention comparison happens. What gets
+used in that comparison is <em>relative</em> distance between two tokens, not an absolute address read off
+like a page number. <a href="/projects/dokidex/learn/core/">Full treatment</a>.</p>
+
+<h2 id="s">S</h2>
+
+<h3 id="scaling-laws">Scaling laws</h3>
+<p>Empirically fit power-law relationships between a model’s loss and the resources spent training it
+(parameters, tokens, compute), letting researchers predict the payoff of a larger run before
+spending the money. Chinchilla was the most consequential correction to the original versions of
+these laws. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="seat">Seat</h3>
+<p>DokiDex’s word for the one local model that answers the coding client by default. In the catalog
+it’s the row whose nature word is <code class="language-plaintext highlighter-rouge">Thinking</code>, and only one row holds that at a time. A seat earns
+the job on the golden suite. Other rows stay runnable by name as candidates. <a href="/projects/dokidex/models/">Full treatment</a>.</p>
+
+<h3 id="sft-supervised-fine-tuning">SFT (Supervised Fine-Tuning)</h3>
+<p>Further training a pretrained model on curated (prompt, ideal-response) demonstration pairs: the
+first stage that teaches instruction-following behavior and response format. It doesn’t reliably
+add new facts the pretraining data didn’t already contain. <a href="/projects/dokidex/learn/core/">Full treatment</a>.</p>
+
+<h3 id="sliding-window-attention">Sliding-window attention</h3>
+<p>Capping each token’s attention to a nearby window of positions, interleaved with occasional
+full-context layers, to cut KV-cache cost: one of the techniques that makes a huge advertised
+context window computationally viable in the first place. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="speculative-decoding">Speculative decoding</h3>
+<p>Using a small, fast “draft” model to propose several tokens ahead, then having the large “target”
+model verify all of them in one parallel forward pass, accepting the longest correct prefix.
+Because verification is exact, the final output distribution is identical to running the target
+model alone: it changes speed, never quality, by construction. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="subagent">Subagent</h3>
+<p>A child agent instance that runs a delegated, self-contained piece of work in its own isolated
+context window, returning only a summary to the parent rather than its full transcript. <code class="language-plaintext highlighter-rouge">doki
+code</code>’s <code class="language-plaintext highlighter-rouge">task</code> tool implements this pattern. A subagent can’t itself spawn further subagents. <a href="/projects/dokidex/local-cli/">Full treatment</a>.</p>
+
+<h3 id="swe-bench-verified--pro">SWE-bench (Verified / Pro)</h3>
+<p>A coding benchmark: given a real GitHub issue at a real commit, the model must produce a patch,
+scored by the repository’s own test suite. Verified is a hand-filtered subset near-saturated at the
+frontier. SWE-bench Pro is a harder, partly-private successor where the specific data split
+(public, held-out, or private/commercial) changes the reported score substantially. Never compare
+two SWE-bench Pro numbers without checking the split. <a href="/projects/dokidex/learn/benchmarks/">Full treatment</a>.</p>
+
+<h3 id="system-prompt">System prompt</h3>
+<p>A block of instructions (persona, rules, available tools, formatting constraints) placed ahead of
+the user’s messages, which the model is trained to weight more durably than an ordinary turn. It’s
+a strong steering signal, <strong>not a hard sandbox boundary</strong>. It’s still just text the model attends
+to, and can sometimes be made to leak or deviate from under adversarial prompting. <a href="/projects/dokidex/learn/core/">Full treatment</a>.</p>
+
+<h2 id="t">T</h2>
+
+<h3 id="tau-bench--tau2-bench">tau-bench / tau2-bench</h3>
+<p>Benchmarks where an agent must complete a task (airline, retail, telecom) by calling tools
+correctly while conversing with a simulated user under written policy constraints. Their signature
+metric, pass^k, measures success across k repeated attempts at the <em>same</em> task specifically to
+expose reliability problems a single pass/fail run hides. <a href="/projects/dokidex/learn/benchmarks/">Full treatment</a>.</p>
+
+<h3 id="temperature">Temperature</h3>
+<p>A number that rescales a model’s output probability distribution before a token is sampled: low
+temperature sharpens toward the most likely token, high temperature flattens toward more uniform
+selection. <strong>It has no mechanism for checking truth</strong>: at temperature 0 the model deterministically
+outputs its single most-likely token. That token can be confidently wrong. Lowering it buys
+consistency, not correctness, though that’s not the same as saying error rates are identical at
+every setting, which they aren’t. <a href="/projects/dokidex/learn/basics/">Full treatment</a>.</p>
+
+<h3 id="terminal-bench">Terminal-Bench</h3>
+<p>A benchmark where an agent operates a real sandboxed terminal (sysadmin, security, ML,
+data-science tasks) scored as binary pass/fail against defined checks. Scores for similar-tier
+models span a wide range depending on the agent harness wrapped around the model, which is why a
+Terminal-Bench number without a named harness is an incomplete citation. <a href="/projects/dokidex/learn/benchmarks/">Full treatment</a>.</p>
+
+<h3 id="test-time-compute">Test-time compute</h3>
+<p>Spending more computation at answer time (longer reasoning traces, or sampling several candidates
+and picking the best) rather than only at training time. It inverts the usual falling-cost story:
+per-token prices keep dropping. But reasoning models spend far more tokens per query. So cost per
+<em>task</em> can rise even as cost per <em>token</em> falls. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<h3 id="thinking-suffix--tier-word">Thinking (suffix / tier word)</h3>
+<p>At Qwen, a genuinely separate model checkpoint (<code class="language-plaintext highlighter-rouge">-Thinking-2507</code> versus <code class="language-plaintext highlighter-rouge">-Instruct-2507</code>) trained
+to always emit extended reasoning. Elsewhere, it’s frequently just a toggle on one model rather than a
+distinct checkpoint. Check which one a specific vendor means before assuming. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="tier-name">Tier name</h3>
+<p>A tier’s name is its id, self-describing
+by construction (real model, per-request context in brackets, then what it is and what it costs
+you in parens, for example <code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code>). A <code class="language-plaintext highlighter-rouge">(Candidate, ...)</code> name
+means a tier is still being judged. Any other nature word means it already cleared the bar for the
+role it holds. The autocomplete (<code class="language-plaintext highlighter-rouge">fim</code>) and embedding (<code class="language-plaintext highlighter-rouge">embed</code>) services are named for what they
+do rather than for a model, since they aren’t <code class="language-plaintext highlighter-rouge">llama-swap</code> rows.</p>
+
+<p>The serving config used to carry a second, unrelated kind of alias that reused the word: real
+routing names <code class="language-plaintext highlighter-rouge">llama-swap</code> resolved, like the subagent seats and the four <code class="language-plaintext highlighter-rouge">doki-*</code> tiers the
+local-CLI skills selected by. The 2026-08-25 rename retired both kinds together. A model’s name is
+now the only name it has, and it’s something a request can actually ask for, not a label layered on
+top of one.
+<a href="/projects/dokidex/models/">Full treatment</a>.</p>
+
+<h3 id="time-horizon-metr">Time horizon (METR)</h3>
+<p>METR’s measure of the task duration, timed against human experts, at which a model succeeds half
+the time: a way of tracking sustained-task coherence rather than single-question accuracy. Its own
+confidence intervals run wide. Whether its reported doubling rate is a durable trend or an
+artifact of a narrow, fast-saturating task suite is explicitly unresolved. <a href="/projects/dokidex/state-of-ai/">Full treatment</a>.</p>
+
+<h3 id="token--tokenizer">Token / Tokenizer</h3>
+<p>A tokenizer splits input text into tokens (sub-word chunks, not words) before a model ever
+processes it. A token can be a whole common word, a fragment of a rarer one, or a single character.
+This is the real reason letter-counting questions (“how many R’s in strawberry”) trip models up:
+the word typically arrives as one or two chunks, never as individual letters. <a href="/projects/dokidex/learn/basics/">Full treatment</a>.</p>
+
+<h3 id="tokens-per-second">Tokens per second</h3>
+<p>The speed figure for a local model. Always ask which phase it measures. Prefill and decode differ by
+10x or more, and a prefill number quoted as “speed” flatters a model badly. The depth matters too,
+since decode slows as the KV cache grows. A number without its phase and context depth isn’t
+comparable to anything.</p>
+
+<h3 id="tool-use-function-calling">Tool use (function calling)</h3>
+<p>A model has no way to directly run code. It only generates text. Tool use works by describing
+available functions to the model up front. Mid-response, instead of prose, the model emits a
+structured request: a name plus arguments. The calling application is what actually executes the
+function and returns the result. The model only ever <em>proposes</em> a call, never runs one itself.
+<a href="/projects/dokidex/learn/core/">Full treatment</a>.</p>
+
+<h3 id="top-p-nucleus-sampling">Top-p (nucleus) sampling</h3>
+<p>A sampling technique layered on top of temperature: it first truncates the candidate token set to
+the smallest group whose combined probability exceeds a threshold (commonly 0.9 to 0.95), then samples
+only from that narrowed set, preventing temperature alone from occasionally surfacing a very
+unlikely, nonsensical token from the distribution’s long tail. <a href="/projects/dokidex/learn/basics/">Full treatment</a>.</p>
+
+<h3 id="transformer-block">Transformer block</h3>
+<p>The repeating unit of a modern LLM: a self-attention sublayer that lets token positions exchange
+information, followed by a feed-forward sublayer that transforms each token’s representation on its
+own, each wrapped in a residual connection. Stack this two-step block dozens of times and you have a
+modern LLM. <a href="/projects/dokidex/learn/core/">Full treatment</a>.</p>
+
+<h2 id="u">U</h2>
+
+<h3 id="uncensored--abliterated">Uncensored / Abliterated</h3>
+<p>A post-hoc weight-editing technique (not a training stage) that finds the direction in a model’s
+activations mediating refusal and projects it out, with no retraining involved. Community-produced,
+with no safety guardrails, intended for research or red-teaming, not production. The edit can cost
+some capability, so a score measured on the stock weights doesn’t carry over. Re-run the evals on
+the edited file before trusting it. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="ultra-tier-word">Ultra (tier word)</h3>
+<p>Google’s historical marker for “largest, most restricted” in the Gemini 1.0 generation, largely
+retired by the 2.5/3.x generations. Not a portable signal: the word means nothing consistent
+outside that one now-superseded lineup. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="ud-quant-unsloth-dynamic">UD quant (Unsloth Dynamic)</h3>
+<p>Unsloth’s GGUF builds marked <code class="language-plaintext highlighter-rouge">UD-</code>, such as <code class="language-plaintext highlighter-rouge">UD-Q4_K_XL</code>. Instead of one rule for every tensor,
+they pick each layer’s precision from measurements of how much that layer suffers when squeezed.
+The result usually beats a plain K-quant of the same size. Both of our seats run one.</p>
+
+<h2 id="v">V</h2>
+
+<h3 id="vals-index">Vals Index</h3>
+<p>An independent evaluator’s own composite benchmark score, built from evaluations it runs itself
+rather than relying on vendor self-reports: one of the few “third-party, not self-reported”
+composite scores in the field. <a href="/projects/dokidex/learn/benchmarks/">Full treatment</a>.</p>
+
+<h3 id="vision-language-model-vl-marker">Vision-language model (VL marker)</h3>
+<p>A model-name marker meaning an image (sometimes video) encoder and multimodal training have been
+added on top of a text model: often a genuinely distinct branch, not a strict superset of the
+text-only sibling it’s paired with. <a href="/projects/dokidex/learn/naming/">Full treatment</a>.</p>
+
+<h3 id="vram">VRAM</h3>
+<p>The GPU’s own onboard memory, where a model’s weights and its KV cache must both fit for local
+inference. For a Mixture-of-Experts model, VRAM sizing is driven by total parameters, not active
+parameters: every expert has to be resident even though only a handful compute per token. <a href="/projects/dokidex/learn/local/">Full treatment</a>.</p>
+
+<h2 id="w">W</h2>
+
+<h3 id="wddm-spill">WDDM spill</h3>
+<p>On Windows, a GPU driven under WDDM doesn’t refuse a model too big for its VRAM. It quietly spills
+the overflow into system RAM and runs many times slower, or crashes later. A load that “worked” can
+still be oversubscribed, which is why we check free VRAM before trusting any speed number. Linux
+drivers usually fail loudly instead.</p>
+
+<h3 id="weights">Weights</h3>
+<p>The large set of fixed numbers a trained model uses to turn an input into an output through
+repeated arithmetic, learned from data, not written by a programmer. <strong>There is no separate,
+searchable archive of training text sitting alongside them</strong>. The weights are the entire model. <a href="/projects/dokidex/learn/basics/">Full treatment</a>.</p>
+
+<h2 id="y">Y</h2>
+
+<h3 id="yarn">YaRN</h3>
+<p>A technique that reinterpolates an existing RoPE model’s rotation frequencies to extend its usable
+context length beyond what it was originally trained on, reported to need far fewer extra tokens
+and training steps than prior extension methods. Extending the <em>technical</em> context limit this way
+doesn’t by itself guarantee the model uses that extended length reliably. <a href="/projects/dokidex/learn/advanced/">Full treatment</a>.</p>
+
+<hr />
+
+<p><strong>Still stuck?</strong> Go back to <a href="/projects/dokidex/learn/">Where to start</a> for the guided version
+of all this, or <a href="/projects/dokidex/reference/">Quick reference</a> for the tables without the
+prose.</p>
+
+    </article>
+
+    
+    <nav class="pager" aria-label="Page navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/reference/">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">Quick reference</span>
+      </a>
+      
+      <span class="pager-link pager-empty"></span>
+    </nav>
+    
+
+    <footer class="site-footer">
+  <div class="footer-main">
+    <p class="footer-line">
+      <strong>DokiDex</strong> v0.62.0:
+      a fully-local AI stack, and a field guide to the machines it runs on.
+    </p>
+    <p class="footer-line footer-dim">
+      Everything on this site is written against the real tree and the measured record. Where a
+      claim is a number, it was measured or sourced. Where it was a judgment call, the reasoning
+      is stated inline. Stale statements are bugs. File them like bugs.
+    </p>
+  </div>
+
+  <div class="footer-links">
+    <a href="/projects/dokidex/local-cli/">Run the CLIs</a>
+    <a href="/projects/dokidex/handbook/">Handbook</a>
+    <a href="/projects/dokidex/reference/">Quick reference</a>
+    <a href="/projects/dokidex/glossary/">Glossary</a>
+    <!-- Deliberately understated: last item in the row, same weight as the rest, no colour,
+         no badge, no image beacon. The ask was "inconspicuous". -->
+    <a class="footer-kofi" href="https://ko-fi.com/dougfessler" rel="noopener">Buy me a coffee</a>
+  </div>
+</footer>
+
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/dokidex.js"></script>
+</body>
+</html>

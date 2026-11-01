@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Advanced: MoE, Attention Variants, Quantization, and the Research Frontier · DokiDex</title>
+<meta name="description" content="How production LLMs are actually built and served: mixture-of-experts routing, the attention variants that shrink the KV cache, quantization theory, speculative decoding, scaling laws, RL post-training, and the questions that are still genuinely open.">
+
+<!-- Open Graph / Twitter, hand-rolled: jekyll-seo-tag is not available under the pinned
+     github-pages gem set used by actions/jekyll-build-pages. -->
+<meta property="og:site_name" content="DokiDex">
+<meta property="og:title" content="Advanced: MoE, Attention Variants, Quantization, and the Research Frontier">
+<meta property="og:description" content="How production LLMs are actually built and served: mixture-of-experts routing, the attention variants that shrink the KV cache, quantization theory, speculative decoding, scaling laws, RL post-training, and the questions that are still genuinely open.">
+<meta property="og:type" content="website">
+<!-- site_origin rather than absolute_url: see the comment in _config.yml. absolute_url would
+     emit http:// here, because the Pages API reports an http html_url while Enforce HTTPS is off. -->
+<meta property="og:url" content="https://dougfessler.com/projects/dokidex/learn/advanced/">
+<link rel="canonical" href="https://dougfessler.com/projects/dokidex/learn/advanced/">
+<!-- `summary`, not `summary_large_image`: no og:image or twitter:image is emitted anywhere on
+     this site, and the large-image card renders as a blank rectangle without one. Switch this back
+     the same day a 1200x630 share asset lands, not before. -->
+<meta name="twitter:card" content="summary">
+
+<!-- Same four families as the handbook, so the two halves of the site read as one product:
+     Marcellus (power words) · Kanit (headings, kickers, nav) · IBM Plex Mono (code, stats) ·
+     Figtree (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/dokidex.css">
+<link rel="icon" href="/projects/dokidex/assets/favicon.svg" type="image/svg+xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<!-- `wide: true` in a page's front matter opts it into --content-w-wide (assets/dokidex.css:51).
+     The CSS keys off `.page-wide` on an ancestor. Without the class emitted here the front-matter
+     flag silently does nothing. -->
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<!-- CSS-only nav toggle. A checkbox beats a JS drawer here: the nav has to work on the mobile
+     read where the reader has scrolled 4000px into a reference table, and a checkbox cannot
+     desync from its own state the way a JS flag can. -->
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/">DokiDex</a>
+    <a class="topbar-cta" href="/projects/dokidex/download/"><svg class="dl-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><g class="dl-arrow"><path d="M8 2.2v6.5"/><path d="M5.2 5.9 8 8.7l2.8-2.8"/></g><path class="dl-tray" d="M3.2 11.3v2.5h9.6v-2.5"/></svg>
+Download</a>
+  </header>
+
+  <!-- Grouped navigation, driven by site.nav in _config.yml.
+
+     A page is "current" when its url matches exactly. The handbook is the one entry that also
+     needs to light up for its children (/handbook/03-serving.html), so it gets a prefix test —
+     without it, the sidebar would show nothing selected the moment a reader steps into a
+     chapter, which reads as "you have left the site". -->
+<nav class="sidebar" aria-label="Site sections">
+  <a class="sidebar-brand" href="/projects/dokidex/">
+    <span class="sidebar-mark" aria-hidden="true">&#9612;&#9608;&#9608;&#9616;</span>
+    <span class="sidebar-brand-text">DokiDex</span>
+  </a>
+
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Start</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/"
+             >Overview</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Use DokiDex</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/local-cli/"
+             >Run the CLIs locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/download/"
+             >Download the launchers</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/models/"
+             >Models it runs</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/games/"
+             >Games the models built</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/telemetry/"
+             >Performance data</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/qwen38/"
+             >Qwen3.8-27B, measured</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/architecture/"
+             >How it's built</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Learn AI</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/"
+             >Where to start</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/basics/"
+             >1 · Foundations</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/core/"
+             >2 · How models work</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link is-active"
+             href="/projects/dokidex/learn/advanced/"
+             aria-current="page">3 · Advanced</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/naming/"
+             >Decoding model names</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/open-vs-closed/"
+             >Open vs closed weights</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/benchmarks/"
+             >Benchmarks</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/local/"
+             >Running models locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/agents/"
+             >Coding agents</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Context</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/state-of-ai/"
+             >State of AI, 2026</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/reference/"
+             >Quick reference</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/glossary/"
+             >Glossary</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Deep dive</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/handbook/"
+             >The Handbook</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+</nav>
+
+
+  <main class="main">
+    <div class="page-head">
+      <p class="kicker">:: TIER 3 · ADVANCED</p>
+      <h1 class="page-title">Advanced: MoE, Attention Variants, Quantization, and the Research Frontier</h1>
+      <p class="page-desc">How production LLMs are actually built and served: mixture-of-experts routing, the attention variants that shrink the KV cache, quantization theory, speculative decoding, scaling laws, RL post-training, and the questions that are still genuinely open.</p>
+      
+      <p class="level-badges">
+        <span class="level-badge level-advanced">Advanced</span>
+      </p>
+      
+    </div>
+
+    <article id="content" class="prose">
+      <p>This tier assumes you already have the transformer architecture and self-attention from
+<a href="/projects/dokidex/learn/core/">How models work</a>: Query/Key/Value, multi-head attention,
+residual stacks, KV caches. What follows is the layer above that: the systems and research
+choices that turn “a transformer” into a model you can train affordably and serve at scale, plus
+an honest look at what’s still unsettled. None of this is decoration. Our own VRAM and
+throughput math, elsewhere on this site, rests on getting these ideas right.</p>
+
+<h2 id="mixture-of-experts-routing-not-specialization">Mixture of Experts: routing, not specialization</h2>
+
+<p>A dense transformer’s feed-forward sub-layer runs the same weights on every token. A
+Mixture-of-Experts (MoE) layer replaces that single feed-forward block with many smaller expert
+feed-forward blocks, plus a learned router that picks a small subset (two of eight in Mixtral,
+and as few as four or eight out of 128 to 256 in the fine-grained designs that followed) to actually
+run for each token. <a href="https://arxiv.org/abs/2401.04088">Mixtral of Experts (Jiang et al.), arXiv:2401.04088</a>
+That’s what lets a model’s <strong>total parameter count</strong> run into the hundreds of billions while its
+<strong>active parameter count</strong> (what actually does compute for any given token) stays a small
+fraction of that.</p>
+
+<p>It’s tempting to picture each expert as a specialist (“the math expert,” “the code expert”), but
+that’s not what’s happening. Routing is a learned, per-<em>token</em>, per-<em>layer</em> decision based on that
+token’s representation at that specific point in the network, not a document-level or topic-level
+classification. There’s no evidence experts map cleanly onto human categories at all.
+<a href="https://arxiv.org/abs/2401.04088">Mixtral of Experts, arXiv:2401.04088</a> Because routing decisions
+are made independently per token and per layer, usage doesn’t naturally spread evenly across
+experts: left alone, a router tends to pile traffic onto a few popular ones, starving the rest
+of training signal. Production MoE training corrects for this with explicit load-balancing
+machinery: an auxiliary loss term penalizing uneven usage, or (DeepSeek-V3’s refinement) a
+bias-based routing adjustment that achieves balance without an auxiliary loss diluting the main
+training objective. <a href="https://arxiv.org/abs/2412.19437">DeepSeek-V3 Technical Report, arXiv:2412.19437</a></p>
+
+<p>Here is the point this site’s numbers depend on:</p>
+
+<blockquote>
+  <p><strong>Key idea:</strong> MoE saves <em>compute</em>, not <em>memory</em>. The router picks a different expert
+combination for every token, and over a real request that sweeps across most or all experts.
+So every one of them has to be resident in VRAM (or fast storage) before you can serve a single
+token, whether or not any given token touches a given expert. A model described as “<em>X</em>B total
+/ <em>Y</em>B active” needs memory sized to <em>X</em>, not <em>Y</em>. DeepSeek-V3 ships 671B total parameters with
+roughly 37B active per token, but running it means holding the full 671B in memory.
+<a href="https://en.wikipedia.org/wiki/DeepSeek">Wikipedia: DeepSeek</a> The pattern holds at consumer scale
+too: Gemma 4’s 26B-A4B is 25.2B total parameters with about 3.8B active.
+<a href="https://huggingface.co/google/gemma-4-26B-A4B-it"><code class="language-plaintext highlighter-rouge">google/gemma-4-26B-A4B-it</code> model card</a>
+Active parameters tell you how fast it runs. Total parameters tell you whether it fits.</p>
+</blockquote>
+
+<figure>
+<svg viewBox="0 0 720 320" role="img" aria-labelledby="dgm-moe-title dgm-moe-desc">
+<title id="dgm-moe-title">MoE routing: total parameters versus active parameters per token</title>
+<desc id="dgm-moe-desc">A token passes through a router that activates 2 of 4 experts. Below,
+a total-parameters bar shows all four expert slots present in memory, while an active-parameters
+bar highlights only the two firing experts — the same total memory footprint either way.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="304" rx="3" />
+<text class="dgm-title" x="28" y="34">One MoE layer: the router fires 2 of 4 experts per token</text>
+<rect class="dgm-panel" x="28" y="52" width="120" height="34" />
+<text class="dgm-mono" x="88" y="74" text-anchor="middle">token</text>
+<rect class="dgm-panel" x="210" y="52" width="100" height="34" />
+<text class="dgm-label" x="260" y="74" text-anchor="middle">Router</text>
+<path class="dgm-flow" d="M148 69 L210 69" />
+<rect class="dgm-panel" x="28" y="104" width="150" height="60" />
+<rect class="dgm-panel" x="196" y="104" width="150" height="60" />
+<rect class="dgm-accent" x="196" y="104" width="6" height="60" />
+<rect class="dgm-panel" x="364" y="104" width="150" height="60" />
+<rect class="dgm-panel" x="532" y="104" width="150" height="60" />
+<rect class="dgm-accent" x="532" y="104" width="6" height="60" />
+<text class="dgm-label" x="103" y="128" text-anchor="middle">Expert 1</text>
+<text class="dgm-label-sm" x="103" y="148" text-anchor="middle">idle this token</text>
+<text class="dgm-label" x="271" y="128" text-anchor="middle">Expert 2</text>
+<text class="dgm-label-sm" x="271" y="148" text-anchor="middle">active — computed</text>
+<text class="dgm-label" x="439" y="128" text-anchor="middle">Expert 3</text>
+<text class="dgm-label-sm" x="439" y="148" text-anchor="middle">idle this token</text>
+<text class="dgm-label" x="607" y="128" text-anchor="middle">Expert 4</text>
+<text class="dgm-label-sm" x="607" y="148" text-anchor="middle">active — computed</text>
+<path class="dgm-flow" d="M260 86 L271 104" />
+<path class="dgm-flow" d="M260 86 L607 104" />
+<text class="dgm-label" x="28" y="198">Total parameters — every expert resident in memory</text>
+<rect class="dgm-panel" x="28" y="206" width="150" height="24" />
+<rect class="dgm-panel" x="196" y="206" width="150" height="24" />
+<rect class="dgm-panel" x="364" y="206" width="150" height="24" />
+<rect class="dgm-panel" x="532" y="206" width="150" height="24" />
+<text class="dgm-label" x="28" y="240">Active parameters this token — only the compute path</text>
+<rect class="dgm-line" x="28" y="248" width="150" height="24" />
+<rect class="dgm-accent" x="196" y="248" width="150" height="24" />
+<rect class="dgm-line" x="364" y="248" width="150" height="24" />
+<rect class="dgm-accent" x="532" y="248" width="150" height="24" />
+<text class="dgm-label-sm" x="28" y="292">Same 4 slots, same memory footprint either way — only which slots fire changes, token by token.</text>
+</svg>
+<figcaption><strong>The total bar and the active bar are the same width in memory.</strong> A
+model's VRAM requirement is set by the total-parameters row, never the active-parameters row:
+the "active" slice just describes how much compute a given token costs, not how much of the
+model you're allowed to leave unloaded. Schematic, not literal: real routers pick from far more
+than 4 experts (Mixtral picks 2 of 8, DeepSeek-V3 8 of 256). Check the card for the real count,
+never a diagram.</figcaption>
+</figure>
+
+<p>This is exactly the distinction <a href="/projects/dokidex/learn/local/">Running models locally</a>
+uses to size a VRAM budget: check total parameters against your memory first, and only then look
+at active parameters to estimate speed.</p>
+
+<h2 id="gqa-mqa-and-mla-shrinking-the-kv-cache-not-the-flops">GQA, MQA, and MLA: shrinking the KV cache, not the FLOPs</h2>
+
+<p>The KV cache (the stored Key and Value vectors for every previous token, at every layer) is
+what makes autoregressive generation linear instead of quadratic per step. It also grows with
+every token generated. Reading it back on every step is a real memory-bandwidth cost. Three
+schemes attack that cost directly:</p>
+
+<ul>
+  <li><strong>Multi-Query Attention (MQA)</strong>: every query head shares one single key/value head.</li>
+  <li><strong>Grouped-Query Attention (GQA)</strong>: the middle ground: query heads are grouped, and each group
+shares one key/value head. <a href="https://arxiv.org/abs/2305.13245">GQA (Ainslie et al.), arXiv:2305.13245</a></li>
+  <li><strong>Multi-head Latent Attention (MLA)</strong>: instead of sharing, keys and values are low-rank
+compressed into a single small latent vector that gets cached and decompressed back up on
+demand. <a href="https://arxiv.org/abs/2405.04434">DeepSeek-V2, arXiv:2405.04434</a></li>
+</ul>
+
+<blockquote>
+  <p><strong>Common trap:</strong> none of these make the attention <em>computation</em> itself cheaper. Their target
+is the KV cache’s memory footprint and the bandwidth cost of streaming it back on every
+decoding step, which, on modern accelerators, is very often the actual bottleneck, not the
+matrix-multiply FLOPs. <a href="https://arxiv.org/abs/2305.13245">GQA, arXiv:2305.13245</a>; <a href="https://arxiv.org/abs/2405.04434">DeepSeek-V2, arXiv:2405.04434</a></p>
+</blockquote>
+
+<p>The trade-off isn’t as linear as “more sharing, more quality loss” implies. GQA’s own paper
+reports converting an already-trained multi-head checkpoint to GQA via “uptraining” using only
+about 5% of its original pretraining compute, recovering quality close to full multi-head
+attention while keeping speed close to MQA. <a href="https://arxiv.org/abs/2305.13245">GQA, arXiv:2305.13245</a>
+MLA goes further, reporting quality that <em>exceeds</em> GQA at an even smaller cache footprint, not
+simply a lesser evil, but a better point on the curve. <a href="https://arxiv.org/abs/2405.04434">DeepSeek-V2, arXiv:2405.04434</a></p>
+
+<figure>
+<svg viewBox="0 0 720 280" role="img" aria-labelledby="dgm-kv-title dgm-kv-desc">
+<title id="dgm-kv-title">KV cache footprint per token: MHA vs GQA vs MLA</title>
+<desc id="dgm-kv-desc">Three rows compare per-token KV cache footprint, illustratively. MHA
+stores eight separate key/value tiles, one per head. GQA shares a handful of KV groups across
+many query heads, shrinking the tiles to two. MLA compresses keys and values into a single
+low-rank latent vector, the smallest footprint of the three.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="264" rx="3" />
+<text class="dgm-title" x="28" y="32">KV cache footprint per token (illustrative)</text>
+<text class="dgm-label" x="28" y="54">MHA — one K/V pair cached per query head</text>
+<rect class="dgm-panel" x="28" y="62" width="22" height="22" />
+<rect class="dgm-panel" x="55" y="62" width="22" height="22" />
+<rect class="dgm-panel" x="82" y="62" width="22" height="22" />
+<rect class="dgm-panel" x="109" y="62" width="22" height="22" />
+<rect class="dgm-panel" x="136" y="62" width="22" height="22" />
+<rect class="dgm-panel" x="163" y="62" width="22" height="22" />
+<rect class="dgm-panel" x="190" y="62" width="22" height="22" />
+<rect class="dgm-panel" x="217" y="62" width="22" height="22" />
+<text class="dgm-label-sm" x="28" y="100">8 separate KV pairs stored and streamed every step</text>
+<text class="dgm-label" x="28" y="130">GQA — several query heads share one KV group</text>
+<rect class="dgm-panel" x="28" y="138" width="40" height="40" />
+<rect class="dgm-panel" x="78" y="138" width="40" height="40" />
+<text class="dgm-label-sm" x="28" y="196">fewer, larger groups — most heads reuse a cached pair</text>
+<text class="dgm-label" x="28" y="222">MLA — K and V compressed into one latent</text>
+<rect class="dgm-accent" x="28" y="230" width="40" height="40" />
+<text class="dgm-label-sm" x="82" y="254">one small vector per token, decompressed on the fly</text>
+</svg>
+<figcaption><strong>Fewer, smaller tiles at every step down this list.</strong> The counts here
+are illustrative, not a specific model's measured ratio. The point is the direction: MQA/GQA
+share, MLA compresses, and all three trade a little of MHA's per-head independence for a smaller,
+cheaper-to-stream cache.</figcaption>
+</figure>
+
+<h2 id="quantization-whats-actually-being-approximated">Quantization: what’s actually being approximated</h2>
+
+<p>Quantization stores weights (and sometimes activations or the KV cache) using fewer bits per
+number (4-bit integers instead of 16-bit floats is the common case), shrinking memory footprint
+and often raising throughput, at some cost to precision. <a href="https://d-central.tech/ai-quantization-guide-int4-int8-fp16/">LLM Quantization Guide</a>
+Rather than quantizing a whole tensor with one scale, practical schemes quantize in small blocks:
+each block of weights (say, 32 or 64 values) gets its own scale factor, stored as small integers
+relative to that scale. Block-wise scaling matters because weight magnitudes vary a lot across a
+tensor: one global scale would waste precision on small values and clip the large ones.</p>
+
+<blockquote>
+  <p><strong>Misconception:</strong> “quantizing to N fewer bits degrades quality roughly proportionally across
+all weights.” AWQ’s central finding is that weight importance is highly uneven: protecting
+roughly the top 1% of <em>activation-salient</em> weight channels (found by looking at activation
+magnitude, not weight magnitude) captures most of the achievable error reduction. Naive
+uniform rounding spends precision where it doesn’t matter and can damage the small number of
+channels that matter disproportionately. <a href="https://arxiv.org/abs/2306.00978">AWQ (Lin et al.), arXiv:2306.00978</a></p>
+</blockquote>
+
+<p>GGUF’s “K-quant” formats (<code class="language-plaintext highlighter-rouge">Q4_K</code>, <code class="language-plaintext highlighter-rouge">Q5_K</code>, and similar) are what <code class="language-plaintext highlighter-rouge">llama.cpp</code> uses, portable
+across CPU and GPU. They take a coarser, <em>static</em> version of this idea rather than falling back to
+naive uniform round-to-nearest: super-block scale/min quantization, combined with a hand-picked
+rule about which <strong>tensor types</strong> get more bits (<code class="language-plaintext highlighter-rouge">Q4_K_M</code>, for instance, bumps <code class="language-plaintext highlighter-rouge">attention.wv</code> and
+<code class="language-plaintext highlighter-rouge">feed_forward.w2</code> up to <code class="language-plaintext highlighter-rouge">Q6_K</code>). <a href="https://cast.ai/blog/demystifying-quantizations-llms/">GPTQ/AWQ/GGUF practitioner overview</a>
+That rule is a real, empirically-earned instinct (those tensor types are reliably more
+error-sensitive), but it’s fixed at build time by tensor <em>type</em>, not derived from any calibration
+data. <code class="language-plaintext highlighter-rouge">llama.cpp</code>’s actual analog to AWQ’s insight is the <strong>importance matrix (imatrix)</strong>:
+activation-derived salience data from running a calibration set through the model. The
+<strong>I-quant</strong> formats (<code class="language-plaintext highlighter-rouge">IQ2_XS</code>, <code class="language-plaintext highlighter-rouge">IQ3_XXS</code>, and similar) use it to weight which values matter most,
+the same <em>channel</em>-level, data-driven idea AWQ uses, as against K-quants’ static, tensor-<em>type</em>-level
+rule. Quality genuinely holds up well under moderate, importance-aware compression. It falls off
+where too few distinct code points remain to represent a salient channel’s range at all, a
+property of the scheme running out of room, not evidence that quantization is a fixed, linear
+quality tax.</p>
+
+<figure>
+<svg viewBox="0 0 720 300" role="img" aria-labelledby="dgm-quant-title dgm-quant-desc">
+<title id="dgm-quant-title">Block quantization: shared scale, genuine 4-bit codes, uneven error</title>
+<desc id="dgm-quant-desc">Illustrative numbers, not a measured tensor. An 8-value block of
+full-precision weights is quantized to one shared scale factor plus eight true 4-bit integer
+codes (range −8 to +7), then dequantized back to approximate values. A marker flags one weight
+channel an importance-aware method like AWQ would prioritize protecting — but under this single
+shared block scale, that channel does not land on a code exactly, while an ordinary channel in
+the same block does. Reconstruction accuracy here is a coincidence of rounding, not evidence of
+protection.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="284" rx="3" />
+<text class="dgm-title" x="28" y="32">One block, dequantized (illustrative numbers)</text>
+<text class="dgm-label" x="28" y="54">Original block (16-bit weights)</text>
+<rect class="dgm-panel" x="28" y="62" width="74" height="32" />
+<rect class="dgm-panel" x="110" y="62" width="74" height="32" />
+<rect class="dgm-panel" x="192" y="62" width="74" height="32" />
+<rect class="dgm-panel" x="274" y="62" width="74" height="32" />
+<rect class="dgm-panel" x="356" y="62" width="74" height="32" />
+<rect class="dgm-panel" x="438" y="62" width="74" height="32" />
+<rect class="dgm-panel" x="520" y="62" width="74" height="32" />
+<rect class="dgm-panel" x="602" y="62" width="74" height="32" />
+<text class="dgm-mono" x="65" y="82" text-anchor="middle">0.42</text>
+<text class="dgm-mono" x="147" y="82" text-anchor="middle">-1.03</text>
+<text class="dgm-mono" x="229" y="82" text-anchor="middle">0.07</text>
+<text class="dgm-mono" x="311" y="82" text-anchor="middle">0.88</text>
+<text class="dgm-mono" x="393" y="82" text-anchor="middle">-0.21</text>
+<text class="dgm-mono" x="475" y="82" text-anchor="middle">1.14</text>
+<text class="dgm-mono" x="557" y="82" text-anchor="middle">0.03</text>
+<text class="dgm-mono" x="639" y="82" text-anchor="middle">-0.67</text>
+<circle class="dgm-accent-3" cx="311" cy="66" r="5" />
+<text class="dgm-label-sm" x="28" y="112">quantize: pick one scale for the block, round each value to a 4-bit code</text>
+<text class="dgm-label-sm" x="28" y="132">shared scale (one per block)</text>
+<rect class="dgm-panel" x="28" y="140" width="140" height="32" />
+<rect class="dgm-accent-2" x="28" y="140" width="6" height="32" />
+<text class="dgm-mono" x="48" y="161">scale ≈ 0.163</text>
+<text class="dgm-label-sm" x="28" y="192">quantized codes (4-bit integers, range −8…+7)</text>
+<rect class="dgm-panel" x="28" y="200" width="74" height="32" />
+<rect class="dgm-panel" x="110" y="200" width="74" height="32" />
+<rect class="dgm-panel" x="192" y="200" width="74" height="32" />
+<rect class="dgm-panel" x="274" y="200" width="74" height="32" />
+<rect class="dgm-panel" x="356" y="200" width="74" height="32" />
+<rect class="dgm-panel" x="438" y="200" width="74" height="32" />
+<rect class="dgm-panel" x="520" y="200" width="74" height="32" />
+<rect class="dgm-panel" x="602" y="200" width="74" height="32" />
+<text class="dgm-mono" x="65" y="220" text-anchor="middle">3</text>
+<text class="dgm-mono" x="147" y="220" text-anchor="middle">-6</text>
+<text class="dgm-mono" x="229" y="220" text-anchor="middle">0</text>
+<text class="dgm-mono" x="311" y="220" text-anchor="middle">5</text>
+<text class="dgm-mono" x="393" y="220" text-anchor="middle">-1</text>
+<text class="dgm-mono" x="475" y="220" text-anchor="middle">7</text>
+<text class="dgm-mono" x="557" y="220" text-anchor="middle">0</text>
+<text class="dgm-mono" x="639" y="220" text-anchor="middle">-4</text>
+<text class="dgm-label-sm" x="28" y="250">dequantize (value ≈ scale × code) — reconstructed block</text>
+<rect class="dgm-panel" x="28" y="258" width="74" height="32" />
+<rect class="dgm-panel" x="110" y="258" width="74" height="32" />
+<rect class="dgm-panel" x="192" y="258" width="74" height="32" />
+<rect class="dgm-panel" x="274" y="258" width="74" height="32" />
+<rect class="dgm-panel" x="356" y="258" width="74" height="32" />
+<rect class="dgm-panel" x="438" y="258" width="74" height="32" />
+<rect class="dgm-panel" x="520" y="258" width="74" height="32" />
+<rect class="dgm-panel" x="602" y="258" width="74" height="32" />
+<text class="dgm-mono" x="65" y="278" text-anchor="middle">0.49</text>
+<text class="dgm-mono" x="147" y="278" text-anchor="middle">-0.98</text>
+<text class="dgm-mono" x="229" y="278" text-anchor="middle">0.00</text>
+<text class="dgm-mono" x="311" y="278" text-anchor="middle">0.81</text>
+<text class="dgm-mono" x="393" y="278" text-anchor="middle">-0.16</text>
+<text class="dgm-mono" x="475" y="278" text-anchor="middle">1.14</text>
+<text class="dgm-mono" x="557" y="278" text-anchor="middle">0.00</text>
+<text class="dgm-mono" x="639" y="278" text-anchor="middle">-0.65</text>
+<circle class="dgm-accent-2" cx="311" cy="262" r="5" />
+<circle class="dgm-ok" cx="475" cy="262" r="5" />
+</svg>
+<figcaption><strong>Some values land on a code exactly. Others don't.</strong> Under one shared
+block scale, whichever value happens to sit near a code boundary reconstructs almost perfectly,
+and whichever doesn't, doesn't, including here, where the pink-marked channel (the one an
+importance-aware method would prioritize protecting) is <em>not</em> the one that reconstructs
+exactly. Making that protection deliberate, rather than a rounding coincidence, is what AWQ
+adds.</figcaption>
+</figure>
+
+<h2 id="speculative-decoding-a-latency-win-not-a-quality-trade">Speculative decoding: a latency win, not a quality trade</h2>
+
+<p>A small, fast <strong>draft</strong> model proposes several tokens ahead. The large <strong>target</strong> model checks
+all of them in one parallel forward pass, accepting the prefix matching what it would have
+produced on its own and rejecting (and correcting) the rest. The verification step is built so
+the <em>final accepted output distribution is identical</em> to running the target model alone: the
+paper reports a 2x to 3x speedup on T5-XXL with no change to output quality. <a href="https://arxiv.org/abs/2211.17192">Leviathan et al., arXiv:2211.17192</a>
+That distributional guarantee is real, but “free” isn’t: the draft model still runs a forward pass
+every round, and the target verifies tokens it may end up discarding, so speculative decoding
+<em>increases</em> total FLOPs spent and needs enough spare VRAM to hold a second model. What it buys is
+single-stream <em>latency</em> (fewer sequential decode steps on the critical path), not free compute.
+In large-batch, compute-bound serving, where the GPU is already saturated with useful work across
+many concurrent requests, the draft model’s extra FLOPs compete for the same compute instead of
+using idle capacity, and throughput can fall rather than improve.</p>
+
+<blockquote>
+  <p><strong>Misconception:</strong> “a weaker draft model makes the final answer worse.” A bad draft guess is
+simply rejected and regenerated by the target model. It never gets a chance to water down the
+result. The draft model’s only job is to guess fast. Correctness is entirely the target
+model’s, exactly as if speculative decoding weren’t in the loop at all.</p>
+</blockquote>
+
+<figure>
+<svg viewBox="0 0 720 260" role="img" aria-labelledby="dgm-spec-title dgm-spec-desc">
+<title id="dgm-spec-title">Speculative decoding: draft proposes, target verifies once</title>
+<desc id="dgm-spec-desc">A fast draft model proposes five tokens in a row. The target model
+checks all five in a single parallel pass: the first three match what the target would have
+produced anyway and are accepted, the fourth diverges and is rejected, and the fifth — built on
+the rejected token — is discarded outright. The target supplies its own corrected token and
+decoding continues from there.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="244" rx="3" />
+<text class="dgm-title" x="28" y="32">One speculative round: 5 proposed, 3 accepted</text>
+<text class="dgm-label" x="28" y="56">Draft model proposes (fast, sequential guesses)</text>
+<rect class="dgm-panel" x="36" y="64" width="120" height="38" />
+<rect class="dgm-panel" x="166" y="64" width="120" height="38" />
+<rect class="dgm-panel" x="296" y="64" width="120" height="38" />
+<rect class="dgm-panel" x="426" y="64" width="120" height="38" />
+<rect class="dgm-panel" x="556" y="64" width="120" height="38" />
+<text class="dgm-mono" x="96" y="88" text-anchor="middle">t1</text>
+<text class="dgm-mono" x="226" y="88" text-anchor="middle">t2</text>
+<text class="dgm-mono" x="356" y="88" text-anchor="middle">t3</text>
+<text class="dgm-mono" x="486" y="88" text-anchor="middle">t4</text>
+<text class="dgm-mono" x="616" y="88" text-anchor="middle">t5</text>
+<path class="dgm-flow" d="M96 102 L96 140" />
+<path class="dgm-flow" d="M226 102 L226 140" />
+<path class="dgm-flow" d="M356 102 L356 140" />
+<path class="dgm-flow" d="M486 102 L486 140" />
+<path class="dgm-flow" d="M616 102 L616 140" />
+<text class="dgm-label" x="28" y="132">Target model verifies — one parallel pass</text>
+<rect class="dgm-panel" x="36" y="140" width="120" height="38" />
+<rect class="dgm-panel" x="166" y="140" width="120" height="38" />
+<rect class="dgm-panel" x="296" y="140" width="120" height="38" />
+<rect class="dgm-panel" x="426" y="140" width="120" height="38" />
+<rect class="dgm-line" x="556" y="140" width="120" height="38" />
+<text class="dgm-mono" x="96" y="164" text-anchor="middle">t1</text>
+<text class="dgm-mono" x="226" y="164" text-anchor="middle">t2</text>
+<text class="dgm-mono" x="356" y="164" text-anchor="middle">t3</text>
+<text class="dgm-mono" x="486" y="164" text-anchor="middle">t4</text>
+<text class="dgm-label-sm" x="616" y="164" text-anchor="middle">discarded</text>
+<circle class="dgm-ok" cx="146" cy="150" r="6" />
+<circle class="dgm-ok" cx="276" cy="150" r="6" />
+<circle class="dgm-ok" cx="406" cy="150" r="6" />
+<circle class="dgm-accent-3" cx="536" cy="150" r="6" />
+<circle class="dgm-ok" cx="400" cy="200" r="6" />
+<text class="dgm-label-sm" x="412" y="204">accepted — matches target</text>
+<circle class="dgm-accent-3" cx="560" cy="200" r="6" />
+<text class="dgm-label-sm" x="572" y="204">rejected — target corrects</text>
+<text class="dgm-label-sm" x="28" y="228">Everything after the first rejection is discarded; the target's own token replaces it and decoding resumes.</text>
+</svg>
+<figcaption><strong>Three tokens accepted for the price of one target pass.</strong> The
+speedup comes from verifying a batch in parallel, not from the draft model doing anything
+smarter. And the output is exactly what the target model would have said alone.</figcaption>
+</figure>
+
+<h2 id="flash-attention-the-bottleneck-is-moving-data-not-doing-math">Flash attention: the bottleneck is moving data, not doing math</h2>
+
+<p>FlashAttention is an <em>exact</em> algorithm for computing self-attention (not an approximation) that
+reorders the computation to minimize traffic between a GPU’s slow high-bandwidth memory (HBM) and
+its fast on-chip SRAM, using tiling and a fused, block-wise softmax instead of materializing the
+full attention matrix in HBM. <a href="https://arxiv.org/abs/2205.14135">FlashAttention (Dao et al.), arXiv:2205.14135</a>
+The paper explicitly contrasts itself with prior <em>approximate</em> attention methods that traded
+quality for speed by changing what gets computed: FlashAttention changes only <em>how</em> it’s
+computed, reporting measured speedups (roughly 15% on BERT-large, 3x on GPT-2) with zero change
+to the result. <a href="https://arxiv.org/abs/2205.14135">FlashAttention, arXiv:2205.14135</a></p>
+
+<p>This is the same underlying story as GQA and MLA, from a different angle. GQA/MLA shrink what has
+to be <em>stored and re-read</em> across decoding steps. FlashAttention shrinks what has to move between
+memory tiers <em>within</em> a single attention computation. Both exist because, on current
+accelerators, moving data is very often the real constraint on serving speed. Raw arithmetic
+throughput is comparatively cheap. One sentence to keep: modern LLM inference is usually
+memory-bandwidth-bound, not compute-bound, and a lot of “efficiency” research is really
+bandwidth-reduction research under a different name.</p>
+
+<h2 id="scaling-laws-chinchilla-and-why-the-field-kept-going-past-it">Scaling laws: Chinchilla, and why the field kept going past it</h2>
+
+<p>Scaling laws are empirically fit power-law relationships between a model’s loss and the resources
+spent training it (parameters, tokens, compute), letting researchers predict a larger run’s
+payoff before spending the money on it. <a href="https://cameronrwolfe.substack.com/p/llm-scaling-laws">Scaling Laws for LLMs</a>
+The most consequential correction to the original (2020) scaling laws came from Hoffmann et al.’s
+Chinchilla work: existing large models, like the 280B-parameter Gopher, were significantly
+<em>undertrained</em> relative to their size. A 70B-parameter model (Chinchilla) trained on 1.4 trillion
+tokens outperformed the far larger Gopher at the <em>same total training compute</em>: for a fixed
+compute budget, model size and training-token count should scale together, not model size alone.
+<a href="https://arxiv.org/abs/2203.15556">Chinchilla (Hoffmann et al.), arXiv:2203.15556</a></p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> “scaling laws say bigger is always better.” Chinchilla’s whole result is that
+parameter count in isolation is a misleading quality proxy. A smaller model with proportionally
+more training tokens can beat a larger, undertrained one at identical compute cost.</p>
+</blockquote>
+
+<figure>
+<svg viewBox="0 0 720 320" role="img" aria-labelledby="dgm-scaling-title dgm-scaling-desc">
+<title id="dgm-scaling-title">Compute-optimal frontier: same compute, two outcomes</title>
+<desc id="dgm-scaling-desc">A schematic loss-versus-compute chart. A frontier curve traces the
+best achievable loss at each compute budget. At one fixed compute budget, a bigger, undertrained
+model lands well above the frontier — worse loss — while a smaller model trained on
+proportionally more tokens lands on the frontier itself, achieving lower loss for the identical
+compute spend.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="304" rx="3" />
+<text class="dgm-title" x="28" y="32">Loss vs. training compute (schematic, log-log)</text>
+<path class="dgm-line" d="M60 50 L60 270" />
+<path class="dgm-line" d="M60 270 L660 270" />
+<text class="dgm-label-sm" x="20" y="60">higher loss</text>
+<text class="dgm-label-sm" x="20" y="264">lower loss</text>
+<text class="dgm-label-sm" x="70" y="288">less compute</text>
+<text class="dgm-label-sm" x="560" y="288">more compute →</text>
+<path class="dgm-flow" d="M100 70 C 250 110, 400 160, 660 240" />
+<text class="dgm-label-sm" x="480" y="205">compute-optimal frontier</text>
+<path class="dgm-line" d="M430 120 L430 270" />
+<circle class="dgm-accent-2" cx="430" cy="120" r="7" />
+<text class="dgm-label-sm" x="446" y="116">same compute, bigger model, fewer tokens — undertrained</text>
+<circle class="dgm-ok" cx="430" cy="180" r="7" />
+<text class="dgm-label-sm" x="446" y="178">compute-optimal: smaller model, more tokens</text>
+</svg>
+<figcaption><strong>Same vertical line, two very different losses.</strong> Chinchilla's finding,
+drawn as a picture: at a fixed compute budget, the undertrained big model sits well above the
+frontier a properly token-matched smaller model reaches.</figcaption>
+</figure>
+
+<p>Chinchilla’s ratio is itself scoped to one objective: minimizing loss for a fixed <em>training</em>
+compute budget. It says nothing about what a model costs after training, once it’s deployed and
+queried possibly billions of times. A model trains once and serves continuously, so if inference
+cost dominates a model’s <em>lifetime</em> cost (the usual case at real scale), the economically
+rational choice can be a model smaller than the Chinchilla-optimal point for its training budget,
+trained on proportionally more tokens than that budget alone prescribes. The extra training
+compute is a one-time cost. The resulting model is cheaper to serve for as long as it’s deployed.
+That’s the logic behind training models well past the point that minimizes training compute alone:
+the objective was never training-compute-optimality by itself. It was total cost including
+serving.</p>
+
+<h2 id="rl-post-training-ppo-dpo-grpo-and-their-failure-modes">RL post-training: PPO, DPO, GRPO, and their failure modes</h2>
+
+<p>Three RL algorithms cover most of production post-training, in lineage order:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Method</th>
+      <th>Core mechanism</th>
+      <th>What it removes vs. its predecessor</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>PPO</strong></td>
+      <td>Optimizes a policy against a separately trained reward model, using a clipped objective that permits several safe minibatch updates per batch of experience. <a href="https://arxiv.org/abs/1707.06347">Schulman et al., arXiv:1707.06347</a></td>
+      <td>(none, it’s the RLHF baseline)</td>
+    </tr>
+    <tr>
+      <td><strong>DPO</strong></td>
+      <td>Solves the same reward-maximization objective in one supervised-style stage, directly on preference pairs: the optimal reward implied by a Bradley-Terry preference model has closed form in the policy itself. <a href="https://papers.nips.cc/paper_files/paper/2023/hash/a85b405ed65c6477a4fe8302b5e06ce7-Abstract-Conference.html">Rafailov et al., NeurIPS 2023</a></td>
+      <td>A <em>separately trained</em> reward model, and the RL sampling loop</td>
+    </tr>
+    <tr>
+      <td><strong>GRPO</strong></td>
+      <td>Keeps on-policy RL, but drops the separate critic/value network: it samples a <em>group</em> of completions per prompt and uses that group’s own mean/std of reward as the baseline for each completion’s advantage. <a href="https://arxiv.org/pdf/2402.03300">DeepSeekMath, arXiv:2402.03300</a></td>
+      <td>A full second model (the critic) that PPO needs to estimate value</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>It’s a common shorthand to say “DPO has no reward model,” but the paper’s own subtitle is <em>the
+language model is secretly a reward model</em>: DPO removes the need for a <em>separately trained</em>
+reward network, not the concept of a reward function, which becomes implicit in the policy
+itself. <a href="https://papers.nips.cc/paper_files/paper/2023/hash/a85b405ed65c6477a4fe8302b5e06ce7-Abstract-Conference.html">DPO, NeurIPS 2023</a>
+Each has a characteristic failure mode. PPO optimizes against a learned proxy reward rather than
+true human judgment, so it inherits the generic risk of any proxy-optimization setup: the policy
+can find outputs that score well on the reward model without being genuinely better, i.e. reward
+hacking. DPO never samples from the live policy during training. That leaves its quality sensitive to
+how well the fixed preference-pair dataset covers situations the model will actually face later.
+GRPO’s group-relative baseline needs <em>variance</em> in the group’s reward to produce a meaningful
+advantage signal by definition, so a group where every sampled completion scores identically (a
+trivially easy or a hopelessly hard prompt) yields a degenerate, near-zero learning signal for
+that prompt. Newer variants keep adjusting the group-baseline formula to patch instabilities like
+this one. The durable idea (drop the critic, keep on-policy sampling, use the group itself as the
+baseline) is what’s worth carrying forward, more than any one successor’s name.</p>
+
+<h2 id="reasoning-chain-of-thought-and-the-honest-state-of-the-evidence">Reasoning, chain-of-thought, and the honest state of the evidence</h2>
+
+<p>Chain-of-thought (CoT) prompting has the model generate intermediate reasoning steps before its
+final answer, which measurably helps on arithmetic, commonsense, and symbolic tasks. The
+original paper found the effect emerges specifically at large model scale. <a href="https://arxiv.org/abs/2201.11903">Wei et al., arXiv:2201.11903</a>
+Test-time compute scaling generalizes this: spend more computation <em>at answer time</em> (longer
+reasoning traces, or sampling several candidates and picking the best) rather than only at
+training time. <a href="https://openai.com/index/learning-to-reason-with-llms/">Learning to reason with LLMs, OpenAI</a>
+Self-consistency is the clearest illustration that “longer” isn’t the mechanism: since a single
+long greedy trace isn’t reliable, it instead samples several <em>independent</em> reasoning paths and
+majority-votes the final answer, gaining +17.9 points on GSM8K by ensembling, not by lengthening
+one trace. <a href="https://arxiv.org/abs/2203.11171">Wang et al., arXiv:2203.11171</a></p>
+
+<blockquote>
+  <p><strong>Misconception:</strong> “the visible chain-of-thought is a faithful, complete report of the model’s
+real internal computation.” Anthropic ran a controlled study planting hints in prompts and
+checking whether extended-thinking traces disclosed using them: on average across hint types,
+Claude 3.7 Sonnet mentioned the hint only 25% of the time it demonstrably used it, versus 39%
+for DeepSeek R1. And the two models don’t move together from there. On the “unauthorized
+access” hint category specifically, Claude’s faithfulness <em>rose</em> to 41% while R1’s <em>fell</em> to
+19%, so this is two models diverging on different scenario types, not one model uniformly
+degrading. Both models sometimes fabricated plausible-sounding rationales unconnected to what
+actually drove the answer, and the study’s starker finding was in reward-hacking scenarios:
+when a model exploited a flaw to land on a rewarded-but-incorrect answer, in more than half the
+tested environments both models verbalized having done so less than 2% of the time. <a href="https://www.anthropic.com/research/reasoning-models-dont-say-think">Reasoning models don’t always say what they think, Anthropic</a></p>
+</blockquote>
+
+<p>The deeper, still-open question is whether RL-based reasoning training (RLVR, reinforcement
+learning with verifiable rewards) teaches genuinely <em>new</em> reasoning ability, or mostly resamples
+what the base model could already do. A widely-discussed 2025 analysis found RLVR-trained models
+beat their base models at pass@1, but the <em>base</em> model wins at pass@k for large k: meaning the
+base model already contained correct-answer trajectories somewhere in its sampling distribution,
+and RL’s main effect is making the single most-likely sample better, not expanding the model’s
+underlying reasoning coverage. Six different RLVR algorithms tested all fell well short of the
+base model’s latent potential, suggesting this is a property of the approach generally, not one
+flawed implementation. By contrast, distillation from a stronger teacher model <em>did</em>
+introduce reasoning patterns genuinely absent from the student’s base distribution. <a href="https://arxiv.org/abs/2504.13837">arXiv 2504.13837</a></p>
+
+<blockquote>
+  <p><strong>Note:</strong> a separate line of evidence points the same direction, not confirms it: Apple’s
+“Illusion of Thinking” study, using logic puzzles of controlled difficulty, found three
+regimes: plain models beat reasoning models on easy problems, reasoning models win in the
+middle range, and <em>both collapse to zero accuracy</em> at high complexity, with the reasoning
+model’s own effort peaking mid-difficulty and then <em>declining</em> even as problems got harder.
+<a href="https://machinelearning.apple.com/research/illusion-of-thinking">Apple Machine Learning Research</a>
+Treat “does RL-trained reasoning generalize” as a live, contested question: the evidence so far
+points toward sharpening existing capability within a bounded envelope, not open-ended new
+reasoning, but this isn’t the final word.</p>
+</blockquote>
+
+<h2 id="distillation-what-transfers-and-what-doesnt">Distillation: what transfers, and what doesn’t</h2>
+
+<p>Knowledge distillation trains a smaller student model to reproduce a larger teacher’s <em>soft</em>
+output probabilities, not just its top-1 answer: a teacher that’s confidently right but “still
+considering” a related wrong answer carries more signal than a bare correct/incorrect label
+would. <a href="https://arxiv.org/abs/1503.02531">Hinton, Vinyals, Dean, arXiv:1503.02531</a> That graded
+shape of near-misses is what transfers. What doesn’t transfer is any account of <em>why</em> the teacher
+assigned those probabilities. The student sees only the numeric fingerprint of the teacher’s
+behavior, no accompanying explanation. Read this alongside the reasoning-generalization question
+above. The same analysis that found RLVR mostly resamples existing capability found distillation
+from a stronger teacher <em>does</em> introduce genuinely new reasoning patterns. Of the two levers,
+teacher distillation currently does more to expand what a model can do, not just how reliably it
+does what it already could. <a href="https://arxiv.org/abs/2504.13837">arXiv 2504.13837</a></p>
+
+<h2 id="lora-and-peft-when-fine-tuning-beats-prompting-or-rag">LoRA and PEFT: when fine-tuning beats prompting or RAG</h2>
+
+<p>Low-Rank Adaptation (LoRA) freezes the pretrained model’s original weights entirely and trains a
+much smaller pair of low-rank matrices added on top of specific weight matrices, on the
+hypothesis that the <em>update</em> a fine-tuning task needs has low intrinsic rank even when the base
+model doesn’t. <a href="https://arxiv.org/abs/2106.09685">Hu et al., arXiv:2106.09685</a> The original paper
+reports LoRA performing on par with or better than full fine-tuning on the models it tested, while
+cutting trainable parameters by up to 10,000x and GPU memory for fine-tuning GPT-3 175B by 3x.
+And because the learned low-rank update can be mathematically merged back into the base weight
+matrix, there’s zero added inference latency once training is done. <a href="https://arxiv.org/abs/2106.09685">LoRA, arXiv:2106.09685</a></p>
+
+<p>That combination (cheap to train, free at inference) is why LoRA is the practical answer to
+“fine-tune, prompt, or retrieve?” for a specific job. Fine-tuning (LoRA included) reliably teaches
+<em>behavior</em>, <em>format</em>, and <em>style</em> (a consistent tone, a house JSON schema, a narrow task’s
+quirks) because that’s what RLHF-style post-training was shown to actually move. It’s
+comparatively unreliable at injecting new, precise factual knowledge, since that’s a
+pretraining-stage property fine-tuning mostly doesn’t touch. For getting the model to use
+specific, current, or proprietary facts correctly, retrieval (putting facts in the prompt at
+query time) is the more dependable lever. For changing <em>how</em> the model behaves given information
+it already has, fine-tuning is the right tool, and LoRA is what makes doing that on a single GPU
+practical at all.</p>
+
+<h2 id="long-context-the-advertised-vs-effective-gap">Long context: the advertised-vs-effective gap</h2>
+
+<p>Beyond the positional-encoding choice itself, two techniques specifically address extending
+usable context: ALiBi biases attention scores by a distance-based penalty rather than modifying
+embeddings, letting a model trained short extrapolate longer at inference. <a href="https://arxiv.org/abs/2108.12409">Press et al., arXiv:2108.12409</a>
+YaRN instead reinterpolates an existing RoPE model’s rotation frequencies, reporting roughly 10x
+fewer tokens and 2.5x fewer training steps than prior extension methods to stretch a model’s
+effective window. <a href="https://arxiv.org/abs/2309.00071">YaRN, arXiv:2309.00071</a></p>
+
+<p>But extending the <em>technical</em> limit and using that limit <em>well</em> are separate problems. Liu et
+al.’s “Lost in the Middle” work found a persistent U-shaped accuracy curve: models recall
+information at the start or end of a long context far more reliably than information buried in
+the middle, independent of whether the context technically fits. <a href="https://arxiv.org/abs/2307.03172">Lost in the Middle, arXiv:2307.03172</a>
+A harder, more recent test sharpens this: Adobe Research’s NoLiMa benchmark deliberately chooses
+“needle” facts sharing almost no literal wording with the test question, forcing genuine semantic
+inference instead of string matching. Under that test, 11 of 13 models advertising 128K+ context
+dropped below 50% of their own short-context score by just 32K tokens, and GPT-4o’s accuracy fell
+from 99.3% to 69.7% as context grew. NoLiMa defines <em>effective</em> length as the longest context at
+which a model retains at least 85% of its short-context score: by that bar, every tested model’s
+effective length lands well below its advertised maximum. <a href="https://arxiv.org/abs/2502.05167">NoLiMa, arXiv:2502.05167</a></p>
+
+<blockquote>
+  <p><strong>Common trap:</strong> “a bigger advertised context window means the model reads that much text
+reliably.” Advertised and effective context are two different numbers, and the gap between them
+is a live, measured phenomenon, not a rare edge case.</p>
+</blockquote>
+
+<h2 id="prefix-caching-why-it-dominates-local-agent-economics">Prefix caching: why it dominates local agent economics</h2>
+
+<p>Prefix caching (also called prompt caching) reuses the already-computed KV cache for a <em>shared
+prefix</em> across multiple requests (a repeated system prompt, tool definitions, or a long document
+reused across many follow-up turns). So the expensive attention computation for that prefix isn’t
+redone from scratch on every call. It changes nothing about the model’s weights. It’s a pure
+serving-time optimization, and it’s exact-match: the moment a shared prefix differs by even one
+token, everything after that point must be recomputed. This is precisely why it matters most for
+<em>agents</em>, which repeatedly re-send a large, mostly-unchanged system prompt and tool schema on
+every turn of a long-running task: the prefix is enormous and nearly static, exactly the shape
+prefix caching is built to exploit. As of July 2026, Anthropic’s own pricing puts cache reads at
+10% of base input price, a 5-minute-TTL cache write at 1.25x normal input price, and a 1-hour-TTL
+write at 2x. <a href="https://platform.claude.com/docs/en/build-with-claude/prompt-caching">Claude docs, prompt caching</a>
+Locally, the same principle applies without a per-token bill attached: skipping recomputation of
+a fixed system prompt and tool schema every turn is the difference between an agent loop that
+gets slower every turn and one that doesn’t.</p>
+
+<figure>
+<svg viewBox="0 0 720 300" role="img" aria-labelledby="dgm-prefix-title dgm-prefix-desc">
+<title id="dgm-prefix-title">Prefix caching across a 3-turn conversation</title>
+<desc id="dgm-prefix-desc">Two ways of serving a growing multi-turn conversation. Without
+prefix caching, every turn recomputes the full prefix from scratch, so cost keeps growing with
+total conversation length. With prefix caching, only the newly added suffix is computed each
+turn; the shared prefix is reused from cache, so per-turn compute cost stays roughly constant.</desc>
+<rect class="dgm-panel" x="8" y="8" width="704" height="284" rx="3" />
+<text class="dgm-title" x="28" y="32">Same conversation, two serving strategies</text>
+<rect class="dgm-line" x="520" y="50" width="14" height="14" />
+<text class="dgm-label-sm" x="540" y="61">reused (cache hit)</text>
+<rect class="dgm-accent-2" x="520" y="70" width="14" height="14" />
+<text class="dgm-label-sm" x="540" y="81">computed fresh</text>
+<text class="dgm-label" x="28" y="56">Without prefix caching — every turn recomputes the whole prefix</text>
+<text class="dgm-label-sm" x="28" y="62">turn 1</text>
+<rect class="dgm-accent-2" x="28" y="64" width="120" height="20" />
+<text class="dgm-label-sm" x="28" y="90">turn 2 — recomputes turn 1's text too</text>
+<rect class="dgm-accent-2" x="28" y="92" width="280" height="20" />
+<text class="dgm-label-sm" x="28" y="118">turn 3 — recomputes everything again</text>
+<rect class="dgm-accent-2" x="28" y="120" width="440" height="20" />
+<text class="dgm-label" x="28" y="160">With prefix caching — only the new suffix is computed</text>
+<text class="dgm-label-sm" x="28" y="178">turn 1 — nothing to reuse yet</text>
+<rect class="dgm-accent-2" x="28" y="180" width="120" height="20" />
+<text class="dgm-label-sm" x="28" y="206">turn 2 — reuse cached prefix, compute only what's new</text>
+<rect class="dgm-line" x="28" y="208" width="120" height="20" />
+<rect class="dgm-accent-2" x="148" y="208" width="160" height="20" />
+<text class="dgm-label-sm" x="28" y="234">turn 3 — reuse turns 1+2, compute only what's new</text>
+<rect class="dgm-line" x="28" y="236" width="280" height="20" />
+<rect class="dgm-accent-2" x="308" y="236" width="160" height="20" />
+</svg>
+<figcaption><strong>The bottom row's "fresh" segments stay the same size every turn. The top
+row's don't.</strong> Without caching, per-turn cost grows with the whole conversation. With it,
+per-turn cost tracks only what's new, which is why long agent sessions depend on this working.</figcaption>
+</figure>
+
+<h2 id="agent-architectures-briefly">Agent architectures, briefly</h2>
+
+<p>An LLM agent interleaves generation with real actions in a loop. ReAct, the canonical
+formalization, has the model alternate a Thought (reasoning about what to do), an Action (a tool
+call), and an Observation (the real result fed back in), repeating until done. <a href="https://arxiv.org/abs/2210.03629">Yao et al., arXiv:2210.03629</a>
+It’s still the same next-token model as everything above, wired into a loop by code outside the
+model: no separate planning module. Multi-agent orchestration composes several such loops,
+potentially different models or personas, coordinated by a manager process. Because each agent
+instance has no shared state beyond the text explicitly passed between them, one agent’s
+ungrounded claim can be handed to another as if verified, with neither able to detect it. More
+agents doesn’t automatically mean more reliable, the way more human specialists usually does. For
+the depth this deserves (scaffolding patterns, failure modes at longer horizons, where
+orchestration earns its complexity), see <a href="/projects/dokidex/learn/agents/">Coding agents</a>.</p>
+
+<h2 id="interpretability-and-alignment-genuinely-open">Interpretability and alignment: genuinely open</h2>
+
+<p>Mechanistic interpretability tries to reverse-engineer what a trained network’s components
+actually compute. Most individual neurons in large networks are <em>polysemantic</em> (they respond to
+a mixture of unrelated concepts), which is why Anthropic’s work on Claude 3 Sonnet trained sparse
+autoencoders to decompose activations into more individually-meaningful “features” instead of
+reading raw neurons. Human evaluators rated roughly 70% of the extracted features as genuinely
+interpretable. <a href="https://transformer-circuits.pub/2024/scaling-monosemanticity/">Scaling Monosemanticity, Anthropic</a>
+That’s real progress, and a real gap: about 30% of extracted features weren’t judged clearly
+interpretable even with this method, and the technique gives a partial, feature-level account of
+behavior, not a complete circuit-level one, consistent with attention weights and visible
+chain-of-thought each separately turning out not to reliably reflect the model’s actual internal
+computation, above. <a href="https://arxiv.org/abs/1902.10186">Attention is not Explanation, arXiv:1902.10186</a></p>
+
+<p>Alignment research aims to keep increasingly capable systems pursuing goals compatible with human
+interests as they exceed the competence of the humans checking their work. Anthropic’s own
+public framing treats the difficulty of that problem as genuinely uncertain, spanning from
+“existing techniques like RLHF and Constitutional AI basically suffice” through to “may not be
+solvable with current techniques,” as live, unresolved possibilities rather than a settled bet.
+Its named open directions include scalable oversight (accurate feedback on a system once it’s
+more capable than its evaluators), interpretability, process-oriented learning (rewarding a
+justified process rather than a good-looking outcome), understanding generalization (telling
+benign pattern-repetition apart from learned misaligned behavior), and deliberately eliciting
+dangerous failure modes in smaller models before they appear in more powerful ones.
+<a href="https://www.anthropic.com/news/core-views-on-ai-safety">Anthropic’s Core Views on AI Safety</a>
+Treat both “alignment is basically solved” and “alignment is provably impossible” as overclaims:
+the honest position is that it’s an active research program with named unsolved problems, not a
+finished argument.</p>
+
+<hr />
+
+<p>That’s the systems and research layer. From here, <a href="/projects/dokidex/learn/naming/">Decoding model names</a>
+turns to something more immediately practical: what all those version numbers, suffixes, and
+“preview” tags in a model ID actually tell you.</p>
+
+    </article>
+
+    
+    <nav class="pager" aria-label="Page navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/learn/core/">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">How models work</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/learn/naming/">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">Decoding model names</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="site-footer">
+  <div class="footer-main">
+    <p class="footer-line">
+      <strong>DokiDex</strong> v0.62.0:
+      a fully-local AI stack, and a field guide to the machines it runs on.
+    </p>
+    <p class="footer-line footer-dim">
+      Everything on this site is written against the real tree and the measured record. Where a
+      claim is a number, it was measured or sourced. Where it was a judgment call, the reasoning
+      is stated inline. Stale statements are bugs. File them like bugs.
+    </p>
+  </div>
+
+  <div class="footer-links">
+    <a href="/projects/dokidex/local-cli/">Run the CLIs</a>
+    <a href="/projects/dokidex/handbook/">Handbook</a>
+    <a href="/projects/dokidex/reference/">Quick reference</a>
+    <a href="/projects/dokidex/glossary/">Glossary</a>
+    <!-- Deliberately understated: last item in the row, same weight as the rest, no colour,
+         no badge, no image beacon. The ask was "inconspicuous". -->
+    <a class="footer-kofi" href="https://ko-fi.com/dougfessler" rel="noopener">Buy me a coffee</a>
+  </div>
+</footer>
+
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/dokidex.js"></script>
+</body>
+</html>

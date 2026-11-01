@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direction · DokiDex Handbook</title>
+<meta name="description" content="The forward options, framed for a decision. What each avenue costs, what it buys, and what kind of stack it makes DokiDex become.">
+
+<!-- Marcellus (power word) · Kanit incl. italics 500-700 (headings/kickers/nav) ·
+     IBM Plex Mono 400/500 (code, stats) · Figtree 300-600 (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/site.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle chapter nav">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/handbook/">DokiDex Handbook</a>
+    <a class="topbar-up" href="/projects/dokidex/">&larr; DokiDex</a>
+  </header>
+
+  <nav class="sidebar" aria-label="Handbook chapters">
+    <a class="sidebar-title" href="/projects/dokidex/handbook/">DokiDex Handbook</a>
+    <ol class="nav-list">
+      
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/01-big-picture.html">
+          <span class="nav-kicker">:: THE FOUNDRY</span>
+          <span class="nav-title">The Big Picture</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/03-serving.html">
+          <span class="nav-kicker">:: THE FORGE</span>
+          <span class="nav-title">Serving Local Models</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/04-tools-and-safety.html">
+          <span class="nav-kicker">:: THE GATE</span>
+          <span class="nav-title">Tools, Permissions, Safety</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/07-evals.html">
+          <span class="nav-kicker">:: THE PROOF</span>
+          <span class="nav-title">Evals & the Parity Ledger</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/08-references.html">
+          <span class="nav-kicker">:: THE CODEX</span>
+          <span class="nav-title">References & Study Path</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/09-capabilities.html">
+          <span class="nav-kicker">:: THE ARSENAL</span>
+          <span class="nav-title">Capabilities</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link is-active" href="/projects/dokidex/handbook/10-direction.html">
+          <span class="nav-kicker">:: THE COMPASS</span>
+          <span class="nav-title">Direction</span>
+        </a>
+      </li>
+      
+    </ol>
+  </nav>
+
+  <main class="main">
+    <div class="hero reveal-up">
+      <canvas class="token-stream" aria-hidden="true"></canvas>
+      <div class="hero-inner">
+        <p class="kicker">:: THE COMPASS</p>
+        <p class="power-word">COMPASS</p>
+        <h1 class="hero-title">Direction</h1>
+        <p class="hero-desc">The forward options, framed for a decision. What each avenue costs, what it buys, and what kind of stack it makes DokiDex become.</p>
+      </div>
+    </div>
+
+    <article id="content" class="prose">
+      <p>The chapters before this one described what exists. This chapter is the decision surface: the credible
+avenues forward, each with its evidence base, rough cost, and the part inventories usually skip,
+which is what kind of stack choosing it makes this become. These are competing bets, not a
+backlog. The framing question for each is <em>“is this the identity?”</em></p>
+
+<h2 id="the-avenues">The avenues</h2>
+
+<h3 id="1--token-economy-cli-wave-5-make-the-local-models-punch-above-their-weight">1 · Token economy (CLI wave 5), make the local models punch above their weight</h3>
+
+<p><strong>Chosen and in flight as of 2026-07-12.</strong> The arc’s planning pass produced its own load-bearing
+finding: on one GPU with llama-swap, the dominant serving win is 92 to 99% prompt-cache reuse, so
+cloud-derived cheap-tier patterns <em>regress</em> if copied naively. Routing work to a different tier
+evicts the resident model and its cache. Every leg was reshaped around that.</p>
+
+<p>Landed: skill governance (<code class="language-plaintext highlighter-rouge">disable-model-invocation</code> + <code class="language-plaintext highlighter-rouge">skillOverrides</code>, which make heavy skills
+cost zero context until run) · cache-safe context compression (folded into the compaction path, which
+already re-prefills) · opt-in housekeeping-tier plumbing (default is the session model, with the
+tradeoff documented in-code) · the <strong>architect+editor mode</strong> (<code class="language-plaintext highlighter-rouge">/architect</code>: plan turns →
+<code class="language-plaintext highlighter-rouge">gpt-oss-120b [128k] (Reasoning, Heavy)</code>, act turns → <code class="language-plaintext highlighter-rouge">Qwen3-Coder-30B-A3B [128k] (Coding, Light)</code>,
+bound to the plan/act boundary so it costs one swap per plan cycle, and
+default-off pending its eval, <code class="language-plaintext highlighter-rouge">docs/scorecards/2026-07-12-architect-editor-eval.md</code>). In flight:
+<strong>LSP-backed context</strong> (clangd as a read-only tool, worth more than any grep for UE-sized C++, and
+absence-first since clangd isn’t assumed installed). Deferred behind LSP: the PageRank repo map
+(LSP may subsume much of its value for C++/C#, changing the calculus).</p>
+
+<p><em>Still true</em>: this is the arc where local-model economics (zero marginal tokens, one user)
+genuinely diverge from cloud designs. <em>Makes it</em>: a sharper daily tool.</p>
+
+<h3 id="2--the-ue-lane-specialize-where-the-owner-actually-lives">2 · The UE lane, specialize where the owner actually lives</h3>
+
+<p>The ingredients exist and have already produced results: 8 UE golden tasks, the <code class="language-plaintext highlighter-rouge">ue-delegates</code>
+skill whose glob-triggered injection took delegate wiring from failing to 3/3, and a dedicated
+research doc on UE-capable local models. Deepening means: more engine-domain skills (UPROPERTY
+lifetimes, replication patterns, Build.cs hygiene), a UE eval expansion, and evaluating a
+fine-tuned/specialized coder tier for engine C++.</p>
+
+<p><em>Costs</em>: moderate, mostly authored knowledge plus eval time, not architecture. <em>Buys</em>: outsized
+quality exactly where the stack gets used most, because the passive-catalog A/B proved authored,
+triggered knowledge moves small models more than anything else measured here. <em>Makes it</em>: a
+gameplay programmer’s instrument rather than a general tool. <strong>Compounds with avenue 1</strong>. The
+two together are the “daily weapon” strategy.</p>
+
+<h3 id="3--model-pruning-to-purpose-a-research-bet">3 · Model pruning to purpose, a research bet</h3>
+
+<p>REAP-style expert pruning scoped to the actual workload: keep the C++/C#/PowerShell experts,
+drop the Ruby. A pruned 30B that behaves like its full self on <em>this repo’s</em> tasks would buy
+context headroom and speed simultaneously. The evidence so far is cautionary. The one REAP
+candidate evaluated scored 7/15 (47%) with three hard timeouts and was parked
+(<code class="language-plaintext highlighter-rouge">docs/scorecards/2026-07-06-claw-Qwen3-Coder-REAP-25B-A3B [128k] (Candidate, Light).md</code>), and pruning research moves
+fast.</p>
+
+<p><em>Costs</em>: GPU-days and eval cycles with a real chance of “measured worse, rejected.”
+<em>Buys</em>: potentially a persistent hardware-multiplier, plus genuine research findings. <em>Makes
+it</em>: a research rig. Right move <strong>only after</strong> avenues 1 and 2 plateau, or as a background
+curiosity.</p>
+
+<h3 id="4--desktop--product-polish-finish-the-migration-and-ship-the-artifact-closed-2026-09-02">4 · Desktop &amp; product polish, finish the migration and ship the artifact (closed, 2026-09-02)</h3>
+
+<p>This avenue used to read: finish the Electron migration (retire the WPF-vs-Electron split and the
+three version counters), settings panel, inline diff view, context meter, live preview in the Code
+workspace, and the C1 through C7 identity taste calls waiting on owner input, plus the media
+web-app direction if the media half was the draw. The owner didn’t take it. The desktop app, the
+Electron shell, and the whole media-generation half of the stack were removed on 2026-09-02 rather
+than finished (<code class="language-plaintext highlighter-rouge">archive.md</code> names the commit), which closes the “two shells, three versions”
+honesty debt by deleting one side of it instead of converging on the other. Nothing under this
+avenue is a live option any more.</p>
+
+<h3 id="5--parity-endgame-declare-victory-deliberately-moot-2026-09-02">5 · Parity endgame, declare victory deliberately (moot, 2026-09-02)</h3>
+
+<p>This avenue used to ask whether to track or freeze the generated parity ledger that scored
+DokiDex’s own agent against Claude Code, after Round 4 closed the last two gaps to a brief 99.1%
+and a 2026-07-12 probe-honesty re-audit rescored two over-credited items downward to a final
+97.6%. The question is moot now. The agent and the ledger both went with the 2026-09-02 removal.
+Measuring your own clone against an upstream stops being a useful instrument once you ship the
+upstream, which is the same conclusion chapter 7 reaches.</p>
+
+<h2 id="cross-cutting-debts-do-these-regardless">Cross-cutting debts (do these regardless)</h2>
+
+<p>Small, known, and they compound if ignored: the voice-extension 404 bug (config points at .wav
+files the TTS route can’t serve) · the stale <code class="language-plaintext highlighter-rouge">tests/doki-notts.test.ps1</code> · the
+<code class="language-plaintext highlighter-rouge">InstallRoot</code>-points-at-<code class="language-plaintext highlighter-rouge">D:\Programs</code> dev-run gotcha (<code class="language-plaintext highlighter-rouge">DOKIDEX_HOME</code> needs setting for studio
+runs from the repo) · the documentation staleness this handbook round is already retiring.</p>
+
+<h2 id="how-to-choose">How to choose</h2>
+
+<p>Strip the options to identities and the choice gets easier:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>If DokiDex is…</th>
+      <th>Then invest in…</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>your daily weapon</strong> (most likely, given usage)</td>
+      <td>1 + 2: token economy, then the UE lane on top</td>
+    </tr>
+    <tr>
+      <td><strong>a product for others</strong></td>
+      <td>4 is closed. The desktop shell was removed rather than finished, so a new product surface would be a fresh avenue, not a resumption</td>
+    </tr>
+    <tr>
+      <td><strong>a research rig</strong></td>
+      <td>3: pruning + the model lane, eval-gated as always</td>
+    </tr>
+    <tr>
+      <td><strong>a finished artifact</strong></td>
+      <td>5 is moot. This handbook is the closest thing to a capstone now that the ledger it tracked is gone</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The avenues aren’t exclusive forever. The next <em>arc</em> should still be one of them, chosen on
+purpose. The stack’s own history argues for how to decide: pick the bet, define the gate that
+would prove it wrong, and let the ledger keep the score.</p>
+
+<p><em>End of the handbook. The source of truth is the tree. When they disagree, the tree wins and
+this document gets a fix.</em></p>
+
+    </article>
+
+    
+    
+    
+    
+
+    
+    <nav class="chapter-pager" aria-label="Chapter navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/handbook/09-capabilities.html">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">Capabilities</span>
+      </a>
+      
+      
+      <span class="pager-link pager-empty"></span>
+      
+    </nav>
+    
+
+    <footer class="statusline">
+      <span>DokiDex Handbook</span>
+      <span class="statusline-sep">&middot;</span>
+      <span>Direction</span>
+      <span class="statusline-sep">&middot;</span>
+      <span>generated from docs/site/handbook, DokiDex v0.62.0</span>
+    </footer>
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/foundry.js"></script>
+</body>
+</html>

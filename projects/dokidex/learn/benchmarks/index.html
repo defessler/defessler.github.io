@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Benchmarks: how to read an AI score honestly · DokiDex</title>
+<meta name="description" content="What the major AI benchmarks actually measure, where every current leaderboard lives, and how to tell a real capability gain from a scaffolding trick, a contaminated dataset, or a footnote doing the heavy lifting.">
+
+<!-- Open Graph / Twitter, hand-rolled: jekyll-seo-tag is not available under the pinned
+     github-pages gem set used by actions/jekyll-build-pages. -->
+<meta property="og:site_name" content="DokiDex">
+<meta property="og:title" content="Benchmarks: how to read an AI score honestly">
+<meta property="og:description" content="What the major AI benchmarks actually measure, where every current leaderboard lives, and how to tell a real capability gain from a scaffolding trick, a contaminated dataset, or a footnote doing the heavy lifting.">
+<meta property="og:type" content="website">
+<!-- site_origin rather than absolute_url: see the comment in _config.yml. absolute_url would
+     emit http:// here, because the Pages API reports an http html_url while Enforce HTTPS is off. -->
+<meta property="og:url" content="https://dougfessler.com/projects/dokidex/learn/benchmarks/">
+<link rel="canonical" href="https://dougfessler.com/projects/dokidex/learn/benchmarks/">
+<!-- `summary`, not `summary_large_image`: no og:image or twitter:image is emitted anywhere on
+     this site, and the large-image card renders as a blank rectangle without one. Switch this back
+     the same day a 1200x630 share asset lands, not before. -->
+<meta name="twitter:card" content="summary">
+
+<!-- Same four families as the handbook, so the two halves of the site read as one product:
+     Marcellus (power words) · Kanit (headings, kickers, nav) · IBM Plex Mono (code, stats) ·
+     Figtree (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/dokidex.css">
+<link rel="icon" href="/projects/dokidex/assets/favicon.svg" type="image/svg+xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<!-- `wide: true` in a page's front matter opts it into --content-w-wide (assets/dokidex.css:51).
+     The CSS keys off `.page-wide` on an ancestor. Without the class emitted here the front-matter
+     flag silently does nothing. -->
+<body class="page-wide">
+<a class="skip-link" href="#content">Skip to content</a>
+
+<!-- CSS-only nav toggle. A checkbox beats a JS drawer here: the nav has to work on the mobile
+     read where the reader has scrolled 4000px into a reference table, and a checkbox cannot
+     desync from its own state the way a JS flag can. -->
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/">DokiDex</a>
+    <a class="topbar-cta" href="/projects/dokidex/download/"><svg class="dl-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><g class="dl-arrow"><path d="M8 2.2v6.5"/><path d="M5.2 5.9 8 8.7l2.8-2.8"/></g><path class="dl-tray" d="M3.2 11.3v2.5h9.6v-2.5"/></svg>
+Download</a>
+  </header>
+
+  <!-- Grouped navigation, driven by site.nav in _config.yml.
+
+     A page is "current" when its url matches exactly. The handbook is the one entry that also
+     needs to light up for its children (/handbook/03-serving.html), so it gets a prefix test —
+     without it, the sidebar would show nothing selected the moment a reader steps into a
+     chapter, which reads as "you have left the site". -->
+<nav class="sidebar" aria-label="Site sections">
+  <a class="sidebar-brand" href="/projects/dokidex/">
+    <span class="sidebar-mark" aria-hidden="true">&#9612;&#9608;&#9608;&#9616;</span>
+    <span class="sidebar-brand-text">DokiDex</span>
+  </a>
+
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Start</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/"
+             >Overview</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Use DokiDex</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/local-cli/"
+             >Run the CLIs locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/download/"
+             >Download the launchers</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/models/"
+             >Models it runs</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/games/"
+             >Games the models built</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/telemetry/"
+             >Performance data</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/qwen38/"
+             >Qwen3.8-27B, measured</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/architecture/"
+             >How it's built</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Learn AI</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/"
+             >Where to start</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/basics/"
+             >1 · Foundations</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/core/"
+             >2 · How models work</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/advanced/"
+             >3 · Advanced</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/naming/"
+             >Decoding model names</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/open-vs-closed/"
+             >Open vs closed weights</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link is-active"
+             href="/projects/dokidex/learn/benchmarks/"
+             aria-current="page">Benchmarks</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/local/"
+             >Running models locally</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/learn/agents/"
+             >Coding agents</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Context</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/state-of-ai/"
+             >State of AI, 2026</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/reference/"
+             >Quick reference</a>
+        </li>
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/glossary/"
+             >Glossary</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+  <div class="nav-group">
+    <p class="nav-group-title">Deep dive</p>
+    <ul class="nav-list">
+      
+        
+        
+        <li class="nav-item">
+          <a class="nav-link"
+             href="/projects/dokidex/handbook/"
+             >The Handbook</a>
+        </li>
+      
+    </ul>
+  </div>
+  
+</nav>
+
+
+  <main class="main">
+    <div class="page-head">
+      <p class="kicker">:: BENCHMARKS</p>
+      <h1 class="page-title">Benchmarks: how to read an AI score honestly</h1>
+      <p class="page-desc">What the major AI benchmarks actually measure, where every current leaderboard lives, and how to tell a real capability gain from a scaffolding trick, a contaminated dataset, or a footnote doing the heavy lifting.</p>
+      
+      <p class="level-badges">
+        <span class="level-badge level-intermediate">Intermediate</span><span class="level-badge level-advanced">Advanced</span>
+      </p>
+      
+    </div>
+
+    <article id="content" class="prose">
+      <p>Every model launch comes with a wall of percentages. This page has two jobs. First, to teach you
+to read one of those numbers the way a skeptical reviewer would: what it measures, what makes it
+move besides the thing it claims to measure, and when to distrust it outright. Second, to be the
+link directory you actually want: a direct path from every benchmark name you’ll see quoted to its
+real leaderboard, so you can check the current number yourself instead of trusting a screenshot in
+a press release.</p>
+
+<p>Everything below is sourced and dated. Leaderboards move. This snapshot is <strong>as of July 2026</strong>.
+Check the date on the live page before you repeat a number from here in six months.</p>
+
+<blockquote>
+  <p><strong>Key idea</strong>: A benchmark score is not a fact about a model. It’s a fact about a model, a
+prompt template, a tool-access setting, a reasoning-effort tier, and an attempt-counting rule.
+Change any one of those and the number moves, often by more than the gap between two competing
+models.</p>
+</blockquote>
+
+<hr />
+
+<h2 id="short-answer">Part 0: The short answer</h2>
+
+<p>The rest of this page teaches you to distrust benchmark numbers. That’s the right instinct. This
+section is where it gets applied rather than used as an excuse not to answer. As of
+<strong>July 2026</strong>, with the evidence in Part 3.</p>
+
+<p>The honest headline isn’t a winner. It’s this:</p>
+
+<blockquote>
+  <p><strong>Key idea</strong>: <strong>the top is compressed and the prices are not.</strong> Five models land between 93% and
+97% on SWE-bench Verified (a 4.0-point spread, inside what scaffolding and prompt differences
+alone can move) while their input prices run from $1 to $10 per MTok, a <strong>10×</strong> range. The
+useful question is not “which model is best” but “how little can I pay to stay inside that band.”</p>
+</blockquote>
+
+<p>So read the table below as <em>shortlists with a reason</em>, not as rankings. Where the gap between first
+and second is smaller than the noise, that’s said outright rather than hidden behind a bolded name.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>If you’re doing this</th>
+      <th>Reasonable default</th>
+      <th>Why, and how firm it is</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Agentic coding in a real repo</strong></td>
+      <td><strong>Claude Opus 5</strong>, or <strong>GPT-5.6 Sol</strong></td>
+      <td>97.0% vs 96.2% on SWE-bench Verified, independently measured (<a href="https://www.vals.ai/benchmarks/swebench">vals.ai</a>, Jul 22 2026). <strong>That 0.8-point gap is not a real difference.</strong> By this page’s own rule, treat it as a tie and pick on price or fit. On SWE-bench Pro, which discriminates better at the frontier, Opus 5 sits <em>third</em> behind Mythos 5 and Fable 5 (<a href="https://benchlm.ai/benchmarks/swePro">benchlm.ai</a>)</td>
+    </tr>
+    <tr>
+      <td><strong>The same, on a budget</strong></td>
+      <td><strong>GPT-5.6 Luna</strong></td>
+      <td>93.0%, four points off the leader at <strong>$1 / $6</strong> per MTok against Opus 5’s <strong>$5 / $25</strong> (<a href="https://developers.openai.com/api/docs/pricing">OpenAI pricing</a>, <a href="https://platform.claude.com/docs/en/about-claude/pricing">Anthropic pricing</a>). This is the firmest call in the table: the capability gap is small and measurable, the price gap is large and certain</td>
+    </tr>
+    <tr>
+      <td><strong>General writing and conversation</strong></td>
+      <td><strong>Claude Fable 5</strong></td>
+      <td>Highest human-preference rating at 1507 ± 6 (<a href="https://arena.ai/leaderboard/text">arena.ai</a>, Jul 21 2026), but Opus 4.6-thinking is 1505 ± 4 and the intervals overlap. The top of that board is a cluster, not a ranking</td>
+    </tr>
+    <tr>
+      <td><strong>Hard science and graduate Q&amp;A</strong></td>
+      <td><strong>GPT-5.6 Sol</strong> or <strong>Claude Mythos Preview</strong></td>
+      <td>Both at 94.6% GPQA Diamond, an exact tie, with Gemini 3.1 Pro 0.3 behind (<a href="https://llm-stats.com/benchmarks/gpqa-diamond">llm-stats</a>). All vendor-reported. <strong>Zero of 232 tracked models carry an independent re-run.</strong> The benchmark is also effectively saturated above the 65% raw / 74% error-corrected human baseline</td>
+    </tr>
+    <tr>
+      <td><strong>Tool-calling agents specifically</strong></td>
+      <td><em>Weak evidence, see note</em></td>
+      <td>Grok 4.5 is reported first on an agentic-tool-use sub-component. But that claim reaches us through <a href="https://techcrunch.com/2026/07/08/spacexai-releases-grok-4-5-which-elon-describes-as-an-opus-class-model/">press coverage</a> of the launch, not a primary card. Its overall index score (54) also trails the 59 to 61 cluster. Treat as a lead to check, not a recommendation</td>
+    </tr>
+    <tr>
+      <td><strong>Running it yourself, offline</strong></td>
+      <td><strong>Qwen3-Coder-30B-A3B</strong></td>
+      <td>What we actually ship: 14/15 on our own golden suite with a clean native tool-call gate. Chosen on reliability, not score. See <a href="/projects/dokidex/models/">Models it runs</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>There’s deliberately <strong>no row for novel abstract reasoning</strong>. Only one ARC-AGI-2 score was
+recoverable from a primary source (Gemini 3.1 Pro, 77.1%, and that’s Google’s own card, not an
+independent run). A single vendor-reported number with nothing to compare it against is a selection
+artifact, not evidence that a model is best at something.</p>
+
+<h3 id="what-holds-up-across-more-than-one-evaluator">What holds up across more than one evaluator</h3>
+
+<p>Two claims (and only two) survive being checked against genuinely separate sources:</p>
+
+<ul>
+  <li><strong>Anthropic’s line leads on coding and on human preference.</strong> Opus 5 tops SWE-bench Verified
+(<a href="https://www.vals.ai/benchmarks/swebench">vals.ai</a>), Fable 5 tops human-preference voting
+(<a href="https://arena.ai/leaderboard/text">arena.ai</a>), and Opus 5 tops a third, methodologically
+unrelated composite (<a href="https://artificialanalysis.ai/models">Artificial Analysis</a>, 61). Note that
+<em>different Anthropic models</em> win different things. This is a family result, not one model
+sweeping. <strong>A caution on how this used to be argued here:</strong> the Vals Index isn’t independent
+corroboration of the SWE-bench result, because vals.ai produces both and the composite <em>contains</em>
+SWE-bench. Two legs from one evaluator is one leg.</li>
+  <li><strong>Price varies far more than measured capability.</strong> Inside the leading band, input runs $1 to $10
+per MTok (10×) and output $6 to $50 (8.3×), while the capability spread is a few points on
+benchmarks that no longer discriminate. That asymmetry is visible on every pricing page and every
+leaderboard. It’s the most actionable fact on this page.</li>
+</ul>
+
+<p>Two further claims are worth knowing but rest on <strong>one source each</strong>. They’re stated as such
+rather than dressed up as consensus: that marketing tiers don’t track measured capability (Fable 5
+is marketed as most capable and scores 60 against Opus 5’s 61 on one index, a 1-point gap, itself
+inside the noise), and that at least one “frontier” family sits below its class median (the Nova
+Premier finding, which lives on <a href="/projects/dokidex/learn/open-vs-closed/">Open vs closed</a>,
+not on this page).</p>
+
+<h3 id="where-the-honest-answer-is-nobody-knows">Where the honest answer is “nobody knows”</h3>
+
+<ul>
+  <li><strong>The best open-weight model for coding.</strong> The highest score below the closed top three belongs to
+<strong>Kimi K3</strong> (93.4%). But its <strong>weights are not released</strong>. Moonshot’s model page shows an
+upcoming-release countdown dated <strong>2026-07-27</strong>. Until the weights land with a licence attached,
+it’s a model you can call, not one you can download. Part 3’s table contains no open-weight model
+at all. So this page can’t tell you what the strongest genuinely runnable open model scores.
+That’s a gap in the evidence, not a small one.</li>
+  <li><strong>ARC-AGI-2 rankings.</strong> One data point isn’t a leaderboard.</li>
+  <li><strong>Anything measured only by its own vendor.</strong> The GPQA and ARC-AGI-2 figures above are
+vendor-reported with no independent re-run: the category Part 4 tells you to discount.</li>
+</ul>
+
+<blockquote>
+  <p><strong>Note</strong>: a cost catch that runs the opposite way to most people’s intuition. Claude models from
+4.7 onward use a tokenizer producing roughly <strong>30% more tokens for the same text</strong> than earlier
+<em>Claude</em> generations (<a href="https://platform.claude.com/docs/en/about-claude/models/overview">Anthropic</a>).
+That’s an intra-vendor comparison, not a claim about OpenAI’s or Google’s tokenizers. Its effect
+on a like-for-like bill is to make the newer Claude models <strong>more</strong> expensive than their sticker
+price suggests, not less. So where this page compares a Claude price against a non-Claude one,
+the real-world gap is if anything <strong>wider</strong> than the numbers shown.</p>
+</blockquote>
+
+<p><strong>This section ages faster than anything else on the site.</strong> Leaderboards move weekly. The K3
+countdown above expires the day after this was written. Part 2 links every live leaderboard so you
+can re-check rather than trust this snapshot.</p>
+
+<h2 id="part-1-the-benchmark-catalog">Part 1: The benchmark catalog</h2>
+
+<h3 id="coding-and-software-engineering">Coding and software engineering</h3>
+
+<h4 id="swe-bench--swe-bench-verified">SWE-bench / SWE-bench Verified</h4>
+
+<p><strong>What it measures.</strong> Given a real GitHub repository at a real commit, plus a real issue
+description, the model must produce a patch. Scoring runs the repository’s own test suite:
+previously-failing tests that are specific to the issue (<code class="language-plaintext highlighter-rouge">FAIL_TO_PASS</code>) must now pass.
+Previously-passing tests (<code class="language-plaintext highlighter-rouge">PASS_TO_PASS</code>) must not regress. <a href="https://github.com/princeton-nlp/SWE-bench">github.com/princeton-nlp/SWE-bench</a></p>
+
+<p><strong>Verified subset.</strong> A hand-filtered 500-problem subset, curated with OpenAI’s Preparedness team
+specifically to drop issues that turned out to be unsolvable, underspecified, or dependent on
+flaky or unfair tests. The 500-problem count is the one figure here confirmed directly against
+the repository page. <a href="https://github.com/princeton-nlp/SWE-bench">github.com/princeton-nlp/SWE-bench</a></p>
+
+<p><strong>Failure modes.</strong> Solution text can leak into an issue description or a linked PR comment (a
+documented contamination vector for any benchmark scraped from public pull requests). Tests can be
+flaky. And scaffolding (the agent harness wrapped around the base model) materially changes the
+score independent of the model itself: the same weights can score very differently under a
+minimal harness (<code class="language-plaintext highlighter-rouge">mini-SWE-agent</code>) versus a custom one, so a cross-vendor comparison of SWE-bench
+numbers implicitly compares harnesses as much as models. See <a href="/projects/dokidex/learn/agents/">Coding agents</a>
+for what a harness actually contributes.</p>
+
+<p><strong>Saturation.</strong> Effectively saturated at the frontier. See the standings table below: the top
+handful of models sit within about 8 points of each other, most above 93%.</p>
+
+<h4 id="swe-bench-pro">SWE-bench Pro</h4>
+
+<p><strong>What it measures.</strong> The same patch-and-test loop, but harder, larger, and partly non-public:
+1,865 problems across 41 repositories, split into public, held-out, and commercial (private) sets
+specifically to blunt contamination. <a href="https://www.morphllm.com/swe-bench-pro">morphllm.com/swe-bench-pro</a></p>
+
+<p><strong>The clearest “which number do you mean” case in this whole page.</strong> At least five different
+“current best” SWE-bench Pro numbers were circulating in this research at once, each real for a
+specific split:</p>
+
+<figure>
+<svg viewBox="0 0 720 300" role="img" aria-labelledby="dgm-swepro-title dgm-swepro-desc">
+<title id="dgm-swepro-title">SWE-bench Pro: five scores, five different measurement conditions</title>
+<desc id="dgm-swepro-desc">A horizontal bar chart showing five reported SWE-bench Pro scores ranging from 47.1% to about 80%, colored by whether the score comes from a public split, a private/commercial split, or an aggregate whose split is unclear. The private/commercial split — the hardest, least contamination-prone condition — scores lowest.</desc>
+<rect class="dgm-panel" x="4" y="4" width="712" height="292" rx="3" />
+<text class="dgm-title" x="24" y="30">"SWE-bench Pro" — same name, five conditions</text>
+
+<!-- legend -->
+<rect class="dgm-accent" x="24" y="44" width="12" height="12" />
+<text class="dgm-label-sm" x="42" y="54">public split</text>
+<rect class="dgm-accent-2" x="140" y="44" width="12" height="12" />
+<text class="dgm-label-sm" x="158" y="54">private/commercial split</text>
+<rect class="dgm-accent-3" x="340" y="44" width="12" height="12" />
+<text class="dgm-label-sm" x="358" y="54">aggregate, split unclear</text>
+
+<!-- bars: base x=180, scale 440px = 90 points -->
+<text class="dgm-label-sm" x="170" y="86" text-anchor="end">Opus 5 / Fable 5 / Mythos 5</text>
+<rect class="dgm-accent" x="180" y="72" width="391" height="22" />
+<text class="dgm-mono" x="577" y="88">~80%</text>
+
+<text class="dgm-label-sm" x="170" y="128" text-anchor="end">Claude Opus 4.8 (split unclear)</text>
+<rect class="dgm-accent-3" x="180" y="114" width="338" height="22" />
+<text class="dgm-mono" x="524" y="130">69.2%</text>
+
+<text class="dgm-label-sm" x="170" y="170" text-anchor="end">GPT-5.4 (xHigh), public standardized</text>
+<rect class="dgm-accent" x="180" y="156" width="289" height="22" />
+<text class="dgm-mono" x="475" y="172">59.1%</text>
+
+<text class="dgm-label-sm" x="170" y="212" text-anchor="end">Gemini 3.1 Pro, public, single attempt</text>
+<rect class="dgm-accent" x="180" y="198" width="265" height="22" />
+<text class="dgm-mono" x="451" y="214">54.2%</text>
+
+<text class="dgm-label-sm" x="170" y="254" text-anchor="end">Claude Opus 4.6, private/commercial</text>
+<rect class="dgm-accent-2" x="180" y="240" width="230" height="22" />
+<text class="dgm-mono" x="416" y="256">47.1%</text>
+
+<path class="dgm-line" d="M180 44 L180 272" />
+<text class="dgm-label-sm" x="180" y="290" text-anchor="middle">0%</text>
+</svg>
+<figcaption><strong>The split accounts for more of the spread than the model generation does.</strong>
+Claude Opus 4.6's private/commercial score (47.1%) sits over 30 points below the newest models'
+likely-public scores (~80%). Most of that gap is the split, not one generation's worth of
+progress. A SWE-bench Pro number without a stated split isn't comparable to any other number on
+this chart.</figcaption>
+</figure>
+
+<p>Sources for the five bars:</p>
+
+<ul>
+  <li>Claude Opus 5 / Fable 5 / Mythos 5 at 79.2 to 80.3%, per <a href="https://benchlm.ai/benchmarks/swePro">benchlm.ai</a></li>
+  <li>Claude Opus 4.8 at 69.2%, an aggregate figure from <a href="https://llm-stats.com/benchmarks/mmlu-pro">llm-stats.com</a> whose split couldn’t be confirmed</li>
+  <li>GPT-5.4 (xHigh) at 59.1% on Scale AI’s standardized public split, via <a href="https://labs.scale.com/leaderboard/swe_bench_pro_public">labs.scale.com</a></li>
+  <li>Gemini 3.1 Pro at 54.2%, public split, single attempt, from <a href="https://deepmind.google/models/gemini/pro/">Google’s own model card</a></li>
+  <li>Claude Opus 4.6 at 47.1% on the private/commercial split, the hardest of the three</li>
+</ul>
+
+<blockquote>
+  <p><strong>Common trap</strong>: Quoting “SWE-bench Pro: 80%” without saying which split turns a real,
+sourced number into something closer to a marketing claim. Always ask: public, held-out, or
+private/commercial?</p>
+</blockquote>
+
+<p><strong>Saturation.</strong> Not saturated. The private/commercial split in particular still sits well under
+50% for good models, in sharp contrast to Verified’s high-90s ceiling.</p>
+
+<h4 id="terminal-bench-10--20--21">Terminal-Bench (1.0 / 2.0 / 2.1)</h4>
+
+<p><strong>What it measures.</strong> An agent operating a real sandboxed terminal (not a chat window) on tasks
+spanning sysadmin, security, ML, and data-science work: building a kernel, configuring a server,
+training a model. Scoring is binary pass/fail against defined output checks.
+<a href="https://www.tbench.ai/">tbench.ai</a></p>
+
+<p><strong>Structure.</strong> Version 1.0 shipped 80 tasks. 2.0/2.1 expanded to 89+ higher-quality tasks, plus
+spin-off suites (Terminal-Bench Science, Terminal-Bench Challenges). <a href="https://www.tbench.ai/">tbench.ai</a></p>
+
+<p><strong>Scaffold sensitivity is severe here.</strong> Even setting aside one aggregator entry this research
+flagged as unreliable (see the warning below), the remaining sourced numbers for nominally similar
+model tiers span roughly 68% to 92%:</p>
+
+<ul>
+  <li>Google’s own card reports Gemini 3.1 Pro at <strong>68.5%</strong> under a named harness, “Terminus-2” <a href="https://deepmind.google/models/gemini/pro/">deepmind.google</a></li>
+  <li>An llm-stats.com tracker puts GPT-5.5 at <strong>82.7%</strong> across 49 evaluated models <a href="https://llm-stats.com/benchmarks/terminal-bench-2">llm-stats.com</a></li>
+  <li>benchlm.ai reports GPT-5.6 Sol at <strong>91.9%</strong> <a href="https://benchlm.ai/benchmarks/terminalBench2">benchlm.ai</a></li>
+  <li>codingfleet.com’s 2.1 tracker lists Kimi K3 at <strong>88.3%</strong> <a href="https://codingfleet.com/blog/terminal-bench-leaderboard-2026/">codingfleet.com</a></li>
+</ul>
+
+<p>None of those four sources name a harness except Google’s, which is itself a clue about which
+numbers to trust more.</p>
+
+<blockquote>
+  <p><strong>Warning</strong>: While assembling this page, one Terminal-Bench aggregator entry turned out, on
+inspection, to reuse a completely different metric (a model’s output tokens-per-second) as if
+it were that model’s benchmark pass rate, apparently because both numbers happened to land in a
+similarly-named column. It has been dropped from this page rather than published. Treat any
+scraped benchmark table as needing a sanity check against the benchmark’s own definition, not
+just against the column header.</p>
+</blockquote>
+
+<p><strong>Saturation.</strong> Not clearly saturated given the spread, but the top of the range (&gt;90%) suggests
+the ceiling is being approached under generous scaffolding. “Generous scaffolding” is the
+operative, unmeasured variable.</p>
+
+<h4 id="livecodebench">LiveCodeBench</h4>
+
+<p><strong>What it measures.</strong> Competitive-programming problems continuously scraped from LeetCode,
+AtCoder, and Codeforces, each tagged with a release date so evaluators can score only on problems
+published after a model’s training cutoff (a contamination control built into the dataset itself,
+rather than bolted on after the fact). <a href="https://llm-stats.com/benchmarks/livecodebench">llm-stats.com</a></p>
+
+<p><strong>Current top</strong> (one tracker, 73 models, dated ~July 2026): DeepSeek-V4-Pro-Max 93.5%,
+DeepSeek-V4-Flash-Max 91.6%, DeepSeek-V3.2 (Thinking) 83.3%, MiniMax M2 83.0%, LongCat-Flash-Thinking
+82.8%, Nemotron 3 Super 81.2%, Grok-3 Mini 80.4%, Grok 4 Fast 80.0%, Grok-4 Heavy 79.4%.
+<a href="https://llm-stats.com/benchmarks/livecodebench">llm-stats.com</a></p>
+
+<p>None of Claude Fable/Opus 5, GPT-5.6, or Gemini 3.1 Pro appear in this tracker’s top 10. Most
+likely a submission-coverage gap in this one aggregator, not evidence those labs are weaker here.
+Gemini 3.1 Pro’s own card reports a different, harder variant, “LiveCodeBench Pro,” scored in Elo
+(2887) rather than percent-correct. Not comparable to the numbers above at all.
+<a href="https://deepmind.google/models/gemini/pro/">deepmind.google</a></p>
+
+<p><strong>Saturation.</strong> Moderate. The average across all 73 tracked models is 53.6%, well below the 93.5%
+leader. The benchmark still discriminates broadly, even as the open-weight frontier (DeepSeek,
+MiniMax) bunches near the top.</p>
+
+<h4 id="aider-polyglot-benchmark">Aider polyglot benchmark</h4>
+
+<p><strong>What it measures.</strong> 225 Exercism coding exercises across C++, Go, Java, JavaScript, Python, and
+Rust, scored on a two-stage pass rate (first attempt, then a refinement pass), tracking
+well-formed-edit-format compliance and cost per run alongside correctness.
+<a href="https://aider.chat/docs/leaderboards/">aider.chat/docs/leaderboards</a></p>
+
+<p><strong>Verified directly: this leaderboard is stale.</strong> Its own footer states last updated November 20,</p>
+<ol>
+  <li>Its top entries: <code class="language-plaintext highlighter-rouge">gpt-5</code> (high) 88.0%, <code class="language-plaintext highlighter-rouge">gpt-5</code> (medium) 86.7%, <code class="language-plaintext highlighter-rouge">o3-pro</code> (high) 84.9%, and
+Gemini 2.5 Pro Preview 83.1%. These predate the entire current model generation (Fable 5, Opus 5,
+GPT-5.6, Gemini 3.1 Pro all shipped after this snapshot).
+<a href="https://aider.chat/docs/leaderboards/">aider.chat/docs/leaderboards</a> As of July 2026, use this
+leaderboard for historical trend context only, never for a current ranking.</li>
+</ol>
+
+<h4 id="humaneval-and-mbpp-why-theyre-dead">HumanEval and MBPP: why they’re dead</h4>
+
+<p><strong>What they measured.</strong> HumanEval: 164 hand-written Python problems with docstrings and unit
+tests (an average of 7.7 tests per problem), testing basic algorithmic code generation. MBPP is
+the same generation-era sibling, similarly small, similarly public since roughly 2021.
+<a href="https://klu.ai/glossary/humaneval-benchmark">klu.ai</a></p>
+
+<p><strong>Why dead, in three parts.</strong></p>
+<ol>
+  <li><strong>Saturation.</strong> By mid-2024, models were already near-ceiling: GPT-4o via the LDB scaffold hit
+98.2% pass@1, GPT-4 reached 96.9%, and even Claude 3 Opus scored 84.9%. That left no headroom to
+discriminate frontier models. <a href="https://klu.ai/glossary/humaneval-benchmark">klu.ai</a></li>
+  <li><strong>Contamination.</strong> The problem sets have been public on GitHub for years: a well-recognized
+risk that current models have simply memorized them during pretraining.</li>
+  <li><strong>Narrow construct validity.</strong> Problems are short, interview-style, and purely algorithmic.
+They say nothing about repo-scale work, multi-file reasoning, code review, or test-writing.</li>
+</ol>
+
+<p><strong>Corroborating evidence.</strong> Neither Claude Opus 5’s nor Gemini 3.1 Pro’s current model card lists
+a HumanEval or MBPP score at all: the frontier labs themselves have stopped reporting them, which
+is itself informative. <a href="https://www.anthropic.com/news/claude-opus-5">anthropic.com/news/claude-opus-5</a> ·
+<a href="https://deepmind.google/models/gemini/pro/">deepmind.google</a></p>
+
+<h3 id="knowledge-and-reasoning">Knowledge and reasoning</h3>
+
+<h4 id="gpqa-diamond">GPQA Diamond</h4>
+
+<p><strong>What it measures.</strong> 198 multiple-choice questions in biology, physics, and chemistry: the
+“Diamond” subset is the hardest slice of the 448-question full GPQA set, written
+and vetted by domain PhDs specifically to be “Google-proof” (resistant to a skilled non-expert
+doing a web search). <a href="https://llm-stats.com/benchmarks/gpqa-diamond">llm-stats.com</a></p>
+
+<p><strong>Human baseline.</strong> PhD-level experts in the <em>relevant</em> domain score around 65% raw, rising to
+about 74% after excluding questions with identified errors in the answer key. The ceiling itself
+has a documented error rate, a known criticism of the dataset.
+<a href="https://llm-stats.com/benchmarks/gpqa-diamond">llm-stats.com</a></p>
+
+<p><strong>Current top.</strong> GPT-5.6 Sol and Claude Mythos Preview tied at 94.6% (no tools), per one tracker.
+<a href="https://llm-stats.com/benchmarks/gpqa-diamond">llm-stats.com</a> Google’s own Gemini 3.1 Pro card
+claims 94.3% and calls this “the highest GPQA Diamond score ever reported,” true at its February
+2026 launch, since edged out by the newer Sol/Mythos generation.
+<a href="https://deepmind.google/models/gemini/pro/">deepmind.google</a></p>
+
+<p><strong>Verification status.</strong> Zero of 232 tracked models on llm-stats.com carry an independently
+re-run GPQA Diamond result: every number above, including the ones just cited, is vendor
+self-reported. <a href="https://llm-stats.com/benchmarks/gpqa-diamond">llm-stats.com</a></p>
+
+<p><strong>Saturation.</strong> Effectively saturated: leading models now score <em>above</em> the expert human
+baseline, which raises a real question of whether remaining gains reflect genuine reasoning
+improvement or exploitation of the dataset’s own known answer-key errors.</p>
+
+<h4 id="aime-and-why-hmmt-matters">AIME (and why HMMT matters)</h4>
+
+<p><strong>What it measures.</strong> All 30 problems from a given year’s American Invitational Mathematics
+Examination (AIME I + II), integer answers 0 to 999, olympiad-level.
+<a href="https://llm-stats.com/benchmarks/aime-2025">llm-stats.com</a></p>
+
+<p><strong>Fully saturated on the 2025 paper.</strong> Five models hit a perfect 1.000: Grok-4 Heavy, GPT-5.2,
+Gemini 3 Pro, GPT-5.2 Pro, and the open-weight Kimi K2-Thinking-0905, with Claude Opus 4.6 close
+behind at 0.998. <a href="https://llm-stats.com/benchmarks/aime-2025">llm-stats.com</a></p>
+
+<p><strong>Why HMMT (Harvard-MIT Math Tournament) gets used instead.</strong> Once a given AIME year saturates,
+evaluators rotate to the freshest available contest specifically because a brand-new contest has
+had zero time to leak into a training corpus. Freshness (not the benchmark’s brand name) is
+what does the contamination-resistance work here. The same pattern holds for every
+contest-math benchmark in this catalog.</p>
+
+<p>A specific, current 2026 HMMT leaderboard couldn’t be located for this page. Treat any claimed
+current HMMT 2026 score as <strong>unverified</strong> until you check it against a live source yourself.</p>
+
+<h4 id="frontiermath">FrontierMath</h4>
+
+<p><strong>What it measures.</strong> Several hundred original, unpublished research-adjacent math problems
+across four difficulty tiers (undergraduate through open-research-level), authored and
+peer-reviewed by professional mathematicians, each typically requiring hours of expert effort.
+<a href="https://epoch.ai/benchmarks/frontiermath">epoch.ai</a></p>
+
+<p><strong>Anti-contamination design.</strong> Of 338 total problems, only 12 are public. Unless stated otherwise,
+every reported number corresponds to evaluation on the private sets.
+<a href="https://epoch.ai/benchmarks/frontiermath">epoch.ai</a></p>
+
+<p><strong>A page that contradicts its own table.</strong> One tracker’s descriptive prose still says current
+models “solve under 2% of problems,” almost certainly stale boilerplate copied from FrontierMath’s
+original 2024 launch commentary (describing GPT-4-era models) and never updated. That same page’s
+own summary statistics, elsewhere on the page, put the leader at 0.9 (90%) and the average at 0.3
+(30%) across the 17 models it tracks, consistent with its own per-model rows, where GPT-5.6 Sol
+sits at 89.0%. <a href="https://llm-stats.com/benchmarks/frontiermath">llm-stats.com</a> Trust the table over
+the prose, and treat the “under 2%” line as an artifact of an unmaintained page rather than a
+current fact.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Score</th>
+      <th>Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>GPT-5.6 Sol</td>
+      <td>89.0%</td>
+      <td><a href="https://llm-stats.com/benchmarks/frontiermath">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>GPT-5.6 Terra</td>
+      <td>84.9%</td>
+      <td><a href="https://llm-stats.com/benchmarks/frontiermath">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>GPT-5.6 Luna</td>
+      <td>78.6%</td>
+      <td><a href="https://llm-stats.com/benchmarks/frontiermath">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>GPT-5.4</td>
+      <td>47.6%</td>
+      <td><a href="https://llm-stats.com/benchmarks/frontiermath">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>GPT-5.2</td>
+      <td>40.3%</td>
+      <td><a href="https://llm-stats.com/benchmarks/frontiermath">llm-stats.com</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Other coverage of Gemini 3.1 Pro states it lost the FrontierMath comparison specifically to
+GPT-5.4, consistent with OpenAI leading this particular benchmark.
+<a href="https://smartscope.blog/en/generative-ai/google-gemini/gemini-3-1-pro-benchmark-analysis-2026/">smartscope.blog</a></p>
+
+<p><strong>Saturation.</strong> A tier-by-tier breakdown couldn’t be confirmed from a primary source for this
+page. The wide per-model spread (40% to 89%) alongside a 30% all-model average suggests real headroom
+remains overall, especially at the hardest, research-level tier. But that specific claim is
+<strong>unverified</strong> rather than sourced.</p>
+
+<h4 id="humanitys-last-exam-hle">Humanity’s Last Exam (HLE)</h4>
+
+<p><strong>What it measures.</strong> 2,500 expert-written multiple-choice and short-answer questions across
+math, humanities, and natural sciences, explicitly built as a successor once MMLU-class
+benchmarks saturated. <a href="https://llm-stats.com/benchmarks/humanitys-last-exam">llm-stats.com</a></p>
+
+<p><strong>The largest cross-source discrepancy on this whole page.</strong> Three sources, three dates, three
+very different pictures:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Source</th>
+      <th>Top scores (no tools unless noted)</th>
+      <th>Dataset date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Official CAIS/Scale site</td>
+      <td>Gemini 3 Pro 38.3%, GPT-5 25.3%, Grok 4 24.5%, Gemini 2.5 Pro 21.6%, Claude 4.5 Sonnet 13.7%, GPT-4o 2.7%</td>
+      <td>marked “updated April 3, 2025”</td>
+    </tr>
+    <tr>
+      <td>llm-stats.com aggregator</td>
+      <td>Claude Mythos Preview 64.7%, Claude Opus 5 64.7%, Claude Fable 5 64.5%, Kimi K3 (rank #9) 56.0% · 91 models, average 0.30</td>
+      <td>page dated ~July 2026</td>
+    </tr>
+    <tr>
+      <td>Gemini 3.1 Pro’s own card</td>
+      <td>44.4% no tools · 51.4% with search (blocklisted) + code access</td>
+      <td>vendor card, 2026</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Sources: <a href="https://agi.safe.ai/">agi.safe.ai</a> · <a href="https://llm-stats.com/benchmarks/humanitys-last-exam">llm-stats.com</a> ·
+<a href="https://deepmind.google/models/gemini/pro/">deepmind.google</a>. One tracker’s HLE table also
+lists a Meta model at 62.1% to 58.4%. Meta’s own attribution for that model couldn’t be confirmed
+from a primary source. So treat it as third-party-attested only.</p>
+
+<p>A partial reconciliation: the official site’s Gemini 3 Pro figure (38.3%, no tools) and Google’s
+own newer Gemini 3.1 Pro figure (44.4%, no tools) show a plausible, modest generational
+improvement, suggesting the official site isn’t wrong, just stale, since its own metadata admits
+an April 2025 dataset snapshot. The 64%+ Claude figures might reflect a genuinely large
+generational leap, an unlabeled tool-use condition, or aggregator error. This couldn’t be
+disambiguated from the sources available. <strong>Do not quote a single HLE number without stating its
+source, its date, and its tool-use condition.</strong></p>
+
+<p><strong>Verification status.</strong> Every number above is self-reported by the aggregator or vendor, not
+independently re-run.</p>
+
+<h4 id="arc-agi-1-arc-agi-2-arc-agi-3">ARC-AGI-1, ARC-AGI-2, ARC-AGI-3</h4>
+
+<p><strong>ARC-AGI-1</strong> measures abstract visual-puzzle generalization on static grids, designed to resist
+memorization through novel task composition. <strong>It is now considered saturated by its own
+creators.</strong> OpenAI’s o3 (December 2024) scored 75.7% on the semi-private eval at a
+“high-efficiency” compute tier and 87.5% at a “low-efficiency” tier using roughly 172x more
+compute. ARC Prize’s own post states plainly that “ARC-AGI-1 is now saturating.” It also notes that
+a large ensemble of cheap solutions can independently reach 81% on the private eval, precisely what
+motivated building ARC-AGI-2.
+<a href="https://arcprize.org/blog/oai-o3-pub-breakthrough">arcprize.org</a></p>
+
+<p><strong>ARC-AGI-2</strong> is the harder static-puzzle successor. A June 2025 ARC Prize post found “no clear
+winner” across every major reasoning system tested at that point. By 2026 the frontier moved
+substantially: Gemini 3.1 Pro’s own card reports <strong>77.1%</strong> under ARC Prize’s own Verified
+methodology, a large jump from the “no clear winner” era.
+<a href="https://deepmind.google/models/gemini/pro/">deepmind.google</a></p>
+
+<p><strong>ARC-AGI-3</strong>, announced March 25, 2026, is a different construct entirely: instead of static,
+one-shot puzzles, agents operate inside interactive game environments, must acquire goals on the
+fly, build world models, and adapt continuously, scored across time, not just a final answer,
+against a 100%-human-efficiency baseline. <a href="https://arcprize.org/arc-agi/3">arcprize.org/arc-agi/3</a>
+Anthropic’s Opus 5 announcement claims its score is “three times as high as the next-best model”
+on ARC-AGI-3 but doesn’t publish the absolute percentage. Treat that comparison as directionally
+sourced, the absolute number as <strong>unverified</strong>. <a href="https://www.anthropic.com/news/claude-opus-5">anthropic.com/news/claude-opus-5</a></p>
+
+<p><strong>Practical implication.</strong> “ARC-AGI” without a version number is now ambiguous between three
+benchmarks measuring three different things: saturated static puzzles (v1), active static puzzles
+(v2), and brand-new interactive agentic learning (v3).</p>
+
+<h3 id="broad-knowledge">Broad knowledge</h3>
+
+<h4 id="mmlu-and-mmlu-pro">MMLU and MMLU-Pro</h4>
+
+<p><strong>MMLU (original).</strong> The 57-subject multiple-choice benchmark that defined “broad knowledge”
+evaluation for years, now considered saturated, with frontier models exceeding 90% accuracy, the
+framing used to justify building HLE in the first place.
+<a href="https://llm-stats.com/benchmarks/humanitys-last-exam">llm-stats.com</a></p>
+
+<p><strong>MMLU-Pro</strong>, the harder successor: options expanded from 4 to 10 per question, trivial questions
+removed, and the set skewed toward reasoning-heavy items across 12,000+ questions in 14 domains.
+Chain-of-thought prompting measurably <em>helps</em> on MMLU-Pro where it didn’t reliably help on plain
+MMLU. Scores drop 16 to 33 points relative to MMLU on the same models: direct evidence the
+harder version still discriminates. <a href="https://llm-stats.com/benchmarks/mmlu-pro">llm-stats.com</a></p>
+
+<p><strong>Current top</strong> (one tracker, 129 tracked models): Qwen3.7 Max 89.6%, Qwen3.6 Plus 88.5%,
+Qwen3.7-Plus 88.5%, MiniMax M2.1 88.0%, Qwen3.5-397B-A17B 87.8%.
+<a href="https://llm-stats.com/benchmarks/mmlu-pro">llm-stats.com</a> No Claude/GPT/Gemini flagship appears
+in this specific top five: most likely a coverage gap in this one tracker rather than a
+capability gap, the same caveat as LiveCodeBench above.</p>
+
+<p><strong>Saturation.</strong> Not saturated per this source’s own framing: meaningful score spread remains
+across all 129 tracked models.</p>
+
+<h4 id="mmmu-and-mmmu-pro">MMMU (and MMMU-Pro)</h4>
+
+<p><strong>What it measures.</strong> 11,500 college-level multimodal questions (charts, diagrams, chemical
+structures) across six disciplines, 30 subjects, and 183 subfields, genuinely requiring image
+and text reasoning together rather than OCR-plus-guessing.
+<a href="https://llm-stats.com/benchmarks/mmmu">llm-stats.com</a></p>
+
+<p><strong>Current top</strong> (one tracker): Qwen3.6 Plus 86.0%, GPT-5.1 (three variants, tied) 85.4%, GPT-5
+84.2%, Qwen3.5-122B-A10B 83.9%, o3 82.9%, Gemini 2.5 Pro Preview 82.0%.
+<a href="https://llm-stats.com/benchmarks/mmmu">llm-stats.com</a> The same coverage caveat applies: no
+Fable 5, Opus 5, GPT-5.6, or Gemini 3.1 Pro visible in this top ten.</p>
+
+<p>Google separately reports Gemini 3.1 Pro at <strong>80.5%</strong> on “MMMU-Pro,” a distinct, harder variant,
+no tools, not directly comparable to the plain-MMMU numbers above. The “Pro” suffix is doing real
+work here, not just marketing. <a href="https://deepmind.google/models/gemini/pro/">deepmind.google</a></p>
+
+<p><strong>Saturation.</strong> Moderate: leader at 86.0%, average 67.3% across 63 tracked models, so real spread
+remains even though the top cluster (82% to 86%) is tight.</p>
+
+<h3 id="agentic-and-tool-use-benchmarks">Agentic and tool-use benchmarks</h3>
+
+<h4 id="tau-bench-and-tau2-bench">tau-bench and tau2-bench</h4>
+
+<p><strong>tau-bench</strong> (Sierra Research): agents must complete tasks in airline and retail domains by
+calling tools correctly while conversing with a simulated user, under written policy constraints.
+Its signature contribution is the <strong>pass^k</strong> metric (the success rate when the <em>same</em> task is
+attempted k times), built specifically to expose reliability problems a single pass/fail run
+hides. In the original paper, <code class="language-plaintext highlighter-rouge">gpt-4o</code> succeeded on under 50% of tasks on a single attempt. Its
+pass^8 (eight repeated attempts) fell below 25% on retail. A model that “passes” a task once
+often can’t repeat that success reliably. <a href="https://arxiv.org/abs/2406.12045">arxiv.org/abs/2406.12045</a></p>
+
+<p><strong>tau2-bench</strong> adds a Telecom domain and, critically, lets the simulated <em>user</em> modify shared
+world state too: a customer performing a phone-side action themselves rather than only
+requesting it. Performance drops significantly moving from a no-user to a dual-control setting. The
+framework separates reasoning failures from communication failures.
+<a href="https://arxiv.org/abs/2506.07982">arxiv.org/abs/2506.07982</a></p>
+
+<p><strong>Conflicting current numbers.</strong> One llm-stats.com tracker (~July 2026) shows Step-3.5-Flash
+leading at 88.2%, then GLM-4.7 87.4%, MiMo-V2-Flash 80.3%, GLM-4.7-Flash 79.5%, MiniMax M2 77.2%,
+with <code class="language-plaintext highlighter-rouge">o3</code> trailing at 63.0%. <a href="https://llm-stats.com/benchmarks/tau-bench">llm-stats.com</a> That’s
+dramatically lower than Google’s own Gemini 3.1 Pro card, which reports <strong>90.8%</strong> on τ2-bench
+Retail and <strong>99.3%</strong> on τ2-bench Telecom. <a href="https://deepmind.google/models/gemini/pro/">deepmind.google</a>
+The gap strongly suggests the llm-stats.com tracker is scoring the older, harder-for-agents
+original tau-bench (or a different split) rather than τ2-bench proper. This is flagged as
+unresolved. Do not merge these two number sets.</p>
+
+<p>Artificial Analysis independently builds “τ³-Banking” as one input into its own composite index,
+a third variant in the same family, again not directly comparable to the two above.
+<a href="https://artificialanalysis.ai/">artificialanalysis.ai</a></p>
+
+<h4 id="bfcl-berkeley-function-calling-leaderboard">BFCL (Berkeley Function-Calling Leaderboard)</h4>
+
+<p><strong>What it measures.</strong> Accuracy of function/tool-call generation, checked via Abstract Syntax Tree
+comparison against ground truth, across simple, multiple, parallel, and relevance-detection
+categories in Python, Java, JavaScript, and REST-API contexts.
+<a href="https://gorilla.cs.berkeley.edu/leaderboard.html">gorilla.cs.berkeley.edu</a></p>
+
+<p><strong>Current standings: unverified, and a genuinely useful cautionary tale.</strong> The official Berkeley
+leaderboard is JavaScript-rendered and returned no tabular data to automated fetching. The one
+aggregator found with BFCL numbers shows a table topped by Llama 3.1 405B/70B/8B Instruct (models
+from mid-2024) despite the page’s own metadata claiming “last updated July 26, 2026.”
+<a href="https://llm-stats.com/benchmarks/bfcl">llm-stats.com</a> This is the clearest concrete proof found
+anywhere in this research that a tracker’s “last updated” timestamp can’t be trusted at face
+value. <strong>Do not cite a current BFCL number from a scraped copy. Check Berkeley’s live,
+JS-rendered site directly.</strong></p>
+
+<h3 id="composite-and-index-benchmarks">Composite and index benchmarks</h3>
+
+<h4 id="lmarena--arenaai-formerly-chatbot-arena">LMArena / Arena.ai (formerly Chatbot Arena)</h4>
+
+<p><strong>What it measures.</strong> Human pairwise preference votes between two anonymized model outputs,
+aggregated into an Elo-style rating, across Text, Agent, Code, and Vision categories. <code class="language-plaintext highlighter-rouge">lmarena.ai</code>
+now redirects to <code class="language-plaintext highlighter-rouge">arena.ai</code>. <a href="https://arena.ai/leaderboard/text">arena.ai/leaderboard/text</a></p>
+
+<p><strong>Methodology, as stated live.</strong> Rankings are drawn from 7,430,560 votes across 378 models in the
+“Overall” Text category, with filters for factuality standards, license type, pricing, and context
+length. Scores carry ± confidence intervals and a “High confidence” vs. “Preliminary” label
+depending on vote volume. Data current through July 21, 2026.
+<a href="https://arena.ai/leaderboard/text">arena.ai/leaderboard/text</a></p>
+
+<p><strong>What Elo does and doesn’t measure.</strong> Raw stylistic preference under blind pairwise comparison,
+on whatever prompts real site visitors happen to type. It’s <em>not</em> a correctness benchmark. It’s
+well documented that longer, more confident-sounding, more pleasantly formatted answers tend to
+win votes independent of factual accuracy. The site’s own use of confidence intervals and a
+“Preliminary” label is itself an acknowledgment that vote-driven rankings are statistically noisy,
+especially for newly added models. Use Arena rank as a proxy for “what will feel good in a chat
+product,” not for “which model gets a hard task right.”</p>
+
+<h4 id="artificial-analysis-intelligence-index">Artificial Analysis Intelligence Index</h4>
+
+<p><strong>What it is.</strong> A composite score (v4.1 at the time of this research) built by weighting nine
+underlying evaluations: GDPval-AA v2, τ³-Banking, Terminal-Bench v2.1, SciCode, Humanity’s Last
+Exam, GPQA Diamond, CritPt, AA-Omniscience, and AA-LCR (long-context reasoning).
+<a href="https://artificialanalysis.ai/">artificialanalysis.ai</a></p>
+
+<p><strong>A footnote that changes cost, not score.</strong> The site explicitly notes Anthropic charges a
+separate cache-write fee on top of normal input pricing, while OpenAI and DeepSeek “typically
+charge only cache-hit pricing with no write or storage fee,” a structural pricing difference that
+changes effective cost-per-task independent of any benchmark result.
+<a href="https://artificialanalysis.ai/">artificialanalysis.ai</a></p>
+
+<blockquote>
+  <p><strong>Note</strong>: Artificial Analysis’s own site states different totals for “models tracked”
+depending on the view (586 listed overall, 170 evaluated on the Intelligence Index at the time
+of this research). Any leaderboard rank you see quoted as “#N of M” should be treated as
+approximate on the denominator, not a fixed site-wide figure.</p>
+</blockquote>
+
+<h4 id="valsai-independent-third-party-evaluator">Vals.ai (independent third-party evaluator)</h4>
+
+<p><strong>What it is.</strong> An organization that runs its own evaluations rather than relying on vendor
+self-reports: “We run all of our own evaluations and create many of our benchmarks in-house.”
+<a href="https://www.vals.ai/">vals.ai</a> It tracks SWE-bench, Terminal-Bench 2.1, LiveCodeBench, GPQA
+Diamond, MMLU Pro, and MMMU alongside a set of original in-house benchmarks, rolled up into a
+composite “Vals Index.”</p>
+
+<figure>
+<svg viewBox="0 0 720 220" role="img" aria-labelledby="dgm-life-title dgm-life-desc">
+<title id="dgm-life-title">Where each benchmark sits on the saturation spectrum</title>
+<desc id="dgm-life-desc">A horizontal spectrum from "dead, no headroom" through "saturated at the frontier" and "still discriminating" to "real headroom remains," with representative benchmarks placed along it based on the saturation evidence discussed on this page.</desc>
+<rect class="dgm-panel" x="4" y="4" width="712" height="212" rx="3" />
+<text class="dgm-title" x="24" y="28">A benchmark's usefulness has a lifecycle</text>
+
+<path class="dgm-flow" d="M50 150 L670 150" />
+<path class="dgm-flow" d="M660 145 L672 150 L660 155" />
+
+<!-- ticks / zone captions -->
+<text class="dgm-label-sm" x="120" y="185" text-anchor="middle">Dead — no headroom</text>
+<text class="dgm-label-sm" x="280" y="185" text-anchor="middle">Saturated at the frontier</text>
+<text class="dgm-label-sm" x="440" y="185" text-anchor="middle">Still discriminating</text>
+<text class="dgm-label-sm" x="600" y="185" text-anchor="middle">Real headroom remains</text>
+
+<!-- chips row A (upper) -->
+<path class="dgm-line" d="M120 150 L120 108" />
+<text class="dgm-label-sm" x="120" y="98" text-anchor="middle">HumanEval / MBPP</text>
+
+<path class="dgm-line" d="M280 150 L280 108" />
+<text class="dgm-label-sm" x="280" y="98" text-anchor="middle">GPQA Diamond</text>
+
+<path class="dgm-line" d="M390 150 L390 108" />
+<text class="dgm-label-sm" x="390" y="98" text-anchor="middle">LiveCodeBench</text>
+
+<path class="dgm-line" d="M530 150 L530 108" />
+<text class="dgm-label-sm" x="530" y="98" text-anchor="middle">HLE</text>
+
+<!-- chips row B (lower, closer to line) -->
+<path class="dgm-line" d="M230 150 L230 128" />
+<text class="dgm-label-sm" x="230" y="118" text-anchor="middle">AIME 2025</text>
+
+<path class="dgm-line" d="M330 150 L330 128" />
+<text class="dgm-label-sm" x="330" y="118" text-anchor="middle">SWE-bench Verified</text>
+
+<path class="dgm-line" d="M460 150 L460 128" />
+<text class="dgm-label-sm" x="460" y="118" text-anchor="middle">MMLU-Pro / MMMU</text>
+
+<path class="dgm-line" d="M610 150 L610 128" />
+<text class="dgm-label-sm" x="610" y="118" text-anchor="middle">FrontierMath (private) / ARC-AGI-2</text>
+</svg>
+<figcaption><strong>A benchmark migrates along this line as models improve. It stops being
+useful for comparing frontier models the moment it reaches the right-hand zone's opposite end.</strong>
+This is a categorization of the evidence discussed on this page, not a new measurement: SWE-bench
+Verified, for instance, still has real headroom below the frontier even though the top models have
+exhausted it.</figcaption>
+</figure>
+
+<hr />
+
+<h2 id="part-2-the-leaderboard-directory">Part 2: The leaderboard directory</h2>
+
+<p>This is the direct-link table. Every benchmark discussed above, what it’s actually good for
+telling you, and where to go check today’s number yourself.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Benchmark</th>
+      <th>Good for</th>
+      <th>Live leaderboard / benchmark home</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SWE-bench Verified</td>
+      <td>Isolated, well-specified GitHub issue fixing</td>
+      <td><a href="https://www.vals.ai/benchmarks/swebench">vals.ai</a> (independent) · <a href="https://github.com/princeton-nlp/SWE-bench">repo</a></td>
+    </tr>
+    <tr>
+      <td>SWE-bench Pro</td>
+      <td>Harder, contamination-resistant repo work (read the split)</td>
+      <td><a href="https://labs.scale.com/leaderboard/swe_bench_pro_public">Scale AI public split</a> · <a href="https://www.morphllm.com/swe-bench-pro">benchmark home</a></td>
+    </tr>
+    <tr>
+      <td>Terminal-Bench 2.x</td>
+      <td>Operating a real dev environment (read the harness)</td>
+      <td><a href="https://www.tbench.ai/">tbench.ai</a> · <a href="https://llm-stats.com/benchmarks/terminal-bench-2">llm-stats.com tracker</a></td>
+    </tr>
+    <tr>
+      <td>LiveCodeBench</td>
+      <td>Contamination-resistant competitive programming</td>
+      <td><a href="https://llm-stats.com/benchmarks/livecodebench">llm-stats.com tracker</a></td>
+    </tr>
+    <tr>
+      <td>Aider polyglot</td>
+      <td>Multi-language edit-format coding, historical trend only, stale since Nov 2025</td>
+      <td><a href="https://aider.chat/docs/leaderboards/">aider.chat/docs/leaderboards</a></td>
+    </tr>
+    <tr>
+      <td>HumanEval / MBPP</td>
+      <td>Nothing current, retired, saturated, contaminated</td>
+      <td><a href="https://klu.ai/glossary/humaneval-benchmark">background only</a>, no current leaderboard worth citing</td>
+    </tr>
+    <tr>
+      <td>GPQA Diamond</td>
+      <td>Graduate-level science reasoning, near-ceiling</td>
+      <td><a href="https://llm-stats.com/benchmarks/gpqa-diamond">llm-stats.com tracker</a></td>
+    </tr>
+    <tr>
+      <td>AIME 2025</td>
+      <td>Olympiad math, fully saturated, historical only</td>
+      <td><a href="https://llm-stats.com/benchmarks/aime-2025">llm-stats.com tracker</a></td>
+    </tr>
+    <tr>
+      <td>HMMT</td>
+      <td>The “next AIME” once a given year saturates</td>
+      <td>not located this session, treat any 2026 score as unverified</td>
+    </tr>
+    <tr>
+      <td>FrontierMath</td>
+      <td>Research-level math with real headroom, private set only</td>
+      <td><a href="https://epoch.ai/benchmarks/frontiermath">Epoch AI</a> · <a href="https://llm-stats.com/benchmarks/frontiermath">llm-stats.com tracker</a> (trust the table, not the prose)</td>
+    </tr>
+    <tr>
+      <td>Humanity’s Last Exam</td>
+      <td>The hardest broad knowledge+reasoning test currently public</td>
+      <td><a href="https://agi.safe.ai/">agi.safe.ai</a> (official) · <a href="https://llm-stats.com/benchmarks/humanitys-last-exam">llm-stats.com tracker</a></td>
+    </tr>
+    <tr>
+      <td>ARC-AGI-1</td>
+      <td>Retired, static puzzle generalization, saturated</td>
+      <td><a href="https://arcprize.org/blog/oai-o3-pub-breakthrough">ARC Prize write-up</a></td>
+    </tr>
+    <tr>
+      <td>ARC-AGI-2</td>
+      <td>Harder static puzzle generalization, still active</td>
+      <td><a href="https://arcprize.org/">arcprize.org</a> (live table is JS-rendered, open it directly)</td>
+    </tr>
+    <tr>
+      <td>ARC-AGI-3</td>
+      <td>Interactive, continuous-learning agent evaluation</td>
+      <td><a href="https://arcprize.org/arc-agi/3">arcprize.org/arc-agi/3</a></td>
+    </tr>
+    <tr>
+      <td>MMLU-Pro</td>
+      <td>Broad knowledge with real discriminating power</td>
+      <td><a href="https://llm-stats.com/benchmarks/mmlu-pro">llm-stats.com tracker</a></td>
+    </tr>
+    <tr>
+      <td>MMMU / MMMU-Pro</td>
+      <td>Multimodal college-level reasoning</td>
+      <td><a href="https://llm-stats.com/benchmarks/mmmu">llm-stats.com tracker</a></td>
+    </tr>
+    <tr>
+      <td>tau-bench / tau2-bench</td>
+      <td>Multi-turn tool use with a simulated user (read pass^k)</td>
+      <td><a href="https://llm-stats.com/benchmarks/tau-bench">llm-stats.com tracker</a> (variant unclear) · <a href="https://arxiv.org/abs/2506.07982">τ2-bench paper</a></td>
+    </tr>
+    <tr>
+      <td>BFCL</td>
+      <td>Function/tool-call correctness, sound method, unverifiable current numbers</td>
+      <td><a href="https://gorilla.cs.berkeley.edu/leaderboard.html">official, JS-rendered</a>, open it live</td>
+    </tr>
+    <tr>
+      <td>LMArena / Arena.ai</td>
+      <td>Everyday conversational preference, not correctness</td>
+      <td><a href="https://arena.ai/leaderboard/text">arena.ai/leaderboard/text</a></td>
+    </tr>
+    <tr>
+      <td>Artificial Analysis Intelligence Index</td>
+      <td>One rough composite sort across many evals, cost overlaid</td>
+      <td><a href="https://artificialanalysis.ai/models">artificialanalysis.ai/models</a></td>
+    </tr>
+    <tr>
+      <td>Vals Index</td>
+      <td>An independent org’s own composite, not vendor self-report</td>
+      <td><a href="https://www.vals.ai/">vals.ai</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="where-each-lab-publishes-its-own-numbers">Where each lab publishes its own numbers</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Vendor</th>
+      <th>Current flagship(s), as of July 2026</th>
+      <th>Where their numbers live</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Fable 5 (GA), Claude Opus 5, Claude Mythos 5 (invite-only)</td>
+      <td><a href="https://platform.claude.com/docs/en/about-claude/models/overview">model overview</a> · <a href="https://www.anthropic.com/news">news/launch posts</a></td>
+      <td>Opus 5’s own launch post reports zero SWE-bench, Terminal-Bench, or GPQA numbers. It leads with proprietary comparisons instead. See Part 3.</td>
+    </tr>
+    <tr>
+      <td>OpenAI</td>
+      <td>GPT-5.6 (Luna &lt; Terra &lt; Sol tiers)</td>
+      <td><a href="https://developers.openai.com/api/docs/pricing">pricing &amp; model list</a> · <a href="https://openai.com/index/gpt-5-6/">model card</a></td>
+      <td>The model card returned an access error to automated fetch during this research. Every GPT-5.6 number on this page comes from third-party trackers, not OpenAI’s own page.</td>
+    </tr>
+    <tr>
+      <td>Google DeepMind</td>
+      <td>Gemini 3.1 Pro (GA), Gemini 3.5 Pro (limited preview)</td>
+      <td><a href="https://deepmind.google/models/gemini/pro/">model card</a></td>
+      <td>The most rigorously footnoted vendor card found in this research: it states harness names, tool conditions, and attempt counts where most vendors don’t.</td>
+    </tr>
+    <tr>
+      <td>xAI</td>
+      <td>Grok 4.5</td>
+      <td><a href="https://docs.x.ai/docs/models">model/API reference</a></td>
+      <td>xAI’s own detailed benchmark card wasn’t reachable in this research. The figures cited here come from press coverage of the launch, a thinner source than a primary card.</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="part-3-current-standings-july-2026">Part 3: Current standings, July 2026</h2>
+
+<p>Every row below is dated and typed as <strong>vendor-reported</strong> or <strong>independent</strong> (a third party
+running its own harness, not relaying the vendor’s claim). Where sources disagree, both are kept.
+See Part 1 for why.</p>
+
+<h3 id="swe-bench-verified">SWE-bench Verified</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Score</th>
+      <th>Type</th>
+      <th>Source</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Claude Opus 5</td>
+      <td>97.0%</td>
+      <td>Independent</td>
+      <td><a href="https://www.vals.ai/benchmarks/swebench">vals.ai</a></td>
+      <td>Jul 22, 2026</td>
+    </tr>
+    <tr>
+      <td>GPT-5.6 Sol</td>
+      <td>96.2%</td>
+      <td>Independent</td>
+      <td><a href="https://www.vals.ai/benchmarks/swebench">vals.ai</a></td>
+      <td>Jul 22, 2026</td>
+    </tr>
+    <tr>
+      <td>Claude Fable 5</td>
+      <td>95.0%</td>
+      <td>Independent</td>
+      <td><a href="https://www.vals.ai/benchmarks/swebench">vals.ai</a></td>
+      <td>Jul 22, 2026</td>
+    </tr>
+    <tr>
+      <td>Kimi K3</td>
+      <td>93.4%</td>
+      <td>Independent</td>
+      <td><a href="https://www.vals.ai/benchmarks/swebench">vals.ai</a></td>
+      <td>Jul 22, 2026</td>
+    </tr>
+    <tr>
+      <td>GPT-5.6 Luna</td>
+      <td>93.0%</td>
+      <td>Independent</td>
+      <td><a href="https://www.vals.ai/benchmarks/swebench">vals.ai</a></td>
+      <td>Jul 22, 2026</td>
+    </tr>
+    <tr>
+      <td>Claude Opus 4.8</td>
+      <td>88.6%</td>
+      <td>Independent</td>
+      <td><a href="https://www.vals.ai/benchmarks/swebench">vals.ai</a></td>
+      <td>Jul 22, 2026</td>
+    </tr>
+    <tr>
+      <td>Grok 4.5</td>
+      <td>86.6%</td>
+      <td>Independent</td>
+      <td><a href="https://www.vals.ai/benchmarks/swebench">vals.ai</a></td>
+      <td>Jul 22, 2026</td>
+    </tr>
+    <tr>
+      <td>Gemini 3.1 Pro</td>
+      <td>80.6% (single attempt)</td>
+      <td>Vendor-reported</td>
+      <td><a href="https://deepmind.google/models/gemini/pro/">deepmind.google</a></td>
+      <td>vendor card, 2026</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="swe-bench-pro-do-not-compare-rows-without-reading-part-1s-split-discussion">SWE-bench Pro (do not compare rows without reading Part 1’s split discussion)</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Score</th>
+      <th>Split</th>
+      <th>Type</th>
+      <th>Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Claude Mythos 5</td>
+      <td>80.3%</td>
+      <td>likely public</td>
+      <td>Independent tracker</td>
+      <td><a href="https://benchlm.ai/benchmarks/swePro">benchlm.ai</a></td>
+    </tr>
+    <tr>
+      <td>Claude Fable 5</td>
+      <td>80.0%</td>
+      <td>likely public</td>
+      <td>Independent tracker</td>
+      <td><a href="https://benchlm.ai/benchmarks/swePro">benchlm.ai</a></td>
+    </tr>
+    <tr>
+      <td>Claude Opus 5</td>
+      <td>79.2%</td>
+      <td>likely public</td>
+      <td>Independent tracker</td>
+      <td><a href="https://benchlm.ai/benchmarks/swePro">benchlm.ai</a></td>
+    </tr>
+    <tr>
+      <td>Claude Opus 4.8</td>
+      <td>69.2%</td>
+      <td>unclear</td>
+      <td>Aggregated, split unconfirmed</td>
+      <td>llm-stats.com</td>
+    </tr>
+    <tr>
+      <td>GPT-5.4 (xHigh)</td>
+      <td>59.1%</td>
+      <td>public, standardized</td>
+      <td>Independent</td>
+      <td><a href="https://labs.scale.com/leaderboard/swe_bench_pro_public">labs.scale.com</a></td>
+    </tr>
+    <tr>
+      <td>Gemini 3.1 Pro</td>
+      <td>54.2%</td>
+      <td>public, single attempt</td>
+      <td>Vendor-reported</td>
+      <td><a href="https://deepmind.google/models/gemini/pro/">deepmind.google</a></td>
+    </tr>
+    <tr>
+      <td>Claude Opus 4.6</td>
+      <td>47.1%</td>
+      <td>private/commercial</td>
+      <td>Independent</td>
+      <td>Scale AI data, secondary synthesis</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="gpqa-diamond-1">GPQA Diamond</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Score</th>
+      <th>Type</th>
+      <th>Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>GPT-5.6 Sol</td>
+      <td>94.6%</td>
+      <td>Vendor-reported (no independent re-run tracked)</td>
+      <td><a href="https://llm-stats.com/benchmarks/gpqa-diamond">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>Claude Mythos Preview</td>
+      <td>94.6%</td>
+      <td>Vendor-reported</td>
+      <td><a href="https://llm-stats.com/benchmarks/gpqa-diamond">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>Gemini 3.1 Pro</td>
+      <td>94.3%</td>
+      <td>Vendor-reported</td>
+      <td><a href="https://deepmind.google/models/gemini/pro/">deepmind.google</a></td>
+    </tr>
+    <tr>
+      <td>Human PhD baseline</td>
+      <td>65% raw / 74% error-corrected</td>
+      <td>Reference point</td>
+      <td><a href="https://llm-stats.com/benchmarks/gpqa-diamond">llm-stats.com</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="humanitys-last-exam-see-part-1-for-the-full-discrepancy">Humanity’s Last Exam (see Part 1 for the full discrepancy)</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Score</th>
+      <th>Tool condition</th>
+      <th>Type</th>
+      <th>Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Claude Mythos Preview</td>
+      <td>64.7%</td>
+      <td>unspecified</td>
+      <td>Vendor-reported (via aggregator)</td>
+      <td><a href="https://llm-stats.com/benchmarks/humanitys-last-exam">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>Claude Opus 5</td>
+      <td>64.7%</td>
+      <td>unspecified</td>
+      <td>Vendor-reported (via aggregator)</td>
+      <td><a href="https://llm-stats.com/benchmarks/humanitys-last-exam">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>Claude Fable 5</td>
+      <td>64.5%</td>
+      <td>unspecified</td>
+      <td>Vendor-reported (via aggregator)</td>
+      <td><a href="https://llm-stats.com/benchmarks/humanitys-last-exam">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>Gemini 3.1 Pro</td>
+      <td>51.4%</td>
+      <td>search (blocklisted) + code</td>
+      <td>Vendor-reported</td>
+      <td><a href="https://deepmind.google/models/gemini/pro/">deepmind.google</a></td>
+    </tr>
+    <tr>
+      <td>Gemini 3.1 Pro</td>
+      <td>44.4%</td>
+      <td>no tools</td>
+      <td>Vendor-reported</td>
+      <td><a href="https://deepmind.google/models/gemini/pro/">deepmind.google</a></td>
+    </tr>
+    <tr>
+      <td>Gemini 3 Pro</td>
+      <td>38.3%</td>
+      <td>no tools</td>
+      <td>Independent (official site)</td>
+      <td><a href="https://agi.safe.ai/">agi.safe.ai</a>, snapshot Apr 3, 2025</td>
+    </tr>
+    <tr>
+      <td>GPT-5</td>
+      <td>25.3%</td>
+      <td>no tools</td>
+      <td>Independent (official site)</td>
+      <td><a href="https://agi.safe.ai/">agi.safe.ai</a>, snapshot Apr 3, 2025</td>
+    </tr>
+    <tr>
+      <td>Claude 4.5 Sonnet</td>
+      <td>13.7%</td>
+      <td>no tools</td>
+      <td>Independent (official site)</td>
+      <td><a href="https://agi.safe.ai/">agi.safe.ai</a>, snapshot Apr 3, 2025</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="arc-agi-2">ARC-AGI-2</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Score</th>
+      <th>Type</th>
+      <th>Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Gemini 3.1 Pro</td>
+      <td>77.1% (ARC Prize Verified)</td>
+      <td>Vendor-reported</td>
+      <td><a href="https://deepmind.google/models/gemini/pro/">deepmind.google</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Only one primary-sourced ARC-AGI-2 number was recoverable this session. Treat this as a single
+data point, not a ranked leaderboard.</p>
+
+<h3 id="aime-2025-saturated--shown-for-reference-only">AIME 2025 (saturated — shown for reference only)</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Score</th>
+      <th>Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Grok-4 Heavy</td>
+      <td>100.0%</td>
+      <td><a href="https://llm-stats.com/benchmarks/aime-2025">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>GPT-5.2</td>
+      <td>100.0%</td>
+      <td><a href="https://llm-stats.com/benchmarks/aime-2025">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>Gemini 3 Pro</td>
+      <td>100.0%</td>
+      <td><a href="https://llm-stats.com/benchmarks/aime-2025">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>GPT-5.2 Pro</td>
+      <td>100.0%</td>
+      <td><a href="https://llm-stats.com/benchmarks/aime-2025">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>Kimi K2-Thinking-0905 (open)</td>
+      <td>100.0%</td>
+      <td><a href="https://llm-stats.com/benchmarks/aime-2025">llm-stats.com</a></td>
+    </tr>
+    <tr>
+      <td>Claude Opus 4.6</td>
+      <td>99.8%</td>
+      <td><a href="https://llm-stats.com/benchmarks/aime-2025">llm-stats.com</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="lmarena--arenaai-text-overall-top-15">LMArena / Arena.ai: Text, Overall (top 15)</h3>
+
+<p>Independent (human vote-based). Data current through July 21, 2026.
+<a href="https://arena.ai/leaderboard/text">arena.ai/leaderboard/text</a></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Rank</th>
+      <th>Model</th>
+      <th>Score</th>
+      <th>Confidence</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td><code class="language-plaintext highlighter-rouge">claude-fable-5</code></td>
+      <td>1507 ± 6</td>
+      <td>High</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><code class="language-plaintext highlighter-rouge">claude-opus-4-6-thinking</code></td>
+      <td>1505 ± 4</td>
+      <td>High</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><code class="language-plaintext highlighter-rouge">claude-opus-4-7-thinking</code></td>
+      <td>1502 ± 4</td>
+      <td>High</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><code class="language-plaintext highlighter-rouge">claude-opus-4-6</code></td>
+      <td>1498 ± 4</td>
+      <td>High</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><code class="language-plaintext highlighter-rouge">muse-spark-1.1</code></td>
+      <td>1495 ± 7</td>
+      <td>Preliminary</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td><code class="language-plaintext highlighter-rouge">claude-opus-4-7</code></td>
+      <td>1494 ± 4</td>
+      <td>High</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td><code class="language-plaintext highlighter-rouge">muse-spark</code></td>
+      <td>1488 ± 6</td>
+      <td>Preliminary</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td><code class="language-plaintext highlighter-rouge">gemini-3.1-pro-preview</code></td>
+      <td>1486 ± 4</td>
+      <td>High</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td><code class="language-plaintext highlighter-rouge">gemini-3-pro</code></td>
+      <td>1486 ± 4</td>
+      <td>High</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td><code class="language-plaintext highlighter-rouge">kimi-k3</code></td>
+      <td>1486 ± 10</td>
+      <td>Preliminary</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td><code class="language-plaintext highlighter-rouge">gpt-5.6-sol-xhigh</code></td>
+      <td>1485 ± 8</td>
+      <td>High</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td><code class="language-plaintext highlighter-rouge">gemini-3.6-flash</code></td>
+      <td>1485 ± 9</td>
+      <td>Preliminary</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td><code class="language-plaintext highlighter-rouge">claude-opus-4-8-thinking</code></td>
+      <td>1484 ± 5</td>
+      <td>High</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td><code class="language-plaintext highlighter-rouge">gpt-5.5-high</code></td>
+      <td>1482 ± 4</td>
+      <td>High</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td><code class="language-plaintext highlighter-rouge">gpt-5.4-high</code></td>
+      <td>1478 ± 4</td>
+      <td>High</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Claude Opus 5 and base (non-<code class="language-plaintext highlighter-rouge">xhigh</code>) GPT-5.6 Sol aren’t in this top-15 slice as fetched. A
+further-refined pull would be needed to locate their exact rank. The <code class="language-plaintext highlighter-rouge">muse-spark</code> entries are
+attested by this tracker only. No official Meta model card was reachable to confirm specs.</p>
+
+<h3 id="artificial-analysis-intelligence-index-v41-partial">Artificial Analysis Intelligence Index v4.1 (partial)</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Score</th>
+      <th>Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Claude Opus 5 (Max effort)</td>
+      <td>61</td>
+      <td><a href="https://artificialanalysis.ai/models">artificialanalysis.ai/models</a></td>
+    </tr>
+    <tr>
+      <td>Claude Opus 5 (xHigh effort)</td>
+      <td>60</td>
+      <td><a href="https://artificialanalysis.ai/models">artificialanalysis.ai/models</a></td>
+    </tr>
+    <tr>
+      <td>Claude Fable 5 (Max effort)</td>
+      <td>60</td>
+      <td><a href="https://artificialanalysis.ai/models">artificialanalysis.ai/models</a></td>
+    </tr>
+    <tr>
+      <td>GPT-5.6 Sol (max)</td>
+      <td>59</td>
+      <td><a href="https://artificialanalysis.ai/models">artificialanalysis.ai/models</a></td>
+    </tr>
+    <tr>
+      <td>Claude Opus 5 (High effort)</td>
+      <td>59</td>
+      <td><a href="https://artificialanalysis.ai/models">artificialanalysis.ai/models</a></td>
+    </tr>
+    <tr>
+      <td>Grok 4.5</td>
+      <td>54</td>
+      <td>reported at rank #13 on Artificial Analysis’s own page for the model, and separately reported as #1 on the index’s agentic-tool-use sub-component, per <a href="https://artificialanalysis.ai/models/grok-4-5">artificialanalysis.ai/models/grok-4-5</a> · sub-component claim via <a href="https://techcrunch.com/2026/07/08/spacexai-releases-grok-4-5-which-elon-describes-as-an-opus-class-model/">techcrunch.com</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Note the cluster of top scores sits at 59 to 61. Grok 4.5’s 54 trails that cluster, it isn’t inside
+it. See the denominator note in Part 1 before repeating any “#N” rank from this table.</p>
+
+<h3 id="vals-index-independent-composite">Vals Index (independent composite)</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Score</th>
+      <th>Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Claude Fable 5</td>
+      <td>75.14%</td>
+      <td><a href="https://www.vals.ai/">vals.ai</a></td>
+    </tr>
+    <tr>
+      <td>Claude Opus 5</td>
+      <td>74.82%</td>
+      <td><a href="https://www.vals.ai/">vals.ai</a></td>
+    </tr>
+    <tr>
+      <td>Kimi K3</td>
+      <td>74.70%</td>
+      <td><a href="https://www.vals.ai/">vals.ai</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="part-4-reading-a-benchmark-number-honestly">Part 4: Reading a benchmark number honestly</h2>
+
+<p>This is the part worth reading even if you skip everything else.</p>
+
+<h3 id="why-scores-are-systematically-overstated">Why scores are systematically overstated</h3>
+
+<ol>
+  <li><strong>Contamination.</strong> Any benchmark built from public data (GitHub PRs, contest archives,
+textbook question banks) risks being seen, verbatim or near-verbatim, during pretraining.
+This is <em>the</em> reason HumanEval and MBPP are dead, and why FrontierMath, LiveCodeBench, and
+fresh-year AIME/HMMT all deliberately hold out or time-window their problems.</li>
+  <li><strong>Unreported or mismatched scaffolding.</strong> The Terminal-Bench spread alone (roughly 68% to 92%
+for supposedly similar model tiers) shows that the agent harness wrapped around a model can
+move the number more than the underlying weights do. A bare model name with no stated harness
+is an incomplete citation. See <a href="/projects/dokidex/learn/agents/">Coding agents</a> for what
+a harness actually is.</li>
+  <li><strong>Best-of-n / pass@k inflation, and its inverse.</strong> Some vendor numbers reflect a single
+attempt (Google’s own card explicitly labels its SWE-bench Verified/Pro numbers “single
+attempt”) while others reflect majority voting or the best of several tries. tau-bench’s own
+designers built the <strong>pass^k</strong> metric specifically because pass@1 numbers hide catastrophic
+reliability drops under repetition (<code class="language-plaintext highlighter-rouge">gpt-4o</code>: under 50% pass@1, under 25% pass^8 on retail). A
+“% solved” number without stating attempts-per-task and the aggregation rule isn’t comparable
+across vendors.</li>
+  <li><strong>Effort-tier and “extended thinking” footnotes.</strong> Artificial Analysis’s own table shows the
+<em>same model</em>, Claude Opus 5, scoring 61 at “Max effort” versus 59 at “High effort,” a
+nontrivial swing from a setting, not a different model. Vendor cards frequently headline only
+the highest-effort configuration while shipping a lower default. See
+<a href="/projects/dokidex/learn/naming/">Decoding model names</a> for how these tiers show up in
+the product names themselves.</li>
+  <li><strong>Selective benchmark reporting.</strong> Anthropic’s Opus 5 launch announcement contains zero
+SWE-bench, Terminal-Bench, or GPQA numbers. It leads with internal, proprietary comparisons
+instead. This is rational vendor behavior: once a benchmark saturates, or a competitor wins it,
+marketing shifts to a newer or proprietary yardstick where the story is more favorable.</li>
+  <li><strong>Aggregator data quality is its own hazard.</strong> This research turned up concrete cases of
+trackers whose “last updated” timestamp didn’t match their actual data (BFCL showing 2024-era
+Llama 3.1 numbers under a claimed “July 26, 2026” update) and a page whose own prose
+contradicted its own table (FrontierMath). Treat every third-party number as needing
+corroboration, not just every vendor number.</li>
+</ol>
+
+<h3 id="the-footnotes-that-change-what-a-score-means">The footnotes that change what a score means</h3>
+
+<figure>
+<svg viewBox="0 0 720 300" role="img" aria-labelledby="dgm-check-title dgm-check-desc">
+<title id="dgm-check-title">Six questions to ask before trusting a benchmark score</title>
+<desc id="dgm-check-desc">A vertical checklist of six questions: which effort tier, tools on or off, single attempt or best-of-n, which split or subset, is the harness named, and is it independently verified or vendor self-reported.</desc>
+<rect class="dgm-panel" x="4" y="4" width="712" height="292" rx="3" />
+<text class="dgm-title" x="24" y="30">Before you repeat a score, ask:</text>
+
+<rect class="dgm-panel" x="24" y="46" width="26" height="26" rx="3" />
+<path class="dgm-flow" d="M30 60 L37 67 L48 51" />
+<text class="dgm-label" x="62" y="63">Which effort / thinking tier? (high vs xhigh vs max can swing several points)</text>
+
+<rect class="dgm-panel" x="24" y="84" width="26" height="26" rx="3" />
+<path class="dgm-flow" d="M30 98 L37 105 L48 89" />
+<text class="dgm-label" x="62" y="101">Tools on or off — and which tools, specifically?</text>
+
+<rect class="dgm-panel" x="24" y="122" width="26" height="26" rx="3" />
+<path class="dgm-flow" d="M30 136 L37 143 L48 127" />
+<text class="dgm-label" x="62" y="139">Single attempt, or best-of-n / majority vote?</text>
+
+<rect class="dgm-panel" x="24" y="160" width="26" height="26" rx="3" />
+<path class="dgm-flow" d="M30 174 L37 181 L48 165" />
+<text class="dgm-label" x="62" y="177">Which split or subset — public, held-out, or private/commercial?</text>
+
+<rect class="dgm-panel" x="24" y="198" width="26" height="26" rx="3" />
+<path class="dgm-flow" d="M30 212 L37 219 L48 203" />
+<text class="dgm-label" x="62" y="215">Is the agent harness / scaffold actually named?</text>
+
+<rect class="dgm-panel" x="24" y="236" width="26" height="26" rx="3" />
+<path class="dgm-flow" d="M30 250 L37 257 L48 241" />
+<text class="dgm-label" x="62" y="253">Independently re-run, or vendor self-reported?</text>
+
+<text class="dgm-label-sm" x="24" y="284">GPQA Diamond and HLE trackers show 0 of 232 / 91 tracked results independently re-run — assume self-report unless stated.</text>
+</svg>
+<figcaption><strong>If a headline number doesn't answer these six questions, it's a marketing
+claim wearing a benchmark's name.</strong> None of these footnotes are hidden maliciously. Most
+are disclosed somewhere on the vendor's own card, but headline marketing rarely repeats them.</figcaption>
+</figure>
+
+<h3 id="why-eloarena-rankings-measure-something-different-from-capability">Why Elo/arena rankings measure something different from capability</h3>
+
+<p>Arena-style Elo is built from blind human pairwise preference votes on whatever prompts real users
+happen to submit. It captures stylistic and conversational preference (tone, formatting,
+confidence, response length, perceived helpfulness on everyday queries), not verified correctness
+on hard, well-specified tasks. It’s well documented in the broader field that longer, more
+assertive, more nicely formatted answers tend to win votes even when a shorter or more hedged
+answer is more accurate. Arena’s own confidence intervals and “Preliminary” labels are an
+acknowledgment that vote-driven rankings are statistically noisy, especially for newly added
+models. Use Arena rank as a proxy for “what will feel good in a chat product,” not “which model
+will get a hard software-engineering task right.”</p>
+
+<h3 id="what-agentic-benchmarks-do-and-dont-tell-you-about-real-repository-work">What agentic benchmarks do and don’t tell you about real repository work</h3>
+
+<p>They <strong>do</strong> tell you whether a model, wrapped in <em>a particular</em> scaffold, can complete <em>this
+specific distribution</em> of self-contained, verifiably-scored tasks: patch-and-test for SWE-bench,
+command-and-check for Terminal-Bench, tool-call-and-verify for tau-bench and BFCL.</p>
+
+<p>They generally <strong>do not</strong> tell you about:</p>
+
+<ul>
+  <li>Reliability under repetition, unless the benchmark explicitly reports pass^k, which most
+don’t. tau-bench/tau2-bench are the notable exception.</li>
+  <li>Performance on genuinely novel, larger, messier real repositories than the benchmark’s own
+source corpus.</li>
+  <li>Cost and latency at your actual usage volume: benchmark cost-per-task figures run under
+research conditions, not production traffic.</li>
+  <li>Behavior on ambiguous or underspecified real tickets: SWE-bench Verified explicitly <em>removed</em>
+such cases. The real world doesn’t remove them.</li>
+  <li>Multi-day or multi-session task continuity: every benchmark on this page is a single-session
+run.</li>
+</ul>
+
+<p>The largest scaffold-sensitivity finding on this page (Terminal-Bench’s roughly 60% to 92% spread for
+similar-tier models) is itself direct evidence that the agent framework around a model does a
+large, often unstated share of the work a benchmark score gets attributed to.</p>
+
+<hr />
+
+<h2 id="part-5-given-a-task-which-benchmark-is-least-bad">Part 5: Given a task, which benchmark is least bad</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>If you care about…</th>
+      <th>Least-bad current benchmark</th>
+      <th>Caveat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Fixing a well-specified, isolated GitHub issue</td>
+      <td>SWE-bench Verified</td>
+      <td>Near-saturated at the frontier (93% to 97%): no longer discriminates between top models. Use SWE-bench Pro’s private/commercial split for frontier comparisons instead</td>
+    </tr>
+    <tr>
+      <td>Operating a real dev environment (build, deploy, debug)</td>
+      <td>Terminal-Bench 2.x</td>
+      <td>Only if the harness is named: unnamed-harness scores aren’t comparable across sources</td>
+    </tr>
+    <tr>
+      <td>Raw competitive-programming ability, contamination-resistant</td>
+      <td>LiveCodeBench (date-filtered)</td>
+      <td>Confirm which variant (plain vs. the Elo-scored “Pro”) is being quoted</td>
+    </tr>
+    <tr>
+      <td>Graduate-level science reasoning</td>
+      <td>GPQA Diamond</td>
+      <td>Near-ceiling. Remaining gains may reflect exploiting known answer-key errors, not new reasoning</td>
+    </tr>
+    <tr>
+      <td>Frontier mathematical reasoning with real headroom</td>
+      <td>FrontierMath, private-set score specifically</td>
+      <td>Verify you’re reading the private-set number, not a stale or contradictory public summary</td>
+    </tr>
+    <tr>
+      <td>The hardest general knowledge+reasoning test available</td>
+      <td>Humanity’s Last Exam</td>
+      <td>Cross-source numbers disagree by 15 to 20+ points right now: get the tool-use condition and date before quoting</td>
+    </tr>
+    <tr>
+      <td>Reliable multi-turn tool use with a human in the loop</td>
+      <td>tau2-bench, reading the pass^k column specifically</td>
+      <td>Most trackers don’t show pass^k at all: go to the paper or original eval if reliability matters</td>
+    </tr>
+    <tr>
+      <td>Function-calling / API-tool correctness</td>
+      <td>BFCL (methodology is sound)</td>
+      <td>Current numeric standings couldn’t be verified this session: check Berkeley’s live site directly</td>
+    </tr>
+    <tr>
+      <td>Long-document reliability, not just window size</td>
+      <td>MRCR-style tasks over classic needle-in-a-haystack</td>
+      <td>Classic needle tests are known-gameable and degrade well inside the stated window</td>
+    </tr>
+    <tr>
+      <td>Everyday conversational quality</td>
+      <td>Arena / LMArena Elo</td>
+      <td>Explicitly not a correctness measure</td>
+    </tr>
+    <tr>
+      <td>A single “how smart overall” number for a quick sort</td>
+      <td>A disclosed composite index (Artificial Analysis or Vals)</td>
+      <td>Still opaque about scaffold per sub-benchmark. Use as a rough sort, not a precise ranking</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="part-6-intelligence-per-dollar">Part 6: Intelligence per dollar</h2>
+
+<p>Benchmarks tell you what a model can do. They say nothing about what it costs to find out. Two
+models a few points apart on a score can be many multiples apart on price. And the effective gap
+is sometimes larger than the pricing table alone suggests.</p>
+
+<blockquote>
+  <p><strong>Note</strong>: Anthropic’s pricing page states that Claude 4.7 and later use a tokenizer that
+produces roughly 30% more tokens for the same text than earlier Claude generations. A per-MTok
+price comparison across tokenizer generations therefore isn’t apples to apples. Factor this
+in before concluding one model is cheaper in practice than another. <a href="https://platform.claude.com/docs/en/about-claude/models/overview">platform.claude.com</a></p>
+</blockquote>
+
+<h3 id="current-published-api-pricing-per-million-tokens-as-of-july-2026">Current published API pricing (per million tokens, as of July 2026)</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Vendor</th>
+      <th>Model</th>
+      <th>Input</th>
+      <th>Output</th>
+      <th>Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Fable 5</td>
+      <td>$10</td>
+      <td>$50</td>
+      <td><a href="https://platform.claude.com/docs/en/about-claude/models/overview">platform.claude.com</a></td>
+    </tr>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Opus 5</td>
+      <td>$5</td>
+      <td>$25</td>
+      <td><a href="https://platform.claude.com/docs/en/about-claude/models/overview">platform.claude.com</a></td>
+    </tr>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Sonnet 5</td>
+      <td>$3 (intro $2 through Aug 31, 2026)</td>
+      <td>$15 (intro $10)</td>
+      <td><a href="https://platform.claude.com/docs/en/about-claude/models/overview">platform.claude.com</a></td>
+    </tr>
+    <tr>
+      <td>Anthropic</td>
+      <td>Claude Haiku 4.5</td>
+      <td>$1</td>
+      <td>$5</td>
+      <td><a href="https://platform.claude.com/docs/en/about-claude/models/overview">platform.claude.com</a></td>
+    </tr>
+    <tr>
+      <td>OpenAI</td>
+      <td>GPT-5.6 Sol</td>
+      <td>$5</td>
+      <td>$30</td>
+      <td><a href="https://developers.openai.com/api/docs/pricing">developers.openai.com</a></td>
+    </tr>
+    <tr>
+      <td>OpenAI</td>
+      <td>GPT-5.6 Terra</td>
+      <td>$2.50</td>
+      <td>$15</td>
+      <td><a href="https://developers.openai.com/api/docs/pricing">developers.openai.com</a></td>
+    </tr>
+    <tr>
+      <td>OpenAI</td>
+      <td>GPT-5.6 Luna</td>
+      <td>$1</td>
+      <td>$6</td>
+      <td><a href="https://developers.openai.com/api/docs/pricing">developers.openai.com</a></td>
+    </tr>
+    <tr>
+      <td>Google</td>
+      <td>Gemini 3.1 Pro Preview</td>
+      <td>$2 (≤200K) / $4 (&gt;200K)</td>
+      <td>$12 (≤200K) / $18 (&gt;200K)</td>
+      <td><a href="https://ai.google.dev/gemini-api/docs/pricing">ai.google.dev</a></td>
+    </tr>
+    <tr>
+      <td>Google</td>
+      <td>Gemini 3.6 Flash</td>
+      <td>$1.50</td>
+      <td>$7.50</td>
+      <td><a href="https://ai.google.dev/gemini-api/docs/pricing">ai.google.dev</a></td>
+    </tr>
+    <tr>
+      <td>Google</td>
+      <td>Gemini 3.5 Flash</td>
+      <td>$1.50</td>
+      <td>$9.00</td>
+      <td><a href="https://ai.google.dev/gemini-api/docs/pricing">ai.google.dev</a></td>
+    </tr>
+    <tr>
+      <td>xAI</td>
+      <td>Grok 4.5</td>
+      <td>$2</td>
+      <td>$6</td>
+      <td><a href="https://techcrunch.com/2026/07/08/spacexai-releases-grok-4-5-which-elon-describes-as-an-opus-class-model/">techcrunch.com</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<figure>
+<svg viewBox="0 0 720 340" role="img" aria-labelledby="dgm-cost-title dgm-cost-desc">
+<title id="dgm-cost-title">Output price versus Artificial Analysis Intelligence Index, four models</title>
+<desc id="dgm-cost-desc">A scatter plot with output price per million tokens on the horizontal axis and Artificial Analysis Intelligence Index score on the vertical axis, plotting Grok 4.5, Claude Opus 5, GPT-5.6 Sol, and Claude Fable 5. Claude Fable 5 is the most expensive of the four but does not have the highest score; Claude Opus 5 does.</desc>
+<rect class="dgm-panel" x="4" y="4" width="712" height="332" rx="3" />
+<text class="dgm-title" x="24" y="28">Price is not a proxy for score</text>
+
+<!-- axes -->
+<path class="dgm-line" d="M80 280 L660 280" />
+<path class="dgm-line" d="M80 280 L80 40" />
+<text class="dgm-label-sm" x="370" y="308" text-anchor="middle">Output price, $ per million tokens</text>
+<text class="dgm-label-sm" x="30" y="160" text-anchor="middle" transform="rotate(-90 30 160)">AA Intelligence Index</text>
+
+<!-- x ticks -->
+<text class="dgm-label-sm" x="80" y="296" text-anchor="middle">$0</text>
+<text class="dgm-label-sm" x="185" y="296" text-anchor="middle">$10</text>
+<text class="dgm-label-sm" x="291" y="296" text-anchor="middle">$20</text>
+<text class="dgm-label-sm" x="397" y="296" text-anchor="middle">$30</text>
+<text class="dgm-label-sm" x="502" y="296" text-anchor="middle">$40</text>
+<text class="dgm-label-sm" x="608" y="296" text-anchor="middle">$50</text>
+
+<!-- y ticks -->
+<text class="dgm-label-sm" x="70" y="284" text-anchor="end">50</text>
+<text class="dgm-label-sm" x="70" y="204" text-anchor="end">55</text>
+<text class="dgm-label-sm" x="70" y="124" text-anchor="end">60</text>
+<text class="dgm-label-sm" x="70" y="44" text-anchor="end">65</text>
+
+<!-- points: x=80+price/55*580, y=280-(score-50)/15*240 -->
+<circle class="dgm-accent-3" cx="143" cy="216" r="6" />
+<text class="dgm-label-sm" x="143" y="238">Grok 4.5</text>
+<text class="dgm-mono" x="143" y="252">$6 · index 54</text>
+
+<circle class="dgm-accent" cx="344" cy="104" r="6" />
+<text class="dgm-label-sm" x="344" y="94">Claude Opus 5 (max)</text>
+<text class="dgm-mono" x="344" y="80">$25 · index 61</text>
+
+<circle class="dgm-accent-2" cx="396" cy="136" r="6" />
+<text class="dgm-label-sm" x="396" y="158">GPT-5.6 Sol (max)</text>
+<text class="dgm-mono" x="396" y="172">$30 · index 59</text>
+
+<circle class="dgm-accent" cx="607" cy="120" r="6" />
+<text class="dgm-label-sm" x="607" y="100">Claude Fable 5 (max)</text>
+<text class="dgm-mono" x="607" y="86">$50 · index 60</text>
+</svg>
+<figcaption><strong>Fable 5 costs twice what Opus 5 costs and scores lower on this index.</strong>
+"Most capable" and "best value" are different questions with different answers here, four real,
+sourced points, not the whole market. Effort tier is "max" for the three where AA states it.
+Treat this as illustrative, not a market survey.</figcaption>
+</figure>
+
+<h3 id="reading-the-frontier">Reading the frontier</h3>
+
+<ul>
+  <li><strong>Anthropic’s own price ladder is a clean illustration of tier-vs-capability tradeoffs.</strong>
+Fable 5 ($10/$50) costs more than Opus 5 ($5/$25), which costs more than Sonnet 5 ($3/$15,
+temporarily $2/$10), which costs more than Haiku 4.5 ($1/$5), a straightforward 10:1 spread top
+to bottom. Meanwhile the Intelligence Index gap between Fable 5 and Opus 5 is small (60 vs. 61).
+Opus 5 is plausibly the better cost-adjusted choice for most tasks despite Fable 5’s
+“most capable” label. <a href="https://artificialanalysis.ai/models">artificialanalysis.ai/models</a></li>
+  <li><strong>xAI’s explicit price-performance claim.</strong> Grok 4.5 at $2/$6 per MTok is positioned by xAI as
+matching GPT-5.5/Codex-class coding performance “at roughly half the per-task cost,” with “2x
+better token efficiency” claimed generally. Both are <strong>vendor claims</strong>, not independently
+verified in this research. <a href="https://techcrunch.com/2026/07/08/spacexai-releases-grok-4-5-which-elon-describes-as-an-opus-class-model/">techcrunch.com</a></li>
+  <li><strong>Artificial Analysis’s own cost framing.</strong> The site computes a “Cost per Intelligence Index
+Task” metric and plots an intelligence-vs-cost scatter with a labeled “most attractive
+quadrant,” the closest thing to a purpose-built intelligence-per-dollar chart in this research,
+though its current occupants weren’t extractable from the page content fetched here. Check the
+live chart yourself. <a href="https://artificialanalysis.ai/">artificialanalysis.ai</a></li>
+  <li><strong>The price spread across the whole market, not just the frontier, is wide.</strong> Nova Micro,
+Sarvam 30B (high), and Gemma 4 E4B are tied at roughly $0.03 per million tokens blended on
+Artificial Analysis’s view. That’s several orders of magnitude below any frontier model above.
+<a href="https://artificialanalysis.ai/models">artificialanalysis.ai/models</a> See
+<a href="/projects/dokidex/learn/local/">Running models locally</a> for what changes when you own the
+hardware instead of renting it by the token.</li>
+  <li><strong>A cost variable no benchmark score captures at all.</strong> Anthropic’s separate cache-write fee,
+versus OpenAI’s and DeepSeek’s cache-hit-only pricing, means two models with identical headline
+per-token prices can have meaningfully different effective costs on a real agentic workload with
+heavy prompt-caching, the exact pattern a coding agent produces by re-reading the same repo
+context across many turns. <a href="https://artificialanalysis.ai/">artificialanalysis.ai</a></li>
+  <li><strong>Effort-level settings change the bill, not just the score.</strong> Because reasoning-effort tiers
+change both the benchmark score and the number of tokens actually billed, “price per million
+output tokens” understates real cost at higher effort settings: the same nominal rate applies to
+a much larger realized token count. No source in this research quantified that multiplier
+directly: flagged here as an open question, not asserted with a number.</li>
+</ul>
+
+<hr />
+
+<p>Benchmarks are the best public signal available for comparing models you haven’t tried yourself.
+And every one of them is narrower, staler, or more gameable than its headline number suggests. Read
+the split. Read the effort tier. Check the date. Then go run the task that actually matters to you,
+because that’s the only benchmark with a sample size of one that’s guaranteed to be about your
+work.</p>
+
+    </article>
+
+    
+    <nav class="pager" aria-label="Page navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/learn/open-vs-closed/">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">Open vs closed weights</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/learn/local/">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">Running models locally</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="site-footer">
+  <div class="footer-main">
+    <p class="footer-line">
+      <strong>DokiDex</strong> v0.62.0:
+      a fully-local AI stack, and a field guide to the machines it runs on.
+    </p>
+    <p class="footer-line footer-dim">
+      Everything on this site is written against the real tree and the measured record. Where a
+      claim is a number, it was measured or sourced. Where it was a judgment call, the reasoning
+      is stated inline. Stale statements are bugs. File them like bugs.
+    </p>
+  </div>
+
+  <div class="footer-links">
+    <a href="/projects/dokidex/local-cli/">Run the CLIs</a>
+    <a href="/projects/dokidex/handbook/">Handbook</a>
+    <a href="/projects/dokidex/reference/">Quick reference</a>
+    <a href="/projects/dokidex/glossary/">Glossary</a>
+    <!-- Deliberately understated: last item in the row, same weight as the rest, no colour,
+         no badge, no image beacon. The ask was "inconspicuous". -->
+    <a class="footer-kofi" href="https://ko-fi.com/dougfessler" rel="noopener">Buy me a coffee</a>
+  </div>
+</footer>
+
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/dokidex.js"></script>
+</body>
+</html>

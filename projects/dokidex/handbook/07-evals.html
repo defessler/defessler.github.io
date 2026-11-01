@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evals & the Parity Ledger · DokiDex Handbook</title>
+<meta name="description" content="Golden tasks, bake-offs, in-binary selftests, and a generated parity scorecard. How anything here earns the word "done."">
+
+<!-- Marcellus (power word) · Kanit incl. italics 500-700 (headings/kickers/nav) ·
+     IBM Plex Mono 400/500 (code, stats) · Figtree 300-600 (body prose). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Kanit:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=IBM+Plex+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/projects/dokidex/assets/site.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<input type="checkbox" id="nav-toggle" class="nav-toggle-input">
+
+<div class="shell">
+  <header class="topbar">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle chapter nav">
+      <span></span><span></span><span></span>
+    </label>
+    <a class="topbar-title" href="/projects/dokidex/handbook/">DokiDex Handbook</a>
+    <a class="topbar-up" href="/projects/dokidex/">&larr; DokiDex</a>
+  </header>
+
+  <nav class="sidebar" aria-label="Handbook chapters">
+    <a class="sidebar-title" href="/projects/dokidex/handbook/">DokiDex Handbook</a>
+    <ol class="nav-list">
+      
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/01-big-picture.html">
+          <span class="nav-kicker">:: THE FOUNDRY</span>
+          <span class="nav-title">The Big Picture</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/03-serving.html">
+          <span class="nav-kicker">:: THE FORGE</span>
+          <span class="nav-title">Serving Local Models</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/04-tools-and-safety.html">
+          <span class="nav-kicker">:: THE GATE</span>
+          <span class="nav-title">Tools, Permissions, Safety</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link is-active" href="/projects/dokidex/handbook/07-evals.html">
+          <span class="nav-kicker">:: THE PROOF</span>
+          <span class="nav-title">Evals & the Parity Ledger</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/08-references.html">
+          <span class="nav-kicker">:: THE CODEX</span>
+          <span class="nav-title">References & Study Path</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/09-capabilities.html">
+          <span class="nav-kicker">:: THE ARSENAL</span>
+          <span class="nav-title">Capabilities</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/projects/dokidex/handbook/10-direction.html">
+          <span class="nav-kicker">:: THE COMPASS</span>
+          <span class="nav-title">Direction</span>
+        </a>
+      </li>
+      
+    </ol>
+  </nav>
+
+  <main class="main">
+    <div class="hero reveal-up">
+      <canvas class="token-stream" aria-hidden="true"></canvas>
+      <div class="hero-inner">
+        <p class="kicker">:: THE PROOF</p>
+        <p class="power-word">PROOF</p>
+        <h1 class="hero-title">Evals & the Parity Ledger</h1>
+        <p class="hero-desc">Golden tasks, bake-offs, in-binary selftests, and a generated parity scorecard. How anything here earns the word "done."</p>
+      </div>
+    </div>
+
+    <article id="content" class="prose">
+      <p>Every stack this size accumulates claims. This chapter is about the machinery that keeps
+DokiDex’s claims attached to measurements. It’s the part that would be QA and CI in a game team, and
+is treated with the same seriousness: automated gates, golden tests, and a standing rule that a
+number nobody can regenerate is a rumor.</p>
+
+<h2 id="the-golden-task-suite">The golden-task suite</h2>
+
+<p><code class="language-plaintext highlighter-rouge">evals/</code> holds a <strong>26-task golden suite</strong> of real coding tasks with objective pass criteria, run
+headlessly against a harness + model combination (<code class="language-plaintext highlighter-rouge">run-eval.ps1</code> / <code class="language-plaintext highlighter-rouge">run-suite.ps1</code>). Eight of the
+tasks (<code class="language-plaintext highlighter-rouge">t16</code> through <code class="language-plaintext highlighter-rouge">t23</code>) are <strong>Unreal-specific C++</strong>: delegate wiring, UCLASS/UPROPERTY
+boilerplate, and Build.cs module dependencies. These are the workloads a gameplay programmer would
+actually hand to an agent, included precisely because generic Python-flavored evals over-predict
+how well a model handles engine-flavored C++. Three more (<code class="language-plaintext highlighter-rouge">t24</code> through <code class="language-plaintext highlighter-rouge">t26</code>), added around
+2026-08-30, test image and game-loop generation rather than a text diff.</p>
+
+<p>Discipline around the suite, learned the hard way:</p>
+
+<ul>
+  <li><strong><code class="language-plaintext highlighter-rouge">results.jsonl</code> is append-only.</strong> Aggregate <em>latest-per-task</em> at report time. Never edit
+history. Trend analysis (<code class="language-plaintext highlighter-rouge">trend.ps1</code>) and per-run scorecards (<code class="language-plaintext highlighter-rouge">docs/scorecards/</code>) read from it.</li>
+  <li><strong>Separate plumbing failures from model failures.</strong> A harness that crashed mid-task says
+nothing about the model. Conflating the two poisoned early numbers, which is why they’re now
+tallied apart.</li>
+  <li><strong>Small deltas are noise.</strong> Promotion requires a candidate to <em>beat</em> the incumbent, not tie it.</li>
+</ul>
+
+<p>The record shows the discipline working, and the rejections are the best evidence: the <code class="language-plaintext highlighter-rouge">claw</code>
+competitor CLI bake-off’d at <strong>45% with flaky tool calls and was rejected</strong> (its research
+write-up survives as a what-not-to-do reference). Nemotron-Cascade-2 scored 45% and was rejected.
+A REAP-pruned challenger had broken tool calls and was rejected. The Q5 quant never beat Q4 and
+was parked with the numbers. High reasoning effort on the big planner measured <em>worse</em> for coding,
+so the default stayed medium. Meanwhile <code class="language-plaintext highlighter-rouge">-np 2</code> parallel slots and the 8B vision tier earned
+adoption through the same gate. Nothing in the roster is there on vibes.</p>
+
+<h2 id="selftests-the-binary-tests-itself">Selftests: the binary tests itself</h2>
+
+<p>The stack’s GPU-free suites are the everyday floor: every <code class="language-plaintext highlighter-rouge">tests/*.test.ps1</code> and <code class="language-plaintext highlighter-rouge">*.test.py</code>,
+discovered by glob rather than by a hand-kept list, so a suite added later cannot silently go
+unrun. That glob exists because a hand-kept list had already drifted: seven committed suites were
+running nowhere. Most of them extract the real function out of the shipping script by AST and run
+it, rather than reimplementing its logic in the test, because a second implementation in a test
+proves only that two copies agree.</p>
+
+<p>The instrument worth singling out is the <strong>corpus check</strong>. <code class="language-plaintext highlighter-rouge">doki-bench</code> and <code class="language-plaintext highlighter-rouge">doki-depth-eval</code> both
+build their prompt corpus from a frozen set of source files, and both used to fall back silently to
+a smaller set if that directory was missing. When the directory in question was deleted, every
+future run would still have printed numbers, on a corpus a third the size, with a different hash,
+and no message anywhere. <code class="language-plaintext highlighter-rouge">tests/bench-corpus.test.ps1</code> now pins the five corpus hashes the recorded
+runs were measured against, and proves the tools refuse rather than substitute. That is the shape
+this handbook keeps recommending: not “does the check pass” but “what would make it fail, and does
+that answer name the thing I just changed”.</p>
+
+<blockquote>
+  <p>This chapter also documented a generated parity ledger, <code class="language-plaintext highlighter-rouge">docs/PARITY.md</code>, which scored how
+completely DokiDex’s own agent recreated the Claude Code CLI across 124 checklist items. The
+agent and the ledger were both removed on 2026-09-02. Measuring your own clone against an
+upstream stops being a useful instrument once you ship the upstream.</p>
+</blockquote>
+
+<p>Next: the study path, where the ideas in this handbook come from, and what’s worth your
+evening hours.</p>
+
+    </article>
+
+    
+    
+    
+    
+
+    
+    <nav class="chapter-pager" aria-label="Chapter navigation">
+      
+      <a class="pager-link pager-prev" href="/projects/dokidex/handbook/04-tools-and-safety.html">
+        <span class="pager-label">&larr; Previous</span>
+        <span class="pager-title">Tools, Permissions, Safety</span>
+      </a>
+      
+      
+      <a class="pager-link pager-next" href="/projects/dokidex/handbook/08-references.html">
+        <span class="pager-label">Next &rarr;</span>
+        <span class="pager-title">References & Study Path</span>
+      </a>
+      
+    </nav>
+    
+
+    <footer class="statusline">
+      <span>DokiDex Handbook</span>
+      <span class="statusline-sep">&middot;</span>
+      <span>Evals & the Parity Ledger</span>
+      <span class="statusline-sep">&middot;</span>
+      <span>generated from docs/site/handbook, DokiDex v0.62.0</span>
+    </footer>
+  </main>
+</div>
+
+<script src="/projects/dokidex/assets/foundry.js"></script>
+</body>
+</html>
