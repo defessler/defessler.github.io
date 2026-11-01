@@ -1,0 +1,45 @@
+# Publish a built project site into this repo under projects/<slug>/.
+#
+# What it does: shallow-clones master over SSH, replaces projects/<slug>/ with the
+# folder's contents, adds the GA4 tag (G-YQB4BCN1CH) to every .html that lacks it,
+# commits as github-actions[bot] and pushes with a pull-rebase retry. No diff means
+# no commit. Any path with a "_"-prefixed segment is refused, because the root site
+# is a Jekyll build and Jekyll drops those.
+#
+# Linux runners only (needs bash, git, ssh, curl, python3).
+#
+# Giving a project a deploy key: add a write deploy key on defessler/defessler.github.io,
+# then store the private half in the project repo's ROOT_SITE_DEPLOY_KEY secret.
+#
+# Usage:
+#   - uses: defessler/defessler.github.io/.github/actions/publish-project@master
+#     with:
+#       slug: dokidex
+#       path: _site
+#       deploy-key: ${{ secrets.ROOT_SITE_DEPLOY_KEY }}
+name: Publish project site
+description: Publish a built site to projects/<slug>/ on defessler.github.io
+inputs:
+  slug:
+    description: Lowercase [a-z0-9-]+. The target is projects/<slug>/.
+    required: true
+  path:
+    description: Folder holding the built site. Must exist and hold at least one .html.
+    required: true
+  deploy-key:
+    description: Private half of a write deploy key on defessler.github.io.
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Publish
+      shell: bash
+      env:
+        INPUT_SLUG: ${{ inputs.slug }}
+        INPUT_PATH: ${{ inputs.path }}
+        INPUT_DEPLOY_KEY: ${{ inputs.deploy-key }}
+      run: bash "${{ github.action_path }}/publish.sh"
+    - name: Remove key and clone
+      if: always()
+      shell: bash
+      run: rm -rf "$RUNNER_TEMP/publish-project"
