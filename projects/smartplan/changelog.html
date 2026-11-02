@@ -542,7 +542,7 @@ footer {
 <a class="current" href="whats-new.html">Project</a>
 <a href="m365-setup.html">M365 Agents</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.151.0 &middot; data 2026-10-20 &middot; built 2026-11-01 3:20 AM PST / 6:20 AM EST</span>
+<span class="stamp">v4.152.0 &middot; data 2026-10-20 &middot; built 2026-11-02 9:10 AM PST / 12:10 PM EST</span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -558,7 +558,6 @@ footer {
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-09-23-sonnet-implements-and-opus-verifies-on-claude-code-the-fixtures-lose-their-answer-hints-and-t43-measures-every-task-so-it-can-fail-v41400">2026-09-23 · Sonnet implements and Opus verifies on Claude Code, the fixtures lose their answer hints, and T43 measures every task so it can fail (v4.140.0)</a></li>
 <li><a href="#2026-09-24-good-at-is-scored-against-its-cost-band-and-the-site-reads-easier-v41410">2026-09-24 · Good at is scored against its cost band, and the site reads easier (v4.141.0)</a></li>
 <li><a href="#2026-09-29-sonnet-55-takes-the-sonnet-seats-and-gpt-61-sol-waits-for-a-score-v41420">2026-09-29 · Sonnet 5.5 takes the Sonnet seats, and GPT-6.1 Sol waits for a score (v4.142.0)</a></li>
 <li><a href="#2026-09-29-t44-moves-the-claude-code-implementer-to-medium-effort-v41430">2026-09-29 · T44 moves the Claude Code implementer to medium effort (v4.143.0)</a></li>
@@ -572,30 +571,13 @@ footer {
 <li><a href="#2026-10-17-a-grilled-plan-a-ready-frontier-phased-diagnosis-and-leaner-references-v41490">2026-10-17 · A grilled plan, a ready frontier, phased diagnosis, and leaner references (v4.149.0)</a></li>
 <li><a href="#2026-10-19-haiku-takes-the-mid-seat-fable-gets-triggers-leaner-standing-load-v41500">2026-10-19 · Haiku takes the Mid seat, Fable gets triggers, leaner standing load (v4.150.0)</a></li>
 <li><a href="#2026-10-20-the-weekly-sweep-copilots-november-retirements-gpt-61-sol-takes-terras-verifier-slots-and-the-auto-pool-corrected-v41510">2026-10-20 · The weekly sweep: Copilot's November retirements, GPT-6.1 Sol takes Terra's verifier slots, and the Auto pool corrected (v4.151.0)</a></li>
+<li><a href="#2026-11-02-smartdiff-joins-the-family-with-a-semantic-diff-for-unreal-blueprints-v41520">2026-11-02 · smartdiff joins the family, with a semantic diff for Unreal Blueprints (v4.152.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-09-23-sonnet-implements-and-opus-verifies-on-claude-code-the-fixtures-lose-their-answer-hints-and-t43-measures-every-task-so-it-can-fail-v41400">2026-09-23 · Sonnet implements and Opus verifies on Claude Code, the fixtures lose their answer hints, and T43 measures every task so it can fail (v4.140.0)</h2>
-<p>On Claude Code, Sonnet now writes every code change, the mechanical leaves
-included, and the verifier seat pins Opus. Haiku keeps only the scout seat,
-which T43 backs: it was exact at scouting and at a trap-laden rename.</p>
-<p>The seeded C++ fixtures no longer name their answer key or state a defect.
-Every hint line was rewritten in place, so each <code>DEFECTS.md</code> file:line still
-holds, and oracle stage (d) fails a regression. T34 gets a dated correction:
-its 8 of 8 ran on the hinted sources.</p>
-<p>T43 closed T42's gaps with a harness under <code>tests/bench/</code>. Every task has a
-known-good and a known-bad control proven before the runs, a scripted blind
-judge replaces the keyword grader, runs exclude every instruction file, and
-a 250-credit cap is enforced from the session store. Haiku fails spec-heavy
-work because it tests against its own beliefs, where Sonnet tests against
-the real library. GPT-6 Luna at medium matched max at a third of the cost,
-so Copilot's session now runs at medium. Scouts must take line numbers from
-a tool after Luna misnumbered correct call sites.</p>
-<p>Oracle stage (i) builds the Pages site before a merge, so a dead link fails
-a PR rather than the deploy. The local-stack benchmark left this repo.</p>
 <h2 id="2026-09-24-good-at-is-scored-against-its-cost-band-and-the-site-reads-easier-v41410">2026-09-24 · Good at is scored against its cost band, and the site reads easier (v4.141.0)</h2>
 <p>The quick-picks Good at marks were hand-set from written rules, which left
 readers unable to compare a cheap model with an expensive one. They're now
@@ -904,6 +886,24 @@ Terminus 2 figures. Full note: <code>research/2026-10-20-sweep.md</code>.</p>
 <p><strong>Gate (q) matches a pin to its longest registry name.</strong> A substring test
 let the <code>claude-opus-5.5</code> pin inherit Opus 5's retirement, which would
 have failed every build from 2026-11-02.</p>
+<h2 id="2026-11-02-smartdiff-joins-the-family-with-a-semantic-diff-for-unreal-blueprints-v41520">2026-11-02 · smartdiff joins the family, with a semantic diff for Unreal Blueprints (v4.152.0)</h2>
+<p><strong>A seventh skill, <code>smartdiff</code>.</strong> It renders a session's changes, from git
+or Perforce, as one self-contained HTML review page with per-file intent
+notes. It started as a <code>session-diff</code> skill the author handed over, and it
+installs as an optional companion like <code>smartdiagram</code>.</p>
+<p><strong>Blueprints get a real diff.</strong> A <code>.uasset</code> used to read "binary file".
+<code>bp_prepare.py</code> now pulls each old revision, and <code>bp_export.py</code> dumps both
+revisions to T3D text inside a headless UE editor. The page then lists
+graph by graph what changed: nodes, wires, pin defaults, variables,
+components and class defaults. Checked against UE 5.8 on a test project
+and on Cropout's <code>BP_Player</code>.</p>
+<p><strong>The page matches a Rider diff.</strong> Dark by default, with green added
+lines, blue modified lines and grey removed ones. Changed lines pair by
+similarity rather than position. The file list hides with <code>f</code> or a
+<strong>Files</strong> button.</p>
+<p><strong>Gate (k)'s cap rises to 2,816B</strong> for the seventh description, with the
+dated rationale in <code>docs/v4-rule-inventory.md</code>. Oracle stage (k) runs
+smartdiff's renderer against a small Blueprint fixture.</p>
 </main>
 <footer>
 <p>smartplan · MIT · generated from repo markdown</p>
