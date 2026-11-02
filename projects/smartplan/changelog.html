@@ -542,7 +542,7 @@ footer {
 <a class="current" href="whats-new.html">Project</a>
 <a href="m365-setup.html">M365 Agents</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.152.0 &middot; data 2026-10-20 &middot; built 2026-11-02 9:10 AM PST / 12:10 PM EST</span>
+<span class="stamp">v4.153.0 &middot; data 2026-10-20 &middot; built 2026-11-02 2:56 PM PST / 5:56 PM EST</span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -558,7 +558,6 @@ footer {
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-09-24-good-at-is-scored-against-its-cost-band-and-the-site-reads-easier-v41410">2026-09-24 · Good at is scored against its cost band, and the site reads easier (v4.141.0)</a></li>
 <li><a href="#2026-09-29-sonnet-55-takes-the-sonnet-seats-and-gpt-61-sol-waits-for-a-score-v41420">2026-09-29 · Sonnet 5.5 takes the Sonnet seats, and GPT-6.1 Sol waits for a score (v4.142.0)</a></li>
 <li><a href="#2026-09-29-t44-moves-the-claude-code-implementer-to-medium-effort-v41430">2026-09-29 · T44 moves the Claude Code implementer to medium effort (v4.143.0)</a></li>
 <li><a href="#2026-09-29-the-m365-agents-match-the-repo-and-the-exporters-recover-from-a-failed-run-v41431">2026-09-29 · The M365 agents match the repo, and the exporters recover from a failed run (v4.143.1)</a></li>
@@ -572,32 +571,13 @@ footer {
 <li><a href="#2026-10-19-haiku-takes-the-mid-seat-fable-gets-triggers-leaner-standing-load-v41500">2026-10-19 · Haiku takes the Mid seat, Fable gets triggers, leaner standing load (v4.150.0)</a></li>
 <li><a href="#2026-10-20-the-weekly-sweep-copilots-november-retirements-gpt-61-sol-takes-terras-verifier-slots-and-the-auto-pool-corrected-v41510">2026-10-20 · The weekly sweep: Copilot's November retirements, GPT-6.1 Sol takes Terra's verifier slots, and the Auto pool corrected (v4.151.0)</a></li>
 <li><a href="#2026-11-02-smartdiff-joins-the-family-with-a-semantic-diff-for-unreal-blueprints-v41520">2026-11-02 · smartdiff joins the family, with a semantic diff for Unreal Blueprints (v4.152.0)</a></li>
+<li><a href="#2026-11-02-smartdiff-reviews-only-the-agents-own-edits-on-copilot-cli-and-claude-code-v41530">2026-11-02 · smartdiff reviews only the agent's own edits, on Copilot CLI and Claude Code (v4.153.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-09-24-good-at-is-scored-against-its-cost-band-and-the-site-reads-easier-v41410">2026-09-24 · Good at is scored against its cost band, and the site reads easier (v4.141.0)</h2>
-<p>The quick-picks Good at marks were hand-set from written rules, which left
-readers unable to compare a cheap model with an expensive one. They're now
-computed. <code>scripts/good-at.py</code> scores each Copilot roster model 0 to 10 on
-five jobs from one dated Artificial Analysis snapshot
-(<code>research/2026-09-24-good-at-data.json</code>), the same AA row the Value column
-reads. The roster splits into five bands by measured cost per task, since
-list price hides the bill (Grok 4.7 lists at 2 / 6 and costs twice Opus 5.5
-a task). Each mark compares a model only with its band: ★ best, ✅ within
-1.5 points, 🟡 within 3, 🟠 further back, ❌ a job the registry never seats
-it for, and ? for no AA row. Two more tables show the same data across the
-whole roster, as absolute A to D grades with a value arrow against a fitted
-cost curve, and as raw scores. Gate (y) now fails the build when the page
-drifts from the generator.</p>
-<p>A clarity pass covered the entry pages and the model guides. GOALS trades
-paragraph-length table cells for a status table plus one short section per
-goal. README and Overview say why the skill ablation counts 63 runs against
-21. The budget page compares GPT-6 Luna at Copilot's default effort rather
-than at max, and the guides note that prerelease CLI 1.0.89-1 is the first
-build to list GPT-6 Sol and Luna in its model picker.</p>
 <h2 id="2026-09-29-sonnet-55-takes-the-sonnet-seats-and-gpt-61-sol-waits-for-a-score-v41420">2026-09-29 · Sonnet 5.5 takes the Sonnet seats, and GPT-6.1 Sol waits for a score (v4.142.0)</h2>
 <p>The weekly sweep re-read all eight research areas at primary sources, with
 a refute verifier on every new or changed claim. Claude Sonnet 5.5 shipped
@@ -904,6 +884,26 @@ similarity rather than position. The file list hides with <code>f</code> or a
 <p><strong>Gate (k)'s cap rises to 2,816B</strong> for the seventh description, with the
 dated rationale in <code>docs/v4-rule-inventory.md</code>. Oracle stage (k) runs
 smartdiff's renderer against a small Blueprint fixture.</p>
+<h2 id="2026-11-02-smartdiff-reviews-only-the-agents-own-edits-on-copilot-cli-and-claude-code-v41530">2026-11-02 · smartdiff reviews only the agent's own edits, on Copilot CLI and Claude Code (v4.153.0)</h2>
+<p><strong>Agent-only mode.</strong> <code>trail.py</code> exports the edits the agent made and
+nothing else, read from the session record rather than the working tree,
+so a teammate's change or a hand edit can't leak into the review. It
+scopes to the last message, the last N messages or the whole session. It
+reads Copilot CLI sessions (<code>apply_patch</code>, <code>edit</code> and <code>create</code>) and
+Claude Code transcripts (Edit, Write and subagent edits), and finds the
+running session by itself. A change it can't prove from recorded
+evidence is left out and named, and the run exits 2. It ships the before
+and after files, a plain diff, the prompts and a transcript beside the
+page. Checked live on both harnesses: a real Copilot CLI edit session,
+and this repo's own Claude Code session, where every reconstructed file
+matched the live copy.</p>
+<p><strong>The page gains an expandable diff.</strong> <code>a</code> or a click on a hunk header
+shows the omitted lines between hunks. <code>b</code> or a chevron hides the file
+list, with <code>f</code> kept as an alias. Free functions, static calls, format
+strings and Unreal export macros get their own colors.
+<code>diffview.py --git-context &lt;repo&gt;</code> reads whole files from git so a
+normal session diff can expand too.</p>
+<p><strong>Oracle stage (k)</strong> now also runs a 31-case trail self-test.</p>
 </main>
 <footer>
 <p>smartplan · MIT · generated from repo markdown</p>
