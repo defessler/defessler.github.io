@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Not found · Doug Fessler</title>
+  <script>
+    // GitHub Pages has no server-side rewrites, so old paths are mapped here.
+    // /smartplan/<page> and /smartplan-plugin/<page> keep their page under
+    // /projects/smartplan/. The two folder stubs handle the bare paths.
+    (function () {
+      var m = location.pathname.match(/^\/(?:smartplan-plugin|smartplan)(\/.*)?$/);
+      if (m) {
+        location.replace('/projects/smartplan' + (m[1] || '/') + location.search + location.hash);
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=16">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-YQB4BCN1CH');
+  </script>
+</head>
+<body>
+  <main style="max-width: 40rem; margin: 6rem auto; padding: 0 1rem;">
+    <h1>Page not found</h1>
+    <p>Nothing lives at this address. Try the <a href="/">home page</a>.</p>
+  </main>
+</body>
+</html>
