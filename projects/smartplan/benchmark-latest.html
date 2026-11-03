@@ -407,6 +407,13 @@ h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
 .skill h3 { margin: 0 0 0.35rem; font: 600 1.05rem var(--mono); }
 .skill p { margin: 0 0 0.5rem; color: var(--ink-2); }
 .skill p.try { color: var(--ink-dim); font-size: 0.9rem; margin: 0; }
+.skill details.example { margin: 0.6rem 0 0; }
+/* An opened example needs room for its report lines, so its card takes
+   the whole row instead of scrolling inside a narrow column. */
+.skill:has(> details.example[open]) { grid-column: 1 / -1; }
+.skill details.example > summary { font-size: 0.9rem; color: var(--ink-2); }
+.skill details.example pre { margin: 0.5rem 0 0; font-size: 0.78rem; line-height: 1.45; }
+.skill details.example p { margin: 0.5rem 0 0; font-size: 0.9rem; }
 details.fresh-panel { margin: 1.5rem 0 0; }
 details.fresh-panel > summary { cursor: pointer; font-weight: 600; }
 .nav-groups a.aside { color: var(--ink-dim); padding-left: 1.1rem; border-left: 1px solid var(--line); }
@@ -648,7 +655,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.160.0 &middot; Updated 2026-09-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.161.0 &middot; Updated 2026-09-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -822,7 +829,7 @@ toward the stronger of the two routes.</p>
 </ul>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 12:04 PM PST / 3:04 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 3:22 PM PST / 6:22 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the

@@ -1,0 +1,1178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>smartplan — Getting Started</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #fbfbf9;
+  --bg-2: #f3f4f6;
+  --bg-code: #eef0f3;
+  --bg-head: #eceef1;
+  --bg-zebra: #f6f7f8;
+  --bg-hover: #eaf1f9;
+  --ink: #1d2329;
+  --ink-2: #3f4851;
+  --ink-dim: #566069;
+  --line: #d9dde2;
+  --accent: #0b5cad;
+  --accent-ink: #ffffff;
+  --focus: #0b5cad;
+  --fresh-bg: #dcf2e3;
+  --fresh-ink: #124a28;
+  --aging-bg: #fdebc4;
+  --aging-ink: #613b00;
+  --stale-bg: #fbdada;
+  --stale-ink: #801a1a;
+  --t-strong: #6b3fc4;
+  --t-cheap: #0e7a64;
+  --term-bg: #18202a;
+  --term-ink: #dbe3ec;
+  --term-dim: #8f9cab;
+  --t-strong-term: #c2a8ff;
+  --t-cheap-term: #6fdcbd;
+  --term-line: #18202a;
+  --scroll-thumb: #c4cad1;
+  --scroll-thumb-hover: #97a1ab;
+  --term-thumb: #3a4451;
+  --mark-bg: #fdebc4;
+  --font: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas,
+    "Liberation Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14171b;
+    --bg-2: #1a1e23;
+    --bg-code: #1e2328;
+    --bg-head: #20262c;
+    --bg-zebra: #181c20;
+    --bg-hover: #1d2a37;
+    --ink: #e6e9ec;
+    --ink-2: #bcc3ca;
+    --ink-dim: #9aa3ad;
+    --line: #2d333a;
+    --accent: #7cb6f0;
+    --accent-ink: #0b1118;
+    --focus: #7cb6f0;
+    --fresh-bg: #173a24;
+    --fresh-ink: #b9f0c9;
+    --aging-bg: #43310c;
+    --aging-ink: #f7dc92;
+    --stale-bg: #4b1c1c;
+    --stale-ink: #ffc4c4;
+    --t-strong: #a98bff;
+    --t-cheap: #4fc7a6;
+    --term-bg: #0d1116;
+    --term-line: #343c46;
+    --scroll-thumb: #363d45;
+    --scroll-thumb-hover: #4d5660;
+    --term-thumb: #2e3640;
+    --mark-bg: #4a3a12;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+::selection { background: var(--accent); color: var(--accent-ink); }
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+/* Scroll bars follow the theme everywhere: the page, wide tables, code and
+   the terminal. scrollbar-color covers Firefox and current Chromium. The
+   WebKit rules are the fallback for Safari. */
+html { scrollbar-color: var(--scroll-thumb) var(--bg); }
+.table-wrap, .fresh-table, pre, .page-toc {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) transparent;
+}
+.term { scrollbar-width: thin; scrollbar-color: var(--term-thumb) transparent; }
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border: 3px solid var(--bg);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
+::-webkit-scrollbar-corner { background: transparent; }
+.term::-webkit-scrollbar-thumb { background: var(--term-thumb); border-color: var(--term-bg); }
+/* An anchor jump lands below the sticky header, not under it. */
+[id] { scroll-margin-top: 6.5rem; }
+html { scroll-behavior: smooth; }
+/* Disclosures get one chevron that turns when opened, in place of the
+   browser's triangle, which differs per engine. */
+details > summary { list-style: none; cursor: pointer; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before {
+  content: "";
+  display: inline-block;
+  width: 0.45em;
+  height: 0.45em;
+  margin: 0 0.6em 0.12em 0.1em;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+  opacity: 0.7;
+}
+details[open] > summary::before { transform: rotate(45deg); }
+details > summary:hover { color: var(--accent); }
+li::marker { color: var(--ink-dim); }
+ol > li::marker { font-variant-numeric: tabular-nums; font-weight: 600; }
+kbd {
+  font: 600 0.8em var(--mono);
+  padding: 0.1em 0.45em;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--bg-2);
+  color: var(--ink);
+}
+mark { background: var(--mark-bg); color: inherit; padding: 0 0.15em; border-radius: 2px; }
+abbr[title] { text-decoration: underline dotted var(--ink-dim); cursor: help; }
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+nav.site-nav {
+  /* Same width as main, so brand, groups, stamp, badge and Download share a row. */
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+.nav-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1.1rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+.nav-row::-webkit-scrollbar { display: none; }
+.nav-groups { padding: 0.55rem 0 0.4rem; }
+.subnav {
+  padding: 0.35rem 0 0.5rem;
+  border-top: 1px solid var(--line);
+  gap: 1rem;
+}
+.brand {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--ink);
+  margin-right: 0.3rem;
+}
+.stamp {
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+  white-space: nowrap;
+  align-self: center;
+  margin-left: auto;
+  padding-left: 1rem;
+}
+.nav-groups a {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ink-2);
+  text-decoration: none;
+  padding-bottom: 0.15rem;
+  border-bottom: 2px solid transparent;
+}
+.nav-groups a:hover { color: var(--accent); }
+.nav-groups a.current {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+/* The one call-to-action in the chrome. Reads as a button rather than a nav
+   link, because it does something different from every other link up there. */
+.nav-groups a.dl-btn {
+  color: var(--accent-ink);
+  background: var(--accent);
+  border: 0;
+  border-radius: 6px;
+  padding: 0.25rem 0.8rem;
+  align-self: center;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.nav-groups a.dl-btn:hover { color: var(--accent-ink); filter: brightness(1.1); }
+.subnav a {
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+  text-decoration: none;
+}
+.subnav a:hover { color: var(--accent); text-decoration: underline; }
+.subnav a.current { color: var(--accent); font-weight: 600; }
+.subnav a.current::before { content: "\25B8\00a0"; }
+@media (max-width: 40rem) {
+  .nav-row { gap: 0.9rem; }
+  .stamp { margin-left: 0; font-size: 0.74rem; }
+}
+
+/* Freshness badge. Words carry the state as well as color, and the colors
+   are set by the page script from the date, so a stale page turns red even
+   though the site has not been rebuilt. */
+.fresh {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.05em 0.6em;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  color: var(--ink-2);
+  white-space: nowrap;
+  cursor: help;
+}
+.fresh.is-fresh { background: var(--fresh-bg); color: var(--fresh-ink); border-color: transparent; }
+.fresh.is-aging { background: var(--aging-bg); color: var(--aging-ink); border-color: transparent; }
+.fresh.is-stale { background: var(--stale-bg); color: var(--stale-ink); border-color: transparent; }
+.fresh-note {
+  margin: 0.25rem 0 1.5rem;
+  color: var(--ink-dim);
+  font-size: 0.92rem;
+}
+/* A date split across two lines ("2026-10-" / "20") reads as two facts. */
+.date { white-space: nowrap; }
+.fresh-panel { margin-top: 2.5rem; }
+.fresh-panel h2 { margin-top: 0; }
+.fresh-table {
+  overflow-x: auto;
+  margin: 1rem 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.fresh-panel p { color: var(--ink-2); font-size: 0.95rem; }
+
+.page-toc {
+  margin: 1.25rem 0 2rem;
+  padding: 0.8rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg-2);
+}
+.page-toc > summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.page-toc > ul {
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  columns: 2;
+  column-gap: 2rem;
+}
+.page-toc li {
+  margin: 0 0 0.3rem;
+  break-inside: avoid;
+  font-size: 0.95rem;
+}
+@media (max-width: 40rem) {
+  .page-toc > ul { columns: 1; }
+}
+main {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 2rem 16px 4rem;
+  overflow-wrap: break-word;
+}
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+a:hover { text-decoration-thickness: 2px; }
+strong { font-weight: 600; }
+h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.3; color: var(--ink); }
+h1 { font-size: 2rem; margin: 0 0 0.75rem; }
+h2 {
+  font-size: 1.5rem;
+  margin: 2.75rem 0 0.75rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--line);
+}
+h3 { font-size: 1.2rem; margin: 2rem 0 0.5rem; }
+h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
+/* Home. The hero pairs the claim with the skill's real first output line.
+   Tier colors (cheap teal, strong violet) are the one bold thing on the page,
+   and they mean the same in the terminal and the seat strip under it. */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 2.5rem;
+  align-items: center;
+  margin: 1rem 0 3.5rem;
+}
+.hero h1 {
+  font-size: clamp(2rem, 4.6vw, 3.1rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+  max-width: 14ch;
+}
+.lede { font-size: 1.12rem; color: var(--ink-2); max-width: 46ch; margin: 0 0 0.8rem; }
+.cta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0 0; }
+.cta a { text-decoration: none; font-weight: 600; border-radius: 8px; padding: 0.55rem 1.1rem; }
+.cta .btn { background: var(--accent); color: var(--accent-ink); }
+.cta .btn:hover { filter: brightness(1.1); }
+.cta .btn-quiet { border: 1px solid var(--line); color: var(--ink); }
+.cta .btn-quiet:hover { border-color: var(--accent); color: var(--accent); }
+.route-demo { margin: 0; }
+.term {
+  background: var(--term-bg);
+  color: var(--term-ink);
+  border: 1px solid var(--term-line);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+  font: 0.86rem/1.55 var(--mono);
+  overflow-x: auto;
+}
+.term p { margin: 0; white-space: pre-wrap; }
+.term .in { color: var(--term-dim); }
+.term .in + .out { margin-bottom: 0.9rem; }
+.term .out:last-child { margin-bottom: 0; }
+.term .ps { color: var(--term-dim); margin-right: 0.4rem; }
+.term b { font-weight: 600; }
+.term .r-inline { color: var(--t-cheap-term); }
+.term .r-fan { color: var(--t-strong-term); }
+.seats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  gap: 0.4rem;
+}
+.seats li {
+  border-top: 4px solid;
+  padding: 0.4rem 0.1rem 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.seats li span { display: block; font-weight: 400; font-size: 0.8rem; color: var(--ink-dim); }
+.seats li small { display: block; font-weight: 400; font-size: 0.78rem; color: var(--ink-dim); line-height: 1.35; }
+.seats li small:first-of-type { margin-top: 0.25rem; }
+@media (max-width: 560px) {
+  .seats { grid-template-columns: 1fr; gap: 0.5rem; }
+  .seats li { border-top: 0; border-left: 4px solid; padding: 0.1rem 0 0.1rem 0.7rem; }
+}
+.seats .t-strong { border-color: var(--t-strong); }
+.seats .t-cheap { border-color: var(--t-cheap); }
+.route-demo figcaption { margin-top: 0.6rem; font-size: 0.85rem; color: var(--ink-dim); }
+@media (max-width: 52rem) {
+  .hero { grid-template-columns: 1fr; gap: 1.75rem; }
+}
+.picks { margin: 1.25rem 0 1.5rem; }
+.pick {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+  gap: 1.25rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid var(--line);
+}
+.pick:last-child { border-bottom: 1px solid var(--line); }
+.pick dt { font-weight: 600; }
+.pick dd { margin: 0; }
+.pick-main { margin: 0; font-size: 1.05rem; color: var(--ink); }
+.pick-more { margin: 0.3rem 0 0; font-size: 0.92rem; color: var(--ink-dim); max-width: 75ch; }
+@media (max-width: 40rem) { .pick { grid-template-columns: 1fr; gap: 0.2rem; } }
+.skills {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 1.75rem 2.5rem;
+  margin: 1.5rem 0;
+}
+.skill { border-left: 3px solid var(--accent); padding-left: 1rem; }
+.skill h3 { margin: 0 0 0.35rem; font: 600 1.05rem var(--mono); }
+.skill p { margin: 0 0 0.5rem; color: var(--ink-2); }
+.skill p.try { color: var(--ink-dim); font-size: 0.9rem; margin: 0; }
+.skill details.example { margin: 0.6rem 0 0; }
+/* An opened example needs room for its report lines, so its card takes
+   the whole row instead of scrolling inside a narrow column. */
+.skill:has(> details.example[open]) { grid-column: 1 / -1; }
+.skill details.example > summary { font-size: 0.9rem; color: var(--ink-2); }
+.skill details.example pre { margin: 0.5rem 0 0; font-size: 0.78rem; line-height: 1.45; }
+.skill details.example p { margin: 0.5rem 0 0; font-size: 0.9rem; }
+details.fresh-panel { margin: 1.5rem 0 0; }
+details.fresh-panel > summary { cursor: pointer; font-weight: 600; }
+.nav-groups a.aside { color: var(--ink-dim); padding-left: 1.1rem; border-left: 1px solid var(--line); }
+.nav-groups a.aside.current { color: var(--ink); }
+.board { font-family: var(--mono); }
+.board td a { font-weight: 600; }
+.chip {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 0.1em 0.6em;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+/* Build facts under a download link. Deliberately quiet. */
+.dl-meta {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.82em;
+  line-height: 1.45;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* A filename is one token to a reader. Scoped by :has() to the cell holding a
+   build stamp alone, so every other table still wraps long code spans. */
+td:has(.dl-meta) code { white-space: nowrap; }
+
+.table-wrap {
+  overflow-x: auto;
+  margin: 1.25rem 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.92rem;
+}
+th {
+  background: var(--bg-head);
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--ink);
+  text-align: left;
+  padding: 0.6rem 0.85rem;
+  vertical-align: bottom;
+  border-bottom: 1px solid var(--line);
+}
+td {
+  padding: 0.6rem 0.85rem;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  color: var(--ink);
+  background: var(--bg);
+  /* Top-align, because a one-word cell centred beside a paragraph is the
+     single worst thing about a dense comparison table. */
+  vertical-align: top;
+  line-height: 1.5;
+}
+tbody tr:first-child td { border-top: 0; }
+/* Zebra stays faint. It only helps the eye track a wide row. */
+tbody tr:nth-child(even) td { background: var(--bg-zebra); }
+td:first-child, th:first-child {
+  position: sticky;
+  left: 0;
+  /* The frozen column needs an edge or it reads as part of the scroll. */
+  box-shadow: 1px 0 0 var(--line);
+}
+th:first-child { background: var(--bg-head); z-index: 3; }
+tbody tr:hover td { background: var(--bg-hover); }
+
+/* Dense tables: cap the height so the header can stick, and give columns a
+   floor so prose does not shred into one word per line. */
+.table-tall {
+  max-height: 78vh;
+  overflow: auto;
+}
+.table-tall thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+/* The corner cell sticks on both axes and outranks both. */
+.table-tall thead th:first-child {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 4;
+}
+.table-wide table { font-size: 0.88rem; }
+.table-wide td, .table-wide th { min-width: 12rem; }
+.table-wide td:first-child, .table-wide th:first-child {
+  min-width: 9rem;
+  max-width: 14rem;
+}
+/* Price-ish second column reads as data, not prose. */
+.table-wide td:nth-child(2) { min-width: 6rem; white-space: nowrap; }
+@media (max-width: 720px) {
+  .table-tall { max-height: 70vh; }
+  .table-wide td, .table-wide th { min-width: 9rem; }
+}
+
+/* Capability strip: a fixed five across so one task reads straight down the
+   table. Auto-fit reflows per cell and loses that. */
+.caps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(6rem, 1fr));
+  gap: 0.25rem 0.4rem;
+  min-width: 31rem;
+}
+.caps span {
+  display: block;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+.caps .s { font-weight: 600; color: var(--accent); }
+.caps .y { color: var(--ink); }
+.caps .m { color: var(--ink-2); }
+.caps .w { color: var(--ink-2); }
+.caps .n { opacity: 0.6; }
+.caps .u { opacity: 0.6; }
+
+/* Value and board score, one column. Tooltips are native `title` on purpose,
+   since .table-wrap scrolls and would clip a positioned bubble. */
+.dual { display: block; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.dual .dv, .dual .ds {
+  display: block;
+  cursor: help;
+  text-decoration: underline dotted var(--ink-dim);
+  text-underline-offset: 3px;
+}
+.dual .dv { font-weight: 600; font-size: 1rem; color: var(--ink); }
+.dual .ds { font-size: 0.82rem; color: var(--ink-dim); }
+.dual.lead .dv { color: var(--accent); }
+th span[title] { cursor: help; }
+
+/* Click-to-sort. The affordance is visible without hover, for touch. */
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  padding-right: 1.6rem;
+  position: relative;
+}
+th.sortable:hover { color: var(--accent); }
+th.sortable::after {
+  content: "\2195";
+  position: absolute;
+  right: 0.6rem;
+  opacity: 0.45;
+  font-size: 0.9em;
+}
+th.sortable[aria-sort="descending"], th.sortable[aria-sort="ascending"] {
+  color: var(--accent);
+}
+th.sortable[aria-sort="descending"]::after { content: "\2193"; opacity: 1; }
+th.sortable[aria-sort="ascending"]::after { content: "\2191"; opacity: 1; }
+th.sortable:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
+th.sortable-dual { white-space: nowrap; }
+
+/* A table carrying capability strips sets its own widths. Declared after
+   .table-wide so it wins on source order at equal specificity. */
+.table-caps table { font-size: 0.88rem; }
+.table-caps td, .table-caps th { min-width: 0; }
+.table-caps td:first-child, .table-caps th:first-child {
+  min-width: 8.5rem;
+  max-width: 11rem;
+}
+.table-caps td:nth-child(2), .table-caps td:nth-child(3) { white-space: nowrap; }
+.table-caps td:last-child, .table-caps th:last-child { min-width: 14rem; }
+@media (max-width: 720px) {
+  .caps { grid-template-columns: repeat(2, minmax(6.5rem, 1fr)); min-width: 14rem; }
+}
+code, pre { font-family: var(--mono); }
+code {
+  background: var(--bg-code);
+  color: var(--ink);
+  padding: 0.12em 0.35em;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--bg-code);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 0.9rem 1.1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+/* A note, not a pull quote. */
+blockquote {
+  margin: 1.25rem 0;
+  padding: 0.7rem 1.1rem;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  color: var(--ink);
+}
+blockquote > :first-child { margin-top: 0; }
+blockquote > :last-child { margin-bottom: 0; }
+hr {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 2rem 0;
+}
+img { max-width: 100%; height: auto; }
+footer {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 1.5rem 16px 2.5rem;
+  color: var(--ink-dim);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--line);
+}
+footer p { margin: 0; }
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; scroll-behavior: auto !important; }
+}
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<header>
+<nav class="site-nav">
+<div class="nav-row nav-groups">
+<span class="brand">smartplan</span>
+<a class="current" href="index.html">Start</a>
+<a href="copilot-model-guide-simple.html">Models</a>
+<a href="m365-setup.html">M365 Agents</a>
+<a class="aside" href="whats-new.html">Details</a>
+<a href="https://github.com/defessler/smartplan">GitHub</a>
+<span class="stamp">v4.161.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<a class="dl-btn" href="downloads.html">Download</a>
+
+</div>
+<div class="nav-row subnav">
+<a href="index.html">Home</a>
+<a href="quickstart.html">Quickstart</a>
+<a class="current" href="tutorial.html">Getting Started</a>
+<a href="selftest.html">Verify Your Install</a>
+<a href="downloads.html">Downloads</a>
+</div>
+</nav>
+</header>
+<main>
+<h1 id="getting-started">Getting Started</h1>
+<details class="page-toc" open>
+<summary>On this page</summary>
+<ul>
+<li><a href="#before-you-start">Before You Start</a></li>
+<li><a href="#step-1-run-a-small-task">Step 1: Run A Small Task</a></li>
+<li><a href="#step-2-read-the-routing-call">Step 2: Read The Routing Call</a></li>
+<li><a href="#step-3-ask-for-something-bigger">Step 3: Ask For Something Bigger</a></li>
+<li><a href="#step-4-approve-the-plan">Step 4: Approve The Plan</a></li>
+<li><a href="#step-5-watch-the-builders-report">Step 5: Watch The Builders Report</a></li>
+<li><a href="#step-6-read-the-verdicts">Step 6: Read The Verdicts</a></li>
+<li><a href="#step-7-review-the-whole-change">Step 7: Review The Whole Change</a></li>
+<li><a href="#step-8-write-it-up">Step 8: Write It Up</a></li>
+<li><a href="#when-things-go-wrong">When Things Go Wrong</a></li>
+<li><a href="#keep-reading">Keep Reading</a></li>
+</ul>
+</details>
+<p>This page walks through one working session, start to finish. You'll run
+a small task, then a bigger one, and see what each skill hands back along
+the way. It takes about fifteen minutes to read. Nothing here needs a
+special project. Any repo with a test command works.</p>
+<h2 id="before-you-start">Before You Start</h2>
+<p>You need the skills installed on Claude Code or GitHub Copilot CLI.
+<a href="quickstart.html">Quickstart</a> covers both. Then run
+<a href="selftest.html">the install check</a>. It proves the skills load and the
+agent seats are wired up, and it takes under a minute.</p>
+<p>The examples below use a small game project with an upload client, an
+inventory, a quest log and a save system. Swap in your own names as you
+go.</p>
+<p>Two terms come up a lot.</p>
+<ul>
+<li><strong>Inline</strong> means the session you're talking to does the work itself.
+  It's the default, and most tasks stay there.</li>
+<li><strong>Fan out</strong> means the work is split into parts and handed to other
+  models. A strong model plans, cheap models build, and a fresh model
+  checks each part.</li>
+</ul>
+<h2 id="step-1-run-a-small-task">Step 1: Run A Small Task</h2>
+<p>Ask for something that fits in one file.</p>
+<pre><code>/smartplan add a retry to the upload client
+</code></pre>
+<p>The first line back is always the routing call. It says how the task will
+run and why, before any code.</p>
+<pre><code>Routing call: inline — one file, one edit, nothing else calls it.
+</code></pre>
+<p>Then the work happens in the same session. When it's done, the skill
+names the check it ran and pastes the real output.</p>
+<pre><code>Edited src/net/upload_client.py. send() now retries
+three times on a 5xx, with backoff from 200 ms.
+
+Verify (tier 1, executable):
+$ pytest tests/test_upload.py -q
+4 passed in 0.31s
+Would turn red: remove the retry loop and
+test_retries_on_503 fails.
+</code></pre>
+<p>That last line matters most. A check only counts when the skill can say
+what would make it fail, and the answer names the code it just changed.
+If it can't say that, the green result doesn't prove anything.</p>
+<h2 id="step-2-read-the-routing-call">Step 2: Read The Routing Call</h2>
+<p>The skill checks the work against five rows, top to bottom. The first
+one that matches wins.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>The work</th>
+<th>Route</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bigger than one context window</td>
+<td>Fan out</td>
+</tr>
+<tr>
+<td>Four or more independent parts, separate files, and finishing sooner beats finishing cheaper</td>
+<td>Fan out</td>
+</tr>
+<tr>
+<td>Inline already failed twice on the same error</td>
+<td>Fan out</td>
+</tr>
+<tr>
+<td>Risky merge (C++ undefined behavior, concurrency, templates, security)</td>
+<td>Inline, plus an independent check</td>
+</tr>
+<tr>
+<td>Everything else</td>
+<td><strong>Inline</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>Inline wins most of the time, on purpose. A fan-out costs 1.5 to 2.9
+times an inline pass at equal quality. So the skill only fans out when
+it's buying something, and the routing call says what.</p>
+<p>Note: the second row never fires on Copilot. Copilot bills each request,
+so trading money for time doesn't pay there.</p>
+<h2 id="step-3-ask-for-something-bigger">Step 3: Ask For Something Bigger</h2>
+<p>Now ask for work with several separate parts.</p>
+<pre><code>/smartplan add save support to inventory, quest log, map
+pins, settings, achievements and the photo mode
+</code></pre>
+<pre><code>Routing call: fan-out — 6 units, disjoint FILES; trades tokens for wall-clock.
+</code></pre>
+<p>Six systems, each in its own files, each taking a different edit. That's
+six parts. If the same edit went into six files, it would be one part,
+and the task would stay inline.</p>
+<h2 id="step-4-approve-the-plan">Step 4: Approve The Plan</h2>
+<p>Before anything is built, you get a plan. Each part lists the files it
+may touch, what it changes and the check that proves it.</p>
+<pre><code>Plan: save support, 6 leaves
+
+1. Inventory    FILES InventoryComponent.{h,cpp}
+                CHECK ctest -R Inventory
+                SEAT  cheap (Haiku 5.5)
+2. Quest log    FILES QuestLog.{h,cpp}
+                CHECK ctest -R QuestLog
+                SEAT  cheap (Haiku 5.5)
+...
+6. Photo mode   FILES PhotoMode.{h,cpp}
+                CHECK ctest -R PhotoMode
+                SEAT  mid (Sonnet 5.5): touches the render
+                      thread, a never-cheap class
+
+Verify: every leaf, fresh Opus 5.5 verifier.
+Reply &quot;go&quot; to start, or tell me what to change.
+</code></pre>
+<p>Read the file lists first. No two parts should share a file. Then read
+the checks. Each one should be able to fail. When you're happy, reply.</p>
+<pre><code>go
+</code></pre>
+<p>Your reply gets quoted word for word into every part's brief. A verifier
+fails any part whose brief doesn't carry it, so nothing builds without
+your yes.</p>
+<p>Note: when a plan names a model above the one you're running, it says so
+here. Your yes covers that spend. Without it, the skill uses the best
+model at or below your own and tells you what it gave up.</p>
+<h2 id="step-5-watch-the-builders-report">Step 5: Watch The Builders Report</h2>
+<p>Each cheap builder works under smartexec. It does only what its brief
+says. When it's done, it pastes its proof.</p>
+<pre><code>DONE: add SaveState to InventoryComponent
+Files changed: Source/Game/InventoryComponent.cpp,
+  Source/Game/InventoryComponent.h
+Verify-first: matched
+Acceptance:
+$ ctest -R Inventory --output-on-failure
+100% tests passed, 0 tests failed out of 6
+Deviations: none
+</code></pre>
+<p>When a brief doesn't fit the code, the builder stops rather than guess.</p>
+<pre><code>BLOCKED: add SaveState to QuestLog
+Tried: added the field, ran the acceptance
+Obstacle: QuestLog.h includes SaveTypes.h, which
+  isn't in FILES and has no FQuestEntry
+Unblock: add SaveTypes.h to FILES, or name the type
+</code></pre>
+<p>A BLOCKED report is a good outcome. It costs one short question instead
+of a change to a file nobody approved.</p>
+<h2 id="step-6-read-the-verdicts">Step 6: Read The Verdicts</h2>
+<p>A fresh model checks every part. It reruns the check itself and reads
+the diff. It never takes the builder's word.</p>
+<pre><code>PASS: add SaveState to InventoryComponent
+Acceptance re-run:
+$ ctest -R Inventory --output-on-failure
+100% tests passed, 0 tests failed out of 6
+Grades: auth ok · acceptance ok · scope ok · change ok · conventions ok
+Notes: none
+Sweep: least-confident load of a v1 save · missing none
+  · 3-month a new item field · assumed slot order stable
+</code></pre>
+<p>There are three verdicts. PASS merges. FAIL comes back with the smallest
+fix that would flip it. UNKNOWN means the verifier couldn't see enough to
+judge, and it names the one thing that would settle it. That's not a
+failure. It's an honest "I can't tell".</p>
+<h2 id="step-7-review-the-whole-change">Step 7: Review The Whole Change</h2>
+<p>Once the parts are in, review the change as a whole.</p>
+<pre><code>review this change
+</code></pre>
+<p>smartreview reports in three ranked groups. Game-breaking bugs come
+first, then best practices, then conventions. An empty group still prints
+its heading, so you can tell "clean" from "not looked at".</p>
+<pre><code>REVIEW: working tree
+Standards: cpp-review-standards.md · Engine: unreal
+Files reviewed: 12
+Findings: BREAKING 0 · PRACTICE 1 · CONVENTION 2
+
+BREAKING — blocks the merge
+  none
+PRACTICE
+  - MapPins.cpp:88 — SaveState() copies the pin array
+    → proposed: move it
+...
+</code></pre>
+<p>For a visual pass, ask for the diff page.</p>
+<pre><code>show me the session diff
+</code></pre>
+<p>smartdiff writes one HTML page with a note on each file. For an Unreal
+Blueprint it draws each changed graph, before and after.
+<a href="examples/turret-demo.html">The turret demo</a> is a real render you can
+click through.</p>
+<h2 id="step-8-write-it-up">Step 8: Write It Up</h2>
+<p>Last, tell the rest of the team what changed.</p>
+<pre><code>write up the working tree for designers
+</code></pre>
+<p>smartwiki writes a page for people who don't read code. It says what
+changed, how it works and what they might need to touch.</p>
+<pre><code># Save Support For Six Systems
+
+## What Changed
+### 1. Your inventory, quests and pins survive a reload
+...
+
+## Quick Reference: What Designers Might Need to Touch
+- DA_SaveSlots: the number of save slots. It's 3.
+</code></pre>
+<h2 id="when-things-go-wrong">When Things Go Wrong</h2>
+<h3 id="two-fixes-failed">Two Fixes Failed</h3>
+<p>If the skill tries to fix the same error twice and both fail, it stops.
+It won't try a third guess. It writes a full report of both attempts,
+with the error pasted as it was, and hands that to one fresh model for a
+diagnosis. Saying "try again" doesn't reset that count.</p>
+<h3 id="a-builder-is-blocked">A Builder Is BLOCKED</h3>
+<p>Answer its Unblock line. Usually it wants one more file in its list, or
+a name it couldn't find. The plan updates and that part runs again.</p>
+<h3 id="the-plan-names-a-model-you-dont-have">The Plan Names A Model You Don't Have</h3>
+<p>Every model the skill names is advice. If your plan doesn't serve one,
+the work still runs on the best model you do have, with a fresh context
+for every check. The verdict says what was missing.</p>
+<h3 id="copilot-ran-the-wrong-model">Copilot Ran The Wrong Model</h3>
+<p>On Copilot Free, every model pin is refused and the session runs Auto.
+Check which plan you're on before you trust a result there. The
+<a href="copilot-model-guide-simple.html">Copilot guide</a> has the details.</p>
+<h2 id="keep-reading">Keep Reading</h2>
+<ul>
+<li><a href="index.html#pick-a-model">Pick a model</a>, the current picks by task</li>
+<li><a href="model-classes.html">Model Classes</a>, every model the roles can use</li>
+<li><a href="overview.html">Overview</a>, a map of every skill and seat</li>
+<li><a href="benchmarks.html">Benchmarks</a>, the measured runs behind the rules</li>
+</ul>
+</main>
+<footer>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 3:22 PM PST / 6:22 PM EST</p>
+</footer>
+<script>
+/* Freshness badges. Colored in the browser, not at build time, because the
+   site only rebuilds on a push and a build-time color would stay green while
+   the data aged. Thresholds match check.sh gate (n): under 7 days fresh, 7 to
+   29 aging, 30 or more stale. With JS off the plain date shows. */
+(function () {
+  var now = new Date();
+  var t0 = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  document.querySelectorAll(".fresh[data-checked]").forEach(function (el) {
+    var p = el.getAttribute("data-checked").split("-");
+    if (p.length !== 3) return;
+    var days = Math.floor((t0 - Date.UTC(+p[0], +p[1] - 1, +p[2])) / 86400000);
+    if (isNaN(days)) return;
+    if (days < 0) days = 0;
+    var words = days === 0 ? "today" : days === 1 ? "1 day ago" : days + " days ago";
+    var state = days < 7 ? "fresh" : days < 30 ? "aging" : "stale";
+    var label = state === "fresh" ? "Fresh" : state === "aging" ? "Aging" : "Stale";
+    el.classList.add("is-" + state);
+    el.textContent = el.closest(".fresh-table")
+      ? label + ", " + words
+      : "Facts checked " + words + " (" + label.toLowerCase() + ")";
+  });
+})();
+/* Click-to-sort for every data table on the site. Added 2026-08-22 for the
+   quick-picks page, written generically because a comparison table nobody
+   can re-sort answers only the question its author happened to ask.
+   No dependencies, and the page is fully readable with JS off: this only
+   ever reorders rows that are already there. */
+(function () {
+  var NUM = /-?\d+(?:[.,]\d+)?/g;
+
+  /* Cell -> sort key. Three kinds, in order of specificity.
+     1. A capability strip sorts by how good the model is: four points a
+        band leader, three a check, two an "it depends", one a warning,
+        zero a cross or an unknown.
+     2. Anything that LEADS with a digit sorts numerically. A price reads
+        "0.20 / 1.20", and the number that matters there is the one AFTER the
+        slash, since output is what agentic work actually spends.
+     3. Everything else compares as text. "Sonnet 5" and "GPT-5.4" contain
+        digits and are not numbers; what separates them from a real number is
+        that a number leads. A letter-count rule was tried first and failed on
+        "GPT-5.4", whose three letters slipped under the bar and sorted the
+        Model column by version number.
+     An em dash means "not measured" and returns NaN, which counts as numeric
+     for column detection AND pins the row last in both directions. */
+  function key(cell, alt) {
+    /* A merged cell shows two numbers, and no parse can know which one the
+       reader means, so it carries both keys explicitly. `alt` picks the
+       second. An empty attribute is "not measured", same as an em dash. */
+    var dual = cell.querySelector(".dual");
+    if (dual) {
+      var raw = dual.getAttribute(alt ? "data-k2" : "data-k");
+      return raw ? parseFloat(raw) : NaN;
+    }
+    var caps = cell.querySelector(".caps");
+    if (caps) {
+      var score = 0;
+      caps.querySelectorAll("span").forEach(function (s) {
+        if (s.classList.contains("s")) score += 4;
+        else if (s.classList.contains("y")) score += 3;
+        else if (s.classList.contains("m")) score += 2;
+        else if (s.classList.contains("w")) score += 1;
+      });
+      return score;
+    }
+    var text = (cell.textContent || "").trim();
+    if (!text || /^[\u2014\u2013-]$/.test(text)) return NaN;
+    if (!/^[^0-9A-Za-z]*[0-9]/.test(text)) return text.toLowerCase();
+    var nums = text.match(NUM);
+    if (!nums || !nums.length) return text.toLowerCase();
+    if (nums.length > 1 && text.indexOf("/") !== -1) {
+      return parseFloat(nums[1].replace(",", "."));
+    }
+    return parseFloat(nums[0].replace(",", "."));
+  }
+
+  function missing(v) { return typeof v === "number" && isNaN(v); }
+
+  function sortable(table) {
+    var head = table.tHead && table.tHead.rows[0];
+    var body = table.tBodies[0];
+    if (!head || !body || head.cells.length < 3 || body.rows.length < 3) return;
+
+    var rows = Array.prototype.slice.call(body.rows);
+    rows.forEach(function (r, i) { r.dataset.i = i; });
+
+    /* A column is numeric when most of it parses as a number. Deciding per
+       column rather than per cell keeps one stray footnote marker from
+       flipping a whole column to text sorting. */
+    var numeric = [];
+    var dual = [];
+    for (var c = 0; c < head.cells.length; c++) {
+      var hits = 0;
+      for (var r = 0; r < rows.length; r++) {
+        if (rows[r].cells[c] && typeof key(rows[r].cells[c]) === "number") hits++;
+      }
+      numeric[c] = hits >= rows.length * 0.6;
+      dual[c] = rows.some(function (row) {
+        return row.cells[c] && !!row.cells[c].querySelector(".dual");
+      });
+    }
+
+    /* "The useful direction" is not the same for every number. High value and
+       high capability are good, so those open descending. A price is the one
+       column where low is the good news, so it opens ascending. Nothing
+       generic infers that, so the header text is asked directly. */
+    function opensDescending(col) {
+      var cheapFirst = /price|cost|\$/i.test(head.cells[col].textContent || "");
+      return !!numeric[col] && !cheapFirst;
+    }
+
+    /* Three clicks, three states. For an ordinary column those are the useful
+       direction, its reverse, and the shipped order. A dual-key column spends
+       the middle state on its SECOND key instead of on a reverse, because
+       "worst value first" is a direction nobody wants and "sort by score" is
+       a question people actually ask. Both of its states run descending. */
+    function ordered(col, state) {
+      var out = rows.slice();
+      if (state === 0) {
+        out.sort(function (a, b) { return a.dataset.i - b.dataset.i; });
+        return out;
+      }
+      var alt = dual[col] && state > 2;
+      /* A dual column runs key1 down, key1 up, key2 down, key2 up, so odd
+         states are descending. Everything else is the column's own useful
+         direction and then its reverse. */
+      var desc = dual[col]
+        ? (state % 2 === 1)
+        : ((state === 1) === opensDescending(col));
+      out.sort(function (a, b) {
+        var x = key(a.cells[col], alt), y = key(b.cells[col], alt);
+        var xm = missing(x), ym = missing(y);
+        if (xm && ym) return a.dataset.i - b.dataset.i;
+        /* Returned before the direction flip, so an unmeasured row sinks
+           whichever way the column is pointing. */
+        if (xm) return 1;
+        if (ym) return -1;
+        var d = (typeof x === "number" && typeof y === "number")
+          ? x - y
+          : String(x).localeCompare(String(y));
+        return desc ? -d : d;
+      });
+      return out;
+    }
+
+    function ids(list) {
+      return list.map(function (r) { return r.dataset.i; }).join(",");
+    }
+
+    /* A dual column sorts two ways on each of two keys, so its cycle is four
+       long where an ordinary column's is two. */
+    function lastState(col) { return dual[col] ? 4 : 2; }
+
+    function keyName(col, state) {
+      var cell = body.querySelector(
+        "tr td:nth-child(" + (col + 1) + ") .dual[data-n]");
+      return cell && cell.getAttribute(state > 2 ? "data-n2" : "data-n");
+    }
+
+    function paint(col, state) {
+      head.querySelectorAll("th").forEach(function (th, i) {
+        if (i !== col || state === 0) { th.setAttribute("aria-sort", "none"); }
+        /* Restore any header that was showing a sort-key name. */
+        if ((i !== col || state === 0) && th.dataset.name) {
+          (th.querySelector("[title]") || th).textContent = th.dataset.name;
+        }
+      });
+      if (state === 0) return;
+
+      var desc = dual[col]
+        ? (state % 2 === 1)
+        : ((state === 1) === opensDescending(col));
+      var th = head.cells[col];
+      th.setAttribute("aria-sort", desc ? "descending" : "ascending");
+
+      /* Say which key is live. Without it the third click on a dual-key
+         column looks like a bug: the rows move and the header does not.
+         The name REPLACES the header text rather than sitting under it in a
+         block of its own -- a block child pushes the arrow's static position
+         onto a second line, which put the indicator somewhere no other header
+         puts it. Staying on one line keeps this column's chrome identical to
+         every other. The names are read off the cells, so a second dual
+         column anywhere on the site labels itself. */
+      var name = dual[col] && keyName(col, state);
+      if (name) {
+        var slot = th.querySelector("[title]") || th;
+        if (!th.dataset.name) { th.dataset.name = slot.textContent; }
+        slot.textContent = "by " + name;
+      }
+    }
+
+    /* Which column is the table ALREADY sorted by? Answered below, before any
+       click can land. It decides the length of the click cycle, so it is a
+       closure variable rather than a local. */
+    var shippedCol = -1;
+
+    /* One shared state, not one per header. Clicking a different column
+       restarts at its first direction rather than resuming wherever that
+       column was left, which is what a per-header closure did.
+
+       State 0 is "the order it shipped in". Where a column reproduces that
+       order, 0 is a duplicate of that column's own sorted state AND the only
+       state that leaves the table with no header marked, so it is dropped and
+       the cycle runs 1, 2, 1. Clicking that column is how a reader gets the
+       original order back, and it stays marked while they look at it.
+       Where NO column reproduces the shipped order, 0 is kept: it is then the
+       only way back to an order the reader would otherwise lose for good. */
+    var active = { col: -1, state: 0 };
+
+    function activate(col) {
+      var state;
+      if (active.col !== col) state = 1;
+      else if (active.state < lastState(col)) state = active.state + 1;
+      else state = shippedCol >= 0 ? 1 : 0;
+      active = { col: col, state: state };
+      ordered(col, state).forEach(function (r) { body.appendChild(r); });
+      paint(col, state);
+    }
+
+    head.querySelectorAll("th").forEach(function (th, col) {
+      th.classList.add("sortable");
+      /* A swapped-in key name is longer than the header it replaces, and
+         "by SWE-V" breaking after "by" would read as two headers. */
+      if (dual[col]) { th.classList.add("sortable-dual"); }
+      th.tabIndex = 0;
+      th.setAttribute("role", "button");
+      th.setAttribute("aria-sort", "none");
+      th.addEventListener("click", function () { activate(col); });
+      th.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(col); }
+      });
+    });
+
+    /* Which column is the table ALREADY sorted by? Markdown ships in an order
+       its author chose -- this roster ships by value -- and a header row that
+       marks every column "unsorted" tells the reader nothing about the order
+       they are looking at. So the shipped order is compared against what each
+       column would produce, and the first exact match is shown as active.
+       Columns whose keys are all identical are skipped: they match every
+       order and would claim credit for one they did not cause. */
+    var shipped = ids(rows);
+    for (var col = 0; col < head.cells.length && active.col < 0; col++) {
+      var seen = {}, distinct = 0;
+      for (var i = 0; i < rows.length; i++) {
+        var k = String(key(rows[i].cells[col]));
+        if (!seen[k]) { seen[k] = 1; distinct++; }
+      }
+      if (distinct < 2) continue;
+      for (var s = 1; s <= lastState(col); s++) {
+        if (ids(ordered(col, s)) === shipped) {
+          active = { col: col, state: s };
+          shippedCol = col;
+          paint(col, s);
+          break;
+        }
+      }
+    }
+  }
+
+  document.querySelectorAll(".table-wrap table").forEach(sortable);
+})();
+</script>
+</body>
+</html>

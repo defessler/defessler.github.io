@@ -407,6 +407,13 @@ h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
 .skill h3 { margin: 0 0 0.35rem; font: 600 1.05rem var(--mono); }
 .skill p { margin: 0 0 0.5rem; color: var(--ink-2); }
 .skill p.try { color: var(--ink-dim); font-size: 0.9rem; margin: 0; }
+.skill details.example { margin: 0.6rem 0 0; }
+/* An opened example needs room for its report lines, so its card takes
+   the whole row instead of scrolling inside a narrow column. */
+.skill:has(> details.example[open]) { grid-column: 1 / -1; }
+.skill details.example > summary { font-size: 0.9rem; color: var(--ink-2); }
+.skill details.example pre { margin: 0.5rem 0 0; font-size: 0.78rem; line-height: 1.45; }
+.skill details.example p { margin: 0.5rem 0 0; font-size: 0.9rem; }
 details.fresh-panel { margin: 1.5rem 0 0; }
 details.fresh-panel > summary { cursor: pointer; font-weight: 600; }
 .nav-groups a.aside { color: var(--ink-dim); padding-left: 1.1rem; border-left: 1px solid var(--line); }
@@ -648,7 +655,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.160.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.161.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -668,7 +675,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-10-13-haiku-takes-the-claude-code-cheap-leaves-and-a-copilot-seat-keeps-its-own-work-v41470">2026-10-13 · Haiku takes the Claude Code Cheap leaves, and a Copilot seat keeps its own work (v4.147.0)</a></li>
 <li><a href="#2026-10-13-no-model-grade-is-required-anywhere-v41480">2026-10-13 · No model grade is required anywhere (v4.148.0)</a></li>
 <li><a href="#2026-10-17-a-grilled-plan-a-ready-frontier-phased-diagnosis-and-leaner-references-v41490">2026-10-17 · A grilled plan, a ready frontier, phased diagnosis, and leaner references (v4.149.0)</a></li>
 <li><a href="#2026-10-19-haiku-takes-the-mid-seat-fable-gets-triggers-leaner-standing-load-v41500">2026-10-19 · Haiku takes the Mid seat, Fable gets triggers, leaner standing load (v4.150.0)</a></li>
@@ -682,47 +688,13 @@ footer p { margin: 0; }
 <li><a href="#2026-11-03-before-and-after-views-filled-pins-and-folding-every-file-in-smartdiff-v41580">2026-11-03 · Before and After views, filled pins, and folding every file in smartdiff (v4.158.0)</a></li>
 <li><a href="#2026-11-03-a-site-that-leads-with-the-picks-the-skills-and-how-they-work-v41590">2026-11-03 · A site that leads with the picks, the skills and how they work (v4.159.0)</a></li>
 <li><a href="#2026-11-03-roles-before-vendors-on-the-site-themed-controls-and-a-one-day-data-refresh-v41600">2026-11-03 · Roles before vendors on the site, themed controls, and a one-day data refresh (v4.160.0)</a></li>
+<li><a href="#2026-11-03-an-example-for-every-skill-a-getting-started-tutorial-and-the-turret-demo-back-on-the-site-v41610">2026-11-03 · An example for every skill, a Getting Started tutorial, and the turret demo back on the site (v4.161.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-10-13-haiku-takes-the-claude-code-cheap-leaves-and-a-copilot-seat-keeps-its-own-work-v41470">2026-10-13 · Haiku takes the Claude Code Cheap leaves, and a Copilot seat keeps its own work (v4.147.0)</h2>
-<p>The author asked for a full refresh, to consider Haiku for coding, and to
-make a Copilot seat above Luna always hand its work to the newest Luna,
-if that proved a net positive.</p>
-<p><strong>Claude Code's Cheap implementer runs Haiku 5.5 at low.</strong> T45 is the
-evidence: both tasks passed 3 of 3 at 7% and 30% of Sonnet 5.5's cost per
-passing run. SKILL.md's Claude Code roles, the tier table, the verifier's
-tier check and the registry now say Haiku writes the mechanical leaves
-and Sonnet the rest. The Mid seat stays on Sonnet, since T45 hit the
-ceiling and never measured a judgment leaf.</p>
-<p><strong>T46 measured the Luna hand-off on Copilot and it doesn't ship.</strong>
-Pre-registered (fbaf045), 30 runs, 142 credits. A probe first showed a
-Copilot seat can dispatch its own subagent, and that the child runs at
-its parent's effort. A Mid seat on GPT-6.1 Sol that always handed
-execution to <code>smartplan-implementer-cheap</code> scored the same as the solo
-seat but cost 16.79 credits per passing semver2 run against 11.56. Sol's
-own requests rose from 10 to 16 per run to 19 to 26. copilot.md now says a
-seat above Luna may dispatch a Luna seat but never must.</p>
-<p><strong>Haiku 5.5 backs GPT-6 Luna on the Copilot Cheap implementer.</strong> It
-passed both T46 tasks 3 of 3 at low. Luna at medium missed one semver2
-case in every run, but renamed for 0.17 credits against 0.32. So the
-seat's list is <code>[gpt-6-luna, claude-haiku-5.5]</code> and Luna leads. Haiku's
-semver2 runs also paid for Copilot's own context compaction near 90K
-tokens, once at the over-100K tier.</p>
-<p><strong>The weekly sweep re-read all eight areas.</strong> Eight Sonnet readers and
-four Opus refute verifiers: 194 rows, 133 verdicts, 4 refuted, every one a
-reader error. Gemini 4 Argon is new on Copilot (Pro+ and up, a 2 / 10
-promo to 2026-12-01, AA 52.6) and gets a not-a-seat registry row, guide
-rows and a quick-picks band. tbench.ai renders again with 35 rows and
-reorders the top. Copilot CLI is at 1.0.97, and 1.0.94 was the first
-stable build to name Haiku 5.5. Claude Code 2.1.296's
-<code>CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL</code> overrides every stage's model, so
-the hook page warns against it. ZCode 3.15.1 adds a per-subagent workflow
-model. OpenAI and Google deprecated older small models. copilot.md,
-claude-code.md and zcode.md took budget raises.</p>
 <h2 id="2026-10-13-no-model-grade-is-required-anywhere-v41480">2026-10-13 · No model grade is required anywhere (v4.148.0)</h2>
 <p>The author asked that no part of smartplan require a specific grade of
 model. Offering one is fine. Requiring one isn't.</p>
@@ -1008,9 +980,28 @@ GPT-5.6 Sol, GPT-5.6 Luna and GPT-5 Chat retiring 2026-11-12, so
 Carbon gain their vals.ai Terminal-Bench 4.0 scores. Gemini 3.8 Flash's
 2027 step-up is stated inline. Claude Code reached 2.1.317 with no seat
 impact. Note: research/2026-11-03-sweep.md.</p>
+<h2 id="2026-11-03-an-example-for-every-skill-a-getting-started-tutorial-and-the-turret-demo-back-on-the-site-v41610">2026-11-03 · An example for every skill, a Getting Started tutorial, and the turret demo back on the site (v4.161.0)</h2>
+<p>The author asked for an example of what each skill's result looks like.
+Every skill card on the home page has a See an example fold now. It shows
+the skill's real report shape: smartplan's routing call and verify line,
+smartexec's DONE and BLOCKED reports, smartreview's three ranked groups,
+a smartwiki page, a smartdiagram outline and a smartvoice before and
+after. An opened card takes the whole row, so the report lines don't
+scroll inside a narrow column.</p>
+<p>At the author's request the site gains a Getting Started page, modeled
+on the sibling project sites' tutorials. It walks one session in eight
+steps, from a small inline task through a six-part fan-out, the plan
+approval, the builders' reports, the verdicts, a review and a write-up.
+A When Things Go Wrong section covers the spiral guard, a BLOCKED
+builder, a model the plan names but you don't have, and Copilot Free.</p>
+<p>The author also asked for the turret demo back. It's smartdiff's render
+of a turret whose targeting moves from its Blueprint into a C++
+component, re-rendered with the current diffview.py and published at
+<code>examples/turret-demo.html</code>. build-site.py copies <code>docs/examples/*.html</code>
+as is, with no site chrome, so the page is exactly what the skill writes.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 12:04 PM PST / 3:04 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 3:22 PM PST / 6:22 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the

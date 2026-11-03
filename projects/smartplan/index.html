@@ -407,6 +407,13 @@ h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
 .skill h3 { margin: 0 0 0.35rem; font: 600 1.05rem var(--mono); }
 .skill p { margin: 0 0 0.5rem; color: var(--ink-2); }
 .skill p.try { color: var(--ink-dim); font-size: 0.9rem; margin: 0; }
+.skill details.example { margin: 0.6rem 0 0; }
+/* An opened example needs room for its report lines, so its card takes
+   the whole row instead of scrolling inside a narrow column. */
+.skill:has(> details.example[open]) { grid-column: 1 / -1; }
+.skill details.example > summary { font-size: 0.9rem; color: var(--ink-2); }
+.skill details.example pre { margin: 0.5rem 0 0; font-size: 0.78rem; line-height: 1.45; }
+.skill details.example p { margin: 0.5rem 0 0; font-size: 0.9rem; }
 details.fresh-panel { margin: 1.5rem 0 0; }
 details.fresh-panel > summary { cursor: pointer; font-weight: 600; }
 .nav-groups a.aside { color: var(--ink-dim); padding-left: 1.1rem; border-left: 1px solid var(--line); }
@@ -648,13 +655,14 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.160.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-03" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-03</span></span>
+<span class="stamp">v4.161.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-03" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-03</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
 <div class="nav-row subnav">
 <a class="current" href="index.html">Home</a>
 <a href="quickstart.html">Quickstart</a>
+<a href="tutorial.html">Getting Started</a>
 <a href="selftest.html">Verify Your Install</a>
 <a href="downloads.html">Downloads</a>
 </div>
@@ -709,13 +717,28 @@ different model family. <a href="model-classes.html">Model Classes</a> lists eve
 model the roles can draw on.</p>
 <h2 id="what-you-get">What you get</h2>
 <p>Seven skills that work in Claude Code and Copilot CLI. You only ever call
-<code>/smartplan</code>. The rest trigger on what you ask for.</p>
+<code>/smartplan</code>. The rest trigger on what you ask for. Each one has a short
+example of what it gives back, and <a href="tutorial.html">Getting Started</a> walks
+through a whole session.</p>
 <div class="skills">
 <div class="skill">
 <h3 id="smartplan_1">smartplan</h3>
 <p>Routes each coding task. Work that fits one context runs inline. Bigger
 work goes to cheaper models, each behind an independent check.</p>
 <p class="try">Try <code>/smartplan add a retry to the upload client</code></p>
+<details class="example">
+<summary>See an example</summary>
+<pre><code>Routing call: inline — one file, one edit, nothing else calls it.
+
+Edited src/net/upload_client.py. send() now retries
+three times on a 5xx, with backoff from 200 ms.
+
+Verify (tier 1, executable):
+$ pytest tests/test_upload.py -q
+4 passed in 0.31s
+Would turn red: remove the retry loop and
+test_retries_on_503 fails.</code></pre>
+</details>
 </div>
 <div class="skill">
 <h3 id="smartexec">smartexec</h3>
@@ -723,6 +746,23 @@ work goes to cheaper models, each behind an independent check.</p>
 and proves it with pasted test output. Otherwise it stops and reports
 BLOCKED.</p>
 <p class="try">smartplan hands it to each part of a plan. You don't call it.</p>
+<details class="example">
+<summary>See an example</summary>
+<pre><code>DONE: add SaveState to InventoryComponent
+Files changed: Source/Game/InventoryComponent.cpp,
+  Source/Game/InventoryComponent.h
+Verify-first: matched
+Acceptance:
+$ ctest -R Inventory --output-on-failure
+100% tests passed, 0 tests failed out of 6
+Deviations: none</code></pre>
+<p>When the brief doesn't fit the code, it stops instead of guessing.</p>
+<pre><code>BLOCKED: add SaveState to QuestLog
+Tried: added the field, ran the acceptance
+Obstacle: QuestLog.h includes SaveTypes.h, which
+  isn't in FILES and has no FQuestEntry
+Unblock: add SaveTypes.h to FILES, or name the type</code></pre>
+</details>
 </div>
 <div class="skill">
 <h3 id="smartreview">smartreview</h3>
@@ -730,6 +770,27 @@ BLOCKED.</p>
 best practices, then conventions. The standards doc is swappable. Its
 default covers C++ for Unreal, a custom engine or plain C++.</p>
 <p class="try">Try "review this change"</p>
+<details class="example">
+<summary>See an example</summary>
+<pre><code>REVIEW: CL 48211
+Standards: cpp-review-standards.md · Engine: unreal
+Files reviewed: 3
+Findings: BREAKING 1 · PRACTICE 1 · CONVENTION 1
+
+BREAKING — blocks the merge
+  - WeaponPool.cpp:57 — lifetime — Acquire() returns a
+    pointer into a TArray that Grow() reallocates, so a
+    held shot dangles after the pool grows → proposed:
+    hand out an index
+PRACTICE
+  - WeaponPool.cpp:31 — Reset() copies an FTransform
+    per slot → proposed: take it by const&amp;
+CONVENTION
+  - WeaponPool.h:12 — rule 4 — bool member lacks the
+    b prefix → fix applied
+
+Categories swept, clean: threading, serialization</code></pre>
+</details>
 </div>
 <div class="skill">
 <h3 id="smartdiff">smartdiff</h3>
@@ -737,12 +798,37 @@ default covers C++ for Unreal, a custom engine or plain C++.</p>
 file. Unreal Blueprints get a graph-level diff with a drawing of each
 changed graph, before and after.</p>
 <p class="try">Try "show me the session diff"</p>
+<details class="example">
+<summary>See an example</summary>
+<p>It writes one HTML page. This one is a real render: a turret's
+targeting moves out of its Blueprint into a new C++ component, so the
+code diff and the Blueprint diff tell one story.</p>
+<p><a href="examples/turret-demo.html">Open the turret demo</a></p>
+</details>
 </div>
 <div class="skill">
 <h3 id="smartwiki">smartwiki</h3>
 <p>Writes a wiki page about a change for designers, QA and producers, from
 a Git commit, a pull request or a Perforce changelist.</p>
 <p class="try">Try "write up CL 1234 for designers"</p>
+<details class="example">
+<summary>See an example</summary>
+<pre><code># CL 1234 - Doors Remember Whether They're Open
+
+**Author:** J. Rivera
+**Date:** 2026-11-03
+
+## What Changed
+### 1. Doors keep their state across a save
+Open a door, save, quit and load. It's still open.
+
+## Config / Settings Changes
+None.
+
+## Quick Reference: What Designers Might Need to Touch
+- BP_Door: tick "Saves State" on doors that should
+  remember. It's off by default.</code></pre>
+</details>
 </div>
 <div class="skill">
 <h3 id="smartdiagram">smartdiagram</h3>
@@ -750,12 +836,35 @@ a Git commit, a pull request or a Perforce changelist.</p>
 by hand rather than dumped from every symbol. Click a part to see the
 rules it keeps.</p>
 <p class="try">Try "how is everything hooked up?"</p>
+<details class="example">
+<summary>See an example</summary>
+<p>It writes one interactive HTML page. In outline:</p>
+<pre><code>architecture.html
+Columns: Input │ Gameplay │ Net │ Save
+Flows:   [Fire weapon] [Load a save] [Join a match]
+
+Pick "Load a save": the path lights up across
+  SaveSystem → World → Inventory, and the rest dims.
+Click SaveSystem:
+  Owns:  slot files, the version header
+  Keeps: writes only on the game thread</code></pre>
+</details>
 </div>
 <div class="skill">
 <h3 id="smartvoice">smartvoice</h3>
 <p>Makes documents read in a voice profile you set per user, and strips the
 usual tells of AI writing. With no profile it stays out of the way.</p>
 <p class="try">Try "make this README sound less like AI"</p>
+<details class="example">
+<summary>See an example</summary>
+<pre><code>Before: In this guide, we will delve into how
+        you can leverage the build cache to
+        seamlessly supercharge your workflow.
+
+After:  This guide shows how to turn on the
+        build cache. A warm cache cuts a full
+        rebuild to about two minutes.</code></pre>
+</details>
 </div>
 </div>
 <h2 id="how-it-works">How it works</h2>
@@ -843,7 +952,7 @@ is worth that. It says so in the routing line when it does.</p>
 
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 12:04 PM PST / 3:04 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 3:22 PM PST / 6:22 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
