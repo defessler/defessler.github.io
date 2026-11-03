@@ -29,6 +29,14 @@
   --aging-ink: #613b00;
   --stale-bg: #fbdada;
   --stale-ink: #801a1a;
+  --t-strong: #6b3fc4;
+  --t-cheap: #0e7a64;
+  --term-bg: #18202a;
+  --term-ink: #dbe3ec;
+  --term-dim: #8f9cab;
+  --t-strong-term: #c2a8ff;
+  --t-cheap-term: #6fdcbd;
+  --term-line: #18202a;
   --font: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas,
@@ -55,6 +63,10 @@
     --aging-ink: #f7dc92;
     --stale-bg: #4b1c1c;
     --stale-ink: #ffc4c4;
+    --t-strong: #a98bff;
+    --t-cheap: #4fc7a6;
+    --term-bg: #0d1116;
+    --term-line: #343c46;
   }
 }
 * { box-sizing: border-box; }
@@ -241,14 +253,97 @@ h2 {
 }
 h3 { font-size: 1.2rem; margin: 2rem 0 0.5rem; }
 h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
-.hero { margin-bottom: 3rem; }
-.thesis {
-  font-size: clamp(1.3rem, 3.5vw, 1.7rem);
-  font-weight: 600;
-  line-height: 1.35;
-  margin: 0 0 1.5rem;
+/* Home. The hero pairs the claim with the skill's real first output line.
+   Tier colors (cheap teal, strong violet) are the one bold thing on the page,
+   and they mean the same in the terminal and the seat strip under it. */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 2.5rem;
+  align-items: center;
+  margin: 1rem 0 3.5rem;
 }
-.thesis em { font-style: normal; color: var(--accent); }
+.hero h1 {
+  font-size: clamp(2rem, 4.6vw, 3.1rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+  max-width: 14ch;
+}
+.lede { font-size: 1.12rem; color: var(--ink-2); max-width: 46ch; margin: 0 0 0.8rem; }
+.cta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0 0; }
+.cta a { text-decoration: none; font-weight: 600; border-radius: 8px; padding: 0.55rem 1.1rem; }
+.cta .btn { background: var(--accent); color: var(--accent-ink); }
+.cta .btn:hover { filter: brightness(1.1); }
+.cta .btn-quiet { border: 1px solid var(--line); color: var(--ink); }
+.cta .btn-quiet:hover { border-color: var(--accent); color: var(--accent); }
+.route-demo { margin: 0; }
+.term {
+  background: var(--term-bg);
+  color: var(--term-ink);
+  border: 1px solid var(--term-line);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+  font: 0.86rem/1.55 var(--mono);
+  overflow-x: auto;
+}
+.term p { margin: 0; white-space: pre-wrap; }
+.term .in { color: var(--term-dim); }
+.term .in + .out { margin-bottom: 0.9rem; }
+.term .out:last-child { margin-bottom: 0; }
+.term .ps { color: var(--term-dim); margin-right: 0.4rem; }
+.term b { font-weight: 600; }
+.term .r-inline { color: var(--t-cheap-term); }
+.term .r-fan { color: var(--t-strong-term); }
+.seats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  gap: 0.4rem;
+}
+.seats li {
+  border-top: 4px solid;
+  padding: 0.4rem 0.1rem 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.seats li span { display: block; font-weight: 400; font-size: 0.8rem; color: var(--ink-dim); }
+.seats .t-strong { border-color: var(--t-strong); }
+.seats .t-cheap { border-color: var(--t-cheap); }
+.route-demo figcaption { margin-top: 0.6rem; font-size: 0.85rem; color: var(--ink-dim); }
+@media (max-width: 52rem) {
+  .hero { grid-template-columns: 1fr; gap: 1.75rem; }
+}
+.picks { margin: 1.25rem 0 1.5rem; }
+.pick {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+  gap: 1.25rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid var(--line);
+}
+.pick:last-child { border-bottom: 1px solid var(--line); }
+.pick dt { font-weight: 600; }
+.pick dd { margin: 0; }
+.pick-main { margin: 0; font-size: 1.05rem; color: var(--ink); }
+.pick-more { margin: 0.3rem 0 0; font-size: 0.92rem; color: var(--ink-dim); max-width: 75ch; }
+@media (max-width: 40rem) { .pick { grid-template-columns: 1fr; gap: 0.2rem; } }
+.skills {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 1.75rem 2.5rem;
+  margin: 1.5rem 0;
+}
+.skill { border-left: 3px solid var(--accent); padding-left: 1rem; }
+.skill h3 { margin: 0 0 0.35rem; font: 600 1.05rem var(--mono); }
+.skill p { margin: 0 0 0.5rem; color: var(--ink-2); }
+.skill p.try { color: var(--ink-dim); font-size: 0.9rem; margin: 0; }
+details.fresh-panel { margin: 1.5rem 0 0; }
+details.fresh-panel > summary { cursor: pointer; font-weight: 600; }
+.nav-groups a.aside { color: var(--ink-dim); padding-left: 1.1rem; border-left: 1px solid var(--line); }
+.nav-groups a.aside.current { color: var(--ink); }
 .board { font-family: var(--mono); }
 .board td a { font-weight: 600; }
 .chip {
@@ -482,18 +577,21 @@ footer p { margin: 0; }
 <div class="nav-row nav-groups">
 <span class="brand">smartplan</span>
 <a href="index.html">Start</a>
-<a href="copilot-model-guide.html">Guides</a>
-<a href="benchmarks.html">Evidence</a>
-<a class="current" href="whats-new.html">Project</a>
+<a href="copilot-model-guide-simple.html">Models</a>
 <a href="m365-setup.html">M365 Agents</a>
+<a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.158.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.159.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
 <div class="nav-row subnav">
 <a href="whats-new.html">What's New</a>
+<a href="overview.html">Overview</a>
 <a href="refresh-pipeline.html">Refresh Pipeline</a>
+<a href="benchmarks.html">Benchmarks</a>
+<a href="goals.html">Goals & Status</a>
+<a href="benchmark-latest.html">Latest Record: T40</a>
 <a class="current" href="changelog.html">Changelog</a>
 </div>
 </nav>
@@ -503,7 +601,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-10-08-haiku-55-passes-the-implementer-trial-per-call-effort-beats-the-pin-and-copilot-is-back-on-free-v41460">2026-10-08 · Haiku 5.5 passes the implementer trial, per-call effort beats the pin, and Copilot is back on Free (v4.146.0)</a></li>
 <li><a href="#2026-10-08-pro-is-back-every-seat-serves-and-the-hook-stops-denying-copilot-v41461">2026-10-08 · Pro+ is back, every seat serves, and the hook stops denying Copilot (v4.146.1)</a></li>
 <li><a href="#2026-10-13-haiku-takes-the-claude-code-cheap-leaves-and-a-copilot-seat-keeps-its-own-work-v41470">2026-10-13 · Haiku takes the Claude Code Cheap leaves, and a Copilot seat keeps its own work (v4.147.0)</a></li>
 <li><a href="#2026-10-13-no-model-grade-is-required-anywhere-v41480">2026-10-13 · No model grade is required anywhere (v4.148.0)</a></li>
@@ -517,38 +614,13 @@ footer p { margin: 0; }
 <li><a href="#2026-11-03-smartdiff-draws-each-changed-blueprint-graph-v41560">2026-11-03 · smartdiff draws each changed Blueprint graph (v4.156.0)</a></li>
 <li><a href="#2026-11-03-drag-and-zoom-on-smartdiffs-graph-drawings-v41570">2026-11-03 · Drag and zoom on smartdiff's graph drawings (v4.157.0)</a></li>
 <li><a href="#2026-11-03-before-and-after-views-filled-pins-and-folding-every-file-in-smartdiff-v41580">2026-11-03 · Before and After views, filled pins, and folding every file in smartdiff (v4.158.0)</a></li>
+<li><a href="#2026-11-03-a-site-that-leads-with-the-picks-the-skills-and-how-they-work-v41590">2026-11-03 · A site that leads with the picks, the skills and how they work (v4.159.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-10-08-haiku-55-passes-the-implementer-trial-per-call-effort-beats-the-pin-and-copilot-is-back-on-free-v41460">2026-10-08 · Haiku 5.5 passes the implementer trial, per-call effort beats the pin, and Copilot is back on Free (v4.146.0)</h2>
-<p>T45, pre-registered and committed before any measured run, put Haiku 5.5
-at low, medium and high against the Claude Code implementer seat, Sonnet
-5.5 at medium, on T44's two tasks at k = 3. All 24 runs scored full marks.
-Haiku at low cost $0.0055 and $0.177 per passing run against Sonnet's
-$0.077 and $0.594, and finished semver2 in 391 seconds against 609. Every
-Haiku semver2 run crossed the 100K prompt tier, and the figures include
-it. The pre-registered rule says to recommend <code>model: haiku</code> at <code>effort:
-low</code> to the author, first for the Cheap implementer and then for the Mid
-one. The author's Sonnet rule holds, so nothing moved.</p>
-<p>Three probes on Claude Code 2.1.294 settled the per-call effort question
-2.1.292 opened. A <code>low</code>-pinned seat ran low on its own, stayed low under
-a per-call <code>model: opus</code>, and ran high under a per-call <code>effort: high</code>,
-so the new Agent-tool knob outranks a seat's frontmatter. The scout seat's
-<code>model: haiku</code> served <code>claude-haiku-5-5</code>. Four due re-check markers were
-re-read and moved.</p>
-<p>A Copilot retest found this box's account on <code>free_limited_copilot</code> since
-2026-10-03. On Free, CLI 1.0.93 refuses every pinned model, GPT-6 Luna
-included, and a session runs Auto on MAI-Code at about 0.25 credits a
-turn. That is what the earlier Haiku 5.5 refusal was, and the ledger now
-says so. GPT-6 Luna stays the Copilot primary for most work at the
-author's direction, with Haiku 5.5 at most a fallback behind it once a
-stable build names the slug. Claude Code's own cost figures turned out to
-price Sonnet 5.5 cache reads at the old 0.20 and Haiku 5.5 at both prompt
-tiers, which the T45 record documents. copilot.md and claude-code.md each
-took a budget raise.</p>
 <h2 id="2026-10-08-pro-is-back-every-seat-serves-and-the-hook-stops-denying-copilot-v41461">2026-10-08 · Pro+ is back, every seat serves, and the hook stops denying Copilot (v4.146.1)</h2>
 <p>The author restored Copilot Pro+ that evening. Six pinned models served
 on stable CLI 1.0.93 in one-turn probes, <code>claude-haiku-5.5</code> among them
@@ -848,9 +920,24 @@ the <code>e</code> and <code>c</code> keys fold every file at once. The key list
 of labeled chips. Each file header carries a type badge such as C++, C#
 or INI, next to the existing Blueprint one. A file's intent note gets
 even spacing above and below. The smartdiff self-test gains eight checks.</p>
+<h2 id="2026-11-03-a-site-that-leads-with-the-picks-the-skills-and-how-they-work-v41590">2026-11-03 · A site that leads with the picks, the skills and how they work (v4.159.0)</h2>
+<p>The author asked for a site that puts the latest useful information
+first and tucks the history away. The home page is now its own source,
+<code>docs/home.md</code>, built from the frontend-design skill's guidance. It
+opens with the routing call shown as real <code>/smartplan</code> output and the
+Plan, Build and Verify seats. Below that come the quick picks, pulled
+straight from the simple model guide so the two can't drift, then the
+seven skills with an example prompt each, how the routing works, the
+measured result and the install commands.</p>
+<p>The Evidence and Project nav groups became one quieter Details group
+holding What's New, the overview, benchmarks, goals and the changelog.
+The per-area freshness table moved into a disclosure at the foot of the
+home page. The header's Updated date on the home page counts the quick
+picks page it embeds. A history line about a September probe left the
+simple guide, and the full guide keeps it.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 10:59 AM PST / 1:59 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 11:10 AM PST / 2:10 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the

@@ -29,6 +29,14 @@
   --aging-ink: #613b00;
   --stale-bg: #fbdada;
   --stale-ink: #801a1a;
+  --t-strong: #6b3fc4;
+  --t-cheap: #0e7a64;
+  --term-bg: #18202a;
+  --term-ink: #dbe3ec;
+  --term-dim: #8f9cab;
+  --t-strong-term: #c2a8ff;
+  --t-cheap-term: #6fdcbd;
+  --term-line: #18202a;
   --font: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas,
@@ -55,6 +63,10 @@
     --aging-ink: #f7dc92;
     --stale-bg: #4b1c1c;
     --stale-ink: #ffc4c4;
+    --t-strong: #a98bff;
+    --t-cheap: #4fc7a6;
+    --term-bg: #0d1116;
+    --term-line: #343c46;
   }
 }
 * { box-sizing: border-box; }
@@ -241,14 +253,97 @@ h2 {
 }
 h3 { font-size: 1.2rem; margin: 2rem 0 0.5rem; }
 h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
-.hero { margin-bottom: 3rem; }
-.thesis {
-  font-size: clamp(1.3rem, 3.5vw, 1.7rem);
-  font-weight: 600;
-  line-height: 1.35;
-  margin: 0 0 1.5rem;
+/* Home. The hero pairs the claim with the skill's real first output line.
+   Tier colors (cheap teal, strong violet) are the one bold thing on the page,
+   and they mean the same in the terminal and the seat strip under it. */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 2.5rem;
+  align-items: center;
+  margin: 1rem 0 3.5rem;
 }
-.thesis em { font-style: normal; color: var(--accent); }
+.hero h1 {
+  font-size: clamp(2rem, 4.6vw, 3.1rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+  max-width: 14ch;
+}
+.lede { font-size: 1.12rem; color: var(--ink-2); max-width: 46ch; margin: 0 0 0.8rem; }
+.cta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0 0; }
+.cta a { text-decoration: none; font-weight: 600; border-radius: 8px; padding: 0.55rem 1.1rem; }
+.cta .btn { background: var(--accent); color: var(--accent-ink); }
+.cta .btn:hover { filter: brightness(1.1); }
+.cta .btn-quiet { border: 1px solid var(--line); color: var(--ink); }
+.cta .btn-quiet:hover { border-color: var(--accent); color: var(--accent); }
+.route-demo { margin: 0; }
+.term {
+  background: var(--term-bg);
+  color: var(--term-ink);
+  border: 1px solid var(--term-line);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+  font: 0.86rem/1.55 var(--mono);
+  overflow-x: auto;
+}
+.term p { margin: 0; white-space: pre-wrap; }
+.term .in { color: var(--term-dim); }
+.term .in + .out { margin-bottom: 0.9rem; }
+.term .out:last-child { margin-bottom: 0; }
+.term .ps { color: var(--term-dim); margin-right: 0.4rem; }
+.term b { font-weight: 600; }
+.term .r-inline { color: var(--t-cheap-term); }
+.term .r-fan { color: var(--t-strong-term); }
+.seats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  gap: 0.4rem;
+}
+.seats li {
+  border-top: 4px solid;
+  padding: 0.4rem 0.1rem 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.seats li span { display: block; font-weight: 400; font-size: 0.8rem; color: var(--ink-dim); }
+.seats .t-strong { border-color: var(--t-strong); }
+.seats .t-cheap { border-color: var(--t-cheap); }
+.route-demo figcaption { margin-top: 0.6rem; font-size: 0.85rem; color: var(--ink-dim); }
+@media (max-width: 52rem) {
+  .hero { grid-template-columns: 1fr; gap: 1.75rem; }
+}
+.picks { margin: 1.25rem 0 1.5rem; }
+.pick {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+  gap: 1.25rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid var(--line);
+}
+.pick:last-child { border-bottom: 1px solid var(--line); }
+.pick dt { font-weight: 600; }
+.pick dd { margin: 0; }
+.pick-main { margin: 0; font-size: 1.05rem; color: var(--ink); }
+.pick-more { margin: 0.3rem 0 0; font-size: 0.92rem; color: var(--ink-dim); max-width: 75ch; }
+@media (max-width: 40rem) { .pick { grid-template-columns: 1fr; gap: 0.2rem; } }
+.skills {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 1.75rem 2.5rem;
+  margin: 1.5rem 0;
+}
+.skill { border-left: 3px solid var(--accent); padding-left: 1rem; }
+.skill h3 { margin: 0 0 0.35rem; font: 600 1.05rem var(--mono); }
+.skill p { margin: 0 0 0.5rem; color: var(--ink-2); }
+.skill p.try { color: var(--ink-dim); font-size: 0.9rem; margin: 0; }
+details.fresh-panel { margin: 1.5rem 0 0; }
+details.fresh-panel > summary { cursor: pointer; font-weight: 600; }
+.nav-groups a.aside { color: var(--ink-dim); padding-left: 1.1rem; border-left: 1px solid var(--line); }
+.nav-groups a.aside.current { color: var(--ink); }
 .board { font-family: var(--mono); }
 .board td a { font-weight: 600; }
 .chip {
@@ -482,18 +577,16 @@ footer p { margin: 0; }
 <div class="nav-row nav-groups">
 <span class="brand">smartplan</span>
 <a class="current" href="index.html">Start</a>
-<a href="copilot-model-guide.html">Guides</a>
-<a href="benchmarks.html">Evidence</a>
-<a href="whats-new.html">Project</a>
+<a href="copilot-model-guide-simple.html">Models</a>
 <a href="m365-setup.html">M365 Agents</a>
+<a class="aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.158.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.159.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
 <div class="nav-row subnav">
 <a class="current" href="index.html">Home</a>
-<a href="overview.html">Overview</a>
 <a href="quickstart.html">Quickstart</a>
 <a href="selftest.html">Verify Your Install</a>
 <a href="downloads.html">Downloads</a>
@@ -502,91 +595,98 @@ footer p { margin: 0; }
 </header>
 <main>
 <section class="hero">
-<p class="thesis">Plan with the <em>strong</em> model. Implement with the
-<em>cheaper</em> model. Escalate when something actually fails, never on a hunch.</p>
-<div class="table-wrap board-wrap"><table class="board">
-<thead><tr><th>seat</th><th>carries</th><th>status</th></tr></thead>
-<tbody>
-<tr><td><a href="copilot-model-guide.html">Guides</a></td><td>the model roster · what to pick · how to spend less</td><td><span class="chip">4 pages</span></td></tr>
-<tr><td><a href="benchmarks.html">Evidence</a></td><td>live benchmark T-records · newest one published in full, corpus indexed</td><td><span class="chip">47 records · latest 2026-10-19</span></td></tr>
-<tr><td><a href="whats-new.html">Project</a></td><td>what changed lately · the full changelog · how the research stays current</td><td><span class="chip">3 pages</span></td></tr>
-<tr><td><a href="https://github.com/defessler/smartplan">Source</a></td><td>the skills themselves — one live tree</td><td><span class="chip">MIT</span></td></tr>
-</tbody>
-</table></div>
-<div class="fresh-panel">
-<h2>How fresh is this?</h2>
-<div class="fresh-table"><table>
-<thead><tr><th>Area</th><th>Last checked</th><th>Age</th></tr></thead>
-<tbody>
-<tr><td>Anthropic models</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
-<tr><td>Claude Code</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
-<tr><td>GitHub Copilot</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
-<tr><td>Other vendors' models</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
-<tr><td>Benchmark boards</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
-<tr><td>Token costs and caching</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
-<tr><td>Microsoft 365 Copilot</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
-</tbody>
-</table></div>
-<p>These dates are when someone last re-read the vendor's own pages. See <a href="refresh-pipeline.html">Refresh Pipeline</a> for how.</p>
+<div class="hero-text">
+<h1>Route each model to the work it's good at.</h1>
+<p class="lede">Agent Skills for Claude Code and GitHub Copilot CLI. Strong models plan and check. Cheap models write the code, and nothing they write merges until a verifier has re-run its check.</p>
+<p class="lede">Built for C++ game development first, across Unreal, a custom engine or plain C++. The routing works in any language.</p>
+<p class="cta"><a class="btn" href="quickstart.html">Install</a><a class="btn-quiet" href="#pick-a-model">See the model picks</a></p>
 </div>
+<figure class="route-demo">
+<div class="term" role="img" aria-label="Two tasks and the routing line the skill prints first for each">
+<p class="in"><span class="ps">&gt;</span> /smartplan rename FHealth to FVitals across the module</p>
+<p class="out">Routing call: <b class="r-inline">inline</b> — one module, the same edit in every file.</p>
+<p class="in"><span class="ps">&gt;</span> /smartplan port the save system to the new serializer</p>
+<p class="out">Routing call: <b class="r-fan">fan-out</b> — 6 units, disjoint FILES; trades tokens for wall-clock.</p>
+</div>
+<ol class="seats" aria-label="Who does what on Claude Code">
+<li class="t-strong"><span>Plan</span>Opus 5.5</li>
+<li class="t-cheap"><span>Build</span>Haiku 5.5</li>
+<li class="t-strong"><span>Verify</span>Opus 5.5</li>
+</ol>
+<figcaption>The first line of every task, and the seats on Claude Code. A fan-out waits for you to approve its plan.</figcaption>
+</figure>
 </section>
-<h1 id="smartplan-model-tiering-skills-for-ai-coding-agents">smartplan: model-tiering skills for AI coding agents</h1>
-<details class="page-toc" open>
-<summary>On this page</summary>
-<ul>
-<li><a href="#does-it-work">Does it work?</a></li>
-<li><a href="#the-rule">The rule</a></li>
-<li><a href="#how-it-routes">How it routes</a></li>
-<li><a href="#primary-use-case-c-game-development">Primary use case: C++ game development</a></li>
-<li><a href="#what-ships">What ships</a></li>
-<li><a href="#install">Install</a></li>
-<li><a href="#license">License</a></li>
-</ul>
-</details>
-<p><strong>v4.158.0</strong> · MIT · <a href="goals.html">goals &amp; status</a> · <a href="overview.html">overview</a> · <a href="quickstart.html">quickstart</a> · <a href="benchmarks.html">benchmarks</a> · <a href="changelog.html">changelog</a></p>
-<p>Portable <strong>Agent Skills</strong> that route each model to the work it's good at.
-Strong models plan and judge. Cheap models execute behind a verifier gate.
-It runs in <strong>Claude Code</strong> and <strong>GitHub Copilot CLI</strong>.</p>
-<h2 id="does-it-work">Does it work?</h2>
-<p>We ran seven scenarios with and without the skill, on Haiku 4.5, Sonnet 5,
-and Opus 5. Three independent judges graded each response. The with-skill
-arm ran every case three times per model. The baseline ran each case once.
-That is why the counts are 63 and 21.</p>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th></th>
-<th>With the skill</th>
-<th>Without</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Passed</strong></td>
-<td><strong>62 of 63</strong></td>
-<td>4 of 21</td>
-</tr>
-</tbody>
-</table></div>
-<p>It holds on the cheap seat too. The newest case passed 3/3 on Haiku, Sonnet,
-and Opus alike.</p>
-<p><strong>Caveats.</strong> The no-skill arm was <em>told</em> not to use the skill. It was not
-prevented from using it. The run is a hand-built stand-in for <code>claude plugin eval</code>
-while that's in early access. One case passes without the skill too. It stays
-in the suite for that reason. Another failed its first pass at 6/9. It reached
-9/9 only after the rule it tests was rewritten.</p>
-<p>Method and full results: <a href="benchmarks.html">T39 and T40</a>.</p>
-<h2 id="the-rule">The rule</h2>
-<p><strong>Plan with the strong model. Implement with the cheaper model. Escalate on
-demonstrated failure, never on a hunch.</strong> And never reach above your current
-seat without asking.</p>
-<p>A strong model's edge is mostly in planning and in breaking work into parts.
-It is not in writing any one piece of code. So buy quality once, at the plan,
-then go cheap and wide. Three things keep that safe. Each leaf (one small,
-independent part of the plan) gets a contract. A disciplined executor does the
-work. An independent verifier, never weaker than the executor, checks it.</p>
-<h2 id="how-it-routes">How it routes</h2>
-<p>The first matching row wins.</p>
+<p class="fresh-note">Prices, models and scores on this page were last checked against vendor sources on <span class="date">2026-11-02</span>. <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></p><h2 id="pick-a-model">Pick a model</h2>
+<p>These are the current picks for GitHub Copilot CLI, by task. Each one
+names the model to reach for first, then when to switch. Prices, scores
+and every other model are in the <a href="copilot-model-guide-simple.html#the-table">full table</a>.</p>
+<dl class="picks">
+<div class="pick"><dt>Writing code</dt><dd><p class="pick-main">GPT-6 Luna, behind a scripted check.</p><p class="pick-more">For judgment calls, use GPT-6.1 Sol on Pro+ and up, or Sonnet 5.5 on plain Pro. GPT-6.1 Sol needs CLI 1.0.90 or later. On an older build, use GPT-6 Sol instead. Neither GPT-6 pick has been trialed here.</p></dd></div>
+<div class="pick"><dt>Code reviews</dt><dd><p class="pick-main">Gemini 3.8 Flash.</p><p class="pick-more">In T42 it caught 13 of 16 seeded C++ defects for 5.8 credits. GPT-5.6 Terra caught the same 13 for 41.7 credits. If the budget allows, GPT-6 Sol caught 14 to 15. On the tightest budget, a fresh Luna re-runs the scripted check on its own simple work.</p></dd></div>
+<div class="pick"><dt>Writing docs</dt><dd><p class="pick-main">Sonnet 5.5 for technical reports.</p><p class="pick-more">Use GPT-5.6 Terra until it leaves Copilot on 2026-11-16. Pick Opus 5.5 when the prose is the product, though only one writing board lists it so far.</p></dd></div>
+<div class="pick"><dt>Exploring a codebase</dt><dd><p class="pick-main">Use GPT-6 Luna or GPT-5.6 Luna to find things.</p><p class="pick-more">Haiku 5.5 serves at the same price. Use Sonnet 5.5 to understand what you find. On Pro+ and up, GPT-6.1 Sol reads long context better at the same list price.</p></dd></div>
+<div class="pick"><dt>Planning and architecture</dt><dd><p class="pick-main">Opus 5.5 on Pro+ and up, with Opus 5 as the pricier fallback</p></dd></div>
+<div class="pick"><dt>Don't want to pick</dt><dd><p class="pick-main">"Auto" routes each request to a model.</p><p class="pick-more">It shows as Copilot Fusion in the CLI, VS Code and the app. On a paid plan it takes 30% off through 2026-11-30. The 10% Auto discount now covers Chat and cloud agent only. Pin a model when the tier matters. On Pro+ and up, Auto can send a hard prompt to GPT-6 Astra at 10 / 50.</p></dd></div>
+</dl>
+
+<p>On Claude Code the skill sets the seats for you. Haiku 5.5 writes the
+code. Sonnet 5.5 takes the risky rows (concurrency, undefined behavior,
+templates, security) and the first retry after a failure. Opus 5.5 plans
+and checks every diff.</p>
+<h2 id="what-you-get">What you get</h2>
+<p>Seven skills that work in Claude Code and Copilot CLI. You only ever call
+<code>/smartplan</code>. The rest trigger on what you ask for.</p>
+<div class="skills">
+<div class="skill">
+<h3 id="smartplan_1">smartplan</h3>
+<p>Routes each coding task. Work that fits one context runs inline. Bigger
+work goes to cheaper models, each behind an independent check.</p>
+<p class="try">Try <code>/smartplan add a retry to the upload client</code></p>
+</div>
+<div class="skill">
+<h3 id="smartexec">smartexec</h3>
+<p>The rules a cheap model works under. It does only what its brief says
+and proves it with pasted test output. Otherwise it stops and reports
+BLOCKED.</p>
+<p class="try">smartplan hands it to each part of a plan. You don't call it.</p>
+</div>
+<div class="skill">
+<h3 id="smartreview">smartreview</h3>
+<p>Reviews a change in three ranked groups: game-breaking bugs first, then
+best practices, then conventions. The standards doc is swappable. Its
+default covers C++ for Unreal, a custom engine or plain C++.</p>
+<p class="try">Try "review this change"</p>
+</div>
+<div class="skill">
+<h3 id="smartdiff">smartdiff</h3>
+<p>Turns a session's changes into one HTML review page with a note per
+file. Unreal Blueprints get a graph-level diff with a drawing of each
+changed graph, before and after.</p>
+<p class="try">Try "show me the session diff"</p>
+</div>
+<div class="skill">
+<h3 id="smartwiki">smartwiki</h3>
+<p>Writes a wiki page about a change for designers, QA and producers, from
+a Git commit, a pull request or a Perforce changelist.</p>
+<p class="try">Try "write up CL 1234 for designers"</p>
+</div>
+<div class="skill">
+<h3 id="smartdiagram">smartdiagram</h3>
+<p>Draws an interactive wiring diagram of a codebase, chosen and laid out
+by hand rather than dumped from every symbol. Click a part to see the
+rules it keeps.</p>
+<p class="try">Try "how is everything hooked up?"</p>
+</div>
+<div class="skill">
+<h3 id="smartvoice">smartvoice</h3>
+<p>Makes documents read in a voice profile you set per user, and strips the
+usual tells of AI writing. With no profile it stays out of the way.</p>
+<p class="try">Try "make this README sound less like AI"</p>
+</div>
+</div>
+<h2 id="how-it-works">How it works</h2>
+<p>Every task starts with one line saying how it will run. The first row
+that matches wins.</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -600,7 +700,7 @@ work. An independent verifier, never weaker than the executor, checks it.</p>
 <td>Fan out</td>
 </tr>
 <tr>
-<td>≥4 independent units, disjoint files, and finishing sooner beats finishing cheaper</td>
+<td>Four or more independent parts, separate files, and finishing sooner beats finishing cheaper</td>
 <td>Fan out</td>
 </tr>
 <tr>
@@ -608,7 +708,7 @@ work. An independent verifier, never weaker than the executor, checks it.</p>
 <td>Fan out</td>
 </tr>
 <tr>
-<td>Risky merge (C++ UB, concurrency, templates, security)</td>
+<td>Risky merge (C++ undefined behavior, concurrency, templates, security)</td>
 <td>Inline, plus an independent check</td>
 </tr>
 <tr>
@@ -617,99 +717,59 @@ work. An independent verifier, never weaker than the executor, checks it.</p>
 </tr>
 </tbody>
 </table></div>
-<p>Fan-out (running several workers at once) costs <strong>1.5–2.9×</strong> an inline pass at
-equal quality, at every leaf count and size measured. So it's a deliberate
-purchase of elapsed time. The skill says when it's making that purchase.</p>
-<p>Independent verification still gates risky merges at any size. Cheap-tier
-output never merges unchecked.</p>
-<h2 id="primary-use-case-c-game-development">Primary use case: C++ game development</h2>
-<p>Engine-agnostic across Unreal, a custom engine, or vanilla C++.</p>
-<p><code>smartreview</code> reviews a changelist against a swappable per-project standards
-doc and ranks what it finds: <strong>game-breaking bugs first</strong>, then best practices,
-then conventions. Its shipped default is C++ gamedev. General C++ rules apply
-everywhere, with Unreal and custom-engine idioms as selectable profiles.</p>
-<p>The brief and verify references add a C++ correctness layer. It checks
-ownership and lifetime, undefined behavior, hot-path performance, threading,
-header hygiene, and determinism and serialization. That keeps cheap tiers safe
-on gamedev diffs. The tiering policy itself works in any language. It covers
-non-gamedev work the same way.</p>
-<h2 id="what-ships">What ships</h2>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Path</th>
-<th>Read by</th>
-<th>What</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>.claude/skills/</code></td>
-<td>Claude Code, Copilot CLI</td>
-<td><code>smartplan</code> (entry point and flow policy), <code>smartexec</code> (the cheap executor's instructions), and five companions: <code>smartreview</code>, <code>smartwiki</code>, <code>smartvoice</code>, <code>smartdiagram</code>, <code>smartdiff</code>.</td>
-</tr>
-<tr>
-<td><code>.claude/agents/</code></td>
-<td>Claude Code</td>
-<td>Implementer, cheap implementer, scout, and verifier, all tool-locked. The scout is read-only. The verifier gets Bash to re-run acceptance but no file-editing tools.</td>
-</tr>
-<tr>
-<td><code>.github/agents/</code></td>
-<td>Copilot CLI</td>
-<td>The same seats as pinned profiles.</td>
-</tr>
-<tr>
-<td><code>evals/</code></td>
-<td><code>claude plugin eval</code></td>
-<td>Eight graded cases, four testing what the skill <em>refuses</em> to do. The eighth, <code>seat-ceiling</code>, is unrun.</td>
-</tr>
-<tr>
-<td><code>scripts/smartcheck-mechanical.sh</code></td>
-<td>both</td>
-<td>Verifies mechanical leaves with no model call: acceptance criteria, git scope, allow list.</td>
-</tr>
-<tr>
-<td><code>docs/benchmarks/</code></td>
-<td>humans</td>
-<td>One timestamped record per live test, with real costs and verdicts.</td>
-</tr>
-</tbody>
-</table></div>
-<p><code>smartroute</code>, <code>smartbrief</code>, and <code>smartcheck</code> are seat names, not directories.
-Their content lives in <code>.claude/skills/smartplan/references/</code>.</p>
-<p>Both harnesses read the one skill tree natively. Marketplace installs serve it
-too, with no packaged copy or sync step. Skills self-trigger from their
-descriptions, with no instructions file needed on Copilot.</p>
+<p>A fan-out runs in three steps. You approve the plan before any work
+starts.</p>
+<ol>
+<li><strong>Plan.</strong> A strong model splits the work into parts that touch
+   separate files, each with a written brief and a check that can fail.</li>
+<li><strong>Build.</strong> A cheap model builds each part from its brief and pastes
+   the check's output as proof.</li>
+<li><strong>Verify.</strong> A fresh model at least as strong as the builder re-runs
+   the check and reads the diff. Nothing merges on the builder's word.</li>
+</ol>
+<p>Fanning out costs 1.5 to 2.9 times an inline pass at equal quality, at
+every size measured so far. The skill only does it when the time saved
+is worth that. It says so in the routing line when it does.</p>
+<p><strong>Does it work?</strong> Across seven test scenarios on Haiku, Sonnet and Opus,
+62 of 63 runs passed with the skill and 4 of 21 without. The
+<a href="benchmarks.html">benchmarks</a> page has the method and the caveats.</p>
 <h2 id="install">Install</h2>
-<p><strong>Claude Code</strong>: install the plugin.</p>
+<p>On Claude Code, add the marketplace and install the plugin.</p>
 <pre><code>/plugin marketplace add defessler/smartplan
 /plugin install sp@smartplan
 </code></pre>
-<p>Or open the repo, which auto-loads <code>.claude/skills/</code>. Invoke with <code>/smartplan</code>.</p>
-<p><strong>Copilot CLI</strong>: in this repo, it auto-loads <code>.claude/skills/</code> and
-<code>.github/agents/</code>. Elsewhere, copy the skill folders into <code>~/.copilot/skills/</code>
-and the agents into <code>~/.copilot/agents/</code>. Manage them with <code>/skills list</code> and
-<code>/subagents</code>.</p>
-<p><strong>Windows, interactive:</strong> <code>scripts\install.cmd</code> walks you through picking a
-target and skills. Re-run it to toggle them later.</p>
-<p><strong>Windows, every session always current:</strong></p>
-<pre><code>powershell -ExecutionPolicy Bypass -File scripts\install-global.ps1
-</code></pre>
-<p>This links the core pair and both agent directories into the checkout. One
-<code>git pull</code> then updates every session on the machine, with no frozen plugin
-cache or <code>/plugin update</code>. Re-run it any time to repair a setup, since it's
-idempotent.</p>
-<p>Companions install per project with
-<code>scripts\install-project.ps1 -Project &lt;root&gt;</code>, which keeps their descriptions
-out of every session's standing context.</p>
-<p>Note: Copilot's sandbox can't read through a junction that points outside the
-project root. In a project set up this way, run Copilot with
-<code>--add-dir &lt;this-checkout&gt;</code>. Claude Code follows the junctions without it.</p>
-<h2 id="license">License</h2>
-<p>MIT (see <code>LICENSE</code>).</p>
+<p>On Copilot CLI, or for a zip you can unpack anywhere, see
+<a href="quickstart.html">Quickstart</a> and <a href="downloads.html">Downloads</a>. Then run
+<a href="selftest.html">the install check</a> to prove it's wired up.</p>
+<h2 id="details">Details</h2>
+<p>The history, the evidence and the upkeep live here, out of the way.</p>
+<ul>
+<li><a href="whats-new.html">What's New</a> and the <a href="changelog.html">changelog</a>, for what changed lately</li>
+<li><a href="benchmarks.html">Benchmarks</a> and <a href="goals.html">Goals &amp; Status</a>, for the measured runs and what's still open</li>
+<li><a href="model-classes.html">Model Classes</a>, the full model registry behind the picks</li>
+<li><a href="overview.html">Overview</a>, a map of every skill and seat</li>
+<li><a href="refresh-pipeline.html">Refresh Pipeline</a>, how the facts stay current</li>
+</ul>
+<details class="fresh-panel">
+<summary>How fresh is each area?</summary>
+<div class="fresh-table"><div class="table-wrap"><table>
+<thead><tr><th>Area</th><th>Last checked</th><th>Age</th></tr></thead>
+<tbody>
+<tr><td>Anthropic models</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
+<tr><td>Claude Code</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
+<tr><td>GitHub Copilot</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
+<tr><td>Other vendors' models</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
+<tr><td>Benchmark boards</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
+<tr><td>Token costs and caching</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
+<tr><td>Microsoft 365 Copilot</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
+</tbody>
+</table></div></div>
+<p>These dates are when someone last re-read the vendor's own pages. See <a href="refresh-pipeline.html">Refresh Pipeline</a> for how.</p>
+</details>
+
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 10:59 AM PST / 1:59 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 11:10 AM PST / 2:10 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the

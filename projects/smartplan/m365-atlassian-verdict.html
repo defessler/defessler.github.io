@@ -29,6 +29,14 @@
   --aging-ink: #613b00;
   --stale-bg: #fbdada;
   --stale-ink: #801a1a;
+  --t-strong: #6b3fc4;
+  --t-cheap: #0e7a64;
+  --term-bg: #18202a;
+  --term-ink: #dbe3ec;
+  --term-dim: #8f9cab;
+  --t-strong-term: #c2a8ff;
+  --t-cheap-term: #6fdcbd;
+  --term-line: #18202a;
   --font: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas,
@@ -55,6 +63,10 @@
     --aging-ink: #f7dc92;
     --stale-bg: #4b1c1c;
     --stale-ink: #ffc4c4;
+    --t-strong: #a98bff;
+    --t-cheap: #4fc7a6;
+    --term-bg: #0d1116;
+    --term-line: #343c46;
   }
 }
 * { box-sizing: border-box; }
@@ -241,14 +253,97 @@ h2 {
 }
 h3 { font-size: 1.2rem; margin: 2rem 0 0.5rem; }
 h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
-.hero { margin-bottom: 3rem; }
-.thesis {
-  font-size: clamp(1.3rem, 3.5vw, 1.7rem);
-  font-weight: 600;
-  line-height: 1.35;
-  margin: 0 0 1.5rem;
+/* Home. The hero pairs the claim with the skill's real first output line.
+   Tier colors (cheap teal, strong violet) are the one bold thing on the page,
+   and they mean the same in the terminal and the seat strip under it. */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 2.5rem;
+  align-items: center;
+  margin: 1rem 0 3.5rem;
 }
-.thesis em { font-style: normal; color: var(--accent); }
+.hero h1 {
+  font-size: clamp(2rem, 4.6vw, 3.1rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+  max-width: 14ch;
+}
+.lede { font-size: 1.12rem; color: var(--ink-2); max-width: 46ch; margin: 0 0 0.8rem; }
+.cta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0 0; }
+.cta a { text-decoration: none; font-weight: 600; border-radius: 8px; padding: 0.55rem 1.1rem; }
+.cta .btn { background: var(--accent); color: var(--accent-ink); }
+.cta .btn:hover { filter: brightness(1.1); }
+.cta .btn-quiet { border: 1px solid var(--line); color: var(--ink); }
+.cta .btn-quiet:hover { border-color: var(--accent); color: var(--accent); }
+.route-demo { margin: 0; }
+.term {
+  background: var(--term-bg);
+  color: var(--term-ink);
+  border: 1px solid var(--term-line);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+  font: 0.86rem/1.55 var(--mono);
+  overflow-x: auto;
+}
+.term p { margin: 0; white-space: pre-wrap; }
+.term .in { color: var(--term-dim); }
+.term .in + .out { margin-bottom: 0.9rem; }
+.term .out:last-child { margin-bottom: 0; }
+.term .ps { color: var(--term-dim); margin-right: 0.4rem; }
+.term b { font-weight: 600; }
+.term .r-inline { color: var(--t-cheap-term); }
+.term .r-fan { color: var(--t-strong-term); }
+.seats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  gap: 0.4rem;
+}
+.seats li {
+  border-top: 4px solid;
+  padding: 0.4rem 0.1rem 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.seats li span { display: block; font-weight: 400; font-size: 0.8rem; color: var(--ink-dim); }
+.seats .t-strong { border-color: var(--t-strong); }
+.seats .t-cheap { border-color: var(--t-cheap); }
+.route-demo figcaption { margin-top: 0.6rem; font-size: 0.85rem; color: var(--ink-dim); }
+@media (max-width: 52rem) {
+  .hero { grid-template-columns: 1fr; gap: 1.75rem; }
+}
+.picks { margin: 1.25rem 0 1.5rem; }
+.pick {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+  gap: 1.25rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid var(--line);
+}
+.pick:last-child { border-bottom: 1px solid var(--line); }
+.pick dt { font-weight: 600; }
+.pick dd { margin: 0; }
+.pick-main { margin: 0; font-size: 1.05rem; color: var(--ink); }
+.pick-more { margin: 0.3rem 0 0; font-size: 0.92rem; color: var(--ink-dim); max-width: 75ch; }
+@media (max-width: 40rem) { .pick { grid-template-columns: 1fr; gap: 0.2rem; } }
+.skills {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 1.75rem 2.5rem;
+  margin: 1.5rem 0;
+}
+.skill { border-left: 3px solid var(--accent); padding-left: 1rem; }
+.skill h3 { margin: 0 0 0.35rem; font: 600 1.05rem var(--mono); }
+.skill p { margin: 0 0 0.5rem; color: var(--ink-2); }
+.skill p.try { color: var(--ink-dim); font-size: 0.9rem; margin: 0; }
+details.fresh-panel { margin: 1.5rem 0 0; }
+details.fresh-panel > summary { cursor: pointer; font-weight: 600; }
+.nav-groups a.aside { color: var(--ink-dim); padding-left: 1.1rem; border-left: 1px solid var(--line); }
+.nav-groups a.aside.current { color: var(--ink); }
 .board { font-family: var(--mono); }
 .board td a { font-weight: 600; }
 .chip {
@@ -482,12 +577,11 @@ footer p { margin: 0; }
 <div class="nav-row nav-groups">
 <span class="brand">smartplan</span>
 <a href="index.html">Start</a>
-<a href="copilot-model-guide.html">Guides</a>
-<a href="benchmarks.html">Evidence</a>
-<a href="whats-new.html">Project</a>
+<a href="copilot-model-guide-simple.html">Models</a>
 <a class="current" href="m365-setup.html">M365 Agents</a>
+<a class="aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.158.0 &middot; Updated 2026-09-22 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.159.0 &middot; Updated 2026-09-22 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -714,7 +808,7 @@ footer p { margin: 0; }
 <p><strong>Don't do this week:</strong> anything involving Copilot Studio, an Atlassian Cloud trial, or a gateway.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 10:59 AM PST / 1:59 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 11:10 AM PST / 2:10 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
