@@ -37,6 +37,10 @@
   --t-strong-term: #c2a8ff;
   --t-cheap-term: #6fdcbd;
   --term-line: #18202a;
+  --scroll-thumb: #c4cad1;
+  --scroll-thumb-hover: #97a1ab;
+  --term-thumb: #3a4451;
+  --mark-bg: #fdebc4;
   --font: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas,
@@ -67,6 +71,10 @@
     --t-cheap: #4fc7a6;
     --term-bg: #0d1116;
     --term-line: #343c46;
+    --scroll-thumb: #363d45;
+    --scroll-thumb-hover: #4d5660;
+    --term-thumb: #2e3640;
+    --mark-bg: #4a3a12;
   }
 }
 * { box-sizing: border-box; }
@@ -81,11 +89,64 @@ body {
   line-height: 1.6;
 }
 ::selection { background: var(--accent); color: var(--accent-ink); }
-a:focus-visible, summary:focus-visible, th:focus-visible {
+:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
   border-radius: 2px;
 }
+/* Scroll bars follow the theme everywhere: the page, wide tables, code and
+   the terminal. scrollbar-color covers Firefox and current Chromium. The
+   WebKit rules are the fallback for Safari. */
+html { scrollbar-color: var(--scroll-thumb) var(--bg); }
+.table-wrap, .fresh-table, pre, .page-toc {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) transparent;
+}
+.term { scrollbar-width: thin; scrollbar-color: var(--term-thumb) transparent; }
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border: 3px solid var(--bg);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
+::-webkit-scrollbar-corner { background: transparent; }
+.term::-webkit-scrollbar-thumb { background: var(--term-thumb); border-color: var(--term-bg); }
+/* An anchor jump lands below the sticky header, not under it. */
+[id] { scroll-margin-top: 6.5rem; }
+html { scroll-behavior: smooth; }
+/* Disclosures get one chevron that turns when opened, in place of the
+   browser's triangle, which differs per engine. */
+details > summary { list-style: none; cursor: pointer; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before {
+  content: "";
+  display: inline-block;
+  width: 0.45em;
+  height: 0.45em;
+  margin: 0 0.6em 0.12em 0.1em;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+  opacity: 0.7;
+}
+details[open] > summary::before { transform: rotate(45deg); }
+details > summary:hover { color: var(--accent); }
+li::marker { color: var(--ink-dim); }
+ol > li::marker { font-variant-numeric: tabular-nums; font-weight: 600; }
+kbd {
+  font: 600 0.8em var(--mono);
+  padding: 0.1em 0.45em;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--bg-2);
+  color: var(--ink);
+}
+mark { background: var(--mark-bg); color: inherit; padding: 0 0.15em; border-radius: 2px; }
+abbr[title] { text-decoration: underline dotted var(--ink-dim); cursor: help; }
 header {
   position: sticky;
   top: 0;
@@ -310,6 +371,12 @@ h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
   font-size: 0.95rem;
 }
 .seats li span { display: block; font-weight: 400; font-size: 0.8rem; color: var(--ink-dim); }
+.seats li small { display: block; font-weight: 400; font-size: 0.78rem; color: var(--ink-dim); line-height: 1.35; }
+.seats li small:first-of-type { margin-top: 0.25rem; }
+@media (max-width: 560px) {
+  .seats { grid-template-columns: 1fr; gap: 0.5rem; }
+  .seats li { border-top: 0; border-left: 4px solid; padding: 0.1rem 0 0.1rem 0.7rem; }
+}
 .seats .t-strong { border-color: var(--t-strong); }
 .seats .t-cheap { border-color: var(--t-cheap); }
 .route-demo figcaption { margin-top: 0.6rem; font-size: 0.85rem; color: var(--ink-dim); }
@@ -581,7 +648,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.159.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.160.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-03" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-03</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -597,7 +664,8 @@ footer p { margin: 0; }
 <section class="hero">
 <div class="hero-text">
 <h1>Route each model to the work it's good at.</h1>
-<p class="lede">Agent Skills for Claude Code and GitHub Copilot CLI. Strong models plan and check. Cheap models write the code, and nothing they write merges until a verifier has re-run its check.</p>
+<p class="lede">Agent Skills for Claude Code and GitHub Copilot CLI. Strong models plan and check. Cheap models write the code. Nothing they write merges until a verifier has re-run its check.</p>
+<p class="lede">The skills name roles, not vendors. Each role goes to the best model your harness serves for it, whoever makes it.</p>
 <p class="lede">Built for C++ game development first, across Unreal, a custom engine or plain C++. The routing works in any language.</p>
 <p class="cta"><a class="btn" href="quickstart.html">Install</a><a class="btn-quiet" href="#pick-a-model">See the model picks</a></p>
 </div>
@@ -608,18 +676,20 @@ footer p { margin: 0; }
 <p class="in"><span class="ps">&gt;</span> /smartplan port the save system to the new serializer</p>
 <p class="out">Routing call: <b class="r-fan">fan-out</b> — 6 units, disjoint FILES; trades tokens for wall-clock.</p>
 </div>
-<ol class="seats" aria-label="Who does what on Claude Code">
-<li class="t-strong"><span>Plan</span>Opus 5.5</li>
-<li class="t-cheap"><span>Build</span>Haiku 5.5</li>
-<li class="t-strong"><span>Verify</span>Opus 5.5</li>
+<ol class="seats" aria-label="Which kind of model takes each step">
+<li class="t-strong"><span>Plan</span>A strong model<small>Claude Code: Opus 5.5</small><small>Copilot: GPT-6.1 Sol</small></li>
+<li class="t-cheap"><span>Build</span>A cheap model<small>Claude Code: Haiku 5.5</small><small>Copilot: GPT-6 Luna</small></li>
+<li class="t-strong"><span>Verify</span>A fresh model<small>Claude Code: Opus 5.5</small><small>Copilot: Gemini 3.8 Flash</small></li>
 </ol>
-<figcaption>The first line of every task, and the seats on Claude Code. A fan-out waits for you to approve its plan.</figcaption>
+<figcaption>The first line of every task, and which kind of model takes each step. The names are the current seats on each harness. A fan-out waits for you to approve its plan.</figcaption>
 </figure>
 </section>
-<p class="fresh-note">Prices, models and scores on this page were last checked against vendor sources on <span class="date">2026-11-02</span>. <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></p><h2 id="pick-a-model">Pick a model</h2>
-<p>These are the current picks for GitHub Copilot CLI, by task. Each one
-names the model to reach for first, then when to switch. Prices, scores
-and every other model are in the <a href="copilot-model-guide-simple.html#the-table">full table</a>.</p>
+<p class="fresh-note">Prices, models and scores on this page were last checked against vendor sources on <span class="date">2026-11-03</span>. <span class="fresh" data-checked="2026-11-03" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-03</span></p><h2 id="pick-a-model">Pick a model</h2>
+<p>These are the current picks for GitHub Copilot CLI, by task. Copilot
+serves models from several vendors, so the picks cross vendors too.
+Each one names the model to reach for first, then when to switch.
+Prices, scores and every other model are in the
+<a href="copilot-model-guide-simple.html#the-table">full table</a>.</p>
 <dl class="picks">
 <div class="pick"><dt>Writing code</dt><dd><p class="pick-main">GPT-6 Luna, behind a scripted check.</p><p class="pick-more">For judgment calls, use GPT-6.1 Sol on Pro+ and up, or Sonnet 5.5 on plain Pro. GPT-6.1 Sol needs CLI 1.0.90 or later. On an older build, use GPT-6 Sol instead. Neither GPT-6 pick has been trialed here.</p></dd></div>
 <div class="pick"><dt>Code reviews</dt><dd><p class="pick-main">Gemini 3.8 Flash.</p><p class="pick-more">In T42 it caught 13 of 16 seeded C++ defects for 5.8 credits. GPT-5.6 Terra caught the same 13 for 41.7 credits. If the budget allows, GPT-6 Sol caught 14 to 15. On the tightest budget, a fresh Luna re-runs the scripted check on its own simple work.</p></dd></div>
@@ -629,10 +699,14 @@ and every other model are in the <a href="copilot-model-guide-simple.html#the-ta
 <div class="pick"><dt>Don't want to pick</dt><dd><p class="pick-main">"Auto" routes each request to a model.</p><p class="pick-more">It shows as Copilot Fusion in the CLI, VS Code and the app. On a paid plan it takes 30% off through 2026-11-30. The 10% Auto discount now covers Chat and cloud agent only. Pin a model when the tier matters. On Pro+ and up, Auto can send a hard prompt to GPT-6 Astra at 10 / 50.</p></dd></div>
 </dl>
 
-<p>On Claude Code the skill sets the seats for you. Haiku 5.5 writes the
-code. Sonnet 5.5 takes the risky rows (concurrency, undefined behavior,
-templates, security) and the first retry after a failure. Opus 5.5 plans
-and checks every diff.</p>
+<p>Whatever the harness, the skill fills the same roles. A cheap model
+writes the code. A mid-tier model takes the risky rows (concurrency,
+undefined behavior, templates, security) and the first retry after a
+failure. A strong model plans, and a fresh model checks every diff. On
+Claude Code those are Haiku 5.5, Sonnet 5.5 and Opus 5.5. On Copilot
+they're GPT-6 Luna, GPT-6.1 Sol and a Gemini 3.8 Flash verifier from a
+different model family. <a href="model-classes.html">Model Classes</a> lists every
+model the roles can draw on.</p>
 <h2 id="what-you-get">What you get</h2>
 <p>Seven skills that work in Claude Code and Copilot CLI. You only ever call
 <code>/smartplan</code>. The rest trigger on what you ask for.</p>
@@ -755,13 +829,13 @@ is worth that. It says so in the routing line when it does.</p>
 <div class="fresh-table"><div class="table-wrap"><table>
 <thead><tr><th>Area</th><th>Last checked</th><th>Age</th></tr></thead>
 <tbody>
-<tr><td>Anthropic models</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
-<tr><td>Claude Code</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
-<tr><td>GitHub Copilot</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
-<tr><td>Other vendors' models</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
-<tr><td>Benchmark boards</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
+<tr><td>Anthropic models</td><td><span class="date">2026-11-03</span></td><td><span class="fresh" data-checked="2026-11-03" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-03</span></td></tr>
+<tr><td>Claude Code</td><td><span class="date">2026-11-03</span></td><td><span class="fresh" data-checked="2026-11-03" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-03</span></td></tr>
+<tr><td>GitHub Copilot</td><td><span class="date">2026-11-03</span></td><td><span class="fresh" data-checked="2026-11-03" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-03</span></td></tr>
+<tr><td>Other vendors' models</td><td><span class="date">2026-11-03</span></td><td><span class="fresh" data-checked="2026-11-03" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-03</span></td></tr>
+<tr><td>Benchmark boards</td><td><span class="date">2026-11-03</span></td><td><span class="fresh" data-checked="2026-11-03" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-03</span></td></tr>
 <tr><td>Token costs and caching</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
-<tr><td>Microsoft 365 Copilot</td><td><span class="date">2026-11-02</span></td><td><span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></td></tr>
+<tr><td>Microsoft 365 Copilot</td><td><span class="date">2026-11-03</span></td><td><span class="fresh" data-checked="2026-11-03" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-03</span></td></tr>
 </tbody>
 </table></div></div>
 <p>These dates are when someone last re-read the vendor's own pages. See <a href="refresh-pipeline.html">Refresh Pipeline</a> for how.</p>
@@ -769,7 +843,7 @@ is worth that. It says so in the routing line when it does.</p>
 
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 11:10 AM PST / 2:10 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 12:04 PM PST / 3:04 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
