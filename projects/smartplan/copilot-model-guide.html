@@ -82,7 +82,7 @@ header {
   border-bottom: 1px solid var(--line);
 }
 nav.site-nav {
-  /* Wider than main, so brand, groups, stamp, badge and Download share a row. */
+  /* Same width as main, so brand, groups, stamp, badge and Download share a row. */
   max-width: 76rem;
   margin: 0 auto;
   padding: 0 16px;
@@ -188,7 +188,7 @@ nav.site-nav {
   border: 1px solid var(--line);
   border-radius: 6px;
 }
-.fresh-panel p { max-width: 72ch; color: var(--ink-2); font-size: 0.95rem; }
+.fresh-panel p { color: var(--ink-2); font-size: 0.95rem; }
 
 .page-toc {
   margin: 1.25rem 0 2rem;
@@ -196,7 +196,6 @@ nav.site-nav {
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--bg-2);
-  max-width: 72ch;
 }
 .page-toc > summary {
   cursor: pointer;
@@ -219,13 +218,11 @@ nav.site-nav {
   .page-toc > ul { columns: 1; }
 }
 main {
-  max-width: 62rem;
+  max-width: 76rem;
   margin: 0 auto;
   padding: 2rem 16px 4rem;
   overflow-wrap: break-word;
 }
-/* Prose holds a reading measure. Tables and code blocks may run wider. */
-main > :is(p, ul, ol, h1, h2, h3, h4, h5, h6, blockquote, dl) { max-width: 72ch; }
 a {
   color: var(--accent);
   text-decoration: underline;
@@ -250,7 +247,6 @@ h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
   font-weight: 600;
   line-height: 1.35;
   margin: 0 0 1.5rem;
-  max-width: 40rem;
 }
 .thesis em { font-style: normal; color: var(--accent); }
 .board { font-family: var(--mono); }
@@ -467,7 +463,7 @@ hr {
 }
 img { max-width: 100%; height: auto; }
 footer {
-  max-width: 62rem;
+  max-width: 76rem;
   margin: 0 auto;
   padding: 1.5rem 16px 2.5rem;
   color: var(--ink-dim);
@@ -491,7 +487,7 @@ footer p { margin: 0; }
 <a href="whats-new.html">Project</a>
 <a href="m365-setup.html">M365 Agents</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.154.0 &middot; Updated 2026-11-02 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.155.0 &middot; Updated 2026-11-02 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -1170,20 +1166,6 @@ and SWE-Pro mean SWE-bench Verified and Pro. TB means Terminal-Bench.</p>
 </thead>
 <tbody>
 <tr>
-<td><strong>GLM-5.3</strong></td>
-<td>Z.ai · MIT</td>
-<td>753B MoE (40B active), 1M ctx · 1.40 / 4.40 (cached 0.26)</td>
-<td><strong>#2 open-weights on Artificial Analysis at Intelligence Index v4.3 45.</strong> GLM-5.2's base model with post-training gains. Independent scores are vals.ai SWE-bench Verified 95.4 and Terminal-Bench 4.0 41.8%.</td>
-<td>Reasoning can't be disabled.</td>
-</tr>
-<tr>
-<td><strong>GLM-5.2</strong></td>
-<td>Zhipu (Z.ai) · MIT</td>
-<td>753B MoE (active count undisclosed), 1M ctx · 1.40 / 4.40</td>
-<td>Superseded by GLM-5.3 at the same price. Vendor SWE-Pro is 62.1.</td>
-<td>NIST CAISI flagged bypassable self-hosted safeguards. AA's Intelligence Index puts it at 34. Z.ai Coding Plans auto-route it to GLM-5.3.</td>
-</tr>
-<tr>
 <td><strong>DeepSeek V4-Pro</strong></td>
 <td>DeepSeek · MIT</td>
 <td>1.6T/49B-active, 1M ctx · 0.66 / 1.98 off-peak, 1.32 / 3.96 peak (cache-hit 0.022 / 0.044)</td>
@@ -1230,7 +1212,7 @@ and SWE-Pro mean SWE-bench Verified and Pro. TB means Terminal-Bench.</p>
 <td>Meta · community license (not OSI)</td>
 <td>109B-400B · via Bedrock/Together/self-host</td>
 <td>The broadest ecosystem and tooling support of any open line.</td>
-<td>It trails Qwen, DeepSeek, and GLM on independent coding evals. The license carries an output-training bar.</td>
+<td>It trails Qwen and DeepSeek on independent coding evals. The license carries an output-training bar.</td>
 </tr>
 <tr>
 <td><strong>Devstral 2 / Small 2</strong></td>
@@ -1275,20 +1257,6 @@ and SWE-Pro mean SWE-bench Verified and Pro. TB means Terminal-Bench.</p>
 <td>Its model card publishes no benchmark numbers.</td>
 </tr>
 <tr>
-<td><strong>GLM-4.7-Flash</strong></td>
-<td>Zhipu (Z.ai) · MIT</td>
-<td>30B/3B-active, 200K ctx · free tier on Z.ai</td>
-<td>The vendor claims size-class SOTA. It runs about 43 tok/s on an Apple M5.</td>
-<td>The free tier is rate-limited. We found no independent scores.</td>
-</tr>
-<tr>
-<td><strong>GLM-4.5-Air</strong></td>
-<td>Zhipu (Z.ai) · MIT</td>
-<td>106B/12B-active, 128K ctx · ~0.13-0.20 / 0.85-1.10 (aggregator)</td>
-<td>The proven mid MoE, with a vendor SWE-V of 57.6. A community REAP-82B prune exists for tighter rigs.</td>
-<td>Superseded by the 4.6, 4.7, and 5.x line.</td>
-</tr>
-<tr>
 <td><strong>gpt-oss-120b</strong></td>
 <td>OpenAI · Apache 2.0</td>
 <td>117B/5.1B-active, 128K ctx · Groq/Together 0.15 / 0.60</td>
@@ -1315,7 +1283,7 @@ and SWE-Pro mean SWE-bench Verified and Pro. TB means Terminal-Bench.</p>
 vision line, which is out of scope for a coding guide.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-02 3:53 PM PST / 6:53 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-02 7:00 PM PST / 10:00 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the

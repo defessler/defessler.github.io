@@ -82,7 +82,7 @@ header {
   border-bottom: 1px solid var(--line);
 }
 nav.site-nav {
-  /* Wider than main, so brand, groups, stamp, badge and Download share a row. */
+  /* Same width as main, so brand, groups, stamp, badge and Download share a row. */
   max-width: 76rem;
   margin: 0 auto;
   padding: 0 16px;
@@ -188,7 +188,7 @@ nav.site-nav {
   border: 1px solid var(--line);
   border-radius: 6px;
 }
-.fresh-panel p { max-width: 72ch; color: var(--ink-2); font-size: 0.95rem; }
+.fresh-panel p { color: var(--ink-2); font-size: 0.95rem; }
 
 .page-toc {
   margin: 1.25rem 0 2rem;
@@ -196,7 +196,6 @@ nav.site-nav {
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--bg-2);
-  max-width: 72ch;
 }
 .page-toc > summary {
   cursor: pointer;
@@ -219,13 +218,11 @@ nav.site-nav {
   .page-toc > ul { columns: 1; }
 }
 main {
-  max-width: 62rem;
+  max-width: 76rem;
   margin: 0 auto;
   padding: 2rem 16px 4rem;
   overflow-wrap: break-word;
 }
-/* Prose holds a reading measure. Tables and code blocks may run wider. */
-main > :is(p, ul, ol, h1, h2, h3, h4, h5, h6, blockquote, dl) { max-width: 72ch; }
 a {
   color: var(--accent);
   text-decoration: underline;
@@ -250,7 +247,6 @@ h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
   font-weight: 600;
   line-height: 1.35;
   margin: 0 0 1.5rem;
-  max-width: 40rem;
 }
 .thesis em { font-style: normal; color: var(--accent); }
 .board { font-family: var(--mono); }
@@ -467,7 +463,7 @@ hr {
 }
 img { max-width: 100%; height: auto; }
 footer {
-  max-width: 62rem;
+  max-width: 76rem;
   margin: 0 auto;
   padding: 1.5rem 16px 2.5rem;
   color: var(--ink-dim);
@@ -491,7 +487,7 @@ footer p { margin: 0; }
 <a class="current" href="whats-new.html">Project</a>
 <a href="m365-setup.html">M365 Agents</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.154.0 &middot; Updated 2026-11-02 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.155.0 &middot; Updated 2026-11-02 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -507,7 +503,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-09-29-t44-moves-the-claude-code-implementer-to-medium-effort-v41430">2026-09-29 · T44 moves the Claude Code implementer to medium effort (v4.143.0)</a></li>
 <li><a href="#2026-09-29-the-m365-agents-match-the-repo-and-the-exporters-recover-from-a-failed-run-v41431">2026-09-29 · The M365 agents match the repo, and the exporters recover from a failed run (v4.143.1)</a></li>
 <li><a href="#2026-09-30-gpt-61-sol-takes-both-copilot-sol-seats-v41440">2026-09-30 · GPT-6.1 Sol takes both Copilot Sol seats (v4.144.0)</a></li>
 <li><a href="#2026-10-08-haiku-55-takes-the-claude-code-scout-and-valsai-re-runs-its-board-v41450">2026-10-08 · Haiku 5.5 takes the Claude Code scout, and vals.ai re-runs its board (v4.145.0)</a></li>
@@ -521,27 +516,13 @@ footer p { margin: 0; }
 <li><a href="#2026-11-02-smartdiff-joins-the-family-with-a-semantic-diff-for-unreal-blueprints-v41520">2026-11-02 · smartdiff joins the family, with a semantic diff for Unreal Blueprints (v4.152.0)</a></li>
 <li><a href="#2026-11-02-smartdiff-reviews-only-the-agents-own-edits-on-copilot-cli-and-claude-code-v41530">2026-11-02 · smartdiff reviews only the agent's own edits, on Copilot CLI and Claude Code (v4.153.0)</a></li>
 <li><a href="#2026-11-02-the-weekly-sweep-aas-new-index-and-a-site-that-says-how-fresh-it-is-v41540">2026-11-02 · The weekly sweep, AA's new index, and a site that says how fresh it is (v4.154.0)</a></li>
+<li><a href="#2026-11-02-zcode-and-zai-leave-the-family-and-the-site-goes-wide-v41550">2026-11-02 · ZCode and z.ai leave the family, and the site goes wide (v4.155.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-09-29-t44-moves-the-claude-code-implementer-to-medium-effort-v41430">2026-09-29 · T44 moves the Claude Code implementer to medium effort (v4.143.0)</h2>
-<p>T44 put Opus 5.5 at low and medium against Sonnet 5.5 at medium and high on
-T43's rename and semver2 tasks, three runs each, pre-registered before any
-measured run. Every one of the 24 runs scored full marks, so it measured
-cost at equal accuracy. Per passing run, Sonnet 5.5 at medium cost $0.075
-and $0.497, Opus 5.5 at low $0.097 and $0.550, and the implementer seat's
-Sonnet 5.5 at high $0.099 and $1.213. At high Sonnet wrote 65K output
-tokens on semver2 against 28K at medium for the same score.</p>
-<p>At the author's direction the Claude Code implementer now pins <code>effort:
-medium</code>, which keeps the rule that Sonnet does all implementation. Its
-escalations ride the pin, so a fail-twice <code>model: opus</code> runs Opus 5.5 at
-medium. The verifier keeps <code>high</code>. Both tasks hit the ceiling, so T44 says
-nothing about accuracy on harder work. The collector also stopped splitting
-transcripts on U+2028, which model-written semver code put inside JSONL
-records.</p>
 <h2 id="2026-09-29-the-m365-agents-match-the-repo-and-the-exporters-recover-from-a-failed-run-v41431">2026-09-29 · The M365 agents match the repo, and the exporters recover from a failed run (v4.143.1)</h2>
 <p>The three M365 agents had never been stamped, so <code>m365-agents.py status</code>
 couldn't say whether Agent Builder matched the repo. A live compare found
@@ -871,9 +852,24 @@ and dark, and the pages got a plain-language pass that kept every fact.</p>
 <p><strong>Fixes.</strong> The m365-shim answered a 404 before reading the request
 body, so Windows reset the connection and oracle stage (f) failed about
 one run in four. It reads first now.</p>
+<h2 id="2026-11-02-zcode-and-zai-leave-the-family-and-the-site-goes-wide-v41550">2026-11-02 · ZCode and z.ai leave the family, and the site goes wide (v4.155.0)</h2>
+<p><strong>ZCode and z.ai are gone</strong>, at the author's direction. That covers
+<code>zcode.md</code>, <code>scripts/zcode-export.sh</code> and its download bundle, the ZCode
+rows in OVERVIEW, QUICKSTART and Downloads, the <code>zcode-harness</code> research
+area (now declared retired), and the GLM rows in the model registry, the
+class page and the open-weights table. The bench harness lost its <code>zai</code>
+arm. The 30 ledger rows about ZCode, z.ai and GLM pricing are out of
+<code>VERIFIED.md</code>. Dated history stays as it was: benchmark records, sweep
+notes and older changelog entries.</p>
+<p><code>glm-and-local.md</code> is now <code>local-models.md</code>. It keeps the shim ladder
+check and the local-model guidance, without the GLM section. The family
+now supports three harnesses: Claude Code, Copilot CLI and M365 Copilot.</p>
+<p><strong>The site is wider.</strong> Pages, the header and the footer share a 76rem
+column, and paragraphs fill it too instead of stopping at a reading
+measure.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-02 3:53 PM PST / 6:53 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-02 7:00 PM PST / 10:00 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the

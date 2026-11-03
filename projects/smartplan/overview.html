@@ -82,7 +82,7 @@ header {
   border-bottom: 1px solid var(--line);
 }
 nav.site-nav {
-  /* Wider than main, so brand, groups, stamp, badge and Download share a row. */
+  /* Same width as main, so brand, groups, stamp, badge and Download share a row. */
   max-width: 76rem;
   margin: 0 auto;
   padding: 0 16px;
@@ -188,7 +188,7 @@ nav.site-nav {
   border: 1px solid var(--line);
   border-radius: 6px;
 }
-.fresh-panel p { max-width: 72ch; color: var(--ink-2); font-size: 0.95rem; }
+.fresh-panel p { color: var(--ink-2); font-size: 0.95rem; }
 
 .page-toc {
   margin: 1.25rem 0 2rem;
@@ -196,7 +196,6 @@ nav.site-nav {
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--bg-2);
-  max-width: 72ch;
 }
 .page-toc > summary {
   cursor: pointer;
@@ -219,13 +218,11 @@ nav.site-nav {
   .page-toc > ul { columns: 1; }
 }
 main {
-  max-width: 62rem;
+  max-width: 76rem;
   margin: 0 auto;
   padding: 2rem 16px 4rem;
   overflow-wrap: break-word;
 }
-/* Prose holds a reading measure. Tables and code blocks may run wider. */
-main > :is(p, ul, ol, h1, h2, h3, h4, h5, h6, blockquote, dl) { max-width: 72ch; }
 a {
   color: var(--accent);
   text-decoration: underline;
@@ -250,7 +247,6 @@ h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
   font-weight: 600;
   line-height: 1.35;
   margin: 0 0 1.5rem;
-  max-width: 40rem;
 }
 .thesis em { font-style: normal; color: var(--accent); }
 .board { font-family: var(--mono); }
@@ -467,7 +463,7 @@ hr {
 }
 img { max-width: 100%; height: auto; }
 footer {
-  max-width: 62rem;
+  max-width: 76rem;
   margin: 0 auto;
   padding: 1.5rem 16px 2.5rem;
   color: var(--ink-dim);
@@ -491,7 +487,7 @@ footer p { margin: 0; }
 <a href="whats-new.html">Project</a>
 <a href="m365-setup.html">M365 Agents</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.154.0 &middot; Updated 2026-11-02 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.155.0 &middot; Updated 2026-11-02 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -539,7 +535,7 @@ See <code>smartplan/references/modes.md</code>.</p>
 per-token bill. Copilot CLI meters credits per token. It defaults to
 <strong><code>max-savings</code></strong>. That setting held equal quality at 54% of balanced's cost on
 mechanical work and 32% on judgment work (T8, T13).</p>
-<h3 id="four-harnesses-one-policy">Four harnesses, one policy</h3>
+<h3 id="three-harnesses-one-policy">Three harnesses, one policy</h3>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -560,20 +556,13 @@ mechanical work and 32% on judgment work (T8, T13).</p>
 <td>Full. <code>scripts/copilot-export.sh</code> builds the bundle.</td>
 </tr>
 <tr>
-<td><strong>ZCode</strong> (Z.ai)</td>
-<td>Per-agent pin at <code>~/.zcode/agents/</code></td>
-<td>Good. Real subagents, deny-capable hooks, and Goal Mode as a verify gate. <code>scripts/zcode-export.sh</code> builds the bundle. It reads <code>AGENTS.md</code>, never <code>CLAUDE.md</code>.</td>
-</tr>
-<tr>
 <td><strong>Microsoft 365 Copilot</strong></td>
 <td>Per agent in Copilot Studio, per user in Cowork, none on declarative agents</td>
 <td>Partial. Custom skills are a Frontier Preview feature. See <code>references/m365-copilot.md</code>.</td>
 </tr>
 </tbody>
 </table></div>
-<p>ZCode loads the family but has no cost benchmarks, only one graded
-record (T37). The M365 row is docs-only
-(read 2026-09-15).</p>
+<p>The M365 row is docs-only (read 2026-09-15).</p>
 <p>Claude Code and Copilot ship <strong>tool-locked agent seats</strong>. The verifier gets a
 shell to re-run acceptance but can't edit files. The scout only reads.
 Copilot pins all seven (planner, three implementer tiers, two verifiers,
@@ -645,7 +634,7 @@ on failure, not on a hunch.</p>
 <p>The full policy is in <code>.claude/skills/smartplan/SKILL.md</code>, goals in <code>GOALS.md</code>.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-02 3:53 PM PST / 6:53 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-02 7:00 PM PST / 10:00 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
