@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Extending Outpost Builder · OutpostBuilder</title>
+<meta name="description" content="A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<div class="shell">
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-controls="sidebar" aria-expanded="false">
+    <span></span><span></span><span></span>
+    <span class="vh">Toggle navigation</span>
+  </button>
+
+  <aside class="side" id="sidebar">
+    <div class="side-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-word">OutpostBuilder</span>
+      </a>
+
+      <nav aria-label="Documentation">
+        <ol class="nav-list">
+          <li>
+            <a href="index.html">
+              <span class="nav-no">01</span>
+              <span class="nav-title">OutpostBuilder</span>
+            </a>
+          </li>
+          <li>
+            <a href="tutorial.html">
+              <span class="nav-no">02</span>
+              <span class="nav-title">Tutorial - A Guided Tour</span>
+            </a>
+          </li>
+          <li>
+            <a href="architecture.html">
+              <span class="nav-no">03</span>
+              <span class="nav-title">Architecture</span>
+            </a>
+          </li>
+          <li>
+            <a href="identity.html">
+              <span class="nav-no">04</span>
+              <span class="nav-title">Instance Identity</span>
+            </a>
+          </li>
+          <li>
+            <a href="edmode.html">
+              <span class="nav-no">05</span>
+              <span class="nav-title">The Ed Mode - UEdMode Deep Dive</span>
+            </a>
+          </li>
+          <li>
+            <a href="toolkit.html">
+              <span class="nav-no">06</span>
+              <span class="nav-title">The Toolkit - FModeToolkit and Slate</span>
+            </a>
+          </li>
+          <li>
+            <a href="prefabs.html">
+              <span class="nav-no">07</span>
+              <span class="nav-title">Prefabs &amp; Fork-on-Stamp</span>
+            </a>
+          </li>
+          <li>
+            <a href="faction-visuals.html">
+              <span class="nav-no">08</span>
+              <span class="nav-title">Faction - Identity and Gating</span>
+            </a>
+          </li>
+          <li>
+            <a href="extending.html" class="active" aria-current="page">
+              <span class="nav-no">09</span>
+              <span class="nav-title">Extending Outpost Builder</span>
+            </a>
+          </li>
+          <li>
+            <a href="quick-reference.html">
+              <span class="nav-no">10</span>
+              <span class="nav-title">Quick Reference - The Cheat Sheet</span>
+            </a>
+          </li>
+          <li>
+            <a href="reference.html">
+              <span class="nav-no">11</span>
+              <span class="nav-title">Reference - Public Surfaces, Hotkeys, and Testing</span>
+            </a>
+          </li>
+          <li>
+            <a href="runtime-loadout.html">
+              <span class="nav-no">12</span>
+              <span class="nav-title">Per-Plot Building Rendering</span>
+            </a>
+          </li>
+          <li>
+            <a href="porting.html">
+              <span class="nav-no">13</span>
+              <span class="nav-title">Porting Into Your Own Project</span>
+            </a>
+          </li>
+          <li>
+            <a href="wiring.html">
+              <span class="nav-no">14</span>
+              <span class="nav-title">System Wiring</span>
+            </a>
+          </li>
+          <li>
+            <a href="technology.html">
+              <span class="nav-no">15</span>
+              <span class="nav-title">Technology &amp; Trade-offs</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
+      <a class="side-github" href="https://github.com/defessler/OutpostBuilder">
+        <span aria-hidden="true">&#8599;</span> Repository
+      </a>
+    </div>
+  </aside>
+
+  <div class="nav-scrim" id="nav-scrim"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="crumb">OutpostBuilder <span class="crumb-sep">/</span> Extending Outpost Builder</span>
+      <span class="published">Published <time datetime="2026-11-03T05:35:00Z">2026-11-03 05:35 UTC</time></span>
+
+    </header>
+
+    <main id="content">
+      <article class="doc">
+<h1 id="extending-outpost-builder">Extending Outpost Builder</h1>
+<p>This page is meant as a quick reference on extending Outpost Builder: three worked examples of the kind of extension you're most likely to reach for, plus a pitfalls list mined from our own verification history so you don't have to rediscover them the hard way.</p>
+<p>Check out <a href="architecture.html">Architecture</a>, <a href="edmode.html">The UEdMode Deep Dive</a>, <a href="prefabs.html">Prefabs</a>, and <a href="faction-visuals.html">Faction - Identity and Gating</a> for the "what" and "why" behind the systems below. This page assumes you've read those (or the source) and just want to add your own thing.</p>
+<p>We're assuming you're comfortable with <code>UEdMode</code>, Slate, <code>UPROPERTY</code>, transactions, and the rest of the editor-extension vocabulary. We won't re-explain engine basics here. What we will do is point at the exact seams this plugin exposes, quote the real code at each one, and tell you where we got burned so you don't have to.</p>
+<h2 id="consuming-outpostbuilder-from-another-project">Consuming OutpostBuilder from Another Project</h2>
+<p>Everything below the fold on this page assumes you're editing the plugin's own source. This section is the other case: you're building a SEPARATE project (or a separate plugin) that depends on OutpostBuilder as an installed dependency and never touches its <code>.uplugin</code>. Five things a downstream project actually reaches for, in the order you'd hit them.</p>
+<h3 id="enable-the-plugin-and-pick-your-module-dependencies">Enable the Plugin and Pick Your Module Dependencies</h3>
+<p>OutpostBuilder ships two modules, one runtime/editor pair. See <a href="architecture.html">Architecture</a>'s "Module Split: Runtime vs Editor" for the full why. The short version for a <em>consumer</em> rather than a contributor: <code>OutpostBuilder</code> (Runtime, <code>OUTPOSTBUILDER_API</code>) is what a packaged game links against, and <code>OutpostBuilderEditor</code> (Editor, <code>OUTPOSTBUILDEREDITOR_API</code>) is editor-only tooling that never ships in a cooked build. The registry bake and its listeners live in the editor module.</p>
+<ul>
+<li><strong>Gameplay-only consumer</strong> (spawn outposts, read definitions, bind events, subclass an actor or a definition): depend on <code>OutpostBuilder</code> alone, from any module type (Runtime or Editor).</li>
+<li><strong>Editor-tooling consumer</strong> (mount or remix the Slate widgets, write your own placement mode): depend on <code>OutpostBuilderEditor</code> too, and only from your own <strong>Editor</strong>-type module, the same <code>LoadingPhase: "Default"</code> / <code>Type: "Editor"</code> shape this plugin's own <code>OutpostBuilderEditor</code> entry uses in its <code>.uplugin</code>.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1">// YourProject/Source/YourEditorModule/YourEditorModule.Build.cs</span>
+<span class="n">PrivateDependencyModuleNames</span><span class="p">.</span><span class="n">AddRange</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="kt">string</span><span class="p">[]</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="s">"OutpostBuilder"</span><span class="p">,</span><span class="w">       </span><span class="c1">// runtime types: AOutpost, UOutpostDefinition, UOutpostEventSubsystem, ...</span>
+<span class="w">    </span><span class="s">"OutpostBuilderEditor"</span><span class="p">,</span><span class="w"> </span><span class="c1">// editor-only: the 13 SOutpost* widgets, FOutpostBuilderWidgetContext, FOutpostPaletteModel</span>
+<span class="p">});</span>
+</code></pre></div>
+
+<p>Once either is listed (Public or Private, since either propagates the include), <code>#include "OutpostBuilder/Outpost.h"</code> and <code>#include "OutpostBuilderEditor/SOutpostBuildingsBrowser.h"</code> just work with no further <code>Build.cs</code> changes on your side: both modules already declare their own Source root as a <code>PublicIncludePath</code> precisely so a "collapsed" (no <code>Public</code>/<code>Private</code> split) module's headers are reachable by full plugin-Source-root-relative paths from any dependent.</p>
+<p><code>OutpostBuilder.Build.cs</code>'s own comment spells this out ("PUBLIC so it propagates to dependent modules (OutpostBuilderEditor)"), and <code>OutpostBuilderEditor.Build.cs</code> does the identical thing for itself.</p>
+<p>The linkable symbols at each of those headers (classes, statics) carry the matching <code>OUTPOSTBUILDER_API</code>/<code>OUTPOSTBUILDEREDITOR_API</code> export mark, which is the piece that actually needed doing. See "Extending the Editor UI" below for exactly which editor-module surfaces are marked and which deliberately aren't.</p>
+<h3 id="bind-the-runtime-event-subsystem">Bind the Runtime Event Subsystem</h3>
+<p><code>UOutpostEventSubsystem</code> (<code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostEventSubsystem.h</code>) is the intended bind-and-go seam for reacting to outpost/plot/faction changes without forking the plugin: three events (<code>OnOutpostStamped</code>, <code>OnPlotAssigned</code>, <code>OnFactionChanged</code>), each with a <code>BlueprintAssignable</code> dynamic delegate AND a plain native multicast "Native" twin firing from the same broadcast call.</p>
+<p>Read the class's own doc comment in full before binding. It covers three things every subscriber needs to know and this page won't repeat: the EDITOR VS GAME split (an editor-authoring action broadcasts on the level-editor world's instance, never on a PIE/packaged world's), that undo/redo does NOT re-fire these, and the exact firing order per entry point.</p>
+<p>C++ (native twin: <code>AddUObject</code>/<code>AddLambda</code>/<code>AddRaw</code>, whichever binder shape your class already uses):</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">UOutpostEventSubsystem</span><span class="o">*</span><span class="w"> </span><span class="n">Events</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UOutpostEventSubsystem</span><span class="o">::</span><span class="n">Get</span><span class="p">(</span><span class="n">GetWorld</span><span class="p">()))</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">Events</span><span class="o">-&gt;</span><span class="n">OnOutpostStampedNative</span><span class="p">.</span><span class="n">AddUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">UYourClass</span><span class="o">::</span><span class="n">HandleOutpostStamped</span><span class="p">);</span>
+<span class="w">    </span><span class="n">Events</span><span class="o">-&gt;</span><span class="n">OnPlotAssignedNative</span><span class="p">.</span><span class="n">AddUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">UYourClass</span><span class="o">::</span><span class="n">HandlePlotAssigned</span><span class="p">);</span>
+<span class="w">    </span><span class="n">Events</span><span class="o">-&gt;</span><span class="n">OnFactionChangedNative</span><span class="p">.</span><span class="n">AddUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">UYourClass</span><span class="o">::</span><span class="n">HandleFactionChanged</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Blueprint: <code>UOutpostEventSubsystem</code> is a <code>UWorldSubsystem</code>, so it gets the engine's usual auto-generated <strong>Get Outpost Event Subsystem</strong> node (subsystem classes are exposed to the subsystem-fetch nodes regardless of <code>BlueprintType</code>). Drag off a World Context, get the subsystem, then <strong>Bind Event to On Outpost Stamped</strong> (etc.) on the result, the same pattern as binding to any other <code>BlueprintAssignable</code> multicast delegate.</p>
+<h3 id="subclass-a-definition-asset">Subclass a Definition Asset</h3>
+<p>Both definition types (<code>UOutpostDefinition</code>, <code>UOutpostBuildingDefinition</code>) are meant to be subclassed, natively or in Blueprint. Add your own fields, keep everything the plugin already does.</p>
+<p>The full contract (why you must never override <code>GetPrimaryAssetId</code>, and why leaving it alone is not a limitation but the whole point) is documented once, on each class, as the "SUBCLASSING CONTRACT" doc comment on <code>GetPrimaryAssetId()</code> in <code>OutpostDefinition.h</code> / <code>OutpostBuildingDefinition.h</code>. Read it there rather than here. This page won't restate it.</p>
+<p>The short version: a subclass is an ORDINARY MEMBER of its parent's primary asset type, so the plugin's existing scan, palette, and picker filters all find your subclass's instances with zero code on your side.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Your own module - native or Blueprint, either way:</span>
+<span class="n">UCLASS</span><span class="p">()</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UMyOutpostBuildingDefinition</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">UOutpostBuildingDefinition</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">GENERATED_BODY</span><span class="p">()</span>
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="c1">// Add your own fields here. Do NOT override GetPrimaryAssetId() - see the SUBCLASSING CONTRACT</span>
+<span class="w">    </span><span class="c1">// comment on the base class for why leaving it alone is required, not just simplest.</span>
+
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Your Project"</span><span class="p">)</span>
+<span class="w">    </span><span class="n">FGameplayTag</span><span class="w"> </span><span class="n">YourCustomTag</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<h3 id="swap-in-your-own-actor-classes">Swap In Your Own Actor Classes</h3>
+<p>Covered in full already, further down this same page under "Override a Spawned Actor Class". The mechanism (four <code>TSubclassOf&lt;&gt;</code> fields on <code>UOutpostBuilderSettingsAsset</code>'s <strong>Actors</strong> category, resolved through <code>UOutpostRuntimeSettings::GetOutpostClass</code>/<code>GetPlotClass</code>/<code>GetVolumeClass</code>/<code>GetOverheadCameraClass</code>) needs no plugin-side code from a downstream project at all: point the settings asset at your subclass and every one of the plugin's 11 spawn sites picks it up.</p>
+<h3 id="extend-the-editor-ui">Extend the Editor UI</h3>
+<p>If you want your own toolkit, panel, or placement mode to look and behave like this one (or to literally reuse pieces of it), mount or remix the 14 reusable <code>SOutpost*</code> widgets rather than starting from a blank <code>SCompoundWidget</code>. They're built for exactly this: <strong>the exemplar contract is "The Widget-Authoring Recipe"</strong> (<code>toolkit.html</code>, <code>SOutpostBuildingsBrowser</code> is the ORIGINAL exemplar it's modeled on).</p>
+<p>Every one of the 14 owns its own state, holds no <code>UOutpostBuilderEdMode*</code>/<code>FOutpostBuilderToolkit*</code> anywhere on the class, and reads the editing session only through an injected <code>TSharedPtr&lt;FOutpostBuilderWidgetContext&gt;</code> and/or <code>TSharedPtr&lt;FOutpostPaletteModel&gt;</code>, reporting every world-mutating action back out as a <code>SLATE_EVENT</code> instead of performing it directly.</p>
+<p>Because none of them hold a reference to <em>this</em> plugin's toolkit or mode, nothing stops you from <code>SNew</code>-ing one into a completely different panel shell, wiring its <code>SLATE_EVENT</code>s to YOUR OWN handlers instead of <code>FOutpostBuilderToolkit</code>'s.</p>
+<p><code>SOutpostSaveFooter</code> deserves a specific callout: this plugin's own editing panel doesn't mount it internally (saving reaches through the in-viewport editing bar's Save button and Ctrl+S instead), but the widget is fully intact and is exactly the worked example the snippet just below mounts. It's an export-only exemplar: reach for it in your own panel the same way regardless.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Your own FModeToolkit/panel, in your OWN OutpostBuilderEditor-dependent editor module:</span>
+<span class="n">TSharedPtr</span><span class="o">&lt;</span><span class="n">FOutpostBuilderWidgetContext</span><span class="o">&gt;</span><span class="w"> </span><span class="n">YourContext</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MakeShared</span><span class="o">&lt;</span><span class="n">FOutpostBuilderWidgetContext</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="n">YourContext</span><span class="o">-&gt;</span><span class="n">bIsPlayOrSimulateActive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TAttribute</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;::</span><span class="n">CreateSP</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">SYourPanel</span><span class="o">::</span><span class="n">IsPlayOrSimulateActive</span><span class="p">);</span>
+<span class="n">YourContext</span><span class="o">-&gt;</span><span class="n">GetEditingOutpost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FOutpostBuilderWidgetContext</span><span class="o">::</span><span class="n">FGetEditingOutpost</span><span class="o">::</span><span class="n">CreateSP</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">SYourPanel</span><span class="o">::</span><span class="n">GetEditingOutpost</span><span class="p">);</span>
+<span class="c1">// ... fill in whichever fields the widgets you mount actually read - see OutpostBuilderWidgetContext.h</span>
+<span class="c1">// for the full field list and each one's own doc.</span>
+
+<span class="n">ChildSlot</span>
+<span class="p">[</span>
+<span class="w">    </span><span class="n">SNew</span><span class="p">(</span><span class="n">SOutpostSaveFooter</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="n">Context</span><span class="p">(</span><span class="n">YourContext</span><span class="p">)</span><span class="w"> </span><span class="c1">// Reads ResolveEditingDefinition through the Context - see the widget's own header for exactly which fields it consumes.</span>
+<span class="w">    </span><span class="p">.</span><span class="n">OnSaveRequested</span><span class="p">(</span><span class="n">FSimpleDelegate</span><span class="o">::</span><span class="n">CreateSP</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">SYourPanel</span><span class="o">::</span><span class="n">HandleSaveRequested</span><span class="p">))</span>
+<span class="p">];</span>
+</code></pre></div>
+
+<p>Not every widget takes a <code>Context</code>. Each header's <code>SLATE_BEGIN_ARGS</code> block is the authority on what it
+consumes. <code>SOutpostBuildingsBrowser</code>, for example, takes no Context at all (it browses every building
+definition unfiltered); its create hook is also <em>not</em> an <code>FSimpleDelegate</code>. It returns the created asset, so
+you bind it with its own type:
+<code>.OnCreateBuildingRequested(SOutpostBuildingsBrowser::FOnCreateBuildingRequested::CreateSP(this, &amp;SYourPanel::HandleCreateBuilding))</code>
+where your handler returns a <code>UOutpostBuildingDefinition*</code>.</p>
+<p><code>FOutpostPaletteModel</code> follows the same shape if you're mounting anything from the Building-palette complex (<code>SOutpostBuildingPalette</code>, <code>SOutpostPaletteTile</code>, <code>SOutpostPaletteFilterRow</code>, <code>SOutpostPaletteCategoryTabRow</code>, <code>SOutpostAssignRow</code>, <code>SOutpostSelectedBuildingPanel</code>): construct one <code>TSharedRef&lt;FOutpostPaletteModel&gt;</code> yourself (its own header has no toolkit/mode dependency to satisfy beyond <code>GateFactionAttribute</code>, which you bind the same CreateSP way) and hand it to every palette widget you mount, so they all agree on the same entry cache/hot-building/filters the way this plugin's own two mount points do.</p>
+<p><strong>What's deliberately NOT part of this seam:</strong> <code>UOutpostBuilderEdMode</code> itself carries no <code>OUTPOSTBUILDEREDITOR_API</code> mark and isn't meant to be subclassed or reused.</p>
+<p>Mode discovery is engine-side machinery. The asset-editor subsystem sweeps <code>UEdMode</code> CDOs directly, so there's nothing to register and nothing to hook - <code>FEditorModeRegistry</code>, the older registration point a legacy <code>FEdMode</code> needed, doesn't apply to a <code>UEdMode</code> at all.</p>
+<p>A downstream project that wants its own full placement UX (viewport ghosts, hit-proxy gizmos, an <code>InputKey</code> state machine) writes its own <code>UEdMode</code>, informed by <a href="edmode.html">The UEdMode Deep Dive</a> and Worked Extension 3 below, rather than inheriting this one.</p>
+<p>The 13 widgets, the two shared read-model primitives, and <code>FOutpostBuilderToolkit</code>'s two public statics (<code>GetPlayBlockedText</code>/<code>GetAssignRefusalText</code>, the shared "why is this refused" wording, exported at the function level since the toolkit class itself isn't) are the intended reuse surface. The mode and the toolkit's own private assembly logic are not.</p>
+<h2 id="worked-extension-1-add-a-new-definition-asset-type-end-to-end">Worked Extension 1: Add a New Definition Asset Type End to End</h2>
+<p>Outpost Builder has two definition asset types: <code>UOutpostDefinition</code> and <code>UOutpostBuildingDefinition</code>. (Factions are NOT a definition asset. They're a fixed <code>EOutpostFaction</code> enum, pure identity and building-eligibility gating with no visual effect. See the note at the end of this section if that's the extension you actually came here for.)</p>
+<p><code>UOutpostBuildingDefinition</code> is a clean, minimal example of every seam a new type needs to go through. We'll walk through adding a third type (call it <code>UOutpostXDefinition</code>) by mirroring it step for step.</p>
+<p><img alt="Four seams: runtime UCLASS, AssetManager scan, UFactory, optional CB context menu" src="assets/extending-new-type-flow.svg" /></p>
+<h3 id="step-1-define-the-data-asset">Step 1: Define the Data Asset</h3>
+<p>Every definition type is a thin <code>UPrimaryDataAsset</code> subclass. Here's the core of the building definition, abridged. The real header also carries <code>GetEffectiveDisplayName()</code>/<code>MakeDefaultDisplayNameFromAssetName()</code>, the <code>PlotTagQuery</code>/<code>MatchesPlotTags()</code> warn-only tag matrix (covered later on this same page), and <code>BuildingCategory</code>, all elided here for space:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostBuildingDefinition.h</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AActor</span><span class="p">;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UStaticMesh</span><span class="p">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Data asset describing a single placeable building type: its display name, the mesh it renders as,</span>
+<span class="cm"> * the actor asset gameplay spawns for it, and the two things that decide WHERE it may go - the plot</span>
+<span class="cm"> * size it requires and the factions that field it.</span>
+<span class="cm"> *</span>
+<span class="cm"> * WHAT RENDERS: when BuildingActorClass is set, the EDITOR previews the ACTOR - the placement ghost</span>
+<span class="cm"> * and the editor-world plot both mirror its template's static-mesh components (the same collector on</span>
+<span class="cm"> * both sides, so the thing you aim is the thing you get). BuildingMesh is the fallback for a class-less</span>
+<span class="cm"> * building, the palette thumbnail source, and what a plot renders in GAME worlds (gameplay spawns</span>
+<span class="cm"> * the real actor itself there; the plugin never double-renders it).</span>
+<span class="cm"> */</span>
+<span class="n">UCLASS</span><span class="p">(</span><span class="n">BlueprintType</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OUTPOSTBUILDER_API</span><span class="w"> </span><span class="n">UOutpostBuildingDefinition</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">UPrimaryDataAsset</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">GENERATED_BODY</span><span class="p">()</span>
+
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">FPrimaryAssetType</span><span class="w"> </span><span class="n">PrimaryAssetTypeName</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="n">FPrimaryAssetId</span><span class="w"> </span><span class="nf">GetPrimaryAssetId</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">override</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span><span class="w"> </span><span class="n">BlueprintReadOnly</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Building"</span><span class="p">)</span>
+<span class="w">    </span><span class="n">FText</span><span class="w"> </span><span class="n">DisplayName</span><span class="p">;</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * The actor asset (e.g. a Blueprint actor) gameplay spawns for this building - and what the EDITOR</span>
+<span class="cm">     * previews when set: the placement ghost and the editor-world plot both mirror this class's</span>
+<span class="cm">     * template (CDO + SCS static-mesh components) into plain components, never a child actor and never</span>
+<span class="cm">     * a spawned instance. Ghost and plot mirror the SAME class through the SAME collector, so one shape</span>
+<span class="cm">     * can't be aimed while another is placed. Game worlds never render from this class (gameplay spawns</span>
+<span class="cm">     * the real actor there).</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span><span class="w"> </span><span class="n">BlueprintReadOnly</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Building"</span><span class="p">,</span><span class="w"> </span><span class="n">meta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">DisplayThumbnail</span><span class="o">=</span><span class="s">"false"</span><span class="p">))</span>
+<span class="w">    </span><span class="n">TSoftClassPtr</span><span class="o">&lt;</span><span class="n">AActor</span><span class="o">&gt;</span><span class="w"> </span><span class="n">BuildingActorClass</span><span class="p">;</span>
+
+<span class="w">    </span><span class="cm">/** The building's mesh: what a plot renders in GAME worlds, the palette thumbnail source, and the editor preview/ghost FALLBACK when BuildingActorClass is unset or yields no static-mesh parts. */</span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span><span class="w"> </span><span class="n">BlueprintReadOnly</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Building"</span><span class="p">)</span>
+<span class="w">    </span><span class="n">TSoftObjectPtr</span><span class="o">&lt;</span><span class="n">UStaticMesh</span><span class="o">&gt;</span><span class="w"> </span><span class="n">BuildingMesh</span><span class="p">;</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Which plots this building fits, as a gameplay-tag QUERY evaluated against the plot's size tag.</span>
+<span class="cm">     * An EMPTY query fits EVERY plot - the default for newly created buildings. A plot whose tag the</span>
+<span class="cm">     * query rejects gets the DISABLED TREATMENT - the building is offered greyed-out, and one already</span>
+<span class="cm">     * assigned to a now-mismatched plot is never auto-deleted or reassigned; it keeps its plot and</span>
+<span class="cm">     * keeps rendering.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span><span class="w"> </span><span class="n">BlueprintReadOnly</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Building"</span><span class="p">)</span>
+<span class="w">    </span><span class="n">FGameplayTagQuery</span><span class="w"> </span><span class="n">PlotSizeQuery</span><span class="p">;</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * The factions that field this building. EMPTY = supported EVERYWHERE (wildcard) - which is exactly</span>
+<span class="cm">     * what an asset authored before this field existed deserializes to, so no existing content is</span>
+<span class="cm">     * narrowed by the upgrade.</span>
+<span class="cm">     *</span>
+<span class="cm">     * Never test this set directly - call SupportsFaction(), which is the one home of the whole rule</span>
+<span class="cm">     * (the Neutral case is not expressible as a membership test and WILL be got wrong here).</span>
+<span class="cm">     * // ... (TSet-vs-bitmask rationale elided - see the header)</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span><span class="w"> </span><span class="n">BlueprintReadOnly</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Building"</span><span class="p">)</span>
+<span class="w">    </span><span class="n">TSet</span><span class="o">&lt;</span><span class="n">EOutpostFaction</span><span class="o">&gt;</span><span class="w"> </span><span class="n">SupportedFactions</span><span class="p">;</span>
+
+<span class="w">    </span><span class="cm">/** THE single home of the faction-eligibility rule ... (Neutral accepts everything; empty = wildcard - see the header). */</span>
+<span class="w">    </span><span class="n">UFUNCTION</span><span class="p">(</span><span class="n">BlueprintPure</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Building"</span><span class="p">)</span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">SupportsFaction</span><span class="p">(</span><span class="n">EOutpostFaction</span><span class="w"> </span><span class="n">OutpostFaction</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p>Note: keep the fields data, not behavior. Every bit of logic that resolves or applies this asset (mesh, footprint, whatever your new type carries) lives on the actor that reads it, not on the definition itself. That's the pattern the outpost and building definitions both follow.</p>
+<p><code>SupportsFaction()</code> is one exception, and its size-eligibility twin <code>MatchesPlotSize()</code> (which evaluates <code>PlotSizeQuery</code>, and is elided from the excerpt above) is the other. They earn it: each is a <code>BlueprintPure</code> query over this asset's own field, and exists precisely so the rule can't be re-derived at a call site.</p>
+<p>If your new type has a rule that is easy to get subtly wrong and impossible to keep consistent once copied (a defaulted-empty container/query that means "everything", say), put the query on the definition and forbid direct field access in the comment, the way both of those do.</p>
+<h3 id="step-2-give-it-a-primary-asset-id">Step 2: Give It a Primary Asset Id</h3>
+<p>The <code>.cpp</code> is almost nothing. That's the point: <code>GetPrimaryAssetId()</code> is the entire identity contract every other system (the palette, the picker widgets, <code>AllowedTypes</code> meta) relies on.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostBuildingDefinition.cpp</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">"OutpostBuilder/OutpostBuildingDefinition.h"</span>
+
+<span class="k">const</span><span class="w"> </span><span class="n">FPrimaryAssetType</span><span class="w"> </span><span class="n">UOutpostBuildingDefinition</span><span class="o">::</span><span class="n">PrimaryAssetTypeName</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">"OutpostBuildingDefinition"</span><span class="p">));</span>
+
+<span class="n">FPrimaryAssetId</span><span class="w"> </span><span class="nf">UOutpostBuildingDefinition::GetPrimaryAssetId</span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">FPrimaryAssetId</span><span class="p">(</span><span class="n">PrimaryAssetTypeName</span><span class="p">,</span><span class="w"> </span><span class="n">GetFName</span><span class="p">());</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>For your new type, swap in <code>TEXT("OutpostXDefinition")</code> and you're done with this step. Give your own <code>UPROPERTY(meta = (AllowedTypes = "OutpostXDefinition"))</code> references the same free ride the outpost and building ids already get.</p>
+<h3 id="step-3-register-it-for-scanning">Step 3: Register It for Scanning</h3>
+<p>This is the step it's easiest to get wrong: the scan has to live in the RUNTIME module, not the editor module. A packaged game still needs to resolve <code>FPrimaryAssetId</code>s against real assets, so an editor-module scan would leave the ids unresolvable in a cooked build.</p>
+<p>Both load-bearing halves (the <code>ScanPathsForPrimaryAssets</code> call that makes the id resolve, and the <code>SetPrimaryAssetTypeRules</code> call that force-cooks the package) are folded into one templated helper, so a new type can't get one half without the other:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Core/OutpostBuilderModule.cpp</span>
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span>
+<span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">RegisterOutpostAssetType</span><span class="p">(</span><span class="n">UAssetManager</span><span class="o">&amp;</span><span class="w"> </span><span class="n">AssetManager</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">AssetManager</span><span class="p">.</span><span class="n">ScanPathsForPrimaryAssets</span><span class="p">(</span><span class="n">T</span><span class="o">::</span><span class="n">PrimaryAssetTypeName</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">TEXT</span><span class="p">(</span><span class="s">"/Game"</span><span class="p">)</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">T</span><span class="o">::</span><span class="n">StaticClass</span><span class="p">(),</span><span class="w"> </span><span class="cm">/*bHasBlueprintClasses=*/</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="cm">/*bIsEditorOnly=*/</span><span class="nb">false</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">FPrimaryAssetRules</span><span class="w"> </span><span class="n">AlwaysCookRules</span><span class="p">;</span>
+<span class="w">    </span><span class="n">AlwaysCookRules</span><span class="p">.</span><span class="n">CookRule</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EPrimaryAssetCookRule</span><span class="o">::</span><span class="n">AlwaysCook</span><span class="p">;</span>
+<span class="w">    </span><span class="n">AssetManager</span><span class="p">.</span><span class="n">SetPrimaryAssetTypeRules</span><span class="p">(</span><span class="n">T</span><span class="o">::</span><span class="n">PrimaryAssetTypeName</span><span class="p">,</span><span class="w"> </span><span class="n">AlwaysCookRules</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Core/OutpostBuilderModule.cpp</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">FOutpostBuilderModule::RegisterAssetScans</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">UAssetManager</span><span class="o">&amp;</span><span class="w"> </span><span class="n">AssetManager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UAssetManager</span><span class="o">::</span><span class="n">Get</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// AlwaysCook all three types, scan+cook-rule TOGETHER via RegisterOutpostAssetType (research/12).</span>
+<span class="w">    </span><span class="c1">// None of these packages is reached by a dependency edge the cooker follows on its own:</span>
+<span class="w">    </span><span class="c1">// outpost/building definitions are reached ONLY through FPrimaryAssetId (a name pair, not a package</span>
+<span class="w">    </span><span class="c1">// reference), and the settings asset is reached ONLY through</span>
+<span class="w">    </span><span class="c1">// UOutpostRuntimeSettings::SettingsAsset - an ini-hosted soft path, which no cooked package</span>
+<span class="w">    </span><span class="c1">// references either. With the default CookRule=Unknown, a packaged build silently drops them ALL,</span>
+<span class="w">    </span><span class="c1">// with nothing logged - exactly the footgun the helper closes by construction (no scan without its</span>
+<span class="w">    </span><span class="c1">// cook rule, and vice versa).</span>
+<span class="w">    </span><span class="c1">//</span>
+<span class="w">    </span><span class="c1">// The mesh a plot renders lives one soft-ref indirection inside one of these: an ASSIGNED plot's</span>
+<span class="w">    </span><span class="c1">// inside its building definition (BuildingMesh), an UNASSIGNED one's inside the settings asset</span>
+<span class="w">    </span><span class="c1">// (EmptyPlotMesh), and the shared fallback (DefaultPreviewMesh) inside the settings asset too.</span>
+<span class="w">    </span><span class="c1">// Cooking the carrier package is what makes the cooker follow those soft refs OUT of it - without</span>
+<span class="w">    </span><span class="c1">// this rule, DefaultPreviewMesh's soft reference is never cooked, and a packaged build silently</span>
+<span class="w">    </span><span class="c1">// falls back to the engine cube instead of the configured preview mesh.</span>
+<span class="w">    </span><span class="n">OutpostBuilder</span><span class="o">::</span><span class="n">Module</span><span class="o">::</span><span class="n">RegisterOutpostAssetType</span><span class="o">&lt;</span><span class="n">UOutpostDefinition</span><span class="o">&gt;</span><span class="p">(</span><span class="n">AssetManager</span><span class="p">);</span>
+<span class="w">    </span><span class="n">OutpostBuilder</span><span class="o">::</span><span class="n">Module</span><span class="o">::</span><span class="n">RegisterOutpostAssetType</span><span class="o">&lt;</span><span class="n">UOutpostBuildingDefinition</span><span class="o">&gt;</span><span class="p">(</span><span class="n">AssetManager</span><span class="p">);</span>
+<span class="w">    </span><span class="n">OutpostBuilder</span><span class="o">::</span><span class="n">Module</span><span class="o">::</span><span class="n">RegisterOutpostAssetType</span><span class="o">&lt;</span><span class="n">UOutpostBuilderSettingsAsset</span><span class="o">&gt;</span><span class="p">(</span><span class="n">AssetManager</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Pre-warm the configured settings asset (one-shot sync load) so the never-loading per-frame</span>
+<span class="w">    </span><span class="c1">// resolution (UOutpostBuilderSettingsAsset::Get) starts serving authored values from the first</span>
+<span class="w">    </span><span class="c1">// frame. This is the site that covers PACKAGED games - the AlwaysCook rule above guarantees the</span>
+<span class="w">    </span><span class="c1">// asset is in the build; the editor mode's Enter and the host's PostEditChangeProperty re-warm on</span>
+<span class="w">    </span><span class="c1">// their own schedules.</span>
+<span class="w">    </span><span class="n">UOutpostBuilderSettingsAsset</span><span class="o">::</span><span class="n">PreWarm</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Add ONE line here for your new type (<code>OutpostBuilder::Module::RegisterOutpostAssetType&lt;UOutpostXDefinition&gt;(AssetManager);</code>) alongside the three above. That one call does both load-bearing halves at once: the scan is what makes the id resolve, and the AlwaysCook rule (research/12) is what stops a packaged build from silently dropping the asset.</p>
+<p>A type reached only through <code>FPrimaryAssetId</code> is invisible to the cooker's package-dependency walk, so the default <code>CookRule=Unknown</code> drops it with nothing logged. <code>RegisterAssetScans</code> itself runs from <code>StartupModule</code> if <code>UAssetManager::IsInitialized()</code> already, else it's deferred onto the post-engine-init delegate. You don't need to touch that plumbing at all.</p>
+<p>One wrinkle worth knowing about even though it doesn't touch this function: the editor module <em>additionally</em> scans whatever folder the settings asset's <code>CreatedDefinitionDirectory</code> points at (<code>FOutpostBuilderEditorModule::ScanConfiguredDefinitionFolder</code>, <code>OutpostBuilderEditorModule.cpp:525</code>), on top of the <code>/Game</code>-only scans above. That only matters for the editor session.</p>
+<p>A packaged game still only ever gets the runtime scans here, so a <code>CreatedDefinitionDirectory</code> pointed outside <code>/Game</code> logs a "won't scan in packaged games" warning (and the toolkit's settings view toasts the same warning on edit). Nothing to do for a new type unless you're touching that folder-configuration path yourself.</p>
+<h3 id="step-4-add-a-content-browser-factory">Step 4: Add a Content Browser Factory</h3>
+<p>The factory is what puts your type in Content Browser's Add New menu. It's editor-only. It lives in <code>OutpostBuilderEditor</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Factories/OutpostBuildingDefinitionFactory.h</span>
+<span class="n">UCLASS</span><span class="p">()</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UOutpostBuildingDefinitionFactory</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">UFactory</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">GENERATED_BODY</span><span class="p">()</span>
+
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">UOutpostBuildingDefinitionFactory</span><span class="p">();</span>
+
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="n">UObject</span><span class="o">*</span><span class="w"> </span><span class="nf">FactoryCreateNew</span><span class="p">(</span><span class="n">UClass</span><span class="o">*</span><span class="w"> </span><span class="n">InClass</span><span class="p">,</span><span class="w"> </span><span class="n">UObject</span><span class="o">*</span><span class="w"> </span><span class="n">InParent</span><span class="p">,</span><span class="w"> </span><span class="n">FName</span><span class="w"> </span><span class="n">InName</span><span class="p">,</span><span class="w"> </span><span class="n">EObjectFlags</span><span class="w"> </span><span class="n">Flags</span><span class="p">,</span><span class="w"> </span><span class="n">UObject</span><span class="o">*</span><span class="w"> </span><span class="n">Context</span><span class="p">,</span><span class="w"> </span><span class="n">FFeedbackContext</span><span class="o">*</span><span class="w"> </span><span class="n">Warn</span><span class="p">)</span><span class="w"> </span><span class="k">override</span><span class="p">;</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="n">FText</span><span class="w"> </span><span class="nf">GetDisplayName</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">override</span><span class="p">;</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">ShouldShowInNewMenu</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">override</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Factories/OutpostBuildingDefinitionFactory.cpp</span>
+<span class="n">UOutpostBuildingDefinitionFactory</span><span class="o">::</span><span class="n">UOutpostBuildingDefinitionFactory</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">bCreateNew</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">    </span><span class="n">bEditAfterNew</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">    </span><span class="n">SupportedClass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UOutpostBuildingDefinition</span><span class="o">::</span><span class="n">StaticClass</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="n">UObject</span><span class="o">*</span><span class="w"> </span><span class="n">UOutpostBuildingDefinitionFactory</span><span class="o">::</span><span class="n">FactoryCreateNew</span><span class="p">(</span><span class="n">UClass</span><span class="o">*</span><span class="w"> </span><span class="n">InClass</span><span class="p">,</span><span class="w"> </span><span class="n">UObject</span><span class="o">*</span><span class="w"> </span><span class="n">InParent</span><span class="p">,</span><span class="w"> </span><span class="n">FName</span><span class="w"> </span><span class="n">InName</span><span class="p">,</span><span class="w"> </span><span class="n">EObjectFlags</span><span class="w"> </span><span class="n">Flags</span><span class="p">,</span><span class="w"> </span><span class="n">UObject</span><span class="o">*</span><span class="w"> </span><span class="n">Context</span><span class="p">,</span><span class="w"> </span><span class="n">FFeedbackContext</span><span class="o">*</span><span class="w"> </span><span class="n">Warn</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">UOutpostBuildingDefinition</span><span class="o">*</span><span class="w"> </span><span class="n">NewDefinition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NewObject</span><span class="o">&lt;</span><span class="n">UOutpostBuildingDefinition</span><span class="o">&gt;</span><span class="p">(</span><span class="n">InParent</span><span class="p">,</span><span class="w"> </span><span class="n">InClass</span><span class="p">,</span><span class="w"> </span><span class="n">InName</span><span class="p">,</span><span class="w"> </span><span class="n">Flags</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Default the display name to the asset name minus its "BD_" prefix (the same rule the panel's</span>
+<span class="w">    </span><span class="c1">// "+ New Building" path uses), so a content-browser-created building isn't born blank.</span>
+<span class="w">    </span><span class="c1">// InName is None only for the transient CDO/template create; guard so that path stays unnamed.</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">NewDefinition</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">InName</span><span class="p">.</span><span class="n">IsNone</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">NewDefinition</span><span class="o">-&gt;</span><span class="n">DisplayName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FText</span><span class="o">::</span><span class="n">FromString</span><span class="p">(</span>
+<span class="w">            </span><span class="n">UOutpostBuildingDefinition</span><span class="o">::</span><span class="n">MakeDefaultDisplayNameFromAssetName</span><span class="p">(</span><span class="n">InName</span><span class="p">.</span><span class="n">ToString</span><span class="p">()));</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">NewDefinition</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Copy the header and <code>.cpp</code> verbatim, rename every <code>Building</code> to <code>X</code>, and point <code>SupportedClass</code> at your new type. You don't need to register the factory anywhere. Any <code>UFactory</code> (or <code>UActorFactory</code>) subclass is found by the engine's own reflection-based class scan, the same way <code>UOutpostDefinitionFactory</code> and <code>UOutpostBuildingDefinitionFactory</code> already are.</p>
+<p>Being found isn't the same as being offered, though: what actually gates whether your factory shows up is <code>SupportedClass</code> (set in the constructor above) plus <code>ShouldShowInNewMenu()</code> for the Content Browser's Add menu, or <code>CanCreateActorFrom()</code> for a drag-and-drop actor factory like <code>prefabs.html</code>'s <code>UActorFactoryOutpostPrefab</code>.</p>
+<p>The <code>DisplayName</code>-default block is specific to <code>UOutpostBuildingDefinition</code>'s <code>"BD_"</code> naming convention and its <code>MakeDefaultDisplayNameFromAssetName</code> helper. Copy it only if your new type <code>X</code> has an equivalent "effective display name" concept and prefix convention of its own. Otherwise drop it and leave <code>DisplayName</code> for the designer to fill in.</p>
+<h3 id="step-5-wire-it-into-the-content-browser-context-menu-optional">Step 5: Wire It Into the Content Browser Context Menu (Optional)</h3>
+<p>This step is optional. Do it when your type benefits from an action that acts on the SELECTED asset, the way "Locate Placed Outpost" does for <code>UOutpostDefinition</code>. Here's that registration in full, since it's the only per-class dynamic context menu extension in the plugin right now:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/OutpostBuilderEditorModule.cpp</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">FOutpostBuilderEditorModule::RegisterContentBrowserContextMenu</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">FToolMenuOwnerScoped</span><span class="w"> </span><span class="n">OwnerScoped</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Per-class dynamic asset context menu; name is composed by the Content Browser as</span>
+<span class="w">    </span><span class="c1">// "ContentBrowser.AssetContextMenu.&lt;ClassName&gt;" (native class FName, no "U" prefix) -</span>
+<span class="w">    </span><span class="c1">// verified in ContentBrowserMenuContexts.cpp / AssetContextMenu.cpp. ExtendMenu() creates</span>
+<span class="w">    </span><span class="c1">// the (unregistered) menu entry on demand, so this works regardless of load order.</span>
+<span class="w">    </span><span class="n">UToolMenu</span><span class="o">*</span><span class="w"> </span><span class="n">Menu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UToolMenus</span><span class="o">::</span><span class="n">Get</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">ExtendMenu</span><span class="p">(</span><span class="s">"ContentBrowser.AssetContextMenu.OutpostDefinition"</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">Menu</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">FToolMenuSection</span><span class="o">&amp;</span><span class="w"> </span><span class="n">Section</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Menu</span><span class="o">-&gt;</span><span class="n">FindOrAddSection</span><span class="p">(</span><span class="s">"GetAssetActions"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">Section</span><span class="p">.</span><span class="n">AddDynamicEntry</span><span class="p">(</span><span class="s">"LocatePlacedOutpost"</span><span class="p">,</span><span class="w"> </span><span class="n">FNewToolMenuSectionDelegate</span><span class="o">::</span><span class="n">CreateLambda</span><span class="p">([](</span><span class="n">FToolMenuSection</span><span class="o">&amp;</span><span class="w"> </span><span class="n">InSection</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// ... resolve UContentBrowserAssetContextMenuContext, add the menu entry, bind its action.</span>
+<span class="w">    </span><span class="p">}));</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>For your own type, you'd <code>ExtendMenu("ContentBrowser.AssetContextMenu.OutpostXDefinition")</code> inside the same function (or a sibling one called from the same <code>RegisterStartupCallback</code>) and add your own section entry. You don't need a second startup/shutdown registration. <code>RegisterContentBrowserContextMenu</code> is already deferred correctly via <code>UToolMenus::RegisterStartupCallback</code> in <code>StartupModule</code>. <code>UToolMenus::UnregisterOwner(this)</code> in <code>ShutdownModule</code> tears down every menu extension registered under this module's owner scope, not just this one.</p>
+<h3 id="if-you-actually-came-here-to-add-a-faction">If You Actually Came Here to Add a Faction</h3>
+<p>Factions aren't a definition asset anymore, so none of the five steps above apply. Adding one means adding a value to <code>EOutpostFaction</code> (<code>OutpostBuilder/OutpostFaction.h</code>, where the shipped <code>Faction1</code>/<code>Faction2</code>/<code>Faction3</code> values are placeholders meant to be renamed or extended in code) and giving it a display name via the enum's own <code>UMETA(DisplayName = ...)</code>.</p>
+<p>That's it: no asset, no factory, no picker widget to touch (the identity header's Faction picker is an engine <code>SEnumComboBox</code> constructed once with <code>StaticEnum&lt;EOutpostFaction&gt;()</code> and reading a live <code>TAttribute</code> off it every frame, so a new value picks up automatically with no refresh call needed anywhere), and no color to configure anywhere. A faction has no visual effect at all.</p>
+<p>What your new value actually DOES is decided entirely on the building side, per building, through <code>UOutpostBuildingDefinition::SupportedFactions</code> (a <code>TSet&lt;EOutpostFaction&gt;</code>, default empty = every faction). Add your new value to a building's set to restrict it to (among) the factions listed, or leave the set empty/untouched to keep it available to every faction, Neutral included.</p>
+<p>See <code>faction-visuals.html</code> for the full eligibility model (<code>SupportsFaction()</code>'s Neutral-always-wins and empty-set-wildcard rules).</p>
+<h3 id="if-you-actually-came-here-to-add-a-toolkit-panel-button-or-a-whole-new-panel-widget">If You Actually Came Here to Add a Toolkit Panel Button, or a Whole New Panel Widget</h3>
+<p>Also not one of the five steps above, and there is no action registry to register into: a proposal for one was REFUTED before it shipped (<code>research/15-l4-action-registry-refutation.md</code>). A button's code lives on the owning WIDGET, not on the toolkit: <code>FOutpostBuilderToolkit</code> is assembly glue over 14 reusable <code>SOutpost*</code> widgets.</p>
+<p>See <code>toolkit.html</code>'s "The Widget Inventory" and "The Widget-Authoring Recipe" sections for the full picture. The two cases below cover the two things you're likely to actually want.</p>
+<p><strong>Adding one button to an EXISTING section</strong> is still, end to end, an <code>SButton</code> block plus its <code>Handle*Clicked</code> / <code>Is*Enabled</code> / <code>Get*Tooltip</code> trio, plus a <code>Can*</code>/<code>Do*</code> pair on <code>UOutpostBuilderEdMode</code> if the button acts on the world. It just lives on the owning WIDGET's <code>.h</code>/<code>.cpp</code> now, not a toolkit <code>.cpp</code>.</p>
+<p><code>OutpostBuilderToolkitBuildTab.cpp</code> carries the recipe as an in-file comment ("TO ADD A BUTTON to the editing panel, copy the '+ New Plot' set end to end") pointing at <code>SOutpostPlotsSection.cpp</code>'s "+ New Plot" block as the worked example to copy verbatim.</p>
+<p>Either way the button itself stays inside the widget's own <code>Construct()</code>. Only the FINAL step, if the button needs to reach <code>UOutpostBuilderEdMode</code>, crosses back into the toolkit as a thin <code>SLATE_EVENT</code> forwarder.</p>
+<p><strong>Adding a whole new reusable panel or section</strong> means writing a new <code>SOutpost*</code> widget rather than a new toolkit method, following the exemplar contract every current one does:</p>
+<ul>
+<li>It owns its own state, holds no <code>UOutpostBuilderEdMode*</code>/<code>FOutpostBuilderToolkit*</code> anywhere on the class, and reads the editing session only through an injected <code>FOutpostBuilderWidgetContext</code> (and <code>FOutpostPaletteModel</code> if it touches the Building palette).</li>
+<li>It reports every world-mutating action back out as a <code>SLATE_EVENT</code> rather than performing it.</li>
+<li>It exposes a public <code>Refresh*()</code> for external triggers to call, or self-refreshes via a registered <code>FOutpostPaletteModel</code> observer, for the palette-complex case.</li>
+</ul>
+<p><code>SOutpostBuildingsBrowser</code> is the ORIGINAL exemplar this whole pattern is modeled on. Read its header's class doc first. <code>SOutpostSaveFooter</code> is the smallest, trivial worked example of the pattern end to end.</p>
+<p><code>SOutpostAssignRow</code>/<code>SOutpostBuildingPalette</code> are the worked example for the one documented DEVIATION: a widget that needs a SHARED state instance across two mount points reads/writes an injected model (<code>FOutpostPaletteModel</code>) instead of owning its own copy. See that model's own class doc (<code>OutpostPaletteModel.h</code>) for why.</p>
+<p>Once your widget exists, wire it into a panel exactly the way every current mount does: a thin <code>BuildSomething()</code> toolkit method that <code>SNew</code>s (or <code>SAssignNew</code>s, if the toolkit needs to call a public method on it later) your widget with <code>.Context(WidgetContext)</code> and whatever <code>SLATE_EVENT</code>s it declares, bound via <code>CreateSP</code> to toolkit forwarders.</p>
+<p><code>research/20-extensibility-plan.md</code> is the forward roadmap past this page: a six-dimension review of what the widget decomposition unlocks next (further reusable pieces, safety rails like the <code>OUTPOST_ENSURE_CONTEXT_BOUND</code> Init sweep and <code>FScopedPaletteObserver</code>, and candidate follow-on extraction targets). Read it before proposing a structural change to the panel shape, so you're not rediscovering ground it already covers.</p>
+<h2 id="override-a-spawned-actor-class">Override a Spawned Actor Class</h2>
+<p>If all you want is a project-specific subclass of <code>AOutpost</code>, <code>AOutpostPlot</code>, <code>AOutpostVolume</code>, or <code>AOverheadCamera</code> (to add your own components, override a virtual, or just carry extra <code>UPROPERTY</code>s), you don't need to touch a single spawn call site. <code>UOutpostBuilderSettingsAsset</code>'s <strong>Actors</strong> category (runtime section, so it ships in packaged games) holds one <code>TSubclassOf&lt;&gt;</code> per actor type:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Settings/OutpostBuilderSettingsAsset.h</span>
+<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Actors"</span><span class="p">,</span><span class="w"> </span><span class="n">meta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">AllowAbstract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"false"</span><span class="p">))</span>
+<span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">AOutpost</span><span class="o">&gt;</span><span class="w"> </span><span class="n">OutpostActorClass</span><span class="p">;</span>
+
+<span class="cm">/** Actor class every new AOutpostPlot is spawned as. See OutpostActorClass above. */</span>
+<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Actors"</span><span class="p">,</span><span class="w"> </span><span class="n">meta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">AllowAbstract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"false"</span><span class="p">))</span>
+<span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">AOutpostPlot</span><span class="o">&gt;</span><span class="w"> </span><span class="n">OutpostPlotActorClass</span><span class="p">;</span>
+
+<span class="c1">// ... OutpostVolumeActorClass / OverheadCameraActorClass, identical shape.</span>
+</code></pre></div>
+
+<p>Each defaults (constructor-set) to the plugin's own native class, so an unauthored asset reproduces today's behavior exactly. To point one at your own C++ or Blueprint subclass, open your project's settings asset (Step 0 in the README), find the <strong>Actors</strong> category, and pick a class. Every spawn site the plugin owns then picks it up automatically:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Settings/OutpostRuntimeSettings.cpp</span>
+<span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">AOutpost</span><span class="o">&gt;</span><span class="w"> </span><span class="n">UOutpostRuntimeSettings</span><span class="o">::</span><span class="n">GetOutpostClass</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">UClass</span><span class="o">*</span><span class="w"> </span><span class="n">Configured</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UOutpostBuilderSettingsAsset</span><span class="o">::</span><span class="n">Get</span><span class="p">().</span><span class="n">OutpostActorClass</span><span class="p">.</span><span class="n">Get</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Configured</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">AOutpost</span><span class="o">::</span><span class="n">StaticClass</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>That's the whole mechanism, times four (<code>GetOutpostClass</code>/<code>GetPlotClass</code>/<code>GetVolumeClass</code>/<code>GetOverheadCameraClass</code>, all on <code>UOutpostRuntimeSettings</code>). Every one of the plugin's 11 spawn sites calls the matching resolver instead of <code>AOutpost::StaticClass()</code> (etc.) directly, so there is nothing left for you to find and edit once the settings asset points at your subclass.</p>
+<p>They are editor ghost placement, <code>UOutpostStampLibrary</code>'s <code>StampOutpost</code>/<code>PlaceDefinitionAt</code>/<code>RestoreOutpost</code>, the default exclusion-volume spawn, the per-outpost Overhead camera spawn, and the Content Browser drag-stamp (<code>UActorFactoryOutpostPrefab::GetDefaultActorClass</code>, which the engine's own placement path calls ahead of <code>PostSpawnActor</code>).</p>
+<p>Two things worth knowing before you reach for this:</p>
+<ul>
+<li><strong><code>TSubclassOf&lt;Base&gt;</code> is what keeps this safe.</strong> Every <code>Cast&lt;AOutpost&gt;</code>/<code>Cast&lt;AOutpostPlot&gt;</code> in the plugin stays valid no matter which subclass actually got spawned. A subclass is always an is-a. <code>meta = (AllowAbstract = "false")</code> also rules out picking an abstract class in the first place, so the resolver's "never null" guarantee never has to cope with an unusable pick.</li>
+<li><strong>This is a class swap, not a behavior hook.</strong> If what you actually need is a new validity rule, a new draw call, or a new toolkit button, this isn't the seam.<ul>
+<li>See Worked Extension 2 below, or the pitfalls list, for those.</li>
+<li>Reach for a subclass when the thing you're adding genuinely belongs on the actor itself: an extra component, an overridden virtual, extra replicated state for your own gameplay.</li>
+</ul>
+</li>
+</ul>
+<h2 id="worked-extension-2-add-a-new-placement-validity-rule">Worked Extension 2: Add a New Placement Validity Rule</h2>
+<p>Plot placement validity is a single boolean (<code>bPreviewPlacementValid</code>) recomputed every <code>MouseMove</code> while <code>bPlacingPlot</code> is true. It already feeds three different pieces of feedback: the ghost's tint, an on-screen reason string, and a pointer line to the specific plot that's blocking you. Adding your own rule mostly means feeding that same trio of outputs, not inventing new ones.</p>
+<h3 id="step-1-find-the-validity-choke-point">Step 1: Find the Validity Choke Point</h3>
+<p><code>StartPlotPlacement</code> snapshots every existing plot's location and footprint radius once, up front:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderEdMode.cpp</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">UOutpostBuilderEdMode::CaptureExistingPlotFootprints</span><span class="p">(</span><span class="n">AOutpost</span><span class="o">*</span><span class="w"> </span><span class="n">Outpost</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">ExistingPlotFootprints</span><span class="p">.</span><span class="n">Reset</span><span class="p">();</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">Outpost</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">UWorld</span><span class="o">*</span><span class="w"> </span><span class="n">World</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Outpost</span><span class="o">-&gt;</span><span class="n">GetWorld</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">World</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">FPrimaryAssetId</span><span class="w"> </span><span class="n">OutpostDefId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Outpost</span><span class="o">-&gt;</span><span class="n">GetOutpostDefinitionId</span><span class="p">();</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">TActorIterator</span><span class="o">&lt;</span><span class="n">AOutpostPlot</span><span class="o">&gt;</span><span class="w"> </span><span class="n">It</span><span class="p">(</span><span class="n">World</span><span class="p">);</span><span class="w"> </span><span class="n">It</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">It</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">AOutpostPlot</span><span class="o">*</span><span class="w"> </span><span class="n">Plot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">It</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">Plot</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">Plot</span><span class="o">-&gt;</span><span class="n">GetOutpostDefinitionId</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">OutpostDefId</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// Existing-plot footprint radius from the same source as the selection ring, so placement</span>
+<span class="w">        </span><span class="c1">// spacing matches what the designer sees - a plot's own size class. THE shared radius rule,</span>
+<span class="w">        </span><span class="c1">// exported from OutpostBuilderDraw.h precisely so this placement-validity path and the selection</span>
+<span class="w">        </span><span class="c1">// ring can never drift apart - never re-derive it here.</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">Radius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OutpostBuilder</span><span class="o">::</span><span class="n">Draw</span><span class="o">::</span><span class="n">GetActorGeometryRadius</span><span class="p">(</span><span class="n">Plot</span><span class="p">,</span><span class="w"> </span><span class="n">UOutpostBuilderSettingsAsset</span><span class="o">::</span><span class="n">Get</span><span class="p">());</span>
+
+<span class="w">        </span><span class="n">ExistingPlotFootprints</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">FPlotFootprint</span><span class="p">{</span><span class="w"> </span><span class="n">Plot</span><span class="o">-&gt;</span><span class="n">GetActorLocation</span><span class="p">(),</span><span class="w"> </span><span class="n">Radius</span><span class="p">,</span><span class="w"> </span><span class="n">Plot</span><span class="o">-&gt;</span><span class="n">GetActorLabel</span><span class="p">()</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>OutpostBuilder::Draw::GetActorGeometryRadius(Actor, Style)</code> (a free function in <code>OutpostBuilderDraw.h</code>, not a method on the mode) is the one radius source every footprint check in this file reads from. The footprint size is deliberately the same as the selection ring size. It forks on what the actor IS:</p>
+<ul>
+<li>An <code>AOutpostPlot</code> resolves its OWN <code>PlotSizeTag</code> through <code>UOutpostRuntimeSettings::GetPlotSizeFootprintRadiusCm</code>, unconditionally, measuring no geometry. A plot's footprint is its PAD, not whatever mesh sits on it: plot size (a gameplay tag) is the plugin's one size concept, so plot rings are uniform per size class rather than per mesh.</li>
+<li>Anything else (in practice <code>AOutpost</code>, which has no size class) takes the larger of its geometry bounds' X/Y half-extents (<code>GetComponentsBoundingBox(bNonColliding=true)</code>), so its ring still tracks its mesh/scale.</li>
+<li><code>Style.PlotGhostRadius</code> backstops a null actor or degenerate bounds.</li>
+</ul>
+<p><code>Style.PlotGhostRadius</code> is the final fallback, a settings-asset knob tunable with no recompile, not an internal constant. It lives on the settings asset, NOT the per-user <code>UOutpostBuilderUserSettings</code> the rest of the style surface uses, precisely because this function is a placement-validity input, not just a look.</p>
+<p>See "Tuning the Look Without Recompiling" on <code>edmode.html</code>. It's the same helper the selection ring and the hover ring use, so placement spacing always matches what's actually drawn on screen.</p>
+<p>Every <code>MouseMove</code> while placing a plot then calls <code>RevalidatePlotPreview()</code>, which walks that snapshot and computes a worst-case proximity ratio, not just a bare pass/fail:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderEdMode.cpp</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">UOutpostBuilderEdMode::RevalidatePlotPreview</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">bPreviewPlacementValid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// Default to "safely clear": with no existing footprints (the outpost's FIRST plot) nothing below</span>
+<span class="w">    </span><span class="c1">// overwrites this, so the default must sit on the clear side of the &gt;= 1.f validity gate for</span>
+<span class="w">    </span><span class="c1">// bPreviewPlacementValid to read true - 2.f is just comfortably clear of the boundary.</span>
+<span class="w">    </span><span class="n">PreviewProximityRatio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.f</span><span class="p">;</span>
+<span class="w">    </span><span class="n">BlockingPlotLabel</span><span class="p">.</span><span class="n">Reset</span><span class="p">();</span>
+<span class="w">    </span><span class="n">BlockingPlotLocation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FVector</span><span class="o">::</span><span class="n">ZeroVector</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">bHasValidPreviewLocation</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">CandidateRadius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetPreviewFootprintRadiusCm</span><span class="p">();</span>
+<span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">WorstRatio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TNumericLimits</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;::</span><span class="n">Max</span><span class="p">();</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FPlotFootprint</span><span class="o">&amp;</span><span class="w"> </span><span class="n">Existing</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">ExistingPlotFootprints</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">Threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CandidateRadius</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Existing</span><span class="p">.</span><span class="n">Radius</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Threshold</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">UE_KINDA_SMALL_NUMBER</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">Distance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="n">FVector</span><span class="o">::</span><span class="n">Dist2D</span><span class="p">(</span><span class="n">PlacementPreviewLocation</span><span class="p">,</span><span class="w"> </span><span class="n">Existing</span><span class="p">.</span><span class="n">Location</span><span class="p">));</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">Ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Distance</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">Threshold</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Ratio</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">WorstRatio</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="n">WorstRatio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Ratio</span><span class="p">;</span>
+<span class="w">            </span><span class="n">BlockingPlotLabel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Existing</span><span class="p">.</span><span class="n">Label</span><span class="p">;</span>
+<span class="w">            </span><span class="n">BlockingPlotLocation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Existing</span><span class="p">.</span><span class="n">Location</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">WorstRatio</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">TNumericLimits</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;::</span><span class="n">Max</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">PreviewProximityRatio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">WorstRatio</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">bPreviewPlacementValid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">PreviewProximityRatio</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">1.f</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h3 id="step-2-add-your-predicate">Step 2: Add Your Predicate</h3>
+<p>Say you want a rule along the lines of "a plot can't be placed more than N meters from its outpost's anchor." The cleanest way to slot that in is a second, independent check inside (or right after) the loop above.</p>
+<p>That check should feed the exact same three outputs the footprint check already feeds: <code>bPreviewPlacementValid</code>, <code>PreviewProximityRatio</code> (or your own ratio, if a graduated tint makes sense for your rule too), and <code>BlockingPlotLabel</code>/<code>BlockingPlotLocation</code> for the reason text and pointer line.</p>
+<p>The threshold itself (<code>N</code> meters) is a judgment call a designer will want to retune without a recompile, so it belongs as a <code>UPROPERTY</code> on <code>UOutpostBuilderSettingsAsset</code> (inside its <code>WITH_EDITORONLY_DATA</code> block, since only the editor reads it) alongside the plugin's other tunable knobs, not as a hand-baked constant in the <code>OutpostBuilder::EdMode</code> internal namespace.</p>
+<p>That namespace is reserved for structural values a designer would never want exposed (tessellation side-counts, trace lengths, an engine material path). A distance threshold like this one is exactly the kind of number that belongs in settings instead.</p>
+<p><strong>The settings asset, specifically, not the per-user <code>UOutpostBuilderUserSettings</code> (Editor Preferences, see <code>reference.html</code>).</strong> <code>MaxPlotDistanceFromAnchorCm</code> gates whether a placement is legal, exactly like the two existing knobs (<code>PlotRingRadius</code>, <code>PlotGhostRadius</code>) that sit on the asset's <code>Placement</code> category.</p>
+<p>A per-user value here would make the same plot legal on one designer's machine and illegal on another's. If the knob you're adding is purely a LOOK (a color, a size that only affects a draw call, a timing value) instead, it belongs on <code>UOutpostBuilderUserSettings</code> now, not the asset. Something like:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Settings/OutpostBuilderSettingsAsset.h (WITH_EDITORONLY_DATA block)</span>
+<span class="c1">// A new UPROPERTY alongside the plugin's other designer-tunable knobs:</span>
+<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Placement"</span><span class="p">,</span><span class="w"> </span><span class="n">meta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">ClampMin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"0.0"</span><span class="p">))</span>
+<span class="kt">float</span><span class="w"> </span><span class="n">MaxPlotDistanceFromAnchorCm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">5000.f</span><span class="p">;</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderEdMode.cpp</span>
+<span class="c1">// Inside RevalidatePlotPreview(), after the footprint loop above:</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bPreviewPlacementValid</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">EditingOutpost</span><span class="p">.</span><span class="n">IsValid</span><span class="p">())</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">UOutpostBuilderSettingsAsset</span><span class="o">&amp;</span><span class="w"> </span><span class="n">Style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UOutpostBuilderSettingsAsset</span><span class="o">::</span><span class="n">Get</span><span class="p">();</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">DistanceFromAnchor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="n">FVector</span><span class="o">::</span><span class="n">Dist2D</span><span class="p">(</span><span class="n">PlacementPreviewLocation</span><span class="p">,</span><span class="w"> </span><span class="n">EditingOutpost</span><span class="o">-&gt;</span><span class="n">GetActorLocation</span><span class="p">()));</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">DistanceFromAnchor</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">Style</span><span class="p">.</span><span class="n">MaxPlotDistanceFromAnchorCm</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">bPreviewPlacementValid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">        </span><span class="n">BlockingPlotLabel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EditingOutpost</span><span class="o">-&gt;</span><span class="n">GetActorLabel</span><span class="p">();</span>
+<span class="w">        </span><span class="n">BlockingPlotLocation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EditingOutpost</span><span class="o">-&gt;</span><span class="n">GetActorLocation</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Keep it synchronous and cheap. This runs on every <code>MouseMove</code> while placing, the same way the footprint loop does. Anything that touches an asset load or a full actor scan belongs in a cached, invalidate-on-change value instead. Better still, put it in a value that needs no asset at all.</p>
+<p><code>GetPreviewFootprintRadiusCm</code> is the worked example of the second option: it resolves a plot SIZE through the settings statics (a never-loading read, cheap enough to do every frame) rather than caching a radius measured off a synchronously-loaded mesh, which would need an invalidation-ordering rule its callers could get wrong. A cache you can delete beats a cache you have to invalidate correctly.</p>
+<p>If your rule does need to resolve a definition asset on this path, reach for the never-load resolver, <code>FindLoadedPrimaryAsset&lt;UOutpostBuildingDefinition&gt;</code> / <code>FindLoadedPrimaryAsset&lt;UOutpostDefinition&gt;</code> (<code>OutpostAssetResolve.h</code>, <code>ResolveObject</code>-based, never force-loads), not <code>LoadPrimaryAssetSync</code> or another <code>TryLoad</code>-based helper.</p>
+<p>Those are for one-shot paths only, and calling one from a per-frame validity check risks a hitch every time the cursor crosses an unloaded asset.</p>
+<h3 id="step-3-let-the-existing-feedback-machinery-pick-it-up">Step 3: Let the Existing Feedback Machinery Pick It Up</h3>
+<p>Because your predicate writes through the same three outputs, you get the color, the HUD text, and the pointer line for free. Your predicate's job is to set <code>bPreviewPlacementValid</code> (and <code>BlockingPlotLabel</code>/<code>BlockingPlotLocation</code>) correctly, and everything downstream follows from that one bool. <code>PreviewProximityRatio</code> still gates it inside <code>RevalidatePlotPreview</code>, but nothing reads a smooth ratio for color anymore.</p>
+<p>The verdict every placement surface reads is <code>GetPlacementFeedback()</code>, and a false <code>bPreviewPlacementValid</code> is exactly its <code>Blocked</code> state, tested first and unconditionally. So a new refusal of yours can never be softened by the warn-only plot-tag advisory that supplies the third state. <code>GetPlotGhostColor</code> is the shared color rule over that verdict, a hard RTS-style flip rather than a gradient:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderEdMode.cpp</span>
+<span class="k">const</span><span class="w"> </span><span class="n">UOutpostBuilderUserSettings</span><span class="o">&amp;</span><span class="w"> </span><span class="n">UserStyle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UOutpostBuilderUserSettings</span><span class="o">::</span><span class="n">Get</span><span class="p">();</span>
+<span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">GetPlacementFeedback</span><span class="p">())</span>
+<span class="p">{</span>
+<span class="k">case</span><span class="w"> </span><span class="no">EOutpostPlacementFeedback</span><span class="o">::</span><span class="no">Warn</span><span class="p">:</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">UserStyle</span><span class="p">.</span><span class="n">PlacementPlateWarnColor</span><span class="p">;</span>
+<span class="k">case</span><span class="w"> </span><span class="no">EOutpostPlacementFeedback</span><span class="o">::</span><span class="no">Blocked</span><span class="p">:</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">UserStyle</span><span class="p">.</span><span class="n">PlacementPlateInvalidColor</span><span class="p">;</span>
+<span class="k">default</span><span class="o">:</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">UserStyle</span><span class="p">.</span><span class="n">PlacementPlateValidColor</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>PlacementPlateValidColor</code>/<code>PlacementPlateWarnColor</code>/<code>PlacementPlateInvalidColor</code> are the per-user style knobs behind the flip (<code>UOutpostBuilderUserSettings</code>, Editor Preferences, <code>Debug|Ghosts</code> category), tunable without a recompile like the rest of the plugin's designer-facing colors.</p>
+<p>If you ever need a fourth state, add it to <code>EOutpostPlacementFeedback</code> and <code>GetPlacementFeedback</code> rather than to a draw: the plate's color AND fill, the wire prism, the ghost tint, and the HUD line all read that one function precisely so they can't describe different states.</p>
+<p><code>PlotGhostColor</code> itself is read elsewhere, as the ownership beam's null-outpost/empty-palette fallback color, not as this function's threshold color.</p>
+<p>If the new knob you're adding is a LOOK rather than a placement-validity input, it belongs on <code>UOutpostBuilderUserSettings</code> now, not the settings asset. See the note at the end of Step 2 above and <code>reference.html</code>'s settings sections for the dividing line.</p>
+<p>And <code>DrawHUD</code> already turns <code>BlockingPlotLabel</code> into on-screen text right at the ghost, deliberately paired with a pointer line drawn in <code>Render</code> rather than color alone. <code>DrawHUD</code> itself only gathers mode state and dispatches. The actual text draw is the free function <code>OutpostBuilder::Draw::DrawInvalidPlacementReason</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderEdMode.cpp</span>
+<span class="c1">// Invalid-placement reason: "Too close to &lt;label&gt;" at the ghost location. Always paired with the</span>
+<span class="c1">// red pointer line drawn in Render - never color alone. Plot placement blames the overlapped plot;</span>
+<span class="c1">// outpost placement blames the exclusion volume. Suppressed in Ctrl-remove mode like the pointer</span>
+<span class="c1">// line it pairs with: it explains a refusal no click is about to make while LMB means remove.</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bPlacingPlot</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">bRemoveModifierHeld</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">bPreviewPlacementValid</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">BlockingPlotLabel</span><span class="p">.</span><span class="n">IsEmpty</span><span class="p">())</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">OutpostBuilder</span><span class="o">::</span><span class="n">Draw</span><span class="o">::</span><span class="n">DrawInvalidPlacementReason</span><span class="p">(</span><span class="n">Canvas</span><span class="p">,</span><span class="w"> </span><span class="n">View</span><span class="p">,</span><span class="w"> </span><span class="n">Font</span><span class="p">,</span><span class="w"> </span><span class="n">DPIScale</span><span class="p">,</span><span class="w"> </span><span class="n">PlacementPreviewLocation</span><span class="p">,</span><span class="w"> </span><span class="n">BlockingPlotLabel</span><span class="p">,</span><span class="w"> </span><span class="n">Style</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderDraw.cpp</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">DrawInvalidPlacementReason</span><span class="p">(</span><span class="n">FCanvas</span><span class="o">*</span><span class="w"> </span><span class="n">Canvas</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">FSceneView</span><span class="o">*</span><span class="w"> </span><span class="n">View</span><span class="p">,</span><span class="w"> </span><span class="n">UFont</span><span class="o">*</span><span class="w"> </span><span class="n">Font</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">DPIScale</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">FVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">WorldLocation</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">FString</span><span class="o">&amp;</span><span class="w"> </span><span class="n">BlockingLabel</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">UOutpostBuilderSettingsAsset</span><span class="o">&amp;</span><span class="w"> </span><span class="n">Style</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// Style retained for signature stability; this function reads only user-style settings.</span>
+<span class="w">    </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">Style</span><span class="p">;</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">UOutpostBuilderUserSettings</span><span class="o">&amp;</span><span class="w"> </span><span class="n">UserStyle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UOutpostBuilderUserSettings</span><span class="o">::</span><span class="n">Get</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// Behind-camera gate (same as the label loop): WorldToPixel mirrors negative-W points instead of</span>
+<span class="w">    </span><span class="c1">// rejecting them, so a second viewport facing away would draw the text at a bogus mirrored spot.</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">View</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">FVector</span><span class="o">::</span><span class="n">DotProduct</span><span class="p">(</span><span class="n">WorldLocation</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">View</span><span class="o">-&gt;</span><span class="n">ViewLocation</span><span class="p">,</span><span class="w"> </span><span class="n">View</span><span class="o">-&gt;</span><span class="n">GetViewDirection</span><span class="p">())</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mf">0.f</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">FVector2D</span><span class="w"> </span><span class="n">PixelLocation</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">View</span><span class="o">-&gt;</span><span class="n">WorldToPixel</span><span class="p">(</span><span class="n">WorldLocation</span><span class="p">,</span><span class="w"> </span><span class="n">PixelLocation</span><span class="p">))</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">PixelLocation</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">DPIScale</span><span class="p">;</span><span class="w"> </span><span class="c1">// DPI fix.</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">FString</span><span class="w"> </span><span class="n">ReasonText</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FString</span><span class="o">::</span><span class="n">Printf</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">"Too close to %s"</span><span class="p">),</span><span class="w"> </span><span class="o">*</span><span class="n">BlockingLabel</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Canvas</span><span class="o">-&gt;</span><span class="n">DrawShadowedString</span><span class="p">(</span><span class="n">PixelLocation</span><span class="p">.</span><span class="n">X</span><span class="p">,</span><span class="w"> </span><span class="n">PixelLocation</span><span class="p">.</span><span class="n">Y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">UserStyle</span><span class="p">.</span><span class="n">HUDReasonTextOffsetY</span><span class="p">,</span><span class="w"> </span><span class="n">ReasonText</span><span class="p">,</span><span class="w"> </span><span class="n">Font</span><span class="p">,</span><span class="w"> </span><span class="n">FLinearColor</span><span class="o">::</span><span class="n">White</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>HUDReasonTextOffsetY</code> is a per-user style knob (<code>UOutpostBuilderUserSettings</code>, <code>UI|HUD</code> category); <code>Draw</code> functions like this one still take a <code>const UOutpostBuilderSettingsAsset&amp; Style</code> parameter for signature stability rather than reading the mode's state directly, which is part of the draw-function seam (see <a href="edmode.html">The UEdMode Deep Dive</a>). They read <code>UOutpostBuilderUserSettings::Get()</code> internally instead, with <code>Style</code> left unused on those paths.</p>
+<p>Note: our research pass on viewport UX (research/09) named this an anti-pattern to avoid. Invalid, hover, and selected states all need to differ by more than hue.</p>
+<p>The canonical negative exemplar the research turned up is Fallout 4's settlement mode, whose undifferentiated "can't place" feedback is color-only and easy to miss. If your new rule's <code>BlockingPlotLabel</code> says something generic like the anchor's own label, consider a rule-specific reason string instead so the designer knows which rule tripped, not just that one did.</p>
+<p>One more thing worth knowing before you copy this pattern: everything above is PLOT placement only. Outpost placement has its own validity rule (the exclusion-volume check), and it does NOT live solely in the ed-mode's per-frame ghost validation the way this walkthrough's rule would.</p>
+<p>It lives once, in <code>OutpostPrefabUtils::FindBlockingExclusionVolume</code>, and is consumed from two places: <code>RevalidateOutpostPreview</code> (the ghost, same red-tint/reason-text/pointer-line trio as above) AND <code>StampPrefab</code>'s drag-and-drop path, which hard-refuses a drop inside range before any actor is spawned.</p>
+<p>If a rule you're adding needs to block a drag-stamp as well as the in-mode ghost, put it in (or alongside) a shared helper like that one rather than only in <code>RevalidatePlotPreview</code>. A rule that only lives in the ghost-validation function can't stop a drag-stamp from creating something it shouldn't.</p>
+<h2 id="worked-extension-add-a-placement-rule-warn-only-tag-match">Worked Extension: Add a Placement Rule (Warn-Only Tag Match)</h2>
+<p>Worked Extension 2 above is about WHERE a plot may go (ghost validity, blocking). This one is about WHICH building fits WHICH plot pad. That's the same question <code>PlotSizeQuery</code>/<code>SupportedFactions</code> answer, but on a project-owned tag vocabulary the plugin ships no opinion on, and answered WARN-ONLY rather than by blocking.</p>
+<p>If you're building your OWN additional rule of this shape (a project-specific eligibility signal that should flag rather than refuse), the plugin's own <code>PlotTags</code>/<code>PlotTagQuery</code> pair is the worked reference to mirror. If you actually want a rule that BLOCKS, mirror <code>PlotSizeQuery</code>/<code>SupportedFactions</code> and <code>OutpostEditorUtils::EvaluateBuildingForPlot</code> instead. See "The Disabled Treatment" on <code>toolkit.html</code>.</p>
+<h3 id="step-1-the-vocabulary-lives-on-both-sides">Step 1: The Vocabulary Lives on Both Sides</h3>
+<p>The plot pad carries an arbitrary tag container; the building carries a query evaluated against it:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostDefinition.h (FOutpostPlotRecord)</span>
+<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Plot"</span><span class="p">)</span>
+<span class="n">FGameplayTagContainer</span><span class="w"> </span><span class="n">PlotTags</span><span class="p">;</span>
+
+<span class="c1">// OutpostBuilder/Source/OutpostBuilder/Actors/OutpostPlot.h (AOutpostPlot)</span>
+<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Plot"</span><span class="p">)</span>
+<span class="n">FGameplayTagContainer</span><span class="w"> </span><span class="n">PlotTags</span><span class="p">;</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostBuildingDefinition.h</span>
+<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span><span class="w"> </span><span class="n">BlueprintReadOnly</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Building"</span><span class="p">)</span>
+<span class="n">FGameplayTagQuery</span><span class="w"> </span><span class="n">PlotTagQuery</span><span class="p">;</span>
+</code></pre></div>
+
+<p><code>PlotTags</code> is a write-through pair, RECORD (<code>FOutpostPlotRecord::PlotTags</code>) and ACTOR (<code>AOutpostPlot::PlotTags</code>), the identical shape <code>PlotSizeTag</code> already established: <code>UOutpostDefinition::SetPlotTags</code>/<code>AOutpostPlot::SetPlotTags</code> are the two halves, a Details-panel edit syncs one into the other via <code>PostEditChangeChainProperty</code>, and <code>OutpostBuilder::Stamp::SpawnPlotsAndCameraFromDefinition</code> copies record→actor on every stamp/place/restore, right next to the <code>PlotSizeTag</code> copy it already does. Copy that exact shape for your own field.</p>
+<p><strong>No migration needed, and that's the point of choosing this shape</strong>: an absent/empty container means "no constraints" on both sides (an empty <code>FGameplayTagContainer</code> and an empty <code>FGameplayTagQuery</code> are both already-established wildcards in this plugin), so a project adding these two properties to its own subclassed definition/actor gets zero behavior change on existing content.</p>
+<p>The plugin carries no migration system: no custom version, no <code>_DEPRECATED</code> twin pattern, nothing to bump. An old asset just drops a field it no longer recognizes on load, and an unset <code>FGameplayTagQuery</code> resolves to the same wildcard a freshly authored one would, so this shape costs nothing to add.</p>
+<p>If your own new rule can lean on that same "empty means unconstrained" convention, it inherits the same free ride. If it can't (a rule with real equality semantics, where an old value has to mean something specific rather than "everything"), there's no migration machinery in this plugin to reach for. Plan for the field to simply be absent on old content instead.</p>
+<p><strong>Vocabulary ownership</strong>: this plugin registers <strong>no native tags</strong> for <code>PlotTags</code>/<code>PlotTagQuery</code> at all. Unlike <code>OutpostBuilder.PlotSize</code>'s four native tags, the whole vocabulary is left to the project's own <code>DefaultGameplayTags.ini</code> (the same "plugin supplies the mechanism, the project supplies the taxonomy" split <code>BuildingCategory</code> already uses). If your own rule is similarly project-specific, don't reach for <code>UE_DEFINE_GAMEPLAY_TAG_STATIC</code>. Just document which tags your project expects under whatever root you pick.</p>
+<h3 id="step-2-one-function-and-decide-where-it-can-live">Step 2: One Function, and Decide Where It Can Live</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostBuildingDefinition.h</span>
+<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">BlueprintPure</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Building"</span><span class="p">)</span>
+<span class="kt">bool</span><span class="w"> </span><span class="n">MatchesPlotTags</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FGameplayTagContainer</span><span class="o">&amp;</span><span class="w"> </span><span class="n">PlotTags</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostBuildingDefinition.cpp</span>
+<span class="kt">bool</span><span class="w"> </span><span class="nf">UOutpostBuildingDefinition::MatchesPlotTags</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FGameplayTagContainer</span><span class="o">&amp;</span><span class="w"> </span><span class="n">PlotTags</span><span class="p">)</span><span class="w"> </span><span class="k">const</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PlotTagQuery</span><span class="p">.</span><span class="n">IsEmpty</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"> </span><span class="c1">// Empty query fits everything.</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">PlotTagQuery</span><span class="p">.</span><span class="n">Matches</span><span class="p">(</span><span class="n">PlotTags</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This lives on the definition itself (runtime module) because it's a pure query over the asset's own field, the same precedent <code>MatchesPlotSize</code>/<code>SupportsFaction</code> set. But the THING THAT DECIDES WHAT A MISMATCH MEANS (warn vs. block, and what UI surfaces it) is a SEPARATE function, and it lives in the EDITOR module:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Utils/OutpostEditorUtils.h</span>
+<span class="k">enum</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">EBuildingPlotAdvisory</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">NoWarning</span><span class="p">,</span><span class="w"> </span><span class="n">PlotTagMismatch</span><span class="w"> </span><span class="p">};</span>
+<span class="n">EBuildingPlotAdvisory</span><span class="w"> </span><span class="nf">EvaluateBuildingPlotAdvisory</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">UOutpostBuildingDefinition</span><span class="o">&amp;</span><span class="w"> </span><span class="n">Building</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">FGameplayTagContainer</span><span class="o">&amp;</span><span class="w"> </span><span class="n">PlotTags</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Two things worth copying deliberately if your own rule is warn-only:</p>
+<ul>
+<li><strong>Keep it a SEPARATE function from the blocking one</strong>, never a third case folded into <code>EBuildingPlotEligibility</code>.<ul>
+<li>Merging them tempts every future call site to start treating your warn-only result as another reason to grey out the Assign button, the one thing warn-only must never do.</li>
+<li>A separate enum, a separate function, is what makes that mistake require an actual code change instead of an accidental one.</li>
+</ul>
+</li>
+<li><strong>Know your module boundary BEFORE you place it.</strong> This plugin's own <code>UOutpostDefinition::IsDataValid</code> needed to read this same rule and discovered mid-implementation that it couldn't: <code>UOutpostDefinition</code> lives in the RUNTIME module, and the advisory function lives in <code>OutpostBuilderEditor</code>, which the runtime module does not (and must never) depend on.<ul>
+<li>The fix was NOT to move the function to the runtime module. It needs nothing runtime-specific, and every OTHER caller is a Slate widget that already lives in the editor module.</li>
+<li>It was to give <code>IsDataValid</code> one documented exception: call <code>UOutpostBuildingDefinition::MatchesPlotTags</code> directly, and say why in a comment.</li>
+<li>If a validation-pass caller of YOUR rule lives in the runtime module, plan for this rather than discovering it at compile time.</li>
+</ul>
+</li>
+</ul>
+<h3 id="step-3-wire-the-surfaces-you-actually-want">Step 3: Wire the Surfaces You Actually Want</h3>
+<p>Nothing here is one function you call from one choke point. The plugin's own four consumers are four small additions to four already-existing widgets/overrides, each independently optional depending on how visible you want your rule to be:</p>
+<ul>
+<li>A <strong>tooltip append</strong> on whatever button performs the action your rule advises about (<code>SOutpostAssignRow::GetAssignTooltip</code> appends <code>"\n\nWarning: ..."</code> to its existing return, after the button's normal enabled/refusal text is already resolved).</li>
+<li>A <strong>glyph on an offering surface</strong> (the palette tile) that reads the CURRENTLY SELECTED context live. This plugin's own tile glyph needed to add a narrow <code>FOutpostBuilderWidgetContext</code> dependency to <code>SOutpostBuildingPalette</code> (previously undocumented as needing one at all) specifically for this, as a live <code>TAttribute&lt;bool&gt;</code> rather than a value baked in at tile-build time, because the palette does not rebuild merely because the selected plot changed.</li>
+<li>A <strong>drift icon on a status/list surface</strong> (the Plots list row) for the case your blocking-rule counterpart doesn't have to handle at all: something ALREADY assigned that has since drifted out of compliance.<ul>
+<li>A tag edited after assignment, or, if your rule feeds Randomize's pool the way this one deliberately does NOT exclude from it, a warned pairing Randomize produced.</li>
+<li>Computed at the same refresh cadence the row's other content already has. It doesn't need to be more reactive than that.</li>
+</ul>
+</li>
+<li>A <strong>validation-pass finding</strong> (<code>IsDataValid</code>, <code>Context.AddWarning</code>, never <code>Context.AddError</code> or setting the result to <code>Invalid</code>) so a warn-only rule still surfaces in a project's asset-validation/CI pass instead of only being visible interactively.</li>
+</ul>
+<p>Every one of these reads the SAME one composition function (Step 2). None of them re-derives the rule from <code>MatchesPlotTags</code> directly (except the one documented, module-forced exception above). That's the actual worked lesson here: a warn-only rule earns exactly the same one-composition discipline a blocking rule does. The only thing that changes is what the composition is ALLOWED to do with its answer: flag, never refuse.</p>
+<h2 id="worked-extension-3-add-an-in-viewport-gizmo">Worked Extension 3: Add an In-Viewport Gizmo</h2>
+<p>Everything a custom drag handle needs is native to the legacy viewport interface this mode already implements (<code>ILegacyEdModeViewportInterface</code>, supplied by <code>UBaseLegacyWidgetEdMode</code>). You don't need <code>UInteractiveGizmo</code> or the rest of the Interactive Tools Framework for this.</p>
+<p>The mode moved to <code>UEdMode</code> without taking on ITF, and these virtuals came along unchanged. Research doc 09 verified every claim below against UE 5.8 source directly, file and line. Treat the citations here as a pointer into that doc rather than something re-verified on this page.</p>
+<p>This isn't purely hypothetical: the placement ghost once carried exactly this kind of handle, a drag-rotate ring (<code>HOutpostRotateRingProxy</code> / <code>DrawRotateRing</code> / <code>UpdateRotateRingDrag</code> / <code>bDraggingRotateRing</code>, all in <code>OutpostBuilderEdMode.cpp</code>). It was removed to keep the mode simple (<code>[</code>/<code>]</code> step rotation is the surviving equivalent).</p>
+<p>The walkthrough below is still the pattern to copy. The removed ring is its worked reference, called out inline where it did something specific. Read the full ring in the plugin's git history.</p>
+<p><img alt="Render sets a hit proxy, HandleClick claims the drag, InputDelta/MouseMove re-raycasts every frame, release commits" src="assets/extending-gizmo-drag-loop.svg" /></p>
+<h3 id="step-1-give-your-handle-a-hit-proxy">Step 1: Give Your Handle a Hit Proxy</h3>
+<p>A custom <code>HHitProxy</code> subclass (declared with <code>DECLARE_HIT_PROXY</code>, see <code>HitProxies.h:56-168</code>) is what makes a shape in the viewport clickable and independently cursor-styled (<code>HHitProxy::GetMouseCursor()</code> is automatic per proxy). Bracket your draw call with <code>PDI-&gt;SetHitProxy(...)</code>, the same pattern engine code uses for spline and landscape handles:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Sketch - not yet in the plugin. Follows the plugin's existing comment/tab style.</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">HOutpostRadiusHandle</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">HHitProxy</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">DECLARE_HIT_PROXY</span><span class="p">();</span>
+<span class="w">    </span><span class="k">explicit</span><span class="w"> </span><span class="n">HOutpostRadiusHandle</span><span class="p">(</span><span class="n">AOutpost</span><span class="o">*</span><span class="w"> </span><span class="n">InOutpost</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">HHitProxy</span><span class="p">(</span><span class="n">HPP_UI</span><span class="p">),</span><span class="w"> </span><span class="n">Outpost</span><span class="p">(</span><span class="n">InOutpost</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">    </span><span class="n">AOutpost</span><span class="o">*</span><span class="w"> </span><span class="n">Outpost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="c1">// In Render():</span>
+<span class="n">PDI</span><span class="o">-&gt;</span><span class="n">SetHitProxy</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">HOutpostRadiusHandle</span><span class="p">(</span><span class="n">Outpost</span><span class="p">));</span>
+<span class="n">DrawWireCylinder</span><span class="p">(</span><span class="n">PDI</span><span class="p">,</span><span class="w"> </span><span class="n">HandleLocation</span><span class="p">,</span><span class="w"> </span><span class="n">FVector</span><span class="o">::</span><span class="n">ForwardVector</span><span class="p">,</span><span class="w"> </span><span class="n">FVector</span><span class="o">::</span><span class="n">RightVector</span><span class="p">,</span><span class="w"> </span><span class="n">FVector</span><span class="o">::</span><span class="n">UpVector</span><span class="p">,</span><span class="w"> </span><span class="n">HandleColor</span><span class="p">,</span><span class="w"> </span><span class="n">HandleRadius</span><span class="p">,</span><span class="w"> </span><span class="n">HandleHalfHeight</span><span class="p">,</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="n">SDPG_Foreground</span><span class="p">);</span>
+<span class="n">PDI</span><span class="o">-&gt;</span><span class="n">SetHitProxy</span><span class="p">(</span><span class="nb">nullptr</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Note: this is a sketch, not code lifted from the plugin. Verify <code>DECLARE_HIT_PROXY</code>'s exact parameters and <code>HHitProxy</code>'s constructor on disk before you commit to this shape, the same way this plugin's own header comments flag engine signatures worth double-checking rather than assuming.</p>
+<h3 id="step-2-route-the-click">Step 2: Route the Click</h3>
+<p>Don't start the drag from <code>HandleClick</code>. <code>HandleClick</code> only fires once a full press-then-release completes as a "click", too late to catch the initial press that should begin a drag. The removed rotate-ring handle started its drag from <code>InputKey</code>'s <code>IE_Pressed</code> event instead, testing the hit proxy under the cursor directly (<code>Viewport-&gt;GetHitProxy(...)</code>), ahead of the ordinary placement-confirm click:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Removed, preserved in git history: OutpostBuilder/Source/OutpostBuilderEditor/Private/OutpostBuilderEdMode.cpp</span>
+<span class="c1">// as of fb9a33e^ - inside UOutpostBuilderEdMode::InputKey's if (bPlacingOutpost || bPlacingPlot) block.</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Key</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">EKeys</span><span class="o">::</span><span class="n">LeftMouseButton</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">Event</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">IE_Pressed</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// Drag-rotate ring: a BARE press landing on the ring's hit proxy starts</span>
+<span class="w">    </span><span class="c1">// the yaw drag and is consumed HERE, before the placement confirm below - it also treats a</span>
+<span class="w">    </span><span class="c1">// bare LMB press as "the click landed" and must not fire for a ring grab. Mirrors</span>
+<span class="w">    </span><span class="c1">// FLandscapeToolNewLandscape::InputKey's grab-handle hit-test</span>
+<span class="w">    </span><span class="c1">// (LandscapeEdModeComponentTools.cpp:1915-1936). Alt+LMB is checked FIRST: it's the</span>
+<span class="w">    </span><span class="c1">// editor's own orbit gesture and must never grab the ring or confirm a placement.</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">bAltHeld</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Viewport</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">Viewport</span><span class="o">-&gt;</span><span class="n">KeyState</span><span class="p">(</span><span class="n">EKeys</span><span class="o">::</span><span class="n">LeftAlt</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">Viewport</span><span class="o">-&gt;</span><span class="n">KeyState</span><span class="p">(</span><span class="n">EKeys</span><span class="o">::</span><span class="n">RightAlt</span><span class="p">));</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Viewport</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">bAltHeld</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">HHitProxy</span><span class="o">*</span><span class="w"> </span><span class="n">RingHitProxy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Viewport</span><span class="o">-&gt;</span><span class="n">GetHitProxy</span><span class="p">(</span><span class="n">Viewport</span><span class="o">-&gt;</span><span class="n">GetMouseX</span><span class="p">(),</span><span class="w"> </span><span class="n">Viewport</span><span class="o">-&gt;</span><span class="n">GetMouseY</span><span class="p">());</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">RingHitProxy</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">RingHitProxy</span><span class="o">-&gt;</span><span class="n">IsA</span><span class="p">(</span><span class="n">HOutpostRotateRingProxy</span><span class="o">::</span><span class="n">StaticGetType</span><span class="p">()))</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="n">bDraggingRotateRing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="c1">// ... placement-confirm handling continues below (Alt+LMB always falls through - orbit).</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>HandleClick</code> is where you'd react to a click that completed without becoming a drag. The mode itself doesn't override it, but the pattern is unchanged if your extension needs one: cast the hit proxy (<code>HitProxyCast&lt;HActor&gt;</code>), check your modifier/state, do the one-shot reaction, and <code>return true</code> to consume, or fall through to <code>Super::HandleClick</code>.</p>
+<p>Your handle's own drag-start check belongs in <code>InputKey</code> alongside the ring's, not in <code>HandleClick</code>. Its job is only non-drag clicks.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Sketch - add inside InputKey's IE_Pressed branch, alongside the ring's own check.</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">HHitProxy</span><span class="o">*</span><span class="w"> </span><span class="n">Hit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Viewport</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">Viewport</span><span class="o">-&gt;</span><span class="n">GetHitProxy</span><span class="p">(</span><span class="n">Viewport</span><span class="o">-&gt;</span><span class="n">GetMouseX</span><span class="p">(),</span><span class="w"> </span><span class="n">Viewport</span><span class="o">-&gt;</span><span class="n">GetMouseY</span><span class="p">())</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">HOutpostRadiusHandle</span><span class="o">*</span><span class="w"> </span><span class="n">HandleProxy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HitProxyCast</span><span class="o">&lt;</span><span class="n">HOutpostRadiusHandle</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Hit</span><span class="p">))</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">bDraggingRadiusHandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Note: <code>DisallowMouseDeltaTracking()</code> is NOT something you call on <code>InViewportClient</code>. It's a <code>const</code> query virtual declared on <code>ILegacyEdModeViewportInterface</code> (<code>Tools/LegacyEdModeInterfaces.h</code>) that the viewport client calls on the mode manager every frame (<code>EditorViewportClient.cpp</code>: <code>if (MouseDeltaTracker-&gt;UsingDragTool() || ModeTools-&gt;DisallowMouseDeltaTracking())</code>). Override it on your mode and return <code>true</code> while <code>bDraggingRadiusHandle</code> is set, so the viewport's own widget-drag tracking steps aside and leaves the raycast-and-recompute loop below as the sole owner of the drag:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// In your UEdMode subclass header/cpp:</span>
+<span class="k">virtual</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">DisallowMouseDeltaTracking</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">bDraggingRadiusHandle</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
+<h3 id="step-3-own-a-drag-loop">Step 3: Own a Drag Loop</h3>
+<p>While <code>bDraggingRadiusHandle</code> is set, re-raycast the cursor every frame and recompute your handle's value from it, instead of trusting the viewport's own delta tracking. Reach for <code>MouseMove</code> only if you never expect the drag to start with the mouse already captured.</p>
+<p>Editor viewports capture the mouse on LMB-down (<code>FViewportClient::GetMouseCaptureMode</code> defaults to <code>CapturePermanently</code>), and a captured move routes to <code>CapturedMouseMove</code>, not <code>MouseMove</code>. The rotate ring overrode <code>CapturedMouseMove</code> for exactly this reason (its comment cited <code>FEdModeFoliage</code> as doing the same):</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Removed, preserved in git history: OutpostBuilder/Source/OutpostBuilderEditor/Private/OutpostBuilderEdMode.cpp</span>
+<span class="c1">// as of fb9a33e^.</span>
+<span class="kt">bool</span><span class="w"> </span><span class="nf">UOutpostBuilderEdMode::CapturedMouseMove</span><span class="p">(</span><span class="n">FEditorViewportClient</span><span class="o">*</span><span class="w"> </span><span class="n">InViewportClient</span><span class="p">,</span><span class="w"> </span><span class="n">FViewport</span><span class="o">*</span><span class="w"> </span><span class="n">InViewport</span><span class="p">,</span><span class="w"> </span><span class="n">int32</span><span class="w"> </span><span class="n">InMouseX</span><span class="p">,</span><span class="w"> </span><span class="n">int32</span><span class="w"> </span><span class="n">InMouseY</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// Editor viewports capture the mouse on LMB-down (FViewportClient::GetMouseCaptureMode defaults</span>
+<span class="w">    </span><span class="c1">// to CapturePermanently and FSceneViewport::OnMouseMove routes captured moves HERE, never to</span>
+<span class="w">    </span><span class="c1">// MouseMove - see FEdModeFoliage, which overrides both for exactly this reason). Without this</span>
+<span class="w">    </span><span class="c1">// override the ring would draw and hover-brighten but never actually rotate the ghost.</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bDraggingRotateRing</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">UpdateRotateRingDrag</span><span class="p">(</span><span class="n">InViewportClient</span><span class="p">);</span>
+<span class="w">        </span><span class="n">InViewportClient</span><span class="o">-&gt;</span><span class="n">Invalidate</span><span class="p">();</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Super</span><span class="o">::</span><span class="n">CapturedMouseMove</span><span class="p">(</span><span class="n">InViewportClient</span><span class="p">,</span><span class="w"> </span><span class="n">InViewport</span><span class="p">,</span><span class="w"> </span><span class="n">InMouseX</span><span class="p">,</span><span class="w"> </span><span class="n">InMouseY</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Also override <code>DisallowMouseDeltaTracking()</code> (see the note in Step 2 above) so the viewport's own camera-drag/widget-delta handling sits out for the duration instead of fighting your drag. The ring's override was one line, <code>return bDraggingRotateRing;</code>.</p>
+<p>Release the drag on the button-up <code>InputKey</code> event by clearing the flag. Also clear it on <code>LostFocus</code>, the way the ring does, since an Alt-tab (or any other focus loss) mid-drag would otherwise leave the flag (and <code>DisallowMouseDeltaTracking()</code>) stuck set until the next LMB release happens to clear it.</p>
+<p>The verified engine exemplar for this general shape (drag a handle without a full gizmo) is <code>LandscapeEdModeComponentTools.cpp:1915-2025</code>. The plugin's own rotate ring (removed, but preserved in git history; functions named above) is the more direct one to copy.</p>
+<p>Verify the exact <code>InputDelta</code>/<code>MouseMove</code>/<code>CapturedMouseMove</code> virtual signatures on disk before you wire any of this up. This plugin's own header comments do the same thing wherever an engine signature matters (see <code>HandleClick(FEditorViewportClient*, HHitProxy*, const FViewportClick&amp;)</code>'s "verify the exact signature on disk" note in contracts.md).</p>
+<p>Wrap the whole drag in one <code>FScopedTransaction</code>, opened once when the drag starts, not per frame. That's the same rule the Overhead camera pilot session already follows: the engine bundles a whole pilot session into one "Pilot Actor" undo transaction. Adding per-frame <code>Modify()</code> calls on top of that would just bloat the undo stack for no benefit.</p>
+<h3 id="step-4-reach-for-this-only-when-you-need-to">Step 4: Reach for This Only When You Need To</h3>
+<p>Before you build a custom handle, check whether one of these cheaper options already gets you there. Both come from research/09 and both are zero or near-zero custom code:</p>
+<ul>
+<li><code>meta = (MakeEditWidget = true)</code> on a <code>UPROPERTY</code> - a free draggable in-viewport handle, no hit proxy or drag loop required at all.</li>
+<li><code>UsesTransformWidget(CheckMode)</code> / <code>GetWidgetAxisToDraw</code> - restricts the STANDARD transform widget to just the axes or mode that make sense for your selection (rotate-only, single-axis), rather than building a bespoke one. Exemplar: <code>PhysicsAssetEditorEditMode.cpp:802-815</code>.</li>
+</ul>
+<p>A custom <code>HHitProxy</code> handle earns its keep when neither of those can express what you need, for instance a radius or footprint-ring drag, where the value isn't a plain transform component.</p>
+<p>Research/09 also flagged a few things here as NOT worth doing. Check these off the list before you build anything:</p>
+<ul>
+<li>Canvas-space clickable HUD buttons (<code>FCanvas::SetHitProxy</code>, the way <code>EditorModeManager.cpp:1666-1737</code> draws clickable vertex icons) are possible. No shipping mode uses them for actual buttons, though. The viewport overlay widget system (already used for the Overhead camera positioning bar) is the better-precedented surface for 2D controls.</li>
+<li>A mode-level <code>GetCursor</code> override alongside per-proxy cursors doesn't combine the way you'd hope: the mode-level override suppresses the per-proxy granularity entirely (<code>EditorViewportClient.cpp:1979-1994</code>). Pick one, and make it per-proxy.</li>
+<li>Bespoke "editing scope" breadcrumb chrome has no engine precedent to lean on. Epic's own shipped affordance for "you're scoped into something" is dimming everything else, not a breadcrumb bar.</li>
+</ul>
+<h2 id="pitfalls-weve-already-hit">Pitfalls We've Already Hit</h2>
+<p>This list comes straight out of our own verification history (research/04 and the fixes that followed it), not speculation. Every one of these was a real, reproduced defect at some point, and every fix shipped at the time.</p>
+<p>A couple of the entries below have since had their surrounding code removed entirely by later refactors (marked historical where that's the case), but the underlying lesson is still correct guidance, so we're keeping them here rather than deleting them.</p>
+<h3 id="the-transacted-transient-orphaning-trap">The Transacted-Transient Orphaning Trap</h3>
+<p>Historical: <code>AOutpostPlot</code>'s whole editor-only preview trio (<code>PlotPreviewMesh</code>/<code>BuildingPreviewMesh</code>/<code>BuildingPreviewParts</code>) has been removed. Plots now render one RUNTIME <code>BuildingMeshComponent</code> via <code>RefreshBuildingPreview</code> instead. <code>BuildingPreviewParts</code> no longer exists. The trap and the fix below are preserved as a lesson, not as a description of current code.</p>
+<p>Trap: <code>BuildingPreviewParts</code> mirrored an assigned building's mesh components. It used to be marked just <code>Transient</code>. A transaction restores <code>Transient</code> properties on undo. It does NOT destroy the actual <code>UObject</code>s that fall out of a shrunk array. Because <code>OwnedComponents</code> isn't itself transaction-restored either, a component that drops out of the tracked array stays alive and registered regardless.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Removed, preserved in git history: OutpostBuilder/Source/OutpostBuilder/Public/OutpostPlot.h as of e14889d^.</span>
+<span class="cm">/**</span>
+<span class="cm"> * Transient mirrors of the assigned building actor class's static-mesh components; takes</span>
+<span class="cm"> * precedence over BuildingPreviewMesh. NonTransactional: undo restoring an older (smaller)</span>
+<span class="cm"> * array would orphan live components, since transactions restore Transient properties but</span>
+<span class="cm"> * never destroy the components themselves - PostEditUndo re-derives this pool instead.</span>
+<span class="cm"> */</span>
+<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">Transient</span><span class="p">,</span><span class="w"> </span><span class="n">NonTransactional</span><span class="p">)</span>
+<span class="n">TArray</span><span class="o">&lt;</span><span class="n">TObjectPtr</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">UStaticMeshComponent</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">BuildingPreviewParts</span><span class="p">;</span>
+</code></pre></div>
+
+<p>Symptom (as it played out before removal): assign a building, undo, reassign, and undo again. The plot accumulated ever-growing, still-visible ghost mesh parts for the rest of the editor session, since the shrink logic that's supposed to destroy leftover parts trusted the (undo-restored, now-wrong) array count.</p>
+<p>IMPORTANT: mark any transient object-pointer array that you rebuild by comparing counts as <code>NonTransactional</code>, or destroy every currently-owned entry before rebuilding rather than trusting the array's new size after an undo.</p>
+<h3 id="postspawnactor-double-fire">PostSpawnActor Double-Fire</h3>
+<p>Trap: the editor's placement subsystem calls <code>UActorFactory::PostSpawnActor</code> TWICE for every real drag-and-drop placement, once from the base factory's <code>CreateActor</code> and once from <code>PostPlaceAsset</code>. A <code>PostSpawnActor</code> override that does real work (forking an asset, spawning child actors) has to tolerate that.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Factories/ActorFactoryOutpostPrefab.cpp</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">UActorFactoryOutpostPrefab::PostSpawnActor</span><span class="p">(</span><span class="n">UObject</span><span class="o">*</span><span class="w"> </span><span class="n">Asset</span><span class="p">,</span><span class="w"> </span><span class="n">AActor</span><span class="o">*</span><span class="w"> </span><span class="n">NewActor</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">Super</span><span class="o">::</span><span class="n">PostSpawnActor</span><span class="p">(</span><span class="n">Asset</span><span class="p">,</span><span class="w"> </span><span class="n">NewActor</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Preview spawns (dragging the asset over the viewport before it is dropped) must never</span>
+<span class="w">    </span><span class="c1">// fork a definition asset or spawn plots/cameras - only a real placement stamps.</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">NewActor</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">NewActor</span><span class="o">-&gt;</span><span class="n">bIsEditorPreviewActor</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">AOutpost</span><span class="o">*</span><span class="w"> </span><span class="n">NewOutpost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Cast</span><span class="o">&lt;</span><span class="n">AOutpost</span><span class="o">&gt;</span><span class="p">(</span><span class="n">NewActor</span><span class="p">);</span>
+<span class="w">    </span><span class="n">UOutpostDefinition</span><span class="o">*</span><span class="w"> </span><span class="n">Definition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Cast</span><span class="o">&lt;</span><span class="n">UOutpostDefinition</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Asset</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">NewOutpost</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">Definition</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// The placement subsystem invokes PostSpawnActor TWICE for a real drop (once from the</span>
+<span class="w">    </span><span class="c1">// base factory's CreateActor, once from PostPlaceAsset). StampPrefab is not idempotent -</span>
+<span class="w">    </span><span class="c1">// it forks a definition and spawns actors - so bail if this anchor was already stamped</span>
+<span class="w">    </span><span class="c1">// (StampPrefab assigns the fork's id to the anchor as its first observable effect).</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">NewOutpost</span><span class="o">-&gt;</span><span class="n">GetOutpostDefinitionId</span><span class="p">().</span><span class="n">IsValid</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// A refused/failed stamp condemns its anchor below; the tag stops the SECOND PostSpawnActor</span>
+<span class="w">    </span><span class="c1">// invocation (see above) from re-attempting - and double-toasting - on an anchor already</span>
+<span class="w">    </span><span class="c1">// scheduled for destruction (its definition id is still invalid, so the id guard alone</span>
+<span class="w">    </span><span class="c1">// wouldn't catch it).</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">FName</span><span class="w"> </span><span class="n">StampRefusedTag</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">"OutpostStampRefused"</span><span class="p">));</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">NewOutpost</span><span class="o">-&gt;</span><span class="n">ActorHasTag</span><span class="p">(</span><span class="n">StampRefusedTag</span><span class="p">))</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">AOutpost</span><span class="o">*</span><span class="w"> </span><span class="n">StampedOutpost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OutpostPrefabUtils</span><span class="o">::</span><span class="n">StampPrefab</span><span class="p">(</span><span class="n">NewActor</span><span class="o">-&gt;</span><span class="n">GetWorld</span><span class="p">(),</span><span class="w"> </span><span class="n">Definition</span><span class="p">,</span><span class="w"> </span><span class="n">NewActor</span><span class="o">-&gt;</span><span class="n">GetActorTransform</span><span class="p">(),</span><span class="w"> </span><span class="n">NewOutpost</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">StampedOutpost</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Refused (exclusion volume - hard refuse) or failed: the</span>
+<span class="w">        </span><span class="c1">// factory-spawned anchor must not survive as a bare, definition-less AOutpost. Destroying</span>
+<span class="w">        </span><span class="c1">// it DURING PostSpawnActor would yank an actor the placement subsystem still references</span>
+<span class="w">        </span><span class="c1">// this frame - defer one tick and destroy outside the drop's own call stack. (The anchor's</span>
+<span class="w">        </span><span class="c1">// definition id is invalid, so its Destroyed() cascade is a guaranteed no-op.) Known</span>
+<span class="w">        </span><span class="c1">// residual: the drop's own transaction stays in the undo buffer, so a later Redo can</span>
+<span class="w">        </span><span class="c1">// transiently resurrect the inert tagged anchor - cosmetic (it stays definition-less and</span>
+<span class="w">        </span><span class="c1">// cascade-free), and undo-before-the-timer-fires is safe via the weak ptr below.</span>
+<span class="w">        </span><span class="n">NewOutpost</span><span class="o">-&gt;</span><span class="n">Tags</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">StampRefusedTag</span><span class="p">);</span>
+<span class="w">        </span><span class="n">TWeakObjectPtr</span><span class="o">&lt;</span><span class="n">AOutpost</span><span class="o">&gt;</span><span class="w"> </span><span class="n">WeakAnchor</span><span class="p">(</span><span class="n">NewOutpost</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">GEditor</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="n">GEditor</span><span class="o">-&gt;</span><span class="n">GetTimerManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">SetTimerForNextTick</span><span class="p">(</span><span class="n">FTimerDelegate</span><span class="o">::</span><span class="n">CreateLambda</span><span class="p">([</span><span class="n">WeakAnchor</span><span class="p">]()</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">AOutpost</span><span class="o">*</span><span class="w"> </span><span class="n">Anchor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">WeakAnchor</span><span class="p">.</span><span class="n">Get</span><span class="p">())</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">UWorld</span><span class="o">*</span><span class="w"> </span><span class="n">AnchorWorld</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Anchor</span><span class="o">-&gt;</span><span class="n">GetWorld</span><span class="p">())</span>
+<span class="w">                    </span><span class="p">{</span>
+<span class="w">                        </span><span class="n">AnchorWorld</span><span class="o">-&gt;</span><span class="n">EditorDestroyActor</span><span class="p">(</span><span class="n">Anchor</span><span class="p">,</span><span class="w"> </span><span class="cm">/*bShouldModifyLevel=*/</span><span class="nb">true</span><span class="p">);</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}));</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Symptom: before the idempotency guard existed, a single drag-and-drop forked the template definition TWICE and spawned two overlapping sets of plots on top of each other, from one drop.</p>
+<p>IMPORTANT: any <code>PostSpawnActor</code> override doing non-trivial work must be idempotent. Check <code>bIsEditorPreviewActor</code> first (the drag-preview ghost should never trigger your logic at all), and bail early once you can detect the work already happened (here, a valid <code>OutpostDefinitionId</code> on the anchor is proof StampPrefab already ran).</p>
+<p>The refusal-tag/deferred-destroy block above exists because <code>StampPrefab</code> can hard-refuse a drop that lands inside an Outpost Volume's exclusion range, and a factory-spawned anchor that gets refused has to be torn down a tick later rather than left behind as a bare, definition-less <code>AOutpost</code>.</p>
+<h3 id="modal-dialog-inside-transaction">Modal-Dialog-Inside-Transaction</h3>
+<p>Trap: opening a modal dialog while an <code>FScopedTransaction</code> is on the stack. A modal dialog pumps its own message loop. Nothing else should be actively transacting while that's happening.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderEdMode.cpp</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">UOutpostBuilderEdMode::ConfirmOutpostPlacement</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">Location</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// PIE GATE: refuses with a toast before GetWorld() below can silently redirect to the ephemeral</span>
+<span class="w">    </span><span class="c1">// PLAY world during Simulate-in-Editor. ConfirmPlotPlacement carries the identical gate, first</span>
+<span class="w">    </span><span class="c1">// thing in its own body.</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IsPlayOrSimulateActive</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">ShowPlayOrSimulateActiveToast</span><span class="p">();</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">UWorld</span><span class="o">*</span><span class="w"> </span><span class="n">World</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetWorld</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">World</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// ... (omitted here: the place-for-definition branch, taken when placement was started for an</span>
+<span class="w">    </span><span class="c1">// existing definition rather than a brand-new one - it never opens a modal dialog at all, so it</span>
+<span class="w">    </span><span class="c1">// opens its FScopedTransaction immediately and returns before reaching the code below.)</span>
+
+<span class="w">    </span><span class="c1">// The label the new actor will receive - resolved up front so the spawned actor and the</span>
+<span class="w">    </span><span class="c1">// definition auto-named from it (GetOrCreateOutpostDefinitionForOutpost reads GetActorLabel())</span>
+<span class="w">    </span><span class="c1">// always agree.</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">FString</span><span class="w"> </span><span class="n">IntendedLabel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OutpostEditorUtils</span><span class="o">::</span><span class="n">MakeUniqueActorLabel</span><span class="p">(</span><span class="n">World</span><span class="p">,</span><span class="w"> </span><span class="n">TEXT</span><span class="p">(</span><span class="s">"Outpost"</span><span class="p">));</span>
+
+<span class="w">    </span><span class="n">FScopedTransaction</span><span class="w"> </span><span class="n">Transaction</span><span class="p">(</span><span class="n">NSLOCTEXT</span><span class="p">(</span><span class="s">"OutpostBuilder"</span><span class="p">,</span><span class="w"> </span><span class="s">"PlaceOutpostTransaction"</span><span class="p">,</span><span class="w"> </span><span class="s">"Place Outpost"</span><span class="p">));</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>There's no modal dialog left on this specific path at all (auto-naming replaced it, see below), but the shape is still the general rule worth copying: a transaction must never be left pending while a modal dialog pumps its own message loop, so anything a dialog would need has to be resolved before the transaction opens.</p>
+<p><code>ConfirmOutpostPlacement</code> still resolves the one thing it genuinely needs ahead of time (the label the new actor is about to receive) before opening the transaction and spawning it below.</p>
+<p>Naming the DEFINITION itself happens later, inside <code>GetOrCreateOutpostDefinitionForOutpost</code> (the single naming path every placement/editing path funnels through before naming a new asset), safely INSIDE that same transaction, since <code>ResolveNewDefinitionSaveLocation</code> never pops a dialog either. Its doc comment carries the ordering rule:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderEdMode.h</span>
+<span class="cm">/**</span>
+<span class="cm"> * Resolves the automatic package path + asset name for a NEW outpost definition (auto-name outpost</span>
+<span class="cm"> * definitions, never show a save dialog): CreatedDefinitionDirectory /</span>
+<span class="cm"> * (DefinitionAssetPrefix + Sanitize(ActorLabel)), falling back to a generic name if ActorLabel</span>
+<span class="cm"> * sanitizes away to nothing. GetOrCreateOutpostDefinitionForOutpost (its only caller) de-dupes</span>
+<span class="cm"> * the result against anything already on disk via IAssetTools::CreateUniqueAssetName, appending _1,</span>
+<span class="cm"> * _2, ... as needed, so this function only has to produce the DESIRED name, not guarantee it's free.</span>
+<span class="cm"> */</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">ResolveNewDefinitionSaveLocation</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FString</span><span class="o">&amp;</span><span class="w"> </span><span class="n">ActorLabel</span><span class="p">,</span><span class="w"> </span><span class="n">FString</span><span class="o">&amp;</span><span class="w"> </span><span class="n">OutPackagePath</span><span class="p">,</span><span class="w"> </span><span class="n">FString</span><span class="o">&amp;</span><span class="w"> </span><span class="n">OutAssetName</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+</code></pre></div>
+
+<p>Symptom: we designed around this one before it ever shipped as a bug, back when this path <em>did</em> show a modal "save new outpost definition" dialog. That dialog is gone now (auto-naming replaced it entirely), so the trap as originally written no longer has a live reproduction case on the outpost-definition path.</p>
+<p>It's still worth flagging, because the toolkit's "+ New Building" flow DOES still open a real modal save dialog (<code>BD_NewBuilding</code> default name) and is the surviving in-plugin exemplar of a path that has to get this ordering right. It's easy to reintroduce the bug on any new save-prompt path if you don't notice the existing transaction scope around it.</p>
+<p>IMPORTANT: resolve any modal dialog's result BEFORE opening the <code>FScopedTransaction</code> that will use it, never after. If you add a new asset-creation path that might prompt (the "+ New Building" flow is the current live example), restructure it the way <code>ConfirmOutpostPlacement</code> above is structured, even though it no longer prompts itself: gather the naming/dialog result first, then open the transaction.</p>
+<h3 id="world-cleanup-ghost-teardown-modes-survive-open-level">World-Cleanup Ghost Teardown (Modes Survive Open Level)</h3>
+<p>Trap: <code>File &gt; Open Level</code> does NOT deactivate editor modes. <code>UWorld::CleanupWorld</code> never unregisters ownerless components on its own either. A ghost mesh pool registered straight to the world (rather than owned by an actor) will dangle across the map swap unless you tear it down yourself.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderEdMode.h</span>
+<span class="cm">/**</span>
+<span class="cm"> * FWorldDelegates::OnWorldCleanup handler: cancels any active placement session when the mode's</span>
+<span class="cm"> * world is being cleaned up (File &gt; Open Level does NOT deactivate editor modes, and</span>
+<span class="cm"> * UWorld::CleanupWorld never unregisters ownerless components). The ghost mesh part components are</span>
+<span class="cm"> * registered directly to the world, and this mode's UPROPERTY refs keep them alive across the map</span>
+<span class="cm"> * change while their raw WorldPrivate/scene pointers go stale - tearing them down here, while the</span>
+<span class="cm"> * world's scene is still alive, is the only safe window.</span>
+<span class="cm"> */</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">HandleWorldCleanup</span><span class="p">(</span><span class="n">UWorld</span><span class="o">*</span><span class="w"> </span><span class="n">World</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">bSessionEnded</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">bCleanupResources</span><span class="p">);</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderEdMode.cpp</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">UOutpostBuilderEdMode::HandleWorldCleanup</span><span class="p">(</span><span class="n">UWorld</span><span class="o">*</span><span class="w"> </span><span class="n">World</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">bSessionEnded</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">bCleanupResources</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// Only react to OUR world going away (PIE worlds clean up too, and placement previews live in the</span>
+<span class="w">    </span><span class="c1">// editor world only). At broadcast time the world's scene is still alive, so unregistering the</span>
+<span class="w">    </span><span class="c1">// ghost mesh component here is safe; one frame later its raw world/scene pointers dangle.</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">World</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">World</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">GetWorld</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">bPlacingOutpost</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">bPlacingPlot</span><span class="p">))</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">CancelPlacement</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Symptom: without this handler, opening a different level mid-placement would leave the ghost mesh components referencing a scene that's about to go away, one frame away from dangling raw pointers. <code>Exit()</code> never comes to save you either, since the mode stays active across the level swap.</p>
+<p>IMPORTANT: don't assume the mode's <code>Exit()</code> is your only teardown window. Hook <code>FWorldDelegates::OnWorldCleanup</code> for anything you've registered directly to the world (not owned by an actor), and tear it down there, while the dying world's scene is still alive to tear down safely.</p>
+<h3 id="the-soft-path-tryload-map-force-load-trap">The Soft-Path TryLoad Map-Force-Load Trap</h3>
+<p>Trap: <code>FSoftObjectPath::TryLoad()</code> on a path that points at an actor INSIDE a level (a subobject path, not a top-level asset) synchronously loads the entire owning map package as an inactive world, just to resolve that one actor.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderEdMode.cpp</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">UOutpostBuilderEdMode::LocateOutpostForDefinition</span><span class="p">(</span><span class="n">FPrimaryAssetId</span><span class="w"> </span><span class="n">DefinitionId</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// ...</span>
+
+<span class="w">    </span><span class="c1">// ResolveObject only - NEVER TryLoad here. PlacedOutpostPath is a subobject path (actor inside a</span>
+<span class="w">    </span><span class="c1">// level), and FSoftObjectPath::TryLoad on a subobject path synchronously loads the whole owning map</span>
+<span class="w">    </span><span class="c1">// package as an inactive world just to look the actor up - a multi-second (or multi-GB) stall that</span>
+<span class="w">    </span><span class="c1">// would then fail the current-world check below anyway. "No map auto-loading in v1" is the contract.</span>
+<span class="w">    </span><span class="n">AOutpost</span><span class="o">*</span><span class="w"> </span><span class="n">Outpost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Cast</span><span class="o">&lt;</span><span class="n">AOutpost</span><span class="o">&gt;</span><span class="p">(</span><span class="n">PlacedPath</span><span class="p">.</span><span class="n">ResolveObject</span><span class="p">());</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="w">    </span><span class="n">UWorld</span><span class="o">*</span><span class="w"> </span><span class="n">CurrentWorld</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetWorld</span><span class="p">();</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">Outpost</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">CurrentWorld</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">Outpost</span><span class="o">-&gt;</span><span class="n">GetWorld</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">CurrentWorld</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// ...</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// No map auto-loading in v1 - just tell the designer where it lives.</span>
+<span class="w">            </span><span class="k">const</span><span class="w"> </span><span class="n">FText</span><span class="w"> </span><span class="n">MapName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FText</span><span class="o">::</span><span class="n">FromString</span><span class="p">(</span><span class="n">PlacedPath</span><span class="p">.</span><span class="n">GetLongPackageName</span><span class="p">());</span>
+<span class="w">            </span><span class="n">ShowPlainNotification</span><span class="p">(</span><span class="n">FText</span><span class="o">::</span><span class="n">Format</span><span class="p">(</span><span class="n">NSLOCTEXT</span><span class="p">(</span><span class="s">"OutpostBuilder"</span><span class="p">,</span><span class="w"> </span><span class="s">"OutpostNotLoadedToast"</span><span class="p">,</span><span class="w"> </span><span class="s">"Outpost actor lives in {0} (not loaded)"</span><span class="p">),</span><span class="w"> </span><span class="n">MapName</span><span class="p">));</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Symptom: <code>TryLoad()</code> here would stall the editor for anywhere from a few seconds to several gigabytes' worth of loading time on click, for a lookup that's going to fail the "is this actor in my current world" check right afterward anyway, since the point of <code>TryLoad</code> is to force-load something that isn't loaded.</p>
+<p>IMPORTANT: use <code>ResolveObject()</code> (only succeeds if the target is already loaded) for any soft reference you don't want to force-load, especially one that points into a level rather than a standalone asset. Save <code>TryLoad()</code> for references you genuinely want to load right now, and even then, think about whether that load belongs on the main thread.</p>
+<h3 id="cdo-safety-in-onconstruction">CDO-Safety in OnConstruction</h3>
+<p>Trap: <code>OnConstruction</code> runs on the class default object too, not just on real instances, which means anything you do there that resolves assets or writes through <code>Modify()</code>/a transaction is running somewhere you probably don't want it running.</p>
+<p>This pitfall once had a live illustration in <code>AOutpost</code>'s faction-color re-application. That whole mechanism (<code>ApplyFactionColor()</code>/<code>GetResolvedFactionColor()</code>, the Custom Primitive Data write they fed, and the <code>OnConstruction()</code>/<code>PostLoad()</code>/<code>PostEditUndo()</code> overrides that drove it, plus <code>AOutpostPlot</code>'s parallel <code>RefreshFactionVisuals()</code>/<code>ApplyCachedFactionVisuals()</code> split) has been removed outright. See <code>faction-visuals.html</code>.</p>
+<p>There is no faction-color code left in the plugin to use as a live example. If you forked a version that had it, that's the code to drop.</p>
+<p>The lesson itself is still real and completely general, independent of that now-deleted example: never resolve an asset or write through <code>Modify()</code>/a transaction from <code>OnConstruction</code>, because that code path runs on the CDO too, and during a compile/reinstance pass the object isn't in a normal, fully-formed state yet.</p>
+<p>That's the kind of bug that shows up as a rare, hard-to-reproduce editor hitch or corruption report, not a clean crash. It's worth avoiding by construction rather than by discipline.</p>
+<p>IMPORTANT: treat <code>OnConstruction</code> as CDO-unsafe for anything beyond cheap, load-free re-derivation from state you've already cached (or work that was never going to load an asset in the first place). Do your actual resolving (asset loads, <code>Modify()</code>, a world/actor scan) from <code>PostLoad</code>, <code>PostRegisterAllComponents</code>, <code>PostEditUndo</code>, or an explicit setter, and give <code>OnConstruction</code> only the "already resolved (or resolve-free), just reapply it" half of the work.</p>
+<h3 id="never-child-actors-or-attachment">Never Child Actors or Attachment</h3>
+<p>Trap: <code>UChildActorComponent</code>, or attaching one actor to another, looks like the obvious way to preview a building on top of a plot. It's forbidden in this plugin, full stop, no exceptions.</p>
+<p>The actual pattern is to put a plain <code>UStaticMeshComponent</code> on your own actor and set a <code>UStaticMesh</code> on it. That's it. Never instantiate, spawn, or attach the other actor:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Actors/OutpostPlot.h - the plot's RUNTIME visual (the only one that</span>
+<span class="c1">// exists in a packaged game; see the actor-template mirror further down for the editor-only second one)</span>
+<span class="n">UPROPERTY</span><span class="p">()</span>
+<span class="n">TObjectPtr</span><span class="o">&lt;</span><span class="n">UStaticMeshComponent</span><span class="o">&gt;</span><span class="w"> </span><span class="n">BuildingMeshComponent</span><span class="p">;</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Actors/OutpostPlot.cpp - resolve a mesh, set it, done. Unconditional in</span>
+<span class="c1">// a GAME world; in an EDITOR world this is the fallback rung, reached only when the actor-template</span>
+<span class="c1">// mirror below doesn't apply (see AOutpostPlot::RefreshBuildingPreview).</span>
+<span class="w">    </span><span class="c1">// Assigned -&gt; that building's mesh. UNASSIGNED -&gt; the settings asset's shared empty-plot mesh.</span>
+<span class="w">    </span><span class="n">UStaticMesh</span><span class="o">*</span><span class="w"> </span><span class="n">ResolvedMesh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AssignedBuildingId</span><span class="p">.</span><span class="n">IsValid</span><span class="p">()</span>
+<span class="w">        </span><span class="o">?</span><span class="w"> </span><span class="n">ResolveBuildingMesh</span><span class="p">(</span><span class="n">AssignedBuildingId</span><span class="p">)</span>
+<span class="w">        </span><span class="o">:</span><span class="w"> </span><span class="n">ResolveEmptyPlotMesh</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// ... (omitted: the settings asset's DefaultPreviewMesh rung, then EmptyPlotFallbackMesh.)</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">BuildingMeshComponent</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">BuildingMeshComponent</span><span class="o">-&gt;</span><span class="n">SetStaticMesh</span><span class="p">(</span><span class="n">ResolvedMesh</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+
+<p>The editor's placement ghost follows the identical shape: one transient <code>UStaticMeshComponent</code> per part (<code>GhostMeshParts</code>, a pool) fed by <code>ResolvePreviewGhostSource()</code>, which resolves the hot building's <code>BuildingActorClass</code> template when it's set and yields at least one static-mesh part, else its <code>BuildingMesh</code> as a single identity part, else the settings asset's <code>EmptyPlotMesh</code> as a single identity part while the palette's Empty tile is hot.</p>
+<p>Ghost and plot render the same template by construction, because <code>AOutpostPlot::RebuildMirroredBuildingParts()</code> (below) mirrors the SAME <code>BuildingActorClass</code> through the SAME collector whenever it applies.</p>
+<p>The template collector both sides share is <code>OutpostPreviewMeshUtils::CollectMeshParts</code>. It walks the CDO and each Blueprint class's SCS nodes without instantiating, capturing per-part material overrides.</p>
+<p>Routing ghost and plot through the SAME collector is what keeps the aimed shape and the placed shape from ever disagreeing: whichever asset the ghost renders, the placed plot mirrors the identical one.</p>
+<p><code>BuildingMesh</code> remains the fallback for a class-less building (or one whose class yields no static-mesh parts) on both sides, and the only thing GAME worlds ever render. The mirror is <code>WITH_EDITOR</code>/<code>WITH_EDITORONLY_DATA</code> only.</p>
+<p>Symptom: a child actor component (or a real attached actor) brings its own full actor lifecycle, tick, replication, and construction script along for the ride, just to show a static mesh where you wanted a lightweight preview. It also means one actor's transform is implicitly coupled to another's, which conflicts with this plugin's "records, not nesting" rule for how plots, outposts, and cameras relate to each other.</p>
+<p>IMPORTANT: never use <code>UChildActorComponent</code> or attach one actor to another, anywhere in this plugin. If you need to preview or mirror another actor's visuals, render a <code>UStaticMesh</code> on a component your own actor owns instead, the way <code>AOutpostPlot::BuildingMeshComponent</code>, its editor-only <code>MirroredBuildingParts</code>, and the ed-mode's <code>GhostMeshParts</code> all do.</p>
+<h2 id="references">References</h2>
+<p>Repo files:</p>
+<ul>
+<li><code>OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostBuildingDefinition.h</code> and <code>OutpostBuildingDefinition.cpp</code></li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostFaction.h</code> and <code>OutpostBuildingDefinition.h</code> (<code>SupportedFactions</code>/<code>SupportsFaction</code>) - the faction identity/eligibility model; no color anywhere</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Settings/OutpostBuilderSettingsAsset.h</code> (runtime + asset-creation/placement config: a <code>Placement</code> category holding the 3 knobs shared with the style surface (see <code>reference.html</code>), plus the runtime-section <code>Actors</code> category, the four <code>TSubclassOf&lt;&gt;</code> overrides "Override a Spawned Actor Class" above walks through)</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Settings/OutpostRuntimeSettings.h</code> / <code>.cpp</code> (<code>GetOutpostClass</code>/<code>GetPlotClass</code>/<code>GetVolumeClass</code>/<code>GetOverheadCameraClass</code>, the four actor-class resolvers)</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostDefinition.h</code> / <code>OutpostBuildingDefinition.h</code> (the "SUBCLASSING CONTRACT" doc comment on each class's <code>GetPrimaryAssetId()</code>, which the definition-subclassing walkthrough above points at rather than restating)</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostEventSubsystem.h</code> / <code>.cpp</code> (the world-scoped runtime event surface: <code>OnOutpostStamped</code>/<code>OnPlotAssigned</code>/<code>OnFactionChanged</code>, each with a <code>BlueprintAssignable</code> dynamic delegate and a native "Native" twin, covered by the "Bind the Runtime Event Subsystem" walkthrough above)</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostBuilderModule.cpp</code></li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Factories/OutpostBuildingDefinitionFactory.h</code> / <code>.cpp</code></li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/OutpostBuilderEditorModule.cpp</code></li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderEdMode.h</code> / <code>.cpp</code></li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderDraw.h</code> / <code>.cpp</code> (the free draw/HUD functions <code>Render</code>/<code>DrawHUD</code> dispatch to)</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Settings/OutpostBuilderUserSettings.h</code> / <code>.cpp</code> (the per-user Editor Preferences class the style knobs live on)</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkit.h</code> (the FILE MAP comment) and its per-panel <code>.cpp</code> files, <code>OutpostBuilderToolkitBuildTab.cpp</code> / <code>ConfigureTab.cpp</code> (the "TO ADD A BUTTON" recipes)</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Widgets/OutpostBuilderWidgetContext.h</code> and <code>OutpostPaletteModel.h</code> / <code>.cpp</code> (the two shared read-model primitives every reusable widget is built against, see <code>toolkit.html</code>'s "Two Shared Primitives"; both carry <code>OUTPOSTBUILDEREDITOR_API</code>, <code>FScopedPaletteObserver</code> deliberately excepted, see its own doc comment)</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Widgets/SOutpostBuildingsBrowser.h</code> / <code>.cpp</code> - the building-definition browser compound widget, the ORIGINAL exemplar the widget-decomposition contract is modeled on, mounted once from the Overview panel's Buildings tab.<ul>
+<li><code>SOutpostSaveFooter.h</code> / <code>.cpp</code> is the smallest worked example of that same contract, export-only, no internal mount. See <code>toolkit.html</code>'s "The Widget Inventory" for the other 12.</li>
+<li>All 13 <code>SOutpost*</code> widget classes carry <code>OUTPOSTBUILDEREDITOR_API</code> (<code>SOutpostTabBar&lt;TEnum&gt;</code> deliberately excepted: it's a template, see its own doc comment), the "Extend the Editor UI" walkthrough above.</li>
+</ul>
+</li>
+<li><code>research/19-reusable-widget-decomposition.md</code> / <code>research/20-extensibility-plan.md</code> - the plan behind the widget-decomposition work and the forward roadmap past it</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Factories/ActorFactoryOutpostPrefab.cpp</code></li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Utils/OutpostPrefabUtils.h</code> (<code>FindBlockingExclusionVolume</code>, the shared placement-exclusion helper)</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Actors/OutpostPlot.h</code> and <code>OutpostPlot.cpp</code></li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostPreviewMeshUtils.h</code> / <code>.cpp</code> (<code>WITH_EDITOR</code>) - <code>CollectMeshParts()</code>, the CDO+SCS template collector</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Actors/Outpost.cpp</code></li>
+<li><code>contracts.md</code> (the frozen shared surfaces this whole plugin is built against)</li>
+<li><code>research/15-l4-action-registry-refutation.md</code> (why there is no toolkit action registry)</li>
+</ul>
+<p>Research docs that shaped this page:</p>
+<ul>
+<li><code>research/09-viewport-gizmo-research.md</code> - the gizmo patterns, engine exemplars, and anti-patterns behind Worked Extension 3 and the placement-feedback note in Worked Extension 2.</li>
+<li><code>research/04-adversarial-verification-log.md</code> - the verification passes and fix batches behind every entry in Pitfalls We've Already Hit.</li>
+<li><code>research/12-asset-loading-strategy.md</code> - why the definition types carry <code>AlwaysCook</code> type rules (Worked Extension 1, Step 3), and the Asset Audit / cook-log check worth running after you add one for a new type.</li>
+</ul>
+<p>Engine source paths (relative to the UE 5.8 install, as verified in research/09). This list is not comprehensive. Treat it as a starting point rather than the full set:</p>
+<ul>
+<li><code>Engine/Source/Editor/UnrealEd/Public/Tools/UEdMode.h</code>, <code>Tools/LegacyEdModeWidgetHelpers.h</code>, and <code>Tools/LegacyEdModeInterfaces.h</code> - <code>UEdMode</code>, <code>UBaseLegacyWidgetEdMode</code>, and the legacy widget/viewport interfaces that supply every virtual named above, <code>DisallowMouseDeltaTracking</code> included.</li>
+<li><code>HitProxies.h:56-168</code> - <code>DECLARE_HIT_PROXY</code>, <code>HHitProxy::GetMouseCursor()</code>.</li>
+<li><code>LandscapeEdModeComponentTools.cpp:1915-2025</code> - the drag-a-handle-without-a-gizmo exemplar.</li>
+<li><code>SplineComponentVisualizer.h:287-373</code> - a worked hit-proxy taxonomy for multiple handle kinds on one component.</li>
+<li><code>EditorModeManager.cpp:1630-1737</code> - <code>Render</code>/<code>DrawHUD</code> dispatch and the canvas-space hit-proxy exemplar.</li>
+<li><code>EditorViewportClient.cpp:1979-1994</code> / <code>:6161-6232</code> - cursor and hover mechanics, including why a mode-level <code>GetCursor</code> override suppresses per-proxy cursors.</li>
+<li><code>PhysicsAssetEditorEditMode.cpp:802-815</code> - restricting the standard transform widget to a subset of axes/modes.</li>
+<li><code>D:/Games/Epic Games/UE_5.8/Engine/Source/Editor/UnrealEd/Private/EditorViewportClient.cpp:713-756</code> - <code>AddRealtimeOverride</code>/<code>RemoveRealtimeOverride</code>, relevant to the world-cleanup pitfall's "the mode outlives the level" framing.</li>
+</ul>
+      </article>
+    <nav class="pager" aria-label="Page navigation">
+      <a class="pager-prev" href="faction-visuals.html">
+        <span class="pager-dir">&larr; Previous</span>
+        <span class="pager-title">Faction - Identity and Gating</span>
+      </a>
+      <a class="pager-next" href="quick-reference.html">
+        <span class="pager-dir">Next &rarr;</span>
+        <span class="pager-title">Quick Reference - The Cheat Sheet</span>
+      </a>
+    </nav>
+    </main>
+
+    <footer class="foot">
+      <p>A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.</p>
+      <a href="https://github.com/defessler/OutpostBuilder">View on GitHub</a>
+    </footer>
+  </div>
+</div>
+
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

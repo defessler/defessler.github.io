@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tutorial - A Guided Tour · OutpostBuilder</title>
+<meta name="description" content="A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<div class="shell">
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-controls="sidebar" aria-expanded="false">
+    <span></span><span></span><span></span>
+    <span class="vh">Toggle navigation</span>
+  </button>
+
+  <aside class="side" id="sidebar">
+    <div class="side-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-word">OutpostBuilder</span>
+      </a>
+
+      <nav aria-label="Documentation">
+        <ol class="nav-list">
+          <li>
+            <a href="index.html">
+              <span class="nav-no">01</span>
+              <span class="nav-title">OutpostBuilder</span>
+            </a>
+          </li>
+          <li>
+            <a href="tutorial.html" class="active" aria-current="page">
+              <span class="nav-no">02</span>
+              <span class="nav-title">Tutorial - A Guided Tour</span>
+            </a>
+          </li>
+          <li>
+            <a href="architecture.html">
+              <span class="nav-no">03</span>
+              <span class="nav-title">Architecture</span>
+            </a>
+          </li>
+          <li>
+            <a href="identity.html">
+              <span class="nav-no">04</span>
+              <span class="nav-title">Instance Identity</span>
+            </a>
+          </li>
+          <li>
+            <a href="edmode.html">
+              <span class="nav-no">05</span>
+              <span class="nav-title">The Ed Mode - UEdMode Deep Dive</span>
+            </a>
+          </li>
+          <li>
+            <a href="toolkit.html">
+              <span class="nav-no">06</span>
+              <span class="nav-title">The Toolkit - FModeToolkit and Slate</span>
+            </a>
+          </li>
+          <li>
+            <a href="prefabs.html">
+              <span class="nav-no">07</span>
+              <span class="nav-title">Prefabs &amp; Fork-on-Stamp</span>
+            </a>
+          </li>
+          <li>
+            <a href="faction-visuals.html">
+              <span class="nav-no">08</span>
+              <span class="nav-title">Faction - Identity and Gating</span>
+            </a>
+          </li>
+          <li>
+            <a href="extending.html">
+              <span class="nav-no">09</span>
+              <span class="nav-title">Extending Outpost Builder</span>
+            </a>
+          </li>
+          <li>
+            <a href="quick-reference.html">
+              <span class="nav-no">10</span>
+              <span class="nav-title">Quick Reference - The Cheat Sheet</span>
+            </a>
+          </li>
+          <li>
+            <a href="reference.html">
+              <span class="nav-no">11</span>
+              <span class="nav-title">Reference - Public Surfaces, Hotkeys, and Testing</span>
+            </a>
+          </li>
+          <li>
+            <a href="runtime-loadout.html">
+              <span class="nav-no">12</span>
+              <span class="nav-title">Per-Plot Building Rendering</span>
+            </a>
+          </li>
+          <li>
+            <a href="porting.html">
+              <span class="nav-no">13</span>
+              <span class="nav-title">Porting Into Your Own Project</span>
+            </a>
+          </li>
+          <li>
+            <a href="wiring.html">
+              <span class="nav-no">14</span>
+              <span class="nav-title">System Wiring</span>
+            </a>
+          </li>
+          <li>
+            <a href="technology.html">
+              <span class="nav-no">15</span>
+              <span class="nav-title">Technology &amp; Trade-offs</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
+      <a class="side-github" href="https://github.com/defessler/OutpostBuilder">
+        <span aria-hidden="true">&#8599;</span> Repository
+      </a>
+    </div>
+  </aside>
+
+  <div class="nav-scrim" id="nav-scrim"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="crumb">OutpostBuilder <span class="crumb-sep">/</span> Tutorial - A Guided Tour</span>
+      <span class="published">Published <time datetime="2026-11-03T05:35:00Z">2026-11-03 05:35 UTC</time></span>
+
+    </header>
+
+    <main id="content">
+      <article class="doc">
+<h1 id="tutorial-a-guided-tour">Tutorial - A Guided Tour</h1>
+<p>This page is a screen-by-screen walkthrough of Outpost Builder, illustrated with real screenshots
+from a live editor session, not mockups. If you already know the plugin, skip to
+<a href="reference.html">Reference</a> or <a href="extending.html">Extending Outpost Builder</a> instead. If you're new,
+this is the fastest way to see what every panel and overlay actually looks like before you touch it
+yourself.</p>
+<p><strong>What you'll build in 10 minutes:</strong> across this walkthrough you'll:</p>
+<ul>
+<li>Enter Outpost Builder mode and place an outpost.</li>
+<li>Add a plot, seeing both the valid and the invalid placement states.</li>
+<li>Assign a building, and meet the ownership beams and selection markers.</li>
+<li>Remove a plot both ways.</li>
+<li>Frame an Overhead camera.</li>
+<li>Take a short detour into reshaping the outpost's Outpost Volume.</li>
+<li>See where the per-user and per-project settings live.</li>
+</ul>
+<p>The captures come from a session with one demo outpost and three plots.</p>
+<blockquote>
+<p><strong>Tip:</strong> every hotkey mentioned here is rebindable in <strong>Editor Preferences &gt; Keyboard Shortcuts</strong>.
+The chords below are the shipped defaults.</p>
+</blockquote>
+<h2 id="1-entering-the-mode-the-overview-panel">1. Entering the Mode: The Overview Panel</h2>
+<p>Open the level editor's <strong>Modes</strong> panel (top-left toolbar, the wrench icon) and select <strong>Outpost
+Builder</strong>. You land in the <strong>Overview</strong> panel, which has two tabs: <strong>Outposts</strong> and <strong>Buildings</strong>.</p>
+<h3 id="the-outposts-tab">The Outposts Tab</h3>
+<p><img alt="The Overview panel's Outposts tab: an outpost combo showing &quot;Outpost_1 (placed)&quot; selected, an Edit button, and the Plugin Settings section below it." src="assets/tutorial/tutorial-01-overview-outposts.png" /></p>
+<p>The combo at the top lists every outpost definition in the project, both placed and not. Selecting one
+turns the button below into a context-sensitive action: <strong>Edit</strong> (jumps straight into editing a placed
+outpost), <strong>Edit (Place Actor)</strong> (for a definition with no live actor yet), or <strong>Restore</strong> (for one that
+was deleted but is still recorded).</p>
+<p>The combo also lists the reverse loss: outpost actors standing in the map whose definition asset is gone
+show up as a <strong>"(missing definition)"</strong> entry, and the button becomes <strong>Restore Definition</strong>. It rebuilds
+the asset from the actors' own configuration.</p>
+<p>Picking the sentinel entry, <strong>Add New Outpost</strong>, turns the button into <strong>Create</strong> instead. That's how
+you start a brand new outpost from scratch.</p>
+<p>Below that sits <strong>Plugin Settings</strong>, a single field pointing at the project's one shared
+<code>UOutpostBuilderSettingsAsset</code> (the <strong>Settings Asset</strong> pointer). That data asset holds every project-wide
+tunable: the folder new outpost definitions are saved into, the definition name prefix, the outpost
+exclusion distance, and the four actor-class overrides. We'll open that asset itself later in
+<a href="#8-the-settings-surfaces-per-user-and-per-project">Section 8</a>.</p>
+<h3 id="the-buildings-tab">The Buildings Tab</h3>
+<p><img alt="The Overview panel's Buildings tab: a list of building definitions (BD_NewBuilding2, NewBuilding3, NewBuilding), a &quot;+ New Building&quot; button, and &quot;Find References in World&quot; below the list." src="assets/tutorial/tutorial-02-overview-buildings.png" /></p>
+<p>Click the <strong>Buildings</strong> segmented-control tab to switch. This is a live browser over every
+<code>UOutpostBuildingDefinition</code> in the project.</p>
+<p>Click <strong>+ New Building</strong> to create one on the spot (no save dialog: it's named and saved automatically),
+click an existing entry to edit its fields inline in the Details view right there in the panel, or select
+one and click <strong>Find References in World</strong> to see every placed plot using it.</p>
+<p>This browser is the Overview panel's, and it stays there. The Editing panel has no Buildings browser of
+its own.</p>
+<p>Once you're mid-edit on an outpost you reach a building a different way: the <strong>Selected
+Building</strong> section shows an inline Details view for whichever building is currently hot in the palette,
+and <strong>+ New Building</strong> sits right in the <strong>Select Plot Contents</strong> heading row.</p>
+<p>Between them you can retune or create a building without leaving the outpost you're building out. We'll
+get to both in <a href="#3-the-editing-panel">Section 3</a>.</p>
+<blockquote>
+<p><strong>Tip:</strong> double-clicking a building tile anywhere in the palette (not this list, but the palette
+further down) opens its asset editor directly.</p>
+</blockquote>
+<h2 id="2-placing-an-outpost">2. Placing an Outpost</h2>
+<p>From the Outposts tab, pick <strong>Add New Outpost</strong> and click <strong>Create</strong> (or, on an existing but
+never-placed definition, <strong>Edit (Place Actor)</strong>). Either way you enter placement:</p>
+<p><img alt="A green wire box outpost ghost floating in the level, with the &quot;OUTPOST BUILD MODE / Placing Outpost&quot; banner top-left and a &quot;Placing Outpost - LMB place - Cancel (RMB / Esc)&quot; overlay at the bottom of the viewport." src="assets/tutorial/tutorial-03-place-outpost.png" /></p>
+<p>Three things are on screen at once, and they always agree with each other:</p>
+<ul>
+<li><strong>The ghost itself</strong> - a green wire box that follows your cursor, with a matching ground square marking
+  the exclusion distance around it. Both flip to red (with a reason, like "Too close to OutpostVolume_1")
+  if you're within that distance of another outpost's Outpost Volume.</li>
+<li><strong>The build-mode banner</strong> (top-left) - states the current mode and sub-state ("Placing Outpost") and
+  the live hotkey legend for whatever you're doing right now.</li>
+<li><strong>The bottom-center placement overlay</strong> - the same information as a compact action bar, plus a
+  <strong>Cancel</strong> button.</li>
+</ul>
+<p>Move the mouse to reposition the ghost, and <strong>left-click</strong> to confirm. <strong>Right-click (a tap, not a
+drag) or Esc</strong> cancels instead. Confirming spawns the outpost actor, auto-creates its
+<code>UOutpostDefinition</code> asset, and drops you straight into the Editing panel. Placement is axis-aligned.
+Rotate placed actors with the ordinary transform gizmo afterwards.</p>
+<blockquote>
+<p><strong>Warning:</strong> a new outpost can't be placed within the <strong>Outpost Exclusion Distance</strong> of another
+outpost's Outpost Volume (a project-wide distance from <code>UOutpostBuilderSettingsAsset</code>, 30 m by
+default). The ghost simply won't validate there, the same kind of rule you'll see enforced for plots
+in <a href="#4-adding-a-plot-valid-and-invalid-ground">Section 4</a>.</p>
+</blockquote>
+<h2 id="3-the-editing-panel">3. The Editing Panel</h2>
+<p>There are three ways into this. Placing an outpost drops you here automatically, clicking <strong>Edit</strong> on
+one from the Outposts tab gets you here, and so does <strong>double-clicking</strong> the outpost actor in the
+viewport. Double-click the outpost you're already editing and you leave again, back to the Overview.</p>
+<p>It's a double-click rather than a single one deliberately: selecting an outpost to read its details is
+something you'll do constantly, and entering editing isn't free (it cancels any placement session,
+swaps the whole panel, and can spawn an Overhead camera), so plain selection stays out of it.</p>
+<p>However you got here, the panel switches to the <strong>Editing</strong> view:</p>
+<p><img alt="The Editing panel for Outpost_1: Display Name and Faction fields, the Select Plot Contents palette (Empty/BD_NewBuilding tiles), the Selected Building section, a Plots list with three rows and their assigned buildings, the in-viewport editing bar (Save, + New Plot, Position Camera, Edit Volume, Randomize Plots), and the build-mode banner." src="assets/tutorial/tutorial-04-editing-panel.png" /></p>
+<p>The big pieces, roughly top to bottom. This isn't the whole panel, just the parts you'll use first:</p>
+<ul>
+<li><strong>The identity header</strong> - <strong>Display Name</strong> (a plain text field) and <strong>Faction</strong> (a combo; Faction has
+  no visual effect on its own and only gates which buildings a plot may field via each building's
+  <code>SupportedFactions</code>).</li>
+<li><strong>Select Plot Contents</strong> - the building palette.<ul>
+<li>Tile <strong>0</strong> is always <strong>Empty</strong> (clears the hot building so new plots are placed unassigned).
+  Every other tile is a building definition, numbered for the <strong>1-9</strong> hotkeys.</li>
+<li>Click a tile (or press its number) to make it the <em>hot</em> building. Every plot you place next
+  gets it automatically.</li>
+<li>The section's heading row carries a size filter and <strong>+ New Building</strong> as well, so creating a
+  building never means leaving the outpost you're editing.</li>
+</ul>
+</li>
+<li><strong>Selected Building</strong> - an inline details view for whichever tile is hot, so you can tweak a building's
+  fields without leaving the outpost you're editing.</li>
+<li><strong>The Assign row</strong> - a building picker combo, <strong>Assign Building</strong>, and <strong>Pin</strong>/<strong>Unpin</strong>. There's a
+  section on it just below, because it does two things the palette above can't.</li>
+<li><strong>Plots</strong> - every plot on this outpost, its assigned building, and its size, plus <strong>+ New Plot</strong> and
+  <strong>Randomize Plots</strong>, which assigns a fresh, eligible building to every <em>selected</em> plot. The button's
+  own label carries the live selected count. There's a narrow fourth column with no header text, which
+  is where the drift warning shows up (see <a href="#plot-tags-and-the-plot-tag-query">Plot Tags</a> below).</li>
+</ul>
+<p>The <strong>in-viewport editing bar</strong> at the bottom of the viewport is the fast path to <strong>Save</strong> plus the four
+editing verbs (<strong>+ New Plot</strong>, <strong>Position Camera</strong>, <strong>Edit Volume</strong>, <strong>Randomize Plots</strong>), each showing
+its own rebindable hotkey.</p>
+<p>The banner (top-left) mirrors the same state in words: which outpost you're editing, how many plots it
+has, and whether its Overhead camera has a saved framing yet.</p>
+<h3 id="finding-a-building-fast">Finding a Building Fast</h3>
+<p>Two shortcuts sit around the palette, and they're easy to miss.</p>
+<p><strong>The eyedropper</strong> is <strong>E</strong>. Point at a plot that already has the building you want and press it, and
+that building becomes the Selected Building.</p>
+<p>With the cursor off in empty space it falls back to the single plot you have selected, so it works
+from the panel too.</p>
+<p>Point it at an unassigned plot and it selects <strong>Empty</strong> and says so in a short toast, which is
+deliberate: a key that appears to do nothing is worse than one that tells you it picked "nothing".</p>
+<p>Fair warning, <strong>E</strong> isn't a free key in Unreal. It's the Rotate widget-mode key and the flycam's up key,
+and we took it anyway because it's the key The Sims uses for this exact verb.</p>
+<p>The trade is covered by refusing the key whenever there's nothing to pick, and always while you're
+mid-drag in the viewport, so <strong>E</strong> keeps flying the camera and keeps reaching the Rotate widget
+everywhere the tool has no answer. Rebind it in Keyboard Shortcuts if you'd rather have it back.</p>
+<p><strong>Dragging a definition</strong> from the Content Browser onto the tile grid works too. Be clear on what it
+does, though: it can't add a building to the palette, because that roster is derived from a scan of
+every building definition in the project, so whatever you dropped was already a member.</p>
+<p>What the drop genuinely changes is that the building becomes <strong>pinned</strong> (so it shows ahead of the others
+and stops counting against the cap) and becomes the Selected Building. The cursor tells you both of
+those before you let go.</p>
+<p>A drop the outpost's faction can't field is refused outright, since pinning it would write a permanent
+setting that could never produce a tile.</p>
+<h3 id="the-assign-row-re-assigning-and-pinning">The Assign Row: Re-assigning and Pinning</h3>
+<p>The palette decides what the NEXT plot you place gets. The Assign row is how you change a plot that
+already exists.</p>
+<p>Select the plot in the viewport (or in the Plots list), pick a building in the row's combo, and click
+<strong>Assign Building</strong>. That's the whole gesture.</p>
+<p>It's also a single undo step: the click writes both the plot actor and the outpost definition's record
+for that plot, inside one transaction.</p>
+<p><strong>Assign Building</strong> is deliberately picky. It refuses a building the plot can't legally field. The toast
+names the rule that refused: either the building needs a different plot size, or a non-Neutral
+outpost's faction doesn't field it.</p>
+<p>The faction half you'll rarely meet here, because the palette already leaves out anything the editing
+outpost's faction can't field. The size half you will, since the palette only filters by size when
+you've set the heading row's size filter.</p>
+<p><strong>Pin</strong>/<strong>Unpin</strong> is the other half of the row. It solves a problem you won't hit until a project has
+grown. The palette shows a capped number of buildings by default (nine at time of writing, the settings
+asset's <strong>Max Default Building Palette Entries</strong>).</p>
+<p>Once a project has more definitions than that, the extras simply don't appear. Pinning a building makes
+it always show, in addition to that count rather than counted against it. Pinned entries also float to
+the front of the palette.</p>
+<p>Pins are per-project workflow state saved silently the moment you click, so there's no asset to dirty
+and nothing to remember to save.</p>
+<blockquote>
+<p><strong>Note:</strong> Unpin doesn't necessarily hide a building. It only removes the pin. A building that was
+already inside the default count keeps showing on its own merits.</p>
+</blockquote>
+<h3 id="plot-tags-and-the-plot-tag-query">Plot Tags and the Plot Tag Query</h3>
+<p>A plot carries a <strong>Plot Tags</strong> container, an ordinary gameplay-tag set on the plot actor, editable in
+the Details panel. A building carries a <strong>Plot Tag Query</strong> it would like a plot's tags to satisfy. The
+vocabulary is entirely yours: the plugin defines no tags of its own here and doesn't care what yours
+mean.</p>
+<p>The important part is that this pairing is <strong>warn-only</strong>. It never refuses an assignment, never blocks
+a placement, and never stops a plot rendering its building. What it does is tell you.</p>
+<p>Assign a building whose query the plot's tags don't satisfy and the <strong>Assign Building</strong> tooltip appends
+a warning line before you click. Afterwards, that plot's row in the Plots list shows a small warning
+triangle in the narrow last column, with a tooltip naming the mismatch.</p>
+<p>The same triangle shows up for drift, which is the case you're more likely to meet: a plot that was fine
+when you assigned it, then had its tags edited afterwards.</p>
+<p>Clearing the icon means editing one side or the other, the plot's tags or the building's query. There's
+deliberately nothing that resolves it for you, since the plugin has no idea which side is right.</p>
+<h2 id="4-adding-a-plot-valid-and-invalid-ground">4. Adding a Plot: Valid and Invalid Ground</h2>
+<p>Click <strong>+ New Plot</strong> (or press <strong>N</strong>) to start placing a plot. This is where the <strong>in-viewport
+building command grid</strong> shows up. It's a compact tile grid pinned to a corner of the viewport, each
+tile showing its digit badge and the building's name, so you can pick a hot building without looking
+away from the ghost:</p>
+<p><img alt="A green plot placement plate and wire square floating in an empty level, with a compact building-tile grid (digit badges 0-3, each tile named) in the bottom-right corner of the viewport." src="assets/tutorial/tutorial-05-place-plot-valid.png" /></p>
+<p>Green means this spot clears every existing plot's footprint and the plot's whole pad fits inside the
+outpost's own volume. A plot can't hang past its outpost's bounds. The reason text says so if you try.</p>
+<p>Move the ghost over (or very near) an existing plot instead, and both the wire square and the flat
+placement plate flip to a hard red, with a named reason:</p>
+<p><img alt="The same plot ghost over an existing plot's footprint, now a red wire square and a flat red X plate, with &quot;Too close to Plot_1&quot; labeled next to it." src="assets/tutorial/tutorial-06-place-plot-invalid.png" /></p>
+<p>The grid's digit badges (bottom-right, <strong>0</strong> through however many building definitions fit) are the
+exact same hotkeys as the panel's own palette, which means the grid and the panel palette can never
+disagree about which key does what.</p>
+<p>Press a digit to make that building hot, or <strong>0</strong> for Empty. Left-click to confirm a valid spot (repeat
+as many times as you like, since the tool stays in placement mode). Right-tap or Esc to stop.</p>
+<blockquote>
+<p><strong>Tip:</strong> the ghost's color is a hard flip, not a gradient. There's no "almost valid" state to
+squint at.</p>
+</blockquote>
+<p><img alt="The plot ghost sweeping across the boundary of a neighbouring plot's footprint, its plate flipping from solid green to solid red and back as it crosses." src="assets/tutorial/clip-01-placement-validity.gif" /></p>
+<p>That flip is the one thing a still cannot show you, so it gets a short clip. Watch the plate, not the
+cursor: it changes the instant the footprint would overlap, with nothing in between.</p>
+<p><strong>There's a third state between those two captures.</strong> If the building you've got selected carries a
+<strong>Plot Tag Query</strong> that a brand-new plot won't satisfy (a new plot is born with no tags at all), the
+plate goes <strong>hollow amber</strong>: outline only, no fill, with a line reading <em>"Plot tags won't match
+&lt;building&gt; (places anyway)"</em>.</p>
+<p>That last part is the whole point. Amber is an advisory, not a refusal, and the click still places.
+Red always wins over amber, so a spot that's genuinely blocked never softens into a warning.</p>
+<p>The three states differ by FILL, not just by color: solid, hollow, solid-plus-an-X. Drain the color
+out of your screen and you can still tell them apart, which matters because roughly 99% of colorblind
+users are red-green.</p>
+<h3 id="reading-the-numbers-while-you-place">Reading the Numbers While You Place</h3>
+<p>Two aids ride alongside the plot ghost while you're placing. Both are on out of the box, and each
+has its own switch under the <strong>Debug|Placement Aids</strong> category of Editor Preferences if you'd rather
+not have it.</p>
+<p><strong>Three live numbers</strong> sit beside the ghost, on the opposite side from the refusal text so a reason
+and its measurements never land on top of each other. They read "To center" (how far the ghost is
+from its outpost's center), "Size" (the pad this plot will claim), and "Gap" (the clear distance to
+the nearest neighboring plot's edge).</p>
+<p>The gap is measured edge to edge between the drawn squares, not center to center, so it's the number
+you're actually looking at on screen. When it goes negative it says <strong>Overlap</strong> instead, with the
+honest word for it.</p>
+<p>There's no gap line at all on an outpost's first plot, since there's nothing yet to be near.</p>
+<p><strong>An alignment guide</strong> appears along the axis whenever the ghost lines up with a nearby plot on X or
+Y, so "in a row with that one" is something you can see instead of something you eyeball.</p>
+<p>The target set is kept deliberately small: only nearby siblings, only like for like (near edge to near
+edge, far edge to far edge, center to center), and only one line per axis. A cloud of snap points helps
+nobody.</p>
+<p>Note that a plot actor you've rotated with the gizmo produces no guide. Its edges no longer run
+along the world axes this search compares, so a line drawn to them would point somewhere its
+footprint doesn't reach.</p>
+<p>That holds for any rotation at all, quarter turns included, even though a square spun 90 degrees is
+still square to the world.</p>
+<p>By default the guide only draws. Turn on <strong>Snap To Alignment Guides</strong> and the ghost will also be
+pulled onto the line it's already close to. It won't fight the editor's own grid snap: the grid keeps
+any axis with no guide on it, and an axis with one moves at most the tolerance you've set.</p>
+<h3 id="ownership-beams-and-selection-markers">Ownership Beams and Selection Markers</h3>
+<p>Now that there's more than one actor in the level, click one and the viewport starts talking. Two draws
+show up the moment something is selected. They're the first thing newcomers ask about.</p>
+<p><strong>Ownership beams</strong> answer "what belongs to what". Select the outpost and it draws a pulsing beam out to
+each of its plots. Select a single plot and it draws exactly one beam back to its owning outpost.</p>
+<p>The flow is always from the thing you selected toward the thing you didn't, with a bright pulse packet
+traveling that way once per cycle and ending in a small ring splash at the far end.</p>
+<p>Every beam cycles a vibrant color palette indexed by plot, which is worth saying plainly because it's
+easy to misread: <strong>beam color means nothing about faction.</strong> It's there so overlapping beams stay
+tellable apart.</p>
+<p><strong>Selection markers</strong> answer "what exactly did I select, and how big is it". Every selected outpost and
+plot gets a crisp rim circle at its base.</p>
+<p>That circle is the same footprint placement enforces, not a decoration around the mesh. So a building
+whose mesh overflows its rim is telling you something real about the pad it's sitting on. A selected
+plot whose footprint overlaps a sibling's draws its rim in red instead.</p>
+<p>There's a third, quieter one: hover an unselected outpost or plot while you're not placing and it picks
+up a thin white ring. That's a distinct channel on purpose.</p>
+<p>White reads as hover, green as selection, and red as invalid or destructive. The plugin tries hard not
+to let those three meanings bleed into each other. All three colors are per-user knobs, so a teammate's
+editor may not match yours exactly.</p>
+<p>You'll also notice a flat blue rectangle around each base that's there whether or not anything is
+selected. That's the <strong>territory border</strong>, the visible boundary of the outpost's Outpost Volume, and
+<a href="#7-reshaping-the-outpost-volume">Section 7</a> is where you reshape it.</p>
+<p><strong>Once you have a second outpost, one more thing happens while you're editing one of them.</strong> Every
+OTHER outpost's name label and volume border fades back, so the one you're working on reads first.</p>
+<p>Be precise about what that is and isn't: it fades exactly those two draws, and nothing else. No
+actor, mesh, or material is touched, so the buildings look identical either way.</p>
+<p>Selection rims, ownership beams, and the hover ring never fade at all, because those mark something you
+just selected or pointed at, and dimming the answer to a question you asked would be no help.</p>
+<p>The fade drains toward the color's own brightness rather than swapping in a second tint, so a faded
+overlay can never be mistaken for a faction (nothing in this plugin is colored by faction).</p>
+<p>Nothing fades while you're not editing anything, which is the state to check first if it ever looks
+wrong. The master switch and its two amount knobs live under <strong>Debug|Selection</strong> in Editor Preferences.</p>
+<blockquote>
+<p><strong>Tip:</strong> the beams pulse in real time, which is why the mode forces every level viewport to redraw
+continuously while it's active. If you're profiling something else, that's the reason.</p>
+</blockquote>
+<h2 id="5-removing-a-plot-ctrl-remove-and-the-delete-key">5. Removing a Plot: Ctrl-Remove and the Delete Key</h2>
+<p>There are two ways to get rid of a plot, and they're both destructive in the same way, so it's worth
+knowing both before you reach for either.</p>
+<h3 id="ctrl-remove-mid-placement">Ctrl-Remove, Mid-Placement</h3>
+<p>While placing a plot, hold <strong>Ctrl</strong> to switch the same tool into remove mode instead of add mode.
+There's no need to cancel placement first:</p>
+<p><img alt="The build-mode banner reading &quot;Removing Plot&quot; in red, the bottom overlay reading &quot;Removing Plot (Ctrl held) - LMB remove plot under cursor - Release Ctrl to keep placing&quot;, and a flat red plate marking the plot under the cursor." src="assets/tutorial/tutorial-07-ctrl-remove.png" /></p>
+<p>Whatever plot is under your cursor gets a flat red candidate plate (the same visual language as an
+invalid placement, since red always means "destructive or blocked" in this plugin). <strong>Left-click</strong> deletes
+that plot and its record in one step; <strong>release Ctrl</strong> to go straight back to placing normally, ghost and
+all, right where you left off.</p>
+<blockquote>
+<p><strong>Warning:</strong> this is genuinely destructive. It deletes the plot's definition record, not just the
+actor. It's still one undo step (Ctrl+Z) if you didn't mean it.</p>
+</blockquote>
+<p><img alt="Holding Ctrl during a plot placement: the ghost gives way to a flat red plate over the plot under the cursor, then the ghost returns the moment Ctrl is released." src="assets/tutorial/clip-02-remove-tool.gif" /></p>
+<p>The hold and the release are the whole gesture, which is why this one is a clip too. The placement
+session never ends: Ctrl borrows the click, and letting go hands it straight back.</p>
+<h3 id="the-delete-key-any-time">The Delete Key, Any Time</h3>
+<p>You don't have to be in placement mode to remove a plot. Select one (or several) in the viewport, the
+Plots list, or the outliner, and press <strong>Del</strong>. The mode intercepts the editor's own delete whenever the
+selection is exclusively outposts and plots. This is the same removal Ctrl-remove performs, reached a
+different way.</p>
+<p>It's worth being plain about what that means, because "it deletes the actor" is the reasonable
+assumption and it's the wrong one.</p>
+<p>Deleting a plot this way <strong>removes the plot's record from the outpost's definition</strong>, not just the actor
+from the level. The definition asset no longer knows that plot ever existed, so a later Restore or
+re-stamp of that outpost won't bring it back.</p>
+<p>One Ctrl+Z undoes the whole thing, actor and record together, since both halves live in one transaction.</p>
+<p>The one case that behaves differently is deleting the outpost ITSELF. Select the outpost actor and press
+<strong>Del</strong> and you get a cascade: the outpost, its plots, its Overhead camera, and its Outpost Volume all
+go.</p>
+<p>The definition's records are deliberately KEPT, though, and that's exactly what <strong>Restore</strong> rebuilds
+from back on the Overview panel's Outposts tab. Marquee-selecting a whole base and deleting it behaves the
+same way, since the plots are going down with their own outpost.</p>
+<blockquote>
+<p><strong>Tip:</strong> a plot whose building mesh has no simple collision is invisible to Ctrl-remove, since that
+tool finds its target by tracing the cursor against simple collision. The Del key doesn't trace
+anything, so it's the reliable escape hatch for those.</p>
+</blockquote>
+<h2 id="6-framing-an-overhead-camera">6. Framing an Overhead Camera</h2>
+<p>Click <strong>Position Camera</strong> on the editing bar (or press <strong>O</strong>) with an outpost or one of its plots
+selected, and the viewport itself becomes the framing tool:</p>
+<p><img alt="The viewport piloting a top-down Overhead camera view of the outpost, the panel showing only a &quot;Positioning overhead camera - use the viewport controls (Revert / Cancel / Done)&quot; notice, and a bottom overlay with Revert / Cancel / Done buttons." src="assets/tutorial/tutorial-08-overhead-camera.png" /></p>
+<p>The editing panel's normal content hides itself while you're positioning. There's nothing to click
+there anyway, since the whole point is to fly the <em>viewport</em> camera into the framing you want.</p>
+<p>Use the regular editor fly controls, then:</p>
+<ul>
+<li><strong>Done</strong> saves that exact transform (and field of view) onto the outpost's definition.</li>
+<li><strong>Revert</strong> snaps back to the last saved framing.</li>
+<li><strong>Cancel</strong> abandons the session entirely.</li>
+</ul>
+<p>There's one Overhead camera actor per outpost, but each plot can carry its own saved framing too. What
+you select before pressing <strong>O</strong> decides which one you're editing.</p>
+<h2 id="7-reshaping-the-outpost-volume">7. Reshaping the Outpost Volume</h2>
+<p>Every outpost gets an <strong>Outpost Volume</strong> automatically the moment it's placed. That's the one name for
+it worth carrying: it's the box brush whose bounds you saw drawn as a territory border back in
+<a href="#ownership-beams-and-selection-markers">Section 4</a>, it's what fences a second outpost out, and it's
+what a plot has to fit inside.</p>
+<p>Click <strong>Edit Volume</strong> on the editing bar (or press <strong>B</strong>) to reshape it, and the editor briefly leaves
+Outpost Builder mode entirely for the engine's own <strong>Brush Editing</strong> (Geometry) mode:</p>
+<p><img alt="The editor in Brush Editing mode, the outpost's Outpost Volume shown as a translucent tan box brush selected in the viewport, and a small pinned &quot;Editing Outpost Volume - Done (Esc)&quot; bar at the bottom of the viewport." src="assets/tutorial/tutorial-09-edit-volume.png" /></p>
+<p>This is a genuine mode switch. The volume brush is a real geometry brush, so you get the full set of
+stock brush-editing tools (the panel on the left) to reshape it exactly like any other BSP volume.</p>
+<p>The one thing that survives the switch is a small pinned bar at the bottom of the viewport: <strong>Done (Esc)</strong>
+takes you straight back into Outpost Builder mode, re-entering editing on the same outpost you left.</p>
+<blockquote>
+<p><strong>Tip:</strong> you can also leave this excursion by picking any other mode from the Modes toolbar, or by
+closing the map. Either way tears the pinned bar down cleanly without stranding you.</p>
+</blockquote>
+<h2 id="8-the-settings-surfaces-per-user-and-per-project">8. The Settings Surfaces: Per-User and Per-Project</h2>
+<p>Outpost Builder splits its tunables across two surfaces, and it's worth seeing both.</p>
+<h3 id="editor-preferences-per-user">Editor Preferences (Per-User)</h3>
+<p>Everything that's purely a <em>look</em> lives in <strong>Editor Preferences &gt; Outpost Builder</strong>: ghost colors,
+beam speed, HUD layout, the Overhead camera's default framing, the plot ghost's placement readouts and
+alignment guides, the scoped-editing fade, and the in-viewport building command grid's own <strong>Columns</strong>
+and anchor corner (the row count derives itself from how many tiles there are).</p>
+<p><img alt="Editor Preferences showing the &quot;Outpost Builder - Outpost Builder&quot; settings page, with collapsed Debug/UI category groups (including the &quot;Building Grid&quot; row under UI) and the expanded Camera and Input categories." src="assets/tutorial/tutorial-10-user-settings.png" /></p>
+<p>This page is a per-machine authoring preference (<code>config = EditorPerProjectUserSettings</code>). One
+designer's tuned beam palette or HUD layout never lands in source control or forces itself on a
+teammate. Expand <strong>UI &gt; Building Grid</strong> to reach the grid's own knobs.</p>
+<h3 id="the-project-settings-asset-shared">The Project Settings Asset (Shared)</h3>
+<p>Everything that's a placement <em>rule</em> rather than a look lives on the one shared
+<code>UOutpostBuilderSettingsAsset</code> a project authors once: the outpost exclusion distance, the default
+volume size, the four actor-class overrides, and the created-definition folder and prefix. The pointer
+to it is the <strong>Settings Asset</strong> field back in <a href="#the-outposts-tab">Section 1</a>. Opening that asset shows
+the full picture:</p>
+<p><img alt="The project settings asset's Details view: Preview (Default Preview Mesh, Empty Plot Mesh), Placement (Outpost Exclusion Distance, Default Outpost Volume Size, New Plot Search Distance, and friends), Actors (the four actor-class overrides), and Assets (Created Definition Folder, Definition Asset Prefix)." src="assets/tutorial/tutorial-11-project-settings.png" /></p>
+<p>Because every designer on a project needs to agree on what's a legal plot spacing or where new
+definitions land, these stay on one shared asset instead of per-user preferences. That's the opposite
+split from Editor Preferences above.</p>
+<blockquote>
+<p><strong>Note:</strong> the demo fixture behind these captures assigns <strong>DA_OutpostSettings</strong> as the project's
+Settings Asset (visible in the Section 1 screenshot), while the Details view above shows a settings
+instance at its default values, which is also exactly what a fresh project sees before tuning one.</p>
+</blockquote>
+<h2 id="where-to-go-from-here">Where to Go From Here</h2>
+<p>You've now seen every screen in the plugin at least once. From here:</p>
+<ul>
+<li><a href="architecture.html">Architecture</a> - the module split and why plots/cameras write back to their
+  outpost's definition instead of nesting under it.</li>
+<li><a href="edmode.html">The Ed Mode - UEdMode Deep Dive</a> - the placement state machine and input routing this
+  tutorial only showed the surface of.</li>
+<li><a href="toolkit.html">The Toolkit - FModeToolkit and Slate</a> - how every panel and widget shown above is
+  actually put together.</li>
+<li><a href="prefabs.html">Prefabs &amp; Fork-on-Stamp</a> - what happens when you drag a placed outpost's definition back
+  into the level.</li>
+<li><a href="reference.html">Reference - Public Surfaces, Hotkeys, and Testing</a> - the full hotkey list and every
+  public method/property, if you'd rather read signatures than click through screens.</li>
+</ul>
+      </article>
+    <nav class="pager" aria-label="Page navigation">
+      <a class="pager-prev" href="index.html">
+        <span class="pager-dir">&larr; Previous</span>
+        <span class="pager-title">OutpostBuilder</span>
+      </a>
+      <a class="pager-next" href="architecture.html">
+        <span class="pager-dir">Next &rarr;</span>
+        <span class="pager-title">Architecture</span>
+      </a>
+    </nav>
+    </main>
+
+    <footer class="foot">
+      <p>A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.</p>
+      <a href="https://github.com/defessler/OutpostBuilder">View on GitHub</a>
+    </footer>
+  </div>
+</div>
+
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

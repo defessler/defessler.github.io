@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Porting Into Your Own Project · OutpostBuilder</title>
+<meta name="description" content="A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<div class="shell">
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-controls="sidebar" aria-expanded="false">
+    <span></span><span></span><span></span>
+    <span class="vh">Toggle navigation</span>
+  </button>
+
+  <aside class="side" id="sidebar">
+    <div class="side-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-word">OutpostBuilder</span>
+      </a>
+
+      <nav aria-label="Documentation">
+        <ol class="nav-list">
+          <li>
+            <a href="index.html">
+              <span class="nav-no">01</span>
+              <span class="nav-title">OutpostBuilder</span>
+            </a>
+          </li>
+          <li>
+            <a href="tutorial.html">
+              <span class="nav-no">02</span>
+              <span class="nav-title">Tutorial - A Guided Tour</span>
+            </a>
+          </li>
+          <li>
+            <a href="architecture.html">
+              <span class="nav-no">03</span>
+              <span class="nav-title">Architecture</span>
+            </a>
+          </li>
+          <li>
+            <a href="identity.html">
+              <span class="nav-no">04</span>
+              <span class="nav-title">Instance Identity</span>
+            </a>
+          </li>
+          <li>
+            <a href="edmode.html">
+              <span class="nav-no">05</span>
+              <span class="nav-title">The Ed Mode - UEdMode Deep Dive</span>
+            </a>
+          </li>
+          <li>
+            <a href="toolkit.html">
+              <span class="nav-no">06</span>
+              <span class="nav-title">The Toolkit - FModeToolkit and Slate</span>
+            </a>
+          </li>
+          <li>
+            <a href="prefabs.html">
+              <span class="nav-no">07</span>
+              <span class="nav-title">Prefabs &amp; Fork-on-Stamp</span>
+            </a>
+          </li>
+          <li>
+            <a href="faction-visuals.html">
+              <span class="nav-no">08</span>
+              <span class="nav-title">Faction - Identity and Gating</span>
+            </a>
+          </li>
+          <li>
+            <a href="extending.html">
+              <span class="nav-no">09</span>
+              <span class="nav-title">Extending Outpost Builder</span>
+            </a>
+          </li>
+          <li>
+            <a href="quick-reference.html">
+              <span class="nav-no">10</span>
+              <span class="nav-title">Quick Reference - The Cheat Sheet</span>
+            </a>
+          </li>
+          <li>
+            <a href="reference.html">
+              <span class="nav-no">11</span>
+              <span class="nav-title">Reference - Public Surfaces, Hotkeys, and Testing</span>
+            </a>
+          </li>
+          <li>
+            <a href="runtime-loadout.html">
+              <span class="nav-no">12</span>
+              <span class="nav-title">Per-Plot Building Rendering</span>
+            </a>
+          </li>
+          <li>
+            <a href="porting.html" class="active" aria-current="page">
+              <span class="nav-no">13</span>
+              <span class="nav-title">Porting Into Your Own Project</span>
+            </a>
+          </li>
+          <li>
+            <a href="wiring.html">
+              <span class="nav-no">14</span>
+              <span class="nav-title">System Wiring</span>
+            </a>
+          </li>
+          <li>
+            <a href="technology.html">
+              <span class="nav-no">15</span>
+              <span class="nav-title">Technology &amp; Trade-offs</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
+      <a class="side-github" href="https://github.com/defessler/OutpostBuilder">
+        <span aria-hidden="true">&#8599;</span> Repository
+      </a>
+    </div>
+  </aside>
+
+  <div class="nav-scrim" id="nav-scrim"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="crumb">OutpostBuilder <span class="crumb-sep">/</span> Porting Into Your Own Project</span>
+      <span class="published">Published <time datetime="2026-11-03T05:35:00Z">2026-11-03 05:35 UTC</time></span>
+
+    </header>
+
+    <main id="content">
+      <article class="doc">
+<h1 id="porting-into-your-own-project">Porting Into Your Own Project</h1>
+<p>Outpost Builder is deliberately a <strong>raw-actor</strong> tool. There is no component you bolt on, no interface your actors implement, and no <code>UChildActorComponent</code> anywhere (that one is banned outright; see <a href="architecture.html">Architecture</a>).</p>
+<p>The editor mode binds directly to the concrete runtime actor classes <code>AOutpost</code> and <code>AOutpostPlot</code>. That is the whole design: keep the runtime tiny, keep the shapes copy-pasteable, and let you graft the few functions your own actors need rather than adopt a framework.</p>
+<p>This page is the porting contract: the <strong>minimal surface</strong> each actor carries, so you can drop it into a project that already has its own base/building actors.</p>
+<p>It is deliberately short, because the runtime really is small (several thousand lines across the whole runtime module, the biggest chunks being the plot actor, the definition asset, and the actor-editing library that backs the hooks below).</p>
+<h2 id="engine-versions">Engine versions</h2>
+<p>The plugin is developed against <strong>UE 5.8</strong> and kept <strong>UE 5.7-compatible</strong> as a standing rule: new
+code prefers APIs that exist in 5.7 or earlier, and a genuinely-required newer API gets exactly one
+<code>UE_VERSION_OLDER_THAN(5, 8, 0)</code> seam with a working 5.7 fallback, never guards scattered through
+call sites.</p>
+<p>Two such seams exist today: <code>OutpostEditorUtils::HideDetailsViewHeaders</code> (on 5.7 a
+details view keeps its grey category header band, cosmetic only) and the module-startup
+<code>OnPostEngineInit</code> accessor. There's also one runtime-checked icon fallback
+(<code>OutpostEditorUtils::GetBrushOrFallback</code>) for a brush name newer style sets register.</p>
+<p>The <code>.uplugin</code> declares every engine plugin the editor module links (including <code>GeometryMode</code>, which
+the volume-editing hand-off activates), so a stripped-down engine that disables it fails loudly at
+plugin load instead of silently at button-click.</p>
+<h2 id="the-two-decisions-this-design-already-made-for-you">The two decisions this design already made for you</h2>
+<ul>
+<li>
+<p><strong>Raw actors, not components or interfaces.</strong> The editor names <code>AOutpost</code>/<code>AOutpostPlot</code> directly (~250 references across the editor module). Porting therefore means one of two things:</p>
+<ul>
+<li><strong>Subclass</strong> <code>AOutpost</code>/<code>AOutpostPlot</code> in your project and add your own visuals/logic on top.</li>
+<li><strong>Copy the surface below</strong> onto your own <code>AActor</code> and repoint the editor module's type references at your class.</li>
+</ul>
+<p>There is intentionally no third "attach a component to any actor" path. That abstraction was considered and declined to keep the tool simple.</p>
+</li>
+<li>
+<p><strong>The data is already actor-agnostic.</strong> <code>UOutpostDefinition</code> stores:</p>
+<ul>
+<li>Plot records as <code>{ FGuid PlotId, FTransform RelativeTransform, FPrimaryAssetId AssignedBuildingId, FGameplayTag PlotSizeTag, FGameplayTagContainer PlotTags }</code> (<code>PlotSizeTag</code> is a gameplay tag under <code>OutpostBuilder.PlotSize</code>; <code>PlotTags</code> is a warn-only, project-owned tag set matched against a building's <code>PlotTagQuery</code>).</li>
+<li>An outpost-level Overhead camera record, and a second, per-plot Overhead camera map keyed by the same <code>PlotId</code> (<code>PlotCameras</code>).</li>
+</ul>
+<p>All of it is stored <strong>relative to the anchor</strong>: <code>World = RelativeTransform * AnchorTransform</code>. Nothing in the record model knows or cares what class the anchor actor is. Copy the definition asset as-is.</p>
+</li>
+</ul>
+<h2 id="anchor-actor-what-to-port-from-aoutpost">Anchor actor: what to port from <code>AOutpost</code></h2>
+<p><code>AOutpost</code> is almost pure data: a definition id, a faction enum, and (editor-only) a preview mesh. The portable surface:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Data (both UPROPERTY, EditAnywhere, Category = "Outpost")</span>
+<span class="n">FPrimaryAssetId</span><span class="w"> </span><span class="n">OutpostDefinitionId</span><span class="p">;</span><span class="w">   </span><span class="c1">// meta = (AllowedTypes = "OutpostDefinition")</span>
+<span class="n">EOutpostFaction</span><span class="w"> </span><span class="n">Faction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EOutpostFaction</span><span class="o">::</span><span class="n">Neutral</span><span class="p">;</span>
+
+<span class="c1">// Accessors the editor mode and the stamp library call</span>
+<span class="n">FPrimaryAssetId</span><span class="w"> </span><span class="nf">GetOutpostDefinitionId</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<span class="kt">void</span><span class="w">            </span><span class="nf">SetOutpostDefinitionId</span><span class="p">(</span><span class="n">FPrimaryAssetId</span><span class="w"> </span><span class="n">NewId</span><span class="p">);</span>
+<span class="n">EOutpostFaction</span><span class="w"> </span><span class="nf">GetFaction</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<span class="kt">void</span><span class="w">            </span><span class="nf">SetFaction</span><span class="p">(</span><span class="n">EOutpostFaction</span><span class="w"> </span><span class="n">NewFaction</span><span class="p">);</span><span class="w">   </span><span class="c1">// Modify+Dirty (skipped if unchanged) - that's it</span>
+
+<span class="c1">// The record basis: rotation + translation, UNIT scale. Records must never absorb anchor scale.</span>
+<span class="n">FTransform</span><span class="w"> </span><span class="nf">GetRecordBasisTransform</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">FTransform</span><span class="p">(</span><span class="n">GetActorRotation</span><span class="p">(),</span><span class="w"> </span><span class="n">GetActorLocation</span><span class="p">());</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
+<p><code>Faction</code> has no visual effect. It is pure identity/eligibility, gating which buildings a plot may field via <code>UOutpostBuildingDefinition::SupportedFactions</code>/<code>SupportsFaction()</code>. There is nothing to resolve, cache, or re-apply on a timer or lifecycle hook: <code>SetFaction</code> is a plain data write, full stop.</p>
+<p>If your port wants the same building-eligibility gate, implement that check on your own building type. If it doesn't, <code>Faction</code> can be ported as inert data or dropped entirely.</p>
+<p>For <strong>full editor behaviour</strong> (not just placement), also port these hooks. On <code>AOutpost</code> itself each one is a single line, forwarding into <code>OutpostBuilder::ActorEditing</code>, a set of free functions in <code>Core/OutpostActorEditingLibrary.h</code>/<code>.cpp</code> where the actual logic lives. That split keeps <code>AOutpost</code> copy-pasteable while the logic can still reach the actor through its own public accessors.</p>
+<p>The library is <code>WITH_EDITOR</code>-gated but sits in the <em>runtime</em> module on purpose: it's the actors' own editor-only logic, not editor tooling, and the runtime module can't link the editor module to reach it if it lived there. Port the header and source alongside the hooks below, or reimplement their guards yourself:</p>
+<ul>
+<li><code>PostEditMove(bFinished)</code> / <code>PostEditChangeChainProperty(...)</code> -&gt; <code>OutpostBuilder::ActorEditing::ReRelativizeOwnedRecords</code> - a finished move (or a typed Details edit) <strong>re-relativizes</strong> every matching plot/camera record against the new anchor transform, so plots stay put in world space.<ul>
+<li>This also re-relativizes the definition's per-plot Overhead camera map (<code>PlotCameras</code>), the one record with no live actor to read a transform from, reconstructed instead from the definition's previously-recorded anchor transform.</li>
+<li>Skipped when more than one anchor shares the definition id (ambiguous basis).</li>
+</ul>
+</li>
+<li><code>Destroyed()</code> -&gt; <code>OutpostBuilder::ActorEditing::HandleOutpostDestroyedCascade</code> - <strong>cascade delete</strong>: destroying the anchor also destroys every <code>AOutpostPlot</code>/<code>AOverheadCamera</code>/<code>AOutpostVolume</code> sharing its instance identity - definition id only for content that predates instance ids - in the same transaction (one undo restores all). The definition asset on disk is left untouched.</li>
+</ul>
+<p><code>AOutpost</code> has no <code>OnConstruction</code>, <code>PostLoad</code>, or <code>PostEditUndo</code> override. There is no faction tint to re-apply, so none is needed. If you only need placement and don't care about the anchor-move re-relativization or the cascade, you can skip the <code>PostEditMove</code>/<code>PostEditChangeChainProperty</code>/<code>Destroyed()</code> hooks (and the library behind them) too, and port just the data + accessors.</p>
+<h2 id="plot-actor-what-to-port-from-aoutpostplot">Plot actor: what to port from <code>AOutpostPlot</code></h2>
+<p>The plot carries a little more, because it owns its own <strong>runtime</strong> visual (the building mesh that ships in packaged games):</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Data</span>
+<span class="n">FPrimaryAssetId</span><span class="w"> </span><span class="n">OutpostDefinitionId</span><span class="p">;</span><span class="w">   </span><span class="c1">// which anchor/definition it belongs to - VisibleAnywhere, never hand-edited (unlike the anchor's own EditAnywhere copy above - see AOutpost's snippet)</span>
+<span class="n">FGuid</span><span class="w">           </span><span class="n">PlotId</span><span class="p">;</span><span class="w">                </span><span class="c1">// record identity - VisibleAnywhere, never hand-edited</span>
+<span class="n">FPrimaryAssetId</span><span class="w"> </span><span class="n">AssignedBuildingId</span><span class="p">;</span><span class="w">    </span><span class="c1">// meta = (AllowedTypes = "OutpostBuildingDefinition")</span>
+<span class="n">FGameplayTag</span><span class="w">    </span><span class="n">PlotSizeTag</span><span class="p">;</span><span class="w">           </span><span class="c1">// size tag (gameplay tag under OutpostBuilder.PlotSize) - actor+record write-through pair, like the transform</span>
+<span class="n">FGameplayTagContainer</span><span class="w"> </span><span class="n">PlotTags</span><span class="p">;</span><span class="w">        </span><span class="c1">// warn-only placement-rule tags - actor+record write-through pair, like PlotSizeTag; GetPlotTags()/SetPlotTags() accessors</span>
+<span class="n">TObjectPtr</span><span class="o">&lt;</span><span class="n">UStaticMeshComponent</span><span class="o">&gt;</span><span class="w"> </span><span class="n">BuildingMeshComponent</span><span class="p">;</span><span class="w">   </span><span class="c1">// the single runtime visual (buildings are mesh-only)</span>
+
+<span class="c1">// Resolve + apply (runs in editor AND packaged games; idempotent)</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">RefreshBuildingPreview</span><span class="p">();</span><span class="w">    </span><span class="c1">// AssignedBuildingId -&gt; else the settings asset's EmptyPlotMesh -&gt; else its DefaultPreviewMesh -&gt; else cube</span>
+<span class="kt">bool</span><span class="w"> </span><span class="nf">IsRecordOwnershipUnique</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span><span class="w">   </span><span class="c1">// guards record write-backs against duplicated plots</span>
+</code></pre></div>
+
+<p><code>PostRegisterAllComponents</code> is <strong>not</strong> editor-only. It realizes the mesh on both spawn (game) and registration (editor), so port it regardless of whether you ship the editor tooling; in a game world it takes the async load path rather than the synchronous editor preview.</p>
+<p>Plot <code>WITH_EDITOR</code> hooks worth porting for full editor behaviour: <code>PostEditMove</code>/<code>PostEditChangeChainProperty</code> (write this plot's relative transform back into the record, guarded by ownership uniqueness), <code>PostEditUndo</code>, and <code>PostDuplicate</code>/<code>PostEditImport</code> (reclaim the record this instance still uniquely owns, else mint a fresh <code>PlotId</code>, so a copy can't overwrite the original's record).</p>
+<p>Like the anchor's hooks above, these are one-line forwards into <code>OutpostBuilder::ActorEditing</code> (<code>SyncRecordTransform</code>, <code>SyncRecordPlotSize</code>, <code>SyncRecordPlotTags</code>, <code>HandleImportIdentityReset</code>) in the same <code>Core/OutpostActorEditingLibrary.h</code>/<code>.cpp</code>. Port that file once and both actors' hooks are covered.</p>
+<h2 id="keep-it-light">Keep it light</h2>
+<p>The runtime module ships in packaged games. The editor module does not. Keep the anchor and plot to <strong>data + one mesh component + the resolve helpers above</strong> and let all the tooling (placement, beams, HUD, camera pilot, prefab stamping) stay in the editor module where it already lives.</p>
+<p><code>Core/OutpostActorEditingLibrary.h</code>/<code>.cpp</code> is the one exception worth knowing about: it's <code>WITH_EDITOR</code>-gated editor-only code that still lives in the runtime module, because it's the actors' own logic rather than tooling. A cooked build strips it out like any other <code>WITH_EDITOR</code> block, same as it strips everything else this section is about.</p>
+<p><code>UOutpostStampLibrary</code> is the one runtime-callable entry point for spawning a full outpost from a definition at runtime. Port it if your game stamps bases at runtime, skip it if the builder is editor-only for you.</p>
+<p>If you do lift the editor tooling too, there's one less thing to carry than you might expect. <code>UOutpostBuilderEdMode</code> is a <code>UEdMode</code> (on <code>UBaseLegacyWidgetEdMode</code>), discovered from its own CDO by <code>UAssetEditorSubsystem::RegisterEditorModes</code>.</p>
+<p>There's no <code>RegisterMode</code>/<code>UnregisterMode</code> pair in the module startup to port, and no <code>AddReferencedObjects</code> either. The mode's strong references are plain <code>UPROPERTY()</code>s. What your module startup DOES still need is the command registration (<code>FOutpostBuilderCommands</code>) and whichever of the property/asset-registry watchers you want. See <a href="edmode.html">The UEdMode Deep Dive</a> for the full lifecycle.</p>
+<h2 id="cooking-the-settings-asset-ships-like-the-definitions">Cooking: the settings asset ships like the definitions</h2>
+<p>Every project-shared plugin tunable lives on ONE <code>UOutpostBuilderSettingsAsset</code> (a <code>UPrimaryDataAsset</code> in the runtime module) that a project authors once and points at from Project Settings &gt; Plugins &gt; "Outpost Builder" (<code>UOutpostRuntimeSettings::SettingsAsset</code>). The per-user debug-draw/editor-UI-style knobs live on a separate <code>UOutpostBuilderUserSettings</code> (editor module, Editor Preferences), none of which is runtime-relevant.</p>
+<p>What lives on the asset and still needs to cook is the runtime section (<code>DefaultPreviewMesh</code>, <code>EmptyPlotMesh</code>, <code>PlotSizeTagHalfSizeCm</code>) plus the editor-only asset-creation/placement config. The latter never ships in a cooked build (<code>WITH_EDITORONLY_DATA</code>), so only the runtime section's soft mesh refs are what the cook story below is about. If you port the runtime surface, port the cook story with it:</p>
+<ul>
+<li><strong>The asset is <code>AlwaysCook</code>-registered exactly like the definitions.</strong> <code>FOutpostBuilderModule::RegisterAssetScans</code> registers a third primary-asset type (<code>"OutpostBuilderSettings"</code>) alongside the outpost/building definition scans and gives all three the same <code>EPrimaryAssetCookRule::AlwaysCook</code> rule. Nothing else would make the cooker reach it: the only reference to the asset is an ini-hosted soft path (<code>SettingsAsset</code> in <code>DefaultGame.ini</code>), which is not a package-dependency edge the cooker follows.</li>
+<li><strong>Cooking the asset is what cooks its meshes.</strong> The soft mesh refs on it (<code>DefaultPreviewMesh</code> and <code>EmptyPlotMesh</code>, the fallback rungs of every plot's mesh ladder) are followed by the cooker OUT of the cooked asset, the same mechanism that pulls <code>BuildingMesh</code> out of a cooked building definition.</li>
+<li><strong>Host cook-critical meshes on the asset, not in an ini.</strong> A mesh referenced only from an ini (e.g. a <code>UDeveloperSettings</code> config soft path) is invisible to the cooker.<ul>
+<li>It gets silently never cooked, and every packaged-game fallback lands on the built-in cube with nothing logged. A mesh referenced from an always-cooked asset is not.</li>
+<li>If your port re-hosts these settings, keep them on a cooked asset, not in config.</li>
+</ul>
+</li>
+</ul>
+<p>At runtime the asset resolves through <code>UOutpostBuilderSettingsAsset::Get()</code> (loaded-or-CDO, never a load on per-frame paths) with a one-shot pre-warm (<code>PreWarm()</code>, called from <code>RegisterAssetScans</code> at startup) that also roots the asset in cooked games so GC can't evict it. An unset pointer is a supported state: the class defaults apply.</p>
+<h2 id="what-not-to-reach-for">What NOT to reach for</h2>
+<ul>
+<li><strong>No <code>UChildActorComponent</code>, no actor-to-actor attachment.</strong> Plots are siblings of their anchor that share an <code>OutpostDefinitionId</code>, never children. To show another actor's visuals, render a <code>UStaticMesh</code> on a component your own actor owns (<code>AOutpostPlot::BuildingMeshComponent</code>) rather than instantiating or attaching it. See the "Never Child Actors or Attachment" pitfall in <a href="extending.html">Extending</a>.</li>
+<li><strong>No component or interface binding layer.</strong> If you find yourself wanting one, that's the abstraction this design deliberately left out. Reach for subclassing or the copy-the-surface approach above instead.</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Actors/Outpost.h</code> / <code>Outpost.cpp</code> - the anchor.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Actors/OutpostPlot.h</code> / <code>OutpostPlot.cpp</code> - the plot.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostActorEditingLibrary.h</code> / <code>.cpp</code> - the free functions both actors' <code>WITH_EDITOR</code> hooks forward into.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostDefinition.h</code> - the actor-agnostic record model.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostStampLibrary.h</code> - the runtime stamp entry point.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Settings/OutpostBuilderSettingsAsset.h</code> / <code>.cpp</code> - the project-shared settings asset (runtime + asset-creation/placement config): <code>Get()</code>/<code>PreWarm()</code>. The per-user debug-draw/editor-UI-style knobs live on the editor module's <code>UOutpostBuilderUserSettings</code> instead (<code>OutpostBuilderUserSettings.h</code>). Those are editor-only, nothing to port for a runtime-only lift; see <code>reference.html</code>.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostBuilderModule.cpp</code> - <code>RegisterAssetScans</code>, the three scans + <code>AlwaysCook</code> rules + startup pre-warm behind the cook story above.</li>
+<li><a href="architecture.html">Architecture</a>, <a href="extending.html">Extending</a> - the "why" behind the raw-actor, no-nesting rules.</li>
+</ul>
+      </article>
+    <nav class="pager" aria-label="Page navigation">
+      <a class="pager-prev" href="runtime-loadout.html">
+        <span class="pager-dir">&larr; Previous</span>
+        <span class="pager-title">Per-Plot Building Rendering</span>
+      </a>
+      <a class="pager-next" href="wiring.html">
+        <span class="pager-dir">Next &rarr;</span>
+        <span class="pager-title">System Wiring</span>
+      </a>
+    </nav>
+    </main>
+
+    <footer class="foot">
+      <p>A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.</p>
+      <a href="https://github.com/defessler/OutpostBuilder">View on GitHub</a>
+    </footer>
+  </div>
+</div>
+
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

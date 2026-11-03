@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" font-family="'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c7d0da" />
+    </marker>
+  </defs>
+
+  <text x="600" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#eef2f6">Definition asset, world actors, and editor tooling</text>
+  <text x="600" y="50" text-anchor="middle" font-size="12.5" fill="#a9b4bf">Only FPrimaryAssetId (and FGuid for plots) crosses these boundaries. No object pointers, no attachment.</text>
+
+  <!-- Column A: definition asset -->
+  <rect x="20" y="90" width="280" height="340" rx="10" fill="#e6a528" fill-opacity="0.07" stroke="#e6a528" stroke-width="2"/>
+  <text x="160" y="118" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="14.5" font-weight="bold" fill="#eef2f6">UOutpostDefinition</text>
+  <text x="160" y="136" text-anchor="middle" font-size="11" fill="#a9b4bf" font-style="italic">UPrimaryDataAsset, asset on disk</text>
+
+  <g font-family="Consolas, 'Cascadia Code', monospace" font-size="12" fill="#eef2f6">
+    <text x="40" y="168">DisplayName : FText</text>
+    <text x="40" y="191">Faction : EOutpostFaction</text>
+    <text x="40" y="214">Plots : TArray&lt;FOutpostPlotRecord&gt;</text>
+    <text x="52" y="232" font-size="10.5" fill="#a9b4bf">PlotId, RelativeTransform,</text>
+    <text x="52" y="246" font-size="10.5" fill="#a9b4bf">AssignedBuildingId</text>
+    <text x="40" y="269">OverheadCamera : FOutpostCameraRecord</text>
+    <text x="52" y="287" font-size="10.5" fill="#a9b4bf">bIsSet, RelativeTransform,</text>
+    <text x="52" y="301" font-size="10.5" fill="#a9b4bf">FieldOfView</text>
+    <text x="40" y="324">PlacedOutpostPath : FSoftObjectPath</text>
+  </g>
+
+  <text x="160" y="360" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">identity:</text>
+  <text x="160" y="376" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="10.5" fill="#eef2f6">FPrimaryAssetId(</text>
+  <text x="160" y="391" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="10.5" fill="#eef2f6">"OutpostDefinition", GetFName())</text>
+  <text x="160" y="412" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">(same shape for Building / Faction</text>
+  <text x="160" y="426" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">definitions, different type name)</text>
+
+  <!-- Column B: world actors -->
+  <rect x="460" y="90" width="280" height="340" rx="10" fill="none" stroke="#8fb8c9" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="600" y="118" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#eef2f6">World actors (flat, unparented)</text>
+  <text x="600" y="136" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">each rooted on its own USceneComponent "Root"</text>
+
+  <rect x="480" y="155" width="240" height="80" rx="8" fill="#28aad0" fill-opacity="0.08" stroke="#28aad0" stroke-width="1.6"/>
+  <text x="500" y="180" font-family="Consolas, 'Cascadia Code', monospace" font-size="13" font-weight="bold" fill="#eef2f6">AOutpost</text>
+  <text x="500" y="200" font-family="Consolas, 'Cascadia Code', monospace" font-size="10.8" fill="#a9b4bf">OutpostDefinitionId : FPrimaryAssetId</text>
+  <text x="500" y="217" font-family="Consolas, 'Cascadia Code', monospace" font-size="10.8" fill="#a9b4bf">Faction : EOutpostFaction (identity/gating only)</text>
+
+  <rect x="480" y="250" width="240" height="95" rx="8" fill="#28aad0" fill-opacity="0.08" stroke="#28aad0" stroke-width="1.6"/>
+  <text x="500" y="275" font-family="Consolas, 'Cascadia Code', monospace" font-size="13" font-weight="bold" fill="#eef2f6">AOutpostPlot</text>
+  <text x="500" y="292" font-size="10.5" fill="#a9b4bf" font-style="italic">(one per plot record)</text>
+  <text x="500" y="311" font-family="Consolas, 'Cascadia Code', monospace" font-size="10.5" fill="#a9b4bf">OutpostDefinitionId, PlotId,</text>
+  <text x="500" y="326" font-family="Consolas, 'Cascadia Code', monospace" font-size="10.5" fill="#a9b4bf">AssignedBuildingId</text>
+
+  <rect x="480" y="360" width="240" height="65" rx="8" fill="#28aad0" fill-opacity="0.08" stroke="#28aad0" stroke-width="1.6"/>
+  <text x="500" y="383" font-family="Consolas, 'Cascadia Code', monospace" font-size="12.5" font-weight="bold" fill="#eef2f6">AOverheadCamera</text>
+  <text x="500" y="399" font-size="10.2" fill="#a9b4bf" font-style="italic">(0 or 1, when OverheadCamera.bIsSet)</text>
+  <text x="500" y="415" font-family="Consolas, 'Cascadia Code', monospace" font-size="10.5" fill="#a9b4bf">OutpostDefinitionId : FPrimaryAssetId</text>
+
+  <!-- Column C: editor mode / toolkit -->
+  <rect x="900" y="90" width="280" height="340" rx="10" fill="#b98fe0" fill-opacity="0.07" stroke="#b98fe0" stroke-width="2"/>
+  <text x="1040" y="118" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="13.5" font-weight="bold" fill="#eef2f6">UOutpostBuilderEdMode</text>
+  <text x="1040" y="136" text-anchor="middle" font-size="10.8" fill="#a9b4bf" font-style="italic">+ FOutpostBuilderToolkit (FModeToolkit)</text>
+
+  <g font-family="Consolas, 'Cascadia Code', monospace" font-size="11.6" fill="#eef2f6">
+    <text x="920" y="168">EnterOutpostEditMode(AOutpost*)</text>
+    <text x="920" y="191">StartPlotPlacement / StampOutpost</text>
+    <text x="920" y="214">AssignBuildingToSelectedPlot(...)</text>
+    <text x="920" y="237">AssignFactionToEditingOutpost(...)</text>
+    <text x="920" y="260">DeleteSelection()</text>
+    <text x="920" y="283">GetLoadedOutposts(TArray&amp;)</text>
+  </g>
+
+  <text x="1040" y="316" text-anchor="middle" font-size="10.8" fill="#a9b4bf" font-style="italic">mode calls HandleEditingOutpostChanged(),</text>
+  <text x="1040" y="332" text-anchor="middle" font-size="10.8" fill="#a9b4bf" font-style="italic">toolkit refreshes: Faction combo,</text>
+  <text x="1040" y="348" text-anchor="middle" font-size="10.8" fill="#a9b4bf" font-style="italic">Outpost Summary card, building palette</text>
+
+  <!-- Arrows: definition <-> actors -->
+  <line x1="300" y1="170" x2="456" y2="170" stroke="#c7d0da" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="380" y="140" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" font-weight="bold" fill="#eef2f6">StampOutpost /</text>
+  <text x="380" y="154" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" font-weight="bold" fill="#eef2f6">EnterOutpostEditMode</text>
+  <text x="380" y="188" text-anchor="middle" font-size="10" fill="#a9b4bf" font-style="italic">World = RelativeTransform *</text>
+  <text x="380" y="200" text-anchor="middle" font-size="10" fill="#a9b4bf" font-style="italic">OutpostActorTransform</text>
+
+  <line x1="456" y1="390" x2="300" y2="390" stroke="#c7d0da" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="380" y="360" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" font-weight="bold" fill="#eef2f6">SyncRecordTransform /</text>
+  <text x="380" y="374" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" font-weight="bold" fill="#eef2f6">ReRelativizeOwnedRecords</text>
+  <text x="380" y="408" text-anchor="middle" font-size="10" fill="#a9b4bf" font-style="italic">Modify() + MarkPackageDirty()</text>
+
+  <!-- Arrows: actors <-> editor tooling -->
+  <line x1="900" y1="170" x2="744" y2="170" stroke="#c7d0da" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="820" y="140" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" font-weight="bold" fill="#eef2f6">EnterOutpostEditMode,</text>
+  <text x="820" y="154" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" font-weight="bold" fill="#eef2f6">AssignBuildingToSelectedPlot</text>
+  <text x="820" y="188" text-anchor="middle" font-size="10" fill="#a9b4bf" font-style="italic">(mode acts on selected actors)</text>
+
+  <line x1="744" y1="390" x2="900" y2="390" stroke="#c7d0da" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="820" y="360" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" font-weight="bold" fill="#eef2f6">GetLoadedOutposts,</text>
+  <text x="820" y="374" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" font-weight="bold" fill="#eef2f6">viewport selection</text>
+  <text x="820" y="408" text-anchor="middle" font-size="10" fill="#a9b4bf" font-style="italic">(AOutpost / AOutpostPlot picked)</text>
+
+  <text x="600" y="470" text-anchor="middle" font-size="12" fill="#a9b4bf">Only FPrimaryAssetId (and FGuid for plots) crosses every boundary above.</text>
+  <text x="600" y="488" text-anchor="middle" font-size="12" fill="#a9b4bf">No UObject pointer connects these boxes, and no actor is ever attached to another.</text>
+</svg>

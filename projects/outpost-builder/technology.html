@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Technology &amp; Trade-offs · OutpostBuilder</title>
+<meta name="description" content="A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<div class="shell">
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-controls="sidebar" aria-expanded="false">
+    <span></span><span></span><span></span>
+    <span class="vh">Toggle navigation</span>
+  </button>
+
+  <aside class="side" id="sidebar">
+    <div class="side-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-word">OutpostBuilder</span>
+      </a>
+
+      <nav aria-label="Documentation">
+        <ol class="nav-list">
+          <li>
+            <a href="index.html">
+              <span class="nav-no">01</span>
+              <span class="nav-title">OutpostBuilder</span>
+            </a>
+          </li>
+          <li>
+            <a href="tutorial.html">
+              <span class="nav-no">02</span>
+              <span class="nav-title">Tutorial - A Guided Tour</span>
+            </a>
+          </li>
+          <li>
+            <a href="architecture.html">
+              <span class="nav-no">03</span>
+              <span class="nav-title">Architecture</span>
+            </a>
+          </li>
+          <li>
+            <a href="identity.html">
+              <span class="nav-no">04</span>
+              <span class="nav-title">Instance Identity</span>
+            </a>
+          </li>
+          <li>
+            <a href="edmode.html">
+              <span class="nav-no">05</span>
+              <span class="nav-title">The Ed Mode - UEdMode Deep Dive</span>
+            </a>
+          </li>
+          <li>
+            <a href="toolkit.html">
+              <span class="nav-no">06</span>
+              <span class="nav-title">The Toolkit - FModeToolkit and Slate</span>
+            </a>
+          </li>
+          <li>
+            <a href="prefabs.html">
+              <span class="nav-no">07</span>
+              <span class="nav-title">Prefabs &amp; Fork-on-Stamp</span>
+            </a>
+          </li>
+          <li>
+            <a href="faction-visuals.html">
+              <span class="nav-no">08</span>
+              <span class="nav-title">Faction - Identity and Gating</span>
+            </a>
+          </li>
+          <li>
+            <a href="extending.html">
+              <span class="nav-no">09</span>
+              <span class="nav-title">Extending Outpost Builder</span>
+            </a>
+          </li>
+          <li>
+            <a href="quick-reference.html">
+              <span class="nav-no">10</span>
+              <span class="nav-title">Quick Reference - The Cheat Sheet</span>
+            </a>
+          </li>
+          <li>
+            <a href="reference.html">
+              <span class="nav-no">11</span>
+              <span class="nav-title">Reference - Public Surfaces, Hotkeys, and Testing</span>
+            </a>
+          </li>
+          <li>
+            <a href="runtime-loadout.html">
+              <span class="nav-no">12</span>
+              <span class="nav-title">Per-Plot Building Rendering</span>
+            </a>
+          </li>
+          <li>
+            <a href="porting.html">
+              <span class="nav-no">13</span>
+              <span class="nav-title">Porting Into Your Own Project</span>
+            </a>
+          </li>
+          <li>
+            <a href="wiring.html">
+              <span class="nav-no">14</span>
+              <span class="nav-title">System Wiring</span>
+            </a>
+          </li>
+          <li>
+            <a href="technology.html" class="active" aria-current="page">
+              <span class="nav-no">15</span>
+              <span class="nav-title">Technology &amp; Trade-offs</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
+      <a class="side-github" href="https://github.com/defessler/OutpostBuilder">
+        <span aria-hidden="true">&#8599;</span> Repository
+      </a>
+    </div>
+  </aside>
+
+  <div class="nav-scrim" id="nav-scrim"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="crumb">OutpostBuilder <span class="crumb-sep">/</span> Technology &amp; Trade-offs</span>
+      <span class="published">Published <time datetime="2026-11-03T05:35:00Z">2026-11-03 05:35 UTC</time></span>
+
+    </header>
+
+    <main id="content">
+      <article class="doc">
+<h1 id="technology-trade-offs">Technology &amp; Trade-offs</h1>
+<p>Every other page on this site explains how a part of OutpostBuilder works. This one explains <em>why it is built out of these particular pieces</em>: what was chosen, what was rejected, what each choice buys, and what it costs. The costs are the point: a technology page that lists only advantages is a sales sheet, not documentation.</p>
+<p>Nothing here is aspirational. Every claim is drawn from the shipped code, the research notes under <code>research/</code>, or the project's own commit history.</p>
+<h2 id="the-choices-at-a-glance">The choices at a glance</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Chosen</th>
+<th>Instead of</th>
+<th>Principal cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Base composition</td>
+<td>Flat sibling actors + records on a data asset</td>
+<td>Attachment, <code>UChildActorComponent</code>, Level Instances, Packed Level Actors</td>
+<td>Hand-written re-relativization; no edit propagation to stamped copies</td>
+</tr>
+<tr>
+<td>References</td>
+<td><code>FPrimaryAssetId</code> between the plugin's own assets and actors</td>
+<td>Hard <code>TObjectPtr</code> (asset payloads stay soft)</td>
+<td>Name-based ids; renames orphan actors in unloaded maps</td>
+</tr>
+<tr>
+<td>Editor host</td>
+<td><code>UEdMode</code>, via the <code>UBaseLegacyWidgetEdMode</code> shim</td>
+<td>Staying on legacy <code>FEdMode</code>; going all the way to the Interactive Tools Framework</td>
+<td>Still no ITF, so new engine gizmo/snapping capability stays out of reach</td>
+</tr>
+<tr>
+<td>Panels</td>
+<td><code>FModeToolkit</code> + hand-written Slate</td>
+<td>Editor Utility Widgets, details-panel-only UI</td>
+<td>Slate by hand; a load-bearing <code>ToolkitBuilder</code> opt-in</td>
+</tr>
+<tr>
+<td>Viewport feedback</td>
+<td>Immediate-mode draws, plus transient preview components</td>
+<td>Spawned preview actors</td>
+<td>Per-frame world scans while the mode is active</td>
+</tr>
+<tr>
+<td>Coherence</td>
+<td>Editor lifecycle hooks + one transaction per action, plus a map-open reconciler for the level registry</td>
+<td>A reconciler pass as the PRIMARY mechanism, or relying on the tool's own buttons alone</td>
+<td>Depends on engine hook behavior that is contract, not API</td>
+</tr>
+<tr>
+<td>Cooking</td>
+<td>Runtime-module scan fused with <code>AlwaysCook</code></td>
+<td>Editor-module registration, or the engine's own ini scan list</td>
+<td>Type-wide force-cook of every definition asset</td>
+</tr>
+<tr>
+<td>Engine targets</td>
+<td>5.7 and 5.8, two named version seams</td>
+<td>Single-version targeting</td>
+<td>The 5.7 side is audited, not continuously built</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-one-idea-everything-else-follows-from">The one idea everything else follows from</h2>
+<p>An outpost is <strong>not an actor hierarchy</strong>. It is a record graph on a <code>UOutpostDefinition</code> asset, and the actors in the level are a rendering of that graph.</p>
+<p><code>AOutpost</code>, <code>AOutpostPlot</code>, <code>AOverheadCamera</code> and <code>AOutpostVolume</code> are never attached to each other. They share no base class and no interface. <code>UChildActorComponent</code> is banned outright. Membership in a base is expressed as data: every one of those actors carries an <code>FPrimaryAssetId OutpostDefinitionId</code>, and a plot additionally carries an <code>FGuid PlotId</code> matching a <code>FOutpostPlotRecord</code>.</p>
+<p><strong>Why not attachment.</strong> Attachment couples lifetimes and transforms in ways this tool actively does not want. Moving the outpost anchor should <em>not</em> drag its plots around, because designers move a base by multi-selecting it, not by dragging one root. Attachment also implies a parent-child ownership story that the record model gets for free from a shared id.</p>
+<p><strong>Why not the engine's prefab systems.</strong> Both were scouted against engine source before being declined (<code>research/07-prefab-mechanisms.md</code>). Packed Level Actors flatten a sublevel into batched static meshes, and <code>PackedLevelActor.h</code> says plainly that "Other components are unsupported and will result in an incomplete APackedLevelActor". These actors exist to carry <code>FPrimaryAssetId</code>s, <code>FGuid</code>s and faction state, none of which survives packing.</p>
+<p>Level Instances were rejected for destructive creation semantics, a hardcoded Save-As dialog on the public API, reference fragility, and per-instance overrides gated on World Partition.</p>
+<p><strong>What it buys.</strong> Every stamped base is genuinely independent: ordinary actors with nothing shared to keep in sync. There is no <code>.umap</code> per prefab, so the plugin ships <code>CanContainContent: false</code> and needs no World Partition. Any actor can find its family by scanning for a matching id, which is what makes recovery features like "rebuild the definition from the actors" possible at all.</p>
+<p><strong>What it costs.</strong> Giving up attachment means giving up free relative-transform tracking, and the tool pays for that with the whole re-relativization machinery (<code>AOutpost::ReRelativizeOwnedRecords</code> and its per-kind sweeps).</p>
+<p>It also gives up edit propagation: with <code>bForkDefinitionOnStamp</code> on, which is the default, editing a definition after stamping does <strong>not</strong> retroactively update already-stamped copies. That is a deliberate trade, fork-on-stamp independence in exchange for no live linkage, and it is a real limitation rather than an oversight.</p>
+<p><strong>What changed since.</strong> That trade is now a switch rather than a law. Turn <code>bForkDefinitionOnStamp</code> off and one definition becomes a template many placements share, which is what the per-instance identity work exists to support.</p>
+<p>Identity then moves to a per-instance GUID, records move onto the actors, and a per-level registry bakes each placement's default state so a simulation layer can read it with the level streamed out.</p>
+<p>Both of the unloaded-read defects that used to sit here are closed - retirement became the liveness signal, and a paste over an unloaded cell is contested by the registry. <a href="identity.html">Instance Identity</a> covers the whole system, including the residual edges that remain.</p>
+<h2 id="data-model">Data model</h2>
+<h3 id="definitions-are-primary-data-assets-ids-are-the-currency">Definitions are primary data assets; ids are the currency</h3>
+<p><code>UOutpostDefinition</code> and <code>UOutpostBuildingDefinition</code> derive <code>UPrimaryDataAsset</code>, each declaring a frozen <code>PrimaryAssetTypeName</code> and the identical <code>GetPrimaryAssetId()</code> body. Every reference between the plugin's own definitions and actors is an <code>FPrimaryAssetId</code> with <code>meta = (AllowedTypes = "...")</code>, never a raw <code>UObject*</code> or a hard pointer held across a save.</p>
+<p>Asset <em>payloads</em> are a separate question and stay deliberately soft: <code>TSoftObjectPtr</code> meshes, a <code>TSoftClassPtr</code> building actor class, and the definition's <code>FSoftObjectPath</code> back-pointer to its placed anchor. That soft hop is exactly what the cook rule further down depends on.</p>
+<p>Synchronous resolution has exactly two entry points, in <code>OutpostBuilder/Core/OutpostAssetResolve.h</code>, and the choice between them is a single question: <em>does this call site run every frame?</em></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Never loads - mandatory on per-frame paths (Render, DrawHUD, Slate attributes).</span>
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">T</span><span class="o">*</span><span class="w"> </span><span class="n">FindLoadedPrimaryAsset</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FPrimaryAssetId</span><span class="o">&amp;</span><span class="w"> </span><span class="n">Id</span><span class="p">);</span>
+
+<span class="c1">// Blocking load - for one-shot user actions (clicks, mode entry).</span>
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">T</span><span class="o">*</span><span class="w"> </span><span class="n">LoadPrimaryAssetSync</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FPrimaryAssetId</span><span class="o">&amp;</span><span class="w"> </span><span class="n">Id</span><span class="p">);</span>
+</code></pre></div>
+
+<p>The rule exists because after a GC cycle evicts an asset, a <em>loading</em> call on a per-frame path would hit disk every frame, while a find-only call costs one frame of fallback value. Game worlds take a third route entirely: the async chain described under <a href="#game-world-plot-rendering">game-world plot rendering</a>.</p>
+<p><strong>Cost.</strong> Ids are name-based, so asset names must be globally unique, and renaming a definition orphans every actor holding the old id. The editor module patches this with an <code>OnAssetRenamed</code> listener.</p>
+<p>That listener can only rebind actors in the <em>loaded</em> world. Actors in maps that were closed at rename time stay stale.</p>
+<p>The two-function resolve rule is also convention, not type safety: nothing stops a loading call being bound into a per-frame attribute.</p>
+<h3 id="the-unit-scale-record-basis">The unit-scale record basis</h3>
+<p>Records are stored relative to <code>AOutpost::GetRecordBasisTransform()</code> (the anchor's rotation and translation with <strong>scale forced to unit</strong>), and the multiply direction lives in exactly one place, a compose/invert helper pair in <code>Outpost.h</code>.</p>
+<p>Scale is stripped for a specific reason: <code>FTransform</code> composition multiplies scale along with location and rotation, so a designer who scales the anchor actor (even just to enlarge its editor preview cube) would otherwise distort every plot in every future stamp, forever.</p>
+<p><strong>Cost.</strong> The <code>PlacedOutpostTransform</code> invariant that makes this work is hand-maintained. It must always name the anchor transform the current records are expressed against; anything that moves the anchor without re-relativizing (or vice versa) breaks the pairing, and the per-plot camera records are what would silently drift. Nothing detects a violation automatically.</p>
+<h3 id="lookups-that-fail-closed">Lookups that fail closed</h3>
+<p><code>OutpostBuilder/Core/OutpostActorQuery.h</code> answers every "which actors carry this id?" question as free function templates, duck-typed on <code>GetOutpostDefinitionId()</code> rather than expressed as an interface or a shared base. That's deliberate, because a common base is exactly the coupling the flat model exists to avoid.</p>
+<p>There are three named ambiguity policies, and callers must pick one: <code>FindUniqueActorForDefinition</code> (the owner, or <code>nullptr</code> when zero <em>or more than one</em> match), <code>FindFirstActorForDefinition</code> (display-ish uses), and <code>HasOtherActorSharingDefinition</code> (the guard every record write-back runs first).</p>
+<p><strong>Cost.</strong> Fail-closed here means fail-<em>silent</em> at most call sites. If a designer Ctrl+W-duplicates a placed outpost (a reflexive editor gesture), both copies share one id, ownership becomes ambiguous, and record write-backs simply stop.</p>
+<p>The plots still move in the level. The asset just stops hearing about it, with no toast and no log at most sites. The state is recoverable (delete the duplicate and the survivor is unique again), but the feedback gap is real.</p>
+<p>Every lookup is also a full <code>TActorIterator</code> with no cache or spatial index.</p>
+<h3 id="actor-classes-resolve-through-settings-never-staticclass">Actor classes resolve through settings, never <code>StaticClass()</code></h3>
+<p>Four statics on <code>UOutpostRuntimeSettings</code> (<code>GetOutpostClass()</code>, <code>GetPlotClass()</code>, <code>GetVolumeClass()</code>, <code>GetOverheadCameraClass()</code>) return the <code>TSubclassOf&lt;&gt;</code> a project configured on the settings asset, falling back to the plugin's native class. Never null.</p>
+<p>Fifteen spawn sites across all four modules route through one chokepoint (<code>SpawnOutpostFamilyActor</code>), plus two <code>ActorFactory</code> class overrides that resolve the same statics directly, so a project drops in a C++ or Blueprint subclass and every path picks it up at once, with no call site to hunt down.</p>
+<p><strong>Cost.</strong> The resolver reads through a <code>Get()</code> that never loads by design. Any spawn running before the settings asset is pre-warmed (or in an editor session after GC evicts it) resolves the CDO's constructor default, which is the plugin's own native class, so a project's configured subclass is quietly ignored with nothing logged.</p>
+<h3 id="no-migration-system-an-old-asset-just-loads-with-the-gaps-defaulted">No migration system: an old asset just loads with the gaps defaulted</h3>
+<p><code>UOutpostDefinition</code>, <code>UOutpostBuildingDefinition</code>, and the settings asset all serialize as ordinary <code>UPrimaryDataAsset</code>s: no <code>Serialize</code> override, no custom version, no <code>*_DEPRECATED</code> fields. An asset saved by an older version of the plugin loads through the engine's own tagged-property serializer, which silently drops any property the current class no longer declares and leaves any property the class has gained since at its default.</p>
+<p>The one place a plugin path leans on that default-filling: an unset plot-size tag resolves as Small everywhere, through <code>OutpostBuilder::PlotSizeTags::ResolveOrDefault</code>, rather than through a migration step converting it once.</p>
+<p><strong>What it buys.</strong> Nothing to keep in sync. No schema-version enum, no RAII scope guarding a <code>UsingCustomVersion</code> call, no deprecated field that has to stay serialized forever just so an old save still parses.</p>
+<p><strong>Cost.</strong> There's no conversion step, so a change that isn't a plain drop-and-default (an old float that should become a new struct, say) has no code path to ride in on. That kind of change needs a one-off script or a manual re-author instead.</p>
+<h2 id="editor-framework">Editor framework</h2>
+<h3 id="uedmode-on-the-legacy-widget-shim-with-itf-still-deferred"><code>UEdMode</code>, on the legacy widget shim, with ITF still deferred</h3>
+<p><code>UOutpostBuilderEdMode</code> is a <code>UCLASS(Transient)</code> deriving <code>UBaseLegacyWidgetEdMode</code>, which is a <code>UEdMode</code> that also implements the legacy widget and viewport interfaces. The mode used to be a legacy <code>FEdMode</code>. The move off it happened deliberately, and it's worth stating what it actually changed, since the answer is "less than the class name suggests".</p>
+<p>The migration was the platform only. It did NOT bring in the Interactive Tools Framework. The direction of travel was already documented (<code>research/26-comparable-tools.md</code>), and it still reads the same way:</p>
+<ul>
+<li><strong>There was never a deprecation.</strong> The <code>FEdMode</code> API page is current through 5.8 with no banner, no redirect, and no mention in the 5.8 release notes. This wasn't a forced move.</li>
+<li><strong>The directional pressure is real but soft.</strong> Epic's own tooling has moved. Modeling Mode, the UV Editor, and the modeling Static Mesh Editor are all <code>UEdMode</code>/ITF, and the engine ships <code>UBaseLegacyWidgetEdMode</code> specifically as the transition shim we're now standing on.</li>
+<li><strong>The mechanism is attrition, not removal.</strong> New gizmo, snapping, and tool-target capability lands ITF-only. That hasn't changed.</li>
+</ul>
+<p><strong>What it bought.</strong> Three things, all of them lifecycle rather than capability:</p>
+<ul>
+<li>The mode is a <code>UObject</code>, which makes garbage collection a plain <code>UPROPERTY()</code> instead of a hand-written <code>AddReferencedObjects</code> that every new strong member had to be remembered into.</li>
+<li>Registration is gone entirely: <code>UAssetEditorSubsystem::RegisterEditorModes</code> sweeps <code>UEdMode</code> CDOs on <code>OnAllModuleLoadingPhasesComplete</code> and reads each one's <code>GetModeInfo()</code>, so the mode's own constructor fills in its <code>FEditorModeInfo</code> and the editor module no longer carries a <code>RegisterMode</code>/<code>UnregisterMode</code> pair to keep in sync.</li>
+<li>The toolkit is built by the base class through a <code>CreateToolkit()</code> override, which puts the <code>Init()</code> call and the <code>BindCommands()</code> call in the engine's hands rather than in a hand-ordered <code>Enter()</code>.</li>
+</ul>
+<p><strong>What it cost.</strong> There is no public unregister. The mode stays listed in the Modes panel until the asset-editor subsystem tears down. A runtime plugin unload leaves a dead entry behind, where the old <code>UnregisterMode</code> cleaned up after itself.</p>
+<p><code>Enter()</code>/<code>Exit()</code> also grew ordering rules that aren't obvious from reading them: the settings pre-warm has to happen BEFORE <code>Super::Enter()</code> (the base call builds the toolkit, and the panels read resolved settings), and <code>CancelPlacement()</code> has to happen BEFORE <code>Super::Exit()</code> (it needs <code>GetWorld()</code>, served by tools contexts the base call destroys). Neither is enforced by anything.</p>
+<p><code>Exit()</code> additionally must NOT close the toolkit, since <code>FEditorModeTools::DeactivateModeAtIndex</code> already did, which is the kind of rule you learn from an assert rather than a signature.</p>
+<p><strong>What it did not buy.</strong> Any ITF capability at all. Per-instance <code>UInteractiveGizmo</code>s and the tool-target layer stay out of reach. Getting them is a separate migration on top of this one.</p>
+<p>The project's own gizmo research found everything else still reachable from the legacy viewport interface this mode kept: hand-rolled hit-proxy drag handles, per-proxy cursors, and the standard transform widget. That remains a tracked "someday" item rather than a fire drill.</p>
+<h3 id="panels-fmodetoolkit-plus-hand-written-slate">Panels: <code>FModeToolkit</code> plus hand-written Slate</h3>
+<p><code>FOutpostBuilderToolkit</code> is an <code>FModeToolkit</code> and an <code>FEditorUndoClient</code>. Its inline content is a two-slot <code>SWidgetSwitcher</code> (Overview and Editing), and its implementation is split across seven <code>.cpp</code> files, roughly one per designer-facing surface: the two panels, the viewport bars, and the placement overlay.</p>
+<p>Changing a surface means opening its file rather than scanning a monolith. Almost every function is still a member (two files add small file-local factory helpers), and the split introduces no new types.</p>
+<p>Widgets never hold the mode or the toolkit. Those that need session state receive <code>FOutpostBuilderWidgetContext</code>: a shared bundle of bound <code>TAttribute</code>s and delegates, all find-only.</p>
+<p>That converts "widget knows the toolkit" into "widget knows a small bag of getters," which is what lets each <code>SOutpost*</code> widget be constructed independently. Several need even less: the viewport overlay shell and the tab bar are fully generic, and the banner takes only its data block.</p>
+<p>The building palette is the one documented exception. <code>FOutpostPaletteModel</code> is shared mutable state with an observer list, because the palette's several hosts (the tile grid, the in-viewport command grid, the assign row, the Selected Building panel) must agree on the hot building by construction rather than by convention.</p>
+<p><strong>Cost.</strong> The <code>ToolkitBuilder</code> opt-in that makes panels height-bounded is a load-bearing dependency on engine internals rather than a documented contract. The widget-context invariant is convention-enforced: nothing in the type system stops a loading getter being bound into a per-frame attribute, and an unbound field fails silently, which is why the toolkit carries an explicit sweep to catch it.</p>
+<h3 id="editor-only-actor-logic-lives-in-the-runtime-module-not-the-editor-module">Editor-only actor logic lives in the runtime module, not the editor module</h3>
+<p><code>OutpostBuilder/Core/OutpostActorEditingLibrary.h</code> holds <code>AOutpost</code> and <code>AOutpostPlot</code>'s editor-only behavior (record sync, cascade delete, import-identity handling, the mirrored-building preview) as free functions in <code>OutpostBuilder::ActorEditing</code>, each taking the actor as its first parameter. <code>AOutpost::PostEditMove</code>, <code>Destroyed</code>, and the matching <code>AOutpostPlot</code> hooks are one-line forwards into it.</p>
+<p>Two constraints put it there instead of somewhere more obviously editor-side:</p>
+<ul>
+<li>The hooks themselves are <code>UObject</code> virtual overrides (<code>PostEditMove</code>, <code>PostEditChangeChainProperty</code>, <code>Destroyed</code>, <code>PostDuplicate</code>, <code>PostEditImport</code>), and a virtual override can't move out of the class it overrides, so <code>AOutpost</code>/<code>AOutpostPlot</code> keep them.</li>
+<li>Those classes live in the runtime module, <code>OutpostBuilder</code>, because a packaged game spawns and simulates them with no editor module loaded at all, and the runtime module can't link <code>OutpostBuilderEditor</code> to borrow its help.</li>
+</ul>
+<p>The whole file is wrapped in <code>#if WITH_EDITOR</code>, so none of it reaches a cooked build even though its address is the module that ships.</p>
+<p><strong>What it buys.</strong> <code>Outpost.cpp</code>/<code>OutpostPlot.cpp</code> shrink to the one-line forwards plus their runtime-relevant code (mesh resolution, the plain accessors), and the editor-only logic reads as an ordinary function taking its subject as a parameter, easier to read and to grep as one file instead of interleaved with <code>#if WITH_EDITOR</code> blocks inside the actor's own method bodies.</p>
+<p><strong>Cost.</strong> The split is a naming and file-location convention, not something the compiler enforces. Nothing stops a future hook's body from growing back inline on the actor class instead of forwarding, and reading the whole story of what one lifecycle hook does still means opening both files.</p>
+<h3 id="the-mode-draws-the-viewport-itself">The mode draws the viewport itself</h3>
+<p>Footprint rings, selection markers, ownership beams, outpost labels, the outpost placement ghost and the invalid-placement text are immediate-mode drawing from <code>Render</code> and <code>DrawHUD</code> through <code>FPrimitiveDrawInterface</code> and <code>FCanvas</code>. Those draw functions are free functions taking explicit parameters. None of them holds a reference to the mode.</p>
+<p>The geometry itself lives one layer further down, in <code>OutpostDrawPrimitives</code>: segments, rectangles, wire squares, rings, pulsed beams, and screen text, built with zero Outpost types anywhere in it.</p>
+<p><code>OutpostBuilderDraw.cpp</code>'s functions gather Outpost state (which actors are selected, a beam's color, whether a border needs the out-of-scope fade) and hand it to that layer, which any other editor tool in the project could link against untouched.</p>
+<p>Two pieces of feedback are deliberately not immediate-mode, and it is worth being exact about them: the <strong>plot</strong> placement ghost and its RTS-style plate are real transient <code>UStaticMeshComponent</code>s registered into the editor world for the session (a mesh preview is not something line primitives can draw), and the HUD banner is a Slate overlay widget. What is rejected everywhere is spawning preview <em>actors</em>.</p>
+<p><strong>What it buys.</strong> Zero level pollution: nothing the tool previews can be selected, saved, or orphaned in the map. Restyling the structural draws is an edit to one <code>.cpp</code>, and the colors and sizes are settings knobs that need no code edit at all.</p>
+<p><strong>Cost.</strong> Immediate mode means recomputing every frame the mode is active, including world scans for the beams and the banner. One instance of that cost was measurable enough to need fixing: the banner recomposed its whole block on <em>every</em> Slate getter, a dozen-plus times per repaint, and now memoizes per engine frame. The general pattern's cost still scales with world size.</p>
+<h3 id="where-settings-live-and-the-question-that-splits-them">Where settings live, and the question that splits them</h3>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Type</th>
+<th>Holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Editor Preferences → Outpost Builder</td>
+<td><code>UOutpostBuilderUserSettings</code> (<code>UDeveloperSettings</code>, <code>config = EditorPerProjectUserSettings</code>, editor module)</td>
+<td>Look and feel: colors, sizes, timings, hotkey modifiers</td>
+</tr>
+<tr>
+<td>The settings <strong>asset</strong></td>
+<td><code>UOutpostBuilderSettingsAsset</code> (<code>UPrimaryDataAsset</code>, runtime module)</td>
+<td>Anything affecting validity: plot dimensions, exclusion distance, actor classes, folders</td>
+</tr>
+<tr>
+<td>Project Settings → Outpost Builder</td>
+<td><code>UOutpostRuntimeSettings</code> (<code>UDeveloperSettings</code>, <code>config = Game</code>)</td>
+<td>The pointer to that asset, plus the config-persisted pinned-buildings list</td>
+</tr>
+</tbody>
+</table>
+<p>The line is drawn on whether a difference between two designers would change <em>behavior</em>. A tuned beam palette is personal and must never land in source control; a plot-size dimension is a project rule and must.</p>
+<p>A few values skip that question entirely because they aren't a knob at all: plain <code>constexpr</code> in <code>OutpostBuilderDraw.cpp</code>'s <code>Private</code> namespace (tessellation and segment counts, HUD text offsets, the out-of-scope fade amounts, the alignment-guide and selection-rim thickness), plus one shared instance, <code>OutpostBuilder::UserSettings::BeamThickness</code>, for the single constant more than that one draw TU needs.</p>
+<p>Nothing there is meant to be retuned per project or per designer, so it isn't exposed as either kind of setting.</p>
+<p><strong>Cost.</strong> That boundary is a human judgement re-made per knob, and nothing enforces it. A validity-affecting value dropped into the per-user class would produce machine-dependent placement rules, precisely the failure the split exists to prevent.</p>
+<h3 id="one-transaction-per-action-both-halves-inside-it">One transaction per action, both halves inside it</h3>
+<p>Every mutating action opens a single named <code>FScopedTransaction</code> and, inside it, writes the live actor, the matching definition record, and - where identity is involved - the level registry entry. This is the write-through law.</p>
+<p>It's why one Ctrl+Z restores level, asset and registry together (a whole-base delete is the case that deliberately keeps the definition record while retiring the registry entry), and why the actors constitute a complete enough backup of the asset for "rebuild the definition from the actors" to work.</p>
+<p>Actions resolve the definition before writing anything that persists: Assign Building, Randomize and Assign Faction refuse with a message rather than writing the actor half alone. Placement is the necessary exception: creating a definition asset cannot be undone by cancelling a transaction, so it spawns the plot first and destroys that just-spawned actor if the definition turns out to be unresolvable.</p>
+<p><strong>Cost.</strong> The law is per-call-site discipline, not a type or a helper. Every new mutator must remember both halves, the ordering, and cancelling the transaction when nothing was written. There is no compiler help.</p>
+<p>Asset <em>creation</em> is also not undoable (a cancelled transaction discards the undo record but does not un-create a minted asset), which is why placement spawns first and only then creates.</p>
+<h3 id="correctness-from-editor-lifecycle-hooks-and-what-that-really-costs">Correctness from editor lifecycle hooks, and what that really costs</h3>
+<p>Record coherence is enforced from actor hooks rather than a reconciler pass (the level registry is the exception, and has one - see <a href="identity.html">Instance Identity</a>): <code>PostEditMove</code> and <code>PostEditChangeChainProperty</code> sync transforms (typed Details-panel edits never fire <code>PostEditMove</code>), <code>PostEditUndo</code> re-derives visuals, <code>PostDuplicate</code>/<code>PostEditImport</code> handle copies, and <code>Destroyed</code> is the one home for record removal on delete paths <em>outside</em> the tool, so no outliner or other-mode delete can leave an orphan.</p>
+<p>(The tool's own delete paths remove records explicitly, and a whole-base delete deliberately keeps its records. That is exactly what Restore rebuilds from.)</p>
+<p>Every mutation entry point is additionally gated on Play/Simulate, with a <code>BeginPIE</code> hook cancelling in-flight sessions.</p>
+<p>This is the most fragile class of code in the plugin, and the honest evidence is the project's own history.</p>
+<p>The batch that made deletion always sync took <strong>four commits in one day</strong>: the batch itself, then three adversarial verification rounds, one of which proved the previous design rested on false assumptions about the engine. What that round established, by reading engine source:</p>
+<ul>
+<li><code>DeleteActors</code> deselects <strong>each actor immediately before destroying it</strong>. That means a dying actor always reads as unselected, while other members of the doomed selection still read as selected.</li>
+<li>Paste and duplicate fire <code>PostEditImport</code> (sometimes <strong>twice</strong>) <em>and</em> <code>PostDuplicate</code> on the same new actor.</li>
+</ul>
+<p>A third fact the design leans on (<code>TActorIterator</code> skips pending-kill actors, so an already-destroyed owner is unfindable) was already on record from the project's earlier engine research.</p>
+<p>The final design accounts for all of it: an RAII scope marks whole-base deletes, the tool's own paths remove records explicitly rather than relying on inference, import handling is idempotent and reclaims a kept record before minting a new one, and every ambiguous case fails toward <em>keeping</em> a record rather than stripping one.</p>
+<p><strong>Cost.</strong> These are engine <em>behaviors</em>, not APIs with compatibility guarantees. Each one would have to be re-verified against a new engine version, and there is no test that would catch a regression automatically.</p>
+<h2 id="assets-cooking-and-packaging">Assets, cooking and packaging</h2>
+<h3 id="the-scan-lives-in-the-runtime-module-fused-with-alwayscook">The scan lives in the runtime module, fused with <code>AlwaysCook</code></h3>
+<p><code>RegisterOutpostAssetType&lt;T&gt;</code> pairs two calls that must never be separated:</p>
+<div class="highlight"><pre><span></span><code><span class="n">AssetManager</span><span class="p">.</span><span class="n">ScanPathsForPrimaryAssets</span><span class="p">(</span><span class="n">T</span><span class="o">::</span><span class="n">PrimaryAssetTypeName</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">TEXT</span><span class="p">(</span><span class="s">"/Game"</span><span class="p">)</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="n">T</span><span class="o">::</span><span class="n">StaticClass</span><span class="p">(),</span><span class="w"> </span><span class="cm">/*bHasBlueprintClasses=*/</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="cm">/*bIsEditorOnly=*/</span><span class="nb">false</span><span class="p">);</span>
+<span class="n">AssetManager</span><span class="p">.</span><span class="n">SetPrimaryAssetTypeRules</span><span class="p">(</span><span class="n">T</span><span class="o">::</span><span class="n">PrimaryAssetTypeName</span><span class="p">,</span><span class="w"> </span><span class="n">Rules</span><span class="w"> </span><span class="cm">/* AlwaysCook */</span><span class="p">);</span>
+</code></pre></div>
+
+<p><code>AlwaysCook</code> is mandatory, not tuning. Nothing reaches these packages by an edge the cooker follows: definitions are referenced only by <code>FPrimaryAssetId</code> (a name pair, not a package reference), the settings asset only by an ini-hosted soft path, and the per-level <code>OutpostLevelRegistry</code> by nothing at all - it is found by name lookup alone.</p>
+<p>With the default cook rule a packaged build drops all four <strong>silently</strong>. For the definitions that means every plot renders a fallback mesh with nothing logged. For the registry it means every unloaded-level lookup returns nothing, which reads as "no outposts here" rather than as a failure.</p>
+<p>Registration sits in the <em>runtime</em> module even though scanning feels like editor plumbing, because packaged games never load the editor module yet still must resolve the same ids the editor wrote. Fusing the two calls in one template means a new definition type cannot be registered half-correctly.</p>
+<p><strong>Cost.</strong> The cook rule is type-wide and unconditional, so every definition asset anywhere under <code>/Game</code> force-cooks (scratch and work-in-progress assets included) with no per-asset opt-out. The scan path is also the hardcoded literal <code>/Game</code>.</p>
+<p>Definitions under a configured out-of-<code>/Game</code> created-definition folder still resolve in the editor, through a separate editor-module rescan, but are invisible to a packaged build (warned, not prevented). A definition hand-authored anywhere else resolves in neither.</p>
+<h3 id="game-world-plot-rendering">Game-world plot rendering</h3>
+<p>A plot carries one runtime <code>UStaticMeshComponent</code>. <code>RefreshBuildingForCurrentWorld()</code> forks on <code>UWorld::IsGameWorld()</code>: game worlds take an <strong>async</strong> load chain (cancelled on <code>EndPlay</code>/<code>BeginDestroy</code>, guarded by a serial so a late callback cannot apply a superseded result), while editor worlds stay synchronous so authoring feedback is immediate.</p>
+<p>The resolution ladder never leaves a plot invisible: assigned building mesh, then the project's empty-plot mesh, then a fallback.</p>
+<p>Async exists in game worlds because component registration is not editor-guarded: it runs for every plot at level load, on the game thread inside time-sliced streaming work, where a synchronous load hitches.</p>
+<p><strong>Cost.</strong> Two implementations of one ladder that must never drift, with nothing enforcing agreement. There is no batching either. N plots issue up to 2N requests.</p>
+<h3 id="two-engine-versions-two-named-seams">Two engine versions, two named seams</h3>
+<p>The plugin targets <strong>UE 5.7 and 5.8</strong>. The standing rule is to prefer APIs present in 5.7. A genuinely required newer API gets a <code>UE_VERSION_OLDER_THAN(5, 8, 0)</code> seam with a working 5.7 fallback, homed in a named helper rather than scattered through call sites.</p>
+<p>Two named helpers exist today: the post-engine-init delegate accessor (deliberately kept as one copy per module that needs it, so a grep finds four guarded blocks in total) and a details-view flag that simply degrades to visible category headers on 5.7.</p>
+<p><strong>Cost.</strong> The compatibility claim rests on an API audit rather than a continuously green 5.7 build in this repository. The 5.7 side is verified by discipline and review, not by CI.</p>
+<h2 id="the-risks-worth-carrying-into-any-decision-about-this-tool">The risks worth carrying into any decision about this tool</h2>
+<p>Most of the costs above are local. These are the ones that shape the whole project:</p>
+<ol>
+<li><strong>Verification is mostly a human with three to four hours.</strong> Automation covers the identity, registry and content-hash surfaces - 23 tests across three files, run headless by <code>scripts/run-tests.bat</code> - and nothing else.</li>
+</ol>
+<p>The five editor listeners, the delete cascade, and every visual, gesture and editor-integration behaviour stay a 126-step manual in-editor checklist, self-estimated at 3-4 hours. That is a defensible scope choice (the checklist covers exactly what a compiler and a code read cannot: visuals, gestures, editor integration, emergent state), but it means regression detection is gated on someone actually walking it.</p>
+<p>In practice, changes ship when they compile and pass review.
+2. <strong>Editor-hook correctness is built on behavior, not contracts.</strong> See above. Four commits in one day (one batch and three verification rounds, one of which refuted the design outright) is the honest shape of this risk.
+3. <strong>Ambiguity is silent.</strong> The unique-or-null policy protects data perfectly and tells the designer nothing. A duplicated outpost quietly stops syncing.
+4. <strong>Clicks can block on disk.</strong> One-shot actions load synchronously by design, inside an open transaction. The definition itself is tiny; what a load can <em>chain into</em> (mirroring a building Blueprint's mesh parts, for instance) is not bounded by anything.
+5. <strong>Two editions are maintained.</strong> The standalone plugin here and a project-module port elsewhere are separate trees with different paths and naming, so parity cannot be verified mechanically and every fix is paid for twice. The port does earn its keep as a second test bed (defects found there have been ported back), but the burden is real.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><code>research/07-prefab-mechanisms.md</code> - the Level Instance and Packed Level Actor scouting behind the flat-actor decision.</li>
+<li><code>research/08-v04-design-synthesis.md</code> - the relative-transform record design.</li>
+<li><code>research/26-comparable-tools.md</code> - comparable tools, and the <code>FEdMode</code> vs Interactive Tools Framework assessment.</li>
+<li><a href="architecture.html">Architecture</a> - the module split and the record model in depth.</li>
+<li><a href="wiring.html">System Wiring</a> - the same picture, interactive.</li>
+<li><a href="porting.html">Porting Into Your Own Project</a> - what the raw-actor posture means for adopters.</li>
+<li><code>TESTING.md</code> - the manual verification checklist referred to above.</li>
+</ul>
+      </article>
+    <nav class="pager" aria-label="Page navigation">
+      <a class="pager-prev" href="wiring.html">
+        <span class="pager-dir">&larr; Previous</span>
+        <span class="pager-title">System Wiring</span>
+      </a>
+    </nav>
+    </main>
+
+    <footer class="foot">
+      <p>A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.</p>
+      <a href="https://github.com/defessler/OutpostBuilder">View on GitHub</a>
+    </footer>
+  </div>
+</div>
+
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

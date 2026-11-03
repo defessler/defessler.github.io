@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OutpostBuilder</title>
+<meta name="description" content="A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<div class="shell">
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-controls="sidebar" aria-expanded="false">
+    <span></span><span></span><span></span>
+    <span class="vh">Toggle navigation</span>
+  </button>
+
+  <aside class="side" id="sidebar">
+    <div class="side-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-word">OutpostBuilder</span>
+      </a>
+
+      <nav aria-label="Documentation">
+        <ol class="nav-list">
+          <li>
+            <a href="index.html" class="active" aria-current="page">
+              <span class="nav-no">01</span>
+              <span class="nav-title">OutpostBuilder</span>
+            </a>
+          </li>
+          <li>
+            <a href="tutorial.html">
+              <span class="nav-no">02</span>
+              <span class="nav-title">Tutorial - A Guided Tour</span>
+            </a>
+          </li>
+          <li>
+            <a href="architecture.html">
+              <span class="nav-no">03</span>
+              <span class="nav-title">Architecture</span>
+            </a>
+          </li>
+          <li>
+            <a href="identity.html">
+              <span class="nav-no">04</span>
+              <span class="nav-title">Instance Identity</span>
+            </a>
+          </li>
+          <li>
+            <a href="edmode.html">
+              <span class="nav-no">05</span>
+              <span class="nav-title">The Ed Mode - UEdMode Deep Dive</span>
+            </a>
+          </li>
+          <li>
+            <a href="toolkit.html">
+              <span class="nav-no">06</span>
+              <span class="nav-title">The Toolkit - FModeToolkit and Slate</span>
+            </a>
+          </li>
+          <li>
+            <a href="prefabs.html">
+              <span class="nav-no">07</span>
+              <span class="nav-title">Prefabs &amp; Fork-on-Stamp</span>
+            </a>
+          </li>
+          <li>
+            <a href="faction-visuals.html">
+              <span class="nav-no">08</span>
+              <span class="nav-title">Faction - Identity and Gating</span>
+            </a>
+          </li>
+          <li>
+            <a href="extending.html">
+              <span class="nav-no">09</span>
+              <span class="nav-title">Extending Outpost Builder</span>
+            </a>
+          </li>
+          <li>
+            <a href="quick-reference.html">
+              <span class="nav-no">10</span>
+              <span class="nav-title">Quick Reference - The Cheat Sheet</span>
+            </a>
+          </li>
+          <li>
+            <a href="reference.html">
+              <span class="nav-no">11</span>
+              <span class="nav-title">Reference - Public Surfaces, Hotkeys, and Testing</span>
+            </a>
+          </li>
+          <li>
+            <a href="runtime-loadout.html">
+              <span class="nav-no">12</span>
+              <span class="nav-title">Per-Plot Building Rendering</span>
+            </a>
+          </li>
+          <li>
+            <a href="porting.html">
+              <span class="nav-no">13</span>
+              <span class="nav-title">Porting Into Your Own Project</span>
+            </a>
+          </li>
+          <li>
+            <a href="wiring.html">
+              <span class="nav-no">14</span>
+              <span class="nav-title">System Wiring</span>
+            </a>
+          </li>
+          <li>
+            <a href="technology.html">
+              <span class="nav-no">15</span>
+              <span class="nav-title">Technology &amp; Trade-offs</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
+      <a class="side-github" href="https://github.com/defessler/OutpostBuilder">
+        <span aria-hidden="true">&#8599;</span> Repository
+      </a>
+    </div>
+  </aside>
+
+  <div class="nav-scrim" id="nav-scrim"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="crumb">OutpostBuilder <span class="crumb-sep">/</span> OutpostBuilder</span>
+      <span class="published">Published <time datetime="2026-11-03T05:35:00Z">2026-11-03 05:35 UTC</time></span>
+
+    </header>
+
+    <main id="content">
+      <article class="doc">
+<h1 id="outpostbuilder">OutpostBuilder</h1>
+<p>An editor mode for Unreal Engine 5.7 and 5.8 that turns "build an RTS-style outpost" into a handful
+of clicks instead of a pile of manual actor placement and bookkeeping.</p>
+<p>This site is the tutorial and reference. It assumes you know <code>UEdMode</code>, Slate and <code>UPROPERTY</code>, so it
+explains this plugin rather than the engine.</p>
+<blockquote>
+<p><strong>New here?</strong> <a href="tutorial.html">Tutorial - A Guided Tour</a> walks every panel and overlay with real
+screenshots before any of the architecture.</p>
+</blockquote>
+<h2 id="what-it-does">What It Does</h2>
+<p>From a designer's seat, in the editor, without touching Blueprint or C++:</p>
+<ul>
+<li><strong>Place an outpost.</strong> Click in the viewport. A marker actor drops in and a definition asset is
+  created describing what that outpost owns.</li>
+<li><strong>Ring it with plots.</strong> Click again to add buildable footprints. The ghost shows whether the spot
+  is clear, legal-but-mismatched, or refused, and reports its distances live.</li>
+<li><strong>Assign buildings.</strong> Pick from the thumbnail palette or press 1-9. The hot building auto-assigns
+  to every plot you place next.</li>
+<li><strong>Frame an Overhead camera.</strong> Fly the viewport to the shot you want, then save it. One camera per
+  outpost, framing saved per outpost or per plot.</li>
+<li><strong>Stamp it as a prefab.</strong> Any outpost you have built is a reusable definition. Drag it back into
+  the level to stamp the whole base, buildings and camera included.</li>
+<li><strong>Ship it.</strong> Every plot renders its own building mesh at runtime, so a stamped base is visible in a
+  packaged game with no extra call.</li>
+</ul>
+<p><img alt="The OutpostBuilder workflow loop: place an outpost, add plots, assign buildings, gate by faction, frame an Overhead camera, save as a prefab, and stamp new bases from it." src="assets/index-workflow-loop.svg" /></p>
+<p>Everything past this point is written for you as the programmer picking this up. Here's how to get it
+running and place your first outpost in under a minute.</p>
+<h2 id="step-1-clone-the-repo">Step 1: Clone the Repo</h2>
+<p>Grab the plugin from GitHub:</p>
+<div class="highlight"><pre><span></span><code>git clone https://github.com/defessler/OutpostBuilder.git
+</code></pre></div>
+
+<h2 id="step-2-junction-the-plugin-into-your-project">Step 2: Junction the Plugin into Your Project</h2>
+<p>OutpostBuilder is a standalone plugin. It needs to live under your target project's <code>Plugins/</code>
+directory. You can copy the <code>OutpostBuilder</code> folder in directly, but we'd suggest a junction instead.
+That way you're always building against the same checkout:</p>
+<div class="highlight"><pre><span></span><code>mklink /J "YourProject\Plugins\OutpostBuilder" "path\to\OutpostBuilder"
+</code></pre></div>
+
+<p>If you add or change source, regenerate your project files (right-click the <code>.uproject</code> file -&gt;
+Generate Visual Studio project files) before the next build.</p>
+<h2 id="step-3-build-the-editor-target">Step 3: Build the Editor Target</h2>
+<div class="highlight"><pre><span></span><code>Build.bat YourProjectEditor Win64 DebugGame
+</code></pre></div>
+
+<p>Note: In our own setup, we build with <code>-NoUBA -MaxParallelActions=4</code> appended to that command. UBA
+(Unreal Build Accelerator) can kill-loop under memory pressure when other heavy resident processes
+are competing for commit, which is the case on our build machine. Treat those flags as a local knob
+rather than something you necessarily need if your machine doesn't have the same pressure.</p>
+<h2 id="step-4-enable-the-mode">Step 4: Enable the Mode</h2>
+<p>The plugin ships with <code>EnabledByDefault: true</code>. It should just show up. If it doesn't, open Settings
+-&gt; Plugins, search "Outpost Builder", and enable it there.</p>
+<h2 id="step-5-place-your-first-outpost">Step 5: Place Your First Outpost</h2>
+<p>This part takes about a minute:</p>
+<ol>
+<li>Open the level editor's Modes panel (top-left toolbar) and select "Outpost Builder".</li>
+<li>In the Overview panel's Outposts tab (the default), click "Add New Outpost", then click "Create".</li>
+<li>A green wire box follows your cursor, with a matching ground square marking the exclusion distance
+   around it. Both flip to red if the spot is refused. Click LMB to confirm placement.</li>
+<li>A cube actor appears at that spot, the Editing panel opens automatically, and a new
+   <code>UOutpostDefinition</code> asset gets created under <code>/Game/Outposts</code> (configurable via the settings
+   asset's Created Definition Folder, covered in <code>reference.html</code>).</li>
+</ol>
+<p>That's your first outpost. Add a plot and assign a building to it. You've already run the whole loop
+once.</p>
+<h2 id="where-to-go-from-here">Where to Go From Here</h2>
+<p>Every page below owns its topic in full. Start wherever your question is.</p>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>What it covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="tutorial.html">Tutorial</a></td>
+<td>Screen-by-screen walkthrough, illustrated with real screenshots</td>
+</tr>
+<tr>
+<td><a href="quick-reference.html">Quick Reference</a></td>
+<td>The cheat sheet: hotkeys, settings surfaces, plot sizes, matching rules</td>
+</tr>
+<tr>
+<td><a href="architecture.html">Architecture</a></td>
+<td>The module split, the two definition assets, and why plots write back instead of nesting</td>
+</tr>
+<tr>
+<td><a href="identity.html">Instance Identity</a></td>
+<td>The <code>FOutpostInstanceId</code> handle, the baked per-level registry, deletion and restore</td>
+</tr>
+<tr>
+<td><a href="wiring.html">System Wiring</a></td>
+<td>An interactive map of every module, asset and actor, with selectable flows</td>
+</tr>
+<tr>
+<td><a href="edmode.html">The Ed Mode</a></td>
+<td>The placement state machine, ghost previews, ownership beams, input routing</td>
+</tr>
+<tr>
+<td><a href="toolkit.html">The Toolkit</a></td>
+<td>The Slate side: panel layout, the building palette, hotkeys</td>
+</tr>
+<tr>
+<td><a href="prefabs.html">Prefabs</a></td>
+<td>Definition-as-prefab, fork-on-stamp, and the transform math behind stamping</td>
+</tr>
+<tr>
+<td><a href="faction-visuals.html">Faction</a></td>
+<td>What faction gates, now that the faction-colour mechanisms are gone</td>
+</tr>
+<tr>
+<td><a href="runtime-loadout.html">Per-Plot Rendering</a></td>
+<td>How plots render their building at runtime, and the per-plot randomizer</td>
+</tr>
+<tr>
+<td><a href="technology.html">Technology</a></td>
+<td>What was picked, what was rejected, and what each choice costs</td>
+</tr>
+<tr>
+<td><a href="extending.html">Extending</a></td>
+<td>Worked examples: a new definition type, a placement rule, a gizmo, plus the pitfalls list</td>
+</tr>
+<tr>
+<td><a href="porting.html">Porting</a></td>
+<td>Lifting the pieces into a project that already has its own base actors</td>
+</tr>
+<tr>
+<td><a href="reference.html">Reference</a></td>
+<td>The public API surfaces in full, the hotkey list, testing and scripts</td>
+</tr>
+</tbody>
+</table>
+<h2 id="references">References</h2>
+<ul>
+<li><code>OutpostBuilder/README.md</code> - the designer-facing quick start that ships inside the plugin.</li>
+<li><code>TESTING.md</code> - the manual in-editor sweep, step by step.</li>
+<li><code>contracts.md</code> - the frozen shared surfaces later refactors have to preserve.</li>
+</ul>
+      </article>
+    <nav class="pager" aria-label="Page navigation">
+      <span></span>
+      <a class="pager-next" href="tutorial.html">
+        <span class="pager-dir">Next &rarr;</span>
+        <span class="pager-title">Tutorial - A Guided Tour</span>
+      </a>
+    </nav>
+    </main>
+
+    <footer class="foot">
+      <p>A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.</p>
+      <a href="https://github.com/defessler/OutpostBuilder">View on GitHub</a>
+    </footer>
+  </div>
+</div>
+
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

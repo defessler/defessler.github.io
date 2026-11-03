@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 400" font-family="'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="ext-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c7d0da" />
+    </marker>
+  </defs>
+
+  <text x="590" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#eef2f6">Adding a new definition asset type: the four seams</text>
+  <text x="590" y="50" text-anchor="middle" font-size="12.5" fill="#a9b4bf">Same shape UOutpostFactionDefinition already went through - copy it four times.</text>
+
+  <!-- Runtime module group -->
+  <rect x="20" y="80" width="560" height="280" rx="10" fill="#e6a528" fill-opacity="0.06" stroke="#e6a528" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="300" y="102" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#e6a528">OutpostBuilder (runtime module)</text>
+
+  <!-- Box 1 -->
+  <rect x="45" y="120" width="510" height="90" rx="8" fill="#e6a528" fill-opacity="0.1" stroke="#e6a528" stroke-width="1.6"/>
+  <text x="300" y="142" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#eef2f6">1. Define the UCLASS</text>
+  <text x="300" y="161" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11.5" fill="#eef2f6">class UOutpostXDefinition : public UPrimaryDataAsset</text>
+  <text x="300" y="178" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#a9b4bf">static const FPrimaryAssetType PrimaryAssetTypeName;</text>
+  <text x="300" y="194" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#a9b4bf">GetPrimaryAssetId() override</text>
+
+  <line x1="300" y1="210" x2="300" y2="240" stroke="#c7d0da" stroke-width="2" marker-end="url(#ext-arrow)"/>
+
+  <!-- Box 2 -->
+  <rect x="45" y="243" width="510" height="97" rx="8" fill="#e6a528" fill-opacity="0.1" stroke="#e6a528" stroke-width="1.6"/>
+  <text x="300" y="265" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#eef2f6">2. Register it for scanning</text>
+  <text x="300" y="284" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#eef2f6">FOutpostBuilderModule::RegisterAssetScans()</text>
+  <text x="300" y="301" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="10.5" fill="#a9b4bf">AssetManager.ScanPathsForPrimaryAssets(...)</text>
+  <text x="300" y="320" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">lives in the RUNTIME module - packaged games</text>
+  <text x="300" y="334" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">must resolve these ids too, not just the editor</text>
+
+  <!-- Arrow across the module boundary -->
+  <line x1="556" y1="167" x2="616" y2="167" stroke="#c7d0da" stroke-width="2" marker-end="url(#ext-arrow)"/>
+  <line x1="556" y1="291" x2="616" y2="291" stroke="#c7d0da" stroke-width="2" marker-end="url(#ext-arrow)"/>
+
+  <!-- Editor module group -->
+  <rect x="620" y="80" width="540" height="280" rx="10" fill="#b98fe0" fill-opacity="0.06" stroke="#b98fe0" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="890" y="102" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#b98fe0">OutpostBuilderEditor (editor module)</text>
+
+  <!-- Box 3 -->
+  <rect x="640" y="120" width="500" height="90" rx="8" fill="#b98fe0" fill-opacity="0.1" stroke="#b98fe0" stroke-width="1.6"/>
+  <text x="890" y="142" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#eef2f6">3. Add a UFactory</text>
+  <text x="890" y="161" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#eef2f6">bCreateNew = true; SupportedClass = UOutpostXDefinition</text>
+  <text x="890" y="178" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">factories auto-register - engine class scan finds them</text>
+  <text x="890" y="194" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">this alone lights up Content Browser -&gt; Add -&gt; New</text>
+
+  <line x1="890" y1="210" x2="890" y2="240" stroke="#c7d0da" stroke-width="2" marker-end="url(#ext-arrow)"/>
+
+  <!-- Box 4 -->
+  <rect x="640" y="243" width="500" height="97" rx="8" fill="#28aad0" fill-opacity="0.1" stroke="#28aad0" stroke-width="1.6"/>
+  <text x="890" y="265" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#eef2f6">4. CB context-menu entry (optional)</text>
+  <text x="890" y="284" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="10.8" fill="#eef2f6">UToolMenus::ExtendMenu("ContentBrowser.AssetContextMenu.&lt;Class&gt;")</text>
+  <text x="890" y="301" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">registered once UToolMenus is ready, via</text>
+  <text x="890" y="316" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">RegisterStartupCallback; unregistered with one</text>
+  <text x="890" y="331" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">UToolMenus::UnregisterOwner(this) in ShutdownModule</text>
+
+  <text x="590" y="382" text-anchor="middle" font-size="11.5" fill="#a9b4bf">Every one of these four already exists for UOutpostFactionDefinition - it is the exemplar to copy.</text>
+</svg>

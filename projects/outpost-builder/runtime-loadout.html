@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Per-Plot Building Rendering · OutpostBuilder</title>
+<meta name="description" content="A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<div class="shell">
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-controls="sidebar" aria-expanded="false">
+    <span></span><span></span><span></span>
+    <span class="vh">Toggle navigation</span>
+  </button>
+
+  <aside class="side" id="sidebar">
+    <div class="side-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-word">OutpostBuilder</span>
+      </a>
+
+      <nav aria-label="Documentation">
+        <ol class="nav-list">
+          <li>
+            <a href="index.html">
+              <span class="nav-no">01</span>
+              <span class="nav-title">OutpostBuilder</span>
+            </a>
+          </li>
+          <li>
+            <a href="tutorial.html">
+              <span class="nav-no">02</span>
+              <span class="nav-title">Tutorial - A Guided Tour</span>
+            </a>
+          </li>
+          <li>
+            <a href="architecture.html">
+              <span class="nav-no">03</span>
+              <span class="nav-title">Architecture</span>
+            </a>
+          </li>
+          <li>
+            <a href="identity.html">
+              <span class="nav-no">04</span>
+              <span class="nav-title">Instance Identity</span>
+            </a>
+          </li>
+          <li>
+            <a href="edmode.html">
+              <span class="nav-no">05</span>
+              <span class="nav-title">The Ed Mode - UEdMode Deep Dive</span>
+            </a>
+          </li>
+          <li>
+            <a href="toolkit.html">
+              <span class="nav-no">06</span>
+              <span class="nav-title">The Toolkit - FModeToolkit and Slate</span>
+            </a>
+          </li>
+          <li>
+            <a href="prefabs.html">
+              <span class="nav-no">07</span>
+              <span class="nav-title">Prefabs &amp; Fork-on-Stamp</span>
+            </a>
+          </li>
+          <li>
+            <a href="faction-visuals.html">
+              <span class="nav-no">08</span>
+              <span class="nav-title">Faction - Identity and Gating</span>
+            </a>
+          </li>
+          <li>
+            <a href="extending.html">
+              <span class="nav-no">09</span>
+              <span class="nav-title">Extending Outpost Builder</span>
+            </a>
+          </li>
+          <li>
+            <a href="quick-reference.html">
+              <span class="nav-no">10</span>
+              <span class="nav-title">Quick Reference - The Cheat Sheet</span>
+            </a>
+          </li>
+          <li>
+            <a href="reference.html">
+              <span class="nav-no">11</span>
+              <span class="nav-title">Reference - Public Surfaces, Hotkeys, and Testing</span>
+            </a>
+          </li>
+          <li>
+            <a href="runtime-loadout.html" class="active" aria-current="page">
+              <span class="nav-no">12</span>
+              <span class="nav-title">Per-Plot Building Rendering</span>
+            </a>
+          </li>
+          <li>
+            <a href="porting.html">
+              <span class="nav-no">13</span>
+              <span class="nav-title">Porting Into Your Own Project</span>
+            </a>
+          </li>
+          <li>
+            <a href="wiring.html">
+              <span class="nav-no">14</span>
+              <span class="nav-title">System Wiring</span>
+            </a>
+          </li>
+          <li>
+            <a href="technology.html">
+              <span class="nav-no">15</span>
+              <span class="nav-title">Technology &amp; Trade-offs</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
+      <a class="side-github" href="https://github.com/defessler/OutpostBuilder">
+        <span aria-hidden="true">&#8599;</span> Repository
+      </a>
+    </div>
+  </aside>
+
+  <div class="nav-scrim" id="nav-scrim"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="crumb">OutpostBuilder <span class="crumb-sep">/</span> Per-Plot Building Rendering</span>
+      <span class="published">Published <time datetime="2026-11-03T05:35:00Z">2026-11-03 05:35 UTC</time></span>
+
+    </header>
+
+    <main id="content">
+      <article class="doc">
+<h1 id="per-plot-building-rendering-formerly-runtime-faction-loadout">Per-Plot Building Rendering (formerly "Runtime Faction Loadout")</h1>
+<p>This page used to document <code>UOutpostLoadoutLibrary</code>, a runtime-gameplay
+system for spawning a faction-specific building actor on each plot and
+swapping it on a faction change. That library is gone: buildings are
+mesh-only now, and a plot renders its own building directly.</p>
+<p>There's no separate spawned actor left to spawn, swap, or clean up. This
+page describes the model that replaces it.</p>
+<h2 id="whats-gone">What's Gone</h2>
+<p><code>UOutpostLoadoutLibrary</code> (<code>ApplyFactionLoadout</code>, <code>RandomizeLoadout</code>) and the
+whole spawn/destroy/re-swap model it existed for are gone. So is the idea
+that assigning a faction changes WHICH building a plot shows.
+<code>UOutpostBuildingDefinition::FactionActorClasses</code>/<code>GetActorClassForFaction</code>
+(the per-faction actor-class override map this library read from) are gone
+too.</p>
+<p>The header now carries:</p>
+<ul>
+<li><code>DisplayName</code></li>
+<li><code>BuildingActorClass</code> - the class a project's own gameplay spawns for this
+  building, and the EDITOR preview source when it's set, covered in "Editor
+  Preview" below. GAME worlds only ever spawn the real actor from it, never
+  render from it directly.</li>
+<li><code>BuildingMesh</code></li>
+<li><code>PlotSizeQuery</code> - a gameplay-tag query for which plots the building fits.</li>
+<li><code>PlotTagQuery</code> - warn-only, over the plot's general tags.</li>
+<li><code>SupportedFactions</code></li>
+<li><code>BuildingCategory</code> - palette grouping only.</li>
+</ul>
+<p><code>SupportedFactions</code> does NOT revive faction-swapping: it decides whether a
+building may be ASSIGNED to an outpost's plot at author time, never which
+building a plot shows at runtime.</p>
+<p>Game code that called <code>ApplyFactionLoadout</code>/<code>RandomizeLoadout</code> will no
+longer compile. There's no drop-in replacement function, because the model
+it served (spawn a separate actor, tag it, destroy-and-respawn on every
+faction change) doesn't exist anymore.</p>
+<h2 id="the-new-model-a-plot-picks-its-own-building">The New Model: A Plot Picks Its Own Building</h2>
+<p><strong>This section describes the mesh ladder that resolves <code>BuildingMeshComponent</code>:
+the plot's one RUNTIME visual, and the ONLY thing a GAME world (packaged
+game or PIE) ever shows.</strong></p>
+<p>There is an earlier, EDITOR-world-only rung in
+front of it (see "Editor Preview: the Actor-Template Mirror" below), but every
+plot still falls through to this same ladder whenever that earlier rung
+doesn't apply, and it is unconditionally the whole story in a game world.</p>
+<p>Every <code>AOutpostPlot</code> resolves which building to render, in this priority
+order:</p>
+<ol>
+<li>
+<p><strong><code>AssignedBuildingId</code></strong>, if it's a valid <code>FPrimaryAssetId</code>: the fixed
+   per-plot assignment the toolkit's Building Picker/Assign row and the
+   Editing panel's palette (the <strong>Select Plot Contents</strong> section) hot-slot
+   one-action placement write.</p>
+</li>
+<li>
+<p>Otherwise (the plot is <strong>unassigned</strong>), the <strong>plugin-wide empty-plot
+   mesh</strong>: <code>UOutpostBuilderSettingsAsset::EmptyPlotMesh</code>, ONE field on
+   the project's settings asset, read through the never-loading
+   <code>UOutpostBuilderSettingsAsset::Get()</code> resolution.</p>
+<ul>
+<li>It is what EVERY unassigned plot of EVERY outpost renders, in the
+  editor AND in packaged games alike.</li>
+<li>It carries no transform of its own: a plot renders the mesh at the
+  plot's own transform. To give a plot a specific building, assign one.</li>
+</ul>
+</li>
+<li>
+<p>Otherwise, when no mesh resolves at all (the plot is unassigned and the
+   project authored no <code>EmptyPlotMesh</code>; or it is assigned and that definition
+   has no <code>BuildingMesh</code> set / fails to load), the <strong>fallback chain</strong>:
+   <code>UOutpostBuilderSettingsAsset::DefaultPreviewMesh</code> if a project has one
+   configured (a settings-asset field too), else the plugin's
+   built-in cube (cached at construction as <code>EmptyPlotFallbackMesh</code>).</p>
+</li>
+</ol>
+<p>Rung 3 is not decoration. <strong>A plot is never invisible</strong> is a load-bearing
+invariant, not a cosmetic one: editor tooling traces a plot's <em>mesh</em> to hit it,
+so an invisible plot would be both unselectable and un-removable. Leaving
+<code>EmptyPlotMesh</code> unset is fine; the chain simply ends at the cube.</p>
+<p>This selection reuses the building-mesh resolution off
+<code>UOutpostBuildingDefinition</code>. The mesh is hosted on a runtime component the
+plot owns directly, so it renders in packaged games as well as in the editor:
+exactly one representation, on one actor, in every GAME world.</p>
+<p>There's no
+separate spawned building actor to keep in sync with it. (In an EDITOR world
+that "one representation" can become several transient PARTS instead of a
+single mesh. It's still one actor, still nothing spawned. See "Editor Preview:
+the Actor-Template Mirror" below.)</p>
+<p>The runtime component is the plot's <code>UPROPERTY</code> <code>UStaticMeshComponent</code>,
+<code>BuildingMeshComponent</code>. Realization runs from <code>PostRegisterAllComponents</code>
+(which fires in both the editor and packaged games, and is re-entrancy-guarded
+via <code>bIsRealizingBuilding</code>), and it splits by world type:</p>
+<ul>
+<li>
+<p>An <strong>editor</strong> world calls <code>RefreshBuildingPreview()</code>: idempotent,
+  synchronous, and also called from the editor-only <code>OnConstruction</code>, which
+  early-returns in a game world so the async path below owns realization there.</p>
+</li>
+<li>
+<p>A <strong>game</strong> world (packaged game + PIE) calls <code>BeginAsyncBuildingRefresh()</code>
+  instead. It shows the built-in cube placeholder only if the component has no
+  mesh yet (a mesh that serialized or streamed in with the cell stays visible,
+  avoiding a cube flicker), then async-loads the real mesh and swaps it in on
+  completion.</p>
+<ul>
+<li>It forks the same way <code>RefreshBuildingPreview()</code> does: an
+  <strong>assigned</strong> plot chains the building definition → <code>BuildingMesh</code>
+  (<code>OnBuildingDefinitionLoaded</code> → <code>OnBuildingMeshLoaded</code>). The mesh path
+  lives one soft-ref indirection <em>inside</em> the definition, which is exactly why
+  it can't be resolved without a load first.</li>
+<li>An <strong>unassigned</strong> one
+  (<code>BeginAsyncEmptyPlotMeshLoad</code> → <code>OnBuildingMeshLoaded</code>) is shorter:
+  <code>EmptyPlotMesh</code> is a direct soft ref on the already-resident settings asset,
+  so there is no definition hop to chain through.</li>
+</ul>
+</li>
+</ul>
+<p>These are two code paths resolving the same question, so the empty-plot choice
+is funnelled through <strong>one</strong> shared settings-asset field rather than being
+re-derived at each call site.</p>
+<p>Both paths read the same
+<code>UOutpostBuilderSettingsAsset::EmptyPlotMesh</code> (the synchronous path via
+<code>ResolveEmptyPlotMesh()</code>). If the two paths could pick independently, the
+editor and the packaged game would be free to disagree about what an empty
+plot looks like.</p>
+<p>The split exists because <code>PostRegisterAllComponents</code> runs on the game thread
+inside time-sliced <code>AddToWorld</code> while (World Partition) cells stream in, where
+a synchronous load would hitch. In the editor the asset registry is resident
+and there's no frame budget, so the preview stays synchronous and immediate.</p>
+<p>Both paths resolve the mesh only. There is no faction-derived tint to apply
+on either one (see "Faction No Longer Affects Rendering" below).</p>
+<h2 id="editor-preview-the-actor-template-mirror">Editor Preview: the Actor-Template Mirror</h2>
+<p>Everything above is the mesh ladder, and it is the ONLY thing that ever
+renders in a game world. It is still the editor's fallback.</p>
+<p>But in an EDITOR
+world, before any of that runs, an <strong>assigned</strong> plot whose building has a
+<code>BuildingActorClass</code> set gets one earlier chance to preview that ACTOR instead
+of <code>BuildingMesh</code>.</p>
+<p><code>AOutpostPlot::RefreshBuildingPreview()</code> calls
+<code>OutpostBuilder::ActorEditing::RebuildMirroredBuildingParts()</code>, which loads the class (synchronous: this is
+a one-shot editor path, never a per-frame one) and mirrors its template's
+static-mesh parts (the native CDO's <code>UStaticMeshComponent</code>s plus every
+Blueprint class's SCS nodes, via <code>OutpostPreviewMeshUtils::CollectMeshParts()</code>)
+into plain, transient <code>UStaticMeshComponent</code>s owned directly by the plot
+actor (<code>MirroredBuildingParts</code>, <code>WITH_EDITORONLY_DATA</code>).</p>
+<p>Each mirrored part
+carries the template's own authored per-slot material overrides only (not the
+ghost's translucent material: that repaint is the placement ghost's job,
+covered in <code>edmode.html</code>). No faction tint is layered on top (see "Faction No
+Longer Affects Rendering" below).</p>
+<p><strong>Never a child actor and never a spawned instance</strong>: mirroring templates
+into plain components this actor owns is the hard-law-compliant pattern, the
+same one <code>edmode.html</code>'s placement ghost uses via the identical
+<code>CollectMeshParts()</code> collector.</p>
+<p>Because both sides read the same collector off
+the same class, ghost and mirrored plot render the same template by
+construction.</p>
+<p>While <code>MirroredBuildingParts</code> is non-empty, <code>BuildingMeshComponent</code> is set to
+carry no mesh: the parts ARE the visual (and, being ordinary collidable
+components, the trace target editor selection/click-picking hits). The mirror
+only ever REPLACES what <code>BuildingMeshComponent</code> would have shown; it never
+renders alongside it.</p>
+<p>This rung is skipped (and the ladder above runs unchanged) whenever
+<code>RebuildMirroredBuildingParts()</code> returns false: the plot is unassigned, the
+assigned building's <code>BuildingActorClass</code> is unset, the class fails to load, or
+the class contributes no static-mesh parts at all (an Actor with only
+non-mesh components, say).</p>
+<p>"A plot is never invisible" still holds in every
+one of those cases, because the fallback is the same ladder that already
+guaranteed it.</p>
+<p><strong>Game worlds never mirror, on purpose.</strong> <code>RefreshBuildingPreview()</code>'s
+actor-template branch is gated on the world NOT being a game world
+(<code>!PlotWorld-&gt;IsGameWorld()</code>). <code>BeginAsyncBuildingRefresh()</code>, the async path
+<code>PostRegisterAllComponents</code> uses in a packaged game or PIE, never calls it at
+all.</p>
+<p>Gameplay is expected to spawn the real <code>BuildingActorClass</code> actor itself
+when it wants one. Mirroring its template into the plot as well would render
+it twice.</p>
+<h2 id="faction-no-longer-affects-rendering">Faction No Longer Affects Rendering</h2>
+<p>Faction is not a rendering input. None of <code>AOutpostPlot</code>'s realize paths
+(<code>RefreshBuildingPreview()</code>, <code>BeginAsyncBuildingRefresh()</code>,
+<code>RebuildMirroredBuildingParts()</code>) apply any color to what they render, and the
+plugin uses no Custom Primitive Data anywhere. (Porting note: if your project
+drove a plot tint off CPD float4 index 0, that contract is gone. Nothing
+writes it now, so drop that node.)</p>
+<p>Faction still matters upstream of all of this, just not as a rendering
+input: <code>UOutpostBuildingDefinition::SupportsFaction()</code> decides whether a
+building may be ASSIGNED to a plot in the first place (a Neutral outpost
+accepts everything; an empty <code>SupportedFactions</code> list is a wildcard).</p>
+<p>Once a
+building IS assigned, what a plot renders (mesh or mirrored actor-template
+parts) is governed entirely by the ladder and the mirror described above,
+with no faction input anywhere in either path. See <code>faction-visuals.html</code>
+for the full model of what faction still does (identity and eligibility
+gating).</p>
+<h2 id="what-this-trades-away">What This Trades Away</h2>
+<p>The old <code>RandomizeLoadout(Outpost, Seed)</code> was an explicit, stateless function
+game code called on demand with a caller-supplied seed, returning a map a
+second call (<code>ApplyFactionLoadout</code>) then used to spawn actors.</p>
+<p>That gave two
+things the current model doesn't: an explicitly re-rollable pick (call it again
+with a new seed, get a new pick), and a documented multiplayer story (every
+peer replicates <code>(FactionId, Seed)</code> and computes the same result locally).</p>
+<p>The current model has no automatic picking at all. An unassigned plot doesn't
+choose a building. It shows the authored empty-plot mesh. So there is no
+runtime randomness left in plot rendering: nothing to re-roll, nothing to
+replicate, and no seed-agreement problem across peers.</p>
+<p>What the mesh ladder
+resolves is a pure function of authored data (<code>AssignedBuildingId</code>, or the
+settings asset's <code>EmptyPlotMesh</code>). World type selects between that ladder and
+the editor-only actor-template mirror described below, but neither side injects
+randomness.</p>
+<p>The trade is variety-for-free. If a project wants a field of visually varied
+unassigned plots, that variety must now be authored: assign buildings to the
+plots you want varied.</p>
+<p>The Editing panel's <strong>Randomize Plots</strong> action does
+exactly that in one undoable transaction: it is an explicit designer re-roll
+that WRITES <code>AssignedBuildingId</code> on each SELECTED plot (actor and definition
+record; it acts on the plots you select, disabled with nothing selected), so
+its results are authored data, not a runtime fallback.</p>
+<p>It is the only
+randomization left in the plugin.</p>
+<h2 id="where-this-fits">Where This Fits</h2>
+<p>Check out <code>faction-visuals.html</code> for what faction still does (identity and
+building-eligibility gating, via <code>SupportsFaction</code>). Check out
+<code>architecture.html</code> for the plot/outpost ownership model (primary-asset
+resolution, the no-nesting rule) this still builds on.</p>
+<h2 id="references">References</h2>
+<p>Repo files:</p>
+<ul>
+<li><code>OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostDefinition.h</code> - <code>FOutpostPlotRecord::AssignedBuildingId</code>, the fixed per-plot assignment read first.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Settings/OutpostBuilderSettingsAsset.h</code> - <code>EmptyPlotMesh</code> (the one empty-plot mesh) and <code>DefaultPreviewMesh</code> (the shared fallback rung).</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Actors/OutpostPlot.cpp</code> - <code>RefreshBuildingPreview()</code> / <code>ResolveEmptyPlotMesh()</code>, the synchronous editor realize path.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Actors/OutpostPlot.cpp</code> - <code>BeginAsyncBuildingRefresh()</code>, the game-world async realize path (placeholder, then async load), and its <code>BeginAsyncEmptyPlotMeshLoad()</code> empty-plot branch (a direct settings-asset soft-ref load).</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostBuildingDefinition.h</code> - the building-mesh resolution this model reuses.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Settings/OutpostRuntimeSettings.h</code> - the host of the <code>SettingsAsset</code> pointer the resolution above rides on.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Actors/OutpostPlot.h</code> - <code>AOutpostPlot</code>, where this selection now lives.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostActorEditingLibrary.h</code> / <code>.cpp</code> (<code>WITH_EDITOR</code>) - <code>OutpostBuilder::ActorEditing::RebuildMirroredBuildingParts()</code> / <code>ClearMirroredBuildingParts()</code>, the actor-template mirror described above. Runs before the ladder in an editor world only.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostPreviewMeshUtils.h</code> / <code>.cpp</code> (<code>WITH_EDITOR</code>) - <code>CollectMeshParts()</code>, the CDO+SCS template collector both the mirror and the placement ghost (<code>edmode.html</code>) share, capturing per-part material overrides.</li>
+</ul>
+<p>Removed symbols (do not look for these):</p>
+<ul>
+<li><code>UOutpostDefinition::EmptyPlotPreviewMesh</code> / <code>EmptyPlotRuntimeMesh</code> and their <code>SelectEmptyPlotMesh</code> selector - replaced by the one settings-asset <code>EmptyPlotMesh</code>.</li>
+<li><code>UOutpostBuilderSettings</code> and <code>UOutpostBuilderStyleSettings</code> - both settings classes collapsed onto <code>UOutpostBuilderSettingsAsset</code>.</li>
+<li><code>AOutpostPlot::OnOutpostDefinitionLoaded</code> - the empty-plot mesh no longer lives one definition-hop away, so the async path loads the mesh directly.</li>
+</ul>
+<p>Other pages:</p>
+<ul>
+<li><code>faction-visuals.html</code> - faction identity and building-eligibility gating.</li>
+<li><code>architecture.html</code> - the primary-asset conventions and no-nesting rule this still builds on.</li>
+<li><code>TESTING.md</code> - the manual verification checklist; see its "15. The ONE Empty-Plot Mesh (Settings Asset)" section for the plot-mesh/empty-plot checks this page's model drives.</li>
+</ul>
+      </article>
+    <nav class="pager" aria-label="Page navigation">
+      <a class="pager-prev" href="reference.html">
+        <span class="pager-dir">&larr; Previous</span>
+        <span class="pager-title">Reference - Public Surfaces, Hotkeys, and Testing</span>
+      </a>
+      <a class="pager-next" href="porting.html">
+        <span class="pager-dir">Next &rarr;</span>
+        <span class="pager-title">Porting Into Your Own Project</span>
+      </a>
+    </nav>
+    </main>
+
+    <footer class="foot">
+      <p>A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.</p>
+      <a href="https://github.com/defessler/OutpostBuilder">View on GitHub</a>
+    </footer>
+  </div>
+</div>
+
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

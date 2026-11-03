@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Faction - Identity and Gating · OutpostBuilder</title>
+<meta name="description" content="A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<div class="shell">
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-controls="sidebar" aria-expanded="false">
+    <span></span><span></span><span></span>
+    <span class="vh">Toggle navigation</span>
+  </button>
+
+  <aside class="side" id="sidebar">
+    <div class="side-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-word">OutpostBuilder</span>
+      </a>
+
+      <nav aria-label="Documentation">
+        <ol class="nav-list">
+          <li>
+            <a href="index.html">
+              <span class="nav-no">01</span>
+              <span class="nav-title">OutpostBuilder</span>
+            </a>
+          </li>
+          <li>
+            <a href="tutorial.html">
+              <span class="nav-no">02</span>
+              <span class="nav-title">Tutorial - A Guided Tour</span>
+            </a>
+          </li>
+          <li>
+            <a href="architecture.html">
+              <span class="nav-no">03</span>
+              <span class="nav-title">Architecture</span>
+            </a>
+          </li>
+          <li>
+            <a href="identity.html">
+              <span class="nav-no">04</span>
+              <span class="nav-title">Instance Identity</span>
+            </a>
+          </li>
+          <li>
+            <a href="edmode.html">
+              <span class="nav-no">05</span>
+              <span class="nav-title">The Ed Mode - UEdMode Deep Dive</span>
+            </a>
+          </li>
+          <li>
+            <a href="toolkit.html">
+              <span class="nav-no">06</span>
+              <span class="nav-title">The Toolkit - FModeToolkit and Slate</span>
+            </a>
+          </li>
+          <li>
+            <a href="prefabs.html">
+              <span class="nav-no">07</span>
+              <span class="nav-title">Prefabs &amp; Fork-on-Stamp</span>
+            </a>
+          </li>
+          <li>
+            <a href="faction-visuals.html" class="active" aria-current="page">
+              <span class="nav-no">08</span>
+              <span class="nav-title">Faction - Identity and Gating</span>
+            </a>
+          </li>
+          <li>
+            <a href="extending.html">
+              <span class="nav-no">09</span>
+              <span class="nav-title">Extending Outpost Builder</span>
+            </a>
+          </li>
+          <li>
+            <a href="quick-reference.html">
+              <span class="nav-no">10</span>
+              <span class="nav-title">Quick Reference - The Cheat Sheet</span>
+            </a>
+          </li>
+          <li>
+            <a href="reference.html">
+              <span class="nav-no">11</span>
+              <span class="nav-title">Reference - Public Surfaces, Hotkeys, and Testing</span>
+            </a>
+          </li>
+          <li>
+            <a href="runtime-loadout.html">
+              <span class="nav-no">12</span>
+              <span class="nav-title">Per-Plot Building Rendering</span>
+            </a>
+          </li>
+          <li>
+            <a href="porting.html">
+              <span class="nav-no">13</span>
+              <span class="nav-title">Porting Into Your Own Project</span>
+            </a>
+          </li>
+          <li>
+            <a href="wiring.html">
+              <span class="nav-no">14</span>
+              <span class="nav-title">System Wiring</span>
+            </a>
+          </li>
+          <li>
+            <a href="technology.html">
+              <span class="nav-no">15</span>
+              <span class="nav-title">Technology &amp; Trade-offs</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
+      <a class="side-github" href="https://github.com/defessler/OutpostBuilder">
+        <span aria-hidden="true">&#8599;</span> Repository
+      </a>
+    </div>
+  </aside>
+
+  <div class="nav-scrim" id="nav-scrim"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="crumb">OutpostBuilder <span class="crumb-sep">/</span> Faction - Identity and Gating</span>
+      <span class="published">Published <time datetime="2026-11-03T05:35:00Z">2026-11-03 05:35 UTC</time></span>
+
+    </header>
+
+    <main id="content">
+      <article class="doc">
+<h1 id="faction-identity-and-gating">Faction - Identity and Gating</h1>
+<p><code>EOutpostFaction</code> is <strong>pure identity and eligibility, with zero visual effect.</strong> It decides
+which buildings a plot may field and nothing else. No tint, beam hue, or border color
+derives from it. This page covers the faction model and where the plugin's colors come from
+instead.</p>
+<h2 id="the-enum">The Enum</h2>
+<p><code>EOutpostFaction</code> (<code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostFaction.h</code>,
+<code>UENUM(BlueprintType)</code>) is <code>{ Neutral, Faction1, Faction2, Faction3 }</code>, and its
+header comment says plainly what it's for:</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/**</span>
+<span class="cm"> * Faction identity for an outpost: pure identity and eligibility, no cosmetic effect of its own.</span>
+<span class="cm"> * Which buildings a faction may field is decided by UOutpostBuildingDefinition::SupportsFaction.</span>
+<span class="cm"> * Append-only: this serializes as a raw uint8, so never reorder or renumber an existing enumerator,</span>
+<span class="cm"> * and pair any rename with a `+EnumRedirects` entry in this plugin's Config/DefaultEngine.ini.</span>
+<span class="cm"> */</span>
+</code></pre></div>
+
+<p>The comment's last two lines are the APPEND-ONLY rule (not a visuals concern, but worth knowing).
+They cover a different hazard: <code>EOutpostFaction</code> serializes as a raw <code>uint8</code> everywhere a
+faction is saved, so an existing enumerator's value must never be reordered or renumbered.</p>
+<p>Renaming one needs a matching <code>+EnumRedirects</code> entry in this plugin's
+<code>Config/DefaultEngine.ini</code> so saved content heals instead of silently reverting to
+Neutral. See the header itself for the full contract.</p>
+<p><code>AOutpost</code> carries it as a plain property, with <code>GetFaction()</code>/<code>SetFaction()</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Outpost"</span><span class="p">)</span>
+<span class="n">EOutpostFaction</span><span class="w"> </span><span class="n">Faction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EOutpostFaction</span><span class="o">::</span><span class="n">Neutral</span><span class="p">;</span>
+</code></pre></div>
+
+<p><code>SetFaction()</code> follows the same no-op → <code>Modify()</code> → mutate → <code>MarkPackageDirty()</code>
+discipline as every setter in the plugin:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">AOutpost::SetFaction</span><span class="p">(</span><span class="n">EOutpostFaction</span><span class="w"> </span><span class="n">NewFaction</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Faction</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">NewFaction</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">EOutpostFaction</span><span class="w"> </span><span class="n">OldFaction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Faction</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">Modify</span><span class="p">();</span>
+<span class="w">    </span><span class="n">Faction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NewFaction</span><span class="p">;</span>
+<span class="w">    </span><span class="n">MarkPackageDirty</span><span class="p">();</span>
+
+<span class="w">    </span><span class="n">UOutpostEventSubsystem</span><span class="o">::</span><span class="n">NotifyFactionChanged</span><span class="p">(</span><span class="n">GetWorld</span><span class="p">(),</span><span class="w"> </span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="n">OldFaction</span><span class="p">,</span><span class="w"> </span><span class="n">NewFaction</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The write ends with a <code>UOutpostEventSubsystem::NotifyFactionChanged</code> broadcast, so any
+listener (game or editor) can react to a faction change without polling.</p>
+<h2 id="what-faction-controls-which-buildings-a-plot-may-field">What Faction Controls: Which Buildings a Plot May Field</h2>
+<p>The one thing faction does is gate <code>UOutpostBuildingDefinition::SupportsFaction</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">bool</span><span class="w"> </span><span class="nf">SupportsFaction</span><span class="p">(</span><span class="n">EOutpostFaction</span><span class="w"> </span><span class="n">OutpostFaction</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+</code></pre></div>
+
+<p>Takes the <strong>outpost's</strong> faction, not the building's, and is the one home of the rule.
+Never test <code>SupportedFactions</code> (<code>TSet&lt;EOutpostFaction&gt;</code>, default empty) directly:</p>
+<ol>
+<li><strong>A Neutral outpost accepts every building</strong>, regardless of what <code>SupportedFactions</code>
+   lists, checked first, before the set is read at all.</li>
+<li><strong>An empty <code>SupportedFactions</code> list is a wildcard</strong> ("supported everywhere"), not
+   "supported nowhere". That's the state every building authored before this field existed,
+   or any building a designer never touches the field on, deserializes to.</li>
+</ol>
+<p><code>UOutpostBuilderEdMode::GetFactionForPlot(Plot)</code> is the read side: it resolves the
+plot's owning outpost (<code>FindOwningOutpostForIdentity</code>: the plot's instance id first, and the definition-unique lookup only as the unmigrated fallback, both failing closed on ambiguity) and
+returns its <code>GetFaction()</code>, or <code>Neutral</code> if there's no unique owner.</p>
+<p><code>Neutral</code> is the
+deliberate, honest fallback for "can't resolve" too. Neutral accepts everything, so an
+unresolvable owner never refuses a building it can't actually justify refusing.</p>
+<p>That gate reaches two places in the Editing panel:</p>
+<ul>
+<li><strong>The Assign button</strong> - <code>AssignBuildingToSelectedPlot</code> re-checks eligibility
+  authoritatively before writing the record (the button's own per-frame check is
+  load-free and permissive when the definition isn't resident, so this is the real
+  backstop); a mismatch disables the button and shows a refusal tooltip/toast:</li>
+</ul>
+<blockquote>
+<p>"This outpost's faction does not field this building. Add that faction to the
+building's Supported Factions, clear that list to allow every faction, or set the
+outpost's faction to Neutral - a Neutral outpost accepts every building."</p>
+</blockquote>
+<ul>
+<li><strong>The palette itself</strong> - <code>FOutpostPaletteModel::PassesFilters</code> applies the same rule
+  as a mandatory view filter: a building the editing outpost's faction can't field isn't
+  shown disabled, it's left out of the palette entirely. If the gate empties the palette
+  down to nothing, an explanatory text row naming the faction takes the grid's place.</li>
+</ul>
+<p>Randomize's building pool excludes the same buildings. This gating is the <em>entire</em> reason
+<code>EOutpostFaction</code> exists on an outpost.</p>
+<h2 id="the-picker-text-only">The Picker: Text Only</h2>
+<p>The Editing panel's identity header hosts a Faction row built from the engine's
+<code>SEnumComboBox</code>, constructed once with
+<code>StaticEnum&lt;EOutpostFaction&gt;()</code>. Its <code>CurrentValue</code> is a <strong>live <code>TAttribute&lt;int32&gt;</code></strong>.</p>
+<p>The widget re-resolves <code>Context-&gt;GetEditingOutpost()-&gt;GetFaction()</code> every frame rather
+than caching a mirror, so the combo needs no external refresh call anywhere. No
+post-undo/redo push, no settings-asset-changed push, nothing.</p>
+<p>A genuine user pick
+fires <code>OnEnumSelectionChanged</code>, cast back from <code>int32</code> to <code>EOutpostFaction</code> and handed
+to <code>HandleFactionSelected</code>, which fires the widget's <code>OnFactionChanged</code> delegate (it
+owns no faction state of its own to update first).</p>
+<p>The toolkit's <code>HandleFactionChanged</code>
+answers that by calling
+<code>UOutpostBuilderEdMode::AssignFactionToEditingOutpost</code> and then re-running the palette's
+visible-entries refresh:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">UOutpostBuilderEdMode::AssignFactionToEditingOutpost</span><span class="p">(</span><span class="n">EOutpostFaction</span><span class="w"> </span><span class="n">Faction</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">CanAssignFaction</span><span class="p">())</span><span class="w"> </span><span class="c1">// IsEditingOutpost()</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="c1">// PIE gate: every persistent-record mutator refuses while Play/Simulate is active.</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IsPlayOrSimulateActive</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">ShowPlayOrSimulateActiveToast</span><span class="p">();</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="w">    </span><span class="n">FScopedTransaction</span><span class="w"> </span><span class="n">Transaction</span><span class="p">(</span><span class="n">NSLOCTEXT</span><span class="p">(</span><span class="s">"OutpostBuilder"</span><span class="p">,</span><span class="w"> </span><span class="s">"AssignFactionTransaction"</span><span class="p">,</span><span class="w"> </span><span class="s">"Assign Faction"</span><span class="p">));</span>
+<span class="w">    </span><span class="n">Outpost</span><span class="o">-&gt;</span><span class="n">SetFaction</span><span class="p">(</span><span class="n">Faction</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">UOutpostDefinition</span><span class="o">*</span><span class="w"> </span><span class="n">Definition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetOrCreateOutpostDefinitionForOutpost</span><span class="p">(</span><span class="n">Outpost</span><span class="p">))</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Definition</span><span class="o">-&gt;</span><span class="n">SetFaction</span><span class="p">(</span><span class="n">Faction</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>That's it. It writes the live actor always, and the definition asset only while this outpost is the definition's ONLY placement - a shared template gets the actor write alone, so one placement's faction can't spread to its siblings the next time each is edited.</p>
+<p>The click refuses outright, transaction cancelled, if no definition resolves at all. There is
+<strong>no color swatch in that row</strong>.</p>
+<p>The combo shows the enum's display text only (<code>SEnumComboBox</code>'s own <code>GetCurrentValueText</code>,
+reading <code>StaticEnum&lt;EOutpostFaction&gt;()</code>'s <code>DisplayName</code> metadata), and the
+row's tooltip says so outright.</p>
+<p>There's a seam worth knowing about here. <code>SEnumComboBox</code> also
+binds its OWN per-value tooltip from the enum's <code>ToolTip</code> metadata, which
+<code>EOutpostFaction</code> doesn't carry, so that resolves empty and Slate falls through to
+this row's tooltip instead:</p>
+<blockquote>
+<p>"Sets the faction of the outpost being edited. Faction gates which buildings its
+plots may field - it never changes their appearance."</p>
+</blockquote>
+<p>The mandatory outpost-faction gate is the one faction rule the palette applies, and the
+Assign picker's own faction narrowing follows the same gate. A faction-ineligible building
+isn't shown as a disabled or chipped tile. <code>PassesFilters</code>' mandatory gate leaves it out
+of the palette entirely, so there's no tile left to grey out.</p>
+<h2 id="the-definition-asset-is-the-source-of-truth">The Definition Asset Is the Source of Truth</h2>
+<p>A designer doesn't set <code>Faction</code> on the live actor directly. Note the definition is the authoritative home only while it backs a single placement - shared, it is the spawn-time default and each placement's actor owns its faction.</p>
+<p>There is a third home besides those two: <code>FOutpostBakedInstance::Faction</code> in the level registry, written per instance by the bake and read back by <code>RestoreOutpostFromBaked</code>, so a registry-driven restore takes faction from the bake rather than from the definition asset.</p>
+<p><code>UOutpostDefinition::GetFaction()</code>/<code>SetFaction()</code> is the persistent, authoritative
+value. The live <code>AOutpost::Faction</code> syncs down from it on edit-entry only when this outpost is the definition's sole placement and the two have actually drifted (in-sync opens no transaction at all).</p>
+<p>A shared template leaves each placement's actor faction alone
+(<code>EnterOutpostEditMode</code>), and also the moment the definition asset itself is edited
+directly in its own asset editor (via
+<code>FOutpostBuilderEditorModule::OnDefinitionAssetPropertyChanged</code>).</p>
+<p>That
+handler finds the UNIQUE live outpost bound to the edited definition's id and calls
+<code>SetFaction(Definition-&gt;GetFaction())</code> on it. An ambiguous id (shared by more than one
+live outpost) means the handler writes nothing rather than guess.</p>
+<h2 id="no-faction-color-anywhere">No Faction Color Anywhere</h2>
+<p>Faction drives no color. If you're porting from a fork that predates this (or reading old
+comments, commits, or <code>research/03-faction-visuals-research.md</code>), none of the faction-color
+machinery exists to hook into: no <code>FactionColors</code> map on the settings asset, no
+<code>GetFactionColor</code>/<code>GetDefaultFactionColor</code> resolver, no <code>ApplyFactionColor</code>/<code>RefreshFactionVisuals</code>,
+no faction swatch on any Slate row, and no faction branch in the beams, territory borders,
+or selection markers.</p>
+<p>The one removal a porter must act on is <strong>Custom Primitive Data</strong>: faction tinting was CPD's
+only use, so the plugin writes no CPD at all now (a repo-wide grep for
+<code>CustomPrimitiveData</code>/<code>CPD</code> across <code>OutpostBuilder/Source</code> turns up nothing). If your project
+drove float4 index 0 off an outpost or plot as "the faction color," that node now reads
+nothing. Drop it.</p>
+<h2 id="where-colors-come-from-instead">Where Colors Come From Instead</h2>
+<p>Every surface that might plausibly take a color from faction instead uses a fixed or
+deterministic-but-faction-blind source:</p>
+<ul>
+<li><strong>Ownership beams</strong> (<code>OutpostBuilder::Draw::Private::ResolveBeamBaseColor</code>,
+  <code>OutpostBuilderDraw.cpp</code>) - every beam cycles
+  <code>UOutpostBuilderUserSettings::BeamVibrantPalette</code> (a designer-editable
+  <code>TArray&lt;FLinearColor&gt;</code>), indexed by <code>GetTypeHash(Plot-&gt;GetPlotId()) %
+  BeamVibrantPalette.Num()</code>.<ul>
+<li>That's deterministic per PLOT (stable across frames,
+  unaffected by selection order) and does not read <code>Faction</code>. The
+  rule is written down on the <code>Beam Color Palette</code> property tooltip in
+  <code>OutpostBuilderUserSettings.h</code>: "beams convey direction, not faction, so this is
+  deliberately not a faction color".</li>
+<li>An empty palette or a null outpost falls back to
+  <code>PlotGhostColor</code>.</li>
+</ul>
+</li>
+<li><strong>Territory borders</strong> (<code>DrawTerritoryBorders</code>, <code>OutpostBuilderDraw.cpp</code>) - always
+  <code>UOutpostBuilderUserSettings::TerritoryBorderColor</code> for every <code>AOutpostVolume</code> in the
+  level. A border never varies by the volume's owning outpost's faction, though a volume
+  outside the outpost being edited is desaturated and dimmed by <code>ApplyOutOfScopeFade</code> when
+  <code>bDimOutOfScopeOverlays</code> is on.</li>
+<li><strong>Selection markers</strong> (<code>DrawSelectionMarkers</code>, <code>OutpostBuilderDraw.cpp</code>) -
+  <code>UOutpostBuilderUserSettings::SelectionRimColor</code> for a normal selection,
+  <code>SelectionOverlapRimColor</code> for a plot overlapping a sibling's footprint. Neither has
+  ever branched on faction.</li>
+<li><strong>The plot ghost's placement color</strong> (<code>UOutpostBuilderEdMode::GetPlotGhostColor</code>)<ul>
+<li>A hard RTS-style pick between three Debug|Ghosts colors, no gradient:
+  <code>UOutpostBuilderUserSettings::PlacementPlateValidColor</code>, <code>PlacementPlateWarnColor</code>, and
+  <code>PlacementPlateInvalidColor</code>, chosen by <code>GetPlacementFeedback()</code>'s three-state verdict.</li>
+<li>Amber is a status color reporting a plot-tag advisory, not a faction color, and its own
+  property tooltip says so.</li>
+<li><code>PlotGhostColor</code> also serves as the ownership beams' fallback
+  color (see above) for a null outpost or an empty <code>BeamVibrantPalette</code>. None of these
+  colors is faction-derived.</li>
+</ul>
+</li>
+</ul>
+<p>All four knobs live on <code>UOutpostBuilderUserSettings</code> (the per-user editor-preferences class)
+and are ordinary designer-tunable colors.</p>
+<h2 id="references">References</h2>
+<p>Repo files:</p>
+<ul>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostFaction.h</code> - <code>EOutpostFaction</code>.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Actors/Outpost.h</code> / <code>.cpp</code> - <code>Faction</code>,
+  <code>GetFaction()</code>/<code>SetFaction()</code>.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostBuildingDefinition.h</code> -
+  <code>SupportedFactions</code>, <code>SupportsFaction(EOutpostFaction)</code>.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Settings/OutpostRuntimeSettings.h</code> (+ <code>.cpp</code>) -
+  <code>UOutpostRuntimeSettings</code>.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Actors/OutpostPlot.h</code> / <code>.cpp</code>.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderEdMode.cpp</code> -
+  <code>GetFactionForPlot()</code>, <code>CanAssignFaction()</code>, <code>AssignFactionToEditingOutpost()</code>.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Widgets/SOutpostIdentityHeader.h</code> / <code>.cpp</code> -
+  the Faction picker is an engine <code>SEnumComboBox</code>; <code>GetCurrentFactionValue()</code> (its live
+  <code>CurrentValue</code> attribute), <code>HandleFactionValueChanged()</code>/<code>HandleFactionSelected()</code> (its
+  <code>OnEnumSelectionChanged</code> path), <code>GetFactionRowTooltip()</code>.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkitConfigureTab.cpp</code> -
+  <code>HandleFactionChanged()</code>, the mutation forwarder: calls
+  <code>AssignFactionToEditingOutpost</code> and re-runs the palette's visible-entries refresh.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkitBuildTab.cpp</code> -
+  <code>GetPaletteGateFaction()</code>, which feeds the mandatory palette gate.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderDraw.cpp</code> -
+  <code>ResolveBeamBaseColor</code>, <code>DrawTerritoryBorders</code>, <code>DrawSelectionMarkers</code>.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Settings/OutpostBuilderUserSettings.h</code> -
+  <code>BeamVibrantPalette</code>, <code>TerritoryBorderColor</code>, <code>SelectionRimColor</code>,
+  <code>SelectionOverlapRimColor</code>, <code>PlotGhostColor</code>, <code>PlacementPlateValidColor</code>,
+  <code>PlacementPlateInvalidColor</code>.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/OutpostBuilderEditorModule.cpp</code> -
+  <code>OnDefinitionAssetPropertyChanged()</code>.</li>
+</ul>
+<p>Other pages:</p>
+<ul>
+<li>Check out <code>architecture.html</code> for how the plugin's primary-asset conventions treat
+  faction specifically (an enum, not a primary asset id) while outposts/plots/buildings
+  still resolve through <code>UAssetManager</code>.</li>
+<li>Check out <code>runtime-loadout.html</code> for how a plot renders its own building mesh. That
+  mesh-ladder resolution does not end in a faction tint of any kind.</li>
+<li>Check out <code>toolkit.html</code> for the Editing panel's identity header and building palette,
+  where the faction picker and mandatory gate live.</li>
+</ul>
+      </article>
+    <nav class="pager" aria-label="Page navigation">
+      <a class="pager-prev" href="prefabs.html">
+        <span class="pager-dir">&larr; Previous</span>
+        <span class="pager-title">Prefabs &amp; Fork-on-Stamp</span>
+      </a>
+      <a class="pager-next" href="extending.html">
+        <span class="pager-dir">Next &rarr;</span>
+        <span class="pager-title">Extending Outpost Builder</span>
+      </a>
+    </nav>
+    </main>
+
+    <footer class="foot">
+      <p>A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.</p>
+      <a href="https://github.com/defessler/OutpostBuilder">View on GitHub</a>
+    </footer>
+  </div>
+</div>
+
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

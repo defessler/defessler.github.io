@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Wiring · OutpostBuilder</title>
+<meta name="description" content="A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<div class="shell">
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-controls="sidebar" aria-expanded="false">
+    <span></span><span></span><span></span>
+    <span class="vh">Toggle navigation</span>
+  </button>
+
+  <aside class="side" id="sidebar">
+    <div class="side-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-word">OutpostBuilder</span>
+      </a>
+
+      <nav aria-label="Documentation">
+        <ol class="nav-list">
+          <li>
+            <a href="index.html">
+              <span class="nav-no">01</span>
+              <span class="nav-title">OutpostBuilder</span>
+            </a>
+          </li>
+          <li>
+            <a href="tutorial.html">
+              <span class="nav-no">02</span>
+              <span class="nav-title">Tutorial - A Guided Tour</span>
+            </a>
+          </li>
+          <li>
+            <a href="architecture.html">
+              <span class="nav-no">03</span>
+              <span class="nav-title">Architecture</span>
+            </a>
+          </li>
+          <li>
+            <a href="identity.html">
+              <span class="nav-no">04</span>
+              <span class="nav-title">Instance Identity</span>
+            </a>
+          </li>
+          <li>
+            <a href="edmode.html">
+              <span class="nav-no">05</span>
+              <span class="nav-title">The Ed Mode - UEdMode Deep Dive</span>
+            </a>
+          </li>
+          <li>
+            <a href="toolkit.html">
+              <span class="nav-no">06</span>
+              <span class="nav-title">The Toolkit - FModeToolkit and Slate</span>
+            </a>
+          </li>
+          <li>
+            <a href="prefabs.html">
+              <span class="nav-no">07</span>
+              <span class="nav-title">Prefabs &amp; Fork-on-Stamp</span>
+            </a>
+          </li>
+          <li>
+            <a href="faction-visuals.html">
+              <span class="nav-no">08</span>
+              <span class="nav-title">Faction - Identity and Gating</span>
+            </a>
+          </li>
+          <li>
+            <a href="extending.html">
+              <span class="nav-no">09</span>
+              <span class="nav-title">Extending Outpost Builder</span>
+            </a>
+          </li>
+          <li>
+            <a href="quick-reference.html">
+              <span class="nav-no">10</span>
+              <span class="nav-title">Quick Reference - The Cheat Sheet</span>
+            </a>
+          </li>
+          <li>
+            <a href="reference.html">
+              <span class="nav-no">11</span>
+              <span class="nav-title">Reference - Public Surfaces, Hotkeys, and Testing</span>
+            </a>
+          </li>
+          <li>
+            <a href="runtime-loadout.html">
+              <span class="nav-no">12</span>
+              <span class="nav-title">Per-Plot Building Rendering</span>
+            </a>
+          </li>
+          <li>
+            <a href="porting.html">
+              <span class="nav-no">13</span>
+              <span class="nav-title">Porting Into Your Own Project</span>
+            </a>
+          </li>
+          <li>
+            <a href="wiring.html" class="active" aria-current="page">
+              <span class="nav-no">14</span>
+              <span class="nav-title">System Wiring</span>
+            </a>
+          </li>
+          <li>
+            <a href="technology.html">
+              <span class="nav-no">15</span>
+              <span class="nav-title">Technology &amp; Trade-offs</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
+      <a class="side-github" href="https://github.com/defessler/OutpostBuilder">
+        <span aria-hidden="true">&#8599;</span> Repository
+      </a>
+    </div>
+  </aside>
+
+  <div class="nav-scrim" id="nav-scrim"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="crumb">OutpostBuilder <span class="crumb-sep">/</span> System Wiring</span>
+      <span class="published">Published <time datetime="2026-11-03T05:35:00Z">2026-11-03 05:35 UTC</time></span>
+
+    </header>
+
+    <main id="content">
+      <article class="doc">
+<style>
+/* Monokai tokens from assets/css/style.css. This block used to name a retired theme's
+   variables, which meant the stylesheet had to carry aliases just to keep this page styled. */
+.wiring-launch {
+  display: inline-flex; align-items: center; gap: .6rem;
+  font-family: var(--font); letter-spacing: .04em;
+  text-transform: uppercase; font-size: .95rem;
+  padding: .7rem 1.15rem; margin: .4rem 0 1.6rem;
+  color: var(--mk-bg); background: var(--mk-cyan);
+  border-radius: var(--radius); text-decoration: none;
+  box-shadow: var(--shadow); transition: transform .15s ease, box-shadow .15s ease;
+}
+.wiring-launch:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.wiring-launch .arr { font-family: var(--font); }
+.wiring-frame {
+  width: 100%; height: 78vh; min-height: 460px;
+  border: 1px solid var(--mk-border); border-radius: var(--radius);
+  background: var(--mk-bg);
+}
+.wiring-note { color: var(--mk-comment); font-size: .85rem; font-style: italic; margin-top: .5rem; }
+</style>
+
+<h1 id="system-wiring">System Wiring</h1>
+<p>Every other sheet on this site zooms in on one subsystem. This one pulls all the way back: a single interactive map of the whole plugin (the editor tool, the definition and settings assets, the four flat world actors, and the runtime module that ships in a cooked game), with the edges that connect them.</p>
+<p>It's the <a href="architecture.html">Architecture</a> sheet's mental model made clickable. Click any box to read its contract in the Inspect panel; pick a flow along the top to dim everything except that one story.</p>
+<p><a class="wiring-launch" href="assets/wiring.html">Launch the interactive map <span class="arr">&#8599;</span></a></p>
+<h2 id="how-to-read-it">How To Read It</h2>
+<ul>
+<li><strong>Four columns, left to right</strong> - the editor tool (<code>OutpostBuilderEditor</code>, never cooked), the data model (the two definition assets, the level registry, plus the two settings objects), the flat world actors (<code>AOutpost</code> and its siblings), and the runtime module (<code>OutpostBuilder</code>, what a packaged game actually gets).<ul>
+<li>The map covers the core placement path. The registry bake and the map-open repair, which live in the editor module, have no node on it yet.</li>
+<li>Edges take the color of the column they leave.</li>
+</ul>
+</li>
+<li><strong>Click a node</strong> - the Inspect panel shows that piece's contract and invariants, paraphrased from the code's own headers. Every box names a real, greppable symbol.</li>
+<li><strong>Pick a flow</strong> - six named stories (place an outpost, write-through, assign buildings, fork-on-stamp, runtime &amp; cook, plus the overview) light up only the nodes and edges that carry them, so you can trace one path without the other five in the way.</li>
+</ul>
+<iframe class="wiring-frame" src="assets/wiring.html" title="OutpostBuilder interactive system wiring diagram" loading="lazy"></iframe>
+
+<p class="wiring-note">Inline preview. It's best viewed full-screen via the button above, since the map is wider than this reading column.</p>
+
+<h2 id="the-four-columns">The Four Columns</h2>
+<ul>
+<li><strong>Editor tool</strong> - the <code>UOutpostBuilderEdMode</code> state machine at the center, its <code>FOutpostBuilderToolkit</code> panels, the read-model and palette model the extracted Slate widgets pull from, the draw layer (Outpost-aware wrappers over a separate, zero-Outpost-type primitive vocabulary), and the fork/stamp/volume helpers. All of it is editor-only and never reaches a cooked build.</li>
+<li><strong>Data model</strong> - <code>UOutpostDefinition</code> is the record graph a base is built from, not an actor hierarchy. It is the single source of truth while it belongs to one placement, which is the default.<ul>
+<li>Reuse it across placements and the actors carry what is actually placed, while the definition becomes their shared starting point.</li>
+<li>Beside it sit the building definition, the per-level <code>UOutpostLevelRegistry</code> that bakes each placed outpost's default state so it can be read with its level streamed out, and the two settings objects (the scanned project asset and its config-backed <code>UDeveloperSettings</code> front end).</li>
+</ul>
+</li>
+<li><strong>World actors</strong> - <code>AOutpost</code>, <code>AOutpostPlot</code>, <code>AOutpostVolume</code>, <code>AOverheadCamera</code>. Flat siblings that never attach to each other; they carry identity and state, and find one another by scanning for a matching identity - the per-instance id where there is one, the definition id otherwise - never by walking an attachment chain.</li>
+<li><strong>Runtime</strong> - what survives into a packaged game: the module that force-cooks the definitions with <code>AlwaysCook</code>, the <code>BlueprintCallable</code> stamp library, the event subsystem that bridges to gameplay, the templated id-lookup over the loaded world, and <code>UOutpostRegistrySubsystem</code>.<ul>
+<li><code>UOutpostRegistrySubsystem</code> is the engine subsystem that answers what an outpost is and what it contains while its level is streamed out, which the templated lookup consults rather than being replaced by.</li>
+<li>Two residents of this module never ship despite living here, both wrapped whole in <code>WITH_EDITOR</code>: the actor editing library backing the flat actors' editor-only hooks (record sync, cascade delete), and the preview-mesh helpers, which live in the runtime tree for the same reason - the editor's placement ghost needs them.</li>
+</ul>
+</li>
+</ul>
+<h2 id="the-six-flows">The Six Flows</h2>
+<ul>
+<li><strong>Place an outpost</strong> - Create drops an <code>AOutpost</code>, auto-creates its definition, records the placement, and seeds the exclusion volume.</li>
+<li><strong>Write-through</strong> - moving a plot or the anchor writes the definition's records in the same transaction, while that definition belongs to this one placement. Share the definition across placements and the template write is refused: the actors carry what is actually placed. Ownership is resolved by id, not by a pointer.</li>
+<li><strong>Assign buildings</strong> - one palette model feeds every surface; assigning writes through the plot into the record and mirrors the building's mesh at once.</li>
+<li><strong>Fork-on-stamp</strong> - dragging a saved definition into the level mints a fresh copy so each stamped base owns its own layout, then spawns the base from records. On by default. Turn it off and every drop shares one template.</li>
+<li><strong>Runtime &amp; cook</strong> - the runtime module resolves the same ids the editor wrote, spawns bases from code, and renders each plot's building through a runtime mesh component.</li>
+<li><strong>Overview</strong> - everything at once, for the shape of the whole system.</li>
+</ul>
+<h2 id="source">Source</h2>
+<p>The map is generated from a curated spec, <code>docs/wiring.json</code>, checked in beside this page. That spec is a versioned, diffable description of the columns, nodes, edges, and flows. It is not an auto-generated call graph: the nodes are the load-bearing pieces only, and each edge is a real relationship. Regenerate the standalone <code>assets/wiring.html</code> from the spec whenever the architecture moves.</p>
+      </article>
+    <nav class="pager" aria-label="Page navigation">
+      <a class="pager-prev" href="porting.html">
+        <span class="pager-dir">&larr; Previous</span>
+        <span class="pager-title">Porting Into Your Own Project</span>
+      </a>
+      <a class="pager-next" href="technology.html">
+        <span class="pager-dir">Next &rarr;</span>
+        <span class="pager-title">Technology &amp; Trade-offs</span>
+      </a>
+    </nav>
+    </main>
+
+    <footer class="foot">
+      <p>A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.</p>
+      <a href="https://github.com/defessler/OutpostBuilder">View on GitHub</a>
+    </footer>
+  </div>
+</div>
+
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

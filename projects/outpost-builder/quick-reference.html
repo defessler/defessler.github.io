@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quick Reference - The Cheat Sheet · OutpostBuilder</title>
+<meta name="description" content="The one-page cheat sheet: every hotkey, the settings surfaces, plot size defaults, the three matching rules, what the plot ghost&#x27;s colors mean, and how to switch on and call the companion utility modules.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<div class="shell">
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-controls="sidebar" aria-expanded="false">
+    <span></span><span></span><span></span>
+    <span class="vh">Toggle navigation</span>
+  </button>
+
+  <aside class="side" id="sidebar">
+    <div class="side-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-word">OutpostBuilder</span>
+      </a>
+
+      <nav aria-label="Documentation">
+        <ol class="nav-list">
+          <li>
+            <a href="index.html">
+              <span class="nav-no">01</span>
+              <span class="nav-title">OutpostBuilder</span>
+            </a>
+          </li>
+          <li>
+            <a href="tutorial.html">
+              <span class="nav-no">02</span>
+              <span class="nav-title">Tutorial - A Guided Tour</span>
+            </a>
+          </li>
+          <li>
+            <a href="architecture.html">
+              <span class="nav-no">03</span>
+              <span class="nav-title">Architecture</span>
+            </a>
+          </li>
+          <li>
+            <a href="identity.html">
+              <span class="nav-no">04</span>
+              <span class="nav-title">Instance Identity</span>
+            </a>
+          </li>
+          <li>
+            <a href="edmode.html">
+              <span class="nav-no">05</span>
+              <span class="nav-title">The Ed Mode - UEdMode Deep Dive</span>
+            </a>
+          </li>
+          <li>
+            <a href="toolkit.html">
+              <span class="nav-no">06</span>
+              <span class="nav-title">The Toolkit - FModeToolkit and Slate</span>
+            </a>
+          </li>
+          <li>
+            <a href="prefabs.html">
+              <span class="nav-no">07</span>
+              <span class="nav-title">Prefabs &amp; Fork-on-Stamp</span>
+            </a>
+          </li>
+          <li>
+            <a href="faction-visuals.html">
+              <span class="nav-no">08</span>
+              <span class="nav-title">Faction - Identity and Gating</span>
+            </a>
+          </li>
+          <li>
+            <a href="extending.html">
+              <span class="nav-no">09</span>
+              <span class="nav-title">Extending Outpost Builder</span>
+            </a>
+          </li>
+          <li>
+            <a href="quick-reference.html" class="active" aria-current="page">
+              <span class="nav-no">10</span>
+              <span class="nav-title">Quick Reference - The Cheat Sheet</span>
+            </a>
+          </li>
+          <li>
+            <a href="reference.html">
+              <span class="nav-no">11</span>
+              <span class="nav-title">Reference - Public Surfaces, Hotkeys, and Testing</span>
+            </a>
+          </li>
+          <li>
+            <a href="runtime-loadout.html">
+              <span class="nav-no">12</span>
+              <span class="nav-title">Per-Plot Building Rendering</span>
+            </a>
+          </li>
+          <li>
+            <a href="porting.html">
+              <span class="nav-no">13</span>
+              <span class="nav-title">Porting Into Your Own Project</span>
+            </a>
+          </li>
+          <li>
+            <a href="wiring.html">
+              <span class="nav-no">14</span>
+              <span class="nav-title">System Wiring</span>
+            </a>
+          </li>
+          <li>
+            <a href="technology.html">
+              <span class="nav-no">15</span>
+              <span class="nav-title">Technology &amp; Trade-offs</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
+      <a class="side-github" href="https://github.com/defessler/OutpostBuilder">
+        <span aria-hidden="true">&#8599;</span> Repository
+      </a>
+    </div>
+  </aside>
+
+  <div class="nav-scrim" id="nav-scrim"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="crumb">OutpostBuilder <span class="crumb-sep">/</span> Quick Reference - The Cheat Sheet</span>
+      <span class="published">Published <time datetime="2026-11-03T05:35:00Z">2026-11-03 05:35 UTC</time></span>
+
+    </header>
+
+    <main id="content">
+      <article class="doc">
+<h1 id="quick-reference-the-cheat-sheet">Quick Reference - The Cheat Sheet</h1>
+<p>Keep this one open on the second monitor. It's the short page: keys, defaults, and the names of things, with no reasoning attached. Every section points at a page that explains itself properly, so follow the link when you want the why.</p>
+<p><code>reference.html</code> is the exhaustive one, every public method and property per class. This page is what you want while you're actually working.</p>
+<h2 id="get-it-running">Get It Running</h2>
+<div class="highlight"><pre><span></span><code>git clone https://github.com/defessler/OutpostBuilder.git
+mklink /J "YourProject\Plugins\OutpostBuilder" "path\to\OutpostBuilder"
+Build.bat YourProjectEditor Win64 DebugGame
+</code></pre></div>
+
+<p>Then open the level editor's Modes panel and pick <strong>Outpost Builder</strong>. The plugin ships <code>EnabledByDefault: true</code>, so it should already be listed. The long version, including the build flags we use locally, is on <code>index.html</code>.</p>
+<h2 id="the-loop">The Loop</h2>
+<ol>
+<li><strong>Place an outpost.</strong> Overview panel, Outposts tab, <strong>Add New Outpost</strong>, then <strong>Create</strong>, then click in the viewport. A <code>UOutpostDefinition</code> asset is created under <code>/Game/Outposts</code>.</li>
+<li><strong>Add plots.</strong> Press <code>N</code> and click. Repeat.</li>
+<li><strong>Assign buildings.</strong> Pick a palette tile with <code>1</code>-<code>9</code>. The hot building auto-assigns to every plot you place next.</li>
+<li><strong>Frame the camera.</strong> Press <code>O</code>, fly the viewport, press <code>Enter</code>.</li>
+<li><strong>Fence the base.</strong> Press <code>B</code> to reshape the Outpost Volume.</li>
+<li><strong>Stamp it again.</strong> Drag the definition from the Content Browser back into the level.</li>
+</ol>
+<h2 id="hotkeys">Hotkeys</h2>
+<p>Every chord below is rebindable under <strong>Editor Preferences &gt; Keyboard Shortcuts &gt; Outpost Builder</strong>. These are the shipped defaults. The in-viewport legend and the palette tile badges read the live chords, so they follow a rebind without you having to come back here.</p>
+<h3 id="while-editing-an-outpost">While editing an outpost</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>N</code></td>
+<td><strong>New Plot.</strong> Starts a plot placement.</td>
+</tr>
+<tr>
+<td><code>O</code></td>
+<td><strong>Position Overhead Camera.</strong> Pilots the viewport onto this outpost's camera.</td>
+</tr>
+<tr>
+<td><code>B</code></td>
+<td><strong>Edit Outpost Volume.</strong> Creates it if missing, then drops you straight into brush editing.</td>
+</tr>
+<tr>
+<td><code>J</code></td>
+<td><strong>Randomize Plots.</strong> One random eligible building per selected plot.</td>
+</tr>
+<tr>
+<td><code>E</code></td>
+<td><strong>Eyedropper.</strong> Loads the building on the plot under the cursor into Selected Building. An unassigned plot picks the Empty tile and says so.</td>
+</tr>
+<tr>
+<td><code>1</code>-<code>9</code></td>
+<td>Select palette building 1 through 9. A tenth is click-only.</td>
+</tr>
+<tr>
+<td><code>0</code></td>
+<td>Select the <strong>Empty</strong> tile, so the next plots are placed unassigned.</td>
+</tr>
+<tr>
+<td><code>Ctrl</code> + <code>S</code></td>
+<td>Save every dirty outpost and building definition, then pass through so the editor's own level save still runs.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="while-placing">While placing</h3>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>LMB</code></td>
+<td>Place. Refused while the plot ghost is red, and the click is eaten either way.</td>
+</tr>
+<tr>
+<td><code>RMB</code> tap or <code>Esc</code></td>
+<td>Cancel the session. An RMB <em>drag</em> still orbits.</td>
+</tr>
+<tr>
+<td><code>Ctrl</code> held</td>
+<td>Plot placement only. Flips into the remove tool: <code>LMB</code> deletes the plot under the cursor. Release to carry on placing.</td>
+</tr>
+</tbody>
+</table>
+<p>The remove modifier is configurable (Ctrl, Alt, or Shift) on the per-user settings. It isn't a rebindable chord, because a hold needs per-frame state rather than a key event.</p>
+<h3 id="while-positioning-the-overhead-camera">While positioning the Overhead camera</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Enter</code></td>
+<td><strong>Done.</strong> Saves the framing to the definition and hands your viewport back.</td>
+</tr>
+<tr>
+<td><code>Home</code></td>
+<td>Revert to the last saved framing for the current target, or the computed default when there's none yet.</td>
+</tr>
+<tr>
+<td><code>Esc</code></td>
+<td>Cancel and restore the viewport.</td>
+</tr>
+</tbody>
+</table>
+<p>Whether you're framing the whole outpost or one plot is decided by what was selected when you pressed <code>O</code>, not by what's selected when you press <code>Enter</code>.</p>
+<h3 id="mouse-fixed-and-not-rebindable">Mouse, fixed and not rebindable</h3>
+<table>
+<thead>
+<tr>
+<th>Gesture</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>LMB</code> double-click an outpost</td>
+<td>Enter editing on it, or leave editing when it's the one you're already on. One gesture, both doors. No modifier held.</td>
+</tr>
+<tr>
+<td><code>LMB</code> single click</td>
+<td>Select. Only outpost-family actors are selectable while the mode is active. Everything else clicks through.</td>
+</tr>
+<tr>
+<td><code>Alt</code> + <code>LMB</code> drag</td>
+<td>The editor's own orbit, untouched.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="where-the-knobs-live">Where the Knobs Live</h2>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>What's on it</th>
+<th>Scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Project Settings &gt; Plugins &gt; <strong>Outpost Builder</strong></td>
+<td>One pointer, the Settings Asset. Nothing else.</td>
+<td>Project</td>
+</tr>
+<tr>
+<td>The settings asset itself</td>
+<td>New-definition folder, exclusion distance, plot size dimensions, the four actor class overrides, the empty and preview meshes.</td>
+<td>Project, source-controlled</td>
+</tr>
+<tr>
+<td>Editor Preferences &gt; <strong>Outpost Builder</strong></td>
+<td>Colors, sizes, timings, the remove modifier, the building grid's shape.</td>
+<td>Per user, never source-controlled</td>
+</tr>
+<tr>
+<td>Editor Preferences &gt; Outpost Builder &gt; <strong>Outpost Utilities</strong></td>
+<td>The companion utility switches, all off until you turn the master on. See "The Utility Modules" below.</td>
+<td>Per user</td>
+</tr>
+<tr>
+<td>Editor Preferences &gt; Keyboard Shortcuts &gt; <strong>Outpost Builder</strong></td>
+<td>Every chord in the tables above.</td>
+<td>Per user</td>
+</tr>
+</tbody>
+</table>
+<p>Change a knob on either settings surface and the mode picks it up on the next draw. No rebuild.</p>
+<h2 id="plot-sizes">Plot Sizes</h2>
+<p>Four native tags ship under <code>OutpostBuilder.PlotSize</code>. Every pad is a square.</p>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th>Default pad</th>
+<th>Stored half-size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OutpostBuilder.PlotSize.Small</code></td>
+<td>400 x 400 cm</td>
+<td>200</td>
+</tr>
+<tr>
+<td><code>OutpostBuilder.PlotSize.Medium</code></td>
+<td>800 x 800 cm</td>
+<td>400</td>
+</tr>
+<tr>
+<td><code>OutpostBuilder.PlotSize.Large</code></td>
+<td>1200 x 1200 cm</td>
+<td>600</td>
+</tr>
+<tr>
+<td><code>OutpostBuilder.PlotSize.Heavy</code></td>
+<td>1600 x 1600 cm</td>
+<td>800</td>
+</tr>
+</tbody>
+</table>
+<p>Retune any of them in the settings asset's <strong>Plot Size Tags</strong> map, which stores the half-size in cm. Add your own sizes as ordinary child tags of <code>OutpostBuilder.PlotSize</code> in your project's gameplay tag config, with no plugin change needed. A tag with no entry in that map falls back to Small's dimensions, and an unset tag reads as Small everywhere.</p>
+<h2 id="the-three-matching-rules">The Three Matching Rules</h2>
+<p>All three live on the building definition. All three treat an empty value as a wildcard, so a building with none of them filled in fits everywhere.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Tested against</th>
+<th>Empty means</th>
+<th>A mismatch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PlotSizeQuery</code></td>
+<td>the plot's <code>PlotSizeTag</code></td>
+<td>fits every size</td>
+<td><strong>Blocks.</strong> Assign refuses and the tooltip says why. Randomize drops it from the pool.</td>
+</tr>
+<tr>
+<td><code>SupportedFactions</code></td>
+<td>the <strong>outpost's</strong> faction</td>
+<td>fielded everywhere</td>
+<td><strong>Blocks.</strong> The building leaves the palette entirely rather than showing disabled.</td>
+</tr>
+<tr>
+<td><code>PlotTagQuery</code></td>
+<td>the plot's <code>PlotTags</code></td>
+<td>fits every plot</td>
+<td><strong>Warns only.</strong> A tooltip line, a tile glyph, a plot list drift icon, an amber ghost. It still places.</td>
+</tr>
+</tbody>
+</table>
+<p>Two rules a plain membership test would miss:</p>
+<ul>
+<li>A <strong>Neutral</strong> outpost accepts every building, whatever that building's <code>SupportedFactions</code> lists. That's checked before the set is read at all.</li>
+<li>A mismatch never auto-deletes or reassigns a building already sitting on a plot. It keeps its plot and keeps rendering.</li>
+</ul>
+<p>The plot tag vocabulary is entirely yours. The plugin registers no native tags for it, unlike plot size. Author your own in <code>DefaultGameplayTags.ini</code>.</p>
+<h2 id="reading-the-plot-ghost">Reading the Plot Ghost</h2>
+<p>Three states, told apart by fill treatment rather than hue alone:</p>
+<table>
+<thead>
+<tr>
+<th>Ghost</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Solid green plate</td>
+<td>Clear. The click places.</td>
+</tr>
+<tr>
+<td>Hollow amber plate</td>
+<td>Legal. The Selected Building's <code>PlotTagQuery</code> just won't be satisfied by the plot this click creates. It still places.</td>
+</tr>
+<tr>
+<td>Solid red plate with an X</td>
+<td>Refused. The click is consumed and nothing happens.</td>
+</tr>
+</tbody>
+</table>
+<p>Three numbers print beside the ghost while you place a plot: distance to the outpost's center, the pad's size, and the clear gap to the nearest neighboring plot's edge. That last one reads "Overlap" once it goes negative, and it's omitted when there's no sibling to measure against.</p>
+<h2 id="types-at-a-glance">Types at a Glance</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UOutpostDefinition</code></td>
+<td>The template. Plot records, camera records, faction, display name.</td>
+</tr>
+<tr>
+<td><code>UOutpostBuildingDefinition</code></td>
+<td>One building. Mesh, actor class, the three matching rules, category tag.</td>
+</tr>
+<tr>
+<td><code>UOutpostBuilderSettingsAsset</code></td>
+<td>The project's shared knobs. One per project, pointed at from Project Settings.</td>
+</tr>
+<tr>
+<td><code>AOutpost</code></td>
+<td>The anchor actor. Every other family actor keys off its definition id.</td>
+</tr>
+<tr>
+<td><code>AOutpostPlot</code></td>
+<td>One buildable pad. Carries a runtime mesh component, so a stamped base renders in packaged games with no extra call.</td>
+</tr>
+<tr>
+<td><code>AOverheadCamera</code></td>
+<td>Exactly zero or one per outpost, however many plots have a saved framing.</td>
+</tr>
+<tr>
+<td><code>AOutpostVolume</code></td>
+<td>The exclusion fence. A brush volume, reshaped with the stock geometry tools.</td>
+</tr>
+<tr>
+<td><code>UOutpostStampLibrary</code></td>
+<td><code>StampOutpost</code> (forks the definition), <code>PlaceDefinitionAt</code> (doesn't), <code>RestoreOutpostFromBaked</code> (the recovery path).</td>
+</tr>
+<tr>
+<td><code>FOutpostInstanceId</code></td>
+<td>Which placed outpost an actor belongs to, where the definition id says only what it was built from.</td>
+</tr>
+<tr>
+<td><code>UOutpostRegistrySubsystem</code></td>
+<td>Answers about baked outposts with no level loaded.</td>
+</tr>
+</tbody>
+</table>
+<p>The one structural fact worth carrying into every other page: plots and cameras are never attached to their outpost. They're flat actors that write records back to the definition. <code>architecture.html</code> covers why.</p>
+<h2 id="the-companion-utilities">The Companion Utilities</h2>
+<p>These shipped for a while as their own <code>OutpostUtilities</code> and <code>OutpostEditorUtilities</code> pair, and now live in the two core modules: the runtime half in <code>OutpostBuilder</code>, the editor half in <code>OutpostBuilderEditor</code>. They stay purely additive. With the master switch off, the plugin behaves exactly as it did before they existed.</p>
+<h3 id="turning-them-on">Turning them on</h3>
+<p>Everything except the registry bake is inert until you switch it on at <strong>Editor Preferences &gt; Outpost Builder &gt; Outpost Utilities</strong>. These are per-user workflow switches (<code>config</code>, not <code>defaultconfig</code>), so they don't travel in source control.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Enable Companion Utilities</strong></td>
+<td>Off</td>
+<td>The master switch. Everything below it is inert until this is on, the registry bake excepted.</td>
+</tr>
+<tr>
+<td>Spawn Overhead Camera</td>
+<td>On</td>
+<td>An outpost entering the level brings an Overhead camera with it.</td>
+</tr>
+<tr>
+<td>Spawn Outpost Volume</td>
+<td>On</td>
+<td>An outpost entering the level brings a bounds volume with it.</td>
+</tr>
+<tr>
+<td>Defer Companion Spawn</td>
+<td>On</td>
+<td>Waits a tick so whatever else is mid-placement finishes first and its own companions get counted. Turning it off puts the outpost and its companions on one undo step, which is safe only when nothing else places outposts.</td>
+</tr>
+<tr>
+<td>Cascade Group Delete</td>
+<td>On</td>
+<td>Deleting a blank-id outpost deletes the companions spawned with it. Blank-id outposts only, since the plugin's own cascade already owns every outpost that has a definition id.</td>
+</tr>
+<tr>
+<td><strong>Bake Registry On Save</strong></td>
+<td>On</td>
+<td>Its own switch rather than riding the master, because a default install that baked nothing would answer every unloaded lookup with silence.</td>
+</tr>
+<tr>
+<td>Propagate Definition Id</td>
+<td>On</td>
+<td>Setting the definition id on any family actor sets it on the rest of its group.</td>
+</tr>
+<tr>
+<td>Enable Placement Actor Factory</td>
+<td>Off</td>
+<td>Registers a second drag-drop factory that places one outpost bound to the dropped definition, with no fork.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="what-runs-on-its-own">What runs on its own</h3>
+<p><code>FOutpostBuilderEditorModule</code> installs five editor listeners at startup, deferring past a null <code>GEngine</code> when the module loads before <code>UEngine::Init</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Listener</th>
+<th>What it watches for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ActorAdded</td>
+<td>An outpost entering the editor world by any route (a Place Actors drag, a paste, a duplicate, an asset drop), and brings its camera and volume along.</td>
+</tr>
+<tr>
+<td>GroupCascade</td>
+<td>A blank-id outpost's deletion, taking its companions with it. Without this a bare outpost's volume outlives the delete, and a stray volume blocks placement around a base that no longer exists.</td>
+</tr>
+<tr>
+<td>IdentitySync</td>
+<td>A definition id set on one group member, pushed out to the rest. It hooks the pre-change half too, because after the change the old id is the only thing still linking a group whose members were never tagged.</td>
+</tr>
+<tr>
+<td>InstanceHeal</td>
+<td>A duplicate or paste, giving the copy its own instance id. A set copied together stays together, and a companion copied alone comes away alone.</td>
+</tr>
+<tr>
+<td>RegistryBake</td>
+<td>Package saves, world saves, and map open. Two save hooks, because under One File Per Actor most outpost edits never touch the world package at all. The registry is marked dirty and never saved from inside the hook.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="what-you-can-actually-call">What you can actually call</h3>
+<p>Three namespaces carry <code>OUTPOSTBUILDER_API</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Namespace</th>
+<th>Header</th>
+<th>What it's for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OutpostBuilder::Group</code></td>
+<td><code>Identity/OutpostGroupTag.h</code></td>
+<td>The group link: <code>MakeGroupTag</code>, <code>ParseGroupTag</code>, <code>FindGroupId</code>, <code>FindOrAddGroupId</code>, <code>AddGroupTag</code>, <code>RemoveGroupTag</code>, <code>CollectGroupMembers</code>.</td>
+</tr>
+<tr>
+<td><code>OutpostBuilder::Identity</code></td>
+<td><code>Identity/OutpostIdentitySync.h</code></td>
+<td>Definition ids without caring which of the four classes you're holding: <code>IsFamilyActor</code>, <code>GetDefinitionId</code>, <code>SetDefinitionId</code>, <code>CollectLinkedActors</code>, <code>PropagateDefinitionId</code>.</td>
+</tr>
+<tr>
+<td><code>OutpostBuilder::Companion</code></td>
+<td><code>Spawn/OutpostCompanionSpawn.h</code></td>
+<td><code>EnsureOverheadCamera</code>, <code>FindGroupOverheadCamera</code>, <code>ResolveCameraFraming</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>The group link is an <code>OutpostGroup.&lt;Guid&gt;</code> entry in <code>AActor::Tags</code>, not a new property on the family. That's what lets it link an outpost to its companions before any of them carries a definition id, and it survives save, load, and copy/paste for free.</p>
+<p>An actor belongs to one group only, so <code>AddGroupTag</code> returns false when the actor already carries a tag. <code>EnsureOverheadCamera</code> is idempotent and mints the group id when the outpost has none, so calling it twice hands back the same camera.</p>
+<p>The editor half exports nothing at all. The registry bake, the volume build, the label helpers and the five listeners are all module-internal by design. You reach that behavior through the listeners and the console commands, not by linking.</p>
+<p>To call the runtime half from your own module, add <code>"OutpostBuilder"</code> to its dependencies. The outpost family types come along with it.</p>
+<h3 id="baking-a-partitioned-map">Baking a partitioned map</h3>
+<p>The save-time bake only sees the cells the editor has loaded. It's honest about that (it upserts what it sees, leaves the rest alone, and records the pass as incomplete), but honest and partial isn't the same as correct. The full pass is a World Partition builder:</p>
+<div class="highlight"><pre><span></span><code>UnrealEditor-Cmd.exe &lt;project&gt; -run=WorldPartitionBuilderCommandlet ^
+    -Builder=OutpostRegistryBuilder -AllowCommandletRendering -Map=&lt;map&gt;
+</code></pre></div>
+
+<p>It loads the entire world rather than one cell at a time, so the registry it writes is complete by construction. It works on ordinary non-partitioned levels too, where the answer is simply already complete. A non-zero exit is what a CI step gates on. With no CI step wired up, <code>Outpost.DumpRegistry</code>'s incomplete warnings are your only signal.</p>
+<h2 id="console">Console</h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Outpost.BakeRegistry</code></td>
+<td>Bakes the open level's outposts into its registry asset. Marks the asset dirty without saving, so save to keep the result. On a partitioned map it bakes only the loaded cells and tells you so.</td>
+</tr>
+<tr>
+<td><code>Outpost.DumpRegistry</code></td>
+<td>Lists every baked outpost with its handle, level, plot count, and verification state.</td>
+</tr>
+<tr>
+<td><code>Outpost.CheckBounds</code></td>
+<td>Checks every outpost's bounds volume in the open level: missing or duplicate volumes, a brush that never got built, a stale cached box, a stale bake, and which plots sit outside their own volume. Lines marked <code>!</code> are the ones to act on.</td>
+</tr>
+<tr>
+<td><code>Outpost.CheckBounds X Y Z</code></td>
+<td>Answers one world-space point against all three containment rules at once - the volume's box, the actual brush, and the baked territory - so you can see where they disagree.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="going-deeper">Going Deeper</h2>
+<ul>
+<li><code>tutorial.html</code> - screen by screen, with real screenshots of every panel and overlay.</li>
+<li><code>reference.html</code> - every public method and property, per class, plus the file map.</li>
+<li><code>architecture.html</code> - the module split and the flat-actor record model.</li>
+<li><code>identity.html</code> - instance handles, the baked registry, and how delete and restore work against them.</li>
+<li><code>edmode.html</code> - the placement state machine, the ghosts, and input routing.</li>
+<li><code>toolkit.html</code> - the Slate side: panels, the palette, the viewport overlays.</li>
+<li><code>prefabs.html</code> - fork on stamp and the transform math behind it.</li>
+<li><code>extending.html</code> - worked examples and a pitfalls checklist.</li>
+<li><code>wiring.html</code> - the interactive system map, with click-to-inspect contracts.</li>
+</ul>
+      </article>
+    <nav class="pager" aria-label="Page navigation">
+      <a class="pager-prev" href="extending.html">
+        <span class="pager-dir">&larr; Previous</span>
+        <span class="pager-title">Extending Outpost Builder</span>
+      </a>
+      <a class="pager-next" href="reference.html">
+        <span class="pager-dir">Next &rarr;</span>
+        <span class="pager-title">Reference - Public Surfaces, Hotkeys, and Testing</span>
+      </a>
+    </nav>
+    </main>
+
+    <footer class="foot">
+      <p>A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.</p>
+      <a href="https://github.com/defessler/OutpostBuilder">View on GitHub</a>
+    </footer>
+  </div>
+</div>
+
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

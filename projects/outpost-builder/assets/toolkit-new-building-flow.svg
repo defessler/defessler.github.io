@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 900" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8b98ab" />
+    </marker>
+  </defs>
+
+  <style>
+    .box { fill: rgba(139,152,171,0.10); stroke: #8b98ab; stroke-width: 1.5; }
+    .diamond { fill: rgba(196,164,90,0.12); stroke: #c4a45a; stroke-width: 1.5; }
+    .side { fill: rgba(171,110,110,0.10); stroke: #a86c6c; stroke-width: 1.5; }
+    .label { fill: #e7ecf3; font-size: 13px; }
+    .sub { fill: #aab4c2; font-size: 12px; }
+    .code { fill: #cfe0d8; font-size: 12px; font-family: Consolas, "Courier New", monospace; }
+    .arrow { stroke: #8b98ab; stroke-width: 1.5; fill: none; marker-end: url(#arrow2); }
+  </style>
+
+  <text x="320" y="24" text-anchor="middle" class="label" font-weight="600" font-size="15">"+ New Building" -&gt; HandleNewBuildingClicked()</text>
+
+  <rect x="170" y="42" width="300" height="46" rx="6" class="box" />
+  <text x="320" y="61" text-anchor="middle" class="code">FSaveAssetDialogConfig</text>
+  <text x="320" y="77" text-anchor="middle" class="sub">DefaultPath = Settings-&gt;CreatedDefinitionFolder</text>
+
+  <path d="M320,88 L320,116" class="arrow" />
+
+  <polygon points="320,116 420,152 320,188 220,152" class="diamond" />
+  <text x="320" y="148" text-anchor="middle" class="label" font-size="12">CreateModalSaveAssetDialog</text>
+  <text x="320" y="164" text-anchor="middle" class="sub">path empty?</text>
+
+  <path d="M220,152 L100,152" class="arrow" />
+  <rect x="10" y="130" width="180" height="44" rx="6" class="side" />
+  <text x="100" y="148" text-anchor="middle" class="label" font-size="12">Cancelled</text>
+  <text x="100" y="164" text-anchor="middle" class="sub">return (no fallback name)</text>
+
+  <path d="M320,188 L320,216" class="arrow" />
+  <text x="335" y="205" class="sub">confirmed</text>
+
+  <rect x="140" y="216" width="360" height="52" rx="6" class="box" />
+  <text x="320" y="236" text-anchor="middle" class="code">CreatePackage(*PackageName)</text>
+  <text x="320" y="252" text-anchor="middle" class="code">NewObject&lt;UOutpostBuildingDefinition&gt;(Package, ...)</text>
+
+  <path d="M320,268 L320,296" class="arrow" />
+
+  <rect x="140" y="296" width="360" height="52" rx="6" class="box" />
+  <text x="320" y="316" text-anchor="middle" class="code">FAssetRegistryModule::AssetCreated(NewAsset)</text>
+  <text x="320" y="332" text-anchor="middle" class="code">NewAsset-&gt;MarkPackageDirty()</text>
+
+  <path d="M320,348 L320,376" class="arrow" />
+
+  <rect x="110" y="376" width="420" height="52" rx="6" class="box" />
+  <text x="320" y="396" text-anchor="middle" class="code">UAssetManager::Get().ScanPathForPrimaryAssets(...)</text>
+  <text x="320" y="412" text-anchor="middle" class="sub">immediate rescan, id resolves without waiting for a full scan</text>
+
+  <path d="M320,428 L320,456" class="arrow" />
+
+  <rect x="130" y="456" width="380" height="52" rx="6" class="box" />
+  <text x="320" y="476" text-anchor="middle" class="code">AssetEditorSubsystem-&gt;OpenEditorForAsset(NewAsset)</text>
+  <text x="320" y="492" text-anchor="middle" class="sub">guarded by GEditor / subsystem null checks</text>
+
+  <path d="M320,508 L320,536" class="arrow" />
+
+  <rect x="90" y="536" width="460" height="66" rx="6" class="box" />
+  <text x="320" y="558" text-anchor="middle" class="code">RefreshBuildingPalette()</text>
+  <text x="320" y="574" text-anchor="middle" class="code">SelectHotBuilding(NewAsset-&gt;GetPrimaryAssetId())</text>
+  <text x="320" y="590" text-anchor="middle" class="code">ShowAssetCreatedToast(NewAsset)</text>
+
+  <path d="M320,602 L320,630" class="arrow" />
+
+  <rect x="170" y="630" width="300" height="40" rx="6" class="box" />
+  <text x="320" y="655" text-anchor="middle" class="label" font-size="12">New tile is hot; palette highlights it</text>
+
+  <text x="320" y="700" text-anchor="middle" class="sub">Same package/NewObject/AssetCreated shape as GetOrCreateOutpostDefinitionForOutpost,</text>
+  <text x="320" y="716" text-anchor="middle" class="sub">just for a building definition instead of an outpost definition.</text>
+</svg>

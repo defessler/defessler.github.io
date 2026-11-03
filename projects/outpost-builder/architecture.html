@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture · OutpostBuilder</title>
+<meta name="description" content="A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<div class="shell">
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-controls="sidebar" aria-expanded="false">
+    <span></span><span></span><span></span>
+    <span class="vh">Toggle navigation</span>
+  </button>
+
+  <aside class="side" id="sidebar">
+    <div class="side-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-word">OutpostBuilder</span>
+      </a>
+
+      <nav aria-label="Documentation">
+        <ol class="nav-list">
+          <li>
+            <a href="index.html">
+              <span class="nav-no">01</span>
+              <span class="nav-title">OutpostBuilder</span>
+            </a>
+          </li>
+          <li>
+            <a href="tutorial.html">
+              <span class="nav-no">02</span>
+              <span class="nav-title">Tutorial - A Guided Tour</span>
+            </a>
+          </li>
+          <li>
+            <a href="architecture.html" class="active" aria-current="page">
+              <span class="nav-no">03</span>
+              <span class="nav-title">Architecture</span>
+            </a>
+          </li>
+          <li>
+            <a href="identity.html">
+              <span class="nav-no">04</span>
+              <span class="nav-title">Instance Identity</span>
+            </a>
+          </li>
+          <li>
+            <a href="edmode.html">
+              <span class="nav-no">05</span>
+              <span class="nav-title">The Ed Mode - UEdMode Deep Dive</span>
+            </a>
+          </li>
+          <li>
+            <a href="toolkit.html">
+              <span class="nav-no">06</span>
+              <span class="nav-title">The Toolkit - FModeToolkit and Slate</span>
+            </a>
+          </li>
+          <li>
+            <a href="prefabs.html">
+              <span class="nav-no">07</span>
+              <span class="nav-title">Prefabs &amp; Fork-on-Stamp</span>
+            </a>
+          </li>
+          <li>
+            <a href="faction-visuals.html">
+              <span class="nav-no">08</span>
+              <span class="nav-title">Faction - Identity and Gating</span>
+            </a>
+          </li>
+          <li>
+            <a href="extending.html">
+              <span class="nav-no">09</span>
+              <span class="nav-title">Extending Outpost Builder</span>
+            </a>
+          </li>
+          <li>
+            <a href="quick-reference.html">
+              <span class="nav-no">10</span>
+              <span class="nav-title">Quick Reference - The Cheat Sheet</span>
+            </a>
+          </li>
+          <li>
+            <a href="reference.html">
+              <span class="nav-no">11</span>
+              <span class="nav-title">Reference - Public Surfaces, Hotkeys, and Testing</span>
+            </a>
+          </li>
+          <li>
+            <a href="runtime-loadout.html">
+              <span class="nav-no">12</span>
+              <span class="nav-title">Per-Plot Building Rendering</span>
+            </a>
+          </li>
+          <li>
+            <a href="porting.html">
+              <span class="nav-no">13</span>
+              <span class="nav-title">Porting Into Your Own Project</span>
+            </a>
+          </li>
+          <li>
+            <a href="wiring.html">
+              <span class="nav-no">14</span>
+              <span class="nav-title">System Wiring</span>
+            </a>
+          </li>
+          <li>
+            <a href="technology.html">
+              <span class="nav-no">15</span>
+              <span class="nav-title">Technology &amp; Trade-offs</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
+      <a class="side-github" href="https://github.com/defessler/OutpostBuilder">
+        <span aria-hidden="true">&#8599;</span> Repository
+      </a>
+    </div>
+  </aside>
+
+  <div class="nav-scrim" id="nav-scrim"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="crumb">OutpostBuilder <span class="crumb-sep">/</span> Architecture</span>
+      <span class="published">Published <time datetime="2026-11-03T05:35:00Z">2026-11-03 05:35 UTC</time></span>
+
+    </header>
+
+    <main id="content">
+      <article class="doc">
+<h1 id="architecture">Architecture</h1>
+<p>This page is meant as a quick reference on the plugin's mental model: how the modules split, what the two definition assets are, and how <code>AOutpost</code>, <code>AOutpostPlot</code>, <code>AOverheadCamera</code>, and <code>AOutpostVolume</code> relate to them without ever attaching to each other.</p>
+<p>If you're coming from a typical UE gameplay codebase, the surprising part isn't any single class. It's that the "outpost" as a base never exists as an actor hierarchy. It's a record graph. The actors are just its rendering of that graph.</p>
+<h2 id="module-split-runtime-vs-editor">Module Split: Runtime vs Editor</h2>
+<p>There are two modules, one runtime/editor pair: <code>OutpostBuilder</code> (runtime, <code>OUTPOSTBUILDER_API</code>) and <code>OutpostBuilderEditor</code> (editor-only, pulling in <code>UnrealEd</code>/<code>Slate</code>/<code>EditorFramework</code> and friends).</p>
+<p>A second pair, <code>OutpostUtilities</code> and <code>OutpostEditorUtilities</code>, sat beside them for a while and has since folded back in. Identity sync and companion spawn are in the runtime module now, and the level-registry bake, the five editor listeners and the automation tests are in the editor one.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/OutpostBuilder.Build.cs</span>
+<span class="k">public</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">OutpostBuilder</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ModuleRules</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="nf">OutpostBuilder</span><span class="p">(</span><span class="n">ReadOnlyTargetRules</span><span class="w"> </span><span class="n">Target</span><span class="p">)</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="k">base</span><span class="p">(</span><span class="n">Target</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// ...</span>
+<span class="w">        </span><span class="n">PublicDependencyModuleNames</span><span class="p">.</span><span class="n">AddRange</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="kt">string</span><span class="p">[]</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="s">"Core"</span><span class="p">,</span>
+<span class="w">            </span><span class="s">"CoreUObject"</span><span class="p">,</span>
+<span class="w">            </span><span class="s">"Engine"</span><span class="p">,</span>
+<span class="w">            </span><span class="s">"DeveloperSettings"</span><span class="p">,</span>
+<span class="w">            </span><span class="s">"GameplayTags"</span>
+<span class="w">        </span><span class="p">});</span>
+<span class="w">        </span><span class="c1">// ...</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The editor module pulls in everything you'd expect for Slate and asset tooling (<code>UnrealEd</code>, <code>EditorFramework</code>, <code>PropertyEditor</code>, <code>AssetRegistry</code>, <code>AssetTools</code>, <code>ContentBrowser</code>, <code>DeveloperSettings</code>, <code>LevelEditor</code>, <code>ToolMenus</code>) plus a private dependency on <code>OutpostBuilder</code> itself.</p>
+<p>Where it gets interesting is the primary-asset scan registration. Your first instinct (mine too) is that scanning <code>/Game</code> for <code>UOutpostDefinition</code>/<code>UOutpostBuildingDefinition</code> assets and registering them with <code>UAssetManager</code> is editor plumbing that belongs in <code>OutpostBuilderEditor</code>.</p>
+<p>It doesn't. It lives in the runtime module instead. Since packaged games never load the editor module, they still need the runtime module to resolve the same <code>FPrimaryAssetId</code>s the editor tooling wrote: definition ids to display names, plot records, and building meshes.</p>
+<p>The project's shared tunables ride a scanned asset too: <code>UOutpostBuilderSettingsAsset</code>, the plugin's one settings asset, registered as a third scanned type right here so its soft mesh references (<code>EmptyPlotMesh</code>, <code>DefaultPreviewMesh</code>) actually cook. Its per-user counterpart, the config-backed <code>UOutpostBuilderUserSettings</code>, is not an asset and never registers. See <a href="reference.html">Reference</a> for the split.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Core/OutpostBuilderModule.cpp</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">FOutpostBuilderModule::StartupModule</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">UAssetManager</span><span class="o">::</span><span class="n">IsInitialized</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">RegisterAssetScans</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">else</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">OnPostEngineInitHandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OutpostBuilder</span><span class="o">::</span><span class="n">Module</span><span class="o">::</span><span class="n">GetPostEngineInitDelegate</span><span class="p">().</span><span class="n">AddRaw</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">FOutpostBuilderModule</span><span class="o">::</span><span class="n">RegisterAssetScans</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// ...</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">FOutpostBuilderModule::RegisterAssetScans</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">UAssetManager</span><span class="o">&amp;</span><span class="w"> </span><span class="n">AssetManager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UAssetManager</span><span class="o">::</span><span class="n">Get</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// None of these four types is reached by a cooker dependency edge on its own (FPrimaryAssetId is</span>
+<span class="w">    </span><span class="c1">// a name pair, not a package reference). Without AlwaysCook, a packaged build silently drops them.</span>
+<span class="w">    </span><span class="n">OutpostBuilder</span><span class="o">::</span><span class="n">Module</span><span class="o">::</span><span class="n">RegisterOutpostAssetType</span><span class="o">&lt;</span><span class="n">UOutpostDefinition</span><span class="o">&gt;</span><span class="p">(</span><span class="n">AssetManager</span><span class="p">);</span>
+<span class="w">    </span><span class="n">OutpostBuilder</span><span class="o">::</span><span class="n">Module</span><span class="o">::</span><span class="n">RegisterOutpostAssetType</span><span class="o">&lt;</span><span class="n">UOutpostBuildingDefinition</span><span class="o">&gt;</span><span class="p">(</span><span class="n">AssetManager</span><span class="p">);</span>
+<span class="w">    </span><span class="n">OutpostBuilder</span><span class="o">::</span><span class="n">Module</span><span class="o">::</span><span class="n">RegisterOutpostAssetType</span><span class="o">&lt;</span><span class="n">UOutpostBuilderSettingsAsset</span><span class="o">&gt;</span><span class="p">(</span><span class="n">AssetManager</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// The registry answers for outposts whose level is not loaded, so it has to be cooked and</span>
+<span class="w">    </span><span class="c1">// resolvable in a packaged game. Without AlwaysCook here it is silently absent in a build.</span>
+<span class="w">    </span><span class="n">OutpostBuilder</span><span class="o">::</span><span class="n">Module</span><span class="o">::</span><span class="n">RegisterOutpostAssetType</span><span class="o">&lt;</span><span class="n">UOutpostLevelRegistry</span><span class="o">&gt;</span><span class="p">(</span><span class="n">AssetManager</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">UOutpostBuilderSettingsAsset</span><span class="o">::</span><span class="n">PreWarm</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Each <code>RegisterOutpostAssetType&lt;T&gt;</code> call does two things together, deliberately paired so neither can be forgotten alone: it calls <code>ScanPathsForPrimaryAssets</code> for <code>T</code> under <code>/Game</code>, and it calls <code>SetPrimaryAssetTypeRules</code> with <code>EPrimaryAssetCookRule::AlwaysCook</code> for that same type.</p>
+<p>Registering the scan is not enough for a packaged build. None of these packages is reached by a dependency edge the cooker follows on its own: definitions are reached only through <code>FPrimaryAssetId</code> (a name pair, not a package reference), and the settings asset only through <code>UOutpostRuntimeSettings::SettingsAsset</code>, an ini-hosted soft path no cooked package references either. With the default <code>CookRule=Unknown</code> a cooked game silently drops them all (every plot renders the fallback cube, nothing logged).</p>
+<p>AlwaysCook force-cooks each package. The cooker then follows the soft mesh refs out of it: <code>BuildingMesh</code> off a building definition, and <code>EmptyPlotMesh</code>/<code>DefaultPreviewMesh</code> off the settings asset, which is what an unassigned plot renders. <code>RegisterAssetScans</code> finishes by pre-warming the configured settings asset (<code>UOutpostBuilderSettingsAsset::PreWarm()</code>, a one-shot sync load) so the never-loading per-frame resolution serves authored values from the first frame of a packaged game.</p>
+<p>Note: <code>UAssetManager::IsInitialized()</code> is the guard because module load order isn't guaranteed. If the asset manager isn't up yet, we defer to the post-engine-init delegate instead of assuming <code>StartupModule</code> ran late enough. That delegate itself needed a small shim, since <code>FCoreDelegates::OnPostEngineInit</code> is deprecated in 5.8 in favor of <code>GetOnPostEngineInit()</code>, which doesn't exist pre-5.8:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Core/OutpostBuilderModule.cpp</span>
+<span class="k">namespace</span><span class="w"> </span><span class="nn">OutpostBuilder</span><span class="o">::</span><span class="nn">Module</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// FCoreDelegates::OnPostEngineInit (the public member) is deprecated in 5.8 in</span>
+<span class="w">    </span><span class="c1">// favor of GetOnPostEngineInit(), which does not exist in 5.7.</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="n">FSimpleMulticastDelegate</span><span class="o">&amp;</span><span class="w"> </span><span class="nf">GetPostEngineInitDelegate</span><span class="p">()</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="cp">#if UE_VERSION_OLDER_THAN(5, 8, 0)</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">FCoreDelegates</span><span class="o">::</span><span class="n">OnPostEngineInit</span><span class="p">;</span>
+<span class="cp">#else</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">FCoreDelegates</span><span class="o">::</span><span class="n">GetOnPostEngineInit</span><span class="p">();</span>
+<span class="cp">#endif</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The editor module's <code>StartupModule</code> handles the stuff that's actually editor-only. It doesn't register the editor mode, since <code>UOutpostBuilderEdMode</code> is a <code>UEdMode</code> and the asset-editor subsystem discovers it from its own CDO. What it does own:</p>
+<ul>
+<li>A <code>BeginPIE</code> hook that cancels the mode's in-flight transient sessions, registered module-wide rather than per toolkit.</li>
+<li>Watching <code>OnObjectPropertyChanged</code>. A building-definition edit live-refreshes every loaded plot's building mesh. A definition-asset edit re-syncs the live outpost actor's faction immediately, unique-live-owner only. An edit to the settings asset, or a <code>SettingsAsset</code> repoint on the host <code>UOutpostRuntimeSettings</code>, re-scans the configured definition folder, re-realizes every loaded plot's visuals, and refreshes the active toolkit.</li>
+<li>Hanging the "Locate/Restore Placed Outpost" entries off the definition asset's Content Browser context menu.</li>
+<li>Scanning the configured <code>CreatedDefinitionDirectory</code> for definitions outside <code>/Game</code>, editor-session only: packaged games still get just the <code>/Game</code> scans above.</li>
+<li>Auto-rebinding placed outpost/plot/camera/volume actors when a definition asset is renamed, through the asset registry's <code>OnAssetRenamed</code>.</li>
+</ul>
+<p>None of that needs to exist in a cooked build, which is exactly why it stays in the editor module.</p>
+<h2 id="the-two-definition-assets">The Two Definition Assets</h2>
+<p>Everything placeable is described by a <code>UPrimaryDataAsset</code> with a <code>static const FPrimaryAssetType PrimaryAssetTypeName</code> and an overridden <code>GetPrimaryAssetId()</code>. There are two DEFINITION types (factions are not a definition asset: they're the fixed <code>EOutpostFaction</code> enum, pure identity/eligibility gating); two primary-asset types that are not definitions follow the same identity pattern and ride the same scan/cook registration: <code>UOutpostBuilderSettingsAsset</code> (type name <code>"OutpostBuilderSettings"</code>, the plugin's one settings asset) and <code>UOutpostLevelRegistry</code> (type name <code>"OutpostLevelRegistry"</code>, one generated registry per level):</p>
+<ul>
+<li><code>UOutpostDefinition</code> - the outpost itself.<ul>
+<li>A display name, a <code>Faction</code> (<code>EOutpostFaction</code>, the persistent source of truth for ownership), the set of plot records, the saved outpost-level Overhead camera record (<code>OverheadCamera</code>) plus a per-plot camera map (<code>PlotCameras</code>, keyed by <code>PlotId</code>, see below), and a soft path + world transform back to the placed <code>AOutpost</code> actor.</li>
+<li>It also exports <code>OutpostDisplayName</code>/<code>OutpostPlacedPath</code> asset-registry tags so tooling can list definitions without loading them. Its primary asset type name is <code>"OutpostDefinition"</code>.</li>
+</ul>
+</li>
+<li><code>UOutpostBuildingDefinition</code> - a placeable building.<ul>
+<li>Display name, the <code>BuildingMesh</code> a plot renders in GAME worlds (buildings are mesh-only there) and the palette thumbnail source, and a <code>BuildingActorClass</code> kept for a project's own gameplay spawns.</li>
+<li><code>BuildingActorClass</code> is also what the EDITOR previews when it's set: the placement ghost and any editor-world plot with this building assigned both mirror the class's template instead of rendering <code>BuildingMesh</code>, which stays the editor-preview fallback for a class-less building.</li>
+<li>The two things that decide WHERE it may go: the <code>PlotSizeQuery</code> it fits and the <code>SupportedFactions</code> that field it.</li>
+<li>A <code>BuildingCategory</code> gameplay tag that groups it in the Editing panel's palette only. Empty means uncategorized, with no eligibility effect at all. See <code>toolkit.html</code>.</li>
+</ul>
+</li>
+</ul>
+<p>The <code>PlotSizeQuery</code> is a gameplay-tag query. An empty query, the default for a new building, fits every plot. There is no per-building footprint radius: plot size is the one size concept, and the centimetres live on the project's settings asset (<code>UOutpostBuilderSettingsAsset::PlotSizeTagHalfSizeCm</code>, keyed by tag, resolved through the <code>UOutpostRuntimeSettings</code> statics) where a designer can retune them without touching a building asset.</p>
+<p>Both follow the identical identity pattern, which is worth internalizing since you'll see it everywhere in this codebase:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostDefinition.cpp</span>
+<span class="k">const</span><span class="w"> </span><span class="n">FPrimaryAssetType</span><span class="w"> </span><span class="n">UOutpostDefinition</span><span class="o">::</span><span class="n">PrimaryAssetTypeName</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">"OutpostDefinition"</span><span class="p">));</span>
+
+<span class="c1">// ...</span>
+
+<span class="n">FPrimaryAssetId</span><span class="w"> </span><span class="nf">UOutpostDefinition::GetPrimaryAssetId</span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">FPrimaryAssetId</span><span class="p">(</span><span class="n">PrimaryAssetTypeName</span><span class="p">,</span><span class="w"> </span><span class="n">GetFName</span><span class="p">());</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>FPrimaryAssetId</code> is the currency the whole plugin trades in. Every reference between an outpost, a plot, and a building is an <code>FPrimaryAssetId</code> (or an <code>FGuid</code> for plot identity within one definition, or an <code>FOutpostInstanceId</code> for WHICH placed outpost an actor belongs to, once a definition is reused - see <a href="identity.html">Instance Identity</a>), resolved through <code>UAssetManager::GetPrimaryAssetPath()</code> plus <code>TSoftObjectPtr::LoadSynchronous()</code> when it's actually needed, never a raw <code>UObject*</code> held across a save.</p>
+<p>That's what lets a <code>UOutpostBuildingDefinition</code> live anywhere under <code>/Game</code> and still get found by <code>AllowedTypes="OutpostBuildingDefinition"</code> pickers. It's also what a packaged game resolves through the same scan you saw above.</p>
+<p>There's no migration system behind any of this. <code>UOutpostDefinition</code>, <code>UOutpostBuildingDefinition</code>, and the settings asset all serialize as ordinary data: no <code>Serialize</code> override, no custom version, no deprecated-field shims. A property the current class no longer declares is simply dropped on load by the engine's own tagged-property serializer, and a property the class has gained since is left at its default.</p>
+<p>The one place a plugin path leans on that: an unset plot-size tag resolves as Small everywhere, through <code>OutpostBuilder::PlotSizeTags::ResolveOrDefault</code>, rather than through a one-time conversion step.</p>
+<h2 id="the-actor-model-flat-actors-records-not-nesting">The Actor Model: Flat Actors, Records Not Nesting</h2>
+<p>There are four actor types. The first three share a shape you'll recognize instantly: a bare <code>USceneComponent</code> named <code>"Root"</code> with at most one visual component attached in game worlds; the fourth is a brush volume.</p>
+<ul>
+<li><code>AOutpost</code> - the anchor. Carries <code>OutpostDefinitionId</code> (which <code>UOutpostDefinition</code> it represents) and its <code>EOutpostFaction Faction</code>, plus an editor-only preview cube (a plain untinted cube; factions have no mesh or color effect at all).</li>
+<li><code>AOutpostPlot</code> - one per plot record. Carries <code>OutpostDefinitionId</code>, its own <code>PlotId</code> (matching a <code>FOutpostPlotRecord::PlotId</code>), <code>AssignedBuildingId</code>, and a RUNTIME <code>BuildingMeshComponent</code> that renders its building in packaged games as well as the editor.<ul>
+<li>An editor-world plot previewing a class-based building instead mirrors that class's template as one-or-more transient, editor-only parts, so the "at most one visual component" shape above is a game-world guarantee, not an editor-world one. See <code>MirroredBuildingParts</code>.</li>
+</ul>
+</li>
+<li><code>AOverheadCamera</code> - zero or one per outpost, total. Carries <code>OutpostDefinitionId</code> and a <code>UCameraComponent</code>.<ul>
+<li><code>UOutpostBuilderEdMode::EnsureOverheadCameraForEditingOutpost()</code> spawns it unconditionally the moment editing an outpost starts, so it always exists while editing regardless of whether <code>OverheadCamera</code> (or any <code>PlotCameras</code> entry) has ever been set.</li>
+<li>It's deliberately not <code>ACameraActor</code>, whose constructor force-enables <code>bConstrainAspectRatio</code>. We don't want the letterbox.</li>
+<li>There is still only ever one of these per outpost. The per-plot camera FRAMINGS (<code>PlotCameras</code>, above) are data on the definition, not additional camera actors.</li>
+</ul>
+</li>
+<li><code>AOutpostVolume</code> - the outpost's exclusion fence: an amber-tinted <code>AVolume</code> brush, any shape, bound to the definition id. Spawned automatically with every new outpost, it blocks OTHER outposts from being placed or stamped within the configured exclusion distance of its extents, never its own definition. It cascades (and undo-restores) with its outpost's delete.</li>
+</ul>
+<p>All four also carry an <code>FOutpostInstanceId</code>, which says WHICH placed outpost the actor belongs to. The definition id answers "built from what" and stops being an answer to "which one" as soon as a definition is reused.</p>
+<p>The four share no base class, so the property is written out in each header rather than inherited, and that is the single most common source of a sweep that handles three of them and forgets the fourth. See <a href="identity.html">Instance Identity</a>.</p>
+<p>None of the four native classes above is hardcoded into a spawn call. <code>UOutpostRuntimeSettings::GetOutpostClass()</code> / <code>GetPlotClass()</code> / <code>GetVolumeClass()</code> / <code>GetOverheadCameraClass()</code> each resolve to the matching <code>TSubclassOf&lt;&gt;</code> a project has configured on <code>UOutpostBuilderSettingsAsset</code>'s <code>Actors</code> category, falling back to the plugin's own native class (<code>AOutpost::StaticClass()</code> and its three siblings) when nothing is configured. Never null.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Settings/OutpostRuntimeSettings.cpp</span>
+<span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">AOutpost</span><span class="o">&gt;</span><span class="w"> </span><span class="n">UOutpostRuntimeSettings</span><span class="o">::</span><span class="n">GetOutpostClass</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">UClass</span><span class="o">*</span><span class="w"> </span><span class="n">Configured</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UOutpostBuilderSettingsAsset</span><span class="o">::</span><span class="n">Get</span><span class="p">().</span><span class="n">OutpostActorClass</span><span class="p">.</span><span class="n">Get</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Configured</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">AOutpost</span><span class="o">::</span><span class="n">StaticClass</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Every spawn site routes through the matching resolver instead of <code>StaticClass()</code> directly: editor ghost placement (<code>ConfirmOutpostPlacement</code>/<code>ConfirmPlotPlacement</code>), the Overhead camera spawns (<code>EnsureOverheadCameraForEditingOutpost</code>/<code>StartOverheadCameraPositioning</code>), <code>UOutpostStampLibrary</code>'s outpost/plot/camera spawns (<code>StampOutpost</code>/<code>PlaceDefinitionAt</code>/<code>RestoreOutpost</code> all share one helper), <code>OutpostPrefabUtils::SpawnDefaultOutpostVolume</code>, and even the Content Browser drag-stamp entry point (<code>UActorFactoryOutpostPrefab::GetDefaultActorClass</code>, which the engine's own placement path calls ahead of <code>PostSpawnActor</code>).</p>
+<p>Fifteen spawn sites across both modules, one resolver each, plus two <code>ActorFactory</code> overrides that resolve <code>GetOutpostClass</code> directly. A project drops in a C++ or Blueprint subclass of any of the four actor types and it's what gets spawned everywhere at once, with no call site to hunt down. <code>TSubclassOf&lt;Base&gt;</code> is what keeps every existing <code>Cast&lt;AOutpost&gt;</code> / <code>Cast&lt;AOutpostPlot&gt;</code> valid regardless of which subclass actually got spawned. A subclass is still an is-a.</p>
+<p>IMPORTANT: none of these actors are ever attached to each other. <code>UChildActorComponent</code> is banned outright in this plugin. A plot doesn't sit under its outpost in the outliner hierarchy. It's a sibling actor in the world that happens to carry the same identity: the same <code>OutpostInstanceId</code> where there is one, and the same <code>OutpostDefinitionId</code> otherwise.</p>
+<p>The relationship lives entirely in data: the <code>UOutpostDefinition</code> asset's <code>Plots</code> array records each plot's <code>RelativeTransform</code>. World position is computed as <code>RelativeTransform * OutpostActorTransform</code> at spawn and stamp time.</p>
+<p>Why go to that trouble instead of just parenting a plot to its outpost, which would give you free relative-transform tracking for nothing? A couple reasons stacked up during the research pass:</p>
+<ul>
+<li>Attachment couples the actors' lifetimes and their transforms in a way this plugin doesn't want. Moving the outpost anchor should not drag plots around with it. Designers move a whole base by multi-selecting, not by moving one root and letting children follow.</li>
+<li>The actors carry state (<code>FPrimaryAssetId</code>s, <code>FGuid</code>s, faction visuals) that doesn't survive the engine's existing "pack a hierarchy into one thing" tools.<ul>
+<li>The research pass into <code>APackedLevelActor</code> found that its own class doc admits non-mesh components are unsupported and result in an incomplete pack.</li>
+<li>Level Instances, meanwhile, are built around a <code>.umap</code> per instance rather than per-plot logic actors.</li>
+<li>Neither fits actors whose entire job is carrying identity and state, not geometry.</li>
+</ul>
+</li>
+<li>A shared, resolvable id is strictly more flexible than a pointer or an attachment. Any plot in the level can find its outpost by scanning for a matching identity, and <code>AOutpostPlot::FindOwningOutpostActor()</code> leans on exactly that lookup.</li>
+</ul>
+<p>That last point is worth seeing in code, since it's the load-bearing lookup behind every record write-back:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Actors/OutpostPlot.cpp</span>
+<span class="n">AOutpost</span><span class="o">*</span><span class="w"> </span><span class="nf">AOutpostPlot::FindOwningOutpostActor</span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// Unique-or-null: ambiguous ownership means callers skip rather than act on the wrong outpost.</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">FindOwningOutpostForIdentity</span><span class="p">(</span><span class="n">GetWorld</span><span class="p">(),</span><span class="w"> </span><span class="o">*</span><span class="k">this</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Read that comment's parenthetical as historical. Two outposts sharing a definition started out as something a designer had to do by hand, and it became the supported case the moment definitions were allowed to be reused.</p>
+<p>Ownership questions now prefer an instance id and fall back to the definition only when there isn't one, through <code>ForEachFamilyActorOfIdentity</code> and its siblings. The unique-or-null shape above is unchanged and still correct for a definition-keyed lookup: it is the fail-closed half of the same rule. <a href="identity.html">Instance Identity</a> covers what replaced the other half.</p>
+<p>The scan itself lives in a shared template, since plots, cameras and the outposts themselves all need the same question answered about the same id. It's duck-typed on <code>GetOutpostDefinitionId()</code> rather than expressed as an interface or a base class. That's deliberate, because giving these actors a common base is exactly the coupling the flat-actor model is avoiding:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Core/OutpostActorQuery.h</span>
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span>
+<span class="n">T</span><span class="o">*</span><span class="w"> </span><span class="n">FindUniqueActorForDefinition</span><span class="p">(</span><span class="n">UWorld</span><span class="o">*</span><span class="w"> </span><span class="n">World</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">FPrimaryAssetId</span><span class="o">&amp;</span><span class="w"> </span><span class="n">DefinitionId</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="o">*</span><span class="w"> </span><span class="n">bOutAmbiguous</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bOutAmbiguous</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="o">*</span><span class="n">bOutAmbiguous</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">World</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">DefinitionId</span><span class="p">.</span><span class="n">IsValid</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">T</span><span class="o">*</span><span class="w"> </span><span class="n">Unique</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">;</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">TActorIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">It</span><span class="p">(</span><span class="n">World</span><span class="p">);</span><span class="w"> </span><span class="n">It</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">It</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">It</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">It</span><span class="o">-&gt;</span><span class="n">GetOutpostDefinitionId</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">DefinitionId</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Unique</span><span class="p">)</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bOutAmbiguous</span><span class="p">)</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="o">*</span><span class="n">bOutAmbiguous</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="n">Unique</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">It</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Unique</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Note: ownership resolution here is id equality, not a pointer walk up an attachment chain. That's the whole records-not-nesting law in one lookup. Relationships are found by scanning for a matching id, not by asking a scene component who its parent is.</p>
+<p>Ambiguity fails closed: two outposts carrying one id yields <code>nullptr</code> rather than an arbitrary pick, and the optional <code>bOutAmbiguous</code> out-param lets a caller tell "nobody owns this" from "too many claim to" when it needs to warn.</p>
+<p>Its siblings in the same header are <code>FindFirstActorForDefinition</code> (first match, no ambiguity rule, for display-ish uses like the ownership-beam owner lookup) and <code>HasOtherActorSharingDefinition</code> (the guard record write-backs use before trusting themselves as the owner). Both are the same scan under different ambiguity policies.</p>
+<p>Records are also stored against a unit-scale basis, not the anchor's raw transform: <code>AOutpost::GetRecordBasisTransform()</code> returns the anchor's rotation and translation with scale forced to unit, so a designer who scales the outpost actor up in the viewport doesn't distort every stamped plot and camera underneath it. See <code>prefabs.html</code>'s "Relative-Transform Math and the Unit-Scale Basis" for the full derivation and the compose/invert helper pair.</p>
+<p>Everything that writes a relative transform composes against this basis. A plot move triggers <code>OutpostBuilder::ActorEditing::SyncRecordTransform()</code>, which <code>AOutpostPlot::PostEditMove(true)</code> and <code>PostEditChangeChainProperty</code> each reach through a one-line forward, since typed Details-panel edits never fire <code>PostEditMove</code>.</p>
+<p>An anchor move triggers <code>OutpostBuilder::ActorEditing::ReRelativizeOwnedRecords()</code> the same way, forwarded from <code>AOutpost::PostEditMove(true)</code>, which walks every matching plot and camera and recomputes their records against the new anchor - but only while the definition is private to this one placement.</p>
+<p>Share the template and the sweep refuses outright, including when the sibling it refuses for is a registry-known placement in an unloaded cell or another map, because for a shared template the per-instance data lives on the actors and in the bake rather than in the records. World positions stay exactly where they were. Only the stored relative transform catches up.</p>
+<p>The sweep also re-relativizes every entry in <code>UOutpostDefinition::PlotCameras</code>. That's the one record here with no live actor to read a ground-truth transform from, so its pre-move world transform is instead reconstructed by composing against the OLD basis (recovered from the definition's <code>PlacedOutpostTransform</code>, read before this same function overwrites it with the anchor's new transform).</p>
+<p>One consequence is asymmetric with the plot/camera actors above: moving a PLOT does NOT move its saved <code>PlotCameras</code> entry, only moving the OUTPOST anchor does. That's a known, accepted limitation (see <code>toolkit.html</code>/<code>edmode.html</code>).</p>
+<p>This logic, along with the rest of <code>AOutpost</code> and <code>AOutpostPlot</code>'s editor-only behavior (cascade delete, import-identity handling, the mirrored-building preview), lives in <code>OutpostBuilder/Core/OutpostActorEditingLibrary.h</code>, as free functions in <code>OutpostBuilder::ActorEditing</code> taking the actor as their first parameter rather than as methods on the actor classes. Two constraints put it there.</p>
+<ul>
+<li><code>PostEditMove</code>, <code>Destroyed</code>, <code>PostEditImport</code>, and their siblings are <code>UObject</code> virtual overrides, and a virtual override can't move out of the class it overrides, which is why <code>Outpost.cpp</code>/<code>OutpostPlot.cpp</code> still carry a one-line forward for each.</li>
+<li><code>AOutpost</code>/<code>AOutpostPlot</code> live in the runtime module, <code>OutpostBuilder</code>, because a packaged game still has to spawn and simulate them with no editor module loaded, while the runtime module can't itself link <code>OutpostBuilderEditor</code> to borrow its help.</li>
+</ul>
+<p>The whole editing-library file is wrapped in <code>#if WITH_EDITOR</code>, so despite sitting in the module that ships, none of it survives into a cooked build.</p>
+<p>Plots intentionally don't follow the anchor: moving it re-relativizes their records without moving them.</p>
+<p>Stamping runs the same formula in the other direction: the file-local <code>SpawnPlotsAndCameraFromDefinition</code> helper (shared by <code>StampOutpost</code>, <code>PlaceDefinitionAt</code>, and <code>RestoreOutpost</code>) composes each record against <code>Outpost-&gt;GetRecordBasisTransform()</code> to spawn actors from a definition, exactly inverting the write-back. You'll see the code on the prefab page, where it's the mechanism behind fork-on-stamp.</p>
+<p>For this page, the important part is just that it's the same shape as the write-back: <code>World = RelativeTransform * OutpostActorTransform</code>, read in one direction to spawn actors from a definition and in the other to keep the definition in sync with actors a designer just dragged around. Neither direction is written inline anywhere: <code>ComposeRecordWorldTransform</code> / <code>MakeRecordRelativeTransform</code> (<code>Outpost.h</code>, alongside <code>GetRecordBasisTransform</code>) are the only place the multiply direction lives.</p>
+<h2 id="the-runtime-function-library">The Runtime Function Library</h2>
+<p>It lives in the runtime module (a <code>UBlueprintFunctionLibrary</code>, <code>BlueprintCallable</code>), so game code can call it from a packaged build with no editor module loaded.</p>
+<p><code>UOutpostStampLibrary</code> turns a definition into world actors, through four entry points:</p>
+<ul>
+<li><code>StampOutpost(Definition, TargetTransform, OptionalAnchor)</code> spawns an outpost plus its plots and Overhead camera (when set) from <code>Definition</code>, using the same <code>ComposeRecordWorldTransform</code> composition shown above. When <code>OptionalAnchor</code> is supplied its own transform is the target and <code>TargetTransform</code> is ignored.</li>
+<li><code>PlaceDefinitionAt</code> is the non-forking counterpart used by interactive "Edit (Place Actor)" placement: it spawns an <code>AOutpost</code> bound to the <em>same</em> definition id (no fork) at an arbitrary transform and writes <code>PlacedOutpostPath</code>/<code>PlacedOutpostTransform</code> back onto it.</li>
+<li><code>RestoreOutpost</code> (editor-only) re-attaches that same definition at its recorded <code>PlacedOutpostTransform</code> after its actors were deleted.</li>
+<li><code>RestoreOutpostFromBaked</code> - the primary restore path now - rebuilds one placement from its baked registry entry under the RECORDED instance id rather than minting a fresh one, which is what makes it work for a shared definition.</li>
+</ul>
+<p>All four are distinct from <code>StampOutpost</code>'s fork-on-stamp behavior. Only <code>StampOutpost</code> mints a new definition per placement. The others intentionally keep one definition per outpost, and legacy <code>RestoreOutpost</code> now runs only as a gated fallback for content deleted before the registry existed.</p>
+<p>There used to be a second library here, <code>UOutpostLoadoutLibrary</code>, a runtime faction-loadout mechanism. It's gone: plots render their own building through a runtime mesh component now, and faction no longer chooses which building a plot shows. The full story of what the old model offered that the new one deliberately doesn't is on the per-plot building rendering page (<code>runtime-loadout.html</code>).</p>
+<h2 id="data-flow">Data Flow</h2>
+<p>Here's how the definition asset, the world actors, and the editor mode/toolkit talk to each other:</p>
+<p><img alt="Definition asset, world actors, and editor tooling data flow" src="assets/architecture-dataflow.svg" /></p>
+<p>For an interactive version of this whole picture (every module, asset, and actor on one screen, with click-to-inspect contracts and six selectable flows), see the <a href="wiring.html">System Wiring map</a>. For why these particular technologies were chosen over the alternatives, and what each one costs, see <a href="technology.html">Technology &amp; Trade-offs</a>.</p>
+<p>The editor mode (<code>UOutpostBuilderEdMode</code>) and its toolkit are the only things that touch both sides directly. <code>EnterOutpostEditMode(AOutpost*)</code> gets or creates the outpost's <code>UOutpostDefinition</code>. Actions like <code>AssignBuildingToSelectedPlot</code> write through both the selected <code>AOutpostPlot</code> actor and the matching record in one transaction.</p>
+<p>The toolkit's Overview list, meanwhile, starts from the asset registry (definition assets plus their frozen tags) and then resolves each row's placement state against a single world pass over live <code>AOutpost</code> actors - which also splits a shared definition into one row per live placement - plus the level registry, for placements in unloaded cells or other maps and for restorable ghosts. A designer can still jump to bases in maps that aren't even open.</p>
+<p>The mode also draws its own viewport feedback every frame it's active: footprint rings, selection markers, ownership beams, labels, HUD readouts. That drawing is split in two layers.</p>
+<p><code>OutpostBuilder::Draw</code> (<code>OutpostBuilderDraw.cpp</code>) gathers the Outpost-specific state behind each draw call, and hands the actual geometry off to <code>OutpostBuilder::DrawPrimitives</code> (<code>OutpostDrawPrimitives.h</code>/<code>.cpp</code>): segments, rectangles, wire squares, rings, pulsed beams, and screen text, with zero Outpost types anywhere in it. Nothing down there knows what an outpost is, on purpose, so any other editor tool in the project can link against the same primitive vocabulary.</p>
+<p>We'll get into the state machine and the Slate side of that on the <code>UEdMode</code> deep-dive page and the toolkit page. For this page, the thing to take away is that the mode never holds its own copy of outpost state. It always goes through the same <code>FPrimaryAssetId</code> lookups and the same record-basis math you just saw.</p>
+<h2 id="references">References</h2>
+<ul>
+<li>Engine source - <code>Engine/Source/Runtime/Engine/Classes/Engine/DataAsset.h</code> (<code>UPrimaryDataAsset</code>, <code>FPrimaryAssetId</code>, <code>FPrimaryAssetType</code>), relative to the UE 5.8 install.</li>
+<li>Engine source - <code>Engine/Source/Runtime/Engine/Classes/Engine/AssetManager.h</code> (<code>UAssetManager::ScanPathsForPrimaryAssets</code>, <code>GetPrimaryAssetPath</code>).</li>
+<li>Engine source - <code>Engine/Source/Runtime/Engine/Public/EngineUtils.h</code> (<code>TActorIterator</code>).</li>
+<li>Repo - <code>OutpostBuilder/Source/OutpostBuilder/OutpostBuilder.Build.cs</code>, <code>OutpostBuilder/Source/OutpostBuilderEditor/OutpostBuilderEditor.Build.cs</code>.</li>
+<li>Repo - <code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostBuilderModule.cpp</code>, <code>OutpostBuilder/Source/OutpostBuilderEditor/OutpostBuilderEditorModule.cpp</code>.</li>
+<li>Repo - <code>OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostDefinition.h</code>, <code>OutpostBuildingDefinition.h</code>, <code>OutpostFaction.h</code>, <code>OutpostRuntimeSettings.h</code>, <code>OutpostBuilderSettingsAsset.h</code>, <code>Outpost.h</code>, <code>OutpostPlot.h</code>, <code>OverheadCamera.h</code>, <code>OutpostVolume.h</code>.</li>
+<li>Repo - <code>OutpostBuilder/Source/OutpostBuilder/Actors/Outpost.cpp</code>, <code>OutpostPlot.cpp</code>, <code>OutpostStampLibrary.cpp</code>, <code>OutpostDefinition.cpp</code>.</li>
+<li>Repo - <code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostStampLibrary.h</code>, <code>OutpostActorQuery.h</code> (the shared definition-id lookups), <code>OutpostActorEditingLibrary.h</code>/<code>.cpp</code> (the actors' editor-only logic, as free functions).</li>
+<li>Repo - <code>OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderDraw.h</code>/<code>.cpp</code>, <code>OutpostDrawPrimitives.h</code>/<code>.cpp</code> (the viewport draw layer and its zero-Outpost-type primitive vocabulary).</li>
+<li>docs/runtime-loadout.md - per-plot building rendering (the mesh resolution ladder, plus the porter notes on the removed loadout library and the retired per-plot randomizer).</li>
+<li>research/07-prefab-mechanisms.md - the Level Instance and Packed Level Actor scouting behind the flat-actor decision.</li>
+<li>research/08-v04-design-synthesis.md - the relative-transform record design.</li>
+</ul>
+      </article>
+    <nav class="pager" aria-label="Page navigation">
+      <a class="pager-prev" href="tutorial.html">
+        <span class="pager-dir">&larr; Previous</span>
+        <span class="pager-title">Tutorial - A Guided Tour</span>
+      </a>
+      <a class="pager-next" href="identity.html">
+        <span class="pager-dir">Next &rarr;</span>
+        <span class="pager-title">Instance Identity</span>
+      </a>
+    </nav>
+    </main>
+
+    <footer class="foot">
+      <p>A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.</p>
+      <a href="https://github.com/defessler/OutpostBuilder">View on GitHub</a>
+    </footer>
+  </div>
+</div>
+
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

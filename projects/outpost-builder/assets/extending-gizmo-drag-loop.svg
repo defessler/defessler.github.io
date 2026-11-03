@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 820" font-family="'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="giz-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c7d0da" />
+    </marker>
+    <marker id="giz-arrow-hold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#ffb86c" />
+    </marker>
+  </defs>
+
+  <text x="450" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#eef2f6">A custom in-viewport drag handle, one frame at a time</text>
+  <text x="450" y="50" text-anchor="middle" font-size="12.5" fill="#a9b4bf">No UInteractiveGizmo needed - this is legacy-FEdMode-native. See research/09 for every engine citation below.</text>
+
+  <!-- Box A: Render -->
+  <rect x="190" y="80" width="520" height="92" rx="8" fill="#28aad0" fill-opacity="0.1" stroke="#28aad0" stroke-width="1.6"/>
+  <text x="450" y="102" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#eef2f6">Render(): draw the handle behind its own hit proxy</text>
+  <text x="450" y="121" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#eef2f6">PDI-&gt;SetHitProxy(new HYourHandle(...));</text>
+  <text x="450" y="137" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#eef2f6">DrawWireCylinder(...); PDI-&gt;SetHitProxy(nullptr);</text>
+  <text x="450" y="156" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">HitProxies.h: DECLARE_HIT_PROXY, GetMouseCursor()</text>
+
+  <line x1="450" y1="172" x2="450" y2="200" stroke="#c7d0da" stroke-width="2" marker-end="url(#giz-arrow)"/>
+
+  <!-- Box B: HandleClick -->
+  <rect x="190" y="203" width="520" height="98" rx="8" fill="#28aad0" fill-opacity="0.1" stroke="#28aad0" stroke-width="1.6"/>
+  <text x="450" y="225" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#eef2f6">HandleClick(): claim the drag, don't finish the click</text>
+  <text x="450" y="244" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#eef2f6">if (HitProxyCast&lt;HYourHandle&gt;(HitProxy)) {</text>
+  <text x="450" y="260" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#eef2f6">  bDraggingHandle = true;</text>
+  <text x="450" y="276" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#eef2f6">  InViewportClient-&gt;DisallowMouseDeltaTracking(); return true; }</text>
+  <text x="450" y="294" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">same shape as the existing Alt+click eyedropper check</text>
+
+  <line x1="450" y1="301" x2="450" y2="329" stroke="#c7d0da" stroke-width="2" marker-end="url(#giz-arrow)"/>
+
+  <!-- Box C: drag loop (with self-loop) -->
+  <rect x="150" y="332" width="600" height="150" rx="8" fill="#ffb86c" fill-opacity="0.1" stroke="#ffb86c" stroke-width="1.8"/>
+  <text x="450" y="356" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#eef2f6">InputKey / MouseMove: re-raycast every frame while held</text>
+  <text x="450" y="376" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#eef2f6">if (bDraggingHandle) {</text>
+  <text x="450" y="393" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#eef2f6">  cursor -&gt; world trace (same pattern MouseMove already uses);</text>
+  <text x="450" y="410" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#eef2f6">  recompute the handle's value; ViewportClient-&gt;Invalidate();</text>
+  <text x="450" y="427" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#eef2f6">  return true; }</text>
+  <text x="450" y="450" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">exemplar: LandscapeEdModeComponentTools.cpp:1915-2025</text>
+  <text x="450" y="466" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">(drag-handle-without-a-gizmo, verified on disk)</text>
+
+  <!-- self-loop arc on box C -->
+  <path d="M 750,380 C 830,380 830,460 750,460" fill="none" stroke="#ffb86c" stroke-width="1.8" marker-end="url(#giz-arrow-hold)"/>
+  <text x="795" y="424" text-anchor="middle" font-size="10.5" fill="#ffb86c" transform="rotate(90 795 424)">every tick, LMB held</text>
+
+  <line x1="450" y1="482" x2="450" y2="510" stroke="#c7d0da" stroke-width="2" marker-end="url(#giz-arrow)"/>
+
+  <!-- Box D: release -->
+  <rect x="190" y="513" width="520" height="92" rx="8" fill="#28aad0" fill-opacity="0.1" stroke="#28aad0" stroke-width="1.6"/>
+  <text x="450" y="535" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#eef2f6">InputKey (release): commit and let go</text>
+  <text x="450" y="554" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#eef2f6">bDraggingHandle = false;</text>
+  <text x="450" y="570" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">wrap the whole drag in ONE FScopedTransaction opened at</text>
+  <text x="450" y="586" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">the start of the drag, not per-frame (see Pitfalls below)</text>
+
+  <!-- loop back to Render -->
+  <path d="M 190,559 C 60,559 60,126 186,126" fill="none" stroke="#c7d0da" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#giz-arrow)"/>
+  <text x="95" y="345" text-anchor="middle" font-size="10.5" fill="#a9b4bf" transform="rotate(-90 95 345)">next frame, handle drawn idle again</text>
+
+  <!-- Alternatives note -->
+  <rect x="150" y="625" width="600" height="150" rx="8" fill="none" stroke="#a9b4bf" stroke-width="1.4" stroke-dasharray="4 4"/>
+  <text x="450" y="650" text-anchor="middle" font-size="13" font-weight="bold" fill="#eef2f6">Lighter-weight alternatives (check these first)</text>
+  <text x="450" y="674" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#eef2f6">meta = (MakeEditWidget = true)</text>
+  <text x="450" y="691" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">a free draggable handle on a UPROPERTY, zero custom code</text>
+  <text x="450" y="716" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#eef2f6">UsesTransformWidget / GetWidgetAxisToDraw</text>
+  <text x="450" y="733" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">restrict the standard gizmo instead of building your own</text>
+  <text x="450" y="756" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">exemplar: PhysicsAssetEditorEditMode.cpp:802-815</text>
+
+  <text x="450" y="800" text-anchor="middle" font-size="11.5" fill="#a9b4bf">Reach for a custom HHitProxy handle only when neither of those can express what you need.</text>
+</svg>

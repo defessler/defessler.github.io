@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Porting, Step by Step · OutpostBuilder</title>
+<meta name="description" content="The long-form porting guide: the integration checklist for getting OutpostBuilder into a project you already have, plus a layer order for bringing it across a piece at a time.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<div class="shell">
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-controls="sidebar" aria-expanded="false">
+    <span></span><span></span><span></span>
+    <span class="vh">Toggle navigation</span>
+  </button>
+
+  <aside class="side" id="sidebar">
+    <div class="side-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-word">OutpostBuilder</span>
+      </a>
+
+      <nav aria-label="Documentation">
+        <ol class="nav-list">
+          <li>
+            <a href="index.html">
+              <span class="nav-no">01</span>
+              <span class="nav-title">OutpostBuilder</span>
+            </a>
+          </li>
+          <li>
+            <a href="tutorial.html">
+              <span class="nav-no">02</span>
+              <span class="nav-title">Tutorial - A Guided Tour</span>
+            </a>
+          </li>
+          <li>
+            <a href="architecture.html">
+              <span class="nav-no">03</span>
+              <span class="nav-title">Architecture</span>
+            </a>
+          </li>
+          <li>
+            <a href="identity.html">
+              <span class="nav-no">04</span>
+              <span class="nav-title">Instance Identity</span>
+            </a>
+          </li>
+          <li>
+            <a href="edmode.html">
+              <span class="nav-no">05</span>
+              <span class="nav-title">The Ed Mode - UEdMode Deep Dive</span>
+            </a>
+          </li>
+          <li>
+            <a href="toolkit.html">
+              <span class="nav-no">06</span>
+              <span class="nav-title">The Toolkit - FModeToolkit and Slate</span>
+            </a>
+          </li>
+          <li>
+            <a href="prefabs.html">
+              <span class="nav-no">07</span>
+              <span class="nav-title">Prefabs &amp; Fork-on-Stamp</span>
+            </a>
+          </li>
+          <li>
+            <a href="faction-visuals.html">
+              <span class="nav-no">08</span>
+              <span class="nav-title">Faction - Identity and Gating</span>
+            </a>
+          </li>
+          <li>
+            <a href="extending.html">
+              <span class="nav-no">09</span>
+              <span class="nav-title">Extending Outpost Builder</span>
+            </a>
+          </li>
+          <li>
+            <a href="quick-reference.html">
+              <span class="nav-no">10</span>
+              <span class="nav-title">Quick Reference - The Cheat Sheet</span>
+            </a>
+          </li>
+          <li>
+            <a href="reference.html">
+              <span class="nav-no">11</span>
+              <span class="nav-title">Reference - Public Surfaces, Hotkeys, and Testing</span>
+            </a>
+          </li>
+          <li>
+            <a href="runtime-loadout.html">
+              <span class="nav-no">12</span>
+              <span class="nav-title">Per-Plot Building Rendering</span>
+            </a>
+          </li>
+          <li>
+            <a href="porting.html">
+              <span class="nav-no">13</span>
+              <span class="nav-title">Porting Into Your Own Project</span>
+            </a>
+          </li>
+          <li>
+            <a href="wiring.html">
+              <span class="nav-no">14</span>
+              <span class="nav-title">System Wiring</span>
+            </a>
+          </li>
+          <li>
+            <a href="technology.html">
+              <span class="nav-no">15</span>
+              <span class="nav-title">Technology &amp; Trade-offs</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
+      <a class="side-github" href="https://github.com/defessler/OutpostBuilder">
+        <span aria-hidden="true">&#8599;</span> Repository
+      </a>
+    </div>
+  </aside>
+
+  <div class="nav-scrim" id="nav-scrim"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="crumb">OutpostBuilder <span class="crumb-sep">/</span> Porting, Step by Step</span>
+      <span class="published">Published <time datetime="2026-11-03T05:35:00Z">2026-11-03 05:35 UTC</time></span>
+
+    </header>
+
+    <main id="content">
+      <article class="doc">
+<h1 id="porting-step-by-step">Porting, Step by Step</h1>
+<p>This page is meant to talk about getting the Outpost Builder into a project you already have, and how to set it up once it's there.</p>
+<p>It's the practical companion to <code>porting.html</code>. That page is the contract: the minimal surface your own anchor and plot types have to carry, and the two decisions (raw actors, actor-agnostic records) the design already made for you. Read it first if you haven't.</p>
+<p>This page covers the mechanics around that contract, which is where the files go, what the build needs, what your own module startup takes over, and the order to bring it all across if you'd rather not do it in one sitting.</p>
+<p>Note: this page isn't in the Sheet Index and nothing on the site links to it. It's still built and published like every other sheet, so treat it as unlisted rather than private.</p>
+<h2 id="two-ways-in">Two Ways In</h2>
+<p>There are two ways to get the tool into a project, and they're pretty different jobs.</p>
+<p>As a plugin - you keep the modules as a plugin and consume them from your project. Nothing merges into your own modules. This is the cheap path, and it's the one the plugin ships expecting.</p>
+<p>As source - you lift the module trees into modules you already own. More work up front, but the code ends up in your tree, under your naming and your build rules, with no plugin boundary in the way.</p>
+<p>Route One takes a few minutes. Route Two is most of this page.</p>
+<h2 id="route-one-keep-it-a-plugin">Route One: Keep It a Plugin</h2>
+<p>The clone, junction, build, and enable sequence lives on the front page already, check it out: <code>index.html</code> . Once "Outpost Builder" shows up in the Modes dropdown, there are two more things worth doing.</p>
+<ul>
+<li>Author a <code>UOutpostBuilderSettingsAsset</code> somewhere under <code>/Game</code>. It's the single project-shared asset, so every tunable the whole team sees lives on it rather than in anyone's local config.</li>
+<li>Point Project Settings -&gt; Plugins -&gt; Outpost Builder -&gt; Settings Asset at it. That pointer is <code>UOutpostRuntimeSettings::SettingsAsset</code>.</li>
+</ul>
+<p>An unset pointer is a supported state, so the mode works before you do either of those. The class defaults apply until you point it somewhere. The per-user knobs (nearly every color, size, and timing the mode draws with) live separately in Editor Preferences -&gt; Outpost Builder, and those never land in source control.</p>
+<p>That's the whole of Route One. Everything below is for the source lift.</p>
+<h2 id="route-two-lift-the-source-into-your-own-modules">Route Two: Lift the Source Into Your Own Modules</h2>
+<p>The tool is two module trees under <code>OutpostBuilder/Source/</code>. Nothing about either one requires being a plugin. They're ordinary Unreal modules, so they drop into modules you already own with a handful of adjustments.</p>
+<h3 id="step-1-copy-the-two-trees">Step 1: Copy the Two Trees</h3>
+<p>There are two, and the split matters more than anything else on this page.</p>
+<ul>
+<li><code>OutpostBuilder/</code> - the runtime tree. Actors, the two definition assets, the per-level <code>UOutpostLevelRegistry</code>, the stamp library, the settings asset, and two subsystems: the world-scoped event one and <code>UOutpostRegistrySubsystem</code>, the engine subsystem a packaged game reads for unloaded levels. Core/OutpostInstanceMint and Core/OutpostRecordDerive live here too. This one ships in packaged games.</li>
+<li><code>OutpostBuilderEditor/</code> - the editor tree. The mode, the toolkit, the widgets, the factories, and the utils. This one is never cooked.</li>
+</ul>
+<p>Copy the runtime tree into a runtime module and the editor tree into an editor module. Keep the two folder names as they are, since the includes depend on them (Step 2). If a file name already exists in your target module, prefer a diff-merge over an overwrite so you don't roll back newer work of your own.</p>
+<p>Everything editor-only in the runtime tree is already <code>WITH_EDITOR</code>-gated, so the runtime tree is safe to ship as-is.</p>
+<h3 id="step-2-put-the-source-root-on-the-include-path">Step 2: Put the Source Root on the Include Path</h3>
+<p>Both trees use a collapsed layout, so <code>Public</code> and <code>Private</code> are merged into the module root and every include is written from the Source root down.</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">"OutpostBuilder/Actors/Outpost.h"</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">"OutpostBuilderEditor/Mode/OutpostBuilderEdMode.h"</span>
+</code></pre></div>
+
+<p>That means the directory holding both trees has to be on the include path. In the plugin it's one line in the runtime module's <code>Build.cs</code>, public so it propagates to the editor module:</p>
+<div class="highlight"><pre><span></span><code><span class="n">PublicIncludePaths</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="n">GetFullPath</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="n">Combine</span><span class="p">(</span><span class="n">ModuleDirectory</span><span class="p">,</span><span class="w"> </span><span class="s">".."</span><span class="p">)));</span>
+</code></pre></div>
+
+<p>If your own modules already put their Source root on the include path (most do), you should be able to drop the trees in and have the includes resolve with no change at all. If they don't, add the equivalent line rather than rewriting ~100 files of includes.</p>
+<h3 id="step-3-add-the-buildcs-dependencies">Step 3: Add the Build.cs Dependencies</h3>
+<p>The runtime module needs these:</p>
+<div class="highlight"><pre><span></span><code><span class="n">PublicDependencyModuleNames</span><span class="p">.</span><span class="n">AddRange</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="kt">string</span><span class="p">[]</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="s">"Core"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"CoreUObject"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"Engine"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"DeveloperSettings"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"GameplayTags"</span>
+<span class="p">});</span>
+</code></pre></div>
+
+<p><code>GameplayTags</code> is public rather than private on purpose. <code>FGameplayTag</code> and <code>FGameplayTagQuery</code> sit on public headers (plot-size tags and the buildings' tag queries), so a dependent module needs it too.</p>
+<p>The editor module needs these:</p>
+<div class="highlight"><pre><span></span><code><span class="n">PrivateDependencyModuleNames</span><span class="p">.</span><span class="n">AddRange</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="kt">string</span><span class="p">[]</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="s">"Core"</span><span class="p">,</span><span class="w"> </span><span class="s">"CoreUObject"</span><span class="p">,</span><span class="w"> </span><span class="s">"Engine"</span><span class="p">,</span><span class="w"> </span><span class="s">"InputCore"</span><span class="p">,</span><span class="w"> </span><span class="s">"Slate"</span><span class="p">,</span><span class="w"> </span><span class="s">"SlateCore"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"UnrealEd"</span><span class="p">,</span><span class="w"> </span><span class="s">"EditorFramework"</span><span class="p">,</span><span class="w"> </span><span class="s">"PropertyEditor"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"AssetRegistry"</span><span class="p">,</span><span class="w"> </span><span class="s">"AssetTools"</span><span class="p">,</span><span class="w"> </span><span class="s">"ContentBrowser"</span><span class="p">,</span><span class="w"> </span><span class="s">"DeveloperSettings"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"Settings"</span><span class="p">,</span><span class="w"> </span><span class="s">"EditorSettingsViewer"</span><span class="p">,</span><span class="w"> </span><span class="s">"LevelEditor"</span><span class="p">,</span><span class="w"> </span><span class="s">"ToolMenus"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"RenderCore"</span><span class="p">,</span><span class="w"> </span><span class="s">"BSPUtils"</span><span class="p">,</span><span class="w"> </span><span class="s">"GeometryMode"</span><span class="p">,</span><span class="w"> </span><span class="s">"GameplayTags"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"WidgetRegistration"</span><span class="p">,</span><span class="w"> </span><span class="s">"EditorWidgets"</span><span class="p">,</span><span class="w"> </span><span class="s">"Documentation"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"OutpostBuilder"</span>
+<span class="p">});</span>
+</code></pre></div>
+
+<p>A few of those are easy to miss, so they're worth calling out. Each one is needed by exactly one thing, which means leaving it out breaks exactly one thing and the rest of the module compiles fine.</p>
+<ul>
+<li><code>Documentation</code> - <code>SDocumentationToolTip</code> and <code>IDocumentation</code>, behind the two-tier tooltips. This is the classic miss.</li>
+<li><code>WidgetRegistration</code> - <code>FToolkitBuilder</code> and <code>FToolkitBuilderArgs</code>, the opt-in that makes the panels height-bounded.</li>
+<li><code>EditorWidgets</code> - <code>SEnumComboBox</code>, the identity header's Faction picker.</li>
+<li><code>GeometryMode</code> - <code>FGeometryEditingModes::EM_Geometry</code>, the Brush Editing mode id the Edit Volume excursion hands off to.</li>
+<li><code>BSPUtils</code> - <code>FBSPOps::csgPrepMovingBrush</code>, which preps the box brush for the default Outpost Volume that placement spawns. It sits next to <code>GeometryMode</code> in the list but isn't part of the excursion.</li>
+<li><code>Settings</code> and <code>EditorSettingsViewer</code> - only the tutorial capture command uses these. If you're not porting <code>OutpostBuilderShotCommand.cpp</code>, you can drop both.</li>
+</ul>
+<p>The last entry, <code>OutpostBuilder</code>, is the runtime module. Replace it with whatever you named yours.</p>
+<h3 id="step-4-enable-the-engine-plugins">Step 4: Enable the Engine Plugins</h3>
+<p>One engine plugin has to be enabled in your <code>.uproject</code>. The <code>.uplugin</code> declares it today, so a source lift is exactly where it gets forgotten.</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nt">"Name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GeometryMode"</span><span class="p">,</span><span class="w"> </span><span class="nt">"Enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
+<p>Declaring them is what makes a stripped-down engine fail loudly at load instead of silently at button-click, so it's worth keeping the declaration rather than relying on the default engine config.</p>
+<h3 id="step-5-take-over-the-module-startup-work">Step 5: Take Over the Module Startup Work</h3>
+<p>Losing the plugin means losing two module classes, so whatever they did has to move into module classes you own.</p>
+<p>The editor listeners are the part most easily missed: <code>FOutpostBuilderEditorModule</code> defers past a null <code>GEngine</code> and then installs five of them (ActorAdded, GroupCascade, IdentitySync, InstanceHeal, RegistryBake), the last of which owns the package-saved, world-saved and map-opened hooks the registry depends on.</p>
+<p>On the runtime side, <code>FOutpostBuilderModule</code> does one job: <code>RegisterAssetScans()</code>, covered in Step 6. It runs at startup if <code>UAssetManager</code> is already up, and defers to post-engine-init if it isn't. That fallback matters, since a runtime module at the <code>PreDefault</code> phase loads before <code>UEngine::Init</code> builds the asset manager.</p>
+<p>On the editor side, <code>FOutpostBuilderEditorModule</code> does more:</p>
+<ul>
+<li><code>FOutpostBuilderCommands::Register()</code> on startup, <code>Unregister()</code> on shutdown. This is what surfaces the hotkeys in Editor Preferences -&gt; Keyboard Shortcuts, and it has to happen before any mode instance exists so <code>BindCommands</code> always finds them.</li>
+<li>A <code>FEditorDelegates::BeginPIE</code> hook calling <code>UOutpostBuilderEdMode::CancelTransientSessionsForPIE()</code>, so hitting Play cancels any in-flight placement or camera-pilot session up front instead of leaving a ghost dangling.</li>
+<li>A <code>FCoreUObjectDelegates::OnObjectPropertyChanged</code> hook, which fans out three ways rather than one. An edit to the runtime settings or the settings asset re-runs <code>ScanConfiguredDefinitionFolder()</code>, sweeps <code>RefreshBuildingPreview()</code> over every loaded plot, and refreshes the toolkit. An edit to an outpost definition reaches the live mode. An edit to a building definition refreshes the palette and every plot preview.</li>
+<li>Hosting for the volume-edit excursion. <code>BeginEditVolumeExcursion(FPrimaryAssetId)</code> lives on the module, the toolkit reaches it by name through <code>FModuleManager::GetModuleChecked</code>, and the module owns its teardown. This one genuinely has to be module-hosted, so porting the delegate hooks and stopping there leaves a link error waiting for you at Layer 19.</li>
+<li>A <code>UToolMenus::RegisterStartupCallback</code> for the Content Browser context menu. <code>UToolMenus</code> may not be ready at module load, and this defers until it is (and fires immediately if it already is).</li>
+<li>An asset-registry <code>OnAssetRenamed()</code> hook, so renaming a definition rebinds the actors placed from it. This one is deliberately module-lifetime rather than toolkit-lifetime, so a rename heals placed actors whether or not the mode happens to be active.</li>
+<li><code>ScanConfiguredDefinitionFolder()</code>, with the same asset-manager-may-not-be-ready fallback the runtime module uses. It's what makes definitions resolve when a project points its created-definition folder somewhere outside <code>/Game</code>.</li>
+</ul>
+<p>One thing you don't have to port is the mode registration, which surprises people. <code>UOutpostBuilderEdMode</code> is a <code>UEdMode</code>, and <code>UAssetEditorSubsystem</code> discovers those itself by walking <code>UEdMode</code> CDOs. The id, name, icon, and visibility all live in the mode's constructor instead.</p>
+<p>There's no <code>RegisterMode</code>/<code>UnregisterMode</code> pair to carry across, and <code>FEditorModeRegistry</code> isn't an option anyway since its factory contract hands back a <code>TSharedRef&lt;FEdMode&gt;</code>, which a UObject mode isn't. The asset factories need no registration either, since UE discovers <code>UFactory</code> subclasses on its own.</p>
+<h3 id="step-6-keep-the-asset-scans">Step 6: Keep the Asset Scans</h3>
+<p>Four primary asset types have to be scanned and given an <code>AlwaysCook</code> rule: <code>OutpostDefinition</code>, <code>OutpostBuildingDefinition</code>, <code>OutpostBuilderSettings</code>, and <code>OutpostLevelRegistry</code>. The last one is the generated per-level registry, reached only by name lookup - without <code>AlwaysCook</code> it is silently absent from a packaged build and every unloaded-level query returns nothing with nothing logged.</p>
+<p>The plugin does this itself in <code>FOutpostBuilderModule::RegisterAssetScans</code>, which pairs the scan and the cook rule per type so the two halves can't be forgotten independently. The engine enforces that ordering anyway, since <code>SetPrimaryAssetTypeRules</code> ensures the type was already scanned at least once. Carrying that function across as-is is the least work and the least risk.</p>
+<p>IMPORTANT: <code>AlwaysCook</code> is not optional. Nothing else reaches these packages. Outpost and building definitions are referenced only through <code>FPrimaryAssetId</code>, which is a name pair rather than a package reference the cooker follows, and the settings asset is referenced only from an ini-hosted soft path.</p>
+<p>Drop the rule and packaged builds silently ship without them, with nothing logged. Every mesh fallback then lands on the built-in cube and you get no clue why.</p>
+<p>If you'd rather drive it from config than from code, the equivalent goes in <code>Config/DefaultGame.ini</code>, merged into an existing <code>[/Script/Engine.AssetManagerSettings]</code> section if you have one.</p>
+<p>Note the block below predates the registry: add a fourth <code>+PrimaryAssetTypesToScan</code> line for <code>OutpostLevelRegistry</code> on the same pattern, or the config route silently drops exactly the type whose absence is silent. Swap <code>/Script/OutpostBuilder</code> for whatever your runtime module is called.</p>
+<div class="highlight"><pre><span></span><code><span class="k">[/Script/Engine.AssetManagerSettings]</span>
+<span class="na">+PrimaryAssetTypesToScan=(PrimaryAssetType</span><span class="o">=</span><span class="s">"OutpostDefinition"</span><span class="na">,AssetBaseClass=/Script/OutpostBuilder.OutpostDefinition,bHasBlueprintClasses=False,bIsEditorOnly=False,Directories=((Path</span><span class="o">=</span><span class="s">"/Game"</span><span class="na">)),Rules</span><span class="o">=</span><span class="s">(CookRule=AlwaysCook))</span>
+<span class="na">+PrimaryAssetTypesToScan=(PrimaryAssetType</span><span class="o">=</span><span class="s">"OutpostBuildingDefinition"</span><span class="na">,AssetBaseClass=/Script/OutpostBuilder.OutpostBuildingDefinition,bHasBlueprintClasses=False,bIsEditorOnly=False,Directories=((Path</span><span class="o">=</span><span class="s">"/Game"</span><span class="na">)),Rules</span><span class="o">=</span><span class="s">(CookRule=AlwaysCook))</span>
+<span class="na">+PrimaryAssetTypesToScan=(PrimaryAssetType</span><span class="o">=</span><span class="s">"OutpostBuilderSettings"</span><span class="na">,AssetBaseClass=/Script/OutpostBuilder.OutpostBuilderSettingsAsset,bHasBlueprintClasses=False,bIsEditorOnly=False,Directories=((Path</span><span class="o">=</span><span class="s">"/Game"</span><span class="na">)),Rules</span><span class="o">=</span><span class="s">(CookRule=AlwaysCook))</span>
+</code></pre></div>
+
+<p>Note: <code>bHasBlueprintClasses=False</code> is deliberate on all three, and it already covers Blueprint subclasses as well as native ones. Flipping it to true is a regression rather than a fix. That reasoning doesn't live in the source (comments there stay short on purpose), so this page is the place to come back to if you need the why.</p>
+<p>If you add a definition type of your own later, here's the recipe, and it has two halves. Declare <code>PrimaryAssetTypeName</code> plus a <code>GetPrimaryAssetId()</code> override on the type, then add one <code>RegisterOutpostAssetType&lt;T&gt;(AssetManager);</code> line. That covers the mount-point scan.</p>
+<p>The editor-side sibling is <code>FOutpostBuilderEditorModule::ScanConfiguredDefinitionFolder</code>, which hand-lists the types it re-scans, so a new type that should also resolve under a project's out-of-<code>/Game</code> created-definition folder joins that list too.</p>
+<h3 id="step-7-author-a-settings-asset">Step 7: Author a Settings Asset</h3>
+<p>Same as Route One. Create a <code>UOutpostBuilderSettingsAsset</code> under <code>/Game</code>, then point Project Settings -&gt; Plugins -&gt; Outpost Builder -&gt; Settings Asset at it.</p>
+<p>Worth knowing while you're in there: host any cook-critical mesh on that asset rather than in an ini. A mesh referenced only from a config soft path is invisible to the cooker, so it silently never cooks.</p>
+<p>A mesh referenced from an always-cooked asset is followed out of it, which is the same mechanism that pulls a building's mesh out of a cooked building definition.</p>
+<h3 id="step-8-build-and-check">Step 8: Build and Check</h3>
+<p>Build the editor target and open the editor. You should be able to find "Outpost Builder" in the Modes dropdown.</p>
+<p>The fastest end-to-end check is the loop from the front page: place an outpost (a definition asset is created for you), add a plot inside it, assign a building, and save.</p>
+<p>If plot transforms and assignments write through to the definition on their own, Steps 5 and 6 both landed.</p>
+<h2 id="bringing-it-over-a-piece-at-a-time">Bringing It Over a Piece at a Time</h2>
+<p>A source lift in one sitting is a big diff to read. If you'd rather bring it across in slices and try each one in the editor before moving on, the order below is the one we'd suggest. Each layer builds on the ones before it and leaves you with something you can actually use.</p>
+<p>This is a reading order, not a set of commits. Nothing tags these layers in the repo, so treat the boundaries as a sensible place to stop rather than a line the code enforces.</p>
+<ul>
+<li>Layer 1 - the record model. <code>Core/OutpostPlotSize.*</code> and a minimal <code>DataAssets/OutpostDefinition.*</code> carrying plot records. After this you can author a definition asset by hand.</li>
+<li>Layer 2 - the actors. Bare <code>Actors/Outpost.*</code> and <code>Actors/OutpostPlot.*</code>, data and accessors only. Drop them into a level by hand.</li>
+<li>Layer 3 - stamping. <code>Core/OutpostStampLibrary.*</code> and <code>Settings/OutpostRuntimeSettings.*</code>. Spawn a recorded base into a world from code.</li>
+<li>Layer 4 - the mode shell. A skeleton <code>Mode/OutpostBuilderEdMode.*</code> and an empty <code>Toolkit/OutpostBuilderToolkit.*</code>. "Outpost Builder" appears in the Modes dropdown.</li>
+<li>Layer 5 - outpost placement. The click-place machine, <code>Settings/OutpostBuilderSettingsAsset.*</code>, the editor's <code>Settings/OutpostBuilderUserSettings.*</code>, <code>Mode/OutpostDrawPrimitives.*</code> (a generic draw vocabulary - segments, rings, pulsed beams, screen text - with no Outpost types in it), <code>Mode/OutpostBuilderDraw.*</code> (the Outpost-specific wrappers built on top of it), and <code>Toolkit/OutpostBuilderCommands.*</code>.<ul>
+<li>Click-place an outpost and get its definition asset created for you. The mint on that path is a plain <code>NewObject</code> on the mode.</li>
+<li><code>Factories/OutpostDefinitionFactory.*</code> is a separate thing worth taking at the same time, since it's what puts the type in the Content Browser's New Asset menu.</li>
+</ul>
+</li>
+<li>Layer 6 - plot placement. The plot ghost and its validity check, Ctrl-remove, and Del. Click-add plots inside an outpost.</li>
+<li>Layer 7 - write-through editing. The <code>PostEditMove</code>, <code>PostEditChangeChainProperty</code>, and <code>Destroyed</code> hooks on both actors, plus <code>Core/OutpostActorEditingLibrary.*</code>, the free-function library those hooks forward into.<ul>
+<li>The actors themselves stay one-line forwards, and the actual logic lives in the library instead - <code>WITH_EDITOR</code>-gated, but in the runtime module rather than the editor module, since it's the actors' own editor-only logic and the runtime module can't link the editor module to reach it.</li>
+<li>Move or edit an actor and the definition follows.</li>
+<li>Deleting an anchor cascades to every family actor sharing its INSTANCE id, with the definition id only as the legacy fallback for content that predates instance ids, and the delete also retires the outpost's registry entry inside the same transaction.</li>
+</ul>
+</li>
+<li>Layer 8 - preview meshes. <code>Core/OutpostPreviewMeshUtils.*</code> and the plot's <code>BuildingMeshComponent</code>. Plots resolve a real mesh, and the ghost gains its mesh parts.</li>
+<li>Layer 9 - viewport chrome. <code>Widgets/SOutpostBuildModeBanner.*</code>, <code>Widgets/SOutpostViewportOverlay.*</code>, and the outpost name labels. See mode state without looking at the panel.</li>
+<li>Layer 10 - toolkit panels. <code>Widgets/SOutpostIdentityHeader.*</code>, <code>Widgets/SOutpostPlotsSection.*</code>, and the editing bar, which is where Save actually lives. The minimal placement tool is complete here. <code>Widgets/SOutpostSaveFooter.*</code> comes along for completeness, but nothing in the plugin mounts it, so don't go hunting for the call site.</li>
+<li>Layer 11 - buildings data. <code>DataAssets/OutpostBuildingDefinition.*</code>, <code>Factories/OutpostBuildingDefinitionFactory.*</code>, and the plot's <code>AssignedBuildingId</code>. Assign buildings from the Details panel.</li>
+<li>Layer 12 - the building palette. <code>Widgets/OutpostPaletteModel.*</code>, <code>Widgets/SOutpostBuildingPalette.*</code>, and <code>Widgets/SOutpostPaletteTile.*</code>. Pick buildings from the palette, with 1-9 and 0 as hotkeys.</li>
+<li>Layer 13 - the assign row and the Selected Building panel. <code>Widgets/SOutpostAssignRow.*</code> and <code>Widgets/SOutpostSelectedBuildingPanel.*</code>. Edit the hot building inline and assign it to a selected plot.</li>
+<li>Layer 14 - the in-viewport command grid. <code>Widgets/SOutpostBuildingCommandGrid.*</code>. The same tiles and hotkeys without leaving the viewport.</li>
+<li>Layer 15 - organizing the palette. Pinning, <code>Widgets/SOutpostPaletteCategoryTabRow.*</code>, <code>Widgets/SOutpostPaletteFilterRow.*</code>, and Randomize Plots on J.</li>
+<li>Layer 16 - the Overhead camera. <code>Actors/OverheadCamera.*</code> plus the camera records on the definition. Frame and save a per-outpost camera on O.</li>
+<li>Layer 17 - the Overview panel. <code>Widgets/SOutpostsOverviewPanel.*</code>, <code>Widgets/SOutpostBuildingsBrowser.*</code>, and <code>Widgets/SOutpostTabBar.h</code>. The Outposts and Buildings tabs: list, place, restore, and locate.</li>
+<li>Layer 18 - ownership beams. The beam draws in <code>Mode/OutpostBuilderDraw.*</code>, riding <code>OutpostDrawPrimitives::DrawPulsedBeam</code> from Layer 5 underneath. Animated plot-ownership beams while you're editing.</li>
+<li>Layer 19 - volumes and the volume-edit excursion. <code>Actors/OutpostVolume.*</code> and <code>Mode/OutpostBuilderVolumeExcursion.*</code>. Exclusion blocking, the bounds rule, and Edit Volume on B.</li>
+<li>Layer 20 - three-state placement validity. The ghost reads valid, warn, or blocked, told apart by fill treatment rather than hue alone.</li>
+<li>Layer 21 - the placement aids. Live distance, footprint, and neighbour-gap numbers beside the ghost, plus the alignment guide.</li>
+<li>Layer 22 - the eyedropper. Press E over a plot to load its building into Selected Building.</li>
+<li>Layer 23 - Content Browser drop, the scoped fade, and two-tier tooltips. <code>Utils/OutpostBuilderTooltips.*</code>. Drag buildings onto the palette, let the edited outpost stand out, and get the long version of a gated control's tooltip on Ctrl+Alt.</li>
+<li>Layer 24 - double-click in and out of editing. Double-click an outpost to start editing it, and double-click the one you're editing to leave.</li>
+</ul>
+<h2 id="the-stop-points">The Stop Points</h2>
+<p>Three of those are natural places to stop for a while, and everything after each one stacks on top rather than weaving through.</p>
+<p>Layer 10 is the early stop. Outpost and plot placement, write-through editing, previews, viewport chrome, and a working side panel, with none of the buildings, camera, volume, or palette weight. If that's all your team needs for now, stop there and come back later.</p>
+<p>Layer 19 is the full editor tool. Everything the mode does for authoring, with the whole v1.30 UX pass still ahead of you.</p>
+<p>Layers 1-24 stop at the v1.30 UX pass. The per-instance identity and baked-registry system sits on top of Layer 24 and is not decomposed into layers here.</p>
+<p>It covers instance ids on the family plus the mint, the level registry asset and its engine subsystem, the bake and its save/map-open listeners, and retire-on-delete with restore-from-baked and the map-open repair. <a href="identity.html">Instance Identity</a> is the guide to that half.</p>
+<p>Layers 20 through 24 are polish and correctness on a tool that already works, so stopping short of them costs you convenience rather than capability.</p>
+<h2 id="layers-grow-files">Layers Grow Files</h2>
+<p>Worth setting expectations on: layers add to files as well as adding files, so a file you copied at Layer 8 may well get extended at Layer 19.</p>
+<p>The heaviest growers are the ones you'd expect. <code>OutpostDefinition</code> grows from Layer 1 all the way through Layer 19. So do the two actors and the actor-editing library behind them, the stamp library, and the whole mode, toolkit, draw, and settings family.</p>
+<p>The practical version of that: don't treat a file as finished just because the layer that introduced it is done. If you're diffing your copy against the plugin to check, diff against the current tree rather than against the layer you took it from.</p>
+<h2 id="dependencies-you-can-defer">Dependencies You Can Defer</h2>
+<p>If you're porting a layer at a time, most of Step 3 can wait. At time of writing, this is roughly where each piece starts being needed.</p>
+<ul>
+<li>Runtime <code>Build.cs</code> - the base list (<code>Core</code>, <code>CoreUObject</code>, <code>Engine</code>, <code>DeveloperSettings</code>, <code>GameplayTags</code>) from Layer 1.</li>
+<li>Editor <code>Build.cs</code> - bring the full Step 3 list at Layer 4, except <code>BSPUtils</code> and <code>GeometryMode</code>, which nothing needs until Layer 19.</li>
+<li><code>Documentation</code> - only from Layer 23, for the two-tier tooltips. It's the one dependency whose absence breaks nothing else, which is exactly why it's easy to miss.</li>
+<li><code>Settings</code> and <code>EditorSettingsViewer</code> - only if you port the tutorial capture command. Skip both otherwise.</li>
+<li>Asset scans - the definition and settings types from Layer 5, the building definition type from Layer 11.</li>
+<li>Module startup work (Step 5) - from Layer 4.</li>
+</ul>
+<h2 id="a-few-heads-ups-for-a-mid-stack-stop">A Few Heads-Ups for a Mid-Stack Stop</h2>
+<p>These are all rough edges of stopping partway rather than defects, and each one heals on its own by the layer noted. Since the layers aren't commits, treat the middle two as what you should expect at that point rather than as states anyone has sat in and observed.</p>
+<ul>
+<li>At Layer 1, hand-authoring two or more plots in the Details panel needs a fresh GUID typed per plot. Array entries default to the zero GUID, and duplicates trip the coherence check on the next load.</li>
+<li>Between Layers 6 and 9, the interim panel shows the outpost placement hint during plot placement too. Layer 10's real panel replaces it.</li>
+<li>At Layer 10, a few tooltips promise things that haven't landed yet, like faction gating of buildings and the outposts overview list. They stop lying once the layers behind them arrive.</li>
+<li>Before Layer 19, the territory border and the exclusion check aren't there, so nothing stops two outposts overlapping. That's worth knowing if designers start authoring real content at an earlier stop.</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li><code>OutpostBuilder/Source/OutpostBuilder/OutpostBuilder.Build.cs</code> and <code>OutpostBuilder/Source/OutpostBuilderEditor/OutpostBuilderEditor.Build.cs</code> - the dependency lists in Step 3. Most of the unobvious entries carry a comment naming the one thing that needs them, though <code>BSPUtils</code> is bare.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostBuilderModule.cpp</code> - <code>RegisterAssetScans</code> and <code>RegisterOutpostAssetType</code>, the two functions behind Step 6.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/OutpostBuilderEditorModule.cpp</code> - every hook Step 5 asks you to take over.</li>
+<li><code>OutpostBuilder/OutpostBuilder.uplugin</code> - the module declarations and the two engine plugin dependencies in Step 4.</li>
+<li><code>porting.html</code> - the actor surface contract this page assumes you've already read.</li>
+<li><code>architecture.html</code> and <code>extending.html</code> - the reasoning behind the raw-actor and no-nesting rules, plus a pitfalls checklist worth a skim before you start.</li>
+<li><code>reference.html</code> - the public API surfaces and the full hotkey list.</li>
+</ul>
+      </article>
+
+    </main>
+
+    <footer class="foot">
+      <p>A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.</p>
+      <a href="https://github.com/defessler/OutpostBuilder">View on GitHub</a>
+    </footer>
+  </div>
+</div>
+
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

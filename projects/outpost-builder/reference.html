@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reference - Public Surfaces, Hotkeys, and Testing · OutpostBuilder</title>
+<meta name="description" content="A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<div class="shell">
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-controls="sidebar" aria-expanded="false">
+    <span></span><span></span><span></span>
+    <span class="vh">Toggle navigation</span>
+  </button>
+
+  <aside class="side" id="sidebar">
+    <div class="side-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-word">OutpostBuilder</span>
+      </a>
+
+      <nav aria-label="Documentation">
+        <ol class="nav-list">
+          <li>
+            <a href="index.html">
+              <span class="nav-no">01</span>
+              <span class="nav-title">OutpostBuilder</span>
+            </a>
+          </li>
+          <li>
+            <a href="tutorial.html">
+              <span class="nav-no">02</span>
+              <span class="nav-title">Tutorial - A Guided Tour</span>
+            </a>
+          </li>
+          <li>
+            <a href="architecture.html">
+              <span class="nav-no">03</span>
+              <span class="nav-title">Architecture</span>
+            </a>
+          </li>
+          <li>
+            <a href="identity.html">
+              <span class="nav-no">04</span>
+              <span class="nav-title">Instance Identity</span>
+            </a>
+          </li>
+          <li>
+            <a href="edmode.html">
+              <span class="nav-no">05</span>
+              <span class="nav-title">The Ed Mode - UEdMode Deep Dive</span>
+            </a>
+          </li>
+          <li>
+            <a href="toolkit.html">
+              <span class="nav-no">06</span>
+              <span class="nav-title">The Toolkit - FModeToolkit and Slate</span>
+            </a>
+          </li>
+          <li>
+            <a href="prefabs.html">
+              <span class="nav-no">07</span>
+              <span class="nav-title">Prefabs &amp; Fork-on-Stamp</span>
+            </a>
+          </li>
+          <li>
+            <a href="faction-visuals.html">
+              <span class="nav-no">08</span>
+              <span class="nav-title">Faction - Identity and Gating</span>
+            </a>
+          </li>
+          <li>
+            <a href="extending.html">
+              <span class="nav-no">09</span>
+              <span class="nav-title">Extending Outpost Builder</span>
+            </a>
+          </li>
+          <li>
+            <a href="quick-reference.html">
+              <span class="nav-no">10</span>
+              <span class="nav-title">Quick Reference - The Cheat Sheet</span>
+            </a>
+          </li>
+          <li>
+            <a href="reference.html" class="active" aria-current="page">
+              <span class="nav-no">11</span>
+              <span class="nav-title">Reference - Public Surfaces, Hotkeys, and Testing</span>
+            </a>
+          </li>
+          <li>
+            <a href="runtime-loadout.html">
+              <span class="nav-no">12</span>
+              <span class="nav-title">Per-Plot Building Rendering</span>
+            </a>
+          </li>
+          <li>
+            <a href="porting.html">
+              <span class="nav-no">13</span>
+              <span class="nav-title">Porting Into Your Own Project</span>
+            </a>
+          </li>
+          <li>
+            <a href="wiring.html">
+              <span class="nav-no">14</span>
+              <span class="nav-title">System Wiring</span>
+            </a>
+          </li>
+          <li>
+            <a href="technology.html">
+              <span class="nav-no">15</span>
+              <span class="nav-title">Technology &amp; Trade-offs</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
+      <a class="side-github" href="https://github.com/defessler/OutpostBuilder">
+        <span aria-hidden="true">&#8599;</span> Repository
+      </a>
+    </div>
+  </aside>
+
+  <div class="nav-scrim" id="nav-scrim"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="crumb">OutpostBuilder <span class="crumb-sep">/</span> Reference - Public Surfaces, Hotkeys, and Testing</span>
+      <span class="published">Published <time datetime="2026-11-03T05:35:00Z">2026-11-03 05:35 UTC</time></span>
+
+    </header>
+
+    <main id="content">
+      <article class="doc">
+<h1 id="reference-public-surfaces-hotkeys-and-testing">Reference - Public Surfaces, Hotkeys, and Testing</h1>
+<p>This page is the complete listing of OutpostBuilder's public surfaces, not a tutorial. Every other page on this site explains the why behind a piece of the plugin. This one just lists the what: every public method and property per class, the hotkey list, the test faction script, and where each file lives. Signatures over bodies.</p>
+<p>If you want the reasoning, <code>architecture.html</code>, <code>edmode.html</code>, <code>toolkit.html</code>, <code>prefabs.html</code>, <code>faction-visuals.html</code> (faction identity/gating), and <code>runtime-loadout.html</code> cover the design decisions this page assumes. If you want the short version, <code>quick-reference.html</code> is the one-page cheat sheet.</p>
+<h2 id="runtime-types">Runtime Types</h2>
+<p>Header:
+<code>OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostDefinition.h</code></p>
+<h3 id="foutpostplotrecord-and-foutpostcamerarecord">FOutpostPlotRecord and FOutpostCameraRecord</h3>
+<p>These are the two record structs a <code>UOutpostDefinition</code> stores. Both transforms are relative to the owning <code>AOutpost</code> actor: <code>World = RelativeTransform * OutpostActorTransform</code>, composed against the outpost's unit-scale record basis (see <code>AOutpost::GetRecordBasisTransform</code> below).</p>
+<ul>
+<li><code>PlotId</code> - <code>FGuid</code> identifying one plot record.</li>
+<li><code>RelativeTransform</code> (on <code>FOutpostPlotRecord</code>) - the plot's transform relative to the owning outpost.</li>
+<li><code>AssignedBuildingId</code> - <code>FPrimaryAssetId</code> (allowed type <code>OutpostBuildingDefinition</code>) for the building assigned to that plot.</li>
+<li><code>PlotSizeTag</code> (on <code>FOutpostPlotRecord</code>) - <code>FGameplayTag</code> under <code>OutpostBuilder.PlotSize</code>, never authored unset. An empty tag reaching a consumer anyway resolves as <code>Small</code> via <code>OutpostBuilder::PlotSizeTags::ResolveOrDefault</code>. It's the size of that plot's pad, mirrored onto <code>AOutpostPlot::PlotSizeTag</code> exactly as <code>AssignedBuildingId</code> is.<ul>
+<li>The RECORD is what every stamp/place/restore/fork rebuilds a plot actor from, so a size held only on the actor would be dropped by all of them.</li>
+<li>The ACTOR is what the live world reads without loading the definition asset.</li>
+<li>Neither alone is sufficient. Both carry it, with the same write-through discipline.</li>
+</ul>
+</li>
+<li><code>PlotTags</code> (on <code>FOutpostPlotRecord</code>, the placement rule matrix's PLOT half) - <code>FGameplayTagContainer</code>, arbitrary and PROJECT-OWNED (no plugin-registered vocabulary, unlike <code>PlotSizeTag</code>). Mirrored onto <code>AOutpostPlot::PlotTags</code> with the identical write-through discipline <code>PlotSizeTag</code> has.<ul>
+<li>An asset saved before this field existed simply deserializes to an empty container, with no default-resolution step needed.</li>
+<li>Matched against a building's <code>PlotTagQuery</code> by <code>OutpostEditorUtils::EvaluateBuildingPlotAdvisory</code> (editor module), <strong>WARN-ONLY</strong>, never a placement/assign refusal. Not checked by <code>ValidateRecordCoherence</code> (that sweep is structural, never field-wise).</li>
+</ul>
+</li>
+<li><code>bIsSet</code> (on <code>FOutpostCameraRecord</code>) - distinguishes "never positioned" from a zero transform.</li>
+<li><code>RelativeTransform</code> (on <code>FOutpostCameraRecord</code>) - same relative-to-outpost rule as the plot record.</li>
+<li><code>FieldOfView</code> - float, defaults to 50.</li>
+</ul>
+<p><code>UOutpostDefinition</code> stores TWO kinds of <code>FOutpostCameraRecord</code>: the single outpost-level <code>OverheadCamera</code> below, and a per-plot <code>TMap&lt;FGuid, FOutpostCameraRecord&gt; PlotCameras</code> keyed by <code>FOutpostPlotRecord::PlotId</code>. Both use the identical struct and the identical relative-to-outpost basis; see <code>PlotCameras</code>'s own entry below for what's different about it.</p>
+<h3 id="uoutpostdefinition">UOutpostDefinition</h3>
+<ul>
+<li><code>PrimaryAssetTypeName</code> - static <code>FPrimaryAssetType</code>, value <code>"OutpostDefinition"</code>.</li>
+<li><code>GetPrimaryAssetId()</code> - <code>{ PrimaryAssetTypeName, GetFName() }</code>.</li>
+<li><code>GetAssetRegistryTags(Context)</code> - exports hidden <code>OutpostDisplayName</code>/<code>OutpostPlacedPath</code> registry tags so the toolkit's Overview list renders name + placement cue from <code>FAssetData</code> alone (live object if loaded, tags otherwise, <code>LoadSynchronous</code> only for pre-tag assets). An empty <code>OutpostPlacedPath</code> value = never placed.</li>
+<li><code>GetPlots()</code> - read-only access to the plot record array.</li>
+<li><code>AddPlot(const FTransform&amp; RelativeTransform, FGameplayTag PlotSizeTag = FGameplayTag())</code> - appends a new plot record and returns its fresh <code>PlotId</code>. An empty tag resolves to <code>Small</code> inside, so a caller with no size to offer still produces a valid default record.</li>
+<li><code>AddPlotRecord(const FOutpostPlotRecord&amp; Record)</code> - appends a FULLY-FORMED record, identity included: the rebuild-from-actors seam behind the Overview panel's <strong>Restore Definition</strong> action (<code>UOutpostBuilderEdMode::RestoreDefinitionFromOutpostActors</code>), where the live plot actors already carry their <code>PlotId</code>s and a freshly minted id would orphan every one of them from its own record.<ul>
+<li>Returns false (no Modify) for an invalid <code>PlotId</code> or one already present. That's the duplicate-id coherence invariant enforced on the way in, so a duplicated plot actor can never displace the first actor's record.</li>
+<li>An unset <code>PlotSizeTag</code> resolves to <code>Small</code> exactly as <code>AddPlot</code> does.</li>
+</ul>
+</li>
+<li><code>SetPlotRelativeTransform(PlotId, RelativeTransform)</code> - updates one plot's relative transform. False if <code>PlotId</code> isn't found or the value is unchanged.</li>
+<li><code>SetPlotAssignedBuilding(PlotId, BuildingId)</code> - same no-op discipline, updates the assigned building.</li>
+<li><code>SetPlotSizeTag(PlotId, NewSizeTag)</code> - same no-op discipline, updates the plot record's size tag. The RECORD half of the write-through pair; a caller resizing a live plot must also call <code>AOutpostPlot::SetPlotSizeTag</code>, in the SAME transaction.</li>
+<li><code>SetPlotTags(PlotId, NewTags)</code> - same no-op discipline, updates the plot record's general tags (<code>FGameplayTagContainer</code>). The RECORD half of the write-through pair; a caller retagging a live plot must also call <code>AOutpostPlot::SetPlotTags</code>, in the SAME transaction. WARN-ONLY consumer: nothing here enforces <code>PlotTagQuery</code>. See <code>OutpostEditorUtils::EvaluateBuildingPlotAdvisory</code>.</li>
+<li><code>RemovePlot(PlotId)</code> - removes a plot record, AND drops any <code>PlotCameras</code> entry keyed to the same <code>PlotId</code> via <code>ClearPlotCameraView</code>. A stranded per-plot camera record would otherwise outlive its plot forever. False if <code>PlotId</code> not found.</li>
+<li><code>RegeneratePlotIds()</code> - reassigns a fresh <code>FGuid</code> to every plot record, used on stamped forks so a fork's plots never collide with the template's ids.<ul>
+<li>It ALSO re-keys <code>PlotCameras</code> through the same old-id-to-new-id mapping (rebuilt into a fresh map, not mutated in place, while iterating the old one). That's required, since <code>PlotCameras</code> is keyed by <code>PlotId</code>: skipping this would orphan every per-plot framing on the fork.</li>
+<li>No Modify/dirty when <code>Plots</code> is empty.</li>
+</ul>
+</li>
+<li><code>GetFaction()</code> / <code>SetFaction(EOutpostFaction)</code> - the definition's persistent faction. Modify+Dirty; <code>SetFaction</code> returns false (no Modify) when unchanged. <code>EOutpostFaction::Neutral</code> is the default. The definition is the source of truth. The live actor syncs from it on edit-mode entry and immediately when the asset is edited directly.</li>
+<li><code>GetOverheadCamera()</code> - read-only accessor for the outpost-level <code>FOutpostCameraRecord</code>.</li>
+<li><code>SetOverheadCameraView(RelativeTransform, FieldOfView)</code> - updates the saved outpost-level camera view and sets <code>bIsSet = true</code>. False if unchanged and already set.</li>
+<li><code>GetPlotCameras()</code> - read-only access to the whole <code>PlotCameras</code> map, keyed by <code>PlotId</code>. Used by <code>AOutpost::ReRelativizeOwnedRecords()</code>'s anchor-move sweep (see <code>architecture.html</code>).</li>
+<li><code>GetPlotCameraView(PlotId)</code> - <code>PlotId</code>'s saved camera framing, or a shared default-constructed (<code>bIsSet == false</code>) record when it has none. Never a dangling reference for an unknown id.</li>
+<li><code>HasPlotCameraView(PlotId)</code> - true iff <code>PlotId</code> has a saved (<code>bIsSet</code>) camera framing.</li>
+<li><code>SetPlotCameraView(PlotId, RelativeTransform, FieldOfView)</code> - updates <code>PlotId</code>'s saved camera framing; adds the entry if <code>PlotId</code> has none yet. Same no-op discipline as <code>SetOverheadCameraView</code>: false (no Modify) if unchanged and already set.</li>
+<li><code>ClearPlotCameraView(PlotId)</code> - drops <code>PlotId</code>'s saved camera framing. False (no Modify) if there was none. Called by <code>RemovePlot</code>.</li>
+<li><code>RecordPlacement(const AActor&amp; Outpost)</code> - records <code>Outpost</code> as this definition's placed actor: soft path AND world transform together, always. The pairing is the invariant: <code>RestoreOutpost</code> respawns at <code>PlacedOutpostTransform</code>, so recording only the path would restore the base at world origin. (<code>SetPlacedOutpostPath</code> is private for exactly that reason; <code>SetPlacedOutpostTransform</code> below stays public for the anchor-move sync that updates the transform only.)</li>
+<li><code>SetPlacedOutpostTransform(NewTransform)</code> - updates the world transform of the placed outpost actor (<code>FTransform::Equals</code>, small tolerance). False if unchanged.</li>
+<li><code>DisplayName</code> - <code>FText</code>, editable. Shown (and editable) in the toolkit's Editing panel identity header.</li>
+<li>Faction property - <code>EOutpostFaction</code> (mirrors <code>AOutpost::Faction</code>), runtime-readable source of truth; <code>Neutral</code> is the explicit no-faction value.</li>
+<li><code>OverheadCamera</code> - the outpost-level <code>FOutpostCameraRecord</code>: frames the base as a whole.</li>
+<li><code>PlotCameras</code> - <code>TMap&lt;FGuid, FOutpostCameraRecord&gt;</code>, keyed by <code>PlotId</code>: one saved framing per plot, independent of <code>OverheadCamera</code>. Same relative-to-outpost basis as <code>OverheadCamera</code>, NOT relative to the plot's own transform.<ul>
+<li>Deliberate consequence: moving a PLOT does not move its saved framing. Only moving the OUTPOST anchor does, via the <code>ReRelativizeOwnedRecords()</code> sweep.</li>
+<li>Authoring-time only: <code>StampOutpost</code>/<code>RestoreOutpost</code> still spawn exactly one <code>AOverheadCamera</code> per outpost, from <code>OverheadCamera</code> alone. Nothing at runtime reads this map.</li>
+<li>See <code>toolkit.html</code>'s "The Contextual Overhead Camera" and <code>edmode.html</code>'s Overhead camera positioning session for how a designer actually sets these.</li>
+</ul>
+</li>
+<li><code>PlacedOutpostPath</code> - <code>FSoftObjectPath</code>, visible-only. Stays valid even when the actor's level isn't loaded.</li>
+<li><code>PlacedOutpostTransform</code> - <code>FTransform</code>, visible-only. Kept current alongside <code>PlacedOutpostPath</code>; <code>RestoreOutpost</code> respawns here.</li>
+<li><code>IsDataValid(Context)</code> (<code>WITH_EDITOR</code>) - one WARNING-severity (never <code>Invalid</code>) finding per stored plot assignment whose building's <code>PlotTagQuery</code> rejects the plot's <code>PlotTags</code>. Calls <code>UOutpostBuildingDefinition::MatchesPlotTags</code> <strong>directly</strong> rather than through <code>OutpostEditorUtils::EvaluateBuildingPlotAdvisory</code>.<ul>
+<li>That's the one documented exception to that function's one-composition rule, because this class lives in the RUNTIME module and cannot depend on <code>OutpostBuilderEditor</code> at all. It's safe because the editor-module function is nothing but this same call wrapped in an enum, with no additional logic to drift from.</li>
+<li>Loads each assigned building synchronously, which is acceptable here since this is a one-shot editor validation pass, not a per-frame path.</li>
+</ul>
+</li>
+</ul>
+<p>Note: every mutator above follows the same discipline. <code>Modify()</code> runs first, and <code>MarkPackageDirty()</code> follows a successful change. A <code>false</code> return means a no-op: neither one runs.</p>
+<h3 id="uoutpostbuildingdefinition">UOutpostBuildingDefinition</h3>
+<p>Header:
+<code>OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostBuildingDefinition.h</code></p>
+<ul>
+<li><code>PrimaryAssetTypeName</code> / <code>GetPrimaryAssetId()</code> - <code>"OutpostBuildingDefinition"</code>.</li>
+<li><code>DisplayName</code> - <code>FText</code>, author-optional (empty is a valid, common state).</li>
+<li><code>GetEffectiveDisplayName()</code> - THE one display-name rule: the authored <code>DisplayName</code> when set, else <code>MakeDefaultDisplayNameFromAssetName(GetName())</code>.<ul>
+<li>Every surface that shows a building's name (the palette tile, the Assign row's building picker combo button, the plot list rows, and the Buildings browser rows) routes through this, or through the toolkit's load-free <code>GetBuildingDisplayText(FPrimaryAssetId)</code> mirror of the same rule, so a renamed building reads identically everywhere.</li>
+<li>Palette-tile and browser-row TOOLTIPS deliberately keep the raw asset name instead. Two buildings can share a <code>DisplayName</code>, never an asset name.</li>
+</ul>
+</li>
+<li><code>MakeDefaultDisplayNameFromAssetName(AssetName)</code> - <code>static FString</code>. The asset name with a leading <code>"BD_"</code> stripped (case-insensitive). Returns the name unchanged if there's no such prefix, or if stripping it would leave nothing (a building literally named <code>"BD_"</code> keeps <code>"BD_"</code>).<ul>
+<li>Load-free and static so a caller holding only an <code>FAssetData</code>/<code>FPrimaryAssetId</code> (no loaded object) can apply the identical rule.</li>
+<li>This is both <code>GetEffectiveDisplayName</code>'s fallback AND the DEFAULT a freshly created building's <code>DisplayName</code> is stamped with. Both creation paths (the panel's "+ New Building" / <code>CreateNewBuildingDefinitionInteractive</code>, and the Content Browser's <code>UOutpostBuildingDefinitionFactory::FactoryCreateNew</code>) set it, so a building named <code>BD_Barracks</code> is born with <code>DisplayName</code> <code>"Barracks"</code>.</li>
+</ul>
+</li>
+<li><code>BuildingActorClass</code> - <code>TSoftClassPtr&lt;AActor&gt;</code>, the actor asset (e.g., a Blueprint actor) that IS the building, kept for a project's own gameplay spawns. GAME worlds never render from this field directly (buildings render mesh-only there).<ul>
+<li>In the EDITOR only, when set, the placement ghost and any editor-world plot with this building assigned both mirror this class's template (its static-mesh components) instead of <code>BuildingMesh</code>. See <code>runtime-loadout.html</code> and <code>edmode.html</code>.</li>
+</ul>
+</li>
+<li><code>BuildingMesh</code> - <code>TSoftObjectPtr&lt;UStaticMesh&gt;</code>, what an assigned plot renders in GAME worlds, the palette thumbnail source, and the editor preview/ghost, specifically its FALLBACK when <code>BuildingActorClass</code> is unset or yields no static-mesh parts. The ghost's validation circle never measured either field (see <code>GetPreviewFootprintRadiusCm</code> in <code>edmode.html</code>); it's the plot's size class, not a mesh bounds.</li>
+<li><code>PlotSizeQuery</code> - <code>FGameplayTagQuery</code>, default EMPTY. Which plots this building fits, evaluated against the plot's <code>PlotSizeTag</code>. <strong>Empty = fits EVERY plot size</strong> (a wildcard, not "nobody"), the default for a newly created building and for one saved before this field existed, and the same wildcard convention <code>SupportedFactions</code> establishes.<ul>
+<li>A mismatch is the <strong>disabled treatment</strong>: the building is refused by the Assign button (with a tooltip saying so) and excluded from Randomize's pool.</li>
+<li>A building already sitting on a now-mismatched plot is NEVER auto-deleted or reassigned. It keeps its plot and keeps rendering.</li>
+</ul>
+</li>
+<li><code>PlotTagQuery</code> (the placement rule matrix's BUILDING half) - <code>FGameplayTagQuery</code>, default EMPTY. Evaluated against the plot's <code>PlotTags</code> by <code>OutpostEditorUtils::EvaluateBuildingPlotAdvisory</code> (editor module). <strong>Empty = fits every plot</strong> (the same wildcard convention <code>PlotSizeQuery</code>/<code>SupportedFactions</code> establish).<ul>
+<li><strong>WARN-ONLY</strong>, the deliberate contrast with <code>PlotSizeQuery</code>/<code>SupportedFactions</code> (both BLOCKING, the disabled treatment): a mismatch never refuses assignment, never excludes a plot from Randomize's pool, and never greys out the Assign button. It only flags (a tooltip line, a palette-tile glyph, a plot-list drift icon, and a WARNING-severity <code>IsDataValid</code> finding).</li>
+<li>VOCABULARY is entirely PROJECT-OWNED: this plugin registers no native tags for it at all (contrast <code>PlotSize</code>'s four native tags). Author your own in <code>DefaultGameplayTags.ini</code>.</li>
+</ul>
+</li>
+<li><code>MatchesPlotTags(PlotTags)</code> - <code>UFUNCTION(BlueprintPure)</code>. THE one home of the plot-tag advisory match, <code>MatchesPlotSize</code>'s WARN-ONLY counterpart. Rule: an EMPTY query fits everything, tested first. Unlike <code>MatchesPlotSize</code>, there is deliberately <strong>no</strong> <code>ResolveOrDefault</code> step: plot tags have no default vocabulary to resolve an unset value into, so <code>PlotTags</code> is evaluated exactly as given. Never call directly from a UI surface. Go through <code>OutpostEditorUtils::EvaluateBuildingPlotAdvisory</code>.</li>
+<li><code>SupportedFactions</code> - <code>TSet&lt;EOutpostFaction&gt;</code>, default EMPTY. The factions that field this building. <strong>Empty = supported everywhere</strong> (a wildcard, not "nobody"), which is exactly what an asset authored before this field existed deserializes to.</li>
+<li><code>SupportsFaction(OutpostFaction)</code> - <code>UFUNCTION(BlueprintPure)</code>. THE one home of the faction rule; takes the <strong>outpost's</strong> faction, not the building's. Never test <code>SupportedFactions</code> directly.<ul>
+<li>Two rules live here that a membership test cannot express: (1) <strong>a Neutral outpost accepts EVERY building</strong> regardless of what it lists, checked first, before the set is read at all; (2) an empty list is a wildcard.</li>
+<li>A call site that checked only <code>.Contains()</code> would silently hide every faction-tagged building from every default (Neutral) outpost in the project.</li>
+</ul>
+</li>
+<li><code>MatchesPlotSize(PlotSizeTag)</code> - <code>UFUNCTION(BlueprintPure)</code>. THE one home of the size rule, <code>SupportsFaction</code>'s exact counterpart: may this building sit on a plot of <code>PlotSizeTag</code>? Never test <code>PlotSizeQuery</code> directly.<ul>
+<li>Two rules live here: (1) an EMPTY query fits everything, tested first; (2) an UNSET plot tag resolves as the default size (<code>Small</code>) before matching, via <code>OutpostBuilder::PlotSizeTags::ResolveOrDefault</code>, so an un-tagged plot behaves exactly like a Small plot.</li>
+</ul>
+</li>
+<li><code>BuildingCategory</code> - <code>FGameplayTag</code>, <code>meta = (Categories = "OutpostBuilder.BuildingCategory")</code>. Purely a PALETTE grouping: it has no bearing on eligibility (contrast <code>PlotSizeQuery</code>/<code>SupportedFactions</code>, which gate what's offerable).<ul>
+<li><strong>Empty = uncategorized</strong>, the default and fully valid. A project that never tags a building sees zero palette UI change, since the editing panel's category tab row hides entirely until at least one building is categorized. See <code>toolkit.html</code>'s "Palette Category Tabs" section.</li>
+</ul>
+</li>
+<li><code>GetAssetRegistryTags(Context)</code> - exports <code>BuildingCategory</code>'s tag NAME as a hidden <code>"BuildingCategory"</code> registry tag (empty string when unset: <code>FGameplayTag::ToString()</code> on an invalid tag returns <code>"None"</code>, not <code>""</code>, so the empty case is spelled out explicitly) so the palette's category tab row and filter gate can bucket an UNLOADED definition without loading it, the same live-else-registry rule used for display names.</li>
+<li><code>OutpostBuilder::BuildingCategoryTags</code> namespace (<code>OutpostBuildingDefinition.h</code>) - the building-category tag vocabulary, the palette-organization counterpart to <code>OutpostBuilder::PlotSizeTags</code> but deliberately smaller: it registers exactly ONE native tag, <code>"OutpostBuilder.BuildingCategory"</code>, via <code>UE_DEFINE_GAMEPLAY_TAG_STATIC</code>, unlike <code>PlotSizeTags::GetParentTag()</code>, which resolves by name because its four children are the native ones.<ul>
+<li><code>BuildingCategory</code> ships no native children to bring a name-resolved parent into the tag tree, so the root itself has to be native. That registration is the whole product: it's what gives the <code>BuildingCategory</code> field's <code>meta=(Categories=...)</code> picker a root to offer children under.</li>
+<li>The namespace exposes no accessor, and the tag static is referenced by nothing. The palette's category census reads the tags off the definitions themselves (<code>FOutpostPaletteModel::ComputeCategoryPresence</code>) rather than querying the tag tree.</li>
+<li>NO native children ship: the taxonomy belongs entirely to the project's own gameplay-tag config, exactly like <code>PlotSize</code>'s project-added sizes.</li>
+</ul>
+</li>
+</ul>
+<h3 id="uoutpostfactiondefinition-deleted">UOutpostFactionDefinition - DELETED</h3>
+<p>This <code>UPrimaryDataAsset</code> and its Content Browser factory (<code>UOutpostFactionDefinitionFactory</code>) no
+longer exist. Faction is the fixed <code>EOutpostFaction</code> enum
+(<code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostFaction.h</code>): pure identity/eligibility, with no
+banner mesh and no color. See <code>faction-visuals.html</code> for the full model.</p>
+<h3 id="plot-size-gameplay-tags">Plot-Size Gameplay Tags</h3>
+<p>Header:
+<code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostPlotSize.h</code> (namespace <code>OutpostBuilder::PlotSizeTags</code>)</p>
+<p>Plot size lives on gameplay tags under <code>OutpostBuilder.PlotSize</code>. The plugin registers four NATIVE tags (<code>OutpostBuilder.PlotSize.Small</code>/<code>Medium</code>/<code>Large</code>/<code>Heavy</code>, the enum's 1:1 twins) via file-local <code>FNativeGameplayTag</code> statics in <code>OutpostPlotSize.cpp</code>; a project adds its own sizes as ordinary child tags of <code>OutpostBuilder.PlotSize</code> in its gameplay-tag config, no plugin change needed. Every consumer reaches the vocabulary through these free functions rather than the native statics directly:</p>
+<ul>
+<li><code>GetParentTag()</code> - <code>OutpostBuilder.PlotSize</code>, resolved by name (<code>ErrorIfNotFound = false</code>).
+  Note the vocabulary's export split: <code>GetDefaultTag</code>/<code>GetRegisteredPlotSizeTags</code>/<code>GetTagLeafText</code>
+  carry <code>OUTPOSTBUILDER_API</code> (the editor module calls them); <code>GetParentTag</code>/<code>ResolveOrDefault</code>/
+  <code>ToNativeTag</code>/<code>IsNativeTag</code> are runtime-module-internal. A downstream module cannot link
+  them, and adding an export needs a real cross-module caller, not symmetry.</li>
+<li><code>GetDefaultTag()</code> - <code>OutpostBuilder.PlotSize.Small</code>. THE default size: an unset tag anywhere (older content, a hand-spawned plot) resolves as Small.</li>
+<li><code>ResolveOrDefault(Tag)</code> - <code>Tag</code> if valid, else <code>GetDefaultTag()</code>. The one home of the unset-resolves-as-Small rule.</li>
+<li><code>ToNativeTag(EOutpostPlotSize)</code> - the enum value's native-tag twin (<code>Small</code> -&gt; <code>OutpostBuilder.PlotSize.Small</code>, etc.), used internally to name the four native tags for lookups like <code>IsNativeTag</code> and the settings asset's built-in dimension ladder.</li>
+<li><code>GetRegisteredPlotSizeTags()</code> - every registered tag under <code>OutpostBuilder.PlotSize</code>: the native four plus whatever the project's tag config added. The palette's Plot Size filter builds its option rows from this.</li>
+<li><code>GetTagLeafText(Tag)</code> - display text: the leaf segment (<code>"Small"</code> from <code>"OutpostBuilder.PlotSize.Small"</code>). An empty tag renders as the default tag's leaf.</li>
+</ul>
+<p><strong>Plot size is ONE feature, not two.</strong> The same tag vocabulary answers both halves: <code>AOutpostPlot::PlotSizeTag</code>/<code>FOutpostPlotRecord::PlotSizeTag</code> carry the size a plot HAS, <code>UOutpostBuildingDefinition::PlotSizeQuery</code> carries the sizes a building FITS (a query now, not a single required value), and a mismatch is a disabled treatment, never an auto-delete, never a reassignment.</p>
+<h3 id="eoutpostplotsize">EOutpostPlotSize</h3>
+<p>Same header. <code>UENUM(BlueprintType) enum class EOutpostPlotSize : uint8 { Small, Medium, Large, Heavy }</code> names the plugin's four native plot sizes for the handful of internal call sites that need to refer to one by value. <code>ToNativeTag</code> is how those four native gameplay tags get identified by lookups like <code>IsNativeTag</code> and the settings asset's built-in dimension ladder.</p>
+<p>Live plot-size data is always the gameplay tag, never this enum. Don't type a new property against this enum, and don't extend it: a project's own plot sizes are tags added to the <code>OutpostBuilder.PlotSize</code> config, not new enum entries.</p>
+<h2 id="the-settings-asset-uoutpostbuildersettingsasset">The Settings Asset - UOutpostBuilderSettingsAsset</h2>
+<p>Header:
+<code>OutpostBuilder/Source/OutpostBuilder/Settings/OutpostBuilderSettingsAsset.h</code></p>
+<p>A <code>UPrimaryDataAsset</code> (type name <code>"OutpostBuilderSettings"</code>) in the RUNTIME module. It holds the project-SHARED knobs (runtime categories, asset-creation/placement config, and three placement-VALIDITY knobs). The per-user debug-draw/editor-UI-style knobs (colors, sizes, and timing, across Ghosts/Footprints/Selection/Hover/Beams/HUD/Overhead Camera/Input) live on a separate per-user class, <code>UOutpostBuilderUserSettings</code> (below).</p>
+<p>A project authors ONE of this asset (Content Browser &gt; Add &gt; Miscellaneous &gt; <strong>Data Asset</strong> &gt; pick <code>OutpostBuilderSettingsAsset</code>) and assigns it once at Project Settings &gt; Plugins &gt; <strong>"Outpost Builder"</strong> &gt; <strong>Settings Asset</strong>, the plugin's single Project Settings entry.</p>
+<p>The class defaults apply for any value (or the whole asset) left unset. <code>UOutpostRuntimeSettings</code> is the host (below).</p>
+<ul>
+<li><code>PrimaryAssetTypeName</code> / <code>GetPrimaryAssetId()</code> - <code>"OutpostBuilderSettings"</code>; registered for scanning AND <code>AlwaysCook</code> in <code>FOutpostBuilderModule::RegisterAssetScans</code> exactly like the two definition types, which is what makes the cooker follow the soft mesh refs below out of the asset (and what fixed the latent never-cooked-<code>DefaultPreviewMesh</code> bug, covered in <code>porting.html</code>).</li>
+<li><code>Get()</code> (static) - THE read every consumer routes through: the configured asset when already loaded, else this class's CDO. <strong>Never loads</strong> (<code>ResolveObject</code>-only, weak-cached keyed by the configured soft path). Its dominant call sites are per-frame draw/HUD/Slate paths.</li>
+<li><code>PreWarm()</code> (static) - one-shot SYNCHRONOUS load of the configured asset so <code>Get()</code> never misses on a real project; called from exactly three sites: <code>RegisterAssetScans</code> (module startup / post-engine-init, the packaged-game site, which also roots the asset in cooked games), <code>UOutpostBuilderEdMode::Enter</code>, and <code>UOutpostRuntimeSettings::PostEditChangeProperty</code> (asset repointed).</li>
+<li><code>IsDataValid(Context)</code> (<code>WITH_EDITOR</code>) - errors on any registered plot-size tag with no <code>PlotSizeTagHalfSizeCm</code> entry (the four native tags excepted, since they always resolve through the built-in ladder), and on a native non-Small tag that resolves to the same dimensions as Small (a sign the built-in dimension ladder is missing its rung for that tag).</li>
+</ul>
+<p>Runtime categories (shipped in packaged games):</p>
+<ul>
+<li><code>DefaultPreviewMesh</code> - <code>TSoftObjectPtr&lt;UStaticMesh&gt;</code>, Preview category. Fallback mesh for a plot's mesh ladder (rung 3, reached when <code>EmptyPlotMesh</code> is unset, or the assigned building's own <code>BuildingMesh</code> is unset/fails to load).<ul>
+<li>NOT read by the placement ghost, which has no equivalent rung of its own. A ghost that resolves nothing simply shows no mesh part (the wire box and its ground square alone).</li>
+<li>Unset keeps the built-in cube for the plot.</li>
+</ul>
+</li>
+<li><code>EmptyPlotMesh</code> - <code>TSoftObjectPtr&lt;UStaticMesh&gt;</code>, Preview category. What an UNASSIGNED plot looks like (EVERY unassigned plot, of every outpost, in the editor AND in packaged games), and what the placement ghost is made of while the palette's Empty tile is hot.<ul>
+<li>Unset is fine: the plot falls through to <code>DefaultPreviewMesh</code>, then the built-in cube.</li>
+<li>It's load-bearing that "a plot is never invisible", since editor tooling traces a plot's MESH to hit it.</li>
+</ul>
+</li>
+<li><code>PlotSizeTagHalfSizeCm</code> - <code>TMap&lt;FGameplayTag, float&gt;</code>, Placement category, DisplayName "Plot Size Tags" (<code>meta = (Units = ...)</code> is UHT-rejected on a <code>TMap</code> property, numeric/struct only, so the unit stays in the tooltip instead of a unit-aware spinner).<ul>
+<li>Every pad is a square, and the stored float is the HALF-size in cm: the distance from the pad's center to an edge (a 400x400cm Small pad is an entry of <code>200</code>).</li>
+<li>A tag absent from the map resolves via the native ladder and finally Small (<code>UOutpostRuntimeSettings::GetPlotSizeFootprintRadiusCm</code>/<code>GetDefaultPlotSizeDimensionsCm</code>).</li>
+<li>This map is the ONE place a size class becomes a number, and it's the whole reason plot size is one feature rather than two: the tag names the class, this retunes what the class MEANS with no recompile and without touching a single building asset.</li>
+</ul>
+</li>
+<li><code>OutpostActorClass</code> / <code>OutpostPlotActorClass</code> / <code>OutpostVolumeActorClass</code> / <code>OverheadCameraActorClass</code> - <code>TSubclassOf&lt;AOutpost&gt;</code> / <code>TSubclassOf&lt;AOutpostPlot&gt;</code> / <code>TSubclassOf&lt;AOutpostVolume&gt;</code> / <code>TSubclassOf&lt;AOverheadCamera&gt;</code>, <strong>Actors</strong> category, each <code>meta = (AllowAbstract = "false")</code>. The class every new instance of that actor type spawns as.<ul>
+<li>The constructor defaults all four to the plugin's own native <code>StaticClass()</code>, so an unauthored asset reproduces the fixed-class behavior exactly.</li>
+<li>A project points one of these at its own C++ or Blueprint subclass to swap what gets spawned, project-wide, with no call-site changes.</li>
+<li>Never read directly (<code>Get().OutpostActorClass</code> etc.). Every consumer goes through the matching <code>UOutpostRuntimeSettings::Get*Class()</code> resolver below, which is what makes the override reach every spawn site instead of just some of them.</li>
+<li>The editor-only <code>OutpostActorFolder</code> (below) shares this same <strong>Actors</strong> category, even though it lives inside <code>WITH_EDITORONLY_DATA</code> and these four don't. Details-panel categories group across that compile boundary freely.</li>
+</ul>
+</li>
+</ul>
+<p>Editor categories (inside <code>WITH_EDITORONLY_DATA</code>, stripped from cooked builds):</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Assets</strong></td>
+<td><code>CreatedDefinitionDirectory</code>, <code>DefinitionAssetPrefix</code>, <code>MaxDefaultBuildingPaletteEntries</code></td>
+</tr>
+<tr>
+<td><strong>Actors</strong></td>
+<td><code>OutpostActorFolder</code> (alongside the four actor-class overrides above)</td>
+</tr>
+<tr>
+<td><strong>Placement</strong></td>
+<td><code>OutpostExclusionDistance</code>, <code>DefaultOutpostVolumeSizeCm</code>, <code>OutpostVolumeBoundsPaddingCm</code>, plus two knobs that feed placement VALIDITY rather than a look: <code>PlotRingRadius</code> and <code>PlotGhostRadius</code> (the new-plot spawn-search radius and a last-resort geometry-bounds fallback), alongside the runtime-shipped <code>PlotSizeTagHalfSizeCm</code> (above), which feeds the same footprint-radius arithmetic</td>
+</tr>
+</tbody>
+</table>
+<p>These stay on the shared asset, not the per-user class, because a per-user divergence would make the same plot legal on one designer's machine and illegal on another's.</p>
+<p>Everything else the style surface holds (Ghosts/Footprints/Selection/Hover/Beams/HUD/Overhead Camera/Input: colors, sizes, timing) lives on the per-user <code>UOutpostBuilderUserSettings</code> (editor module). See "Per-User Style Settings" and "Editor Settings on the Asset" below.</p>
+<h2 id="runtime-settings-host-uoutpostruntimesettings">Runtime Settings Host - UOutpostRuntimeSettings</h2>
+<p>Header:
+<code>OutpostBuilder/Source/OutpostBuilder/Settings/OutpostRuntimeSettings.h</code></p>
+<p>A <code>UDeveloperSettings</code> (<code>config = Game, defaultconfig</code>, DisplayName <strong>"Outpost Builder"</strong>): the plugin's ONE Project Settings entry. It holds no tunables of its own, its single visible property is the <code>SettingsAsset</code> pointer.</p>
+<p>It stays in the RUNTIME module for reachability. Packaged games must resolve the pointer (a runtime plot's mesh-ladder resolution needs <code>EmptyPlotMesh</code>/<code>DefaultPreviewMesh</code>, and a runtime plot must learn its own size's real dimensions), and <code>DefaultGame.ini</code> ships.</p>
+<ul>
+<li><code>SettingsAsset</code> - <code>TSoftObjectPtr&lt;UOutpostBuilderSettingsAsset&gt;</code>, config, EditAnywhere. THE pointer everything resolves through. Unset is supported (every read falls back to the asset class's CDO defaults), but a real project should author one. The asset is also what makes its soft-referenced meshes cook.</li>
+<li><code>PinnedBuildingDefinitions</code> - <code>TArray&lt;FName&gt;</code>, <code>UPROPERTY(config)</code> with <strong>no</strong> EditAnywhere, <code>WITH_EDITORONLY_DATA</code>. Package names of building definitions pinned to always show in the editing panel's palette.<ul>
+<li>Deliberately INVISIBLE in Project Settings and hosted here rather than on the asset: pins are workflow state the Pin button flips with a silent, instant <code>SaveConfig</code>. Asset-hosting them would turn every pin toggle into a dirty package and save prompt.</li>
+</ul>
+</li>
+<li><code>GetPlotSizeDimensionsCm(PlotSizeTag)</code> / <code>GetDefaultPlotSizeDimensionsCm(PlotSizeTag)</code> - the settings asset's configured entry if present, else the built-in default; an unset tag resolves as the default (<code>Small</code>) size. Built-in defaults exist only for the four NATIVE tags, square pads on a 4m step: Small 400×400, Medium 800×800, Large 1200×1200, Heavy 1600×1600. A project-added tag with no configured entry falls back to Small's.</li>
+<li><code>GetPlotSizeFootprintRadiusCm(PlotSizeTag)</code> - a plot size's configured half-size in cm: the <code>PlotSizeTagHalfSizeCm</code> entry for the (resolved) tag, or the built-in default when it has none. <strong>This is the one place the size→radius arithmetic lives.</strong><ul>
+<li>Every pad is a square, so this one number doubles as "distance from center to edge" and the radius <code>OutpostBuilder::Draw::GetActorGeometryRadius</code> uses for a plot's own selection/footprint ring, without either needing to re-derive it from the other.</li>
+<li>A configured entry is returned as authored, so a negative half-size reaches callers as-is. Callers must NOT use a negative value as an "unresolved" sentinel.</li>
+</ul>
+</li>
+<li><code>GetOutpostClass()</code> / <code>GetPlotClass()</code> / <code>GetVolumeClass()</code> / <code>GetOverheadCameraClass()</code> - the four actor-class resolvers every spawn site in the plugin routes through: the settings asset's configured <code>OutpostActorClass</code>/<code>OutpostPlotActorClass</code>/<code>OutpostVolumeActorClass</code>/<code>OverheadCameraActorClass</code> (above) when set, else that actor type's own native class. Never <code>nullptr</code>, even with a cleared field.<ul>
+<li>Callable from BOTH modules (the editor module already depends on the runtime one, so this creates no circular dependency), which is what lets editor placement AND the runtime-only <code>StampOutpost</code>/<code>PlaceDefinitionAt</code> path share one source of truth for which class each spawn instantiates.</li>
+<li>All 11 spawn sites resolve through these four statics: <code>ConfirmOutpostPlacement</code>/<code>ConfirmPlotPlacement</code>/<code>EnsureOverheadCameraForEditingOutpost</code>/<code>StartOverheadCameraPositioning</code> (<code>UOutpostBuilderEdMode</code>), <code>StampOutpost</code>/<code>PlaceDefinitionAt</code>/<code>RestoreOutpost</code>'s outpost spawn plus the shared plot- and camera-spawn helper they call (<code>UOutpostStampLibrary</code>), <code>SpawnDefaultOutpostVolume</code> (<code>OutpostPrefabUtils</code>), and the Content Browser drag-stamp's <code>UActorFactoryOutpostPrefab::GetDefaultActorClass</code> override.</li>
+</ul>
+</li>
+<li><code>PostEditChangeProperty</code> (<code>WITH_EDITOR</code>) - a repointed <code>SettingsAsset</code> pre-warms the new asset (<code>UOutpostBuilderSettingsAsset::PreWarm</code>) so the never-loading per-frame resolution serves the new values immediately.</li>
+</ul>
+<p>All the statics resolve through <code>UOutpostBuilderSettingsAsset::Get()</code>, which is <strong>loaded-or-CDO, never a load</strong>, so they are safe on per-frame Slate bindings and draw paths.</p>
+<h2 id="runtime-actors">Runtime Actors</h2>
+<h3 id="aoutpost">AOutpost</h3>
+<p>Header:
+<code>OutpostBuilder/Source/OutpostBuilder/Actors/Outpost.h</code></p>
+<ul>
+<li><code>AOutpost()</code> - constructs the root <code>USceneComponent</code> ("Root") and the editor-only preview cube.</li>
+<li><code>GetOutpostDefinitionId()</code> / <code>SetOutpostDefinitionId(NewId)</code> - the owning <code>UOutpostDefinition</code>'s primary asset id. Setter is Modify+Dirty.</li>
+<li><code>GetFaction()</code> / <code>SetFaction(EOutpostFaction)</code> - Modify+Dirty (skipped if unchanged). <code>Faction</code> itself is a plain <code>UPROPERTY(EditAnywhere, Category="Outpost") EOutpostFaction</code>, default <code>EOutpostFaction::Neutral</code>. On a real change, <code>SetFaction</code> also broadcasts <code>UOutpostEventSubsystem::OnFactionChanged</code> for this world; there is still no faction-color mechanism in the plugin. See <code>faction-visuals.html</code>.</li>
+<li><code>GetRecordBasisTransform()</code> - <code>FTransform(GetActorRotation(), GetActorLocation())</code>, the outpost's rotation and translation with scale stripped. Every plot and camera record's relative transform is composed against this basis, both when it's written and when a definition is stamped. That keeps a scaled anchor from ever distorting a stamp.</li>
+<li>No <code>PostLoad()</code>, <code>OnConstruction(const FTransform&amp;)</code>, or <code>PostEditUndo()</code> override - there is no faction tint to re-apply, so none is needed.</li>
+<li><code>PostEditMove(bFinished)</code> (<code>WITH_EDITOR</code>) - plots and cameras are independent actors, never attached to the outpost (the no-nesting rule). Moving the anchor doesn't move them. Instead, a finished move re-relativizes every matching plot/camera actor's record against the new outpost transform, keeping world positions steady under the new basis. Skipped when more than one outpost shares the definition id (an ambiguous basis).</li>
+<li><code>PostEditChangeChainProperty(...)</code> (<code>WITH_EDITOR</code>) - Details-panel transform edits never fire <code>PostEditMove</code>. This triggers the same re-relativization from typed edits instead.</li>
+<li><code>Destroyed()</code> (<code>WITH_EDITOR</code>) - cascade delete: an interactive editor destruction of this outpost (outliner, Del key, or the mode's <code>DeleteSelection</code>, any path) also destroys every <code>AOutpostPlot</code>/<code>AOverheadCamera</code> sharing this outpost's definition id in the same world, inside the same active transaction. One undo restores the outpost and every companion actor together.<ul>
+<li>Guarded against world teardown, undo/redo replay, and Blueprint reconstruction. The definition asset itself is left untouched on disk.</li>
+<li>Check out <code>UOutpostStampLibrary::RestoreOutpost</code> below for the recovery side of that.</li>
+</ul>
+</li>
+</ul>
+<h3 id="aoutpostplot">AOutpostPlot</h3>
+<p>Header:
+<code>OutpostBuilder/Source/OutpostBuilder/Actors/OutpostPlot.h</code></p>
+<ul>
+<li><code>AOutpostPlot()</code> - root <code>USceneComponent</code> ("Root") plus ONE runtime <code>UStaticMeshComponent</code>, <code>BuildingMeshComponent</code> (not <code>WITH_EDITORONLY_DATA</code>), so a plot's building renders in packaged games too.<ul>
+<li>See <code>runtime-loadout.html</code> for the mesh-ladder selection model (<code>AssignedBuildingId</code>, else the settings asset's plugin-wide <code>EmptyPlotMesh</code>, else its <code>DefaultPreviewMesh</code>, else the built-in cube). That ladder is unconditional and the ONLY path in a GAME world, and the EDITOR-world fallback.</li>
+<li>A second, <code>WITH_EDITORONLY_DATA</code>+<code>Transient</code> array, <code>MirroredBuildingParts</code>, holds the actor-template mirror an EDITOR-world plot wears instead when its assigned building's <code>BuildingActorClass</code> resolves at least one static-mesh part (see <code>RebuildMirroredBuildingParts()</code> below). <code>BuildingMeshComponent</code> carries no mesh while that array is populated.</li>
+</ul>
+</li>
+<li><code>GetOutpostDefinitionId()</code> / <code>SetOutpostDefinitionId(NewId)</code> - Modify+Dirty.</li>
+<li><code>GetPlotId()</code> / <code>SetPlotId(NewPlotId)</code> - Modify+Dirty.</li>
+<li><code>GetAssignedBuildingId()</code> / <code>SetAssignedBuilding(BuildingId)</code> - Modify+Dirty, then triggers a re-realization of the rendered building and broadcasts <code>UOutpostEventSubsystem::OnPlotAssigned</code> for this world.</li>
+<li><code>GetPlotSizeTag()</code> / <code>SetPlotSizeTag(NewSizeTag)</code> - Modify+Dirty, skipped when unchanged. The ACTOR half of the write-through pair (see <code>FOutpostPlotRecord::PlotSizeTag</code>); a caller resizing a live plot must also call <code>UOutpostDefinition::SetPlotSizeTag</code>, in the SAME transaction, or the next stamp rebuilds the plot at its old size.<ul>
+<li>Deliberately does NOT refresh the mesh, unlike <code>SetAssignedBuilding</code>: size is not an input to mesh resolution, so there is nothing cached to re-derive.</li>
+<li>What size DOES feed (the editor's footprint radius and the disabled treatment) is re-read every frame, never cached. It IS what the plot's selection ring and overlap test measure (<code>OutpostBuilder::Draw::GetActorGeometryRadius</code>).</li>
+</ul>
+</li>
+<li><code>GetPlotTags()</code> / <code>SetPlotTags(NewTags)</code> - Modify+Dirty, skipped when unchanged. The ACTOR half of the write-through pair (see <code>FOutpostPlotRecord::PlotTags</code>); a caller retagging a live plot must also call <code>UOutpostDefinition::SetPlotTags</code>, in the SAME transaction.<ul>
+<li>The Details panel is the only interactive write surface: <code>PostEditChangeChainProperty</code> syncs the record via <code>SyncRecordPlotTags</code>, mirroring <code>PlotSizeTag</code>'s own branch. No mesh refresh (tags are not a mesh-resolution input) and no migration (no legacy source).</li>
+</ul>
+</li>
+<li><code>RefreshBuildingPreview()</code> - building realization. In an EDITOR world it first tries <code>RebuildMirroredBuildingParts()</code> (below) when the assigned building's <code>BuildingActorClass</code> is set. Only when that returns false (no class, an unloadable class, or a class with no static-mesh parts) does it fall through to the mesh-ladder priority order in <code>runtime-loadout.html</code>, reusing <code>UOutpostBuildingDefinition</code>'s existing mesh resolution.<ul>
+<li>That ladder is unconditional (and the ONLY path) in a GAME world. It runs in both the editor and packaged games.</li>
+<li>This is the one idempotent, synchronous realize path. <code>PostRegisterAllComponents()</code> (below, the override contracts.md cites) calls it in an editor world and kicks <code>BeginAsyncBuildingRefresh()</code> in a game world instead (which never mirrors: the async path is the mesh ladder only), so a streaming cell never takes a synchronous mesh load.</li>
+</ul>
+</li>
+<li><code>OutpostBuilder::ActorEditing::RebuildMirroredBuildingParts(Plot, BuildingDefinition)</code> (<code>WITH_EDITOR</code>, <code>OutpostActorEditingLibrary.h</code>, called from <code>RefreshBuildingPreview</code>) - loads <code>BuildingDefinition-&gt;BuildingActorClass</code> synchronously (one-shot; the caller already guards the world type) and mirrors its template's static-mesh parts, via <code>OutpostPreviewMeshUtils::CollectMeshParts()</code> (the SAME collector the placement ghost uses, covered in <code>edmode.html</code>), into <code>MirroredBuildingParts</code>.<ul>
+<li>These are ordinary collidable, <code>WITH_EDITORONLY_DATA</code>+<code>Transient</code> <code>UStaticMeshComponent</code>s, each carrying the template's own authored per-slot material overrides.</li>
+<li>Returns false and leaves no parts when the class is unset, fails to load, or contributes no static-mesh parts. The caller then falls through to the mesh ladder.</li>
+<li>Never a child actor, never a spawned instance: that's the hard law. Template mirroring is the compliant pattern. <code>ClearMirroredBuildingParts(Plot)</code> destroys every mirrored part and empties the array. Both run on every <code>RefreshBuildingPreview()</code> call.</li>
+</ul>
+</li>
+<li>No <code>RefreshFactionVisuals()</code> or <code>CachedFactionColor</code> - there is no faction-color mechanism in the plugin; a plot's building is never tinted. See <code>faction-visuals.html</code>.</li>
+<li><code>OnConstruction(const FTransform&amp;)</code> (<code>WITH_EDITOR</code>) - re-derives the plot's building mesh (<code>RefreshBuildingPreview()</code>). Early-returns in a game world, where the async <code>PostRegisterAllComponents</code> path owns realization instead. An uncooked game world reruns construction scripts inside the time-sliced <code>AddToWorld</code>.</li>
+<li><code>PostEditMove(bFinished)</code> / <code>PostEditChangeChainProperty(...)</code> (<code>WITH_EDITOR</code>) - both drive the same write-back: this plot's transform, relative to the owner's unit-scale record basis, gets written into the definition record. Guarded by finding the owning outpost and by <code>IsRecordOwnershipUnique()</code>.</li>
+<li><code>PostEditUndo()</code> (<code>WITH_EDITOR</code>) - calls <code>RefreshBuildingPreview()</code>, since the mesh isn't transactional and needs re-deriving after undo/redo.</li>
+<li><code>PostRegisterAllComponents()</code> - realizes the building mesh, on both spawn (game) and registration (editor). Deliberately not <code>WITH_EDITOR</code>-gated, which is what makes a plot's building render in packaged games. Re-entrancy-guarded (re-registration around undo/redo can fire it more than once for the same instance).<ul>
+<li>It branches on world type: a game world kicks the async load-then-swap (<code>BeginAsyncBuildingRefresh()</code>), an editor world realizes synchronously via <code>RefreshBuildingPreview()</code>.</li>
+</ul>
+</li>
+<li><code>PostDuplicate(bDuplicateForPIE)</code> / <code>PostEditImport()</code> (<code>WITH_EDITOR</code>) - both route through <code>OutpostBuilder::ActorEditing::HandleImportIdentityReset</code>, idempotent against the engine firing either one more than once per paste.<ul>
+<li>An already-resolved <code>PlotId</code> for this paste is left alone, else a still-uniquely-owned record is reclaimed (a cut base pasted back reconnects to its own record), else a fresh id is minted. A copy never silently overwrites the original's record.</li>
+</ul>
+</li>
+<li><code>IsRecordOwnershipUnique()</code> - true when no other plot actor in the world shares this plot's (<code>OutpostDefinitionId</code>, <code>PlotId</code>) pair. Gates every record write-back and removal. A shared pair means a duplicate exists somewhere. Writing would corrupt the original's record in that case.</li>
+</ul>
+<h3 id="aoverheadcamera">AOverheadCamera</h3>
+<p>Header:
+<code>OutpostBuilder/Source/OutpostBuilder/Actors/OverheadCamera.h</code></p>
+<ul>
+<li><code>AOverheadCamera()</code> - root <code>USceneComponent</code> ("Root") with a <code>UCameraComponent</code> ("Camera") attached. Deliberately not <code>ACameraActor</code>: that actor's constructor force-enables <code>bConstrainAspectRatio</code> (letterboxing), while <code>UCameraComponent</code>'s own default is false. No tick.<ul>
+<li>Exactly zero-or-one per outpost, total, regardless of how many plots have a saved <code>PlotCameras</code> framing. A plot's own per-plot framing is data on the DEFINITION, not a separate camera actor.</li>
+<li><code>UOutpostBuilderEdMode::EnsureOverheadCameraForEditingOutpost()</code> spawns this actor unconditionally the moment editing an outpost starts (see <code>edmode.html</code>).</li>
+</ul>
+</li>
+<li><code>GetCameraComponent()</code> - accessor for the attached camera component.</li>
+<li><code>GetOutpostDefinitionId()</code> / <code>SetOutpostDefinitionId(NewId)</code> - Modify+Dirty.</li>
+</ul>
+<h3 id="aoutpostvolume">AOutpostVolume</h3>
+<p>Header:
+<code>OutpostBuilder/Source/OutpostBuilder/Actors/OutpostVolume.h</code></p>
+<ul>
+<li><code>AOutpostVolume : AVolume</code> - the outpost's exclusion fence: an amber-tinted brush volume, reshaped like any other volume actor. Spawned automatically with every new outpost (<code>OutpostPrefabUtils::SpawnDefaultOutpostVolume</code>).<ul>
+<li><strong>Edit Outpost Volume</strong> (the editing viewport bar's own button, covered in <code>toolkit.html</code>) create-if-missing re-adds one after a delete, or simply selects the existing one for reshaping, and immediately starts an excursion into the engine's own Geometry/Brush-Editing mode so the reshape can happen right there. See "Edit Outpost Volume Excursion" under Hotkeys and Mouse, below.</li>
+<li>The default brush is sized to the base's actual bounds plus <code>OutpostVolumeBoundsPaddingCm</code> of clearance per side (default 500 cm), floored per-axis at the resolved volume size (default 3000 cm) for an outpost with no plots yet. Both are settings-asset properties, not hardcoded numbers.</li>
+<li>The per-axis floor resolves per-OUTPOST first: <code>UOutpostDefinition::GetVolumeSizeCm</code> returns that definition's own <code>VolumeSizeCm</code> when <code>bVolumeSizeOverridden</code>, else the settings asset's shared default. See the settings-asset section below for the full resolve ladder.</li>
+<li>Neither setting re-fits an EXISTING volume's already-baked brush geometry.</li>
+</ul>
+</li>
+<li><code>GetOutpostDefinitionId()</code> / <code>SetOutpostDefinitionId(NewId)</code> - Modify+Dirty; the association the exclusion rule and the cascade delete key on.</li>
+<li><code>GetWorldBounds()</code> - world-space AABB of the brush geometry (<code>GetComponentsBoundingBox(bNonColliding=true)</code>); the exclusion test is distance-to-extents (0 inside).</li>
+<li>Cascade: destroyed (and undo-restored) with its outpost by <code>AOutpost::Destroyed()</code>; rebound on definition rename like plots/cameras.</li>
+</ul>
+<h2 id="runtime-function-library">Runtime Function Library</h2>
+<p>Header:
+<code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostStampLibrary.h</code></p>
+<h3 id="uoutpoststamplibrary">UOutpostStampLibrary</h3>
+<ul>
+<li><code>StampOutpost(WorldContextObject, Definition, TargetTransform, OptionalAnchor = nullptr)</code> - Blueprint-callable. Spawns an outpost, its plots, and its Overhead camera (when set) from <code>Definition</code> at <code>TargetTransform</code>. Pass <code>OptionalAnchor</code> to reuse an already-spawned <code>AOutpost</code> instead of spawning one, in which case its transform becomes the target and <code>TargetTransform</code> is ignored.<ul>
+<li>Opens no transactions itself, since editor callers own that.</li>
+<li>This is the stamp half of fork-on-stamp: callers fork the definition first (see <code>prefabs.html</code>), which is why every stamped outpost ends up owning its own definition.</li>
+</ul>
+</li>
+<li><code>PlaceDefinitionAt(WorldContextObject, Definition, Transform)</code> - Blueprint-callable. Interactive, non-forking placement of an EXISTING definition at an arbitrary transform: spawns an <code>AOutpost</code> at <code>Transform</code>, binds the SAME definition id (no fork), reattaches its plots and Overhead camera from records, and writes <code>PlacedOutpostPath</code>/<code>PlacedOutpostTransform</code> back onto <code>Definition</code>.<ul>
+<li>Three-way contrast: <code>StampOutpost</code> forks, <code>RestoreOutpost</code> re-attaches at the recorded transform and bails if already placed, <code>PlaceDefinitionAt</code> re-attaches the same definition at a caller-supplied transform regardless of any prior placement.</li>
+<li>Returns nullptr (and logs a warning) on a null <code>Definition</code>/<code>World</code> or a failed spawn. This is the runtime half of the toolkit's "Edit (Place Actor)" action (see <code>edmode.html</code>).</li>
+</ul>
+</li>
+<li><code>RestoreOutpostFromBaked(WorldContextObject, Baked)</code> - Blueprint-callable. Rebuilds one outpost from its BAKED registry entry, leaving the definition untouched.<ul>
+<li>This is the recovery path once records live on the actors: the registry holds what the outpost WAS, so a deleted one comes back from the bake rather than from the template, and it works for an outpost whose definition is shared, which the definition-keyed restore below cannot.</li>
+<li>Refuses and returns nullptr when the instance is already live, since restoring over it would mint a second claimant to one handle. See <a href="identity.html">Instance Identity</a>.</li>
+</ul>
+</li>
+<li><code>RestoreOutpost(Definition, World)</code> (<code>WITH_EDITOR</code>, not Blueprint-callable) - <strong>superseded by <code>RestoreOutpostFromBaked</code></strong>, kept while content authored before the registry still carries its records on the definition.<ul>
+<li>The deliberate contrast with the drag-stamp path: it re-attaches the SAME definition asset to a freshly spawned <code>AOutpost</code> rather than forking a new one first, because this is reconstructing what already belonged to <code>Definition</code>, not creating a new placement.</li>
+<li>Spawns at <code>Definition-&gt;PlacedOutpostTransform</code>, rebuilds every plot and the Overhead camera record (when set) against the new outpost's own record basis, and writes <code>PlacedOutpostPath</code>/<code>PlacedOutpostTransform</code> back onto <code>Definition</code>.</li>
+<li>Returns nullptr (and logs a warning) when <code>Definition</code> or <code>World</code> is null, or when <code>PlacedOutpostPath</code> still resolves to a live <code>AOutpost</code> (nothing to restore).</li>
+<li>No transaction opened here either. Its callers own that: the Content Browser's "Restore Placed Outpost" action and the mode's <code>RestoreOutpostForDefinition</code> (both below).</li>
+</ul>
+</li>
+</ul>
+<p>All three broadcast <code>UOutpostEventSubsystem::OnOutpostStamped</code> once, last, after every actor and record write for that call has landed.</p>
+<h3 id="uoutpostloadoutlibrary-deleted">UOutpostLoadoutLibrary - DELETED</h3>
+<p>The runtime-gameplay functions <code>ApplyFactionLoadout</code>/<code>RandomizeLoadout</code> (header
+<code>OutpostBuilder/Source/OutpostBuilder/OutpostLoadoutLibrary.h</code>) no longer exist. Buildings are
+mesh-only, and a plot renders its own building mesh directly. There is no separate spawned
+building actor. Game code that called either function will not compile and has no drop-in
+replacement. Full walkthrough of the current model: <code>runtime-loadout.html</code>.</p>
+<h2 id="instance-identity-and-the-registry">Instance Identity and the Registry</h2>
+<p>The surfaces the per-instance identity work added. <a href="identity.html">Instance Identity</a> covers the model and why it exists; this is the API shape.</p>
+<h3 id="foutpostinstanceid-outpostinstanceidh"><code>FOutpostInstanceId</code> (<code>OutpostInstanceId.h</code>)</h3>
+<p><code>USTRUCT(BlueprintType)</code> wrapping one <code>FGuid Value</code> (<code>VisibleAnywhere</code>, <code>BlueprintReadOnly</code>). Says WHICH placed outpost an actor belongs to, where the definition id says only what it was built from. Carried as a <code>UPROPERTY</code> on all four family actors, written out per header rather than pasted from a macro, because a <code>UPROPERTY</code> inside a user-defined macro is invisible to UHT and still compiles.</p>
+<ul>
+<li><code>IsValid()</code> - the wrapped guid is set.</li>
+<li><code>Generate()</code> - <code>static</code>, mints a fresh one.</li>
+<li><code>operator==</code> / <code>operator!=</code> / <code>GetTypeHash</code> / <code>ToString()</code> - usable as a <code>TMap</code> key.</li>
+</ul>
+<h3 id="foutpostbakedinstance-outpostlevelregistryh"><code>FOutpostBakedInstance</code> (<code>OutpostLevelRegistry.h</code>)</h3>
+<p><code>USTRUCT(BlueprintType)</code>, one placed outpost's baked default state: <code>InstanceId</code>, <code>DefinitionId</code>, <code>DisplayName</code>, <code>Faction</code>, <code>AnchorTransform</code>, <code>Plots</code>, <code>OverheadCamera</code>, <code>TerritoryBounds</code>, <code>AnchorActorPath</code>, <code>ContentHash</code>, <code>bVerifiedThisBake</code>. <code>Plots</code> and <code>ContentHash</code> are not <code>BlueprintReadOnly</code> (<code>FOutpostPlotRecord</code> is not a <code>BlueprintType</code>, and Blueprints have no <code>uint32</code>).</p>
+<p><code>AnchorActorPath</code> is an <code>FString</code> rather than an <code>FSoftObjectPath</code> deliberately: a soft path is a cook-graph edge, and under One File Per Actor it would make the registry a recursive cook manager of the level's external actor packages.</p>
+<h3 id="uoutpostlevelregistry-outpostlevelregistryh"><code>UOutpostLevelRegistry</code> (<code>OutpostLevelRegistry.h</code>)</h3>
+<p><code>UPrimaryDataAsset</code>, one per level, type name <code>"OutpostLevelRegistry"</code>. Treat it as a generated artifact.</p>
+<ul>
+<li><code>Instances</code> / <code>RecentlyRemoved</code> / <code>LevelPackageName</code> - the entries, the lossy undo net (capped at <code>MaxRecentlyRemoved</code>, 32), and the level this describes.</li>
+<li><code>bBakeWasComplete</code> / <code>IncompleteReasons</code> - how far to trust it. A partitioned save sees only loaded cells and says so here.</li>
+<li><code>FindInstance(InstanceId)</code> - <code>const</code>, by handle.</li>
+<li><code>UpsertInstance(Instance)</code> - adds or updates, returns whether anything changed. Refuses when two different actors claim one handle, comparing <code>AnchorActorPath</code>, and early-outs on an unchanged <code>ContentHash</code>.</li>
+<li><code>RetireInstance(InstanceId)</code> - moves the entry to <code>RecentlyRemoved</code>.</li>
+<li><code>BeginBakePass()</code> - clears every <code>bVerifiedThisBake</code> so one pass can mark what it actually saw.</li>
+<li><code>IsDataValid(Context)</code> (<code>WITH_EDITOR</code>) - flags an unresolvable level path and any duplicate instance id.</li>
+</ul>
+<h3 id="uoutpostregistrysubsystem-outpostregistrysubsystemh"><code>UOutpostRegistrySubsystem</code> (<code>OutpostRegistrySubsystem.h</code>)</h3>
+<p><code>UEngineSubsystem</code>, so every registry is resident and answerable with no level loaded. Nothing here is a <code>UFUNCTION</code>: the data types are Blueprint-exposed, the accessors are C++ only.</p>
+<ul>
+<li><code>MakeLevelKey(World)</code> / <code>MakeLevelKeyForActor(Actor)</code> - <code>static</code>. THE level keys. In the runtime module so a simulation layer can build one, and because a PIE caller reaching for the package name directly gets a <code>UEDPIE_</code>-prefixed string that matches nothing baked.</li>
+<li><code>EnsureLoaded()</code> / <code>IsReady()</code> / <code>InvalidateCache()</code> - load on first use, refusing to latch while assets are still loading.</li>
+<li><code>FindInstance(InstanceId)</code> / <code>FindLevelForInstance(InstanceId)</code> - point lookups, no verification filter.</li>
+<li><code>GetAllInstances(Out)</code> / <code>GetUnverifiedInstances(Out)</code> - split on <code>bVerifiedThisBake</code>. Read the <a href="identity.html#current-state">Current state</a> note before relying on that split.</li>
+<li><code>GetInstancesForLevel(LevelPackageName, Out)</code> / <code>GetInstancesContainingPoint(Point, Out)</code> / <code>GetIncompleteLevels(Out)</code>.</li>
+<li><code>FindLiveOutpost(WorldContextObject, InstanceId)</code> - the live actor, or null when its level is not loaded. The baked entry still answers.</li>
+</ul>
+<p>Every returned <code>FOutpostBakedInstance*</code> points into a registry's own array and is valid only until the next bake or <code>InvalidateCache</code>. Read what you need, do not store it.</p>
+<h3 id="console">Console</h3>
+<ul>
+<li><code>Outpost.BakeRegistry</code> - bakes the currently open level's outposts into its registry asset. <strong>Marks the asset dirty and does not save it</strong> - save to keep the result. On a partitioned map it bakes only the loaded cells and says so, pointing at the builder commandlet for a complete pass.</li>
+<li><code>Outpost.DumpRegistry</code> - lists every baked outpost with its handle, level, plot count and verification state, including entries the last bake did not see.</li>
+<li><code>Outpost.CheckBounds</code> - checks every outpost's bounds volume in the open level and prints the numbers. Flags a missing or duplicated volume, a volume whose brush was never built, a cached box that no longer matches the brush, and a baked box that no longer matches the live one. Lines marked <code>!</code> need a decision from you. Refit drift and plots outside their bounds are printed without the mark: neither is a fault, because nothing resizes a volume after it is spawned and the plot rule only ever ran at placement time.</li>
+<li><code>Outpost.CheckBounds X Y Z</code> - answers a single world-space point against every containment rule the plugin ships: the volume's axis-aligned box, the actual brush, and the baked territory box. They can disagree, and the point of printing all three together is that you can see it when they do.</li>
+</ul>
+<p>None of this needs a PIE session. The registry is a <code>UEngineSubsystem</code>, the brush is built editor-side, and each box is a const read off a spawned actor.</p>
+<h2 id="editor-mode-uoutpostbuilderedmode">Editor Mode - UOutpostBuilderEdMode</h2>
+<p>Header:
+<code>OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderEdMode.h</code></p>
+<p>Full behavioral deep dive lives in <code>edmode.html</code>. This is the class's public surface for lookup.</p>
+<h3 id="uedmode-overrides">UEdMode Overrides</h3>
+<p><code>UOutpostBuilderEdMode</code> is a <code>UCLASS(Transient)</code> deriving <code>UBaseLegacyWidgetEdMode</code>, which is a <code>UEdMode</code> that also supplies the legacy widget and viewport interfaces (<code>ILegacyEdModeWidgetInterface</code>/<code>ILegacyEdModeViewportInterface</code>).</p>
+<p>There is no registration call anywhere: <code>UAssetEditorSubsystem::RegisterEditorModes</code> discovers the class from its CDO and reads <code>GetModeInfo()</code>, which is why the CONSTRUCTOR fills in <code>Info</code> (id, name, icon, visibility, and a <code>MAX_int32</code> priority that sorts the mode last in the Modes toolbar).</p>
+<ul>
+<li><code>EM_OutpostBuilderId</code> - static <code>FEditorModeID</code>, value <code>"EM_OutpostBuilder"</code>.</li>
+<li><code>GetActive()</code> - static; the running mode instance, or null when <code>GEditor</code> is absent or the mode isn't active (<code>GLevelEditorModeTools().GetActiveScriptableMode</code>). Never cache the result across ticks: a deactivated instance is parked in <code>FEditorModeTools</code>' recycle list and handed back on the next activation.</li>
+<li><code>Enter()</code> / <code>Exit()</code> - mode lifecycle. <code>Enter()</code> pre-warms the settings asset BEFORE <code>Super::Enter()</code>, since that base call is what builds the toolkit and the palette/details it constructs read resolved settings.<ul>
+<li><code>Exit()</code> cancels any active placement and Overhead camera positioning session and exits the editing submode, all ahead of <code>Super::Exit()</code>. It deliberately does NOT close the toolkit itself (<code>FEditorModeTools::DeactivateModeAtIndex</code> already did, and <code>Super::Exit()</code> resets the pointer).</li>
+</ul>
+</li>
+<li><code>CreateToolkit()</code> - constructs <code>FOutpostBuilderToolkit</code> and nothing else. <code>UEdMode::Enter()</code> calls this, then <code>Init()</code>s the result against <code>Owner-&gt;GetToolkitHost()</code>, then calls <code>BindCommands()</code>.</li>
+<li><code>BindCommands()</code> - assigns <code>CommandList</code> from the toolkit's own list (which is why it can't run any earlier) and maps every <code>FOutpostBuilderCommands</code> entry. Deliberately skips <code>Super::BindCommands()</code>, which would map <code>FocusViewportToSelection</code> onto that list.</li>
+<li><code>Tick(ViewportClient, DeltaTime)</code> - auto-cancels an Overhead camera positioning session whose outpost or camera actor died.</li>
+<li><code>Render(View, Viewport, PDI)</code> - draws the placement ghosts, the ownership beams, the RTS-style selection markers (a crisp neon-green rim under every selected <code>AOutpost</code>/<code>AOutpostPlot</code>), the Outpost Volume borders, and the hover highlight.<ul>
+<li>While placing a PLOT, the existing-plot footprint pass doubles as the Ctrl-remove tool's dim candidate-ring pass when armed, the at-most-two alignment guides draw below the ghost, a warned spot draws the plate's border square in place of its suppressed fill, and a blocked spot draws an X across the flat placement plate (two PDI lines) alongside the blocking-plot pointer.</li>
+<li>It also resolves the editing outpost's definition id once per frame, by value, and hands it to <code>DrawTerritoryBorders</code> as the scope the fade is measured against.</li>
+</ul>
+</li>
+<li><code>DrawHUD(ViewportClient, Viewport, View, Canvas)</code> - screen-space text: every loaded outpost's label, the placement reason line (a refusal or the warn-only tag advisory), and the plot ghost's three live readouts.<ul>
+<li>The build-mode banner is a Slate viewport overlay, <code>SOutpostBuildModeBanner</code>, kept mounted by the toolkit for the mode's whole session; see "Build-Mode Banner" below. The placement hint line is on the toolkit's bottom-of-viewport overlay.</li>
+</ul>
+</li>
+<li><code>HandleClick(InViewportClient, HitProxy, Click)</code> - the viewport route into and out of the editing submode, and the only gesture in this mode that changes the edit target from the viewport. A plain LMB DOUBLE-click on an <code>AOutpost</code> enters editing on it, or leaves editing when it's the outpost already being edited.<ul>
+<li>Modifier-held double-clicks, single clicks, a null hit proxy, a non-outpost proxy, an active placement/positioning session, and Play/Simulate all fall through to <code>Super</code> untouched.</li>
+<li>Returning <code>true</code> is load-bearing: it suppresses <code>FLevelEditorViewportClient::ProcessClick</code>'s own double-click-to-component-selection behavior for that click. See <code>edmode.html</code>'s "The Viewport Way In and Out".</li>
+</ul>
+</li>
+<li><code>GetCursor(OutCursor)</code> - <code>UEdMode</code> override consulted by <code>FEditorViewportClient::GetCursor</code> via <code>FEditorModeTools::GetCursor</code>, which iterates <code>ActiveScriptableModes</code> and calls each mode's <code>GetCursor</code> directly. Returns <code>false</code> (default cursor) except while the Ctrl-remove tool is armed: <code>EMouseCursor::Crosshairs</code> when <code>HoveredActor</code> resolves to a removable plot, <code>EMouseCursor::SlashedCircle</code> when armed with nothing under the cursor.</li>
+<li><code>MouseMove(...)</code> - updates the placement ghost location and, when not placing, the hover highlight.</li>
+<li><code>InputKey(...)</code> - dispatches the <code>FOutpostBuilderCommands</code> key commands (<code>Esc</code> cancel, palette <code>0</code>-<code>9</code>, pass-through <code>Ctrl</code> + <code>S</code>) through the mode's <code>FUICommandList</code>s, plus the raw pointer gestures: LMB placement confirm and the RMB tap-vs-drag cancel.<ul>
+<li>An explicit Ctrl-tolerant bracket-key rotate match, checked alongside the Ctrl-held cancel special case, keeps rotating the (hidden) ghost reachable for the whole time the Ctrl-remove tool is armed (the main dispatch's exact-chord matching alone would reject a bracket key while Ctrl is held).</li>
+</ul>
+</li>
+<li><code>UsesToolkits()</code> - true.</li>
+<li><strong>GC of the mode's own objects</strong> - there's no <code>AddReferencedObjects</code> to write. The mode is a <code>UObject</code> that <code>FEditorModeTools</code> holds, so a plain <code>UPROPERTY()</code> is the whole contract.<ul>
+<li>It covers the ghost mesh parts pool and its material, the placement plate component and its OWN material (<code>PlacementPlateComponent</code>/<code>PlacementPlateMaterial</code>), and the pending place-for-definition asset (<code>PendingPlacementDefinition</code>).</li>
+<li>That last one is a strong reference on purpose: nothing else holds a hard ref across a multi-second placement session (the toolkit list carries only <code>FPrimaryAssetId</code>s), and a collected definition would silently fall the confirm through to the create-new path.</li>
+</ul>
+</li>
+</ul>
+<h3 id="editing-submode">Editing submode</h3>
+<ul>
+<li><code>IsEditingOutpost()</code> / <code>GetEditingOutpost()</code> - current editing state.</li>
+<li><code>EnterOutpostEditMode(Outpost)</code> - gets or creates the outpost's definition asset, syncs faction drift, calls <code>EnsureOverheadCameraForEditingOutpost()</code> (see below), and notifies the toolkit (<code>HandleEditingOutpostChanged()</code>, a direct call, not a delegate broadcast).</li>
+<li><code>ExitOutpostEditMode()</code> - notifies the toolkit the same way, but only if the state actually changed.</li>
+</ul>
+<h3 id="placement">Placement</h3>
+<p>Mutually exclusive; each <code>Start*</code> calls <code>CancelPlacement()</code> first.</p>
+<ul>
+<li><code>StartOutpostPlacement()</code> / <code>StartPlotPlacement()</code> - begin a ghost placement session. <code>StartPlotPlacement</code> seeds the ghost at a ring-search location around the editing outpost and snapshots existing plot footprints for the validity check.</li>
+<li><code>StartOutpostPlacementForDefinition(DefinitionId)</code> - begins interactive outpost placement bound to an EXISTING definition instead of creating a new one: resolves <code>DefinitionId</code>, stashes it, then defers to <code>StartOutpostPlacement()</code>.<ul>
+<li>On confirm, spawns via <code>UOutpostStampLibrary::PlaceDefinitionAt</code> (no fork) and enters editing on the result. A cancelled session never leaks into a later create-new placement. This is the toolkit's "Edit (Place Actor)" action for a definition with no live placed actor.</li>
+</ul>
+</li>
+<li><code>CanAddPlot()</code> - <code>IsEditingOutpost()</code>.</li>
+<li><code>CancelPlacement()</code> - ends any active placement session.</li>
+<li><code>IsPlacementActive()</code> - true while either ghost (outpost or plot) is active. Drives the toolkit's <code>GetActivePanelIndex</code> panel routing (routes to the SAME Editing-panel index editing does: there is no separate placement panel, only individually-disabled editing-panel controls) and the placement viewport overlay.</li>
+<li><code>IsPlacingPlot()</code> - once <code>IsPlacementActive()</code> is true, distinguishes which kind.</li>
+<li><strong>Three-state validity</strong> - <code>EOutpostPlacementFeedback</code> (<code>Valid</code>/<code>Warn</code>/<code>Blocked</code>, declared in <code>OutpostBuilderEdMode.h</code>) is the plot ghost's verdict, decided once in <code>GetPlacementFeedback(FString* OutWarnReason = nullptr)</code> and read by the plate's color AND fill, the wire prism, the ghost mesh tint, and the <code>DrawHUD</code> reason line.<ul>
+<li><code>Blocked</code> is exactly <code>!bPreviewPlacementValid</code>, tested first and unconditionally.</li>
+<li><code>Warn</code> means the Selected Building's <code>PlotTagQuery</code> isn't satisfied by the untagged plot the click will create. It's advisory, never gates <code>ConfirmPlotPlacement</code>, and it draws a HOLLOW plate (fill alpha 0, border square instead) so the three states differ by fill treatment rather than hue alone.</li>
+<li>The rule is delegated whole to <code>OutpostEditorUtils::EvaluateBuildingPlotAdvisory</code>. The function loads nothing, so an unresolvable Selected Building reads as <code>Valid</code>. Outpost placement never returns <code>Warn</code> (no plot tags, no query to test). See <code>edmode.html</code>'s "Three-State Validity Tint".</li>
+</ul>
+</li>
+<li><strong>Placement aids</strong> - PLOT placement only, and both suppressed in remove mode.<ul>
+<li><code>OutpostBuilder::Draw::DrawPlacementReadouts</code> prints three lines beside the ghost (distance to the outpost's center, the pad's size, and the edge-to-edge gap to the nearest sibling, which says "Overlap" when the number goes negative and is omitted entirely when there's no sibling). It measures nothing itself, every number arriving as a parameter from <code>RevalidatePlotPreview</code>'s existing snapshot pass.</li>
+<li><code>UpdatePlotAlignmentGuides()</code> recomputes at most two axis-aligned guides per <code>MouseMove</code>, from the SAME <code>ExistingPlotFootprints</code> snapshot, and drives the optional snap. It runs AFTER the editor's grid snap and BEFORE <code>RevalidatePlotPreview()</code>, so validity always judges the settled spot.</li>
+<li>The guides are cleared in <code>CaptureExistingPlotFootprints</code> and <code>CancelPlacement</code>, so a line can never outlive the plot it pointed at. Knobs under <code>Debug|Placement Aids</code>; see <code>edmode.html</code>'s "Placement Aids".</li>
+</ul>
+</li>
+<li><strong>The remove tool</strong> - holding the configured <strong>Remove-Mode Modifier</strong> (Ctrl by default; an Input-category knob) during PLOT placement flips the session into a remove-plot tool.<ul>
+<li>The ghost hides, a <strong>flat red plate + X</strong> marks the editing outpost's plot under the cursor (found by the SAME cursor trace that positions the ghost, never a second trace), and <strong>LMB destroys that plot and its record</strong> through the shared <code>RemovePlotAndItsRecord</code> rule, one "Remove Plot" (singular) transaction per removal.</li>
+<li>A per-frame Tick-cached flag (<code>bRemoveModifierHeld</code>) drives every DISPLAY surface (banner "Removing Plot" + its red accent stripe/text, legend, hint bar, ghost visibility, the mouse cursor), while the destructive click re-reads the actual key state from the viewport at click time. The PIE gate is independent of the flag (D6/I4).</li>
+<li>Releasing Ctrl resumes placing exactly where the session was. RMB tap / Esc still cancels the whole session from remove mode.</li>
+<li>The modifier is a fixed gesture, NOT rebindable (a chord fires on a key event; a hold needs per-frame state, the same reason the Alt-orbit check polls).</li>
+<li>The bracket keys explicitly still rotate the (hidden) ghost while armed (see <code>InputKey</code> above), and Ctrl+1-9 are the EDITOR's viewport bookmarks. That's why the legend suppresses both the rotate row and the "1-9: select building" row while remove mode is armed, even though rotation itself keeps working.</li>
+<li>A plot whose mesh has no simple collision is invisible to the trace (ECC_Visibility hits simple collision). The Del key (<code>CanDeleteSelection()</code>/<code>DeleteSelection()</code>, below) remains the escape hatch.</li>
+<li>The mouse cursor changes while armed (<code>GetCursor</code>, above: crosshair over a removable plot, a slashed circle otherwise). Every OTHER plot of the editing outpost draws a dim red candidate ring (<code>UOutpostBuilderUserSettings::RemoveCandidateRingColor</code>) so the whole removable set reads at a glance.</li>
+<li><code>RemovePlotAndItsRecord</code> deselects a selected target BEFORE destroying it (a just-placed plot stays selected by design, unlike the Del path, so without this the transform gizmo would linger at the dead actor's location).</li>
+<li>The hovered target's marker uses the SAME <code>PlacementPlateComponent</code>/<code>PlacementPlateInvalidColor</code> knob the invalid-placement plate uses: one "red = removal/invalid" visual language.</li>
+</ul>
+</li>
+</ul>
+<h3 id="actions">Actions</h3>
+<ul>
+<li><code>CanDeleteSelection()</code> - true when at least one <code>AOutpost</code>/<code>AOutpostPlot</code> is selected. Deliberately mixed-kind.</li>
+<li><code>DeleteSelection()</code> - removes plot records for plots deleted WITHOUT their owning outpost (unique-record-owner only; the records of plots deleted together with their outpost are preserved so Restore rebuilds the whole base), and exits the editing submode if the editing outpost itself was deleted.<ul>
+<li>Deleting an outpost this way also triggers the cascade delete in <code>AOutpost::Destroyed()</code>: plots, Overhead camera, and outpost volume alike.</li>
+<li>This pair is the ONLY interactive delete path for both plots and outposts. The Del key / outliner delete routes through it via <code>ProcessEditDelete()</code> below.</li>
+</ul>
+</li>
+<li><code>ProcessEditDelete()</code> - <code>UEdMode</code> override: while the selection is EXCLUSIVELY outposts/plots, the native Del key (and outliner delete) routes through <code>DeleteSelection()</code>, including its lack of a Play/Simulate gate. Mixed selections fall through to the editor default. See <code>edmode.html</code>'s "Delete Routing" section for the full accounting.</li>
+<li><code>IsSelectionAllowed(InActor, bInSelection)</code> - <code>UEdMode</code> override: only outpost-family actors (<code>AOutpost</code>/<code>AOutpostPlot</code>/<code>AOverheadCamera</code>/<code>AOutpostVolume</code>) are selectable while the mode is active; every other actor clicks through. Deselection is always allowed.</li>
+<li><code>GetSelectedPlot()</code> - the single selected <code>AOutpostPlot</code>, or <code>nullptr</code> when zero or MORE THAN ONE is selected. Backs <code>HasSelectedPlot()</code> and the Assign row.</li>
+<li><code>HasSelectedPlot()</code> - true when exactly one <code>AOutpostPlot</code> is selected.</li>
+<li><code>GetFactionForPlot(Plot)</code> - the faction of the outpost owning <code>Plot</code>, read from the owning outpost ACTOR (<code>FindUniqueActorForDefinition</code>, fail-closed on ambiguity) so there is no asset load and it is safe on per-frame Slate bindings. <code>Neutral</code> when <code>Plot</code> is null or has no unique owner. Neutral accepts everything, so an unresolvable owner refuses nothing.</li>
+<li><code>AssignBuildingToSelectedPlot(BuildingDefinitionId)</code> - write-through: updates both the selected plot actor and its definition record, then notifies the toolkit (<code>HandlePlotsChanged()</code>). <strong>Play/Simulate-gated</strong> (with the standard toast), since it mutates a persistent definition record.<ul>
+<li>Also <strong>refuses</strong> a building the disabled treatment rejects for the selected plot (a <code>PlotSizeQuery</code> that doesn't match, or not fielded by a non-Neutral outpost's faction), toasting which rule refused. This is the AUTHORITATIVE check: it can afford the load; the button's identical one is advisory (find-only).</li>
+<li>An id whose asset won't load is assigned anyway: it's still a valid id, and an unproven refusal is not a refusal.</li>
+</ul>
+</li>
+<li><code>GetPlotsForEditingOutpost(OutPlots)</code> - every <code>AOutpostPlot</code> in the current world sharing the editing outpost's definition id (empty when not editing an outpost). Mirrors <code>CaptureExistingPlotFootprints</code>'s filter. Feeds the editing panel's plot list.</li>
+<li><code>SelectPlots(const TArray&lt;AOutpostPlot*&gt;&amp;)</code> - <code>SelectNone</code>, then <code>SelectActor</code> on each entry with <code>bNotify=false</code> (nulls skipped), then one <code>NoteSelectionChange</code>, selecting every plot in the array in one pass, matching the pattern every other placement/restore path uses.<ul>
+<li>An empty array is a valid, exact "deselect everything" call, mirroring a ctrl-click that deselects the last plot by hand.</li>
+<li>Backs the plot list's selection changed handler, now <code>ESelectionMode::Multi</code>. The handler ignores its own <code>NewSelection</code> argument and passes the list's whole current <code>GetSelectedItems()</code> set through here instead.</li>
+</ul>
+</li>
+<li><code>CanRandomizeSelectedPlots()</code> / <code>RandomizeSelectedPlots()</code> - assigns a random ELIGIBLE building (runtime RNG) to each <strong>SELECTED plot of the editing outpost</strong> in one transaction, then notifies the toolkit (<code>HandlePlotsChanged()</code>).<ul>
+<li>Gated off during Play/Simulate, when no building definitions exist, and <strong>when none of the editing outpost's plots is selected</strong> (no selection = disabled, never a silent fall-back to all plots).</li>
+<li>The selected set comes from <code>GetSelectedPlotsForEditingOutpost()</code> (below), so the gate, the sweep, and the button's live count can never disagree. Beware the post-placement state: <code>ConfirmPlotPlacement</code> leaves exactly ONE plot selected, which is why the editing panel's Randomize button LABEL carries the live count.</li>
+<li>The pool is filtered through the same <code>OutpostEditorUtils::EvaluateBuildingForPlot</code> rule the Assign button enforces, recomputed PER PLOT (plot size varies per plot; the outpost's faction is fixed for the sweep).</li>
+<li>A plot with nothing eligible is <strong>left exactly as it is</strong> (never cleared, never handed an ineligible pick) and counted into a toast. A sweep that assigns nothing cancels its transaction rather than leaving an empty undo entry.</li>
+<li><code>CanRandomizeSelectedPlots()</code> deliberately does NOT answer "is anything eligible": it's a per-frame Slate binding, and that question needs every definition in the project RESOLVED, not just listed. It staying true while a click changes nothing is by design. The toast is what makes that legible.</li>
+</ul>
+</li>
+<li><code>GetSelectedPlotsForEditingOutpost(OutPlots)</code> - the SELECTED <code>AOutpostPlot</code>s sharing the editing outpost's definition id; a sibling of <code>GetPlotsForEditingOutpost</code> (the editing panel's plot list still needs ALL plots). One source, three readers: the randomize gate, the sweep, and the button's label/tooltip count.<ul>
+<li>Filters out a FOREIGN outpost's selected plots (<code>IsSelectionAllowed</code> permits any <code>AOutpostPlot</code>) because the sweep loads ONE definition. A selection of only foreign plots leaves Randomize disabled rather than enabled-then-silently-no-op.</li>
+<li>Selection query + id compares only, no loads: per-frame safe.</li>
+</ul>
+</li>
+<li><code>HasAnyBuildingDefinition()</code> - whether at least one <code>UOutpostBuildingDefinition</code> exists (the raw <code>GetPrimaryAssetIdList</code> count, the SAME count <code>CanRandomizeSelectedPlots</code> gates on, never the palette's resolvable-entry count, which could disagree). Public so the Randomize tooltip can split its disabled wording into its two real causes: no building definitions (project setup) vs. nothing selected (transient). No loads: per-frame safe.</li>
+<li><code>CanEditVolume()</code> - <code>IsEditingOutpost() &amp;&amp; !IsPlayOrSimulateActive()</code>.</li>
+<li><code>EditVolumeForEditingOutpost()</code> - CREATE-IF-MISSING then SELECT: spawns an <code>AOutpostVolume</code> via <code>OutpostPrefabUtils::SpawnDefaultOutpostVolume</code> when the editing outpost has none, or finds the existing one via <code>FindVolumeForEditingOutpost()</code> below, then selects it either way so the designer can reshape its brush with the stock BSP tools.<ul>
+<li>It refuses only when there's genuinely no definition id to bind to. <code>"Edit Outpost Volume"</code> transaction.</li>
+<li>Returns <code>bool</code>, true iff a volume was resolved and selected, so the toolkit's <code>HandleEditOutpostVolumeClicked</code> can tell a genuine success from every early-out (Play/Simulate, no editing outpost, no world, no definition id) before starting the Edit Outpost Volume excursion (see below). The excursion must never start over a refusal that selected nothing.</li>
+</ul>
+</li>
+<li><code>FindVolumeForEditingOutpost()</code> - the <code>AOutpostVolume</code> bound to the editing outpost's definition id, or null. Find-only; never spawns.</li>
+<li><code>OutpostBuilder::Draw::GetActorGeometryRadius(const AActor* Actor, const UOutpostBuilderSettingsAsset&amp; Style)</code> (a free function in <code>OutpostBuilderDraw.h</code>, not a member of this class) - the one radius source for the selection ring, hover ring, and placement footprint.<ul>
+<li>It forks on the actor: an <code>AOutpostPlot</code> resolves its own <code>PlotSizeTag</code> through <code>UOutpostRuntimeSettings::GetPlotSizeFootprintRadiusCm</code> (measuring no geometry), anything else takes the larger of its geometry bounds' X/Y half-extents (<code>FMath::Max(Extent.X, Extent.Y)</code>), falling back to <code>Style.PlotGhostRadius</code> when the actor has no valid bounds at all.</li>
+<li>The mode's own placement-validity code, <code>CaptureExistingPlotFootprints</code>, calls it too.</li>
+</ul>
+</li>
+</ul>
+<h3 id="faction-assignment">Faction assignment</h3>
+<ul>
+<li><code>CanAssignFaction()</code> - <code>IsEditingOutpost()</code>.</li>
+<li><code>AssignFactionToEditingOutpost(EOutpostFaction)</code> - sets the faction on both the outpost actor and its definition, then refreshes every plot sharing that definition id.</li>
+<li><code>SetPreviewBuildingDefinition(BuildingDefinitionId)</code> - pushed by the toolkit whenever the palette selection changes. Drives the footprint validity check and the building-mesh ghost while placing a plot.</li>
+</ul>
+<h3 id="overhead-camera-positioning-submode">Overhead camera positioning submode</h3>
+<ul>
+<li><code>CanPositionOverheadCamera()</code> - <code>IsEditingOutpost() &amp;&amp; !IsPositioningOverheadCamera()</code>.</li>
+<li><code>IsPositioningOverheadCamera()</code> - current session state.</li>
+<li><code>GetCameraFramingTarget()</code> - resolves the CURRENT EDITOR SELECTION to exactly one <code>AOutpost</code> or <code>AOutpostPlot</code> belonging to the editing outpost's definition, or null.<ul>
+<li>Null covers: nothing selected, a mix of an outpost and a plot, two-or-more of one kind, an actor from a different definition, or a plot whose <code>PlotId</code> is invalid (a duplicate/pasted plot has its id deliberately cleared and so has no record to key a camera on).</li>
+<li>Polls the selection on demand rather than caching from a delegate. The editing viewport bar's Position Camera button gates its enabled state off this method (a plain enabled/disabled boolean, no per-case status line).</li>
+</ul>
+</li>
+<li><code>EnsureOverheadCameraForEditingOutpost()</code> - guarantees exactly one <code>AOverheadCamera</code> exists for the editing outpost's definition: no-op if a unique one already exists, refuses to spawn a third if ownership is already ambiguous, spawns at the saved <code>OverheadCamera</code> record's transform (or <code>ComputeDefaultCameraTransform</code>) otherwise.<ul>
+<li>Called unconditionally from <code>EnterOutpostEditMode()</code>, so the camera actor exists the moment editing starts rather than only after the first Position click. No-op during Play/Simulate or when not editing an outpost. Owns its own <code>"Add Overhead Camera"</code> transaction.</li>
+</ul>
+</li>
+<li><code>StartOverheadCameraPositioning()</code> - gets or creates the outpost's camera actor and locks the viewport to it, starting the pilot session. Also snapshots <code>GetCameraFramingTarget()</code>'s plot (if any) into <code>PositioningPlotId</code>, deciding which record <code>ConfirmOverheadCameraPositioning()</code> will write.</li>
+<li><code>ConfirmOverheadCameraPositioning()</code> - writes the definition's camera record, ends the pilot, and restores the viewport. Writes to <code>Definition-&gt;SetPlotCameraView(PositioningPlotId, ...)</code> when <code>PositioningPlotId</code> is valid, else <code>Definition-&gt;SetOverheadCameraView(...)</code>. That's the framing TARGET snapshotted at <code>StartOverheadCameraPositioning</code>, not whatever happens to be selected when Done is pressed.</li>
+<li><code>CancelOverheadCameraPositioning()</code> - ends the pilot and restores the viewport, then destroys the camera if it was spawned this session (otherwise restores its pre-pilot transform).</li>
+<li><code>RevertOverheadCameraToSaved()</code> - restores the framing TARGET's own last saved record while positioning, the same resolution <code>StartOverheadCameraPositioning()</code> uses: <code>PositioningPlotId</code>'s <code>PlotCameras</code> entry when a plot is being framed, else the outpost's own <code>OverheadCamera</code>. Falls back to <code>ComputeDefaultCameraTransform()</code> and the default FOV when the target has no saved record yet. Never writes the definition record. Only <code>ConfirmOverheadCameraPositioning()</code> does that.</li>
+</ul>
+<h3 id="toolkit-utilities">Toolkit utilities</h3>
+<ul>
+<li><code>LocateOutpostForDefinition(DefinitionId)</code> - resolves the definition's <code>PlacedOutpostPath</code>. A live actor in the current editor world gets selected, framed, and entered for editing. Anything else (an unset path, an unresolvable actor, or an actor whose world isn't the current editor world) surfaces a non-intrusive notification instead. This never auto-loads a map.</li>
+<li><code>RestoreOutpostForDefinition(DefinitionId)</code> - re-spawns a deleted outpost and its plots/camera from the definition's records via <code>UOutpostStampLibrary::RestoreOutpost</code>, wrapped in one "Restore Outpost" transaction so the whole cascade undoes as a single step, then selects, frames, and enters it for editing, the same tail as <code>LocateOutpostForDefinition</code>.<ul>
+<li>Backs the Overview action button's "Restore" branch, the toolkit-side counterpart to the Content Browser's "Restore Placed Outpost" (see below). Unlike that entry it needs no mode activation, since the mode is already active.</li>
+<li>A stale placement snapshot is safe to act on: <code>RestoreOutpost</code> re-checks liveness itself and refuses, so the worst case is a notification, never a second same-id outpost (see <code>toolkit.html</code>).</li>
+</ul>
+</li>
+<li><code>RestoreDefinitionFromOutpostActors(DefinitionId)</code> - the INVERSE restore, backing the Overview action button's <strong>Restore Definition</strong> branch (the "(missing definition)" entries): the actors stand but the definition asset is gone.<ul>
+<li>It rebuilds a fresh <code>UOutpostDefinition</code> named EXACTLY the id's asset name (any other name would not resolve the actors' name-based id) in the <code>CreatedDefinitionDirectory</code> folder, from the family actors' own mirrored state.</li>
+<li>That state is: <code>DisplayName</code>/<code>Faction</code> from the anchor, one plot record per family <code>AOutpostPlot</code> via <code>AddPlotRecord</code> (PlotId preserved, <code>RelativeTransform</code> re-expressed in the anchor's record basis), the camera record from a unique family Overhead camera, and the volume-size override from a unique family volume's standing bounds.</li>
+<li>It then runs <code>RecordPlacement</code>, <code>AssetCreated</code> + dirty (saving stays the designer's), and a rescan so the id resolves immediately.</li>
+<li>Refuses with a notification (never overwriting or renaming) when the id resolves again by click time, when more (or fewer) than exactly ONE <code>AOutpost</code> carries it, or when the target package already exists in memory/on disk/in the registry (see <code>toolkit.html</code>'s "The inverse restore").</li>
+</ul>
+</li>
+</ul>
+<h3 id="toolkit-notifications-and-firing-discipline">Toolkit notifications and firing discipline</h3>
+<p>There is no public delegate surface on the mode for these events. The mode calls the toolkit's own public methods directly (see <code>FOutpostBuilderToolkit</code> below and <code>toolkit.html</code>), through a private <code>GetOutpostToolkit()</code> getter. The firing rule each one keeps is the part worth remembering, since a notification that fires on the wrong edge is worse than one that doesn't fire at all:</p>
+<ul>
+<li><code>HandleEditingOutpostChanged()</code> - called from <code>EnterOutpostEditMode</code>/<code>ExitOutpostEditMode</code>, only on a genuine state change.</li>
+<li><code>HandleCameraPositioningChanged()</code> - called on <code>StartOverheadCameraPositioning</code>'s success path, and on <code>ConfirmOverheadCameraPositioning</code>/<code>CancelOverheadCameraPositioning</code>, but only when a session was actually active. Both of those are also called unconditionally from cleanup paths, which must not spuriously notify. Lets the toolkit add and remove its viewport overlay.</li>
+<li><code>HandlePlacementStateChanged()</code> - called once on a genuine placement-state transition. <code>StartOutpostPlacement</code>/<code>StartPlotPlacement</code> each wrap their body in <code>BeginPlacementTransition()</code>/<code>EndPlacementTransition()</code>, which runs <code>CancelPlacement()</code> internally first with its own notification suppressed.<ul>
+<li>That way, switching from idle into placement, or from one placement kind straight into the other, notifies exactly once instead of a spurious end-then-start pair. A direct <code>CancelPlacement()</code> call (RMB, world cleanup, session teardown) notifies only when a placement was actually active.</li>
+</ul>
+</li>
+<li><code>HandlePaletteHotkey(int32)</code> - called with index 0-8 when a <code>SelectPaletteBuilding</code> command executes (bare 1-9 by default, rebindable) while editing an outpost (not while positioning the camera). Indexes <code>VisiblePaletteEntries</code>, not <code>BuildingPaletteEntries</code>.<ul>
+<li>That way the keys follow whatever the palette actually shows, and the filter combos / faction gate remap them exactly the way pinning does (the refill re-renders the tile badges from the same indices, so a badge never lies about its key; see <code>toolkit.html</code>).</li>
+</ul>
+</li>
+<li><code>HandlePaletteEmptyHotkey()</code> - the same for the <code>SelectEmptyBuilding</code> command (bare <code>0</code> by default): selects the palette's Empty tile, clearing the hot building so new plots are placed unassigned.</li>
+<li><code>HandleEyedropperPick(BuildingId)</code> - called when the <code>PickBuildingFromPlot</code> command executes (bare <code>E</code> by default). The MODE resolves the target plot (<code>ResolveEyedropperTargetPlot()</code>: the <code>AOutpostPlot</code> under the cursor, else the single selected plot, else null, scoped to the EDITING outpost's own plots, so a foreign plot resolves to null and returns the key unconsumed) and reads its <code>AssignedBuildingId</code>.<ul>
+<li>The toolkit end just calls <code>SelectHotBuilding</code>, so a pick and a tile click can't leave the palette in different states. An INVALID id is expected input, not a failure to screen: an unassigned plot IS the Empty tile.</li>
+<li><code>CanPickBuildingFromPlot()</code> gates on editing an outpost, not positioning the camera, the toolkit being hosted, the active viewport NOT tracking a drag, and a target actually resolving.</li>
+<li>A false <code>CanExecute</code> returns the chord unconsumed, which is what leaves bare <code>E</code> doing its normal editor job everywhere this tool has nothing to pick.</li>
+</ul>
+</li>
+<li><code>HandlePlotsChanged()</code> - called after a plot is placed, removed (<code>DeleteSelection</code>, or the Ctrl-remove tool's <code>RemovePlotUnderCursor</code>), assigned a building, or randomized (<code>RandomizeSelectedPlots</code>). Re-runs <code>RefreshPlotList()</code> so the editing panel's plot list never shows a stale row.</li>
+</ul>
+<h2 id="editor-toolkit-foutpostbuildertoolkit">Editor Toolkit - FOutpostBuilderToolkit</h2>
+<p>Header:
+<code>OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkit.h</code></p>
+<p>Full panel anatomy, the widget inventory, and the two shared read-model primitives live in <code>toolkit.html</code>. This class is thin assembly glue, a panel switcher plus mount functions for the reusable <code>SOutpost*</code> widgets.</p>
+<p>So most of what used to be toolkit methods (palette tile builders, plot-list rows, the faction combo, the Save button, ...) now live on those widgets instead. This section lists only what genuinely remains a class member for lookup.</p>
+<ul>
+<li><code>FOutpostBuilderToolkit(InOwningMode)</code> - stores a raw back-pointer to the owning mode. Also builds the two shared-state primitives (<code>WidgetContext</code>/<code>PaletteModel</code>, both <code>TSharedRef</code>, built here rather than <code>Init()</code> since a <code>TSharedRef</code> has no default constructor).<ul>
+<li>Never calls <code>GLevelEditorModeTools()</code> anywhere in the class, including the destructor. That's the structural fix for a shutdown-time assert, since the mode outlives the toolkit for the whole of <code>Exit()</code>.</li>
+</ul>
+</li>
+<li><code>~FOutpostBuilderToolkit()</code> - unconditionally removes all four viewport overlays still attached (camera/placement/editing-bar plus the build-mode banner), unsubscribes from the asset registry and undo system.<ul>
+<li>No mode-delegate handles to unsubscribe: the mode calls this toolkit's public methods directly, and it owns the toolkit, so it can never outlive-call into a destroyed instance.</li>
+<li><code>PaletteModel</code>'s own destructor (run when this toolkit's <code>TSharedRef</code> member is destroyed) releases the palette's soft-class preload handle.</li>
+</ul>
+</li>
+<li><code>Init(InitToolkitHost, InOwningMode)</code> - the TWO-argument overload deliberately, since that's the one <code>UEdMode::Enter()</code> calls. It forwards to <code>FModeToolkit::Init(Host, Mode)</code>, which is what seeds the base's <code>OwningEditorMode</code>.<ul>
+<li>It then binds every <code>WidgetContext</code> field and <code>PaletteModel-&gt;GateFactionAttribute</code> to a toolkit getter, runs an <code>ensureMsgf</code> sweep confirming each actually bound (<code>OUTPOST_ENSURE_CONTEXT_BOUND</code>), then builds the panel switcher (which is where the widgets actually get constructed and mounted).</li>
+<li>Subscribes to the asset registry's <code>OnAssetRemoved</code>/<code>OnAssetRenamed</code>/<code>OnAssetAdded</code> (<code>OnAssetAdded</code> guarded against startup-scan storms via <code>IAssetRegistry::IsLoadingAssets()</code>) and registers for undo. The thumbnail pool is <code>FOutpostPaletteModel</code>'s own constructor's job, not built here directly.</li>
+</ul>
+</li>
+<li><code>GetToolkitFName()</code> - <code>"OutpostBuilderToolkit"</code>.</li>
+<li><code>GetBaseToolkitName()</code> - display name text.</li>
+<li><code>GetInlineContent()</code> - the cached root widget.</li>
+<li><code>GetPlayBlockedText()</code> (static) - the ONE "Stop Play/Simulate before placing or editing outposts." wording, read by every tooltip getter that needs it instead of each retyping its own copy.</li>
+<li><code>HandleEditingOutpostChanged()</code> / <code>HandleCameraPositioningChanged()</code> / <code>HandlePlacementStateChanged()</code> / <code>HandlePaletteHotkey(int32)</code> / <code>HandlePaletteEmptyHotkey()</code> / <code>HandleEyedropperPick(FPrimaryAssetId)</code> / <code>HandlePlotsChanged()</code> - the mode's direct-call notification surface; see "Toolkit notifications and firing discipline" above.</li>
+<li><code>GetPaletteBuildingDisplayText(BuildingId)</code> - the palette's display name for a building id, a thin forward to <code>FOutpostPaletteModel::GetBuildingDisplayText</code>. Public because the MODE has no palette model of its own and the eyedropper's confirmation toast must name the pick with the same string the tile and the Plots list show. Never loads.</li>
+<li><code>PostUndo(bSuccess)</code> / <code>PostRedo(bSuccess)</code> (<code>FEditorUndoClient</code> overrides) - re-run the dynamic-panel refresh set (outpost list, details views, faction selector, hot-building view) after an undo/redo, since a data-only definition change fires neither <code>HandleEditingOutpostChanged()</code> nor a selection-changed event.</li>
+</ul>
+<h2 id="editor-settings-on-the-asset">Editor Settings on the Asset</h2>
+<p>Header:
+<code>OutpostBuilder/Source/OutpostBuilder/Settings/OutpostBuilderSettingsAsset.h</code> (the <code>WITH_EDITORONLY_DATA</code> block)</p>
+<p>These properties live inside <code>UOutpostBuilderSettingsAsset</code>'s <code>#if WITH_EDITORONLY_DATA</code> block, so cooked builds strip them. They hold the asset-creation/placement config plus two knobs on a shared <strong>Placement</strong> category. The debug-draw/editor-UI-style knobs live on the per-user <code>UOutpostBuilderUserSettings</code> (see the next section).</p>
+<p>There is no separate Project Settings page for any of this. Open the settings asset and edit it there (and Editor Preferences for the style knobs, covered below).</p>
+<p>Editor categories (Assets / Placement / Actors):</p>
+<ul>
+<li><code>CreatedDefinitionDirectory</code> - <code>FDirectoryPath</code>, default <code>/Game/Outposts</code>, shown as <strong>Created Definition Folder</strong> with a browsable content-directory picker (<code>meta = (ContentDir)</code>) instead of a typed string. Where newly created <code>UOutpostDefinition</code> assets land.<ul>
+<li>Outpost definitions are auto-named with NO save dialog, and "+ New Building"'s modal dialog seeds itself here. Read via <code>.Path</code> at every call site.</li>
+<li>A folder outside <code>/Game</code> resolves in-editor but not in packaged games (only <code>/Game</code> is scanned there).</li>
+</ul>
+</li>
+<li><code>DefinitionAssetPrefix</code> - <code>FString</code>, default <code>"OD_"</code>. Auto-created definitions are named <code>&lt;Prefix&gt;&lt;SanitizedActorLabel&gt;</code>, de-duplicated via <code>CreateUniqueAssetName</code>.</li>
+<li><code>OutpostExclusionDistance</code> - <code>float</code>, <code>meta = (Units = "Centimeters")</code>, default <strong><code>3000</code></strong> (30 m). Minimum clearance between a NEW outpost and any <code>AOutpostVolume</code>'s extents, enforced by the placement ghost AND drag-stamp's hard refusal.</li>
+<li><code>DefaultOutpostVolumeSizeCm</code> - <code>float</code>, <code>meta = (Units = "Centimeters", DisplayName = "Default Outpost Volume Size")</code>, default <code>3000</code>. Per-axis MINIMUM size of a newly spawned outpost volume's box brush, the PROJECT-WIDE fallback.<ul>
+<li><code>SpawnDefaultOutpostVolume</code> fits the brush to the outpost's actual base bounds plus <code>OutpostVolumeBoundsPaddingCm</code> per side, and only falls back to this floor when the fitted result would be smaller on that axis AND the outpost's own definition has no override (see <code>VolumeSizeCm</code> just below).</li>
+<li>Affects newly spawned volumes only. It never re-fits an existing one.</li>
+</ul>
+</li>
+<li><strong><code>UOutpostDefinition::VolumeSizeCm</code>/<code>bVolumeSizeOverridden</code> (RUNTIME module: <code>OutpostDefinition.h</code>, Category "Outpost", not on the settings asset)</strong>: a PER-OUTPOST override for the same floor <code>DefaultOutpostVolumeSizeCm</code> supplies project-wide.<ul>
+<li><code>bVolumeSizeOverridden</code> (<code>meta = (InlineEditConditionToggle)</code>) distinguishes "never authored, fall back to the settings asset" (<code>false</code>, the default, which is what every already-placed definition predating this field carries) from "this outpost has its own value" (<code>true</code>). <code>VolumeSizeCm</code> (<code>DisplayName = "Outpost Volume Size"</code>, <code>ClampMin = "0.0"</code>) holds that value only while the bool is true.</li>
+<li>RESOLVE LADDER, read by <code>UOutpostDefinition::GetVolumeSizeCm(FallbackCm)</code>, the one call site being <code>OutpostPrefabUtils::SpawnDefaultOutpostVolume</code>: the definition's own <code>VolumeSizeCm</code> when <code>bVolumeSizeOverridden</code>, else the caller-supplied fallback (the settings asset's <code>DefaultOutpostVolumeSizeCm</code>).</li>
+<li>SEEDED, not migrated: both <code>UOutpostDefinitionFactory::FactoryCreateNew</code> and <code>UOutpostBuilderEdMode::GetOrCreateOutpostDefinitionForOutpost</code> (the two "create a new definition" surfaces) set <code>bVolumeSizeOverridden = true</code> and copy the settings asset's CURRENT <code>DefaultOutpostVolumeSizeCm</code> in as a one-time baked snapshot for every NEWLY created definition.</li>
+<li>That way a fresh definition starts as an editable, honest copy of the project default rather than silently tracking a LATER settings-asset edit.</li>
+<li><code>IsDataValid</code> adds one WARNING (never Invalid, matching every other check on this class) when <code>bVolumeSizeOverridden</code> is true with <code>VolumeSizeCm &lt;= 0</code> (every newly spawned volume on that outpost would floor to nothing).</li>
+</ul>
+</li>
+<li><code>OutpostVolumeBoundsPaddingCm</code> - <code>float</code>, <code>meta = (Units = "Centimeters", DisplayName = "Outpost Volume Bounds Padding")</code>, default <code>500</code>. Padding added to EACH SIDE of the computed base bounds when sizing a newly spawned outpost volume, contributing twice per axis (once per side), applied BEFORE the <code>DefaultOutpostVolumeSizeCm</code> floor. Kept alongside that floor deliberately: the two are one sizing recipe.</li>
+<li><code>MaxDefaultBuildingPaletteEntries</code> - <code>int32</code>, default <code>9</code> (lines up with the 1-9 palette hotkeys), <strong>Assets</strong> category. How many building definitions the editing panel's palette shows by default; beyond this many, a definition is hidden unless pinned. Pinned entries are shown IN ADDITION to this count, not counted against it. (The pin list itself is NOT on the asset. See <code>UOutpostRuntimeSettings::PinnedBuildingDefinitions</code> above.)</li>
+<li><code>OutpostActorFolder</code> - <code>FString</code>, default <code>"Outposts"</code>, <strong>Actors</strong> category, shown as <strong>Outpost Outliner Folder</strong>. World Outliner base folder for actors the plugin spawns.<ul>
+<li>Every NEWLY spawned outpost/plot/Overhead camera/volume lands in <code>&lt;this&gt;/&lt;definition asset name&gt;</code> (e.g. <code>Outposts/OD_MyBase</code>). The subfolder is the definition's <code>PrimaryAssetName</code>: free to read, stable across restore/re-place, and fork-on-stamp gives each drag-stamped base its own folder.</li>
+<li>A <code>/</code> nests the base deeper. EMPTY disables foldering entirely (new spawns land at the Outliner root, since the helpers skip <code>SetFolderPath</code> rather than writing <code>NAME_None</code>).</li>
+<li>Spawn-time only: editing this never moves an already-placed actor, hand-moved actors are never yanked back, and restore/re-place (which respawns through a folding path, sweeping the whole base by the anchor's identity) is the deliberate opt-in migration for an unfoldered base.</li>
+<li>Renaming a definition re-folds only actors still in the exact stale computed folder. Editor tooling only: Blueprint/game-code callers of <code>UOutpostStampLibrary</code> get no folders.</li>
+<li>Recipe and sweep live in <code>OutpostEditorUtils</code> (<code>ResolveOutpostActorFolder</code> / <code>ApplyOutpostActorFolder</code> / <code>ApplyOutpostFoldersForInstance</code>).</li>
+</ul>
+</li>
+</ul>
+<p><strong>Placement category, the knobs that stayed shared:</strong> these did NOT move to the per-user class, because each feeds placement VALIDITY rather than a look. A per-user divergence would make the same plot legal on one designer's machine and illegal on another's:</p>
+<ul>
+<li><code>PlotSizeTagHalfSizeCm</code> - see above (Runtime categories); on <strong>Placement</strong> because it feeds the same footprint-radius arithmetic as the two knobs below. DisplayName "Plot Size Tags", with no <code>Units</code> meta, since UHT rejects it on this <code>TMap</code> property.</li>
+<li><code>PlotRingRadius</code> - <code>float</code>, <code>meta = (Units = "Centimeters", DisplayName = "New Plot Search Distance")</code>, default <code>600</code>. Ring search radius <code>StartPlotPlacement</code>/<code>FindPlotSpawnLocation</code> use to seed a new plot's spawn location. Sizes where a NEW plot may land.</li>
+<li><code>PlotGhostRadius</code> - <code>float</code>, <code>meta = (Units = "Centimeters", DisplayName = "Fallback Footprint Half-Size")</code>, default <code>150</code>. Last-resort radius for an outpost-family actor with no usable geometry bounds. Despite the name it does not size the plot ghost (a plot's footprint is rooted on its size class instead).<ul>
+<li>The name is kept because it's a serialized property and renaming it would orphan authored data.</li>
+</ul>
+</li>
+</ul>
+<p>Everything else the style surface holds (the knobs across Ghosts/Footprints/Selection/Hover/Beams/HUD/Overhead Camera/Input) lives on the per-user <code>UOutpostBuilderUserSettings</code>, documented next.</p>
+<h2 id="per-user-style-settings-uoutpostbuilderusersettings">Per-User Style Settings - UOutpostBuilderUserSettings</h2>
+<p>Header:
+<code>OutpostBuilder/Source/OutpostBuilderEditor/Settings/OutpostBuilderUserSettings.h</code></p>
+<p>A <code>UDeveloperSettings</code> (<code>config = EditorPerProjectUserSettings</code>, deliberately bare, <strong>not</strong> <code>defaultconfig</code>), in the EDITOR module. Shown in <strong>Editor Preferences &gt; "Outpost Builder"</strong> (<code>GetContainerName()</code> returns <code>"Editor"</code>), so it is a per-machine authoring preference: one designer's tuned beam palette or HUD layout never lands in source control or forces itself on a teammate, in contrast to the project-shared settings asset above.</p>
+<p>It deliberately does NOT carry <code>defaultconfig</code>. That flag would route the engine's Editor Preferences save path to the project-shared <code>DefaultEditorPerProjectUserSettings.ini</code> for a <code>CLASS_DefaultConfig</code> object instead of the per-user one, silently defeating the whole per-user premise the moment someone edited it through the Preferences UI.</p>
+<p>Holds the debug-draw + editor-UI-style knobs, across the categories <code>Debug|*</code> / <code>UI|*</code> / bare <code>Camera</code> / bare <code>Input</code>, plus <code>Debug|Territory</code>.</p>
+<p>Every property whose value is a physical quantity carries <code>meta = (Units = "...")</code> (plus a <code>DisplayName</code> where the identifier carried the unit suffix). Ratios/counts/colors/screen-pixel offsets are left alone (no engine <code>EUnit</code> exists for pixels):</p>
+<p>See the header (<code>OutpostBuilderUserSettings.h</code>) for the authoritative current <code>DisplayName</code>/tooltip wording per knob rather than re-deriving them here.</p>
+<p><strong><code>Debug|Ghosts</code></strong> (10 properties):</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OutpostGhostBoxHalfSize</code></td>
+<td>cm; <strong>Outpost Ghost Box Half-Size</strong></td>
+</tr>
+<tr>
+<td><code>OutpostGhostColor</code></td>
+<td><strong>Outpost Ghost Box Color</strong></td>
+</tr>
+<tr>
+<td><code>PlotGhostHalfHeight</code></td>
+<td>cm; <strong>Plot Ghost Prism Half-Height</strong></td>
+</tr>
+<tr>
+<td><code>PlotGhostColor</code></td>
+<td><strong>Beam Fallback Color</strong> - the ownership beam's null-outpost/empty-palette fallback tint. Does NOT feed the plot ghost's own wire, which takes one of the three placement colors below</td>
+</tr>
+<tr>
+<td><code>PlacementPlateValidColor</code></td>
+<td><strong>Placement Plate Color (Valid)</strong>, default <code>(0,1,0,0.35)</code></td>
+</tr>
+<tr>
+<td><code>PlacementPlateWarnColor</code></td>
+<td><strong>Placement Plate Color (Warn)</strong>, default <code>(1,0.6,0,0.35)</code></td>
+</tr>
+<tr>
+<td><code>PlacementPlateInvalidColor</code></td>
+<td><strong>Placement Plate Color (Invalid / Remove)</strong>, default <code>(1,0,0,0.35)</code></td>
+</tr>
+<tr>
+<td><code>GhostMaterialAlpha</code></td>
+<td>ratio, no unit; <strong>Ghost Opacity</strong></td>
+</tr>
+<tr>
+<td><code>GhostMaterialOverride</code></td>
+<td>soft material path; <strong>Ghost Material Override</strong>. Unset means the built-in engine translucent material</td>
+</tr>
+<tr>
+<td><code>FootprintRingColor</code></td>
+<td><strong>Footprint Context Ring Color</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The three plate colors are the RTS-style placement plate's fill, also fed into <code>GetPlotGhostColor()</code>'s three-way return so the wire prism and the mesh ghost never disagree with the plate.</p>
+<p>The Warn color's own tooltip states plainly that it's a STATUS color and not a faction color, since factions carry no color in this plugin, and its plate draws HOLLOW (border only) so the warning survives a grayscale or red-green-colorblind read.</p>
+<p><code>RemoveModifier</code> sits in this block in the header for proximity to the plate colors it drives, but is categorized <code>Input</code> (below).</p>
+<p><strong><code>Debug|Placement Aids</code></strong> (8 properties, PLOT placement only, every knob):</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bShowPlacementReadouts</code></td>
+<td><code>bool</code>, default <code>true</code>; <strong>Show Placement Readouts</strong></td>
+</tr>
+<tr>
+<td><code>PlacementReadoutTextColor</code></td>
+<td>default <code>(0.75,0.92,1,1)</code>, a distinct cool tint so the numbers never read as one of the red/amber/green placement states; <strong>Placement Readout Text Color</strong></td>
+</tr>
+<tr>
+<td><code>bShowAlignmentGuides</code></td>
+<td><code>bool</code>, default <code>true</code>; <strong>Show Alignment Guides</strong> - turning it off also turns off the snap below, since nothing may snap to a line the designer can't see</td>
+</tr>
+<tr>
+<td><code>bSnapToAlignmentGuides</code></td>
+<td><code>bool</code>, default <strong><code>false</code></strong>; <strong>Snap To Alignment Guides</strong></td>
+</tr>
+<tr>
+<td><code>AlignmentGuideToleranceCm</code></td>
+<td>cm, default <code>40</code>; <strong>Alignment Guide Tolerance</strong></td>
+</tr>
+<tr>
+<td><code>AlignmentGuideSearchRadiusCm</code></td>
+<td>cm, default <code>4000</code>; <strong>Alignment Guide Search Radius</strong></td>
+</tr>
+<tr>
+<td><code>AlignmentGuideColor</code></td>
+<td>default <code>(0.35,0.95,0.85,0.9)</code>; <strong>Alignment Guide Color</strong></td>
+</tr>
+<tr>
+<td><code>AlignmentGuideZLiftCm</code></td>
+<td>cm, default <code>20</code>; <strong>Alignment Guide Z Lift</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The readout block's vertical offset (<code>HUDReadoutTextOffsetY</code>) and the alignment guide line's thickness (<code>AlignmentGuideThickness</code>) are fixed values at time of writing, in <code>OutpostBuilderDraw.cpp</code>'s <code>OutpostBuilder::Draw::Private</code> namespace rather than knobs here. A project that wants either back adds it as a UPROPERTY.</p>
+<p><strong><code>Debug|Selection</code></strong> (3 properties):</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SelectionRimColor</code></td>
+<td><strong>Selection Rim Color</strong></td>
+</tr>
+<tr>
+<td><code>SelectionOverlapRimColor</code></td>
+<td><strong>Selection Rim Color (Overlapping)</strong></td>
+</tr>
+<tr>
+<td><code>bDimOutOfScopeOverlays</code></td>
+<td><code>bool</code>, default <code>true</code>; <strong>Fade Other Outposts' Labels and Borders While Editing</strong> - the scoped-editing fade's own switch</td>
+</tr>
+</tbody>
+</table>
+<p>The fade reaches exactly two draws, other outposts' name labels and other outposts' volume borders, and touches no actor, mesh, or material. See <code>edmode.html</code>'s "The Scoped-Editing Fade".</p>
+<p>The rim's own line thickness (<code>SelectionRimThickness</code>) and the fade's desaturation/opacity amounts (<code>OutOfScopeDesaturation</code>/<code>OutOfScopeOpacity</code>) are fixed values at time of writing, in the same <code>OutpostBuilder::Draw::Private</code> namespace.</p>
+<ul>
+<li><code>Debug|Hover</code> (2): <code>HoverRingColor</code> (<strong>Hover Ring Color</strong>), <code>RemoveCandidateRingColor</code> (<strong>Remove-Candidate Ring Color</strong>, default <code>(0.6,0.15,0.15,0.6)</code>), the dim ring every OTHER plot of the editing outpost draws while the Ctrl-remove tool is armed.</li>
+</ul>
+<p><strong><code>Debug|Beams</code></strong> (7 properties):</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bShowOwnershipBeams</code></td>
+<td><code>bool</code>, default <code>true</code>; <strong>Show Ownership Beams</strong> - the master switch. Off leaves selection rims and every other indicator unaffected</td>
+</tr>
+<tr>
+<td><code>BeamPulseSpeed</code></td>
+<td>radians/sec; <strong>Beam Pulse Speed</strong>, where <code>PulseAngle = FApp::GetCurrentTime() * BeamPulseSpeed</code> is consumed directly as an angle</td>
+</tr>
+<tr>
+<td><code>BeamMinBrightness</code></td>
+<td>ratio, no unit; <strong>Beam Minimum Brightness</strong></td>
+</tr>
+<tr>
+<td><code>BeamZLiftCm</code></td>
+<td>cm; shown as <strong>Beam Z Lift</strong></td>
+</tr>
+<tr>
+<td><code>BeamSplashRingCount</code></td>
+<td>count, no unit; <strong>Beam Splash Ring Count</strong></td>
+</tr>
+<tr>
+<td><code>BeamSplashMaxRadiusCm</code></td>
+<td>cm; shown as <strong>Beam Splash Max Radius</strong></td>
+</tr>
+<tr>
+<td><code>BeamVibrantPalette</code></td>
+<td><strong>Beam Color Palette</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Every beam cycles <code>BeamVibrantPalette</code> by plot id alone. See <code>faction-visuals.html</code>.</p>
+<p>Beam thickness, the pulse packet's own brightness boost, and the splash rings' stagger are fixed values at time of writing: <code>BeamThickness</code> lives in <code>OutpostBuilder::UserSettings</code> (<code>OutpostBuilderUserSettings.h</code>, shared between the mode and the draw TU so both read the same value), and <code>BeamPulsePacketBoost</code>/<code>BeamSplashRingPhaseOffset</code> live in <code>OutpostBuilderDraw.cpp</code>'s <code>OutpostBuilder::Draw::Private</code> namespace.</p>
+<p><strong><code>Debug|Territory</code></strong> (4 properties):</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bShowTerritoryBorders</code></td>
+<td><code>bool</code>, default <code>true</code>; <strong>Show Outpost Volume Borders</strong> - master switch for <code>OutpostBuilder::Draw::DrawTerritoryBorders</code> (<code>edmode.html</code> "Territory Borders")</td>
+</tr>
+<tr>
+<td><code>TerritoryBorderColor</code></td>
+<td><code>FLinearColor</code>, default <code>(0.25, 0.65, 1.0, 0.9)</code>; <strong>Outpost Volume Border Color</strong> - the ONE border color for every volume rectangle, configurable right here in Editor Preferences</td>
+</tr>
+<tr>
+<td><code>TerritoryBorderThickness</code></td>
+<td><code>float</code>, cm; <strong>Outpost Volume Border Thickness</strong></td>
+</tr>
+<tr>
+<td><code>TerritoryBorderZLiftCm</code></td>
+<td><code>float</code>, cm; shown as <strong>Outpost Volume Border Z Lift</strong> - lift above the volume actor's own Z, not its bounds' min Z</td>
+</tr>
+</tbody>
+</table>
+<p>The border draws as TRANSLUCENT lines, so this color's alpha (and the scope fade's opacity half) actually mean something. The engine's opaque line path forces alpha to 1 before batching.</p>
+<p><strong><code>UI|HUD</code></strong> (16 properties):</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DisabledCursor</code></td>
+<td><code>EOutpostDisabledCursor</code>, default <code>SlashedCircle</code>; <strong>Disabled-Button Cursor</strong> - the disabled-hover cursor override every gated button in this plugin's panel/viewport overlays reads via <code>OutpostBuilder::ViewportOverlay::MakeDisabledAwareCursor</code> (<code>SOutpostViewportOverlay.h</code>/<code>.cpp</code>, above). <code>None</code> keeps a disabled button showing its normal (enabled-state) cursor instead of overriding it. <code>Hand</code>/<code>Crosshairs</code> map onto the matching <code>EMouseCursor::Type</code> values</td>
+</tr>
+<tr>
+<td><code>HUDBannerMarginPx</code></td>
+<td><strong>Banner Margin</strong></td>
+</tr>
+<tr>
+<td><code>HUDBannerPaddingPx</code></td>
+<td><strong>Banner Content Padding</strong></td>
+</tr>
+<tr>
+<td><code>HUDBannerLineGapPx</code></td>
+<td><strong>Banner Line Spacing</strong>, screen pixels, no engine unit applied</td>
+</tr>
+<tr>
+<td><code>HUDBannerBackingColor</code></td>
+<td><strong>Banner Background Color</strong></td>
+</tr>
+<tr>
+<td><code>HUDBannerTextColor</code></td>
+<td><strong>Banner Title Color</strong></td>
+</tr>
+<tr>
+<td><code>HUDBannerSubStateTextColor</code></td>
+<td><strong>Banner Sub-State Text Color</strong></td>
+</tr>
+<tr>
+<td><code>HUDHotkeyTextColor</code></td>
+<td><strong>Hotkey Legend Text Color</strong></td>
+</tr>
+<tr>
+<td><code>OutpostLabelWorldZOffset</code></td>
+<td>cm; <strong>Outpost Label Height</strong></td>
+</tr>
+<tr>
+<td><code>OutpostLabelMaxDistanceCm</code></td>
+<td>cm; shown as <strong>Outpost Label Max Distance</strong></td>
+</tr>
+<tr>
+<td><code>OutpostLabelEditingColor</code></td>
+<td><strong>Outpost Label Color (Editing)</strong></td>
+</tr>
+<tr>
+<td><code>OutpostLabelColor</code></td>
+<td><strong>Outpost Label Color (Others)</strong></td>
+</tr>
+<tr>
+<td><code>BannerAccentEditingColor</code></td>
+<td><strong>Banner Accent - Editing</strong>, amber</td>
+</tr>
+<tr>
+<td><code>BannerAccentPlacingColor</code></td>
+<td><strong>Banner Accent - Placing</strong>, green</td>
+</tr>
+<tr>
+<td><code>BannerAccentRemovingColor</code></td>
+<td><strong>Banner Accent - Removing</strong>, red</td>
+</tr>
+<tr>
+<td><code>BannerAccentPositioningColor</code></td>
+<td><strong>Banner Accent - Positioning Camera</strong>, cyan</td>
+</tr>
+</tbody>
+</table>
+<p>The four banner accents are the per-state colors: <code>ComposeBannerBlock</code> picks exactly one per frame to feed BOTH the banner's left edge stripe and its sub-state text. Every <code>HUDBanner*</code>/<code>HUDHotkeyTextColor</code> knob is read by the Slate banner (<code>SOutpostBuildModeBanner</code>) for its own text/background colors and margins.</p>
+<p>The invalid-reason HUD text's vertical offset (<code>HUDReasonTextOffsetY</code>) is a fixed value at time of writing, in <code>OutpostBuilderDraw.cpp</code>'s <code>OutpostBuilder::Draw::Private</code> namespace.</p>
+<ul>
+<li><code>Camera</code> (5): <code>CameraMinHorizontalDistance</code> (cm; <strong>Camera Minimum Distance</strong>), <code>CameraDistanceMargin</code> (cm; <strong>Camera Distance Margin</strong>), <code>CameraSlantMultiplier</code> (ratio, no unit; <strong>Camera Slant Multiplier</strong>), <code>CameraPitchDegrees</code> (degrees; shown as <strong>Camera Pitch</strong>), <code>DefaultOverheadCameraFieldOfView</code> (degrees; <strong>Default Camera Field of View</strong>).</li>
+<li><code>Input</code> (3): <code>RemoveModifier</code> (<strong>Remove-Mode Modifier</strong>) sets which held key arms the plot-remove tool; it lives beside the Ghosts knobs in the header for proximity to the plate colors it drives, but carries the <code>Input</code> category. Plus <code>RMBTapMaxMovePx</code> (screen pixels, no engine unit; <strong>Right-Click Tap Max Movement</strong>) and <code>RMBTapMaxHoldSeconds</code> (seconds; <strong>Right-Click Tap Max Hold</strong>).</li>
+</ul>
+<p><strong><code>UI|BuildingGrid</code></strong> (2 properties) for the in-viewport building command grid (<code>SOutpostBuildingCommandGrid</code>, <code>toolkit.html</code> "The In-Viewport Building Command Grid"):</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>BuildingGridCols</code></td>
+<td><code>int32</code>, default 4, <code>ClampMin=1</code>/<code>ClampMax=8</code>; DisplayName <strong>Columns</strong></td>
+</tr>
+<tr>
+<td><code>BuildingGridAnchorCorner</code></td>
+<td><code>EOutpostBuildingGridCorner</code>, default <code>BottomRight</code>; <strong>Grid Anchor Corner</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Both are STRUCTURAL, read once at that widget's own <code>Construct()</code> time (not a live per-frame re-read like every other knob on this class), so an edit here takes effect the next time Outpost Build Mode is entered, not mid-session.</p>
+<p>The grid's ROW count is not a knob: <code>SOutpostBuildingCommandGrid::FillView</code> derives it every call from how many tiles there are to show (the Empty tile plus every visible palette entry) divided across <code>BuildingGridCols</code>, so there is never an empty trailing row.</p>
+<p>That's 60 <code>EditAnywhere</code> knobs in total, across the ten categories above.</p>
+<ul>
+<li><code>Get()</code> (static) - THE style read every consumer routes through: <code>*GetDefault&lt;UOutpostBuilderUserSettings&gt;()</code>, a <code>UDeveloperSettings</code> CDO singleton. Always resident (loaded at module init, never garbage-collected), so every read site is a plain pointer deref, safe on the per-frame Render/DrawHUD paths that dominate this style surface's call sites.<ul>
+<li>Never a load, unlike the asset's own <code>Get()</code>, which still has a loaded-or-CDO branch. A <code>UDeveloperSettings</code> CDO needs no such branch at all.</li>
+</ul>
+</li>
+</ul>
+<p><code>OutpostBuilder::Draw</code> functions (<code>OutpostBuilderDraw.h</code>) all still take a <code>const UOutpostBuilderSettingsAsset&amp; Style</code> parameter, kept for signature stability, but most of them read a pure look value now, which comes from <code>UOutpostBuilderUserSettings::Get()</code> instead. <code>Style</code> sits unused (<code>(void)Style;</code>) on those paths rather than being dropped from the signature.</p>
+<p><code>GetActorGeometryRadius</code> (and <code>CaptureExistingPlotFootprints</code>'s ghost-radius resolve, which calls it) is the one still reading <code>Style.PlotGhostRadius</code>, the placement-validity fallback for an actor with no usable geometry bounds.</p>
+<h2 id="editor-module-and-content-browser-actions">Editor Module and Content Browser Actions</h2>
+<p>Header:
+<code>OutpostBuilder/Source/OutpostBuilderEditor/OutpostBuilderEditorModule.h</code></p>
+<p><code>FOutpostBuilderEditorModule::StartupModule()</code> registers the editor mode, subscribes to <code>FCoreUObjectDelegates::OnObjectPropertyChanged</code> (live-refreshes loaded outposts/plots when a faction or building definition gets edited), and defers Content Browser context-menu registration until <code>UToolMenus</code> is ready. <code>ShutdownModule()</code> unwinds all three.</p>
+<p>Two Content Browser asset-context-menu actions get registered on <code>UOutpostDefinition</code> assets:</p>
+<ul>
+<li><code>Locate Placed Outpost</code> - always shown for a selected <code>UOutpostDefinition</code>. Activates the Outpost Builder mode if it isn't already active, then calls <code>LocateOutpostForDefinition</code> on the active mode instance.</li>
+<li><code>Restore Placed Outpost</code> - same activation step, but greyed out while the definition's <code>PlacedOutpostPath</code> still resolves to a live <code>AOutpost</code>.<ul>
+<li>Enabled, it opens a "Restore Outpost" transaction, calls <code>UOutpostStampLibrary::RestoreOutpost</code>, folds the restored base into the configured Outliner folder while the transaction is still open (the fold <code>Modify()</code>s actors and can create a <code>UActorFolder</code> in a World Partition map, so it must not escape the undo scope), then selects, frames, and enters edit mode on the restored outpost.</li>
+</ul>
+</li>
+</ul>
+<p>The module's <code>OnDefinitionAssetRenamed</code> handler (asset-registry <code>OnAssetRenamed</code>) rebinds every loaded outpost/plot/camera/volume from the old name-based id to the new one, and re-folds alongside the rebind: the Outliner subfolder is the definition's <code>PrimaryAssetName</code>, so a rename orphans <code>&lt;base&gt;/&lt;old name&gt;</code>. Only actors still sitting in that exact stale computed folder are moved to <code>&lt;base&gt;/&lt;new name&gt;</code>, while anything the designer dragged elsewhere stays put.</p>
+<p>Non-transactional like the rebind itself, for the same reason (the rename isn't Ctrl+Z-able, so an undoable follow-up could be reverted independently).</p>
+<p>Note: the runtime module (<code>FOutpostBuilderModule</code>, <code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostBuilderModule.h</code>) has its own <code>StartupModule</code>/<code>ShutdownModule</code>. It registers the primary-asset scan paths for THREE types with <code>UAssetManager</code>, the outpost and building definitions plus the settings asset (faction is not scanned, since it's an enum, not an asset).</p>
+<p>It sets all three types' cook rule to <code>AlwaysCook</code>: definitions are reached only through <code>FPrimaryAssetId</code>, a name pair the cooker can't follow as a package-dependency edge, and the settings asset only through an ini-hosted soft path, which no cooked package references either.</p>
+<p>It then pre-warms the configured settings asset (<code>UOutpostBuilderSettingsAsset::PreWarm()</code>) so the per-frame, never-loading resolution serves authored values from the first frame of a packaged game. It's deliberately in the runtime module rather than the editor one, which lets a packaged game resolve the same ids the editor tooling writes. Check out <code>architecture.html</code> for why that split exists.</p>
+<h2 id="hotkeys-and-mouse">Hotkeys and Mouse</h2>
+<p>Every KEY binding below is an <code>FUICommandInfo</code> (<code>OutpostBuilderCommands.h</code>/<code>.cpp</code>), rebindable under <strong>Editor Preferences &gt; Keyboard Shortcuts &gt; Outpost Builder</strong>. The key names listed are the shipped defaults, and the in-viewport legend, placement bar, and palette tile badges read the ACTIVE chords so they follow a rebind.</p>
+<p>Mouse gestures (LMB place, RMB tap-to-cancel, the double-click into and out of editing) are not commands and are fixed.</p>
+<p>Outside any session (no placement, no camera positioning):</p>
+<ul>
+<li><code>LMB</code> <strong>double-click</strong> on an outpost - enter editing on it, or leave editing when it's the outpost you're already editing. One gesture, both doors.<ul>
+<li>Plain LMB only and NO modifier held: Ctrl and Shift stay the editor's additive-selection gestures and Alt stays its orbit gesture, so all three fall through untouched. A single click still just selects.</li>
+<li>The build-mode banner carries a <code>Dbl-click</code> legend row stating whichever face applies, which is the gesture's only written record (it has no chord to rebind and no button to read). See <code>edmode.html</code>'s "The Viewport Way In and Out".</li>
+</ul>
+</li>
+</ul>
+<p>While placing an outpost or plot:</p>
+<ul>
+<li><code>LMB</code> - place. Refused (but still consumed) while a plot ghost is invalid.</li>
+<li><code>RMB</code> tap / <code>Esc</code> - cancel placement (<code>Esc</code> is the <code>CancelPlacement</code> command; RMB is a gesture, which means a drag still orbits).</li>
+<li><code>1</code>-<code>9</code> - the nine <code>SelectPaletteBuilding</code> commands: select a building palette slot, while editing an outpost and not positioning the camera. A tenth building is click-only.</li>
+<li><code>0</code> - <code>SelectEmptyBuilding</code>: select the palette's leading <strong>Empty</strong> tile, clearing the hot building so new plots are placed unassigned. Same gate as its nine siblings. Bare number keys by default; exact-chord matching means any Ctrl, Alt, or Shift held falls through instead, keeping editor bookmark chords working.</li>
+</ul>
+<p>While placing a PLOT specifically, the same nine digits (plus <code>0</code>) also badge the in-viewport building command grid's tiles (<code>SOutpostBuildingCommandGrid</code>, <code>toolkit.html</code>).</p>
+<p>That's a grid of compact palette tiles (columns configurable, rows derived from content, each with a small truncated name under its thumbnail) anchored to a corner of the viewport, so the hot building can be switched without looking away from the placement ghost.</p>
+<p>The badges are read off the SAME <code>SelectPaletteBuilding</code>/<code>SelectEmptyBuilding</code> chords the panel palette's own tiles show (never a second, positional key scheme). A rebind shows on both surfaces identically. Digits were kept over the RTS command-card convention's usual QWERT/ASDFG precisely because those collide with the flycam's own WASD/QE.</p>
+<p>While editing an outpost (the editing viewport bar's four keybinds, where each chord's CanExecute is the literal SAME method its bar button's enabled state already reads, so a key can never do more than the button would):</p>
+<ul>
+<li><code>N</code> - <code>AddPlot</code>: starts placing a new plot (mirrors the bar's <strong>New Plot</strong> button / the Plots section's "+ New Plot").</li>
+<li><code>O</code> - <code>PositionOverheadCamera</code>: pilots the viewport onto this outpost's Overhead camera.</li>
+<li><code>B</code> - <code>EditOutpostVolume</code>: creates (if missing) and selects this outpost's Outpost Volume, then starts the Edit Outpost Volume excursion. See "Edit Outpost Volume Excursion" below.</li>
+<li>
+<p><code>J</code> - <code>RandomizePlots</code>: assigns a random eligible building to each selected plot.</p>
+</li>
+<li>
+<p><code>E</code> - <code>PickBuildingFromPlot</code>, the eyedropper: loads the building assigned to the plot under the cursor (or the single selected plot) into the <strong>Selected Building</strong>. A plot with nothing assigned selects the palette's <strong>Empty</strong> tile rather than doing nothing, and a short toast names whichever was picked.</p>
+<ul>
+<li>A DEDICATED key, never a modifier chord, because the Ctrl-remove tool already owns a user-configurable Ctrl/Alt/Shift chord that a designer's own setting could re-point onto whatever we picked here, making one gesture mean two things.</li>
+<li><code>E</code> is also the key The Sims uses for this exact verb, so it arrives pre-learned.</li>
+</ul>
+</li>
+</ul>
+<p>Bare <code>E</code> is NOT free, unlike the four defaults above, and that's an accepted trade rather than an oversight: <code>E</code> is the editor's Rotate widget-mode key and the flycam's up key. Both are protected by the command's <code>CanExecute</code> rather than by choosing a different key.</p>
+<p>It refuses (and so falls through unconsumed) unless a pick target actually resolves, and always while the active viewport is tracking a drag, flying included, so <code>E</code> keeps flying the viewport and keeps reaching the Rotate widget except in the one state where a plot is genuinely under the cursor or selected.</p>
+<p>The guard is <code>IsTracking()</code> and deliberately not <code>IsFlightCameraActive()</code>: that one is true whenever a navigation key is DOWN under <strong>Flight Camera Control Type</strong> = "WASD always", and <code>E</code> is itself one of those keys, so the guard would have refused its own keystroke. Rebind it in Keyboard Shortcuts if you want the plain <code>E</code> behavior back in that state.</p>
+<p>The four BAR keybinds were each checked against the engine's own level-viewport chords before picking them (see <code>OutpostBuilderCommands.h</code>'s own per-member doc for the specific collision each one dodges).</p>
+<p>Checked chords: the WASDQE flycam keys plus its R/F/C/Z (local-up/down, FOV) rungs, the W/E/R gizmo-mode keys, the P/X/V/G viewport toggles (Navigation showflag, TRS-snap, vertex-snap, Game View), the Alt-modified showflag chords, and the L/U raw-poll orbit-force keys.</p>
+<p>N/O/B/J are the confirmed-clear picks. The eyedropper's <code>E</code> is the one deliberate exception, covered above.</p>
+<p>Each bar button's tooltip and face both show the active chord (<code>FUICommandInfo::GetInputText()</code>), so a Keyboard-Shortcuts rebind is always visible without needing this list.</p>
+<p>While positioning the Overhead camera (the viewport overlay's three buttons, each showing its active chord on its face):</p>
+<ul>
+<li><code>Enter</code> - <code>ConfirmOverheadCamera</code>: saves the current framing to the definition and restores your viewport (the overlay's <strong>Done</strong>, its first button).</li>
+<li><code>Home</code> - <code>RevertOverheadCamera</code>: returns the camera to the last saved framing for the current target (the selected plot, or the outpost), or the computed default when none is saved yet.</li>
+<li><code>Esc</code> - cancels positioning and restores your viewport: the same <code>CancelPlacement</code> command placement uses, one Esc for both session kinds.</li>
+</ul>
+<p>Both new chords are gated to the positioning session (<code>CanExecute</code> is <code>IsPositioningOverheadCamera</code>), so <code>Enter</code> and <code>Home</code> fall through unconsumed everywhere else.</p>
+<h3 id="edit-outpost-volume-excursion">Edit Outpost Volume Excursion</h3>
+<p>Clicking <strong>Edit Outpost Volume</strong> (the bar button, or its <code>B</code> chord) does its existing create-if-missing-then-select work, then, if a volume actually resolved, starts an <strong>excursion</strong>: the editor temporarily leaves Outpost Builder mode and enters the engine's own Geometry ("Brush Editing") mode (<code>FGeometryEditingModes::EM_Geometry</code>, <code>Engine/Plugins/Editor/GeometryMode</code>).</p>
+<p>That's so the designer can reshape the volume's brush immediately with the stock vertex/edge/poly tools, no separate "enter brush editing" step required.</p>
+<p>Activating Geometry mode deactivates Outpost Builder mode as a side effect (neither mode overrides <code>IsCompatibleWith</code>, so <code>FEditorModeTools::ActivateMode</code> treats them as mutually exclusive, exactly like any other legacy-mode switch). THAT tears down <code>FOutpostBuilderToolkit</code> and every viewport overlay it hosts, so the excursion cannot be toolkit-owned.</p>
+<p>It is a small object (<code>FOutpostVolumeExcursion</code>, <code>OutpostBuilderVolumeExcursion.h</code>/<code>.cpp</code>) owned by the EDITOR MODULE instead (<code>FOutpostBuilderEditorModule::ActiveVolumeExcursion</code>/<code>BeginEditVolumeExcursion</code>), which outlives the mode switch:</p>
+<ul>
+<li>Stores the editing outpost's definition id (a name-based <code>FPrimaryAssetId</code>, with nothing actor/definition-pointer-shaped to dangle across the switch).</li>
+<li>Activates <code>EM_Geometry</code> via the SAME <code>GLevelEditorModeTools().ActivateMode(...)</code> entry point the Modes toolbar itself uses. There is no other supported way in. The volume was already selected by <code>EditVolumeForEditingOutpost()</code> before this runs, so the engine's own <code>FEdModeGeometry::Enter()</code> (which reads the CURRENT actor selection for <code>ABrush</code>es) picks it up with no extra wiring.</li>
+<li>Mounts a compact "Editing Outpost Volume / Done (Esc)" viewport overlay, reusing <code>SOutpostViewportOverlay</code>, the same fully-generic bottom-center shell the toolkit's own overlays use (it holds no toolkit/mode reference by design), added via <code>ILevelEditor::AddViewportOverlayWidget</code> (<code>ILevelEditor</code> IS an <code>IToolkitHost</code>, the identical interface the toolkit's overlays use, just reached through <code>FLevelEditorModule</code> instead of a toolkit's cached host).</li>
+<li>Registers itself as a Slate <code>IInputProcessor</code> so <code>Esc</code> returns even when the viewport doesn't hold Slate focus.</li>
+</ul>
+<p><strong>Return</strong> (Done button or Esc): unsubscribes its own watcher delegates first, removes the overlay/input processor, deactivates <code>EM_Geometry</code>, re-activates <code>EM_OutpostBuilderId</code>, then calls the freshly-active <code>UOutpostBuilderEdMode::LocateOutpostForDefinition</code> on the stored id, the SAME select+frame+<code>EnterOutpostEditMode</code> path the Content Browser's "Locate Placed Outpost" action already uses. That lands the designer back in Outpost Builder mode, editing the same outpost.</p>
+<p><strong>Abnormal teardown</strong>: the designer may instead manually pick a third mode from the Modes toolbar, or close/switch the map. Either is caught (<code>FEditorModeTools::OnEditorModeIDChanged</code> / <code>FWorldDelegates::OnWorldCleanup</code>, the latter scoped to the EDITOR world only, mirroring <code>UOutpostBuilderEdMode::HandleWorldCleanup</code>'s own guard) and torn down the same way (overlay/input-processor/delegates removed).</p>
+<p>It deliberately does NOT re-activate Outpost Builder mode or re-enter editing, since the designer's own action (or the map going away) should win, not be silently overridden.</p>
+<p>Engine finding worth noting: <code>FGeometryEditingModes::EM_Geometry</code> lives in the <code>GeometryMode</code> engine plugin (<code>Engine/Plugins/Editor/GeometryMode</code>, <code>EnabledByDefault: true</code>). There is no <code>EM_Geometry</code>-equivalent constant in <code>FBuiltinEditorModes</code> itself (that plugin was the only place it's still defined in UE 5.8).</p>
+<p>Activation never refuses for lack of a selection: <code>FEdModeGeometry::Enter()</code> just calls <code>GetFromSource()</code>, which produces an empty (but valid) geometry-object set if nothing selected. The excursion never needs a fallback path for a "mode refused to activate" case because that case doesn't occur here.</p>
+<ul>
+<li><code>Ctrl</code> + <code>S</code> (the <code>SaveOutpostAssets</code> command) - while the mode is active, saves every dirty outpost/building definition package, then deliberately passes through so the editor's own level save runs too. (<code>Alt</code> + <code>LMB</code> is purely the editor's orbit gesture.)</li>
+</ul>
+<h2 id="test-factions-script-now-a-read-only-migration-helper">Test Factions Script - Now a Read-Only Migration Helper</h2>
+<p><code>scripts/create_test_factions.py</code> is a read-only migration helper. Factions are the fixed
+<code>EOutpostFaction</code> enum, so there is nothing to author beyond picking a value per outpost
+(see <code>faction-visuals.html</code>); the script creates and updates nothing.</p>
+<p>Running it prints that explanation and, read-only, lists any asset paths still present under
+<code>/Game/Outposts/Factions/</code>, as a reminder to delete them manually (they're orphaned once the
+class they were saved against no longer exists). It never references
+<code>unreal.OutpostFactionDefinition</code>, since that class no longer exists.</p>
+<p>The editor has to be closed first. A running editor already holds the project's asset registry and package locks. A second process opening the same project will conflict with it. The shape of the command, with your own paths substituted in:</p>
+<div class="highlight"><pre><span></span><code>"&lt;engine-root&gt;\Engine\Binaries\Win64\UnrealEditor-Cmd.exe" ^
+    "&lt;your-project&gt;\YourProject.uproject" ^
+    -run=pythonscript -script="&lt;plugin-root&gt;\scripts\create_test_factions.py" ^
+    -EnablePlugins=PythonScriptPlugin
+</code></pre></div>
+
+<p>Note: <code>-EnablePlugins=PythonScriptPlugin</code> enables the Python Editor Script Plugin's commandlet for this one run, without editing the <code>.uproject</code> file. That flag matters, since the plugin ships with <code>EnabledByDefault: false</code>, and the host project's <code>.uproject</code> doesn't list it either. Without it, <code>-run=pythonscript</code> won't resolve to anything, since there's no such commandlet registered.</p>
+<h2 id="testing">Testing</h2>
+<p>Check out <code>TESTING.md</code> for the manual verification checklist that exercises the full editor workflow: mode registration, outpost and plot placement, faction assignment, Overhead camera framing, and the fork-on-stamp prefab flow.</p>
+<h2 id="where-things-live">Where Things Live</h2>
+<p>One line per file. This mirrors the tree in <code>contracts.md</code>, kept current against what's actually on disk.</p>
+<h3 id="plugin-root">Plugin Root</h3>
+<ul>
+<li><code>OutpostBuilder/OutpostBuilder.uplugin</code> - plugin and module declarations for both modules.</li>
+<li><code>OutpostBuilder/README.md</code> - designer-facing quick start and data model overview.</li>
+</ul>
+<h3 id="runtime-module-outpostbuildersourceoutpostbuilder">Runtime Module - OutpostBuilder/Source/OutpostBuilder/</h3>
+<ul>
+<li><code>OutpostBuilder.Build.cs</code> - runtime module dependencies (<code>Core</code>, <code>CoreUObject</code>, <code>Engine</code>, plus <code>DeveloperSettings</code> for <code>UOutpostRuntimeSettings</code>).</li>
+<li><code>OutpostBuilderModule.h</code>, <code>OutpostBuilderModule.cpp</code> - <code>FOutpostBuilderModule</code>; registers primary-asset scan paths + <code>AlwaysCook</code> rules for the outpost/building definition types and the settings asset, then pre-warms the configured settings asset (faction is not a scanned primary-asset type, since it's an enum).</li>
+<li><code>OutpostDefinition.h</code>, <code>OutpostDefinition.cpp</code> - <code>UOutpostDefinition</code>, <code>FOutpostPlotRecord</code>, <code>FOutpostCameraRecord</code>.</li>
+<li><code>OutpostBuildingDefinition.h</code>, <code>OutpostBuildingDefinition.cpp</code> - <code>UOutpostBuildingDefinition</code>.</li>
+<li><code>OutpostFaction.h</code> - <code>EOutpostFaction</code> (replaces the deleted <code>OutpostFactionDefinition.h</code>).</li>
+<li><code>OutpostBuilderSettingsAsset.h</code>, <code>OutpostBuilderSettingsAsset.cpp</code> - <code>UOutpostBuilderSettingsAsset</code>, the project-SHARED settings asset: runtime categories (Preview and Placement, plus an <strong>Actors</strong> category holding the four <code>TSubclassOf&lt;&gt;</code> actor-class overrides), the <code>WITH_EDITORONLY_DATA</code> asset-creation/placement categories (Placement also holding the two validity knobs), plus <code>Get()</code>/<code>PreWarm()</code>/<code>IsDataValid()</code>. The style surface lives entirely on the editor module's <code>UOutpostBuilderUserSettings</code> (below).</li>
+<li><code>OutpostRuntimeSettings.h</code>, <code>OutpostRuntimeSettings.cpp</code> - <code>UOutpostRuntimeSettings</code> (the HOST): the <code>SettingsAsset</code> pointer, the hidden <code>PinnedBuildingDefinitions</code> config list, the statics (<code>GetPlotSizeDimensionsCm</code>/<code>GetPlotSizeFootprintRadiusCm</code>, plus their default variants), and the four actor-class resolvers (<code>GetOutpostClass</code>/<code>GetPlotClass</code>/<code>GetVolumeClass</code>/<code>GetOverheadCameraClass</code>).</li>
+<li><code>OutpostPlotSize.h</code>, <code>OutpostPlotSize.cpp</code> - the <code>OutpostBuilder::PlotSizeTags</code> gameplay-tag vocabulary plus <code>EOutpostPlotSize</code>, the native-tag naming enum <code>ToNativeTag</code> maps from.</li>
+<li><code>Outpost.h</code>, <code>Outpost.cpp</code> - <code>AOutpost</code>.</li>
+<li><code>OutpostPlot.h</code>, <code>OutpostPlot.cpp</code> - <code>AOutpostPlot</code>.</li>
+<li><code>OverheadCamera.h</code>, <code>OverheadCamera.cpp</code> - <code>AOverheadCamera</code>.</li>
+<li><code>OutpostVolume.h</code>, <code>OutpostVolume.cpp</code> - <code>AOutpostVolume</code>.</li>
+<li><code>OutpostStampLibrary.h</code>, <code>OutpostStampLibrary.cpp</code> - <code>UOutpostStampLibrary</code> (<code>StampOutpost</code>, <code>PlaceDefinitionAt</code>, <code>RestoreOutpost</code>). Every actor spawn in this file resolves its class through the matching <code>UOutpostRuntimeSettings::Get*Class()</code> static rather than a hardcoded <code>StaticClass()</code>.</li>
+<li><code>OutpostAssetResolve.h</code> - header-only: <code>FindLoadedPrimaryAsset&lt;T&gt;</code> (<code>ResolveObject</code>-based, never loads, so it's safe on per-frame paths) and <code>LoadPrimaryAssetSync&lt;T&gt;</code> (<code>TryLoad</code>-based, one-shot paths only), THE two definition-id-to-asset resolve paths, called from every module including the companion pair.</li>
+<li><code>OutpostActorQuery.h</code> - header-only: duck-typed world queries keyed on <code>GetOutpostDefinitionId()</code>: <code>FindUniqueActorForDefinition&lt;T&gt;</code> (unique-or-null, optional ambiguity flag), <code>FindFirstActorForDefinition&lt;T&gt;</code>, <code>HasOtherActorSharingDefinition&lt;T&gt;</code>.<ul>
+<li>Also the plugin's one shared spawn chokepoint: <code>SpawnOutpostFamilyActor&lt;T&gt;</code> (resolves <code>T</code>'s settings-asset class override via <code>TOutpostFamilySpawnResolver&lt;T&gt;</code>, one specialization per <code>AOutpost</code>/<code>AOutpostPlot</code>/<code>AOverheadCamera</code>/<code>AOutpostVolume</code>, spawns with the plugin's one standard <code>FActorSpawnParameters</code>, and binds the caller's definition id) and <code>ForEachFamilyActorOfDefinition&lt;Fn&gt;</code> (runs a per-actor-typed callback over every outpost-family actor sharing a definition id).</li>
+<li>Every actor-family enumeration/spawn site that treats the family uniformly routes through these two rather than repeating its own by-hand loop.</li>
+</ul>
+</li>
+<li><code>OutpostActorEditingLibrary.h</code>, <code>OutpostActorEditingLibrary.cpp</code> (<code>WITH_EDITOR</code>) - <code>namespace OutpostBuilder::ActorEditing</code>: the editor-time bodies behind <code>AOutpost</code>/<code>AOutpostPlot</code>'s <code>WITH_EDITOR</code> overrides (re-relativization, the cascade delete, the write-through record syncs, the import-identity reset, the mirrored-building-parts rebuild), taking the actor as an explicit first parameter rather than living as private members. The actors themselves keep one-line forwards into here.<ul>
+<li><code>FFamilyCascadeScope</code> (RAII, nest-safe), <code>NeedsDefinitionPlacementSync</code>, and <code>SyncDefinitionPlacement</code> are the exported pieces with call sites outside the actor classes.</li>
+<li>The scope marks a whole-base delete in progress so the plot destroy cascade skips record removal, letting <code>RestoreOutpost</code> rebuild it.</li>
+</ul>
+</li>
+<li><code>OutpostEventSubsystem.h</code>, <code>OutpostEventSubsystem.cpp</code> - <code>UOutpostEventSubsystem</code>, a <code>UWorldSubsystem</code>: the plugin's runtime event seam, <code>OnOutpostStamped</code>/<code>OnPlotAssigned</code>/<code>OnFactionChanged</code> (each with a Blueprint-assignable delegate and a native C++ twin), for game code that wants to react to a stamp, an assignment, or a faction change without forking the plugin. Undo/redo never re-fires these; they broadcast only on a genuine change.</li>
+<li><code>OutpostPreviewMeshUtils.h</code> / <code>.cpp</code> (<code>WITH_EDITOR</code>) - <code>CollectMeshParts(ActorClass, OutParts)</code>, the CDO+SCS static-mesh-part gatherer (never instantiates the class), with per-part material-override capture (<code>FOutpostPreviewMeshPart::OverrideMaterials</code>). TWO callers that must agree: the placement ghost (<code>UOutpostBuilderEdMode::ResolvePreviewGhostSource()</code>, <code>edmode.html</code>) and the editor-world plot preview (<code>AOutpostPlot::RebuildMirroredBuildingParts()</code>, above). Both walk the SAME <code>BuildingActorClass</code>, so the thing the ghost aims is the thing the placed plot shows.</li>
+<li>DELETED: <code>OutpostFactionDefinition.h</code>/<code>.cpp</code> (<code>UOutpostFactionDefinition</code>) and <code>OutpostLoadoutLibrary.h</code>/<code>.cpp</code> (<code>UOutpostLoadoutLibrary</code>: <code>ApplyFactionLoadout</code>, <code>RandomizeLoadout</code>). Deep dive on what replaces the loadout library: <code>runtime-loadout.html</code>.</li>
+</ul>
+<h3 id="editor-module-outpostbuildersourceoutpostbuildereditor">Editor Module - OutpostBuilder/Source/OutpostBuilderEditor/</h3>
+<ul>
+<li><code>OutpostBuilderEditor.Build.cs</code> - editor module dependencies (<code>InputCore</code>, <code>Slate</code>, <code>SlateCore</code>, <code>UnrealEd</code>, <code>EditorFramework</code>, <code>PropertyEditor</code>, <code>AssetRegistry</code>, <code>AssetTools</code>, <code>ToolMenus</code>, <code>RenderCore</code>, <code>BSPUtils</code>, <code>GeometryMode</code> (<code>FGeometryEditingModes::EM_Geometry</code>, the Edit Volume excursion's mode id), <code>DeveloperSettings</code>, <code>ContentBrowser</code>, <code>LevelEditor</code>, plus the runtime <code>OutpostBuilder</code> module).</li>
+<li><code>OutpostBuilderEditorModule.h</code>, <code>OutpostBuilderEditorModule.cpp</code> - <code>FOutpostBuilderEditorModule</code>; mode registration, the building live-refresh listener, the two Content Browser context-menu actions, and <code>BeginEditVolumeExcursion</code>/<code>ActiveVolumeExcursion</code>, the Edit Outpost Volume excursion's module-owned entry point and one-at-a-time slot. See "Edit Outpost Volume Excursion" above.</li>
+<li><code>OutpostBuilderVolumeExcursion.h</code>, <code>OutpostBuilderVolumeExcursion.cpp</code> - <code>FOutpostVolumeExcursion</code>: the excursion object itself (<code>Begin</code>/<code>Return</code>/<code>TeardownDangling</code>, the <code>IInputProcessor</code> Esc hook). See "Edit Outpost Volume Excursion" above for the full mechanics.</li>
+<li><code>OutpostBuilderCommands.h</code>, <code>OutpostBuilderCommands.cpp</code> - <code>FOutpostBuilderCommands</code>, every discrete key input as a rebindable <code>FUICommandInfo</code>.</li>
+<li><code>OutpostBuilderEdMode.h</code>, <code>OutpostBuilderEdMode.cpp</code> - <code>UOutpostBuilderEdMode</code>, the placement state machine, ghosts, and input routing; <code>Render</code>/<code>DrawHUD</code> gather mode state and call into <code>OutpostBuilderDraw.h</code>. Deep dive: <code>edmode.html</code>.</li>
+<li><code>OutpostBuilderDraw.h</code>, <code>OutpostBuilderDraw.cpp</code> - <code>namespace OutpostBuilder::Draw</code>: the beams, selection markers, hover highlight, outpost labels, and invalid-placement reason, as free functions taking explicit parameters instead of the mode. Wraps <code>OutpostBuilder::DrawPrimitives</code> (below) for the actual PDI/canvas calls.<ul>
+<li>The HUD banner/legend layout is NOT here. The banner is a Slate viewport overlay (see <code>OutpostBuilderBannerBlock.h</code>/<code>SOutpostBuildModeBanner.h</code> below).</li>
+<li>These functions read <code>UOutpostBuilderUserSettings::Get()</code> for style values internally, alongside the <code>Style</code> (<code>UOutpostBuilderSettingsAsset&amp;</code>) parameter kept for the placement-validity floor (<code>GetActorGeometryRadius</code>'s <code>PlotGhostRadius</code> fallback). Deep dive: <code>edmode.html</code>.</li>
+</ul>
+</li>
+<li><code>OutpostDrawPrimitives.h</code>, <code>OutpostDrawPrimitives.cpp</code> - <code>namespace OutpostBuilder::DrawPrimitives</code>: the generic PDI/canvas drawing primitives (<code>DrawWireSquare</code>, <code>DrawRing</code>, <code>DrawPulsedBeam</code>, the translucent-segment/rectangle helpers, the screen-text/label helpers) that <code>OutpostBuilder::Draw</code> wraps. No Outpost type appears anywhere in its signatures - a free-standing vocabulary any future editor tool could reuse. Deep dive: <code>edmode.html</code>.</li>
+<li><code>OutpostBuilderBannerBlock.h</code> - <code>namespace OutpostBuilder::Banner</code>, <code>struct FOutpostBannerBlock</code>: the build-mode banner's composed-content POD (title/sub-state/its accent color/status lines/hotkey lines), a tiny Slate-free header so both <code>UOutpostBuilderEdMode.h</code> (the composer's return type) and <code>SOutpostBuildModeBanner.h</code> (the renderer) can include it without either pulling in the other's dependencies. The POD carries composed strings, never raw mode state.</li>
+<li><code>SOutpostBuildModeBanner.h</code>, <code>SOutpostBuildModeBanner.cpp</code> - <code>SOutpostBuildModeBanner</code>, a viewport overlay: a top-left, CONTENT-SIZED (no width cap and no height, and nothing wraps, so the panel is exactly as wide as its widest row), rounded-corner (<code>FSlateRoundedBoxBrush</code>) panel.<ul>
+<li>Its status/hotkey-legend rows render through one shared <code>SGridPanel</code> two-column TABLE (key | description, auto-aligned columns). See <code>edmode.html</code>'s build-mode-banner section for the full shape.</li>
+<li>Deliberately NOT built on <code>SOutpostViewportOverlay</code> (a top-left vertical text stack + accent stripe shares nothing with that shell's bottom-center label+action-row shape). See the widget's own header for the full rationale.</li>
+<li>Mounted (<code>FOutpostBuilderToolkit::Init()</code>) and torn down (the dtor) unconditionally for the mode's whole session, unlike the other overlays' Sync*-toggled lifecycle.</li>
+</ul>
+</li>
+<li><code>SOutpostBuildingCommandGrid.h</code>, <code>SOutpostBuildingCommandGrid.cpp</code> - <code>SOutpostBuildingCommandGrid</code>, the in-viewport building command grid: a grid of compact palette tiles (<code>SOutpostPaletteTile</code>'s <code>.bCompact(true)</code> argument, which also draws a small truncated name under the thumbnail) for hot-building selection during a PLOT placement, without leaving the viewport. Columns are configurable; rows derive from content.<ul>
+<li>Also not built on <code>SOutpostViewportOverlay</code>, for the same corner-anchor-vs-bottom-center-shell reason <code>SOutpostBuildModeBanner</code> isn't. Mounted/unmounted by <code>HandlePlacementStateChanged</code> (<code>IsPlacementActive() &amp;&amp; IsPlacingPlot()</code>), alongside <code>PlacementOverlayWidget</code>.</li>
+<li>Two <code>UOutpostBuilderUserSettings</code> knobs (<code>BuildingGridCols</code>/<code>BuildingGridAnchorCorner</code>, category <code>UI|BuildingGrid</code>) size and anchor it. See "Per-User Style Settings" above. Deep dive: <code>toolkit.html</code>'s "The In-Viewport Building Command Grid".</li>
+</ul>
+</li>
+<li><code>OutpostBuilderUserSettings.h</code>, <code>OutpostBuilderUserSettings.cpp</code> - <code>UOutpostBuilderUserSettings</code>, the per-user <code>config = EditorPerProjectUserSettings</code> <code>UDeveloperSettings</code> holding the debug-draw/editor-UI-style knobs (Editor Preferences &gt; "Outpost Builder"); <code>Get()</code>. Also declares the shared <code>OutpostBuilder::UserSettings::BeamThickness</code> constexpr, read by both this module's draw code and the mode. See "Per-User Style Settings" above.</li>
+<li><code>OutpostBuilderToolkit.h</code> - <code>FOutpostBuilderToolkit</code>'s one declaration surface; carries the FILE MAP comment pointing at the seven <code>.cpp</code>s below. Deep dive: <code>toolkit.html</code>.</li>
+<li><code>OutpostBuilderToolkit.cpp</code> - lifecycle/<code>Init</code> (the <code>WidgetContext</code>/<code>PaletteModel</code> bind + <code>ensure</code> sweep, all five viewport overlays: camera/placement/editing-bar plus the build-mode banner and the building command grid), panel routing, the Editing panel shell (Back/label header only, no tab bar), the undo client, asset-registry hooks (including the pin migration-on-rename), viewport-overlay lifecycle.</li>
+<li><code>OutpostBuilderWidgetContext.h</code> - <code>FOutpostBuilderWidgetContext</code>, the shared find-only read-model handed to every extracted widget (bound delegates/<code>TAttribute</code>s, never a raw mode/toolkit pointer). <code>bIsPlacementActive</code> mirrors <code>IsPlacementActive()</code>.<ul>
+<li>The identity header/Plots section/Assign row OR it into their own <code>IsEditingContentUsable()</code> mirrors alongside <code>bIsPositioningOverheadCamera</code>, so those controls genuinely disable (not just grey out, since each carries the leaf-level <code>IsEnabled</code> binding this requires) during EITHER placement kind.</li>
+<li>The <code>bIsPlacingPlot</code> field is the palette family's narrower "outpost placement only" signal. Deep dive: <code>toolkit.html</code>.</li>
+</ul>
+</li>
+<li><code>OutpostPaletteModel.h</code>, <code>OutpostPaletteModel.cpp</code> - <code>FOutpostPaletteModel</code> (the palette's shared entry cache/hot-building/filter-state/thumbnail-pool/preload-handle, read/written by both palette hosts) and <code>FScopedPaletteObserver</code> (the RAII register/unregister wrapper for the model's observer mechanism). Deep dive: <code>toolkit.html</code>.</li>
+<li><code>OutpostBuilderToolkitOverview.cpp</code> - the Overview panel's browse shell (the Outposts/Buildings tab bar, an <code>SOutpostTabBar</code> mount) plus the Outposts-tab mount point, which constructs one <code>SOutpostsOverviewPanel</code> (below) and forwards its events into the toolkit's existing handlers.</li>
+<li><code>OutpostBuilderToolkitBuildingsTab.cpp</code> - the Overview panel's Buildings-tab MOUNT POINT (<code>BuildBrowseTabBuildingsContent</code>). Constructs the plugin's one <code>SOutpostBuildingsBrowser</code> instance, plus the refresh plumbing (<code>RefreshAllBuildingBrowsers</code> / <code>HandleBuildingBrowserContentsChanged</code>). The browser widget itself (list, inline details view, "+ New Building", Find References in World) lives in <code>SOutpostBuildingsBrowser.h</code>/<code>.cpp</code> below.</li>
+<li><code>SOutpostBuildingsBrowser.h</code>, <code>SOutpostBuildingsBrowser.cpp</code> - <code>SOutpostBuildingsBrowser</code>, the self-contained building-definition browser <code>SCompoundWidget</code>; the Overview panel's Buildings tab is its one live mount.<ul>
+<li>Owns <code>FBuildingBrowserEntry</code>/<code>FBuildingReferenceEntry</code>, the browser list, its inline details view, "+ New Building" (via the toolkit's <code>OnCreateBuildingRequested</code> delegate), and Find References in World (plot-record scan, loaded and unloaded maps alike).</li>
+<li>Deliberately holds no reference to <code>UOutpostBuilderEdMode</code> or any editing-session state. Browsing/editing a building definition never disturbs the outpost being edited.</li>
+</ul>
+</li>
+<li><code>OutpostBuilderToolkitBuildTab.cpp</code> - the Editing panel's WHOLE BODY (<code>BuildEditingPanelContent</code>, no tab switcher), a THIN SHELL over reusable widgets: thin mounts for <code>SOutpostIdentityHeader</code> (Display Name + Faction) and <code>SOutpostPlotsSection</code> (add/randomize, a multi-column plot list), the Select Plot Contents section's own thin shell (<code>SOutpostPaletteFilterRow</code> + <code>SOutpostPaletteCategoryTabRow</code> + <code>SOutpostBuildingPalette</code> + <code>SOutpostSelectedBuildingPanel</code> + <code>SOutpostAssignRow</code>).<ul>
+<li>Plus the toolkit-level palette plumbing every mount shares (<code>RefreshBuildingPalette</code>/<code>SelectHotBuilding</code>/<code>HandlePaletteHotkey</code>/<code>HandleEyedropperPick</code>/<code>CreateNewBuildingDefinitionInteractive</code>) and the "TO ADD A BUTTON" recipe comment.</li>
+<li>See the widget files below and <code>toolkit.html</code>'s Widget Inventory for what each piece owns.</li>
+</ul>
+</li>
+<li><code>SOutpostIdentityHeader.h</code>/<code>.cpp</code>, <code>SOutpostPlotsSection.h</code>/<code>.cpp</code>, <code>SOutpostPaletteTile.h</code>/<code>.cpp</code>, <code>SOutpostPaletteFilterRow.h</code>/<code>.cpp</code>, <code>SOutpostPaletteCategoryTabRow.h</code>/<code>.cpp</code>, <code>SOutpostBuildingPalette.h</code>/<code>.cpp</code>, <code>SOutpostSelectedBuildingPanel.h</code>/<code>.cpp</code>, <code>SOutpostAssignRow.h</code>/<code>.cpp</code> - the editing panel's reusable widgets: the identity header, the Plots section, and the palette-complex pieces.<ul>
+<li>The Plots section is a multi-column <code>SListView</code>/<code>SHeaderRow</code> plot list, columns Plot/Building/Size/warn, plus <code>SelectPlots(const TArray&lt;AOutpostPlot*&gt;&amp;)</code> for the mode's viewport-selection sync via <code>UOutpostBuilderEdMode::SyncPlotsListSelectionFromViewport</code>/<code>FOutpostBuilderToolkit::HandleViewportPlotSelectionChanged</code>.</li>
+<li>The palette-complex pieces are the leaf tile, the size filter combo, category tabs, the tile-grid assembly, the Selected Building panel, and the Assign row.</li>
+<li><code>SOutpostBuildingPalette</code>/<code>SOutpostPaletteCategoryTabRow</code>/<code>SOutpostPaletteFilterRow</code> are disabled ONLY during an OUTPOST placement (<code>Context-&gt;bIsPlacementActive &amp;&amp; !Context-&gt;bIsPlacingPlot</code>), fully live during a PLOT placement. <code>SOutpostBuildingPalette</code> is also the Content Browser drop target: dropping building definitions PINS them and selects the first, which is all a DERIVED roster can honestly change.</li>
+<li><code>SOutpostSelectedBuildingPanel</code> is a bordered section box (swatch + a large name + Clear). <code>SOutpostPaletteFilterRow</code> lives in Select Plot Contents and has no Faction combo.</li>
+<li><code>SOutpostPaletteTile</code> has a timing-detected double-click (opens the tile's asset via <code>SOutpostBuildingPalette::HandleTileDoubleClicked</code>) and a three-cue selected-tile treatment (brighter/thicker ring, an inner fill wash, a checkmark badge). Deep dive: <code>toolkit.html</code>'s Widget Inventory.</li>
+</ul>
+</li>
+<li><code>OutpostBuilderToolkitConfigureTab.cpp</code> - surviving forwarders (not a tab of its own): <code>IsSaveEnabled</code>/<code>HandleSaveClicked</code> (called by the editing bar's Save button), the identity header's mutation forwarders (<code>HandleDisplayNameCommitted</code>/<code>HandleFactionChanged</code>), and the Overhead camera pilot's forwarders (<code>HandlePositionOverheadCameraClicked</code>/<code>HandleEditOutpostVolumeClicked</code>/the Revert-Cancel-Done trio), all called by the editing viewport bar.<ul>
+<li><code>HandleEditOutpostVolumeClicked</code>: after its own <code>EditVolumeForEditingOutpost()</code> call succeeds, starts the Edit Outpost Volume excursion via <code>FOutpostBuilderEditorModule::BeginEditVolumeExcursion</code>. See "Edit Outpost Volume Excursion" above.</li>
+</ul>
+</li>
+<li><code>SOutpostSaveFooter.h</code>/<code>.cpp</code>, <code>SOutpostTabBar.h</code> - the pinned Save button, and the generic tab-bar template. <code>SOutpostSaveFooter</code> is EXPORT-ONLY: this plugin does not mount it internally (saving is the editing bar's Save button + Ctrl+S); the widget is <code>docs/extending.md</code>'s smallest worked example of the <code>FOutpostBuilderWidgetContext</code> pattern. <code>SOutpostTabBar&lt;TEnum&gt;</code>'s only mount is the Overview panel's Outposts/Buildings bar (<code>EOutpostBrowseTab</code>).</li>
+<li><code>OutpostBuilderToolkitPlacement.cpp</code> - placement forwarders: <code>IsPlacingPlot</code> (the <code>WidgetContext-&gt;bIsPlacingPlot</code> forwarder, feeding the palette family's "disabled during outpost placement only" rule) and the placement viewport overlay's bindings (<code>GetPlacementOverlayText</code>/<code>HandleCancelPlacementClicked</code>, the session's ONE Cancel affordance). Placement does not swap to a separate panel.</li>
+<li><code>SOutpostViewportOverlay.h</code>/<code>.cpp</code> - the shared bottom-center viewport overlay shell reused for the placement overlay, the Overhead-camera-positioning overlay, and the editing bar, three of the plugin's five viewport overlays.<ul>
+<li>The other two are separate widgets, neither built on this shell: the build-mode banner (<code>SOutpostBuildModeBanner</code>) and the in-viewport building command grid (<code>SOutpostBuildingCommandGrid</code>, above).</li>
+<li>Also carries <code>OutpostBuilder::ViewportOverlay::MakeDisabledAwareCursor</code>, the shared disabled-hover-cursor helper every gated button in the plugin's panel/overlays reads: enabled shows the button's normal cursor; disabled reads <code>UOutpostBuilderUserSettings::DisabledCursor</code> (SlashedCircle/None/Hand/Crosshairs).</li>
+<li>Engine-verified consulted even on a disabled widget (<code>FSlateUser::QueryCursor</code> -&gt; <code>SWidget::OnCursorQuery</code>, no <code>IsEnabled()</code> gate in that path). No enabled-wrapper workaround needed.</li>
+</ul>
+</li>
+<li><code>SOutpostsOverviewPanel.h</code>/<code>.cpp</code> - the Overview panel's Outposts sub-view: the outpost combo, its single Create/Edit/Restore/Edit(Place Actor)/Restore Definition action button, and the Plugin Settings details view.</li>
+<li>DELETED: <code>OutpostBuilderSettings.h</code>/<code>.cpp</code> (<code>UOutpostBuilderSettings</code>) and <code>OutpostBuilderStyleSettings.h</code>/<code>.cpp</code> (<code>UOutpostBuilderStyleSettings</code>) - their properties live on the runtime module's <code>UOutpostBuilderSettingsAsset</code> and the editor module's <code>UOutpostBuilderUserSettings</code> (above), which is a distinct class, not a revival of either.</li>
+<li><code>OutpostDefinitionFactory.h</code>, <code>.cpp</code> - the Content Browser "New Asset" factory for <code>UOutpostDefinition</code>.</li>
+<li><code>OutpostBuildingDefinitionFactory.h</code>, <code>.cpp</code> - the Content Browser "New Asset" factory for <code>UOutpostBuildingDefinition</code>.</li>
+<li>DELETED: <code>OutpostFactionDefinitionFactory.h</code>/<code>.cpp</code> (the Content Browser "New Asset" factory for the deleted <code>UOutpostFactionDefinition</code>).</li>
+<li><code>OutpostPrefabUtils.h</code>, <code>OutpostPrefabUtils.cpp</code> - <code>ForkDefinition</code>, <code>StampPrefab</code>, <code>FindBlockingExclusionVolume</code> (THE shared exclusion rule, used by the ghost and drag-stamp's hard refusal), <code>SpawnDefaultOutpostVolume</code> (the default volume every new outpost auto-spawns; sizes its brush to the base's actual bounds, the recipe numbers on the settings asset; idempotent per definition id). Deep dive: <code>prefabs.html</code>.</li>
+<li><code>OutpostEditorUtils.h</code>, <code>OutpostEditorUtils.cpp</code> - shared editor helpers: <code>ShowAssetCreatedToast</code>, <code>SyncContentBrowserToAsset</code>, <code>HarvestActorLabels</code>, <code>MakeUniqueActorLabel</code>.<ul>
+<li><code>EvaluateBuildingForPlot</code> + <code>EBuildingPlotEligibility</code>, the disabled treatment's one eligibility rule, kept here so the palette filter, the Assign refusal, and the tooltip all ask the same function.</li>
+<li><code>EvaluateBuildingPlotAdvisory</code> + <code>EBuildingPlotAdvisory</code>, the placement rule matrix's WARN-ONLY counterpart, deliberately a SEPARATE composition from <code>EvaluateBuildingForPlot</code> so warn-only can never be folded into the disabled treatment. Every advisory surface (the Assign tooltip, the palette tile glyph, the plot list drift icon) asks here, except <code>UOutpostDefinition::IsDataValid</code>, which cannot (runtime module, no dependency on this one).</li>
+<li>The Outliner-foldering recipe: <code>ResolveOutpostActorFolder</code> (the one home of <code>&lt;OutpostActorFolder&gt;/&lt;PrimaryAssetName&gt;</code>), <code>ApplyOutpostActorFolder</code> (one freshly spawned actor), <code>ApplyOutpostFoldersForInstance</code> (whole-base sweep keyed on the anchor's identity, the editor-side answer to the runtime spawn cascades: four plain <code>TActorIterator</code> loops here rather than a template in the runtime module's headers).</li>
+</ul>
+</li>
+<li><code>ActorFactoryOutpostPrefab.h</code>, <code>ActorFactoryOutpostPrefab.cpp</code> - <code>UActorFactoryOutpostPrefab</code>, the drag-from-Content-Browser stamp entry point. Its <code>GetDefaultActorClass()</code> override routes the engine's own placement path through <code>UOutpostRuntimeSettings::GetOutpostClass()</code> too, so a configured <code>AOutpost</code> subclass is honored at drag-drop time, not just on the stamp that follows. Deep dive: <code>prefabs.html</code>.</li>
+</ul>
+<h2 id="references">References</h2>
+<p>Repo files:</p>
+<ul>
+<li><code>OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostDefinition.h</code>, <code>OutpostBuildingDefinition.h</code>, <code>OutpostFaction.h</code>, <code>OutpostPlotSize.h</code>, <code>OutpostBuilderSettingsAsset.h</code>, <code>OutpostRuntimeSettings.h</code>, <code>Outpost.h</code>, <code>OutpostPlot.h</code>, <code>OverheadCamera.h</code>, <code>OutpostVolume.h</code>, <code>OutpostStampLibrary.h</code>, <code>OutpostActorEditingLibrary.h</code>, <code>OutpostBuilderModule.h</code> - every public runtime surface quoted on this page. The plugin carries no custom serialization version. See "Editor Settings on the Asset" above for the settings asset's knob surface.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderEdMode.h</code>, <code>OutpostBuilderDraw.h</code>, <code>OutpostDrawPrimitives.h</code>, <code>OutpostBuilderToolkit.h</code>, <code>OutpostBuilderWidgetContext.h</code>, <code>OutpostPaletteModel.h</code>, <code>OutpostBuilderEditorModule.h</code>, <code>OutpostBuilderUserSettings.h</code> - every public editor surface quoted on this page.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/OutpostBuilderEditorModule.cpp</code> - the two Content Browser context-menu action implementations.</li>
+<li><code>TESTING.md</code> - the manual verification checklist.</li>
+<li><code>scripts/create_test_factions.py</code> - a read-only migration-note/cleanup helper; its docstring is quoted verbatim above.</li>
+<li><code>contracts.md</code> - the frozen shared surfaces every wave of this plugin was built against, including the file layout this page's "Where Things Live" section mirrors.</li>
+</ul>
+<p>Engine source (relative to the UE 5.8 install):</p>
+<ul>
+<li><code>Engine/Source/Editor/UnrealEd/Public/Tools/UEdMode.h</code> and <code>Tools/LegacyEdModeWidgetHelpers.h</code> - <code>UEdMode</code> and <code>UBaseLegacyWidgetEdMode</code>, the base classes <code>UOutpostBuilderEdMode</code> overrides.</li>
+<li><code>Engine/Plugins/Experimental/PythonScriptPlugin/Source/PythonScriptPlugin/Private/PythonScriptCommandlet.cpp</code> - parses the <code>-Script=</code> commandlet argument (matched case-insensitively, meaning <code>-script=</code> works too) the test faction script's <code>-run=pythonscript</code> invocation depends on.</li>
+</ul>
+      </article>
+    <nav class="pager" aria-label="Page navigation">
+      <a class="pager-prev" href="quick-reference.html">
+        <span class="pager-dir">&larr; Previous</span>
+        <span class="pager-title">Quick Reference - The Cheat Sheet</span>
+      </a>
+      <a class="pager-next" href="runtime-loadout.html">
+        <span class="pager-dir">Next &rarr;</span>
+        <span class="pager-title">Per-Plot Building Rendering</span>
+      </a>
+    </nav>
+    </main>
+
+    <footer class="foot">
+      <p>A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.</p>
+      <a href="https://github.com/defessler/OutpostBuilder">View on GitHub</a>
+    </footer>
+  </div>
+</div>
+
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instance Identity · OutpostBuilder</title>
+<meta name="description" content="A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<div class="shell">
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-controls="sidebar" aria-expanded="false">
+    <span></span><span></span><span></span>
+    <span class="vh">Toggle navigation</span>
+  </button>
+
+  <aside class="side" id="sidebar">
+    <div class="side-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-word">OutpostBuilder</span>
+      </a>
+
+      <nav aria-label="Documentation">
+        <ol class="nav-list">
+          <li>
+            <a href="index.html">
+              <span class="nav-no">01</span>
+              <span class="nav-title">OutpostBuilder</span>
+            </a>
+          </li>
+          <li>
+            <a href="tutorial.html">
+              <span class="nav-no">02</span>
+              <span class="nav-title">Tutorial - A Guided Tour</span>
+            </a>
+          </li>
+          <li>
+            <a href="architecture.html">
+              <span class="nav-no">03</span>
+              <span class="nav-title">Architecture</span>
+            </a>
+          </li>
+          <li>
+            <a href="identity.html" class="active" aria-current="page">
+              <span class="nav-no">04</span>
+              <span class="nav-title">Instance Identity</span>
+            </a>
+          </li>
+          <li>
+            <a href="edmode.html">
+              <span class="nav-no">05</span>
+              <span class="nav-title">The Ed Mode - UEdMode Deep Dive</span>
+            </a>
+          </li>
+          <li>
+            <a href="toolkit.html">
+              <span class="nav-no">06</span>
+              <span class="nav-title">The Toolkit - FModeToolkit and Slate</span>
+            </a>
+          </li>
+          <li>
+            <a href="prefabs.html">
+              <span class="nav-no">07</span>
+              <span class="nav-title">Prefabs &amp; Fork-on-Stamp</span>
+            </a>
+          </li>
+          <li>
+            <a href="faction-visuals.html">
+              <span class="nav-no">08</span>
+              <span class="nav-title">Faction - Identity and Gating</span>
+            </a>
+          </li>
+          <li>
+            <a href="extending.html">
+              <span class="nav-no">09</span>
+              <span class="nav-title">Extending Outpost Builder</span>
+            </a>
+          </li>
+          <li>
+            <a href="quick-reference.html">
+              <span class="nav-no">10</span>
+              <span class="nav-title">Quick Reference - The Cheat Sheet</span>
+            </a>
+          </li>
+          <li>
+            <a href="reference.html">
+              <span class="nav-no">11</span>
+              <span class="nav-title">Reference - Public Surfaces, Hotkeys, and Testing</span>
+            </a>
+          </li>
+          <li>
+            <a href="runtime-loadout.html">
+              <span class="nav-no">12</span>
+              <span class="nav-title">Per-Plot Building Rendering</span>
+            </a>
+          </li>
+          <li>
+            <a href="porting.html">
+              <span class="nav-no">13</span>
+              <span class="nav-title">Porting Into Your Own Project</span>
+            </a>
+          </li>
+          <li>
+            <a href="wiring.html">
+              <span class="nav-no">14</span>
+              <span class="nav-title">System Wiring</span>
+            </a>
+          </li>
+          <li>
+            <a href="technology.html">
+              <span class="nav-no">15</span>
+              <span class="nav-title">Technology &amp; Trade-offs</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
+      <a class="side-github" href="https://github.com/defessler/OutpostBuilder">
+        <span aria-hidden="true">&#8599;</span> Repository
+      </a>
+    </div>
+  </aside>
+
+  <div class="nav-scrim" id="nav-scrim"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="crumb">OutpostBuilder <span class="crumb-sep">/</span> Instance Identity</span>
+      <span class="published">Published <time datetime="2026-11-03T05:35:00Z">2026-11-03 05:35 UTC</time></span>
+
+    </header>
+
+    <main id="content">
+      <article class="doc">
+<h1 id="instance-identity-and-the-baked-registry">Instance Identity and the Baked Registry</h1>
+<p>Everything on the <a href="architecture.html">Architecture</a> page describes actors that find each other by a shared <code>FPrimaryAssetId</code>. That was true while one <code>UOutpostDefinition</code> meant exactly one placed outpost. It stopped being the whole story once a definition became a reusable template, and this page is the part that changed.</p>
+<p>The short version: a definition now answers "built from what", and a new per-instance GUID answers "which one". A per-level registry asset bakes each placed outpost's default state so a simulation layer can read it while that level is streamed out.</p>
+<blockquote>
+<p><strong>Note:</strong> everything on this page is verified by compiler and 23 automation tests, and none of it has ever been watched running in an interactive editor. <a href="#current-state">Current state</a> says exactly what holds and on what evidence.</p>
+</blockquote>
+<h2 id="why-it-exists">Why It Exists</h2>
+<p>The driving requirement was not "find the actor when it isn't loaded". It was a strategic layer sitting over a streamed world:</p>
+<blockquote>
+<p>Bake off the default state of an outpost so that we can simulate its state even when the actor isn't loaded, and know what the handle to the actor and state is going to be before it loads, so we can get access.</p>
+</blockquote>
+<p>Three things fall out of that:</p>
+<ul>
+<li><strong>The handle has to be stable and knowable before load</strong>, which rules out anything resolved by a
+  live-world query.</li>
+<li><strong>The state has to be readable with the level unloaded</strong>, which means it has to be baked somewhere
+  resident.</li>
+<li><strong>The handle has to survive the moment the level does load</strong>, so the same id addresses the baked
+  entry and the live actor.</li>
+</ul>
+<p>We evaluated <code>NamedIdsPlugin</code> for the handle and turned it down. It resolves by live-world query, and a target whose level is not loaded resolves to nothing, which is the exact requirement. Two of its ideas were worth borrowing anyway: re-key the ARRIVING copy rather than the incumbent, and fail closed on ambiguity.</p>
+<h2 id="the-handle">The Handle</h2>
+<p><code>FOutpostInstanceId</code> is an <code>FGuid</code> in a wrapper, carried as a <code>UPROPERTY</code> on all four family actors.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Core/OutpostInstanceId.h</span>
+<span class="n">USTRUCT</span><span class="p">(</span><span class="n">BlueprintType</span><span class="p">)</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">OUTPOSTBUILDER_API</span><span class="w"> </span><span class="n">FOutpostInstanceId</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">GENERATED_BODY</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">VisibleAnywhere</span><span class="p">,</span><span class="w"> </span><span class="n">BlueprintReadOnly</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Outpost"</span><span class="p">)</span>
+<span class="w">    </span><span class="n">FGuid</span><span class="w"> </span><span class="n">Value</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="nf">IsValid</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">Value</span><span class="p">.</span><span class="n">IsValid</span><span class="p">();</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="n">FOutpostInstanceId</span><span class="w"> </span><span class="nf">Generate</span><span class="p">();</span><span class="w"> </span><span class="c1">// ... defined inline in the header</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p>It's a wrapper rather than a bare <code>FGuid</code> because the family already carries an unrelated one. <code>AOutpostPlot::PlotId</code> identifies a plot's record within a definition, and passing one where the other belongs would compile perfectly. The wrapper makes that a type error.</p>
+<p>The property is written out in each of the four headers rather than pasted from the accessor macro
+next to it. That is not a style choice.</p>
+<p>UHT does not run the preprocessor, so a <code>UPROPERTY</code> inside a user-defined macro is invisible to
+reflection. It still compiles, as a plain C++ member that never serializes and never appears in
+Details.</p>
+<p>Grep the generated <code>.gen.cpp</code> for <code>NewProp_&lt;Name&gt;</code> after adding any reflected member. Zero hits means
+UHT never saw it.</p>
+<h2 id="definitions-became-templates">Definitions Became Templates</h2>
+<p><code>bForkDefinitionOnStamp</code> on the settings asset is the switch.</p>
+<p>Leave it <strong>on</strong> (the default, and what every page written before this one assumes) and stamping a prefab forks a private copy of the definition. One definition, one outpost, and the plugin behaves exactly as <a href="prefabs.html">Prefabs</a> describes.</p>
+<p>Turn it <strong>off</strong> and a definition is a template many placements share. That is the mode this whole system exists for, and it changes what the definition means: it becomes the spawn-time default rather than the record of what is currently placed.</p>
+<p>Because of that, a write to the definition is no longer a write to "this outpost". It's a write to every sibling's starting state. Every path that writes a record therefore asks whether the template is private first:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// The template is writable only while this outpost is its ONLY placement.</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">bTemplateIsPrivate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">!</span><span class="n">HasOtherActorSharingDefinition</span><span class="p">(</span><span class="n">Outpost</span><span class="p">);</span>
+</code></pre></div>
+
+<p>When it isn't private, the write is refused and the actor keeps the data itself. The plot actor already carried its own <code>PlotId</code>, <code>AssignedBuildingId</code>, <code>PlotSizeTag</code> and <code>PlotTags</code>, so for the most part this is the actors becoming authoritative over data they were already holding.</p>
+<h2 id="finding-family">Finding Family</h2>
+<p>Every ownership question now goes through an identity-preferring wrapper. It uses the instance id when there is one and falls back to the definition when there isn't:</p>
+<div class="highlight"><pre><span></span><code><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">AnchorT</span><span class="p">,</span><span class="w"> </span><span class="k">typename</span><span class="w"> </span><span class="nc">Fn</span><span class="o">&gt;</span>
+<span class="kt">void</span><span class="w"> </span><span class="n">ForEachFamilyActorOfIdentity</span><span class="p">(</span><span class="n">UWorld</span><span class="o">*</span><span class="w"> </span><span class="n">World</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">AnchorT</span><span class="o">&amp;</span><span class="w"> </span><span class="n">Anchor</span><span class="p">,</span><span class="w"> </span><span class="n">Fn</span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">Visitor</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Anchor</span><span class="p">.</span><span class="n">GetOutpostInstanceId</span><span class="p">().</span><span class="n">IsValid</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">ForEachFamilyActorOfInstance</span><span class="p">(</span><span class="n">World</span><span class="p">,</span><span class="w"> </span><span class="n">Anchor</span><span class="p">.</span><span class="n">GetOutpostInstanceId</span><span class="p">(),</span><span class="w"> </span><span class="n">Forward</span><span class="o">&lt;</span><span class="n">Fn</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Visitor</span><span class="p">));</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">ForEachFamilyActorOfDefinition</span><span class="p">(</span><span class="n">World</span><span class="p">,</span><span class="w"> </span><span class="n">Anchor</span><span class="p">.</span><span class="n">GetOutpostDefinitionId</span><span class="p">(),</span><span class="w"> </span><span class="n">Forward</span><span class="o">&lt;</span><span class="n">Fn</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Visitor</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>That fallback is load-bearing and worth understanding before you touch it. Content authored before instance ids existed has none, and outposts whose template is shared deliberately never get one, because with only a definition id to go on nothing can tell one placement's plots from another's. The fallback is what keeps all of that working instead of orphaned.</p>
+<p>Anything that removes it, including a future sweep that "finishes the migration" by making these wrappers instance-only, silently detaches every shared-template placement in the project.</p>
+<p>A blank identity matches nothing, in both directions. An anchor with neither id owns nothing at all, which stops an outpost dragged in from Place Actors sizing its bounds volume around every stray plot in the map.</p>
+<h2 id="the-baked-registry">The Baked Registry</h2>
+<p><code>UOutpostLevelRegistry</code> is one <code>UPrimaryDataAsset</code> per level, holding an <code>FOutpostBakedInstance</code> per placed outpost:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>What it carries</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>InstanceId</code></td>
+<td>The handle, known before the level loads</td>
+</tr>
+<tr>
+<td><code>DefinitionId</code></td>
+<td>Which template it was built from</td>
+</tr>
+<tr>
+<td><code>DisplayName</code>, <code>Faction</code></td>
+<td>Per-instance, not per-template</td>
+</tr>
+<tr>
+<td><code>AnchorTransform</code></td>
+<td>World transform of the anchor</td>
+</tr>
+<tr>
+<td><code>Plots</code></td>
+<td>Every plot with its building, size, tags and framing</td>
+</tr>
+<tr>
+<td><code>OverheadCamera</code></td>
+<td>The saved framing</td>
+</tr>
+<tr>
+<td><code>TerritoryBounds</code></td>
+<td>World-space bounds, so a query can answer "what is near here" without loading</td>
+</tr>
+<tr>
+<td><code>AnchorActorPath</code></td>
+<td>Diagnostic only, deliberately an <code>FString</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>AnchorActorPath</code> is a string rather than an <code>FSoftObjectPath</code> on purpose. A soft path is a cook-graph edge, and under One File Per Actor it points into <code>/Game/__ExternalActors__/</code>, which would make the registry a recursive cook manager of the level's external actor packages. Nothing resolves it to answer a query. The bake is the answer.</p>
+<p>One asset per level rather than one per project keeps edits local, so two designers working different
+maps never touch the same file.</p>
+<p>The asset name carries a hash of the full package path. A primary asset id keys on the asset's SHORT
+name, so two levels both called "Main" in different folders would otherwise mint one id and make
+every outpost in one of them unanswerable.</p>
+<p>Treat the registry as a generated artifact. It is derived from the actors, and it carries <code>bBakeWasComplete</code> plus <code>IncompleteReasons</code> to say how far to trust itself.</p>
+<h2 id="when-it-bakes">When It Bakes</h2>
+<p>Three paths BAKE it, and all three key on the level the ACTOR lives in, so an outpost in a streaming sublevel belongs to that sublevel's registry. A fourth path REPAIRS it, described under <a href="#reading-it">Reading It</a>:</p>
+<ul>
+<li><strong>Per-actor</strong>, incrementally, as you edit.</li>
+<li><strong>On world save.</strong> <code>PostSaveWorldWithContext</code> also fires during cook, so the handler's first line is a cook guard. Without it the cooker silently overwrites a good designer-verified registry with a worse one assembled from cell-order streaming, and no editor test catches it.</li>
+<li><strong>The <code>UOutpostRegistryBuilder</code> commandlet</strong>, for a full pass over a partitioned map.</li>
+</ul>
+<p>An <code>FOutpostBakedInstance</code> carries a <code>ContentHash</code> so an untouched outpost's entry is left alone. The
+hash is computed from the projected ENTRY rather than by re-walking the actors, so "the hash covers
+the payload" is true by construction.</p>
+<p>Two things it deliberately avoids:</p>
+<ul>
+<li><strong>No FName-keyed hashing.</strong> FName hashes are a process-specific name-table index and would rehash
+  every entry every session.</li>
+<li><strong>String terms use <code>FCrc::StrCrc32</code>, which is case-sensitive.</strong> <code>GetTypeHash(FString)</code> folds case,
+  so a rename from <code>Base</code> to <code>BASE</code> would never have reached the registry.</li>
+</ul>
+<p>Under World Partition a save only sees the loaded cells. The bake knows that and records why in
+<code>IncompleteReasons</code>, and it never retires an entry, because it cannot tell deleted from unloaded.</p>
+<p><strong>Deleting an outpost retires its own entry</strong>, in the delete's transaction, recoverable by undo and
+listed in the registry's <code>RecentlyRemoved</code>.</p>
+<p>The bake is the only source that never retires. The other two do:</p>
+<ul>
+<li>The <strong>map-open repair</strong> retires an entry whose anchor package is proven gone from disk.</li>
+<li>The <strong>builder commandlet</strong> retires under earned completeness.</li>
+</ul>
+<p>An outpost the bake cannot bake, because its shared template blocks migration, is named in the log
+rather than dropped in silence.</p>
+<h2 id="reading-it">Reading It</h2>
+<p><code>UOutpostRegistrySubsystem</code> is a <code>UEngineSubsystem</code>, so every registry is resident and answerable with no level loaded:</p>
+<div class="highlight"><pre><span></span><code><span class="k">const</span><span class="w"> </span><span class="n">FOutpostBakedInstance</span><span class="o">*</span><span class="w"> </span><span class="nf">FindInstance</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FOutpostInstanceId</span><span class="o">&amp;</span><span class="w"> </span><span class="n">InstanceId</span><span class="p">);</span>
+<span class="n">FName</span><span class="w"> </span><span class="nf">FindLevelForInstance</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FOutpostInstanceId</span><span class="o">&amp;</span><span class="w"> </span><span class="n">InstanceId</span><span class="p">);</span>
+<span class="n">AOutpost</span><span class="o">*</span><span class="w"> </span><span class="nf">FindLiveOutpost</span><span class="p">(</span><span class="n">UObject</span><span class="o">*</span><span class="w"> </span><span class="n">WorldContextObject</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">FOutpostInstanceId</span><span class="o">&amp;</span><span class="w"> </span><span class="n">InstanceId</span><span class="p">);</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">GetInstancesContainingPoint</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">Point</span><span class="p">,</span><span class="w"> </span><span class="n">TArray</span><span class="o">&lt;</span><span class="k">const</span><span class="w"> </span><span class="n">FOutpostBakedInstance</span><span class="o">*&gt;&amp;</span><span class="w"> </span><span class="n">OutInstances</span><span class="p">);</span>
+</code></pre></div>
+
+<p><code>MakeLevelKey</code> lives in the runtime module for the same reason. PIE renames packages with a <code>UEDPIE_</code> prefix, and a caller who reached for <code>World-&gt;GetOutermost()-&gt;GetName()</code> in PIE would match nothing baked in the editor and get an empty array that reads as "no outposts here" rather than as a failure.</p>
+<p>Every <code>FOutpostBakedInstance*</code> points into a registry's own array. Read what you need and don't store it. At cooked runtime nothing bakes, so they're stable for the session.</p>
+<p>Two console commands exercise the whole path with no commandlet: <code>Outpost.BakeRegistry</code> then <code>Outpost.DumpRegistry</code>.</p>
+<h2 id="the-repair-pass">The Repair Pass</h2>
+<p>The bake writes what the world says. It cannot repair what the world and the registry disagree about,
+because the editor produces skews no write path is present for: a save declined after a delete, an
+undo, a Save As that clones every actor with its id, a deletion made outside the editor entirely.</p>
+<p>So one pass runs on every map open, before the auto-bake toggle is even consulted, and it makes three
+repairs in a walk each:</p>
+<ul>
+<li><strong>Un-retire a live outpost.</strong> A retire mutated the resident registry, then the level save carrying
+  the delete was declined (or the delete undone). The live actor wins and its entry returns,
+  re-anchored to the actor that is actually there.</li>
+<li><strong>Re-key a Save As clone.</strong> Save Current Level As copies every actor with its id, so two levels
+  claim one handle. Whichever map opens first re-keys ITS copy to a fresh id - deterministic and
+  self-resolving - and only when the other side's anchor package genuinely exists on disk.</li>
+<li><strong>Scavenge a completed deletion.</strong> An entry with no live actor whose anchor package is gone from
+  disk was deleted somewhere this editor never saw. Retired, and recoverable like any retirement.</li>
+</ul>
+<p>All three rest on one primitive worth naming, because guessing is what the rest of the system spent
+three reviews learning not to do:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// True when the entry's anchor actor package is still on disk. Under One File Per Actor a completed</span>
+<span class="c1">// deletion removes it; a declined save, a pending undo or an unloaded cell all leave it there.</span>
+<span class="k">static</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">DoesBakedAnchorExistOnDisk</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FOutpostBakedInstance</span><span class="o">&amp;</span><span class="w"> </span><span class="n">Entry</span><span class="p">);</span>
+</code></pre></div>
+
+<p>That distinction is the whole reason the repair can act at all. "No live actor" alone means nothing
+under World Partition - most outposts are unloaded most of the time. The package's absence is proof.</p>
+<p>It also gates what Restore is allowed to offer: a retirement whose anchor is still on disk is skew,
+never a candidate, because restoring it would spawn a second claimant on a handle a living outpost
+already holds.</p>
+<p>Note that nothing on the subsystem is a <code>UFUNCTION</code>. The data types are all <code>BlueprintType</code> with <code>BlueprintReadOnly</code> fields, but the API that turns a handle into data is C++ only. A Blueprint simulation layer would need that surface added.</p>
+<h2 id="current-state">Current State</h2>
+<p>The two defects that used to sit here - the ones that broke the goal - are closed, and the mechanism
+that closed them is worth knowing because it defines what the registry means now.</p>
+<p><strong>Retirement is the liveness signal.</strong> An entry in a registry's <code>Instances</code> is a placed outpost,
+loaded or not.</p>
+<p>Deleting an outpost through the editor retires its entry into <code>RecentlyRemoved</code> inside the delete's
+own transaction. The registry is transactional, so undo restores entry and actors together, and
+Restore brings it back re-anchored to the new actor.</p>
+<p><code>bVerifiedThisBake</code> reverted to what it always meant, "the last bake saw it", a staleness hint the
+dump reports. Nothing derives existence from it anymore.</p>
+<p>Two consequences. A partial World Partition save hides nothing. And a paste over an unloaded cell is
+contested by the registry and re-keyed, instead of silently sharing a handle with the streamed-out
+original.</p>
+<p>The honest edges, stated rather than implied:</p>
+<ul>
+<li><strong>Nothing here has run in an interactive editor.</strong> Compiler plus 23 automation tests (the riskiest
+  branches negative-controlled) is the entire evidence base. <code>TESTING.md</code> steps 119-126 script the
+  session that checks it.</li>
+<li><strong>An out-of-band deletion lingers only until that map is next opened.</strong> Deleting an outpost
+  outside the editor's delete path - source control revert, another user's change - used to wait for
+  a registry-builder pass. The map-open repair now scavenges it: an entry with no live actor whose
+  anchor package is absent from disk is a completed deletion, proven rather than guessed, so it is
+  retired (and recoverable, like every retirement). What lingers is the window until that map opens,
+  and the builder pass is still the fallback for levels nobody opens.</li>
+<li><strong>One undo wart remains</strong> (research/28 finding 20): undoing immediately after a paste undoes only
+  the re-key step first, leaving two actors on one id until the next undo removes the paste itself.</li>
+</ul>
+<h2 id="tests">Tests</h2>
+<p>The identity and registry surfaces are covered by automation tests under <code>OutpostBuilder/Source/OutpostBuilderEditor/Tests/</code>, run headless by <code>scripts/run-tests.bat</code>. Each test is named for a defect that actually shipped.</p>
+<p>They cover:</p>
+<ul>
+<li>The content hash, and the registry's upsert and retire rules.</li>
+<li>Migration being atomic per family, and blank-identity matching.</li>
+<li>The shared-template write guard, and the duplicate and paste re-keying rule.</li>
+<li>The deliberate-spawn scope.</li>
+<li>Reclaim-before-mint: an actor adopts the id a registry entry already anchors to its path.</li>
+<li>The ghost list's disk-truth gate: a retirement whose anchor still exists on disk is skew, and is
+  never offered for restore.</li>
+</ul>
+<p>They do not cover the five editor listeners or the delete cascade, and the test files say so.</p>
+      </article>
+    <nav class="pager" aria-label="Page navigation">
+      <a class="pager-prev" href="architecture.html">
+        <span class="pager-dir">&larr; Previous</span>
+        <span class="pager-title">Architecture</span>
+      </a>
+      <a class="pager-next" href="edmode.html">
+        <span class="pager-dir">Next &rarr;</span>
+        <span class="pager-title">The Ed Mode - UEdMode Deep Dive</span>
+      </a>
+    </nav>
+    </main>
+
+    <footer class="foot">
+      <p>A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.</p>
+      <a href="https://github.com/defessler/OutpostBuilder">View on GitHub</a>
+    </footer>
+  </div>
+</div>
+
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

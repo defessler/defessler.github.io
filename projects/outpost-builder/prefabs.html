@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prefabs &amp; Fork-on-Stamp · OutpostBuilder</title>
+<meta name="description" content="A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<div class="shell">
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-controls="sidebar" aria-expanded="false">
+    <span></span><span></span><span></span>
+    <span class="vh">Toggle navigation</span>
+  </button>
+
+  <aside class="side" id="sidebar">
+    <div class="side-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-word">OutpostBuilder</span>
+      </a>
+
+      <nav aria-label="Documentation">
+        <ol class="nav-list">
+          <li>
+            <a href="index.html">
+              <span class="nav-no">01</span>
+              <span class="nav-title">OutpostBuilder</span>
+            </a>
+          </li>
+          <li>
+            <a href="tutorial.html">
+              <span class="nav-no">02</span>
+              <span class="nav-title">Tutorial - A Guided Tour</span>
+            </a>
+          </li>
+          <li>
+            <a href="architecture.html">
+              <span class="nav-no">03</span>
+              <span class="nav-title">Architecture</span>
+            </a>
+          </li>
+          <li>
+            <a href="identity.html">
+              <span class="nav-no">04</span>
+              <span class="nav-title">Instance Identity</span>
+            </a>
+          </li>
+          <li>
+            <a href="edmode.html">
+              <span class="nav-no">05</span>
+              <span class="nav-title">The Ed Mode - UEdMode Deep Dive</span>
+            </a>
+          </li>
+          <li>
+            <a href="toolkit.html">
+              <span class="nav-no">06</span>
+              <span class="nav-title">The Toolkit - FModeToolkit and Slate</span>
+            </a>
+          </li>
+          <li>
+            <a href="prefabs.html" class="active" aria-current="page">
+              <span class="nav-no">07</span>
+              <span class="nav-title">Prefabs &amp; Fork-on-Stamp</span>
+            </a>
+          </li>
+          <li>
+            <a href="faction-visuals.html">
+              <span class="nav-no">08</span>
+              <span class="nav-title">Faction - Identity and Gating</span>
+            </a>
+          </li>
+          <li>
+            <a href="extending.html">
+              <span class="nav-no">09</span>
+              <span class="nav-title">Extending Outpost Builder</span>
+            </a>
+          </li>
+          <li>
+            <a href="quick-reference.html">
+              <span class="nav-no">10</span>
+              <span class="nav-title">Quick Reference - The Cheat Sheet</span>
+            </a>
+          </li>
+          <li>
+            <a href="reference.html">
+              <span class="nav-no">11</span>
+              <span class="nav-title">Reference - Public Surfaces, Hotkeys, and Testing</span>
+            </a>
+          </li>
+          <li>
+            <a href="runtime-loadout.html">
+              <span class="nav-no">12</span>
+              <span class="nav-title">Per-Plot Building Rendering</span>
+            </a>
+          </li>
+          <li>
+            <a href="porting.html">
+              <span class="nav-no">13</span>
+              <span class="nav-title">Porting Into Your Own Project</span>
+            </a>
+          </li>
+          <li>
+            <a href="wiring.html">
+              <span class="nav-no">14</span>
+              <span class="nav-title">System Wiring</span>
+            </a>
+          </li>
+          <li>
+            <a href="technology.html">
+              <span class="nav-no">15</span>
+              <span class="nav-title">Technology &amp; Trade-offs</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
+      <a class="side-github" href="https://github.com/defessler/OutpostBuilder">
+        <span aria-hidden="true">&#8599;</span> Repository
+      </a>
+    </div>
+  </aside>
+
+  <div class="nav-scrim" id="nav-scrim"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="crumb">OutpostBuilder <span class="crumb-sep">/</span> Prefabs &amp; Fork-on-Stamp</span>
+      <span class="published">Published <time datetime="2026-11-03T05:35:00Z">2026-11-03 05:35 UTC</time></span>
+
+    </header>
+
+    <main id="content">
+      <article class="doc">
+<h1 id="prefabs-fork-on-stamp">Prefabs &amp; Fork-on-Stamp</h1>
+<p>This page covers the prefab model the stamping system is built on and how its pieces fit together. It's the most conceptually dense material on the site.</p>
+<h2 id="any-outpost-definition-is-a-prefab">Any Outpost Definition Is a Prefab</h2>
+<p>There's no separate "prefab" asset type in this plugin. A <code>UOutpostDefinition</code> already holds everything a base needs to reconstruct itself: a display name, a faction (a fixed enum: identity and building-eligibility gating only, no visual effect), every plot's relative transform and assigned building, and an optional Overhead camera record.</p>
+<p>There's a second, per-plot camera map too, <code>PlotCameras</code>. It's authoring-time only: stamping and restoring still spawn exactly one Overhead camera actor per outpost, from the single outpost-level record, never one per plot.</p>
+<p>Once you've placed and dressed up one outpost, its definition asset already IS a prefab. Drag it back into the level and you get a full copy of that base.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostDefinition.h</span>
+<span class="cm">/**</span>
+<span class="cm"> * Data asset describing an outpost: its display name and the set of plots</span>
+<span class="cm"> * (each with a transform relative to the owning AOutpost actor and an</span>
+<span class="cm"> * optionally assigned building) placed within it.</span>
+<span class="cm"> */</span>
+<span class="n">UCLASS</span><span class="p">(</span><span class="n">BlueprintType</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OUTPOSTBUILDER_API</span><span class="w"> </span><span class="n">UOutpostDefinition</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">UPrimaryDataAsset</span>
+</code></pre></div>
+
+<p>The design research looked hard at engine-native alternatives first, mainly Level Instances, before landing here. Level Instances give you real edit-in-context propagation.</p>
+<p>They also need a <code>.umap</code> per prefab, a Save-As dialog that isn't headless by default, and per-instance property overrides gated behind World Partition. None of that fits a lightweight data asset that already carries <code>FGuid</code> plot identities and faction state.</p>
+<p>Check out <code>research/07-prefab-mechanisms.md</code> if you want the full comparison against Level Instances and Packed Level Actors.</p>
+<h3 id="fork-on-stamp-one-definition-per-placed-outpost-by-default">Fork-on-Stamp: One Definition per Placed Outpost, by Default</h3>
+<p>This was a law when the page was first written. It's a setting now, and the rest of this section describes what it is still the default.</p>
+<p>A plot actor writes its own transform back into its owning definition's plot record every time you move it (more on that below). If two placed outposts pointed at the SAME definition asset, both sets of plots would be writing into the same record array, and whichever plot moved last would win.</p>
+<p>That is why <code>bForkDefinitionOnStamp</code> ships <strong>on</strong>: every drag-and-drop places a fresh, forked copy of the template, so no two placements share a record array.</p>
+<p>Turn it <strong>off</strong> and a definition becomes a genuine reusable template. Sharing stops being a corruption hazard because identity moved to a per-instance id and the write-backs above learned to refuse a shared template rather than fight over it. That is a different model with its own page: see <a href="identity.html">Instance Identity</a>. Everything below assumes the default.</p>
+<p>Note: manually duplicating a placed <code>AOutpost</code> used to be the thing to avoid. With fork-on-stamp on it still makes plot write-backs ambiguous, and the write-back code skips rather than risk corrupting the wrong copy, so you get stale records instead of a crash. <code>AOutpostPlot::FindOwningOutpostActor</code> and <code>AOutpost::ReRelativizeOwnedRecords</code> both check for this and bail out.</p>
+<p>With the default in place, stamping never lets two placements share a definition:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Utils/OutpostPrefabUtils.h</span>
+<span class="c1">// Any UOutpostDefinition doubles as a prefab. With bForkDefinitionOnStamp on, which is the</span>
+<span class="c1">// default, dragging it into a level stamps a private forked copy so editing one placement never</span>
+<span class="c1">// mutates the template. Turn that off and every drop binds the SAME definition, which is what</span>
+<span class="c1">// makes it a reusable template - identity is the per-instance id, not the definition.</span>
+<span class="k">namespace</span><span class="w"> </span><span class="nn">OutpostPrefabUtils</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="w">    </span><span class="n">UOutpostDefinition</span><span class="o">*</span><span class="w"> </span><span class="nf">ForkDefinition</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">UOutpostDefinition</span><span class="o">*</span><span class="w"> </span><span class="n">Template</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="w">    </span><span class="n">AOutpost</span><span class="o">*</span><span class="w"> </span><span class="nf">StampPrefab</span><span class="p">(</span><span class="n">UWorld</span><span class="o">*</span><span class="w"> </span><span class="n">World</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">UOutpostDefinition</span><span class="o">*</span><span class="w"> </span><span class="n">Template</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">FTransform</span><span class="o">&amp;</span><span class="w"> </span><span class="n">TargetTransform</span><span class="p">,</span><span class="w"> </span><span class="n">AOutpost</span><span class="o">*</span><span class="w"> </span><span class="n">OptionalAnchor</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="w">    </span><span class="n">AOutpostVolume</span><span class="o">*</span><span class="w"> </span><span class="nf">FindBlockingExclusionVolume</span><span class="p">(</span><span class="n">UWorld</span><span class="o">*</span><span class="w"> </span><span class="n">World</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">FVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">Location</span><span class="p">,</span><span class="w"> </span><span class="n">FPrimaryAssetId</span><span class="w"> </span><span class="n">IgnoreDefinitionId</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="w">    </span><span class="n">AOutpostVolume</span><span class="o">*</span><span class="w"> </span><span class="nf">SpawnDefaultOutpostVolume</span><span class="p">(</span><span class="n">UWorld</span><span class="o">*</span><span class="w"> </span><span class="n">World</span><span class="p">,</span><span class="w"> </span><span class="n">AOutpost</span><span class="o">*</span><span class="w"> </span><span class="n">Outpost</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>ForkDefinition</code> duplicates the template into the settings-configured folder as <code>&lt;Name&gt;_Stamp</code>, uniqued against whatever's already there via <code>IAssetTools::CreateUniqueAssetName</code> (so stamping the same template twice gets <code>_Stamp</code>, then <code>_Stamp1</code>, and so on, never a collision), and immediately calls <code>RegeneratePlotIds()</code> on the copy.</p>
+<p>That's what keeps the fork's plots from ever sharing a <code>FGuid</code> with the template's. It's also what keeps the fork's per-plot Overhead camera framings (<code>PlotCameras</code>, keyed by the same <code>PlotId</code>) pointed at the right plots:</p>
+<p><code>RegeneratePlotIds()</code> re-keys that map through the same old-id-to-new-id mapping it uses to reassign <code>Plots</code>, so a fork's per-plot framings travel with their plots instead of being silently orphaned or left pointing at the template's old ids:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Utils/OutpostPrefabUtils.cpp</span>
+<span class="n">UOutpostDefinition</span><span class="o">*</span><span class="w"> </span><span class="nf">OutpostPrefabUtils::ForkDefinition</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">UOutpostDefinition</span><span class="o">*</span><span class="w"> </span><span class="n">Template</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">UOutpostDefinition</span><span class="o">*</span><span class="w"> </span><span class="n">Fork</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Private</span><span class="o">::</span><span class="n">DuplicateDefinitionAsset</span><span class="p">(</span><span class="n">Template</span><span class="p">,</span><span class="w"> </span><span class="n">TEXT</span><span class="p">(</span><span class="s">"_Stamp"</span><span class="p">));</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">Fork</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">Fork</span><span class="o">-&gt;</span><span class="n">RegeneratePlotIds</span><span class="p">();</span>
+
+<span class="w">    </span><span class="n">FAssetRegistryModule</span><span class="o">::</span><span class="n">AssetCreated</span><span class="p">(</span><span class="n">Fork</span><span class="p">);</span>
+<span class="w">    </span><span class="n">Fork</span><span class="o">-&gt;</span><span class="n">MarkPackageDirty</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// ...</span>
+</code></pre></div>
+
+<p>(<code>Private::</code> here is <code>OutpostPrefabUtils::Private</code>, this file's named internal-linkage namespace. See <code>edmode.html</code>'s note on the plugin-wide convention of naming these rather than leaving them anonymous.)</p>
+<p><code>StampPrefab</code> first checks the drop point against every <code>AOutpostVolume</code> in the world via <code>OutpostPrefabUtils::FindBlockingExclusionVolume</code>. A stamp always mints a fresh definition id, so no volume is ever "its own" the way it would be for the self-excluded "Edit (Place Actor)" path below. Every volume in range blocks a stamp.</p>
+<p>A blocked drop refuses right there, before the transaction or the fork, so there's nothing left to clean up. The designer gets a toast naming the blocking volume.</p>
+<p>Past that check, <code>StampPrefab</code> wraps the rest in one undo transaction and works through a fixed sequence:</p>
+<ul>
+<li>Forks the template and spawns via <code>UOutpostStampLibrary::StampOutpost</code> (the shared runtime spawn routine, also <code>BlueprintCallable</code> so gameplay code can stamp outposts too).</li>
+<li>Harvests every actor label in the world once and uses it to label the outpost, its plots, and its Overhead camera uniquely.</li>
+<li>Folds the whole stamped base into its own World Outliner folder (<code>&lt;Outpost Actor Folder&gt;/&lt;fork name&gt;</code>). The fork's fresh id means the by-definition-id fold sweep can only touch this stamp's actors, the same argument the label sweep rests on. <code>StampOutpost</code> itself is runtime-module and can no more <code>SetFolderPath</code> than <code>SetActorLabel</code>.</li>
+<li>Records the fork's <code>PlacedOutpostPath</code> AND <code>PlacedOutpostTransform</code> pointing at the new actor. Both are recorded together, since a fork that only recorded its path would restore at the world origin after a delete.</li>
+</ul>
+<p>A failed fork or spawn cancels the transaction so no empty undo entry is left behind. A spawn failure after a successful fork logs the orphaned fork's name so you know to delete it by hand.</p>
+<p>Undo has one asymmetry worth knowing: undoing a drag-stamp reverses the spawned actors and their records, but asset creation isn't transactional, so the <code>&lt;Name&gt;_Stamp</code> definition itself stays behind in the Content Browser.</p>
+<p>The diagram below walks the whole drag-to-stamp sequence, including the idempotence guard we'll get to next.</p>
+<p><img alt="Drag-to-stamp flow: PostSpawnActor fires twice, forks the definition, and stamps the outpost" src="assets/prefabs-fork-flow.svg" /></p>
+<h2 id="the-idempotent-postspawnactor">The Idempotent PostSpawnActor</h2>
+<p><code>UActorFactoryOutpostPrefab</code> is what makes dragging a <code>UOutpostDefinition</code> asset into the viewport spawn a stamped outpost instead of nothing. Its <code>PostSpawnActor</code> override does the forking and stamping.</p>
+<p>There's a catch: the engine's placement subsystem calls <code>PostSpawnActor</code> on the SAME actor twice for one real drop, once from the base factory's <code>CreateActor</code> and once again from <code>PostPlaceAsset</code>.</p>
+<p><code>StampPrefab</code> is not something you want to run twice. It forks an asset and spawns actors. Do that twice and you end up with two definitions and two sets of plots for a single drop.</p>
+<p>The factory bails on the second call using the anchor's own state as the signal. <code>StampOutpost</code>'s first observable effect is assigning the fork's id to the anchor, which means a valid <code>OutpostDefinitionId</code> says "this anchor was already stamped":</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Factories/ActorFactoryOutpostPrefab.cpp</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">UActorFactoryOutpostPrefab::PostSpawnActor</span><span class="p">(</span><span class="n">UObject</span><span class="o">*</span><span class="w"> </span><span class="n">Asset</span><span class="p">,</span><span class="w"> </span><span class="n">AActor</span><span class="o">*</span><span class="w"> </span><span class="n">NewActor</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">Super</span><span class="o">::</span><span class="n">PostSpawnActor</span><span class="p">(</span><span class="n">Asset</span><span class="p">,</span><span class="w"> </span><span class="n">NewActor</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Preview spawns (dragging the asset over the viewport before it is dropped) must never</span>
+<span class="w">    </span><span class="c1">// fork a definition asset or spawn plots/cameras - only a real placement stamps.</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">NewActor</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">NewActor</span><span class="o">-&gt;</span><span class="n">bIsEditorPreviewActor</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">AOutpost</span><span class="o">*</span><span class="w"> </span><span class="n">NewOutpost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Cast</span><span class="o">&lt;</span><span class="n">AOutpost</span><span class="o">&gt;</span><span class="p">(</span><span class="n">NewActor</span><span class="p">);</span>
+<span class="w">    </span><span class="n">UOutpostDefinition</span><span class="o">*</span><span class="w"> </span><span class="n">Definition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Cast</span><span class="o">&lt;</span><span class="n">UOutpostDefinition</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Asset</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">NewOutpost</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">Definition</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// The placement subsystem invokes PostSpawnActor TWICE for a real drop (once from the</span>
+<span class="w">    </span><span class="c1">// base factory's CreateActor, once from PostPlaceAsset). StampPrefab is not idempotent -</span>
+<span class="w">    </span><span class="c1">// it forks a definition and spawns actors - so bail if this anchor was already stamped</span>
+<span class="w">    </span><span class="c1">// (StampPrefab assigns the fork's id to the anchor as its first observable effect).</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">NewOutpost</span><span class="o">-&gt;</span><span class="n">GetOutpostDefinitionId</span><span class="p">().</span><span class="n">IsValid</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// A refused/failed stamp condemns its anchor below; the tag stops the SECOND PostSpawnActor</span>
+<span class="w">    </span><span class="c1">// invocation (see above) from re-attempting - and double-toasting - on an anchor already</span>
+<span class="w">    </span><span class="c1">// scheduled for destruction (its definition id is still invalid, so the id guard alone</span>
+<span class="w">    </span><span class="c1">// wouldn't catch it).</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">FName</span><span class="w"> </span><span class="n">StampRefusedTag</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">"OutpostStampRefused"</span><span class="p">));</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">NewOutpost</span><span class="o">-&gt;</span><span class="n">ActorHasTag</span><span class="p">(</span><span class="n">StampRefusedTag</span><span class="p">))</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">AOutpost</span><span class="o">*</span><span class="w"> </span><span class="n">StampedOutpost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OutpostPrefabUtils</span><span class="o">::</span><span class="n">StampPrefab</span><span class="p">(</span><span class="n">NewActor</span><span class="o">-&gt;</span><span class="n">GetWorld</span><span class="p">(),</span><span class="w"> </span><span class="n">Definition</span><span class="p">,</span><span class="w"> </span><span class="n">NewActor</span><span class="o">-&gt;</span><span class="n">GetActorTransform</span><span class="p">(),</span><span class="w"> </span><span class="n">NewOutpost</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">StampedOutpost</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Refused (drop point within an exclusion volume - a hard refuse) or failed: the</span>
+<span class="w">        </span><span class="c1">// factory-spawned anchor must not survive as a bare, definition-less AOutpost. Destroying</span>
+<span class="w">        </span><span class="c1">// it DURING PostSpawnActor would yank an actor the placement subsystem still references</span>
+<span class="w">        </span><span class="c1">// this frame - defer one tick and destroy outside the drop's own call stack. (The anchor's</span>
+<span class="w">        </span><span class="c1">// definition id is invalid, so its Destroyed() cascade is a guaranteed no-op.) Known</span>
+<span class="w">        </span><span class="c1">// residual: the drop's own transaction stays in the undo buffer, so a later Redo can</span>
+<span class="w">        </span><span class="c1">// transiently resurrect the inert tagged anchor - cosmetic (it stays definition-less and</span>
+<span class="w">        </span><span class="c1">// cascade-free), and undo-before-the-timer-fires is safe via the weak ptr below.</span>
+<span class="w">        </span><span class="n">NewOutpost</span><span class="o">-&gt;</span><span class="n">Tags</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">StampRefusedTag</span><span class="p">);</span>
+<span class="w">        </span><span class="n">TWeakObjectPtr</span><span class="o">&lt;</span><span class="n">AOutpost</span><span class="o">&gt;</span><span class="w"> </span><span class="n">WeakAnchor</span><span class="p">(</span><span class="n">NewOutpost</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">GEditor</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="n">GEditor</span><span class="o">-&gt;</span><span class="n">GetTimerManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">SetTimerForNextTick</span><span class="p">(</span><span class="n">FTimerDelegate</span><span class="o">::</span><span class="n">CreateLambda</span><span class="p">([</span><span class="n">WeakAnchor</span><span class="p">]()</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">AOutpost</span><span class="o">*</span><span class="w"> </span><span class="n">Anchor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">WeakAnchor</span><span class="p">.</span><span class="n">Get</span><span class="p">())</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">UWorld</span><span class="o">*</span><span class="w"> </span><span class="n">AnchorWorld</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Anchor</span><span class="o">-&gt;</span><span class="n">GetWorld</span><span class="p">())</span>
+<span class="w">                    </span><span class="p">{</span>
+<span class="w">                        </span><span class="n">AnchorWorld</span><span class="o">-&gt;</span><span class="n">EditorDestroyActor</span><span class="p">(</span><span class="n">Anchor</span><span class="p">,</span><span class="w"> </span><span class="cm">/*bShouldModifyLevel=*/</span><span class="nb">true</span><span class="p">);</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}));</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>There's a second guard above the definition-id check worth calling out separately: <code>bIsEditorPreviewActor</code>. While you're still dragging the asset across the viewport before you release the mouse, the engine spawns a preview ("ghost") actor under the cursor and calls the SAME factory hooks on it every frame.</p>
+<p>Without that check you'd fork a new definition asset on every mouse-move during the drag, which would flood your content folder before you'd even placed anything.</p>
+<p>The third guard, the <code>OutpostStampRefused</code> actor tag, exists because a real drop can now fail to stamp at all. If <code>StampPrefab</code> refuses or fails, that tag stops the drop's SECOND <code>PostSpawnActor</code> call from re-attempting the same doomed stamp and firing a second toast.</p>
+<p>Between the three guards, <code>PostSpawnActor</code> on a real drop either stamps exactly once or is hard-refused once. Either way the factory's bare anchor never survives as a definition-less <code>AOutpost</code>. Destroying that anchor is deferred one tick rather than done inline, because doing it during <code>PostSpawnActor</code> itself would yank an actor the placement subsystem still references for the rest of the frame.</p>
+<p>If you're adding your own actor factory for a new prefab-like asset type later, this is the pattern to copy: treat <code>PostSpawnActor</code> as "might run twice, might run on a preview actor."</p>
+<p>Pick a piece of the actor's own post-spawn state as your "did I already do this" flag rather than a separate bool, since a separate bool wouldn't survive the factory potentially being invoked from two different call sites you don't control.</p>
+<h3 id="exclusion-volumes-hard-refuse-a-stamp">Exclusion Volumes Hard-Refuse a Stamp</h3>
+<p><code>OutpostPrefabUtils::FindBlockingExclusionVolume</code> is the one shared exclusion rule in the plugin: it walks every <code>AOutpostVolume</code> in the world and returns the first one whose extents lie within the settings-configured <code>OutpostExclusionDistance</code> of a point. The mode's ghost validation calls it every frame while you're click-placing an outpost (red ghost, "Too close to \&lt;volume&gt;" HUD text, blocked confirm), and <code>StampPrefab</code> calls it once at drop time for a drag-stamp.</p>
+<p>A volume can be told to ignore the definition it's already bound to, which is how "Edit (Place Actor)" is allowed to re-place a base inside its own volume. But a stamp never passes an id to ignore, because fork-on-stamp always mints a brand-new definition id.</p>
+<p>There is no such thing as "this stamp's own volume" at drop time. Every volume in range blocks the drop. The moment a stamp lands, though, it gets one: every new-outpost path (mode placement, Edit (Place Actor), drag-stamp) spawns the fork's own default Outpost Volume via <code>SpawnDefaultOutpostVolume</code> (idempotent per definition id), so back-to-back stamps space themselves out automatically.</p>
+<h2 id="two-non-forking-entry-points-restore-and-edit-place-actor">Two Non-Forking Entry Points: Restore and "Edit (Place Actor)"</h2>
+<p>Fork-on-stamp is the rule for a fresh drag-and-drop, but it's not the only way an <code>AOutpost</code> gets spawned from a <code>UOutpostDefinition</code>. Two other entry points deliberately do NOT fork, because in both cases the definition being reattached already belongs, unambiguously, to the actor about to exist:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Core/OutpostStampLibrary.h</span>
+<span class="c1">// From PlaceDefinitionAt's doc comment (RestoreOutpost is documented separately, #if WITH_EDITOR).</span>
+<span class="c1">// NOTE: an older version of this comment said StampOutpost FORKS. It does not, and structurally</span>
+<span class="c1">// cannot - ForkDefinition is editor-only and the runtime module does not link it. The FORK happens</span>
+<span class="c1">// one level up, in StampPrefab, before it calls StampOutpost with the fork. RestoreOutpost</span>
+<span class="c1">// re-attaches the SAME definition at its RECORDED PlacedOutpostTransform and bails when</span>
+<span class="c1">// PlacedOutpostPath already resolves to a live outpost; PlaceDefinitionAt also re-attaches the</span>
+<span class="c1">// SAME definition (no fork - the caller chose an existing definition explicitly) but at an</span>
+<span class="c1">// ARBITRARY caller-supplied Transform, regardless of any prior recorded placement.</span>
+<span class="k">static</span><span class="w"> </span><span class="n">AOutpost</span><span class="o">*</span><span class="w"> </span><span class="nf">RestoreOutpost</span><span class="p">(</span><span class="n">UOutpostDefinition</span><span class="o">*</span><span class="w"> </span><span class="n">Definition</span><span class="p">,</span><span class="w"> </span><span class="n">UWorld</span><span class="o">*</span><span class="w"> </span><span class="n">World</span><span class="p">);</span>
+<span class="k">static</span><span class="w"> </span><span class="n">AOutpost</span><span class="o">*</span><span class="w"> </span><span class="nf">PlaceDefinitionAt</span><span class="p">(</span><span class="n">UObject</span><span class="o">*</span><span class="w"> </span><span class="n">WorldContextObject</span><span class="p">,</span><span class="w"> </span><span class="n">UOutpostDefinition</span><span class="o">*</span><span class="w"> </span><span class="n">Definition</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">FTransform</span><span class="o">&amp;</span><span class="w"> </span><span class="n">Transform</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Both call the same file-local <code>SpawnPlotsAndCameraFromDefinition</code> helper that <code>StampOutpost</code> uses, so plot and camera reattachment go through the identical <code>Record.RelativeTransform * Outpost-&gt;GetRecordBasisTransform()</code> composition described below. The two differ only in where the transform comes from and when each refuses to run.</p>
+<p><strong><code>RestoreOutpost</code></strong> (<code>WITH_EDITOR</code>-only; it's a recovery action, not a <code>BlueprintCallable</code> runtime stamp) respawns the outpost at the definition's recorded <code>PlacedOutpostTransform</code>, assigns the SAME <code>OutpostDefinitionId</code>, and rebuilds plots/camera from the definition's records.</p>
+<p>It refuses in three cases, each logged as a warning and returning <code>nullptr</code>:</p>
+<ul>
+<li>The definition's <code>PlacedOutpostPath</code> is null (never placed, nothing recorded to reconstruct).</li>
+<li>The path still resolves to a live <code>AOutpost</code> (nothing to restore).</li>
+<li>The path is set but unresolved AND its owning map package isn't currently loaded in memory (the outpost may still be alive in a map that just isn't open). Respawning in that case would mint a second same-id placement and orphan the original on disk, so <code>RestoreOutpost</code> never loads a map itself to check.</li>
+</ul>
+<p>The Content Browser's asset context menu exposes this as <strong>Restore Placed Outpost</strong> next to <strong>Locate</strong>, enabled only when the definition's placed path does not resolve to a live actor. It wraps the call in a <code>"Restore Outpost"</code> transaction, which also folds the restored base into the definition's Outliner folder <em>before</em> the transaction closes (the fold <code>Modify()</code>s each actor and can create a <code>UActorFolder</code> in a World Partition map, so it must not escape the undo scope).</p>
+<p>It then selects, frames, and enters edit mode on the result.</p>
+<p>This is also what makes <code>RestoreOutpost</code> a real whole-base recovery: deleting an outpost together with its plots (and now its volumes too) keeps every plot record on the definition (actors die, records survive), so <code>RestoreOutpost</code> rebuilds the entire base at its recorded transform. One Ctrl+Z right after that cascade delete gets you everything back without ever calling <code>RestoreOutpost</code> at all.</p>
+<p><strong><code>PlaceDefinitionAt</code></strong> is the runtime-callable, non-<code>WITH_EDITOR</code>-gated counterpart used by the <strong>"Edit (Place Actor)"</strong> workflow: it spawns at a caller-supplied <code>FTransform</code> rather than a recorded one, and has no live-actor guard because the caller (interactive viewport placement) only ever calls it for a definition it already knows is safe to place.</p>
+<p>In the mode's toolkit, an outpost list entry whose definition has never had a placed actor (<code>PlacementState == EOutpostPlacementState::NeverPlaced</code>) shows an <strong>"Edit (Place Actor)"</strong> button instead of plain <strong>"Edit"</strong>. Clicking it calls <code>UOutpostBuilderEdMode::StartOutpostPlacementForDefinition(DefinitionId)</code>, which resolves the definition (toasting and bailing if it can't), stashes it as a pending placement, and starts the normal interactive placement flow.</p>
+<p><code>ConfirmOutpostPlacement</code> then branches on that pending definition: instead of creating a brand-new definition, it calls <code>PlaceDefinitionAt</code> with the clicked transform, binds the SAME definition id, reattaches the existing plots/camera at the new location, and enters edit mode on the result.</p>
+<p>An entry whose definition has been placed but whose actor currently lives in an unloaded map keeps the plain <strong>"Edit"</strong> label. That case routes to <code>LocateOutpostForDefinition</code> and names the map instead of offering to place a second copy at all.</p>
+<p>So there are three ways an <code>AOutpost</code> gets bound to a <code>UOutpostDefinition</code>, and it's worth keeping their names straight:</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What it does</th>
+<th>Guard</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>StampOutpost</code></td>
+<td>Binds whatever definition it is handed and spawns plots from its records</td>
+<td>Its editor caller <code>StampPrefab</code> is what forks, when the setting says to</td>
+</tr>
+<tr>
+<td><code>RestoreOutpost</code></td>
+<td>Reattaches at the recorded transform, same definition</td>
+<td>Refuses if already live or unresolved-but-loaded</td>
+</tr>
+<tr>
+<td><code>PlaceDefinitionAt</code></td>
+<td>Reattaches at an arbitrary transform, same definition</td>
+<td>No live-actor guard, because the caller already knows it's safe</td>
+</tr>
+</tbody>
+</table>
+<p>All three copy the same per-plot thing from the definition onto the spawned actor: its record's <code>AssignedBuildingId</code>. An unassigned plot renders the plugin-wide settings-asset <code>EmptyPlotMesh</code>, so nothing mesh-related travels with the definition on a fork. A fork's unassigned plots look like the template's because every project's unassigned plots look the same.</p>
+<p>The persistent <code>Faction</code> enum comes across too, with one wrinkle: <code>RestoreOutpost</code> and <code>PlaceDefinitionAt</code> always apply it, but <code>StampOutpost</code> only does so when it spawns the anchor itself. A caller-supplied anchor is treated as a live outpost being re-stamped and keeps the faction it already has.</p>
+<p>That's the case on the drag-stamp path, where the factory hands <code>StampPrefab</code> the anchor it just spawned, so a dragged-in stamp does not take its faction from the template.</p>
+<h2 id="relative-transform-math-and-the-unit-scale-basis">Relative-Transform Math and the Unit-Scale Basis</h2>
+<p>Every plot and camera record stores a transform relative to its owning <code>AOutpost</code>, never an absolute world transform. The header comment says it plainly:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostDefinition.h</span>
+<span class="cm">/**</span>
+<span class="cm"> * A single plot placement recorded within an outpost's definition asset.</span>
+<span class="cm"> *</span>
+<span class="cm"> * RelativeTransform is relative to the owning AOutpost actor's transform:</span>
+<span class="cm"> * World = RelativeTransform * OutpostActorTransform.</span>
+<span class="cm"> */</span>
+</code></pre></div>
+
+<p>The "OutpostActorTransform" in that comment isn't literally <code>GetActorTransform()</code> though. It's <code>GetRecordBasisTransform()</code>. The difference matters:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Actors/Outpost.h</span>
+<span class="cm">/**</span>
+<span class="cm"> * The basis every definition-record relative transform is stored against: this outpost's</span>
+<span class="cm"> * rotation + translation with UNIT scale. Records must never absorb anchor scale - a</span>
+<span class="cm"> * scaled anchor would otherwise shrink/distort every stamped copy.</span>
+<span class="cm"> */</span>
+<span class="n">FTransform</span><span class="w"> </span><span class="nf">GetRecordBasisTransform</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">FTransform</span><span class="p">(</span><span class="n">GetActorRotation</span><span class="p">(),</span><span class="w"> </span><span class="n">GetActorLocation</span><span class="p">());</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
+<p>Scale is stripped on purpose. <code>FTransform</code> composition multiplies scale components along with location and rotation. If the basis carried the anchor's scale, scaling an <code>AOutpost</code> actor (even just as a cosmetic tweak to the preview cube) would silently distort every plot's own recorded scale the next time anything re-derived a world transform from it.</p>
+<p>Since the same basis function is used both when a plot writes its transform back AND when <code>StampOutpost</code> spawns a fresh copy from a template, a scaled template would keep passing that distortion on to every stamp forever.</p>
+<p>Both ends of the composition go through the four inline helpers in <code>Outpost.h</code>, the only place the multiply direction lives. Write-back uses <code>MakeRecordRelativeTransform</code> (<code>Relative = World expressed in Basis space</code>), from <code>AOutpostPlot::SyncRecordTransform</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Actors/OutpostPlot.cpp</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">UOutpostDefinition</span><span class="o">*</span><span class="w"> </span><span class="n">Definition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LoadPrimaryAssetSync</span><span class="o">&lt;</span><span class="n">UOutpostDefinition</span><span class="o">&gt;</span><span class="p">(</span><span class="n">OutpostDefinitionId</span><span class="p">))</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">Definition</span><span class="o">-&gt;</span><span class="n">SetPlotRelativeTransform</span><span class="p">(</span><span class="n">PlotId</span><span class="p">,</span><span class="w"> </span><span class="n">MakeRecordRelativeTransform</span><span class="p">(</span><span class="n">GetActorTransform</span><span class="p">(),</span><span class="w"> </span><span class="o">*</span><span class="n">OwningOutpost</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>And stamping, from the file-local <code>SpawnPlotsAndCameraFromDefinition</code> helper that <code>StampOutpost</code>, <code>PlaceDefinitionAt</code>, and <code>RestoreOutpost</code> all share:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Core/OutpostStampLibrary.cpp</span>
+<span class="k">const</span><span class="w"> </span><span class="n">FTransform</span><span class="w"> </span><span class="n">EffectiveTransform</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Outpost</span><span class="o">-&gt;</span><span class="n">GetRecordBasisTransform</span><span class="p">();</span>
+<span class="c1">// ...</span>
+<span class="k">const</span><span class="w"> </span><span class="n">FTransform</span><span class="w"> </span><span class="n">PlotWorldTransform</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ComposeRecordWorldTransform</span><span class="p">(</span><span class="n">Record</span><span class="p">.</span><span class="n">RelativeTransform</span><span class="p">,</span><span class="w"> </span><span class="n">EffectiveTransform</span><span class="p">);</span>
+</code></pre></div>
+
+<p>The plot's own <code>RelativeTransform</code> still carries its own scale just fine. Only the anchor's contribution to the basis is forced to unit scale.</p>
+<p><code>MakeRecordRelativeTransform</code> is the exact inverse of <code>ComposeRecordWorldTransform</code>, which is what keeps the two ends from drifting apart: get the multiply direction backwards in one of them and every stamped base silently distorts.</p>
+<p>The diagram below shows the composition and why stripping just the anchor's scale (and nothing else) is the fix.</p>
+<p><img alt="World = RelativeTransform * GetRecordBasisTransform composition diagram" src="assets/prefabs-transform-composition.svg" /></p>
+<p><code>AOutpost::PostEditMove(bFinished)</code> uses the same basis to keep things coherent when you move the anchor itself. Plots deliberately don't follow the anchor (no actor nesting in this plugin, by design).</p>
+<p>A finished anchor move re-relativizes every owned plot and camera record against the anchor's NEW basis instead, leaving their world positions untouched. It skips this entirely when more than one outpost shares the definition id, since re-relativizing against the wrong anchor would corrupt a shared record.</p>
+<p>Check out <code>edmode.html</code> for how the placement and selection side of this actor model works, and <code>architecture.html</code> for why plots are independent actors instead of children in the first place.</p>
+<h2 id="record-identity-across-duplicate-paste-import-and-undo">Record Identity Across Duplicate, Paste, Import, and Undo</h2>
+<p>A plot's <code>FGuid PlotId</code> is its claim on one specific record in the definition's plot array. If two plot actors in the world ever carried the same <code>(OutpostDefinitionId, PlotId)</code> pair, both would think they own the same record. Whichever one happened to sync last would clobber the other's data.</p>
+<p>Ctrl-drag duplicate, copy/paste, and an outliner "Duplicate" all route through the same two engine hooks. Both clear the id:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Actors/OutpostPlot.cpp</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">AOutpostPlot::PostDuplicate</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">bDuplicateForPIE</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">Super</span><span class="o">::</span><span class="n">PostDuplicate</span><span class="p">(</span><span class="n">bDuplicateForPIE</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">bDuplicateForPIE</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">PlotId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FGuid</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">AOutpostPlot::PostEditImport</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">Super</span><span class="o">::</span><span class="n">PostEditImport</span><span class="p">();</span>
+<span class="w">    </span><span class="n">PlotId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FGuid</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Notice the <code>bDuplicateForPIE</code> guard. Play-in-editor duplication isn't a designer making a copy. It's the same logical plot temporarily existing in a separate PIE world. That copy keeps its id.</p>
+<p>A cleared <code>PlotId</code> should already mean no duplicate can collide with the original. <code>IsRecordOwnershipUnique()</code> re-checks at write time anyway, as a belt-and-suspenders measure against anything that slips a valid id through some other path (a scripted spawn, a hand-edited T3D paste, whatever we haven't thought of yet):</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Actors/OutpostPlot.h</span>
+<span class="cm">/** True when this plot's (OutpostDefinitionId, PlotId) pair is carried by no other plot actor in the world. Record write-backs/removals require uniqueness - a shared pair means a duplicate exists and writing would corrupt the original's record. */</span>
+<span class="kt">bool</span><span class="w"> </span><span class="nf">IsRecordOwnershipUnique</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+</code></pre></div>
+
+<p>This same check gates every write-back path in the plugin: <code>SyncRecordTransform</code>, the shared <code>SyncRecordField</code> helper whose two callers are <code>SyncRecordPlotSize</code> and the placement-rule-matrix's <code>SyncRecordPlotTags</code>, the mode's Delete action removing a plot's record, and <code>AOutpost</code>'s anchor-move re-relativization loop.</p>
+<p>If ownership is ever ambiguous, all five just skip the plot silently rather than risk writing to the wrong copy's data.</p>
+<p>So why doesn't undo need the same treatment? Undo and redo aren't duplication at all. They're the transaction system putting a UPROPERTY back to a previously recorded value.</p>
+<p><code>PlotId</code> is an ordinary (non-transient) property, which means it comes back automatically as part of whatever transaction touched it. There's no "duplicate" step for <code>PostDuplicate</code>/<code>PostEditImport</code> to intercept. Neither one fires on undo, because there's nothing to intercept.</p>
+<p>What undo DOES need help with is anything the transaction system doesn't restore for you, which is the next section.</p>
+<h2 id="typed-details-edits-fire-posteditchangechainproperty-never-posteditmove">Typed Details Edits Fire PostEditChangeChainProperty, Never PostEditMove</h2>
+<p><code>PostEditMove(bFinished)</code> only fires when you drag the viewport gizmo. Type a number directly into the Details panel's Location, Rotation, or Scale 3D fields and the engine routes that through <code>PostEditChangeChainProperty</code> instead. <code>PostEditMove</code> never fires for a typed edit at all. If the write-back only lived in <code>PostEditMove</code>, editing a plot's transform by typing it in would leave the definition silently stale.</p>
+<p>Both <code>AOutpost</code> and <code>AOutpostPlot</code> override <code>PostEditChangeChainProperty</code> and check for the same three property names, then call the exact same private helper that <code>PostEditMove(true)</code> calls:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Actors/OutpostPlot.cpp</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">AOutpostPlot::PostEditMove</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">bFinished</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">Super</span><span class="o">::</span><span class="n">PostEditMove</span><span class="p">(</span><span class="n">bFinished</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bFinished</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">SyncRecordTransform</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">AOutpostPlot::PostEditChangeChainProperty</span><span class="p">(</span><span class="n">FPropertyChangedChainEvent</span><span class="o">&amp;</span><span class="w"> </span><span class="n">PropertyChangedEvent</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">Super</span><span class="o">::</span><span class="n">PostEditChangeChainProperty</span><span class="p">(</span><span class="n">PropertyChangedEvent</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Typed transform edits in the Details panel never fire PostEditMove - sync the record</span>
+<span class="w">    </span><span class="c1">// here so the definition can't silently go stale.</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">FName</span><span class="w"> </span><span class="n">PropertyName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PropertyChangedEvent</span><span class="p">.</span><span class="n">GetPropertyName</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PropertyName</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">USceneComponent</span><span class="o">::</span><span class="n">GetRelativeLocationPropertyName</span><span class="p">()</span><span class="w"> </span><span class="o">||</span>
+<span class="w">        </span><span class="n">PropertyName</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">USceneComponent</span><span class="o">::</span><span class="n">GetRelativeRotationPropertyName</span><span class="p">()</span><span class="w"> </span><span class="o">||</span>
+<span class="w">        </span><span class="n">PropertyName</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">USceneComponent</span><span class="o">::</span><span class="n">GetRelativeScale3DPropertyName</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">SyncRecordTransform</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>AOutpost</code> mirrors this with its own <code>ReRelativizeOwnedRecords()</code> behind both <code>PostEditMove(true)</code> and its own <code>PostEditChangeChainProperty</code>. Either actor ends up with exactly one write-back implementation, called from two input paths that both mean "the transform changed and it's final."</p>
+<p>You'll want to follow this same two-hook pattern for any new transform-driven UPROPERTY you add to either actor. A single override of either hook alone will miss one editing path or the other.</p>
+<h2 id="transaction-and-undo-discipline">Transaction and Undo Discipline</h2>
+<p>The plot's resolved building mesh (written to <code>BuildingMeshComponent</code>, or to <code>MirroredBuildingParts</code> in an editor world when the assigned building's <code>BuildingActorClass</code> mirrors static-mesh parts) is a derived cache, never data. It's cheap to recompute from <code>OutpostDefinitionId</code> and <code>AssignedBuildingId</code>.</p>
+<p>Instead of wrapping it in <code>Modify()</code>/transactions and hoping undo threads it through correctly, we just never transact it and re-derive it wherever the underlying data could have changed: <code>PostRegisterAllComponents</code>, the editor-only <code>OnConstruction</code>, <code>PostEditUndo</code>, and the explicit setters.</p>
+<p><code>PostRegisterAllComponents</code> (not <code>PostLoad</code>, which <code>AOutpostPlot</code> doesn't override at all) is the realize path precisely because it runs in the editor AND in packaged games.</p>
+<p>That's also why it can't just call <code>RefreshBuildingPreview()</code> unconditionally: in a game world (packaged or PIE) it runs inside time-sliced streaming, where the building mesh must NOT load synchronously, so that branch kicks an async load-then-swap instead and only the editor path stays synchronous.</p>
+<p>The fence below elides the re-entrancy guard that sets <code>bIsRealizingBuilding</code> (cleared on the last line) and the async plumbing itself.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilder/Actors/OutpostPlot.cpp</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">AOutpostPlot::PostEditUndo</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">Super</span><span class="o">::</span><span class="n">PostEditUndo</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// AssignedBuildingId/OutpostDefinitionId are restored by the transaction, but the runtime</span>
+<span class="w">    </span><span class="c1">// mesh is not transactional - re-derive it so undo/redo stays in sync.</span>
+<span class="w">    </span><span class="n">RefreshBuildingPreview</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// ...</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">AOutpostPlot::PostRegisterAllComponents</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">Super</span><span class="o">::</span><span class="n">PostRegisterAllComponents</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="w">    </span><span class="n">UWorld</span><span class="o">*</span><span class="w"> </span><span class="n">PlotWorld</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetWorld</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PlotWorld</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">PlotWorld</span><span class="o">-&gt;</span><span class="n">IsGameWorld</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">BeginAsyncBuildingRefresh</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">else</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">RefreshBuildingPreview</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="w">    </span><span class="n">bIsRealizingBuilding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Note: here's a trap that's easy to hit because it's natural to assume the wrong thing about <code>Transient</code>. <code>Transient</code> only means "don't serialize this to disk." It does NOT mean "undo ignores this."</p>
+<p>A transaction's archive isn't persistent, and <code>CPF_Transient</code> is only skipped when the archive IS persistent. So a plain <code>Transient</code> UPROPERTY gets captured and restored by undo/redo right along with everything else in that transaction.</p>
+<p>A transient array of live component pointers that is only <code>Transient</code> will therefore be <em>restored</em> by an undo: undoing a building assignment puts the OLD array of component pointers back, while re-derive logic that assumed the array was already cleared orphans the live components it meant to destroy instead of replacing them.</p>
+<p>The fix is the stronger <code>NonTransactional</code> specifier, which keeps a property out of both persistence AND the transaction buffer.</p>
+<p>If you're adding your own transient derived-cache array or pointer to either actor and it holds onto live <code>UObject</code>s (components especially), reach for <code>NonTransactional</code> by default rather than plain <code>Transient</code>, unless you specifically want undo to restore it. Check out <code>extending.html</code> for this same trap listed again in the pitfalls checklist, alongside the other verification-history gotchas.</p>
+<h2 id="references">References</h2>
+<p>Engine source (relative to the UE 5.8 install):</p>
+<ul>
+<li><code>Engine/Source/Editor/UnrealEd/Private/Factories/ActorFactory.cpp</code> - <code>CreateActor</code> / <code>PostPlaceAsset</code> double-dispatch of <code>PostSpawnActor</code>.</li>
+<li><code>Engine/Source/Editor/UnrealEd/Classes/ActorFactories/ActorFactory.h</code> - <code>CanCreateActorFrom</code>, <code>PostSpawnActor</code> hook contract.</li>
+<li><code>Engine/Source/Editor/LevelInstanceEditor/Private/LevelInstanceActorFactory.cpp</code> - the "one spawned actor, <code>PostSpawnActor</code> cascades into populating many" exemplar this plugin's factory mirrors.</li>
+<li><code>Engine/Source/Runtime/CoreUObject/Private/UObject/Property.cpp:1057-1067</code> - <code>ShouldSerializeValue</code>, why <code>CPF_Transient</code> is restored by a non-persistent transaction archive.</li>
+<li><code>Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h</code> - <code>OwnedComponents</code> not being transaction-restored (the other half of the <code>NonTransactional</code> story).</li>
+</ul>
+<p>Repo files:</p>
+<ul>
+<li><code>OutpostBuilder/Source/OutpostBuilder/DataAssets/OutpostDefinition.h</code> and <code>OutpostDefinition.cpp</code></li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Actors/Outpost.h</code> and <code>Outpost.cpp</code></li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Actors/OutpostPlot.h</code> and <code>OutpostPlot.cpp</code></li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Core/OutpostStampLibrary.h</code> and <code>OutpostStampLibrary.cpp</code></li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Utils/OutpostPrefabUtils.h</code> and <code>.cpp</code></li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Actors/OutpostVolume.h</code> - <code>AOutpostVolume</code>, the exclusion volume <code>FindBlockingExclusionVolume</code> checks against</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Factories/ActorFactoryOutpostPrefab.h</code> and <code>.cpp</code></li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/OutpostBuilderEditorModule.cpp</code> - the Content Browser's <strong>Restore Placed Outpost</strong> context-menu action</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Widgets/SOutpostsOverviewPanel.h</code> and <code>.cpp</code> - the <strong>"Edit (Place Actor)"</strong> button's label, enable state, and click dispatch; <code>OutpostBuilderEdMode.cpp</code> - <code>StartOutpostPlacementForDefinition</code></li>
+</ul>
+<p>Research:</p>
+<ul>
+<li><code>research/07-prefab-mechanisms.md</code> - the Level Instance / Packed Level Actor / Data Layer comparison behind the pure-data stamping decision.</li>
+<li><code>research/08-v04-design-synthesis.md</code> - the fork-on-stamp verdict and relative-transform migration plan.</li>
+<li><code>research/04-adversarial-verification-log.md</code> - the <code>Transient</code> vs <code>NonTransactional</code> finding this page's undo section is built on.</li>
+</ul>
+      </article>
+    <nav class="pager" aria-label="Page navigation">
+      <a class="pager-prev" href="toolkit.html">
+        <span class="pager-dir">&larr; Previous</span>
+        <span class="pager-title">The Toolkit - FModeToolkit and Slate</span>
+      </a>
+      <a class="pager-next" href="faction-visuals.html">
+        <span class="pager-dir">Next &rarr;</span>
+        <span class="pager-title">Faction - Identity and Gating</span>
+      </a>
+    </nav>
+    </main>
+
+    <footer class="foot">
+      <p>A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.</p>
+      <a href="https://github.com/defessler/OutpostBuilder">View on GitHub</a>
+    </footer>
+  </div>
+</div>
+
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

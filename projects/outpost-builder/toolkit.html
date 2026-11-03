@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Toolkit - FModeToolkit and Slate · OutpostBuilder</title>
+<meta name="description" content="A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.">
+<link rel="stylesheet" href="assets/css/style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQB4BCN1CH"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQB4BCN1CH');</script><script src="/js/insights.js" defer></script></head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<div class="shell">
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-controls="sidebar" aria-expanded="false">
+    <span></span><span></span><span></span>
+    <span class="vh">Toggle navigation</span>
+  </button>
+
+  <aside class="side" id="sidebar">
+    <div class="side-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-word">OutpostBuilder</span>
+      </a>
+
+      <nav aria-label="Documentation">
+        <ol class="nav-list">
+          <li>
+            <a href="index.html">
+              <span class="nav-no">01</span>
+              <span class="nav-title">OutpostBuilder</span>
+            </a>
+          </li>
+          <li>
+            <a href="tutorial.html">
+              <span class="nav-no">02</span>
+              <span class="nav-title">Tutorial - A Guided Tour</span>
+            </a>
+          </li>
+          <li>
+            <a href="architecture.html">
+              <span class="nav-no">03</span>
+              <span class="nav-title">Architecture</span>
+            </a>
+          </li>
+          <li>
+            <a href="identity.html">
+              <span class="nav-no">04</span>
+              <span class="nav-title">Instance Identity</span>
+            </a>
+          </li>
+          <li>
+            <a href="edmode.html">
+              <span class="nav-no">05</span>
+              <span class="nav-title">The Ed Mode - UEdMode Deep Dive</span>
+            </a>
+          </li>
+          <li>
+            <a href="toolkit.html" class="active" aria-current="page">
+              <span class="nav-no">06</span>
+              <span class="nav-title">The Toolkit - FModeToolkit and Slate</span>
+            </a>
+          </li>
+          <li>
+            <a href="prefabs.html">
+              <span class="nav-no">07</span>
+              <span class="nav-title">Prefabs &amp; Fork-on-Stamp</span>
+            </a>
+          </li>
+          <li>
+            <a href="faction-visuals.html">
+              <span class="nav-no">08</span>
+              <span class="nav-title">Faction - Identity and Gating</span>
+            </a>
+          </li>
+          <li>
+            <a href="extending.html">
+              <span class="nav-no">09</span>
+              <span class="nav-title">Extending Outpost Builder</span>
+            </a>
+          </li>
+          <li>
+            <a href="quick-reference.html">
+              <span class="nav-no">10</span>
+              <span class="nav-title">Quick Reference - The Cheat Sheet</span>
+            </a>
+          </li>
+          <li>
+            <a href="reference.html">
+              <span class="nav-no">11</span>
+              <span class="nav-title">Reference - Public Surfaces, Hotkeys, and Testing</span>
+            </a>
+          </li>
+          <li>
+            <a href="runtime-loadout.html">
+              <span class="nav-no">12</span>
+              <span class="nav-title">Per-Plot Building Rendering</span>
+            </a>
+          </li>
+          <li>
+            <a href="porting.html">
+              <span class="nav-no">13</span>
+              <span class="nav-title">Porting Into Your Own Project</span>
+            </a>
+          </li>
+          <li>
+            <a href="wiring.html">
+              <span class="nav-no">14</span>
+              <span class="nav-title">System Wiring</span>
+            </a>
+          </li>
+          <li>
+            <a href="technology.html">
+              <span class="nav-no">15</span>
+              <span class="nav-title">Technology &amp; Trade-offs</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
+      <a class="side-github" href="https://github.com/defessler/OutpostBuilder">
+        <span aria-hidden="true">&#8599;</span> Repository
+      </a>
+    </div>
+  </aside>
+
+  <div class="nav-scrim" id="nav-scrim"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="crumb">OutpostBuilder <span class="crumb-sep">/</span> The Toolkit - FModeToolkit and Slate</span>
+      <span class="published">Published <time datetime="2026-11-03T05:35:00Z">2026-11-03 05:35 UTC</time></span>
+
+    </header>
+
+    <main id="content">
+      <article class="doc">
+<h1 id="the-toolkit-fmodetoolkit-and-slate">The Toolkit - FModeToolkit and Slate</h1>
+<p>This page is meant as a quick reference on <code>FOutpostBuilderToolkit</code>, the <code>FModeToolkit</code> that drives the mode's Slate panel, and how it's put together.</p>
+<p>If you haven't read <code>architecture.html</code> yet, the short version is that the ed mode (<code>edmode.html</code>) owns all of the state, placement, and viewport drawing. The toolkit is purely the panel docked into the Modes tab. It reads the mode's state through getters and pushes user intent back through a small set of methods on <code>UOutpostBuilderEdMode</code>. It never owns gameplay logic itself.</p>
+<p>The toolkit is <strong>assembly glue</strong>: a panel switcher plus a set of thin mount functions that construct 14 reusable <code>SOutpost*</code> widgets and wire their events back to the mode.</p>
+<p>Almost none of the panel CONTENT lives in the toolkit's own methods. It lives on the widgets, each of which owns its own state and reads the editing session through a small shared read-model rather than a toolkit or mode pointer.</p>
+<p>This page covers that shape first, then the behavioral territory that sits on top of it:</p>
+<ul>
+<li><strong>The shape</strong> - Construction and Ownership, the File Map, the Widget Inventory, the two shared primitives, the widget-authoring recipe, Panel Anatomy.</li>
+<li><strong>The behavior</strong> - the Building palette and its hotkeys, the "+ New Building" flow, the in-viewport overlays, and the Overhead camera viewport overlay.</li>
+</ul>
+<p>The placement state machine, ghosts, and beams live in <code>edmode.html</code>. Fork-on-stamp and the rest of the prefab flow live in <code>prefabs.html</code>. Faction has no visual effect. What the faction row actually gates (which buildings a plot may field) lives in <code>faction-visuals.html</code>. The widget-extraction pattern itself, as a recipe for building the next reusable widget, is also summarized in <code>extending.html</code>.</p>
+<h2 id="construction-and-ownership">Construction and Ownership</h2>
+<p><code>FOutpostBuilderToolkit</code> holds a raw back-pointer to its owning mode, not a shared or weak pointer:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkit.h</span>
+<span class="cm">/** Back-pointer to the owning editor mode. NEVER call GLevelEditorModeTools() from this class. */</span>
+<span class="n">UOutpostBuilderEdMode</span><span class="o">*</span><span class="w"> </span><span class="n">OwningMode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">;</span>
+</code></pre></div>
+
+<p>IMPORTANT: never call <code>GLevelEditorModeTools()</code> from anywhere in this class, including the destructor. This is the structural fix for a shutdown-time assert: the toolkit is torn down (by <code>FEditorModeTools::DeactivateModeAtIndex</code>, before the mode's own <code>Exit()</code> even runs) while <code>GLevelEditorModeTools()</code> is already mid-teardown itself.</p>
+<p>Reaching back into mode tools during toolkit shutdown is undefined. The mode outlives the toolkit for the whole of <code>Exit()</code>, which is why the back-pointer stays a raw, always-valid pointer instead of needing a weak reference.</p>
+<p>The constructor's initializer list builds the toolkit's two shared-state primitives (see "Two Shared Primitives" below) as <code>TSharedRef</code>s, since a <code>TSharedRef</code> has no default constructor:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkit.cpp</span>
+<span class="n">FOutpostBuilderToolkit</span><span class="o">::</span><span class="n">FOutpostBuilderToolkit</span><span class="p">(</span><span class="n">UOutpostBuilderEdMode</span><span class="o">*</span><span class="w"> </span><span class="n">InOwningMode</span><span class="p">)</span>
+<span class="w">    </span><span class="o">:</span><span class="w"> </span><span class="n">OwningMode</span><span class="p">(</span><span class="n">InOwningMode</span><span class="p">)</span>
+<span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">WidgetContext</span><span class="p">(</span><span class="n">MakeShared</span><span class="o">&lt;</span><span class="n">FOutpostBuilderWidgetContext</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">PaletteModel</span><span class="p">(</span><span class="n">MakeShared</span><span class="o">&lt;</span><span class="n">FOutpostPaletteModel</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="p">{</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Neither is usable yet at this point: their delegate/attribute fields are still default-constructed. <code>Init()</code> runs once, when the mode activates the toolkit, and does a handful of things in order:</p>
+<ul>
+<li><strong>Binds every <code>WidgetContext</code> field and <code>PaletteModel-&gt;GateFactionAttribute</code></strong> first, before any panel builder runs: <code>TAttribute&lt;T&gt;::CreateSP(this, &amp;FOutpostBuilderToolkit::SomeGetter)</code> for each, so every widget the panel builders are about to construct sees a fully-bound Context/model from its very first frame. <code>CreateSP</code> needs a live shared-pointer control block for <code>this</code>, which is why this binding happens in <code>Init()</code> and not the constructor above.</li>
+<li><strong>Runs an <code>ensureMsgf</code> sweep over every field it just bound</strong> (<code>OUTPOST_ENSURE_CONTEXT_BOUND</code>, a file-scoped macro defined and <code>#undef</code>'d around this one block, mirroring the <code>LOCTEXT_NAMESPACE</code> define/undef discipline).<ul>
+<li>A field left accidentally unbound would otherwise leave every widget that reads it polling a silent, forever-default value with no error anywhere until a designer noticed a stuck control. This is editor-only and costs nothing in a shipped build.</li>
+</ul>
+</li>
+<li>Building the viewport-overlay widgets:<ul>
+<li><code>OverheadCameraOverlayWidget</code>, <code>PlacementOverlayWidget</code>, and <code>EditingOutpostBarWidget</code> (each an <code>SOutpostViewportOverlay</code> mount, see "The Overhead Camera Viewport Overlay" below), plus <code>BuildingCommandGridWidget</code> (<code>SOutpostBuildingCommandGrid</code>, NOT itself an <code>SOutpostViewportOverlay</code>) and <code>BuildModeBannerWidget</code> (<code>SOutpostBuildModeBanner</code>, added to the viewport unconditionally right after <code>FModeToolkit::Init()</code>, not toggled).</li>
+<li>The first four are just <code>SWidget</code>s at this point, not yet added to any viewport. (The thumbnail pool is <code>FOutpostPaletteModel</code>'s own constructor's job, sized 64 and shared by every palette tile's <code>FAssetThumbnail</code>, not something <code>Init()</code> does directly.)</li>
+</ul>
+</li>
+<li>Building <code>ToolkitContent</code>, the bare <code>SWidgetSwitcher</code> that <code>GetInlineContent()</code> returns, gating the two panels. Building it calls the panel builders (<code>BuildOverviewPanel</code>/<code>BuildEditingPanel</code>), which is where the 13 <code>SOutpost*</code> widgets actually get constructed and mounted.</li>
+</ul>
+<p>The owning mode calls this toolkit's public <code>HandleEditingOutpostChanged()</code> / <code>HandleCameraPositioningChanged()</code> / <code>HandlePlacementStateChanged()</code> / <code>HandlePaletteHotkey(int32)</code> directly, through its own <code>GetOutpostToolkit()</code>. There are no mode-delegate subscriptions to set up here.</p>
+<p>The destructor unwinds the asset-registry subscriptions and the undo registration, then removes all five viewport-overlay widgets:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkit.cpp</span>
+<span class="n">FOutpostBuilderToolkit</span><span class="o">::~</span><span class="n">FOutpostBuilderToolkit</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">FModuleManager</span><span class="o">::</span><span class="n">Get</span><span class="p">().</span><span class="n">IsModuleLoaded</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">"AssetRegistry"</span><span class="p">)))</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">IAssetRegistry</span><span class="o">&amp;</span><span class="w"> </span><span class="n">AssetRegistry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FAssetRegistryModule</span><span class="o">::</span><span class="n">GetRegistry</span><span class="p">();</span>
+<span class="w">        </span><span class="n">AssetRegistry</span><span class="p">.</span><span class="n">OnAssetRemoved</span><span class="p">().</span><span class="n">Remove</span><span class="p">(</span><span class="n">AssetRemovedHandle</span><span class="p">);</span>
+<span class="w">        </span><span class="n">AssetRegistry</span><span class="p">.</span><span class="n">OnAssetRenamed</span><span class="p">().</span><span class="n">Remove</span><span class="p">(</span><span class="n">AssetRenamedHandle</span><span class="p">);</span>
+<span class="w">        </span><span class="n">AssetRegistry</span><span class="p">.</span><span class="n">OnAssetAdded</span><span class="p">().</span><span class="n">Remove</span><span class="p">(</span><span class="n">AssetAddedHandle</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">GEditor</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">GEditor</span><span class="o">-&gt;</span><span class="n">UnregisterForUndo</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IsHosted</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">OverheadCameraOverlayWidget</span><span class="p">.</span><span class="n">IsValid</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">GetToolkitHost</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">RemoveViewportOverlayWidget</span><span class="p">(</span><span class="n">OverheadCameraOverlayWidget</span><span class="p">.</span><span class="n">ToSharedRef</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IsHosted</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">PlacementOverlayWidget</span><span class="p">.</span><span class="n">IsValid</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">GetToolkitHost</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">RemoveViewportOverlayWidget</span><span class="p">(</span><span class="n">PlacementOverlayWidget</span><span class="p">.</span><span class="n">ToSharedRef</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IsHosted</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">BuildingCommandGridWidget</span><span class="p">.</span><span class="n">IsValid</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">GetToolkitHost</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">RemoveViewportOverlayWidget</span><span class="p">(</span><span class="n">BuildingCommandGridWidget</span><span class="p">.</span><span class="n">ToSharedRef</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IsHosted</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">EditingOutpostBarWidget</span><span class="p">.</span><span class="n">IsValid</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">GetToolkitHost</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">RemoveViewportOverlayWidget</span><span class="p">(</span><span class="n">EditingOutpostBarWidget</span><span class="p">.</span><span class="n">ToSharedRef</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IsHosted</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">BuildModeBannerWidget</span><span class="p">.</span><span class="n">IsValid</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">GetToolkitHost</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">RemoveViewportOverlayWidget</span><span class="p">(</span><span class="n">BuildModeBannerWidget</span><span class="p">.</span><span class="n">ToSharedRef</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The overlay removals are guarded by <code>IsHosted()</code> rather than the <code>OwningMode</code> check the rest of the class uses: the overlays live in the viewport host, not the mode, so they have to come down even in whatever corner case leaves <code>OwningMode</code> gone by dtor time. <code>IsHosted()</code> is the real guard there.</p>
+<p><code>PaletteModel</code>'s own destructor (run when the toolkit's <code>TSharedRef&lt;FOutpostPaletteModel&gt;</code> member is destroyed) cancels and releases the palette's soft-class preload handle, so there is nothing left for this dtor to remember there.</p>
+<h2 id="file-map">File Map</h2>
+<p><code>OutpostBuilderToolkit.h</code> is the ONE declaration surface (see its own FILE MAP comment for the authoritative, up-to-date list). The definitions are split one file per designer-facing panel, so changing a panel means opening its file rather than scanning a single monolith. Every function is still a member; the split is a pure <code>.cpp</code> partition, no straddling helpers, no shared private header:</p>
+<ul>
+<li><code>OutpostBuilderToolkit.cpp</code> - Lifecycle/<code>Init</code> (the Context/model binding + <code>ensure</code> sweep, all five viewport-overlay widgets, the panel switcher), panel routing, the Editing panel's shell (Back/label header), the undo client, asset-registry hooks, overlay lifecycle (<code>SyncViewportOverlay</code>).</li>
+<li><code>OutpostBuilderToolkitOverview.cpp</code> - The Overview panel: its browse shell (Outposts/Buildings <code>SOutpostTabBar</code> + switcher) and the Outposts-tab mount point (constructs one <code>SOutpostsOverviewPanel</code>).</li>
+<li><code>OutpostBuilderToolkitBuildingsTab.cpp</code> - The Overview panel's Buildings-tab mount point, constructing the plugin's one <code>SOutpostBuildingsBrowser</code> instance, plus the refresh plumbing (<code>RefreshAllBuildingBrowsers</code>/<code>HandleBuildingBrowserContentsChanged</code>) that instance's own edits/creates drive.</li>
+<li><code>OutpostBuilderToolkitBuildTab.cpp</code> - The Editing panel's whole body (<code>BuildEditingPanelContent</code>): thin mounts for <code>SOutpostIdentityHeader</code> and <code>SOutpostPlotsSection</code>, the Select Plot Contents section (a thin shell around <code>SOutpostPaletteFilterRow</code>/<code>SOutpostPaletteCategoryTabRow</code>/<code>SOutpostBuildingPalette</code>/<code>SOutpostSelectedBuildingPanel</code>/<code>SOutpostAssignRow</code>, five pieces), the shared <code>RefreshBuildingPalette</code>/<code>SelectHotBuilding</code>/<code>HandlePaletteHotkey</code>/<code>HandleEyedropperPick</code> toolkit-level palette plumbing, and <code>CreateNewBuildingDefinitionInteractive</code>.</li>
+<li><code>OutpostBuilderToolkitConfigureTab.cpp</code> - The identity header's mutation forwarders (<code>HandleDisplayNameCommitted</code>/<code>HandleFactionChanged</code>) and the Overhead camera pilot's forwarders (<code>HandlePositionOverheadCameraClicked</code>/<code>HandleEditOutpostVolumeClicked</code>/the Revert-Cancel-Done trio), all reached from the editing viewport bar. <code>IsSaveEnabled</code>/<code>HandleSaveClicked</code> also live here, called by that bar's Save button.</li>
+<li><code>OutpostBuilderToolkitPlacement.cpp</code> - <code>IsPlacingPlot</code> (the <code>WidgetContext-&gt;bIsPlacingPlot</code> forwarder, gating the palette family's "outpost placement only" rule) and the placement viewport overlay's bindings (<code>GetPlacementOverlayText</code>/<code>HandleCancelPlacementClicked</code>, the session's one Cancel affordance).</li>
+<li><code>OutpostBuilderToolkitEditingBar.cpp</code> - The editing viewport overlay's content: the five-button row (Save / New Plot / Position Overhead Camera / Edit Outpost Volume / Randomize Plots) via the file-local <code>OutpostBuilder::EditingBar::BuildBarButton</code> factory, and each button's gate/handler pair.</li>
+</ul>
+<h2 id="the-widget-inventory">The Widget Inventory</h2>
+<p>The 14 reusable <code>SOutpost*</code> widgets, in the order they were extracted (research/19's leaf-up ordering: dumb leaves first, then the pieces that assemble them). Every one follows the exemplar contract described under "The Widget-Authoring Recipe" below: owns its own state, holds no <code>UOutpostBuilderEdMode*</code>/<code>FOutpostBuilderToolkit*</code>, and reads the editing session only through an injected <code>FOutpostBuilderWidgetContext</code> and/or <code>FOutpostPaletteModel</code>.</p>
+<ul>
+<li><code>SOutpostBuildingsBrowser</code> - The building-definition browser (create, inline edit, Find References in World), mounted once in the Overview panel's Buildings tab. The original exemplar the whole widget contract is modeled on; written as an independent, reconstructable widget that assumes no particular mount count.</li>
+<li><code>SOutpostSaveFooter</code> - The editing panel's pinned Save button, the trivial proof of the Context pattern end to end. Export-only, no internal mount today (see "The Save Footer" below).</li>
+<li><code>SOutpostTabBar&lt;TEnum&gt;</code> - Generic reusable tab bar (<code>SSegmentedControl&lt;TEnum&gt;</code> wrapper). Its one mount is the Overview panel's Outposts/Buildings bar (<code>EOutpostBrowseTab</code>); the template is ready for a future second enum-keyed bar at the cost of nothing but its own enum and entries list.</li>
+<li><code>SOutpostsOverviewPanel</code> - The Overview panel's Outposts sub-view: the outpost combo, its single Create/Edit/Restore/Edit(Place Actor)/Restore Definition action button, and the Plugin Settings details view.</li>
+<li><code>SOutpostIdentityHeader</code> - The editing panel's Display Name field and Faction combo.</li>
+<li><code>SOutpostPaletteTile</code> - The single palette tile leaf (building or Empty): one <code>SBorder</code>-wrapped-<code>SButton</code>-with-<code>SOverlay</code> shape both callers mount identically. Carries a double-click event (<code>OnTileDoubleClicked</code>, timing-detected; see "Palette Tile Double-Click" below) and a three-cue selected treatment (brighter/thicker ring, an inner fill wash, a checkmark badge; see "Stronger Selected-Tile Treatment" below).</li>
+<li><code>SOutpostPaletteFilterRow</code> - The Plot Size filter combo, mounted in the Select Plot Contents section's heading row beside "+ New Building" (filter to the button's left, both right-aligned). A single-combo row. Carries an OPTIONAL <code>Context</code>: disabled ONLY during an outpost placement (<code>bIsPlacementActive &amp;&amp; !bIsPlacingPlot</code>), fully live during a plot placement.</li>
+<li><code>SOutpostPaletteCategoryTabRow</code> - The "All / one category per tab / ... / Uncategorized" tab row above the palette tiles. Carries the same optional <code>Context</code>/narrow disabling rule as <code>SOutpostPaletteFilterRow</code>.</li>
+<li><code>SOutpostBuildingPalette</code> - The tile-grid ASSEMBLY view. It refills from <code>FOutpostPaletteModel</code>'s visible subset.<ul>
+<li>Its own <code>Context</code> drives the "disabled during outpost placement only" rule, threaded onto every tile's own <code>IsEnabled</code>/<code>Cursor</code> (see "Placement Keeps the Editing Panel" below for why a wrapping-container <code>IsEnabled</code> alone would not be enough).</li>
+<li><code>HandleTileDoubleClicked</code> opens the definition's own asset editor, and the grid is also the Content Browser drop target (see "The Content Browser Drop" below).</li>
+</ul>
+</li>
+<li><code>SOutpostSelectedBuildingPanel</code> - Its own bordered SECTION BOX: a thumbnail-sized swatch, the building's own name shown LARGE (with the dirty asterisk folded in), Show-in-Content-Browser/Save icon-buttons, and a Clear button (fires the same signal the palette's Empty tile does). See "The Selected Building Section Box" below.<ul>
+<li>The empty-state line and the hot building's own scoped details view sit below, inside the same box.</li>
+</ul>
+</li>
+<li><code>SOutpostAssignRow</code> - The building picker combo, the <strong>Assign Building</strong> button, and the <strong>Pin</strong>/<strong>Unpin</strong> button.</li>
+<li><code>SOutpostPlotsSection</code> - The Plots section: the heading's two buttons (+ New Plot / Randomize Plots) and the multi-select plot list, a multi-column <code>SListView</code> + <code>SHeaderRow</code> (Plot | Building | Size | a narrow warn column). <code>SelectPlots(const TArray&lt;AOutpostPlot*&gt;&amp;)</code> drives the bidirectional viewport sync (see "The Plots List" below).</li>
+<li><code>SOutpostViewportOverlay</code> - The shared bottom-center viewport overlay SHELL: one parameterized widget (label + a content slot) reused for the Overhead-camera-positioning overlay, the placement overlay, and the editing bar. Also carries <code>OutpostBuilder::ViewportOverlay::MakeDisabledAwareCursor</code> (see "The Disabled-Button Cursor" below).</li>
+<li><code>SOutpostBuildingCommandGrid</code> - The in-viewport building command grid: a grid (columns configurable, rows derived from content) of COMPACT <code>SOutpostPaletteTile</code>s (the shared leaf's <code>.bCompact(true)</code> argument, not a second tile widget) inside a single rounded, translucent shell, anchored to a configurable viewport corner. Shown only during PLOT placement.<ul>
+<li>NOT built on <code>SOutpostViewportOverlay</code> (a corner-anchored tile grid doesn't fit that shell's bottom-center label+action-row shape, the same reason <code>SOutpostBuildModeBanner</code> isn't one either). See "The In-Viewport Building Command Grid" below.</li>
+</ul>
+</li>
+</ul>
+<p><code>FOutpostPaletteModel</code> (covered next) is not itself a widget. It is the shared state primitive several of the rows above read and write.</p>
+<h2 id="two-shared-primitives">Two Shared Primitives</h2>
+<p>Every extracted widget above reads the editing session through one or both of two shared, ref-counted (<code>TSharedRef</code>, never a bare value or <code>UObject</code>) primitives, both constructed once by the toolkit and handed down as <code>SLATE_ARGUMENT</code>s.</p>
+<h3 id="foutpostbuilderwidgetcontext"><code>FOutpostBuilderWidgetContext</code></h3>
+<p>Declared in <code>OutpostBuilderWidgetContext.h</code>. A bundle of <strong>find-only</strong> reads of the editing session, as bound delegates/<code>TAttribute</code>s, never a raw <code>UOutpostBuilderEdMode*</code> or <code>FOutpostBuilderToolkit*</code>. This is what turns "the widget knows the toolkit" into "the widget knows a small bag of getters". research/19 calls it the single highest-leverage move in the whole decomposition.</p>
+<p>Every field must stay safe for PER-FRAME Slate bindings (<code>IsEnabled</code>/<code>Visibility</code>/<code>Text</code> attributes polled every tick), so nothing bound into it may ever <code>LoadSynchronous</code>. The project's "per-frame paths never load assets" invariant holds here too.</p>
+<p>One-shot handlers that genuinely need a force-loading resolve (Save, a property commit) stay on the toolkit and are reached through each widget's own <code>SLATE_EVENT</code>, never through the Context.</p>
+<p>The FIND-ONLY contract extends to naming: <code>ResolveEditingDefinition</code> on the Context is bound to <code>FOutpostBuilderToolkit::FindLoadedEditingDefinition</code>, NOT to the toolkit's near-identically-named but force-loading <code>ResolveEditingDefinition</code>.</p>
+<p>The Context grows one field (or field-group) per widget that needs one, and keeps growing the same way: add a field here rather than threading a new toolkit/mode pointer into a new widget.</p>
+<p><code>bIsPlacementActive</code> drives the identity-header/Plots-section/Assign-row disabling rule. <code>bIsPlacingPlot</code> tells the palette family which placement kind is active (its narrower "outpost placement only" rule). See "Placement Keeps the Editing Panel" below.</p>
+<p>Every field is bound in <code>Init()</code> via <code>TAttribute&lt;T&gt;::CreateSP(this, &amp;FOutpostBuilderToolkit::SomeGetter)</code> or the delegate equivalent, to a small toolkit-owned forwarder method that itself just calls <code>OwningMode-&gt;SomeGetter()</code>, a layer of indirection that exists solely so <code>CreateSP</code> never has to expose <code>OwningMode</code> itself to any widget.</p>
+<h3 id="foutpostpalettemodel-and-fscopedpaletteobserver"><code>FOutpostPaletteModel</code> and <code>FScopedPaletteObserver</code></h3>
+<p>Declared in <code>OutpostPaletteModel.h</code>/<code>.cpp</code>. This is the DOCUMENTED DEVIATION from the Context's per-instance-state rule: a normal extracted widget owns its OWN state, but the palette's state (the entry cache, the filter state, the hot-building selection) is read by more than the palette view itself. The Assign picker, the palette hotkeys, and the Selected Building panel all consume it.</p>
+<p>So it has to be ONE shared instance the toolkit owns, not view-local copies. <code>FOutpostPaletteModel</code> is that instance, constructed once by the toolkit and handed to every palette-complex widget.</p>
+<p>It owns:</p>
+<ul>
+<li><strong>The entry cache</strong> (<code>RefreshEntries()</code> rescans the asset registry. <code>GetBuildingPaletteEntries()</code>/<code>GetVisiblePaletteEntries()</code> return the full set and the filtered/pinned/capped subset).</li>
+<li><strong>The hot-building selection</strong> (<code>GetHotBuildingId()</code>/<code>SetHotBuildingId()</code>, which notifies observers on a genuine change. The per-frame highlight attributes alone aren't enough, since the panel palette and the in-viewport command grid share no invalidation root and a bare field write can leave one of them painting the old selection).</li>
+<li><strong>The filter state</strong> (<code>SizeFilter</code>/<code>CategoryFilter</code>, each with a setter that calls <code>RecomputeVisibleEntries()</code>).</li>
+<li><strong>The view rule</strong> (<code>PassesFilters()</code>: the mandatory faction gate, then category, then size, in that order).</li>
+<li><strong>The emptiness diagnosis</strong> (<code>DiagnoseEmptyVisibleSet()</code>), <strong>the category census</strong> (<code>ComputeCategoryPresence()</code>), <strong>the pin intake</strong> (<code>PinBuilding()</code>, a static), the shared thumbnail pool, and the async soft-class preload handle.</li>
+</ul>
+<p><strong>Observers.</strong> The model exposes one explicit <code>FSimpleMulticastDelegate</code>: <code>RegisterObserver</code>/<code>UnregisterObserver</code>/<code>NotifyObservers()</code>. <code>RecomputeVisibleEntries()</code> calls <code>NotifyObservers()</code> at its end, the ONE place that happens. So every mutator that changes what should be visible (a filter setter, or <code>RefreshEntries()</code> indirectly) just calls it rather than notifying separately.</p>
+<p><code>FScopedPaletteObserver</code> (same header) is the RAII wrapper for the register/unregister pair, for any widget that holds a <code>TSharedPtr&lt;FOutpostPaletteModel&gt;</code> + <code>FDelegateHandle</code> and registers in <code>Construct()</code> / unregisters in its destructor. Held as a plain VALUE member (never a <code>TSharedPtr</code> to one), move-only.</p>
+<p>It is not itself a crash fix: every observer callback is bound via <code>CreateSP</code>, which already holds a WEAK ref to its owning widget, so a missed unregister is safe, just untidy.</p>
+<p>What it buys is structural: register and unregister can no longer drift apart (a copy-pasted <code>Construct()</code> whose matching destructor line was forgotten), and every FUTURE observer widget gets this for free by holding one as a plain member.</p>
+<p><code>GateFactionAttribute</code> is the model's one cross-cutting read, injected exactly like a Context field: bound by the toolkit in <code>Init()</code> to <code>GetPaletteGateFaction()</code> (the editing outpost ACTOR's faction, read directly and never from a cached mirror, since <code>HandleEditingOutpostChanged</code> refreshes the palette before it syncs the identity header's own faction display).</p>
+<p>Everything else the model needs (the palette cap and <code>EmptyPlotMesh</code> off <code>UOutpostBuilderSettingsAsset</code>, the pin list off <code>UOutpostRuntimeSettings</code>) is a global-settings singleton read with no toolkit/mode dependency, so no further injection is needed.</p>
+<h2 id="the-widget-authoring-recipe">The Widget-Authoring Recipe</h2>
+<p>Every widget above (and the exemplar the whole epic started from, <code>SOutpostBuildingsBrowser</code>) follows the same contract. Building a new one (or judging whether an existing one still follows the pattern) means checking it against this list:</p>
+<ol>
+<li><strong>Owns its own state.</strong> Whatever the panel needs to remember (combo options, selection, a details view, a list's backing array) lives as a private member on the widget, built in its own <code>Construct()</code>. Nothing is left on the toolkit "for now."</li>
+<li><strong>Holds no toolkit or mode pointer.</strong> No <code>UOutpostBuilderEdMode*</code>, no <code>FOutpostBuilderToolkit*</code>, anywhere on the class. Every editing-session read comes through an injected <code>TSharedPtr&lt;FOutpostBuilderWidgetContext&gt;</code> and/or <code>TSharedPtr&lt;FOutpostPaletteModel&gt;</code>, taken as a <code>SLATE_ARGUMENT</code> and null-checked at every use (never null in practice, but every access still guards).</li>
+<li><strong>Context/model in, <code>SLATE_EVENT</code>s out.</strong> Reads flow in through the Context/model's find-only getters.<ul>
+<li>Anything that MUTATES (a transaction, a spawn, a config write) is reported back out as a <code>SLATE_EVENT</code> (an <code>FSimpleDelegate</code> or a purpose-named one-param delegate), which the toolkit's mount site binds via <code>CreateSP</code> to a thin forwarder that calls the one <code>UOutpostBuilderEdMode</code> method that actually does the work. A world-mutating action is never performed by the widget itself.</li>
+</ul>
+</li>
+<li><strong>A public <code>Refresh*()</code> (or self-refresh in <code>Construct()</code>).</strong> A widget that owns state needs a way for an external trigger (undo/redo, an asset-registry event, a sibling panel's edit) to re-sync it.<ul>
+<li>The convention is a public <code>RefreshFoo()</code> the toolkit's cross-cutting handlers (<code>HandleEditingOutpostChanged</code>, <code>RefreshAfterTransaction</code>, <code>HandleAssetRemoved</code>/<code>HandleAssetRenamed</code>) call directly on a stored <code>TSharedPtr&lt;SOutpostFoo&gt;</code> member.</li>
+<li>The alternative, for the palette-complex widgets, is a <code>FScopedPaletteObserver</code> that self-refreshes off <code>FOutpostPaletteModel::NotifyObservers()</code> instead of needing an external call at all.</li>
+<li>Every widget also self-refreshes once at the end of its own <code>Construct()</code>, so the toolkit's <code>Init()</code> no longer needs a matching "prime it" call for each mount.</li>
+</ul>
+</li>
+<li><strong>The per-widget <code>IsEditingContentUsable()</code> mirror.</strong> The positioning-gate rule ("nothing should read as usable while positioning the Overhead camera") is a small two-line <code>IsEditingContentUsable() const</code> on each widget that needs it (<code>SOutpostIdentityHeader</code>, <code>SOutpostAssignRow</code>, <code>SOutpostPlotsSection</code>), reading <code>Context-&gt;bIsPositioningOverheadCamera</code> directly.<ul>
+<li>It is deliberately a small mirror repeated per widget, not a shared helper, since each is a two-line function and a shared helper would just be a new toolkit/mode-adjacent dependency for widgets built specifically to avoid one.</li>
+<li>Those same three mirrors also OR in <code>Context-&gt;bIsPlacementActive</code>.</li>
+<li>See "Placement Keeps the Editing Panel" below for why: during placement the containing body stays VISIBLE (individual controls disable instead), so this mirror is the ONLY line of defense there, which is why each is paired with a leaf-level <code>IsEnabled</code> binding on the actual interactive control (see that section for the engine-verified reason a container-level <code>IsEnabled</code> alone would not be enough).</li>
+</ul>
+</li>
+</ol>
+<p><strong>The button recipe</strong> (<code>OutpostBuilderToolkitBuildTab.cpp</code>, above <code>BuildEditingPanelContent</code>) spells out the concrete steps for the most common case, adding one button to an existing section:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkitBuildTab.cpp</span>
+<span class="c1">// TO ADD A BUTTON to the editing panel, copy the "+ New Plot" set end to end: an SButton block in the</span>
+<span class="c1">// owning section widget's Construct() + its Handle*Clicked / Is*Enabled / Get*Tooltip trio declared in</span>
+<span class="c1">// that widget's .h and defined in its .cpp + (when it acts on the world) a Can*/Do* pair on</span>
+<span class="c1">// UOutpostBuilderEdMode that a thin toolkit forwarder (here or in the core file) relays a SLATE_EVENT</span>
+<span class="c1">// to. Wire IsEnabled/ToolTipText/OnClicked exactly as that set does - see SOutpostPlotsSection.cpp's</span>
+<span class="c1">// "+ New Plot" (the recipe below still applies verbatim to whichever widget a new button joins).</span>
+</code></pre></div>
+
+<p>Those five <code>SButton</code> lines (<code>.Text</code>/<code>.ToolTipText</code>/<code>.IsEnabled</code>/<code>.OnClicked</code>, plus the block itself) are the whole Slate surface, and four of them ARE the button's four facts (label, tooltip, enabled, execute). Slate's <code>(this, &amp;F::Fn)</code> overload is already the declarative sugar.</p>
+<p>A leaf once proposed replacing them with a registration table and was refuted by its own design scout: the trio is where the logic lives and survives any registry, so the honest saving was small and spelled worse. Don't re-propose it without reading research/15.</p>
+<h2 id="panel-anatomy-overview-and-editing">Panel Anatomy - Overview and Editing</h2>
+<p><code>GetInlineContent()</code> returns the bare <code>SWidgetSwitcher</code> with <strong>two</strong> slots. <code>GetActivePanelIndex()</code> decides which slot shows:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkit.cpp</span>
+<span class="n">int32</span><span class="w"> </span><span class="nf">FOutpostBuilderToolkit::GetActivePanelIndex</span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// Placement does not swap to its own panel - a placement session routes to the SAME Editing-panel</span>
+<span class="w">    </span><span class="c1">// index (1) editing does, with the editing panel's individual controls disabled rather than the</span>
+<span class="w">    </span><span class="c1">// whole panel replaced. This covers a brand-new OUTPOST placement too, where IsEditingOutpost() is</span>
+<span class="w">    </span><span class="c1">// still false (the outpost doesn't exist until ConfirmOutpostPlacement's EnterOutpostEditMode call).</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">OwningMode</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">OwningMode</span><span class="o">-&gt;</span><span class="n">IsPlacementActive</span><span class="p">()</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">OwningMode</span><span class="o">-&gt;</span><span class="n">IsEditingOutpost</span><span class="p">()))</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Both panels exist the whole time the toolkit is alive. They're built once by the panel-builder functions during <code>Init()</code>, which is when every widget mount below actually happens. Entering or leaving the editing sub-mode, or starting/cancelling a placement, doesn't rebuild widgets; it just flips which slot draws.</p>
+<h3 id="the-overview-panel-index-0">The Overview panel (index 0)</h3>
+<p>A browse shell: <code>BuildOverviewPanel()</code> mounts an <code>SOutpostTabBar&lt;EOutpostBrowseTab&gt;</code> (<strong>Outposts / Buildings</strong>) over an <code>SWidgetSwitcher</code>. <code>GetActiveBrowseTabValue()</code> returns the stored <code>ActiveBrowseTab</code> directly.</p>
+<ul>
+<li><strong>Outposts tab</strong> (<code>BuildBrowseTabOutpostsContent()</code>) mounts one <code>SOutpostsOverviewPanel</code>.<ul>
+<li>The outpost combo box, the single action button, and the Plugin Settings details view are ALL that widget's own state, built in its own <code>Construct()</code>.</li>
+<li>The toolkit supplies a <code>Context</code> (for <code>bIsPlayOrSimulateActive</code>, the one editing-session read the button's enabled state needs) and five action <code>SLATE_EVENT</code>s (<code>OnPlaceOutpostForDefinition</code>/<code>OnRestoreOutpostForDefinition</code>/<code>OnLocateOutpostForDefinition</code>/<code>OnRestoreDefinitionFromActors</code>/<code>OnStartOutpostPlacement</code>), each a thin <code>CreateSP</code> forward to one <code>UOutpostBuilderEdMode</code> call, plus <code>OnSettingsChanged</code> (the toolkit still owns the actual config write-back and the out-of-<code>/Game</code> warning toast).</li>
+<li>The combo's entry text, the placement-state classification (<code>ComputeOutpostPlacementState()</code>/<code>GetOutpostPlacementCue()</code>), and the action button's text/tooltip/enabled state/dispatch (<code>GetOutpostActionButtonText</code>/<code>GetOutpostActionButtonTooltip</code>/<code>IsOutpostActionEnabled</code>/<code>HandleOutpostActionClicked</code>) are all <code>SOutpostsOverviewPanel</code> members, not toolkit methods. See that widget's header for the full behavior.</li>
+<li><code>RefreshOutpostList()</code> is PUBLIC on the widget, called once at the end of its own <code>Construct()</code> and thereafter by the toolkit's cross-cutting triggers (<code>HandleEditingOutpostChanged</code>, <code>HandleAssetRemoved</code>, undo/redo).</li>
+<li>The list has TWO sources: the asset registry's <code>UOutpostDefinition</code> assets (one entry each, except that a definition with more than one live placement in this map gets one entry per placement, labelled <code>Placement (Template) (placed)</code> and keyed on its own instance id), plus the editor world's <code>AOutpost</code> actors whose valid definition id matches no asset.</li>
+<li>That's the ORPHAN case, shown as one <strong>"(missing definition)"</strong> entry per id (<code>EOutpostPlacementState::MissingDefinition</code>), named by the id's asset name, however many actors carry it. The action button for that state reads <strong>Restore Definition</strong> (see "The restore flow" below).</li>
+</ul>
+</li>
+<li><strong>Buildings tab</strong> (<code>BuildBrowseTabBuildingsContent()</code>, <code>OutpostBuilderToolkitBuildingsTab.cpp</code>) mounts one <code>SOutpostBuildingsBrowser</code> instance (<code>BuildingsBrowserOverview</code>). See "The Buildings-Tab Browser Widget" below.</li>
+</ul>
+<h4 id="the-restore-flow">The restore flow</h4>
+<p>Deleting an outpost's actors does <strong>not</strong> clear the definition's <code>PlacedOutpostPath</code>. Interactive delete deliberately leaves it set so the base can be rebuilt from its records, and it also retires the outpost's registry entry inside the same transaction - so undo restores entry and actors together.</p>
+<p>The "(deleted - restorable)" cue therefore reports either of two things: a fork-mode <code>PlacedOutpostPath</code> whose actor is gone, or a retired registry ghost whose anchor package is gone from disk. The second is what gives a shared template, which records no <code>PlacedOutpostPath</code> at all, a reachable Restore. There are two ways to act on it:</p>
+<ul>
+<li><strong>Overview panel</strong> - select the entry, click <strong>Restore</strong> on <code>SOutpostsOverviewPanel</code>'s action button. Routes to <code>UOutpostBuilderEdMode::RestoreOutpostForDefinition(FPrimaryAssetId)</code>.</li>
+<li><strong>Content Browser</strong> - right-click the <code>UOutpostDefinition</code> asset, <strong>Restore Placed Outpost</strong> (registered in <code>OutpostBuilderEditorModule.cpp</code>). Unlike the panel, this one has to activate the ed mode first, since it can be invoked with the mode closed.</li>
+</ul>
+<p>Both open a single <code>FScopedTransaction</code> and restore registry-first - <code>CollectRestorableGhosts</code> then <code>UOutpostStampLibrary::RestoreOutpostFromBaked</code> per ghost, which rebuilds under the recorded instance handle - with legacy <code>RestoreOutpost</code> as a gated fallback. The whole restored cascade (outpost + every plot + the Overhead camera) still undoes as one step, matching the delete it reverses.</p>
+<p>Both then select, frame (<code>FrameOutpostBase</code>), and <code>EnterOutpostEditMode</code> on the result, the same tail <code>LocateOutpostForDefinition</code> uses.</p>
+<p>Restore legality is now decided in three layers rather than one:</p>
+<ol>
+<li><code>CollectRestorableGhosts</code> decides what is even offered, gated on the disk-truth test (a retirement whose anchor package still exists is skew, never a candidate).</li>
+<li>The caller then refuses the legacy path outright whenever the registry knows any live placement of that definition.</li>
+<li><code>RestoreOutpost</code>'s own three refusals apply last, to pre-registry content only, re-checking the world itself rather than trusting its caller: it refuses (returns null, logging why) when the definition has no recorded placement, when <code>PlacedOutpostPath</code> still resolves to a <strong>live</strong> outpost, or when the recorded map isn't loaded.</li>
+</ol>
+<p>Respawning in that last case would mint a second same-id placement and orphan the real one. This is what makes the panel's cached <code>PlacementState</code> snapshot safe to act on even when an undo has revived the actor since the last refresh: the worst case is a toast, not a duplicate.</p>
+<h4 id="the-inverse-restore-restore-definition">The inverse restore: Restore Definition</h4>
+<p>The opposite loss (the ACTORS stand in the map but the definition ASSET is gone, deleted or renamed out from under a placed base) has its own path. Such an orphaned id shows in the combo as a <strong>"(missing definition)"</strong> entry (one per id, named by the id's asset name; several same-id actors still make ONE entry), and the action button reads <strong>Restore Definition</strong>, routing to <code>UOutpostBuilderEdMode::RestoreDefinitionFromOutpostActors(FPrimaryAssetId)</code>.</p>
+<p>It rebuilds a fresh <code>UOutpostDefinition</code> named EXACTLY the id's asset name (any other name would not resolve the actors' name-based id) in the <code>CreatedDefinitionDirectory</code> folder, from the actors' own mirrored state.</p>
+<p>The write-through law is what makes every field recoverable:</p>
+<ul>
+<li><code>DisplayName</code> from the anchor's label.</li>
+<li><code>Faction</code> from the anchor's copy (the one survivor of the deleted asset).</li>
+<li>One plot record per family <code>AOutpostPlot</code> (PlotId preserved, <code>RelativeTransform</code> recomputed against the anchor's record basis).</li>
+<li>The camera record from a unique family Overhead camera when one stands.</li>
+<li>The volume-size override from a unique family volume's standing bounds (its largest axis; <code>VolumeSizeCm</code> is a per-axis floor).</li>
+</ul>
+<p>It then records the placement (<code>RecordPlacement</code>, not <code>SyncDefinitionPlacement</code>; a fresh asset has no old basis to migrate records from), registers/dirties the asset (saving stays the designer's), and rescans so the id resolves immediately. The entry flips to "(placed)" on the panel's own post-action refresh.</p>
+<p>Four refusals, each a toast and never an overwrite:</p>
+<ul>
+<li>The id resolves again by click time (stale snapshot).</li>
+<li>MORE THAN ONE <code>AOutpost</code> carries the id (the record-ownership spine's fail-closed ambiguity rule).</li>
+<li>No <code>AOutpost</code> carries it.</li>
+<li>The target package already exists in memory/on disk/in the registry (a same-named asset outside the primary-asset scan paths; never overwritten, never renamed around).</li>
+</ul>
+<p><code>GetOrCreateOutpostDefinitionForOutpost</code>'s own refusal of a valid-but-unresolvable id is unchanged and still correct. Its toast just points at this action as the sanctioned remedy.</p>
+<p>Refresh honesty for the orphan lifecycle: deleting the asset while its actors stand flips the entry to "(missing definition)" live (the <code>HandleAssetRemoved</code> trigger), and the asset coming back flips it back live (<code>HandleAssetAdded</code> plus the widget's post-action refresh).</p>
+<p>Deleting the orphaned ACTORS fires no asset-registry event, so that entry can linger until the next refresh (at the latest, opening the combo, which rebuilds the list every time).</p>
+<h4 id="five-placement-states-and-deleting-a-definition-that-isnt-coming-back">Five Placement States, and Deleting a Definition That Isn't Coming Back</h4>
+<p>Every outpost-list entry carries one of five states (<code>EOutpostPlacementState</code>): <strong>NeverPlaced</strong>, <strong>Placed</strong>, <strong>DeletedRestorable</strong>, <strong>NotLoaded</strong>, and <strong>MissingDefinition</strong>.</p>
+<p><code>NotLoaded</code> is the quiet fourth case: a recorded placement whose actor's map isn't currently open. It's told apart from <code>DeletedRestorable</code> without ever loading a map to check (<code>ComputeOutpostPlacementState</code> only asks <code>FindPackage</code>, never <code>TryLoad</code>), and its entry keeps the plain <strong>Edit</strong> label rather than <strong>Restore</strong>, since respawning here would mint a duplicate the moment the real map loads back in (see "The restore flow" above).</p>
+<p>The first four states all come off the SAME definition-asset scan <code>RefreshOutpostList()</code> runs first. <strong>MissingDefinition</strong> doesn't: it comes from a SEPARATE pass over every <code>AOutpost</code> actor in the loaded editor world, checking each one's definition id against the set the asset scan already found.</p>
+<p>One scan catches "asset present, actor absent." The other catches "actor present, asset absent." Neither can stand in for the other.</p>
+<p>A <code>DeletedRestorable</code> entry can also be discarded outright instead of restored: <strong>Delete Definition...</strong>, visible only for that state AND only when the row's cue came from <code>PlacedOutpostPath</code> rather than from a registry ghost.</p>
+<p>It re-checks the SAME placement state the visibility binding used, TWICE, before it even asks: once against the cached row, then again, after a fresh load, against the definition's live <code>PlacedOutpostPath</code>.</p>
+<p>The ghost exclusion is what keeps those two checks derived from the same source - a shared template records no <code>PlacedOutpostPath</code>, so a ghost-lit row would show the button and then silently refuse it. Only then does its own confirm dialog open (naming the fact that this is the one action here undo can't reach).</p>
+<p>That second check is the one that earns its keep. An undo can silently restore the whole base with no refresh trigger to catch it, so a click that started over a genuinely gone outpost can land on a row that's since come back to life. Deleting the definition out from under a base that's standing again is exactly the disaster the re-check exists to prevent.</p>
+<h3 id="the-buildings-tab-browser-widget">The Buildings-Tab Browser Widget</h3>
+<p><code>SOutpostBuildingsBrowser</code> (<code>SOutpostBuildingsBrowser.h</code>/<code>.cpp</code>) is a self-contained <code>SCompoundWidget</code> extracted from what used to be entirely toolkit code, the original exemplar the whole widget contract is modeled on. It is mounted once, in the Overview panel's Buildings tab, as the plugin's only live instance.</p>
+<p>The widget class itself assumes nothing about mount count. It was never written to expect exactly one mount site, so a future second mount elsewhere would cost nothing (each instance carries its own selection/details/find-results state, since Slate widgets are single-parent).</p>
+<p><code>FBuildingBrowserEntry</code> and <code>FBuildingReferenceEntry</code> (the browser's row structs) live in <code>SOutpostBuildingsBrowser.h</code> alongside the class that owns them. The widget holds no reference to <code>UOutpostBuilderEdMode</code> or any editing-session state at all.</p>
+<p>Browsing or editing a building definition never disturbs the outpost being edited (research/18's Shape A decision: "read-only toward the editing session in all shapes"). So the browser needs nothing from the mode.</p>
+<p>Two callbacks out cover everything it can't do itself: <code>OnCreateBuildingRequested</code> (mints a new asset; the modal dialog flow stays on the toolkit, shared with the editing panel's own "+ New Building") and <code>OnContentsChanged</code> (a building definition's fields changed; the toolkit answers by refreshing the palette too).</p>
+<p><code>OutpostBuilderToolkitBuildingsTab.cpp</code> itself is thin: the one mount-point function (<code>BuildBrowseTabBuildingsContent()</code>) plus the refresh plumbing.</p>
+<p>That's <code>RefreshAllBuildingBrowsers()</code> (calls <code>RefreshList()</code> on the live instance; <code>BuildingsBrowserOverview</code> is a permanent toolkit member, built once in <code>Init()</code>, so a validity check is enough, with no weak-registry bookkeeping needed; the name stays "All" so a future second mount joins the same sweep with no call-site changes) and <code>HandleBuildingBrowserContentsChanged()</code> (the <code>OnContentsChanged</code> answer described above).</p>
+<p>The browser list itself (<code>BuildingBrowserListView</code>/<code>BuildingBrowserEntries</code>, <code>RefreshList()</code>) applies no visibility cap, no filters, and no resolvable-primary-asset-id gate, unlike the palette: the browser is the <em>editing</em> surface for everything the project has, including a definition parked outside the scanned roots that the palette (an <em>assignment</em> surface) rightly hides.</p>
+<p>Row text is the building's effective display name (<code>GetEffectiveDisplayName()</code> when the definition is resident, else <code>MakeDefaultDisplayNameFromAssetName</code> via a non-loading <code>FastGetAsset</code>). Hover for the package path.</p>
+<p>Selection is preserved by id across refreshes, and the refresh runs off asset-registry remove/rename, undo/redo, and its own details view's property commits.</p>
+<p><strong>Find References in World</strong> reads three truths in precedence order:</p>
+<ol>
+<li>Live <code>AOutpostPlot</code> actors for placements loaded right now (an assignment made since the last save counts immediately, because the bake is one save behind by construction).</li>
+<li>The baked registry for placements that are not loaded.</li>
+<li>A definition's own <code>GetPlots()</code> records only for content nothing has ever baked.</li>
+</ol>
+<p>The search still loads no map, and the "N outpost(s)" total counts instances that actually reference the building rather than every placement of the definition.</p>
+<h3 id="the-editing-panel-index-1">The Editing panel (index 1)</h3>
+<p>The editing panel is one continuous, tab-less body: a header row (<strong>Back</strong> + the editing outpost's actor label) flowing straight into the content via <code>FillHeight(1.f)</code>. <code>BuildEditingPanelContent()</code> (<code>OutpostBuilderToolkitBuildTab.cpp</code>) assembles everything about the outpost being edited, top to bottom. There is no pinned Save footer. Saving is the in-viewport editing bar's Save button + Ctrl+S (see "The Save Footer" below):</p>
+<ol>
+<li><strong>Identity header</strong> (<code>BuildOutpostIdentityHeader()</code>, a thin mount for <code>SOutpostIdentityHeader</code>, <code>SAssignNew</code>'d into the <code>IdentityHeader</code> member) - Display Name (an <code>SEditableTextBox</code>) and, in its own scoped <code>IsEnabled</code>/<code>ToolTipText</code> box, the <strong>Faction</strong> combo.<ul>
+<li>There is no swatch anywhere in this row. The combo shows the enum's display text only. The widget owns its own combo options/selection.</li>
+<li>The toolkit supplies <code>Context</code> and two events, <code>OnFactionChanged</code> (answered by <code>FOutpostBuilderToolkit::HandleFactionChanged</code>, <code>OutpostBuilderToolkitConfigureTab.cpp</code>; the assign PLUS the Building-palette refresh, since the outpost's faction is the palette's mandatory gate and <code>AssignFactionToEditingOutpost</code> never notifies anyone) and <code>OnDisplayNameCommitted</code> (answered by <code>HandleDisplayNameCommitted</code>, same file; the "Rename Outpost" transaction, below).</li>
+<li>Both the Display Name field AND the Faction combo (bound directly on the combo itself, not just the wrapping box; see "Placement Keeps the Editing Panel" below) disable during a placement session, alongside the positioning gate.</li>
+</ul>
+</li>
+</ol>
+<p>The display-name commit goes through the same Modify/dirty discipline as any other edit to a data asset:</p>
+<p>```cpp
+   // OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkitConfigureTab.cpp
+   void FOutpostBuilderToolkit::HandleDisplayNameCommitted(const FText&amp; NewText, ETextCommit::Type CommitType)
+   {
+    UOutpostDefinition* Definition = ResolveEditingDefinition();
+    if (!Definition || Definition-&gt;DisplayName.EqualTo(NewText))
+    {
+        return;
+    }</p>
+<div class="highlight"><pre><span></span><code>FScopedTransaction Transaction(LOCTEXT("RenameOutpostTransaction", "Rename Outpost"));
+Definition-&gt;Modify();
+Definition-&gt;DisplayName = NewText;
+Definition-&gt;MarkPackageDirty();
+</code></pre></div>
+
+<p>}
+   ```</p>
+<p>The no-op guard matters here in a way it wouldn't for a button click: <code>SEditableTextBox</code> fires <code>OnTextCommitted</code> on every focus loss, not only on an actual edit. Without it, tabbing into the field and back out would open an empty undo transaction every single time.</p>
+<p>The handler lives on the toolkit even though its widget is <code>SOutpostIdentityHeader</code>, a file-organization choice (this file already owns the faction-adjacent code), not a behavior split. <code>SOutpostIdentityHeader</code>'s <code>OnDisplayNameCommitted</code> <code>SLATE_EVENT</code> matches <code>FOnTextCommitted</code> exactly, so no wrapper is needed at the mount site.</p>
+<ol>
+<li><strong>Select Plot Contents section</strong> (<code>BuildSelectPlotContentsSection()</code>, directly in <code>OutpostBuilderToolkitBuildTab.cpp</code>; a thin SHELL rather than a single widget mount, since it assembles FIVE already-reusable pieces):<ul>
+<li>Heading row: heading text, then, right-aligned, the <strong>size filter combo</strong> (<code>SOutpostPaletteFilterRow</code>) beside <strong>"+ New Building"</strong>, filter to the button's LEFT, the size combo the only other control on the row.</li>
+<li>The category tab row (<code>SOutpostPaletteCategoryTabRow</code>).</li>
+<li>The building palette (<code>SOutpostBuildingPalette</code>; a building tile's double-click opens its definition's own asset editor, and the grid is the Content Browser's drop target).</li>
+<li>The Selected Building panel (<code>SOutpostSelectedBuildingPanel</code>, <code>SAssignNew</code>'d so <code>SelectHotBuilding</code>/<code>RefreshAfterTransaction</code> can call its public <code>RefreshView()</code>).</li>
+<li>Below all of that, the Assign row (<code>SOutpostAssignRow</code>, a fresh <code>SNew</code>; it owns no state a toolkit trigger ever needs to reach).</li>
+<li>See "The Building Palette" below for what each piece does, and "Placement Keeps the Editing Panel" for this section's placement-specific disabling rule (the palette family stays live during plot placement, unlike everything else here).</li>
+</ul>
+</li>
+<li><strong>Plots section</strong> (<code>BuildPlotsSection()</code>, a thin mount for <code>SOutpostPlotsSection</code>, <code>SAssignNew</code>'d into the <code>PlotsSection</code> member) - heading row ("+ New Plot" / "Randomize Plots") and the multi-select plot list, a multi-column <code>SListView</code> + <code>SHeaderRow</code> (see "The Plots List" below).<ul>
+<li>With zero plots, a muted "No plots yet - + New Plot adds one." line sits directly under the column headers (visibility-bound to the live entry count, so it collapses the moment the first plot lands).</li>
+<li>The widget owns <code>PlotListEntries</code>/<code>PlotListView</code>. Its public <code>RefreshPlotList()</code> is called by the toolkit's <code>HandlePlotsChanged()</code>/<code>HandleEditingOutpostChanged()</code>.</li>
+</ul>
+</li>
+</ol>
+<h3 id="the-positioning-notice-and-disabled-editing-controls">The Positioning Notice and Disabled Editing Controls</h3>
+<p>Positioning the Overhead camera closes off the rest of the editing panel with two layers, deliberately redundant:</p>
+<ul>
+<li><strong>The whole normal body hides.</strong> <code>BuildEditingPanelContent()</code>'s body (identity header, Select Plot Contents, and Plots) sits in one <code>SVerticalBox</code> whose <code>Visibility</code> is bound to <code>GetEditingPanelNormalContentVisibility()</code>, <code>EVisibility::Collapsed</code> for as long as <code>OwningMode-&gt;IsPositioningOverheadCamera()</code> is true. In its place, a sibling <code>STextBlock</code> bound to the inverse (<code>GetEditingPanelPositioningNoticeVisibility()</code>) shows one line: "Positioning overhead camera - use the viewport controls (Revert / Cancel / Done)."</li>
+<li><strong>Every write-capable control inside that body is ALSO individually gated</strong>, on each widget's own per-widget <code>IsEditingContentUsable()</code> mirror (see "The Widget-Authoring Recipe" above). <code>SOutpostIdentityHeader</code>, <code>SOutpostAssignRow</code>, and <code>SOutpostPlotsSection</code> each carry their own copy, ANDed ahead of their own existing rule.</li>
+</ul>
+<p>Contrast this with placement ("Placement Keeps the Editing Panel" below), which deliberately does the OPPOSITE: the panel stays put and disables in place, per the user's own distinction between the two sessions. Because the body ISN'T hidden during placement, each widget's <code>IsEditingContentUsable()</code> mirror also ORs in <code>Context-&gt;bIsPlacementActive</code>, and there that per-widget gate is the control's only line of defense.</p>
+<h3 id="the-save-footer-export-only">The Save Footer (export-only)</h3>
+<p><code>SOutpostSaveFooter</code> (the editing panel's original pinned Save button) has no internal mount today. Saving the editing outpost's definition is reached through the in-viewport editing bar's own <strong>Save</strong> button (<code>OutpostBuilderToolkitEditingBar.cpp</code>) and <strong>Ctrl+S</strong>. <code>IsSaveEnabled</code>/<code>HandleSaveClicked</code> (the toolkit methods) are called only by that bar's button. The widget itself is untouched and fully functional.</p>
+<p>It remains <code>docs/extending.md</code>'s smallest worked example of the <code>FOutpostBuilderWidgetContext</code> pattern end to end, and a downstream project can still <code>SNew(SOutpostSaveFooter).Context(...).OnSaveRequested(...)</code> it into their own panel. Its own header doc is marked "export-only, no internal mount."</p>
+<p>One layout fact is worth keeping for anyone touching <code>BuildEditingPanelContent()</code>'s layout: <code>ToolkitContent</code> (the bare <code>SWidgetSwitcher</code> <code>GetInlineContent()</code> returns) carries no <code>SScrollBox</code> of its own, because the engine's own <code>FModeToolkit::UpdatePrimaryModePanel</code> wraps whatever <code>GetInlineContent()</code> returns in ITS OWN <code>SScrollBox</code> before docking it in the Modes panel (unconditional, non-virtual, for any <code>FModeToolkit</code> like this one that never opts into <code>ToolkitBuilder</code>).</p>
+<p>The editing panel's body is a plain <code>FillHeight(1)</code> region inside that engine scroll box, with no inner cap or scroll box of the toolkit's own to reconcile.</p>
+<h3 id="delete-routing">Delete Routing</h3>
+<p>The toolkit has no delete button. Interactive delete (the <strong>Del</strong> key and the outliner's own <strong>Delete</strong> command) routes through the mode's mixed-kind <code>UOutpostBuilderEdMode::ProcessEditDelete</code> (<code>CanDeleteSelection()</code>/<code>DeleteSelection()</code>), which deletes whatever combination of outposts and plots is selected, cascading when an outpost is among them, and is deliberately NOT gated on Play/Simulate.</p>
+<p>Ctrl-click during placement (<code>RemovePlotUnderCursor</code>) is the other surviving plot-only removal path. See <code>edmode.html</code>'s "Delete Routing" section for the full accounting.</p>
+<h3 id="the-disabled-treatment">The Disabled Treatment</h3>
+<p>Two facts about a building decide whether it may go on a plot, and they are independent:</p>
+<ul>
+<li><strong>Size.</strong> <code>UOutpostBuildingDefinition::MatchesPlotSize(PlotSizeTag)</code> evaluates <code>PlotSizeQuery</code>, a <code>FGameplayTagQuery</code>, against the plot's <code>PlotSizeTag</code>. <strong>An empty query is a wildcard, matching every size</strong>, the default for a newly created building.</li>
+<li><strong>Faction.</strong> <code>Building-&gt;SupportsFaction(OutpostFaction)</code>, passed the OUTPOST's faction. <strong>A Neutral outpost accepts every building</strong>; the gate only engages once an outpost has a real faction. An empty <code>SupportedFactions</code> is a wildcard.</li>
+</ul>
+<p>Composed in exactly one place, <code>OutpostEditorUtils::EvaluateBuildingForPlot</code>, which returns <em>which</em> rule refused rather than a bool. Three consumers read it: <code>SOutpostAssignRow</code>'s <code>IsAssignEnabled</code>/<code>GetAssignTooltip</code> (via <code>FOutpostBuilderToolkit::GetSelectedPlotEligibility</code>, exposed to the widget through <code>WidgetContext-&gt;GetSelectedPlotEligibility</code> rather than re-derived locally; see that Context field's own doc for why it must stay toolkit-computed), and Randomize's pool filter (<code>SOutpostPlotsSection</code>).</p>
+<p>So the Assign button can never refuse what Randomize would happily assign. <strong>Never test <code>SupportedFactions</code> directly</strong>: the Neutral rule isn't expressible as a membership test.</p>
+<p>A mismatched building is refused at ASSIGN time only. One already sitting on a now-mismatched plot is <strong>never auto-deleted or reassigned</strong>.</p>
+<p>A second, OFFER-level surface for the faction half exists too: the palette and the Assign row's picker no longer <em>list</em> buildings the editing outpost's faction can't field at all. See "Palette Filters and the Faction Gate" below. The two are complementary: the gate narrows what's offered, the disabled treatment refuses what still gets picked. Only the ASSIGN path is authoritative.</p>
+<p><strong>The per-frame hazard, and how it's handled.</strong> Slate <code>.IsEnabled</code>/<code>.ToolTipText</code> are <code>TAttribute</code>s polled EVERY FRAME, and <code>OutpostAssetResolve.h</code>'s rule is that <code>LoadPrimaryAssetSync</code> belongs on one-shot actions only.</p>
+<p>So the button resolves its building from <code>FBuildingPaletteEntry::Definition</code> (a pointer <code>FOutpostPaletteModel::RefreshEntries</code> <strong>already loaded for the thumbnail</strong>, so caching it costs zero new loads), falling back to find-only <code>FindLoadedPrimaryAsset</code> (<code>FOutpostPaletteModel::FindCachedBuilding</code>). Caching the <em>object</em> rather than copies of the two fields is what keeps the rule single-homed.</p>
+<p>The faction likewise comes from the owning outpost ACTOR (<code>UOutpostBuilderEdMode::GetFactionForPlot</code>), never a definition load.</p>
+<p>That resolve can come up empty. When it does, the button stays <strong>permissive</strong>: <code>AssignBuildingToSelectedPlot</code> re-checks authoritatively with a real load before writing anything, and toasts the same wording (<code>FOutpostBuilderToolkit::GetAssignRefusalText</code>, a public static both the widget's tooltip and the mode's toast call) the tooltip would have shown.</p>
+<p><strong>Randomize is filtered for the same reason the button is.</strong> Its pool is filtered per plot; the <code>Can*</code> check is a per-frame binding too, so it deliberately does NOT ask "is anything eligible". That lives in the one-shot click that can afford the loads. A toast says how many were skipped.</p>
+<h3 id="the-placement-rule-matrix-plot-tags-warn-only-and-deliberately-separate">The Placement Rule Matrix (Plot Tags) - Warn-Only, and Deliberately Separate</h3>
+<p>The Disabled Treatment above is BLOCKING: a size or faction mismatch refuses assignment outright.</p>
+<p>A second rule is the opposite shape on purpose (user decision of record): a plot carries an arbitrary, PROJECT-OWNED <code>FGameplayTagContainer PlotTags</code> (no plugin-registered vocabulary; author your own in the project's <code>DefaultGameplayTags.ini</code>, exactly like <code>BuildingCategory</code>'s taxonomy, unlike <code>PlotSize</code>'s plugin-native four tags), and a building carries <code>PlotTagQuery</code> (<code>FGameplayTagQuery</code>, empty = fits everything, the same wildcard convention <code>PlotSizeQuery</code>/<code>SupportedFactions</code> establish).</p>
+<p>A mismatch <strong>never blocks</strong>: not assignment, not Randomize's pool, not the palette offer. It only <em>flags</em>.</p>
+<p>Composed in exactly one place, <code>OutpostEditorUtils::EvaluateBuildingPlotAdvisory</code> (<code>EBuildingPlotAdvisory::NoWarning</code>/<code>PlotTagMismatch</code>), deliberately a SEPARATE function from <code>EvaluateBuildingForPlot</code>, not a third case folded into <code>EBuildingPlotEligibility</code>: merging the two would tempt the disabled treatment to start consuming a result the user explicitly decided must never block anything.</p>
+<p>Four surfaces call it, all editor-only, all advisory:</p>
+<ul>
+<li><strong>The Assign row's tooltip</strong> (<code>SOutpostAssignRow::GetAssignTooltip</code>) appends a warning line when the advisory fires for the (hot building, selected plot) pair. The button itself stays enabled/disabled exactly as the disabled treatment alone would leave it.</li>
+<li><strong>The palette tile</strong> (<code>SOutpostPaletteTile</code>/<code>SOutpostBuildingPalette</code>) shows a small <code>Icons.Warning</code> glyph (bottom-right corner; hotkey owns top-left, pin owns top-right) when the advisory fires for that tile's building against the palette's CURRENTLY SELECTED plot, live per-frame like the selection highlight (<code>SOutpostBuildingPalette::GetTileWarningVisibility</code>) since a plot selection change doesn't rebuild the palette.<ul>
+<li>This is the one place this widget complex reads <code>FOutpostBuilderWidgetContext::GetSelectedPlot</code> at all, a narrow, documented amendment to its "takes no Context" origin story (see the widget's own header).</li>
+<li>The mid-placement glyph judges against the plot placement keeps selected, the one just placed. Since a freshly placed plot carries no tags, a tag-demanding building's glyph lights there, and that is a truthful preview: auto-assigning that building to the NEXT fresh plot produces exactly the warned pairing the glyph shows, the same one the plot list's drift icon then reports.</li>
+</ul>
+</li>
+<li><strong>The Plots list row</strong> (<code>SOutpostPlotsSection</code>) shows the same glyph as DRIFT DETECTION: the row's <em>already-assigned</em> building's query rejected the plot's <em>current</em> tags.<ul>
+<li>That means tags edited after assignment, or a Randomize pairing that landed in the warned set (accepted and expected: Randomize is NOT biased away from warnings). Computed once per <code>RefreshPlotList</code>, the same snapshot cadence the row's text already has.</li>
+</ul>
+</li>
+<li><strong><code>UOutpostDefinition::IsDataValid</code></strong> emits one WARNING-severity finding per stored assignment the query rejects. This is the one surface that does NOT call <code>EvaluateBuildingPlotAdvisory</code>: <code>UOutpostDefinition</code> lives in the RUNTIME module, which cannot depend on <code>OutpostBuilderEditor</code>, so it calls <code>UOutpostBuildingDefinition::MatchesPlotTags</code> directly instead.<ul>
+<li>This is documented as safe because the editor-module function is nothing but that same call wrapped in an enum, with no additional composed logic to drift from.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Enforcement is editor-only.</strong> <code>UOutpostStampLibrary</code>'s runtime stamping/restore path copies <code>PlotTags</code> record-&gt;actor (the same write-through <code>PlotSizeTag</code> gets) but never evaluates the query. A packaged game never sees a warning, never refuses a spawn, never even links against the editor-module advisory function.</p>
+<h3 id="edit-outpost-volume-create-if-missing">Edit Outpost Volume, Create-if-Missing</h3>
+<p>The editing viewport bar's <strong>Edit Volume</strong> button is the one place this verb is reachable. <code>HandleEditOutpostVolumeClicked</code> (<code>OutpostBuilderToolkitConfigureTab.cpp</code>) calls <code>OwningMode-&gt;EditVolumeForEditingOutpost()</code>, which creates the outpost's Outpost Volume if missing (else finds it via <code>FindVolumeForEditingOutpost()</code> when spawning is refused) and either way SELECTS the resulting volume.</p>
+<p>It RETURNS <code>bool</code>: true iff a volume was actually resolved/selected, false on every refusal. So <code>HandleEditOutpostVolumeClicked</code> can tell success from refusal before doing anything further.</p>
+<p>On success, it hands the editing outpost's definition id to <code>FOutpostBuilderEditorModule::BeginEditVolumeExcursion</code>, a MODULE-level call, deliberately not a toolkit method, because the excursion's very first act is activating the engine's Geometry ("Brush Editing") mode, which deactivates Outpost Builder mode as a side effect (<code>UEdMode::IsCompatibleWith</code> always returns false, and <code>FEdModeGeometry::IsCompatibleWith</code> only allows <code>EM_Bsp</code>, so neither mode tolerates the other).</p>
+<p>And THAT tears down this toolkit and every viewport overlay it hosts, including the button that was just clicked.</p>
+<p>Nothing toolkit-owned can survive to host a "come back" bar, so the excursion object (<code>FOutpostVolumeExcursion</code>) lives on the module instead, reached through <code>FModuleManager::GetModuleChecked&lt;FOutpostBuilderEditorModule&gt;</code>.</p>
+<p>Full mechanics (activation, the return overlay, the Esc hook, and the abnormal-teardown story for a manual mode switch or a map close) are in <code>reference.html</code>'s "Edit Outpost Volume Excursion". This toolkit has exactly one call site and no other involvement.</p>
+<h3 id="the-contextual-overhead-camera">The Contextual Overhead Camera</h3>
+<p>Each outpost has one saved camera framing (<code>UOutpostDefinition::OverheadCamera</code>) plus a per-plot map (<code>TMap&lt;FGuid, FOutpostCameraRecord&gt; PlotCameras</code>); the whole flow reads the current editor SELECTION to decide which record it's working with:</p>
+<ul>
+<li><code>OwningMode-&gt;GetCameraFramingTarget()</code> resolves the selection to exactly one <code>AOutpost</code> or <code>AOutpostPlot</code> belonging to the editing outpost's definition, or null for anything else. <strong>Position Overhead Camera</strong>'s enabled check includes <code>GetCameraFramingTarget() != nullptr</code> (one of its four ANDed conditions), and its tooltip names what's wrong when it's null.</li>
+<li>The Position/Done pilot session keys off whichever target <code>GetCameraFramingTarget()</code> currently resolves to. The Revert/Cancel/Done controls live on the viewport overlay; the positioning overlay's label binds <code>GetOverheadCameraOverlayLabelText</code>, rendering <code>"Positioning Overhead Camera - Framing: &lt;target&gt;"</code> from the session's own snapshot (<code>OwningMode-&gt;GetPositioningFramingTargetName()</code>, set at <code>StartOverheadCameraPositioning</code>, NOT a live <code>GetCameraFramingTarget()</code> re-read, which can drift from what Done will write). See <code>edmode.html</code>'s positioning-session section.</li>
+<li>There is exactly <strong>one</strong> <code>AOverheadCamera</code> actor per outpost, total. <code>PlotCameras</code> holds saved FRAMINGS, not extra camera actors. <code>EnterOutpostEditMode</code> unconditionally calls <code>EnsureOverheadCameraForEditingOutpost()</code> (no-op if a unique camera already exists), so the camera actor exists the moment editing starts.</li>
+<li>KNOWN LIMITATION, documented on <code>PlotCameras</code> itself in <code>OutpostDefinition.h</code>: entries are stored relative to the OUTPOST's record basis, NOT the plot's own transform. Moving a PLOT does not move its saved framing.</li>
+</ul>
+<p><code>FOutpostBuilderToolkit</code> is an <code>FEditorUndoClient</code> as well as an <code>FModeToolkit</code>, registered via <code>GEditor-&gt;RegisterForUndo(this)</code> at the end of <code>Init()</code>. Its <code>PostUndo</code>/<code>PostRedo</code> overrides both call <code>RefreshAfterTransaction()</code>, which re-runs <code>HandleEditingOutpostChanged()</code> (the outpost list, the plot list, the Building palette, the identity header's faction selector) plus <code>SelectedBuildingPanel-&gt;RefreshView()</code> and <code>RefreshAllBuildingBrowsers()</code>, and then relays straight to <code>OwningMode-&gt;HandleTransactionWhilePlacing()</code>.</p>
+<p>That relay is why the mode needs no undo registration of its own: the toolkit is the plugin's one registered undo client, so an undo/redo landing mid-placement (a session with no footprint snapshot of its own, but still holding stale validity state) only ever reaches the mode through this one path.</p>
+<p>That's the full dynamic-panel-plus-mode refresh set. It exists because undo/redo of a data-only definition change fires neither <code>HandleEditingOutpostChanged()</code> nor a selection-changed event on its own.</p>
+<p>The asset registry's <code>OnAssetRemoved</code>/<code>OnAssetRenamed</code> likewise refresh the Overview combo and palette so deleted/renamed assets never linger as stale entries. <code>OnAssetAdded</code> does the same for a definition CREATED outside this toolkit (a Content Browser duplicate, a Save-As, an import).</p>
+<p>It early-outs while <code>IAssetRegistry::IsLoadingAssets()</code> is true, so the initial/background asset scan (every asset added fires the delegate) never triggers a refresh storm. A single post-scan creation reaches the same class-filtered refresh <code>HandleAssetRemoved</code> uses.</p>
+<p>A definition rename reaches further than this toolkit-side refresh. <code>FOutpostBuilderEditorModule::OnDefinitionAssetRenamed</code> is a SEPARATE <code>OnAssetRenamed</code> subscriber, registered by the module rather than the toolkit, and it does different work.</p>
+<p>It rebinds every family actor's <code>OutpostDefinitionId</code> to the new name-based id in the loaded editor world, and re-folds any actor sitting in the STALE name-keyed World Outliner folder into the fresh one (a definition rename is the one instability the name-based folder scheme has to account for).</p>
+<p>The rebind is deliberately NOT wrapped in a transaction: the rename itself isn't undoable, so an undoable rebind could later revert on its own and re-orphan actors against a name that's already gone.</p>
+<h2 id="the-building-palette">The Building Palette</h2>
+<p>The palette complex is one shared model (<code>FOutpostPaletteModel</code>) plus six widgets built leaf-up from it (<code>SOutpostPaletteTile</code>, <code>SOutpostPaletteFilterRow</code>, <code>SOutpostPaletteCategoryTabRow</code>, <code>SOutpostBuildingPalette</code>, <code>SOutpostSelectedBuildingPanel</code>, <code>SOutpostAssignRow</code>). See "Two Shared Primitives" and "The Widget Inventory" above for the overview. This section covers the BEHAVIOR; the pieces that make it up moved into widgets, but the behavior itself is the same.</p>
+<p>The thumbnail pool is created once, in <code>FOutpostPaletteModel</code>'s own constructor:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Widgets/OutpostPaletteModel.cpp</span>
+<span class="n">FOutpostPaletteModel</span><span class="o">::</span><span class="n">FOutpostPaletteModel</span><span class="p">()</span>
+<span class="w">    </span><span class="c1">// Sized generously so a project with many building definitions doesn't start recycling tiles'</span>
+<span class="w">    </span><span class="c1">// thumbnails out from under the designer mid-session.</span>
+<span class="w">    </span><span class="o">:</span><span class="w"> </span><span class="n">ThumbnailPool</span><span class="p">(</span><span class="n">MakeShared</span><span class="o">&lt;</span><span class="n">FAssetThumbnailPool</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">64</span><span class="p">))</span>
+<span class="p">{</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>FOutpostPaletteModel::RefreshEntries()</code> rebuilds <code>BuildingPaletteEntries</code> from the asset registry, filters out anything whose primary asset id doesn't actually resolve, and prefers a real thumbnail of the building's own mesh over the definition asset's generic icon:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Widgets/OutpostPaletteModel.cpp (abbreviated)</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">FOutpostPaletteModel::RefreshEntries</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">BuildingPaletteEntries</span><span class="p">.</span><span class="n">Reset</span><span class="p">();</span>
+
+<span class="w">    </span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FAssetData</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Assets</span><span class="p">;</span>
+<span class="w">    </span><span class="n">FAssetRegistryModule</span><span class="o">::</span><span class="n">GetRegistry</span><span class="p">().</span><span class="n">GetAssetsByClass</span><span class="p">(</span>
+<span class="w">        </span><span class="n">UOutpostBuildingDefinition</span><span class="o">::</span><span class="n">StaticClass</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetClassPathName</span><span class="p">(),</span><span class="w"> </span><span class="n">Assets</span><span class="p">,</span><span class="w"> </span><span class="cm">/*bSearchSubClasses=*/</span><span class="nb">true</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FAssetData</span><span class="o">&amp;</span><span class="w"> </span><span class="n">AssetData</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">Assets</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">FPrimaryAssetId</span><span class="w"> </span><span class="n">AssetId</span><span class="p">(</span><span class="n">UOutpostBuildingDefinition</span><span class="o">::</span><span class="n">PrimaryAssetTypeName</span><span class="p">,</span><span class="w"> </span><span class="n">AssetData</span><span class="p">.</span><span class="n">AssetName</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// Only offer tiles whose primary asset id actually resolves.</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">UAssetManager</span><span class="o">::</span><span class="n">IsInitialized</span><span class="p">()</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">UAssetManager</span><span class="o">::</span><span class="n">Get</span><span class="p">().</span><span class="n">GetPrimaryAssetPath</span><span class="p">(</span><span class="n">AssetId</span><span class="p">).</span><span class="n">IsValid</span><span class="p">())</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">TSharedPtr</span><span class="o">&lt;</span><span class="n">FBuildingPaletteEntry</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Entry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MakeShared</span><span class="o">&lt;</span><span class="n">FBuildingPaletteEntry</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="w">        </span><span class="n">Entry</span><span class="o">-&gt;</span><span class="n">AssetData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AssetData</span><span class="p">;</span>
+<span class="w">        </span><span class="n">Entry</span><span class="o">-&gt;</span><span class="n">AssetId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AssetId</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">// ... thumbnail resolution against BuildingMesh when set, else the definition asset itself;</span>
+<span class="w">        </span><span class="c1">// Entry-&gt;Definition caches the loaded pointer for later per-frame reads.</span>
+<span class="w">        </span><span class="n">BuildingPaletteEntries</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">Entry</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">RecomputeVisibleEntries</span><span class="p">();</span><span class="w"> </span><span class="c1">// Also NotifyObservers() at its end.</span>
+<span class="w">    </span><span class="c1">// ... plus the async residency warmer described below.</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>That resolution check earns its keep. <code>GetAssetsByClass</code> finds every <code>UOutpostBuildingDefinition</code> package the registry knows about, including ones sitting outside whatever paths <code>ScanPathsForPrimaryAssets</code> covers. Filtering here keeps the palette honest with what the picker and the runtime can actually use.</p>
+<p><strong>The refresh ends with an async residency warmer, not a load.</strong> After rebuilding the entry cache and notifying every observer, <code>RefreshEntries()</code> cancels any prior <code>PalettePreloadHandle</code>, collects the <code>FSoftObjectPath</code>s of every entry's <code>BuildingActorClass</code> + <code>BuildingMesh</code> (ALL entries, not just the visible subset) plus the settings asset's <code>EmptyPlotMesh</code>, skips anything null or already resident, and, if anything remains, issues one <code>RequestAsyncLoad</code>, stashing the handle back on <code>PalettePreloadHandle</code>.</p>
+<p>This is a pure residency hint: the one-shot <code>LoadSynchronous</code> sites the ghost/preview code already uses (<code>ResolvePreviewGhostSource</code> et al., see <code>edmode.html</code>) remain the authoritative load. The handle is cancelled and replaced on every refresh, and cancelled and released in <code>FOutpostPaletteModel</code>'s destructor.</p>
+<p>Note: <code>BuildingPaletteEntries</code> isn't sorted. Whatever order <code>GetAssetsByClass</code> hands back is also the hotkey order. Treat the hotkeys as "whatever's currently in slot N" of <code>GetVisiblePaletteEntries()</code>, not necessarily of <code>GetBuildingPaletteEntries()</code>.</p>
+<p><code>RefreshBuildingPalette()</code> on the toolkit (<code>OutpostBuilderToolkitBuildTab.cpp</code>) is a thin wrapper: it calls <code>PaletteModel-&gt;RefreshEntries()</code>, then pushes the FULL building count into the mode's HUD legend (<code>SetPaletteEntryCount</code>), the one effect that was never palette-MODEL state, since it belongs to the mode's viewport HUD, not the panel.</p>
+<h3 id="pinning-a-building-and-whats-actually-rendered">Pinning a Building, and What's Actually Rendered</h3>
+<p><code>GetBuildingPaletteEntries()</code> is "every building definition the project has." It is NOT what the palette renders. <code>RecomputeVisibleEntries()</code> computes a second array, <code>GetVisiblePaletteEntries()</code>, the subset the palette actually shows and the hotkeys actually address:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Widgets/OutpostPaletteModel.cpp (abbreviated)</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">FOutpostPaletteModel::RecomputeVisibleEntries</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// ... self-heals a vanished category-filter bucket first (see "Palette Category Tabs" below) ...</span>
+<span class="w">    </span><span class="n">VisiblePaletteEntries</span><span class="p">.</span><span class="n">Reset</span><span class="p">();</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">int32</span><span class="w"> </span><span class="n">MaxDefault</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FMath</span><span class="o">::</span><span class="n">Max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">UOutpostBuilderSettingsAsset</span><span class="o">::</span><span class="n">Get</span><span class="p">().</span><span class="n">MaxDefaultBuildingPaletteEntries</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Pinned entries first - always shown. Filters run before pin AND cap in both passes.</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">TSharedPtr</span><span class="o">&lt;</span><span class="n">FBuildingPaletteEntry</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">Entry</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">BuildingPaletteEntries</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">PassesFilters</span><span class="p">(</span><span class="o">*</span><span class="n">Entry</span><span class="p">))</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IsBuildingPinned</span><span class="p">(</span><span class="n">Entry</span><span class="o">-&gt;</span><span class="n">AssetData</span><span class="p">.</span><span class="n">PackageName</span><span class="p">))</span><span class="w"> </span><span class="n">VisiblePaletteEntries</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">Entry</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Then up to MaxDefault MORE non-pinned entries, in their existing order.</span>
+<span class="w">    </span><span class="n">int32</span><span class="w"> </span><span class="n">UnpinnedAdded</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">TSharedPtr</span><span class="o">&lt;</span><span class="n">FBuildingPaletteEntry</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">Entry</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">BuildingPaletteEntries</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">UnpinnedAdded</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">MaxDefault</span><span class="p">)</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IsBuildingPinned</span><span class="p">(</span><span class="n">Entry</span><span class="o">-&gt;</span><span class="n">AssetData</span><span class="p">.</span><span class="n">PackageName</span><span class="p">))</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">PassesFilters</span><span class="p">(</span><span class="o">*</span><span class="n">Entry</span><span class="p">))</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">        </span><span class="n">VisiblePaletteEntries</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">Entry</span><span class="p">);</span>
+<span class="w">        </span><span class="o">++</span><span class="n">UnpinnedAdded</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">NotifyObservers</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>MaxDefaultBuildingPaletteEntries</code> (<code>UOutpostBuilderSettingsAsset</code>, default 9, lining up with the 1-9 hotkeys) is how many NON-pinned definitions show by default. <code>PinnedBuildingDefinitions</code> (<code>TArray&lt;FName&gt;</code> of package names, a HIDDEN config-only property on the host <code>UOutpostRuntimeSettings</code>) always show IN ADDITION to that count.</p>
+<p>The palette filters (next section) run FIRST, ahead of pin and cap: a pinned building that fails the current filter or the mandatory faction gate does not show.</p>
+<p>Pinned entries also float to the FRONT rather than staying in their original <code>BuildingPaletteEntries</code> position, the same convention pinned tabs and channels follow elsewhere.</p>
+<p>The <strong>Pin</strong>/<strong>Unpin</strong> button lives on <code>SOutpostAssignRow</code>, beside Assign Building, and acts on whichever building is currently HOT (<code>PaletteModel-&gt;GetHotBuildingId()</code>): <code>HandlePinClicked</code> resolves the hot building's package name via <code>UAssetManager::GetPrimaryAssetPath</code> (no load), fires <code>OnPinRequested</code>, which the toolkit's <code>HandlePinHotBuildingClicked</code> answers by toggling it in the host <code>UOutpostRuntimeSettings</code>'s <code>PinnedBuildingDefinitions</code>, calling <code>SaveConfig()</code>, then <code>RefreshVisiblePaletteEntries()</code> (a thin toolkit forward to <code>PaletteModel-&gt;RecomputeVisibleEntries()</code>), with no asset-registry rescan needed.</p>
+<p><strong>The pin badge.</strong> A pin-shaped corner badge (<code>FAppStyle::Get().GetBrush("Icons.Pinned")</code>) sits on every pinned tile's TOP-RIGHT corner (the opposite corner from the 1-9 hotkey badge), built by <code>SOutpostPaletteTile</code> itself off its <code>bIsPinned</code> argument, with the explanation folded into the tile's own tooltip. Pinning's semantics are palette-VISIBILITY-only.</p>
+<p>Don't confuse this with the unrelated, informal use of the word "pin" elsewhere on this site (<code>runtime-loadout.html</code>): "assign a building to a plot to pin it" there means fixing that ONE PLOT's building choice so it stops taking the deterministic per-plot randomized pick, a completely different, plot-level concept with no button behind it at all.</p>
+<p>There is no per-tile faction color coding of any kind. <code>SupportedFactions</code> drives only the palette's mandatory faction gate (below), never a tile decoration. A restricted building never shows in the palette at all (the gate omits it); one picked another way is refused with a tooltip.</p>
+<h3 id="palette-category-tabs">Palette Category Tabs</h3>
+<p><code>UOutpostBuildingDefinition::BuildingCategory</code> is a <code>FGameplayTag</code> (<code>meta = (Categories = "OutpostBuilder.BuildingCategory")</code>) that groups buildings in the palette and does nothing else. It has no bearing on <code>MatchesPlotSize</code>/<code>SupportsFaction</code> eligibility. Empty is uncategorized, the default and fully valid.</p>
+<p><code>SOutpostPaletteCategoryTabRow</code> is the tab row, an <code>SWrapBox</code> of buttons, one of the two RECONSTRUCTABLE model observers (alongside <code>SOutpostBuildingPalette</code>; see <code>FScopedPaletteObserver</code>'s own doc for why a widget that can be destroyed while the model lives on needs an RAII unregister, even though a missed one is already safe).</p>
+<p><code>RefillTabRow()</code> reads <code>PaletteModel-&gt;GetBuildingPaletteEntries()</code> (the FULL set, not the visible subset; the tab row answers "what categories does this project's buildings have"), via <code>PaletteModel-&gt;ComputeCategoryPresence()</code> (the one shared census both this row and <code>RecomputeVisibleEntries()</code>'s self-heal read, so the two can never disagree about what exists):</p>
+<ul>
+<li>Buttons read <strong>All</strong> (always first, unset filter), then one per DISTINCT category present, sorted by leaf tag segment (never registry/creation order), then <strong>Uncategorized</strong> LAST, only when the set is actually mixed.</li>
+<li>The WHOLE row is collapsed (<code>GetRowVisibility</code>, driven by <code>bAnyEntryCategorized</code>) until at least one entry resolves a non-empty category.</li>
+<li>Selection lives in <code>PaletteModel</code>'s <code>CategoryFilter</code> (<code>TOptional&lt;FGameplayTag&gt;</code>: unset = All; set-but-invalid = Uncategorized; set-valid = that exact category). A click (<code>HandleTabClicked</code>) calls <code>PaletteModel-&gt;SetCategoryFilter()</code>, which recomputes the visible subset and notifies internally.</li>
+<li>A selected bucket can VANISH mid-session. <code>RecomputeVisibleEntries()</code> self-heals BEFORE filtering: it re-runs <code>ComputeCategoryPresence()</code> and resets a vanished bucket's filter to <strong>All</strong>. Without that, the stale filter would reject every entry while the row, seeing zero categories, collapsed entirely, both hosts empty and the way back hidden.</li>
+</ul>
+<p><code>PassesFilters</code> gates on it right after the mandatory faction gate and before the size combo: <strong>All</strong> passes everything. <strong>Uncategorized</strong> passes only an entry whose resolved category is empty. A real category requires EXACT leaf-tag equality against <code>CategoryFilter</code>, deliberately NOT the hierarchical <code>MatchesTag()</code> rule, so a sub-category never also shows up under its parent's tab.</p>
+<p><code>SOutpostBuildingPalette::GetEmptyReasonText()</code>'s "filtered" branch names the category tab alongside the size combo. See "Palette Filters and the Faction Gate" below for the full gate order.</p>
+<p>The editing panel mounts the category tab row directly in <code>BuildSelectPlotContentsSection</code>, above the palette tiles it filters (the one palette host).</p>
+<h3 id="palette-filters-and-the-faction-gate">Palette Filters and the Faction Gate</h3>
+<p><code>SOutpostPaletteFilterRow</code> holds ONE <code>SComboBox</code>, <strong>Plot Size</strong> ("Any size" + one row per REGISTERED <code>OutpostBuilder.PlotSize</code> tag), mounted in the Select Plot Contents section's heading row beside "+ New Building" (filter to the button's left, both right-aligned). Its option list (<code>SizeFilterOptions</code>) is built once per mounted instance, in the widget's own <code>Construct()</code> (<code>RefreshFilterOptions()</code>), a tag-registry walk cheap enough that there's no cross-instance state to keep in sync by sharing one copy.</p>
+<p><strong>There is deliberately no <code>SComboBox</code> member holding selection, and no <code>InitiallySelectedItem</code> anywhere.</strong> Slate is single-parent, so the filter STATE lives on <code>FOutpostPaletteModel</code> (<code>SizeFilter</code>), and each combo instance's label is an attribute binding (<code>GetSizeFilterDisplayText</code>) that re-reads the model. Filter state is in-memory session state: nothing serializes it, and it resets to Any on restart.</p>
+<p>The actual rule is <code>FOutpostPaletteModel::PassesFilters(Entry)</code>, THREE checks in order:</p>
+<ol>
+<li><strong>The mandatory faction gate</strong> - reject unless <code>Definition-&gt;SupportsFaction(gate faction)</code>, where the gate faction is the editing outpost ACTOR's faction (<code>GateFactionAttribute</code>, bound by the toolkit's <code>GetPaletteGateFaction()</code>, read directly and never from a cached mirror). Skipped entirely when no editing outpost resolves. This is the palette's ONE faction-related filter.</li>
+<li><strong>The Category tab row</strong> - see above.</li>
+<li><strong>The Plot Size combo</strong> - <code>Definition-&gt;MatchesPlotSize(SizeFilter)</code>.</li>
+</ol>
+<p>Both read the LIVE definition through <code>FBuildingPaletteEntry::Definition</code>; a null (asset deleted since the last refresh) short-circuits before either check and PASSES, permissive on ignorance. Filtering is a <strong>view rule only</strong>: it never touches <code>HotBuildingId</code>, so a filter that hides the hot building's tile does not clear the hot building.</p>
+<p>The combo's <code>OnSelectionChanged</code> handler calls <code>PaletteModel-&gt;SetSizeFilter</code>, which recomputes and notifies internally, remapping the 1-9 hotkeys exactly the way pinning always has (<code>HandlePaletteHotkey</code> indexes <code>GetVisiblePaletteEntries()</code>), with the same refill re-rendering the tile badges from the same indices.</p>
+<p><strong>When the visible list comes up empty</strong> with entries still in the project, <code>SOutpostBuildingPalette::FillView()</code> appends a subdued explanation line (<code>GetEmptyReasonText()</code>) naming the ACTUAL cause. The widget only words the answer; WHICH narrowing emptied the grid is the model's call, <code>FOutpostPaletteModel::DiagnoseEmptyVisibleSet()</code>, and it reports the OUTERMOST cause rather than the most recently touched control. That order is the faction gate before the filters, the filters before the cap:</p>
+<ul>
+<li><code>FactionGate</code> - no definition in the project is fielded by the editing outpost's faction. The line names that faction, and points at the building's <strong>Supported Factions</strong> or at setting the outpost to Neutral. No palette control can fix this one.</li>
+<li><code>Filters</code> - something passes the gate, but nothing passes the category tab and size combo on top of it. The line names both controls.</li>
+<li><code>Cap</code> - entries pass the gate and the filters, but the cap is 0 and nothing pinned survives it.</li>
+</ul>
+<p>Ordering it that way is what keeps each wording a remedy that works. Blaming the cap first (it's the last control in the chain, so it looks like the one that ran out of room) would tell someone whose faction gate or filters had already emptied the palette to raise a cap that changes nothing.</p>
+<p><code>SOutpostSelectedBuildingPanel::GetEmptyStateText()</code> carries a matching branch so its own empty-state stops saying "click a tile or press 1-9" at a palette with no tiles and no key that resolves. The mode's HUD legend deliberately still receives the FULL building count: a filtered view must not make the HUD claim the project has no buildings.</p>
+<h3 id="the-content-browser-drop">The Content Browser Drop</h3>
+<p><code>SOutpostBuildingPalette</code> is a drop target for the engine's own <code>FAssetDragDropOp</code>, so an existing drag habit works here.</p>
+<p>It's worth being precise about what a drop does, because "add this to the palette" is the obvious reading and it isn't available: this roster is DERIVED from an asset-registry scan, not an authored list, so a dropped definition was already a member the instant it was saved.</p>
+<p>The two things a drop can genuinely change are which member is SELECTED and which members survive the cap, so <code>OnDrop</code> does exactly those two, in that order:</p>
+<ul>
+<li><strong>Pin</strong> (<code>FOutpostPaletteModel::PinBuilding</code>, one recompute for the whole payload afterwards) - the only durable, visible sense in which this palette can "take" a building.<ul>
+<li>Pinned entries show ahead of everything else and are never counted against <code>MaxDefaultBuildingPaletteEntries</code>, so the dropped building has a tile even in a project whose roster runs past the cap.</li>
+<li>It ADDS only: a drop is an intake gesture, and making a second drop of the same asset silently un-pin it would be a toggle the gesture doesn't read as. The Assign row's <strong>Pin</strong>/<strong>Unpin</strong> button is the way back out, and the tile's pin badge is what says the drop did this.</li>
+</ul>
+</li>
+<li><strong>Select</strong> - "I dragged this one over" is a statement about what to build next, so the FIRST dropped definition goes through the same <code>OnBuildingSelected</code> a tile click fires, putting it on the ghost and in the Selected Building panel immediately.<ul>
+<li>A multi-asset drop pins them all but selects one, since there's only one Selected Building and picking the first is the only choice that doesn't depend on a drag order you can't see.</li>
+</ul>
+</li>
+</ul>
+<p>Deliberately not done: creating or duplicating assets, writing to the outpost, or assigning the building to a plot. A drop onto a picker isn't an edit to the level.</p>
+<p><code>EvaluateDrop</code> is the one classification rule, shared by the hover cue and the drop itself (<code>OnDrop</code> re-derives it rather than trusting the last hover frame's cached verdict).</p>
+<p>It type-tests each asset with <code>OutpostEditorUtils::IsAssetInstanceOf</code> (load-free and subclass-aware, matching the <code>bSearchSubClasses=true</code> scan that builds the palette, so a Blueprint subclass definition drops like any other), then keeps only ids the Asset Manager can resolve, the same admission test <code>RefreshEntries</code> applies to a tile.</p>
+<p>Five verdicts come out of it, each with its own decorator wording on the engine's standard drag decorator plus a border tint:</p>
+<ul>
+<li><code>Accept</code> - at least one droppable definition, and it passes the current filters. The decorator names the exact two effects ("Pin <code>"&lt;name&gt;"</code> to the palette and select it") rather than a vague "add", because the pin is a persistent settings change and must be stated before the mouse is released.</li>
+<li><code>AcceptHiddenByFilters</code> - droppable, but the category tab or size combo hides every one of them. Still an accept (both effects land, and either filter is one click from revealing the tile), and it only needs its own wording, or a drop that worked would read as a drop that did nothing and get repeated.</li>
+<li><code>RejectFactionGate</code> - every dropped definition is refused by the editing outpost's MANDATORY faction gate.<ul>
+<li>Refused rather than accepted, because the pin is a settings write with no transaction and no undo, and the palette makes the filters beat the pin: pinning a building this outpost's faction can't field would write a permanent entry that never becomes a tile, with nothing on screen to say why. The wording names the actual fix.</li>
+</ul>
+</li>
+<li><code>RejectUnresolvable</code> - building definitions whose primary asset id the Asset Manager can't resolve. They can never become tiles, so the drop is refused with its own wording instead of silently doing nothing.</li>
+<li><code>Reject</code> - not a payload this palette takes, or the palette is disabled by an active outpost placement. That last clause matters: a drop that selects a hot building is exactly the action those tiles are disabled FOR, so it's refused here too rather than leaving one live path into a state the rest of the widget is closed for.</li>
+</ul>
+<p>The border only exists while a drag hovers (<code>GetDropTargetBorderImage</code> returns no brush otherwise), so the palette never carries a permanent frame it didn't have before. An accept tints it the palette's ONE selected-accent hue (<code>OutpostBuilder::Palette::PaletteSelectedAccentColor</code>), since the drop's result IS a selection; a refusal tints it red. <code>OnDragOver</code> returns <code>Handled()</code> only on an accept, so an unhandled drag stays free to find a target that does want it.</p>
+<h3 id="the-eyedropper">The Eyedropper</h3>
+<p><code>HandleEyedropperPick(FPrimaryAssetId)</code> is the toolkit's landing point for the eyedropper (<code>FOutpostBuilderCommands::PickBuildingFromPlot</code>, <strong>E</strong> by default). The MODE resolves which plot was picked and reads its <code>AssignedBuildingId</code>; this end does only what a tile click does, through the same <code>SelectHotBuilding</code>, so a pick and a click can't leave the palette, the ghost, and the details view in different states. See <code>edmode.html</code> for the pick target's own resolution rule and its guards.</p>
+<p>It filters nothing. An INVALID <code>BuildingId</code> is a real, expected input rather than a failure to screen out: a plot with nothing assigned IS the palette's Empty tile, the same invalid id that tile clicks with, so eyedropping an empty plot selects <strong>Empty</strong>.</p>
+<p>A picked building the palette's own filters or cap currently hide is still a legitimate Selected Building too, since the Selected Building panel shows it whether or not a tile does.</p>
+<p><code>GetPaletteBuildingDisplayText(FPrimaryAssetId)</code> is public alongside it, a thin forward to <code>FOutpostPaletteModel::GetBuildingDisplayText</code>, because the mode has no palette model of its own and its confirmation toast has to name the pick with the SAME string the tile and the Plots list show. It never loads.</p>
+<p>Two staleness wires close the loop: <code>FOutpostBuilderToolkit::HandleFactionChanged</code> (fired by <code>SOutpostIdentityHeader</code>'s <code>OnFactionChanged</code>) appends the same refresh tail after <code>AssignFactionToEditingOutpost</code>, and <code>SOutpostSelectedBuildingPanel</code>'s own <code>OnFinishedChangingProperties</code> wire (<code>HandleDetailsViewChanged</code> -&gt; <code>OnContentsChanged</code> -&gt; the toolkit's <code>HandleHotBuildingPropertyChanged</code> -&gt; <code>RefreshBuildingPalette</code>) means editing <code>PlotSizeQuery</code>/<code>SupportedFactions</code>/<code>BuildingMesh</code> in the Selected Building view re-filters (and re-thumbnails) the palette on commit.</p>
+<h3 id="uniform-tiles-and-the-name-ellipsis">Uniform Tiles and the Name Ellipsis</h3>
+<p>Every tile's NAME text block sits in an <code>SBox</code> with <code>WidthOverride(OutpostBuilder::PaletteTile::NameColumnWidth)</code> (96px, <code>SOutpostPaletteTile.cpp</code>), with <code>.Justification(ETextJustify::Left)</code> and <code>.OverflowPolicy(ETextOverflowPolicy::Ellipsis)</code>.</p>
+<p>Left justification is load-bearing, not taste: Slate's single-line text layout maps a centered line to <code>ETextOverflowDirection::NoOverflow</code> and only builds the ellipsis glyph for left/right overflow, so a centered name would silently ignore the policy and paint at its full width across the neighboring tiles.</p>
+<p>Elision is never lossy. The tile tooltip always carries the full asset name.</p>
+<p>The NAME text itself is the building's effective display name, not its raw asset name: <code>SOutpostBuildingPalette::BuildTile</code> reads <code>Entry-&gt;Definition-&gt;GetEffectiveDisplayName()</code> when the palette already has the definition loaded, falling back to <code>MakeDefaultDisplayNameFromAssetName()</code> otherwise. The tooltip is the one place that deliberately stays on the raw asset name: two tiles can share a display name, never an asset name.</p>
+<h3 id="the-hotkey-badge">The Hotkey Badge</h3>
+<p><code>SOutpostPaletteTile::Construct</code> renders the 1-9 digit straight over the thumbnail's corner, a bigger bold font (<code>OutpostBuilder::PaletteTile::GetHotkeyBadgeFont()</code>, <code>SOutpostPaletteTile.cpp</code>) with a drop shadow, no backing chip. Because BOTH tile forms (building and Empty) are now the SAME widget, the badge treatment can't drift between them. Which key a tile shows reads the live command chord (<code>OutpostBuilder::BuildingPalette::GetPaletteHotkeyLabel</code>/<code>GetEmptyPaletteHotkeyLabel</code>, <code>SOutpostBuildingPalette.cpp</code>). The Pin badge, opposite corner, keeps its own <code>SBorder</code> backing.</p>
+<h3 id="palette-tile-double-click">Palette Tile Double-Click</h3>
+<p>Double-clicking a BUILDING tile opens its definition in its own asset editor (<code>GEditor-&gt;GetEditorSubsystem&lt;UAssetEditorSubsystem&gt;()-&gt;OpenEditorForAsset</code>): <code>SOutpostBuildingPalette::HandleTileDoubleClicked</code>, bound as <code>SOutpostPaletteTile</code>'s <code>OnTileDoubleClicked</code> event on <code>BuildTile</code> only. <code>BuildEmptyTile</code> never binds it, so the Empty tile deliberately ignores double-click (there is no asset to open for it).</p>
+<p>Single-click hot-selection is UNCHANGED. <code>OnTileClicked</code> still fires on every click, including the first click of a double-click, with no wait-and-see delay.</p>
+<p><code>SOutpostPaletteTile</code> detects the double-click itself, by TIMING, not a native Slate event: <code>SButton</code> (the tile's inner clickable leaf) has no dedicated double-click event in this engine version, and Slate's pointer-event routing (leaf-to-root bubble) means the button (the deepest hit-testable widget in the tile) would swallow a genuine platform double-click and treat it as an ordinary click before it could ever reach an override on the tile itself.</p>
+<p><code>HandleClicked</code> instead tracks the platform time of its own last recognized click and treats a SECOND <code>OnClicked</code> firing within <code>OutpostBuilder::PaletteTile::DoubleClickMaxIntervalSeconds</code> (0.5s) as one double-click, resetting so a third rapid click starts a fresh pair rather than double-firing again.</p>
+<h3 id="stronger-selected-tile-treatment">Stronger Selected-Tile Treatment</h3>
+<p>The hot tile's accent border grows three reinforcing cues while selected, all driven by the same <code>IsSelected</code> attribute the caller already binds:</p>
+<ol>
+<li><strong>A brighter, thicker ring.</strong> <code>GetBorderColor()</code>'s accent brightens to <code>(0.35, 0.75, 1, 1)</code>; <code>GetBorderPadding()</code> (a live <code>TAttribute&lt;FMargin&gt;</code> on the outer <code>SBorder</code>'s own <code>.Padding</code>) widens from 2px to 3px while selected. Unselected stays exactly 2px at the original <code>(0.2, 0.6, 1, 1)</code> color, so an unselected tile's appearance is byte-identical to a plain on/off ring.</li>
+<li><strong>A subtle fill wash.</strong> A SECOND, inner <code>SBorder</code> (a plain <code>WhiteBrush</code>) sits directly behind the tile's content, tinted a low-alpha (<code>0.18</code>) version of the same accent while selected, fully transparent otherwise (<code>GetFillColor()</code>), a second, independent cue that reads even where the ring alone might not catch the eye.</li>
+<li><strong>A checkmark badge</strong> marking the selected tile.</li>
+</ol>
+<p>This coordinates with "The Selected Building Section Box" below: "which building is hot" reads consistently from both the palette grid (this treatment) and the Select Plot Contents section's own header (the large name + swatch).</p>
+<h3 id="the-selected-building-section-box">The Selected Building Section Box</h3>
+<p><code>SOutpostSelectedBuildingPanel</code> is its OWN visually distinct section, a ROUNDED INSET BOX (the SAME <code>FSlateRoundedBoxBrush</code> pattern the build-mode banner and the in-viewport command grid use: a white-tinted brush plus a live, dark translucent <code>BorderBackgroundColor</code>), a deliberate divergence from <code>SOutpostIdentityHeader</code>'s own bordered-header shape, stated in the panel's own class doc.</p>
+<p>Its outer margin is 2px, its inner content padding 10px so the header/details content doesn't crowd the rounded border. Its header row, left to right:</p>
+<ul>
+<li><strong>A thumbnail-sized swatch</strong> (<code>BuildSwatchContent()</code>, 48px, <code>OutpostBuilder::Palette::PaletteTileThumbnailSize</code>) - the cached <code>FBuildingPaletteEntry</code>'s own <code>FAssetThumbnail</code>, the SAME one the palette tile renders (never a second thumbnail construction for the same asset), scanning the FULL entry cache so a hot building hidden by the palette's own cap/filters still shows here.<ul>
+<li>A centered subdued "-" glyph when nothing is selected or the entry isn't cached yet, the same glyph <code>SOutpostBuildingPalette::BuildEmptyTile</code> uses for its own Empty tile.</li>
+</ul>
+</li>
+<li><strong>A small "Selected Building" caption</strong>, subdued, above the centerpiece.</li>
+<li><strong>The building's own name, shown LARGE</strong> (<code>GetHotBuildingNameText()</code>, a 16pt bold font) - "Empty" when nothing is selected, else the effective display name (<code>PaletteModel-&gt;GetBuildingDisplayText</code>), with the dirty asterisk folded in (<code>"Barracks *"</code>) via the SAME <code>IsSaveEnabled</code> read that already lights the Save icon. The asterisk can never disagree between the two.</li>
+<li><strong>Show in Content Browser</strong> and <strong>Save</strong> icon-buttons.</li>
+<li><strong>Clear</strong> - a button that fires the SAME "select nothing" signal the palette's own Empty tile fires (<code>OnClearRequested</code>, mounted to <code>SelectHotBuilding(FPrimaryAssetId())</code> at the toolkit's mount site), disabled while nothing is already selected.</li>
+</ul>
+<p>The existing inline Hot Building details view, and the empty-state line, both stay BELOW the header row, still inside the same box.</p>
+<p><code>SOutpostSelectedBuildingPanel</code> holds no <code>FScopedPaletteObserver</code>, unlike the palette grid and category tab row right above it.</p>
+<p>It doesn't need one: the hot building only ever changes through a direct call the toolkit already routes to it (a palette click, a hotkey, the Assign row's picker, undo/redo), never through a filter/pin edit that leaves the hot selection itself untouched.</p>
+<p>A model-change notification would tell this widget nothing a direct <code>RefreshView()</code> call doesn't already tell it sooner.</p>
+<h3 id="the-forked-building-picker">The Forked Building Picker</h3>
+<p>The Assign row's picker must obey the same filters/gate as the palette, and the engine widget it used (<code>IAssetManagerEditorModule::MakePrimaryAssetIdSelector</code>) offers <strong>no filter hook</strong>. So <code>SOutpostAssignRow::BuildBuildingPickerCombo()</code>/<code>BuildBuildingPickerMenu()</code> (<code>SOutpostAssignRow.cpp</code>) reproduce it, an <code>SComboButton</code> over <code>PropertyCustomizationHelpers::MakeAssetPickerWithMenu</code>, with <code>ShouldFilterBuildingPickerAsset</code> injected. <strong>Porting note:</strong> on a UE upgrade, diff those functions against the engine's copy; two behaviors are load-bearing and easy to drop: <code>FSlateApplication::Get().DismissAllMenus()</code> on pick and <code>UAssetManager::GetPrimaryAssetIdForData(AssetData)</code> (never a hand-built <code>FPrimaryAssetId</code>).</p>
+<p><code>ShouldFilterBuildingPickerAsset</code> (TRUE = exclude, the engine polarity) first reproduces the replaced predicate, then calls <code>PaletteModel-&gt;PassesFilters(*Entry)</code> directly. The picker and the palette are literally one predicate, zero loads on menu-open. A resolvable definition the palette has NOT cached is deliberately <strong>offered</strong>, not hidden.</p>
+<p>The combo BUTTON's own text (<code>SOutpostAssignRow::GetBuildingSelectorDisplayText()</code>) is the "Select Building..." prompt when nothing is picked, else <code>PaletteModel-&gt;GetBuildingDisplayText(PaletteModel-&gt;GetHotBuildingId())</code> (the effective-display-name rule), a thin wrapper over the ONE real lookup on the model.</p>
+<p>Clicking a tile and pressing a hotkey both funnel through the same toolkit setter:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkitBuildTab.cpp</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">FOutpostBuilderToolkit::SelectHotBuilding</span><span class="p">(</span><span class="n">FPrimaryAssetId</span><span class="w"> </span><span class="n">Id</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">PaletteModel</span><span class="o">-&gt;</span><span class="n">SetHotBuildingId</span><span class="p">(</span><span class="n">Id</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">OwningMode</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">OwningMode</span><span class="o">-&gt;</span><span class="n">SetPreviewBuildingDefinition</span><span class="p">(</span><span class="n">Id</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">SelectedBuildingPanel</span><span class="p">.</span><span class="n">IsValid</span><span class="p">())</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">SelectedBuildingPanel</span><span class="o">-&gt;</span><span class="n">RefreshView</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>SetPreviewBuildingDefinition</code> pushes the choice into the mode, which is where hot-building placement, the ghost preview, and the palette tile's own highlighted border (<code>SOutpostPaletteTile::GetBorderColor</code>, via <code>SOutpostBuildingPalette::IsTileSelected</code>) all read it back from.</p>
+<p><code>SelectedBuildingPanel-&gt;RefreshView()</code> is what keeps the Selected Building details view current across every one of <code>SelectHotBuilding</code>'s callers: palette click, hotkey, and the Assign row's picker all funnel through this one setter.</p>
+<p><code>RefreshBuildingPalette</code> also pushes its <strong>building</strong> count into the mode (<code>SetPaletteEntryCount</code>), excluding the always-present Empty tile.</p>
+<p>The number keys 1 through 9 select palette slots 0 through 8 of <code>GetVisiblePaletteEntries()</code>, and <strong>0</strong> selects the Empty tile. These are real, rebindable editor commands (<code>FOutpostBuilderCommands::SelectPaletteBuilding</code>/<code>SelectEmptyBuilding</code>) dispatched through the toolkit's own <code>CommandList</code> (<code>Toolkit-&gt;GetToolkitCommands()</code>), reaching <code>FOutpostBuilderToolkit::HandlePaletteHotkey(Index)</code>/<code>HandlePaletteEmptyHotkey()</code> directly. <code>edmode.html</code> covers the ownership rule.</p>
+<p>The <strong>Empty</strong> tile itself is deliberately <em>not</em> an entry in <code>GetBuildingPaletteEntries()</code>. <code>SOutpostBuildingPalette::BuildEmptyTile()</code> prepends one hand-built tile to the wrap box on every refill, riding the same <code>SOutpostPaletteTile</code> plumbing on the <strong>invalid</strong> <code>FPrimaryAssetId</code>.</p>
+<h2 id="new-building-creating-a-definition-on-the-fly">"+ New Building" - Creating a Definition on the Fly</h2>
+<p>The palette's "+ New Building" button creates a brand-new <code>UOutpostBuildingDefinition</code> without going through the Content Browser's factory menu at all. <code>FOutpostBuilderToolkit::CreateNewBuildingDefinitionInteractive()</code> (<code>OutpostBuilderToolkitBuildTab.cpp</code>) does the whole thing in five steps and remains a toolkit method: it's a one-shot modal flow shared (via <code>SOutpostBuildingsBrowser</code>'s <code>OnCreateBuildingRequested</code> delegate) by the editing panel's own <code>HandleNewBuildingClicked()</code> and every live Buildings-tab browser instance's own "+ New Building" button.</p>
+<ol>
+<li><strong>Ask where to save</strong> - seed an <code>FSaveAssetDialogConfig</code> from the settings asset's <code>CreatedDefinitionDirectory</code> and a default name of <code>BD_NewBuilding</code>, show it with <code>FContentBrowserModule::CreateModalSaveAssetDialog</code>. An empty return path means the designer cancelled.</li>
+<li><strong>Create the package and the asset</strong> - <code>CreatePackage</code> the chosen path, <code>NewObject</code> the <code>UOutpostBuildingDefinition</code> with <code>RF_Public | RF_Standalone</code>. Its <code>DisplayName</code> is stamped with <code>MakeDefaultDisplayNameFromAssetName(AssetName)</code> so a building created <code>BD_Barracks</code> opens already reading "Barracks".</li>
+<li><strong>Register and rescan</strong> - <code>FAssetRegistryModule::AssetCreated</code> + <code>MarkPackageDirty</code>, then a targeted <code>ScanPathForPrimaryAssets</code> so the new id resolves through <code>UAssetManager</code> right away.</li>
+<li><strong>Open it for editing</strong> - <code>UAssetEditorSubsystem::OpenEditorForAsset</code>.</li>
+<li><strong>Refresh both surfaces, then toast</strong> - <code>RefreshBuildingPalette()</code> and <code>RefreshAllBuildingBrowsers()</code> both pick up the new asset; the caller does its own selection step, and <code>ShowAssetCreatedToast</code> hands back a hyperlink into the Content Browser.</li>
+</ol>
+<p>Note: this deliberately skips <code>UOutpostBuildingDefinitionFactory</code> (that factory exists for the Content Browser's own "Add" menu, where the engine drives the create-and-name flow itself). If you add a third creation entry point somewhere else in the editor, reach for this <code>CreatePackage</code>/<code>NewObject</code>/<code>AssetCreated</code> shape rather than the factory.</p>
+<p>The <code>DisplayName</code> default is duplicated rather than shared: <code>MakeDefaultDisplayNameFromAssetName(AssetName)</code> is stamped on both this path AND <code>UOutpostBuildingDefinitionFactory::FactoryCreateNew</code> (see <code>extending.html</code>), so a building created either way opens with the same BD_-stripped default.</p>
+<p><img alt="The &quot;+ New Building&quot; flow: dialog, package creation, rescan, open, hot-select, toast" src="assets/toolkit-new-building-flow.svg" /></p>
+<h2 id="the-overhead-camera-viewport-overlay">The Overhead Camera Viewport Overlay</h2>
+<p>While the mode is positioning the Overhead camera, the toolkit adds a small button row directly on top of the level viewport, the same trick the engine's own level-instance edit mode uses for its own "editing level instance" banner.</p>
+<p>Both this overlay and the placement overlay below mount the SAME reusable shell, <code>SOutpostViewportOverlay</code>. See "The Widget Inventory" above for why one parameterized widget replaced two near-identical inline constructions.</p>
+<p>The overlay is built once in <code>Init()</code> and just sits inert as a <code>TSharedPtr&lt;SWidget&gt;</code> until a positioning session actually starts.</p>
+<p>Its action-button row (<strong>Revert</strong> / Cancel / Done; see "The Overhead Camera Positioning Session" in <code>edmode.html</code>) comes from <code>BuildOverheadCameraActionButtons()</code> (<code>OutpostBuilderToolkit.cpp</code>, namespace <code>OutpostBuilder::CameraPositioning</code>), a FREE FUNCTION (it owns no state, just three <code>FOnClicked</code> parameters) with one call site: <code>SOutpostViewportOverlay</code>'s content slot at the camera overlay's mount site in <code>Init()</code>. The viewport overlay is the ONLY place a designer sees or clicks Revert/Cancel/Done.</p>
+<p>The mode calls <code>HandleCameraPositioningChanged()</code> directly at the end of <code>StartOverheadCameraPositioning</code>, <code>ConfirmOverheadCameraPositioning</code>, and <code>CancelOverheadCameraPositioning</code>. The handler itself is a one-liner:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkit.cpp</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">FOutpostBuilderToolkit::HandleCameraPositioningChanged</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">SyncViewportOverlay</span><span class="p">(</span><span class="n">OwningMode</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">OwningMode</span><span class="o">-&gt;</span><span class="n">IsPositioningOverheadCamera</span><span class="p">(),</span><span class="w"> </span><span class="n">OverheadCameraOverlayWidget</span><span class="p">,</span><span class="w"> </span><span class="n">bOverheadCameraOverlayAdded</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>SyncViewportOverlay(bWanted, Overlay, bAddedFlag)</code> is the ONE add/remove rule, shared with the placement overlay's own handler below. <code>IToolkitHost::AddViewportOverlayWidget</code>/<code>RemoveViewportOverlayWidget</code> default to whichever level viewport is currently active, the one accepted rough edge: if a designer starts positioning in one viewport and switches to another before Done/Cancel, the overlay can end up added to one viewport with the removal aimed at another.</p>
+<h2 id="the-in-viewport-building-command-grid">The In-Viewport Building Command Grid</h2>
+<p>A fifth viewport overlay, <code>SOutpostBuildingCommandGrid</code>: a grid of compact palette tiles for one-click/hotkey hot-building selection without leaving the viewport. Columns are configurable, rows derive from content.</p>
+<p>Built once in <code>Init()</code> like its four siblings, but NOT on <code>SOutpostViewportOverlay</code>: that shell's bottom-center label+action-row shape doesn't fit a corner-anchored tile grid, the same reason <code>SOutpostBuildModeBanner</code> isn't one either (see that widget's own header for the identical argument).</p>
+<p>Mounted/unmounted by <code>HandlePlacementStateChanged</code> alongside <code>PlacementOverlayWidget</code>, gated on <code>IsPlacementActive() &amp;&amp; IsPlacingPlot()</code>, visible ONLY during a plot placement, since an outpost placement has no hot-building concept (the exact same narrower rule the Select Plot Contents palette family already follows; see "Placement Keeps the Editing Panel" just below).</p>
+<p>That handler already fires on a straight outpost-to-plot (or reverse) KIND switch, not just idle-to-placement, so the grid mounts/unmounts correctly on a mid-session kind change too.</p>
+<p><strong>Content, in order, every visible entry.</strong> Cell 0 is the Empty tile (hotkey 0). Then EVERY entry in <code>PaletteModel-&gt;GetVisiblePaletteEntries()</code>, in order, laid out via a plain <code>SUniformGridPanel</code> wrapped across <code>BuildingGridCols</code> columns: <code>CellIndex % Cols</code>/<code>CellIndex / Cols</code> math, so the row count simply grows to fit however many entries there are.</p>
+<p>Digits 1-9 badge the first nine of those exactly as the panel palette numbers them. <code>OutpostBuilder::BuildingPalette::GetPaletteHotkeyLabel</code>/<code>GetEmptyPaletteHotkeyLabel</code> live in <code>SOutpostBuildingPalette</code>'s own header specifically so this grid calls the SAME two functions, not a reimplementation that could drift.</p>
+<p>This grid imposes no separate cap of its own. The palette's own <code>MaxDefaultBuildingPaletteEntries</code>/pin cap is what typically bounds the count (9 by default). So it stays a compact SHORTCUT for the hotkeyed slots without ever disagreeing with the panel palette about which entries are visible.</p>
+<p><code>FillView()</code> is registered on <code>PaletteModel</code> via the same <code>FScopedPaletteObserver</code> RAII pattern <code>SOutpostBuildingPalette</code> uses, so a filter change, a pin toggle, or an asset-registry rescan refills this grid exactly like the panel palette.</p>
+<p><strong>Compact tiles, one parameterized leaf.</strong> Rather than a second tile widget, <code>SOutpostPaletteTile</code> takes one argument, <code>.bCompact(true)</code>, which swaps the full 96px name row for a SMALL, thumbnail-width (48px) truncated one (a smaller font, tighter padding), so a compact tile teaches its own name at a glance instead of relying on the tooltip alone.</p>
+<p>The tile's width shrinks to the thumbnail's own 48px (the small name row reuses that same width, never wider).</p>
+<p>Everything else about the tile is unchanged: the hotkey corner badge, the selected treatment's cues, and the warn glyph (this grid's <code>GetTileWarningVisibility</code> reads the identical <code>OutpostEditorUtils::EvaluateBuildingPlotAdvisory</code> call the panel palette's own tile-warning attribute does) all still apply.</p>
+<p>The grid's tiles carry no pin badge (<code>bIsPinned</code> is hardcoded false here) and no double-click binding (<code>OnTileDoubleClicked</code> is deliberately left unbound, since popping an asset editor over the viewport mid-placement would hijack the placement session; the panel palette remains the open-asset surface).</p>
+<p>Every existing <code>SOutpostPaletteTile</code> caller is unaffected (<code>bCompact</code> defaults false, and the panel palette's own full tiles never pass <code>bCompact(true)</code>).</p>
+<p><strong>Digits over positional QWERTY/ASDFG.</strong> A command-card convention badges its slots QWERT/ASDFG so a player's hand never leaves the movement cluster.</p>
+<p>But those same keys are already WASD/QE flycam navigation in an editor viewport (no flycam exists in an RTS game, so the convention's own collision never arises there).</p>
+<p>This grid deliberately keeps the plugin's EXISTING bare 0-9 digit commands (<code>FOutpostBuilderCommands::SelectPaletteBuilding</code>/<code>SelectEmptyBuilding</code>; already bound, already read by the panel palette) instead, at the cost of the badges sitting one row below the keyboard's natural home-row reach. That cost is accepted, since this is an editor authoring tool, not a twitch RTS match.</p>
+<p><strong>Shell and click-through.</strong> A single rounded-corner, ~50%-opacity dark <code>SBorder</code> (the SAME <code>FSlateRoundedBoxBrush</code> pattern <code>SOutpostBuildModeBanner</code> uses for its own background) serves as BOTH the "rounded box" and the "dark backdrop" at once, one translucent layer, not two.</p>
+<p>Click-through is load-bearing (a designer is mid-plot-placement whenever this grid is up, and must be able to click/drag anywhere else in the viewport without the grid eating that click): Slate's hit-test grid registration is PER-WIDGET, and a <code>SelfHitTestInvisible</code> widget contributes NOTHING to that grid for itself (though its children still can).</p>
+<p><code>SBoxPanel</code> (this widget's root <code>SHorizontalBox</code>'s base class) and <code>SUniformGridPanel</code> (the tile grid) both already default to <code>SelfHitTestInvisible</code> in their own engine-side <code>SLATE_BEGIN_ARGS</code>. Only the shell <code>SBorder</code> does not, so it is the one place this widget sets the override explicitly.</p>
+<p>Each <code>SOutpostPaletteTile</code>'s own inner <code>SButton</code> stays at its ordinary, hit-testable default: only a click that actually lands on a tile is captured.</p>
+<p><strong>Two knobs, <code>UOutpostBuilderUserSettings</code>, <code>UI|BuildingGrid</code> category:</strong> <code>BuildingGridCols</code> (default 4, clamped 1-8; DisplayName <strong>Columns</strong>) and <code>BuildingGridAnchorCorner</code> (<code>EOutpostBuildingGridCorner</code>: <code>BottomRight</code>/<code>BottomLeft</code>/<code>TopRight</code>/<code>TopLeft</code>, default <code>BottomRight</code>, the RTS command-card convention, and the corner farthest from the bottom-CENTER placement viewport overlay, the one other overlay up whenever this grid is; the two can still meet on an unusually narrow viewport).</p>
+<p>Both are STRUCTURAL: read ONCE, at the grid widget's own <code>Construct()</code> time, not re-read live like the build-mode banner's own margin/color knobs. A mid-session Editor Preferences edit takes effect the next time Outpost Build Mode is entered, since <code>Init()</code> rebuilds this widget fresh every time the mode is entered.</p>
+<p>The tile CONTENT stays fully live regardless (the <code>FScopedPaletteObserver</code> refill above is unaffected by this), and the ROW COUNT itself tracks that live content too (see "Content, in order, every visible entry" above) rather than being capped by a separate knob.</p>
+<p><code>OnBuildingSelected</code> routes straight to the toolkit's <code>SelectHotBuilding</code>, the SAME method the panel palette's own tile clicks and the 1-9/0 hotkey commands already call. So "which building is hot" reads identically no matter which of the three surfaces picked it.</p>
+<h2 id="placement-keeps-the-editing-panel">Placement Keeps the Editing Panel</h2>
+<p>Placement does not swap to its own panel. It routes to the SAME Editing-panel index editing does, and the editing panel's own controls disable themselves in place instead of the panel swapping away. (Contrast the Overhead-camera positioning session, which hides the body entirely, per the user's own distinction between the two; see "The Positioning Notice" above.) See "Panel Anatomy" above for <code>GetActivePanelIndex()</code>'s two-slot shape.</p>
+<p><strong>What disables, and what stays live.</strong> <code>GetEditingPanelNormalContentVisibility()</code> still collapses the whole body only for camera positioning, never for placement. Instead, each control's own gate widens:</p>
+<ul>
+<li><strong>Identity header, Plots section, Assign row</strong> - <code>SOutpostIdentityHeader</code>/<code>SOutpostPlotsSection</code>/<code>SOutpostAssignRow</code>'s own <code>IsEditingContentUsable()</code> mirrors OR in <code>Context-&gt;bIsPlacementActive</code> alongside the pre-existing <code>bIsPositioningOverheadCamera</code> read (see "The Widget-Authoring Recipe" item 5 above), disabled during EITHER placement kind.<ul>
+<li>This reaches the Display Name field, the Faction combo (bound directly on the combo itself, not just its wrapping box; see below), the "+ New Plot"/"Randomize Plots" buttons, the plot list itself, and the whole Assign row (picker combo + Assign + Pin).</li>
+</ul>
+</li>
+<li><strong>The Select Plot Contents palette family</strong> (<code>SOutpostBuildingPalette</code>/<code>SOutpostPaletteCategoryTabRow</code>/<code>SOutpostPaletteFilterRow</code>) - follows a NARROWER, DIFFERENT rule: <code>Context-&gt;bIsPlacementActive &amp;&amp; !Context-&gt;bIsPlacingPlot</code> (i.e. "placing an OUTPOST specifically").<ul>
+<li>Live during a PLOT placement (switching the hot building mid-session, by tile click or hotkey, is the whole point, narrowing the palette mid-session is exactly as legitimate as clicking a different tile, and "+ New Building" stays live too, since it's part of the same section's heading, not the palette itself), disabled during an OUTPOST placement (no hot-building concept exists there at all).</li>
+<li>The <code>Context-&gt;bIsPlacingPlot</code> field is what tells these three widgets which placement kind is active. <code>SOutpostBuildingPalette::EvaluateDrop</code> takes the same rule, so a Content Browser drop can't be the one live path into a state the tiles are closed for.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Leaf-level <code>IsEnabled</code>, not just a container's.</strong> Slate's disabled-ancestor cascade only dims descendants visually (the <code>bParentEnabled</code> thread through <code>Paint</code>/<code>OnPaint</code>).</p>
+<p>It does NOT block a descendant's own input handling, since <code>SWidget::IsEnabled()</code> reads only that widget's OWN <code>EnabledStateAttribute</code>, with no ancestor lookup (engine-verified: <code>Args.GetHittestGrid().AddWidget(...)</code> in <code>SWidget::Paint()</code> is gated on hit-testability, never on the enabled cascade).</p>
+<p>So every one of the controls above binds <code>.IsEnabled(...)</code> on the ACTUAL interactive leaf (the <code>SEditableTextBox</code>, the <code>SComboBox</code>/<code>SComboButton</code>, the <code>SButton</code>, the <code>SListView</code>), never merely a wrapping <code>SHorizontalBox</code>/<code>SBox</code>.</p>
+<p><code>SOutpostPaletteTile</code> and the category tab row's per-button <code>SButton</code> reflect their OWN externally-bound <code>IsEnabled()</code>/<code>Cursor()</code> onto their inner clickable <code>SButton</code> (<code>TAttribute&lt;bool&gt;::CreateSP(this, &amp;SWidget::IsEnabled)</code>, and the <code>Cursor</code> equivalent) precisely because a wrapping compound widget's <code>.IsEnabled(false)</code> at ITS mount site would otherwise be just as toothless one level down.</p>
+<p><strong>The viewport overlay is the session's ONE Cancel affordance.</strong> The placement overlay's Cancel button (<code>PlacementOverlayWidget</code>, built in <code>Init()</code>) reads <strong>"Cancel (RMB / Esc)"</strong>, <code>BuildIconLabelContent</code>'s chord slot fed a LITERAL <code>FText</code>, not a <code>FUICommandInfo</code> lookup (RMB is a raw gesture with no command to bind; mixing a literal "RMB" with a dynamically-read "Esc" chord would read as inconsistent, so both stay hand-authored together).</p>
+<p>The mode's <code>GetPlacementHintText()</code> (the ONE source of placement guidance text) carries no trailing "RMB or Esc cancel" clause of its own, now that the button says it directly. The two surfaces can never say it twice.</p>
+<p>The overlay is built once in <code>Init()</code>, added/removed via <code>HandlePlacementStateChanged()</code>/<code>SyncViewportOverlay</code>, its own <code>bPlacementOverlayAdded</code> flag, <code>IsPlacementActive()</code>/<code>IsPlacingPlot()</code> as the small public mode-level surface it reads.</p>
+<h3 id="the-disabled-button-cursor">The Disabled-Button Cursor</h3>
+<p>Every gated button this disabling reaches (the six editing-bar buttons, the camera-positioning trio, the placement Cancel, and the editing panel's own "+ New Plot"/"Randomize Plots"/"Assign Building"/"Pin") shows a DIFFERENT cursor while hovering it disabled, not just a greyed-out look.</p>
+<p><code>OutpostBuilder::ViewportOverlay::MakeDisabledAwareCursor(IsEnabledAttribute, EnabledCursor = EMouseCursor::Default)</code> (<code>SOutpostViewportOverlay.h</code>/<code>.cpp</code>, beside <code>BuildIconLabelContent</code>) is the one shared helper: it returns <code>EnabledCursor</code> while enabled, else maps <code>UOutpostBuilderUserSettings::DisabledCursor</code> (a <code>UI|HUD</code> category knob, <code>EOutpostDisabledCursor</code>: <code>SlashedCircle</code> default, <code>None</code>, <code>Hand</code>, <code>Crosshairs</code>) onto the real <code>EMouseCursor::Type</code>.</p>
+<p><code>None</code> deliberately returns <code>EnabledCursor</code> unchanged, a configurable "don't override" rather than a special case.</p>
+<p>Slate does consult a disabled widget's cursor (verified, since disabled buttons visibly still show tooltips): <code>FSlateUser::QueryCursor()</code> (<code>Engine/Source/Runtime/Slate/Private/Framework/Application/SlateUser.cpp</code>) calls <code>ArrangedWidget.Widget-&gt;OnCursorQuery(...)</code> for every widget in the hit-tested path, top of stack first, with NO <code>IsEnabled()</code>/<code>IsInteractable()</code> gate anywhere in that loop.</p>
+<p><code>SWidget::OnCursorQuery</code> (<code>SlateCore/Private/Widgets/SWidget.cpp</code>) just returns whatever <code>.Cursor(...)</code> is bound, unconditionally. <code>SButton</code> doesn't override either. Consulted, not skipped.</p>
+<p>So no enabled-wrapper workaround is needed: every button binds <code>.Cursor(MakeDisabledAwareCursor(...))</code> directly on itself, the same widget whose <code>.IsEnabled(...)</code> reads the identical attribute.</p>
+<p><code>OutpostBuilder::EditingBar::BuildBarButton</code> (<code>OutpostBuilderToolkitEditingBar.cpp</code>) wires this once for all six editing-bar buttons; the camera-positioning trio and the placement Cancel (both always-enabled today, no gate of their own) get the same call with a constant-<code>true</code> attribute anyway, for the "one shared helper reached the same way everywhere" consistency, a no-op in practice, but future-proofed identically to every gated button.</p>
+<h3 id="dynamic-disabled-reason-tooltips-and-a-live-randomize-count">Dynamic Disabled-Reason Tooltips and a Live Randomize Count</h3>
+<p>Each editing-bar button's tooltip is a live getter that mirrors the exact source its panel twin already computes, rather than a static string or duplicated logic. <code>BuildBarButton</code>'s <code>TooltipFormat</code> is a <code>TAttribute&lt;FText&gt; TooltipAttribute</code>, and its <code>Label</code> a <code>TAttribute&lt;FText&gt;</code> (a fixed caption still passes straight in via <code>TAttribute</code>'s implicit value constructor); the bound command's chord is read once, to feed the button-face badge.</p>
+<p>Each button binds its own <code>GetEditingBar*Tooltip</code> getter, which states the disabled cause and falls back to the chord-annotated action text when enabled:</p>
+<ul>
+<li><strong>Save</strong> &rarr; <code>"No unsaved outpost changes to save."</code> (its only disabled cause; not PIE-gated).</li>
+<li><strong>New Plot / Edit Volume</strong> &rarr; <code>GetPlayBlockedText()</code> while Play/Simulate blocks them (the only cause reachable while the bar is on screen), reusing the shared static every gated surface already reads.</li>
+<li><strong>Position Camera</strong> &rarr; names the specific cause from the SAME four gate forwarders <code>IsEditingBarPositionCameraEnabled</code> composes, in gate order: <code>GetPlayBlockedText()</code> (Play/Simulate), <code>GetPositionCameraNeedsPerspectiveText()</code> (orthographic viewport; a shared static that also became the mode's own orthographic toast, so toast and greyed-out button can't disagree), else <code>"Select this outpost or one of its plots to choose what the Overhead camera frames."</code> (the no-<code>GetCameraFramingTarget()</code> case, unique to this button's own surface).</li>
+<li><strong>Randomize</strong> &rarr; the shared <code>FOutpostBuilderToolkit::ComposeRandomizeDisabledReason(bPlayOrSimulateActive, bHasAnyBuildingDefinition)</code> (a public static, <code>OutpostBuilderToolkitBuildTab.cpp</code> beside <code>GetAssignRefusalText</code>), the EXACT same split <code>SOutpostPlotsSection::GetRandomizeButtonTooltip</code> also calls (Play/Simulate vs. no building definitions vs. no selection). The disabled wording is single-homed: <code>SOutpostPlotsSection</code> passes its <code>Context</code> values, the bar passes the identical toolkit forwarders (<code>IsPlayOrSimulateActive()</code>/<code>HasAnyBuildingDefinition()</code>), so one home, two surfaces, no drift.</li>
+</ul>
+<p><strong>The live Randomize count.</strong> The panel Randomize button shows <code>"(N)"</code> for the selected-plot count; <code>GetEditingBarRandomizeLabel()</code> carries the same <code>"Randomize Plots (N)"</code> from the SAME source (<code>GetSelectedPlotCountForEditingOutpost()</code>, the exact method the panel button's <code>Context-&gt;SelectedPlotCountForEditingOutpost</code> binds to), the one-source law, not a re-derived count. The bar's Randomize tooltip carries the same <code>(N)</code> in its enabled/ready wording.</p>
+<h3 id="two-tier-tooltips-the-live-reason-and-the-reference-detail">Two-Tier Tooltips: the Live Reason and the Reference Detail</h3>
+<p>Most of the plugin's action buttons build their tooltip through one shared helper instead of a plain <code>.ToolTipText</code>: <code>OutpostBuilder::Tooltips::MakeToolTip</code> (<code>OutpostBuilderTooltips.h</code>/<code>.cpp</code>), reached by the editing bar's five buttons, the Assign row's Assign Building, the Plots section's New Plot/Randomize/Delete, and every palette tile.</p>
+<p>It wraps the engine's own <code>SDocumentationToolTip</code>, which draws BOTH tiers. Tier one is the same live, per-frame short text covered just above (the button's enabled/disabled-reason wording). Tier two is a longer, static reference paragraph plus an "Open the documentation" button.</p>
+<p>The doc link is a PLAIN URL straight into this docs site, not an engine doc id: engine doc ids resolve against <code>.udn</code> documentation trees the plugin doesn't ship, so an id-based link would always come up empty here.</p>
+<p>Each tier-two paragraph (<code>OutpostBuilder::Tooltips::SaveOutpost()</code>, <code>AddPlot()</code>, <code>RandomizePlots()</code>, and so on, one function per verb, shared by every surface that verb reaches) explains what the action actually DOES and why, and deliberately never repeats tier one's live disabled-reason text.</p>
+<p>The two tiers answer different questions ("why can't I click this right now" versus "what does this actually do"), and folding one into the other would just be the same sentence twice, once live and once already stale by the time the button re-enables.</p>
+<h3 id="the-plots-list-multi-column-rows-and-a-two-way-sync">The Plots List: Multi-Column Rows and a Two-Way Sync</h3>
+<p><strong>Columns.</strong> The plot list is a multi-column <code>SListView&lt;TSharedPtr&lt;FPlotListEntry&gt;&gt;</code> + <code>SHeaderRow</code> with four columns:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Shows</th>
+<th>Width</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Plot</strong></td>
+<td>The actor label</td>
+<td><code>FillWidth</code> 0.35</td>
+</tr>
+<tr>
+<td><strong>Building</strong></td>
+<td>The effective display name, or "Unassigned"</td>
+<td><code>FillWidth</code> 0.45</td>
+</tr>
+<tr>
+<td><strong>Size</strong></td>
+<td>The plot's size-tag leaf</td>
+<td><code>FixedWidth</code> 56px</td>
+</tr>
+<tr>
+<td>(unlabeled warn)</td>
+<td>The drift icon, below</td>
+<td><code>FixedWidth</code> 24px</td>
+</tr>
+</tbody>
+</table>
+<p><code>FPlotListEntry</code> carries one <code>FText</code> field per text column (<code>PlotLabelText</code>/<code>BuildingText</code>/<code>SizeText</code>) plus <code>bHasPlotTagWarning</code>. <code>RefreshPlotList()</code> populates all four independently.</p>
+<p>The row widget itself is <code>OutpostBuilder::PlotsList::SPlotListRow</code> (<code>SOutpostPlotsSection.cpp</code>'s own file-local namespace), a <code>SMultiColumnTableRow&lt;TSharedPtr&lt;FPlotListEntry&gt;&gt;</code> whose <code>GenerateWidgetForColumn</code> switches on the column's <code>FName</code> id and returns a plain <code>STextBlock</code> (or, for the warn column, an <code>Icons.Warning</code> <code>SImage</code>). <code>HandleGeneratePlotListRow</code> is a two-line <code>SNew(SPlotListRow, OwnerTable).Entry(Entry)</code>.</p>
+<p>Sortable is deliberately NOT offered. <code>SHeaderRow</code>'s default <code>SortMode(None)</code> is left untouched.</p>
+<p><code>Plot-&gt;GetPlotSizeTag()</code>'s leaf text (<code>OutpostBuilder::PlotSizeTags::GetTagLeafText</code>, load-free, the identical helper the size filter combo's own labels use) resolves an unset/empty tag to the default tag's own leaf, so an untagged or hand-spawned plot still shows a size, never a blank. The drift-warning icon (placement rule matrix mismatch) is in its own column.</p>
+<p>Selection highlighting, the bidirectional viewport sync (below), and multi-select all key on the row ITEM (<code>TSharedPtr&lt;FPlotListEntry&gt;</code>), never its rendered columns, so <code>HandlePlotListSelectionChanged</code>/<code>SelectPlots()</code>/<code>ESelectInfo::Direct</code> are independent of the column layout.</p>
+<p><strong>Bidirectional sync.</strong> <code>SelectPlots(const TArray&lt;AOutpostPlot*&gt;&amp;)</code> highlights the list rows for a viewport plot selection: <code>PlotListView-&gt;ClearSelection()</code> then <code>SetItemSelection(Entry, true, ESelectInfo::Direct)</code> per matching entry. <code>ESelectInfo::Direct</code> is what stops this from re-firing <code>OnPlotSelectionPushed</code> back out (<code>HandlePlotListSelectionChanged</code>'s Direct guard is what makes this safe).</p>
+<p>The mode-side half rides the SAME notify the click-clear feature uses, <code>ActorSelectionChangeNotify()</code>, at the TWO points that do NOT trigger click-clear. The walk is deliberate, so the two features can never fight over the same click:</p>
+<ul>
+<li><strong>Empty-space deselection</strong> (<code>SelectedActors.Num() == 0</code>, click-clear's own early-out) also calls <code>SyncPlotsListSelectionFromViewport()</code> before returning: an empty push clears the list's own highlight too.</li>
+<li><strong>A family selection</strong> (every selected actor belongs to the editing outpost's family, or is the <code>AOutpost</code> carve-out), click-clear's own <code>!bSelectionOutsideFamily</code> branch, calls the same sync instead of doing nothing.</li>
+</ul>
+<p><code>SyncPlotsListSelectionFromViewport()</code> (private, <code>UOutpostBuilderEdMode</code>) reads <code>GetSelectedPlotsForEditingOutpost()</code> (the SAME source Randomize's button label already reads, never a re-derived query) and forwards through <code>FOutpostBuilderToolkit::HandleViewportPlotSelectionChanged(Plots)</code> to <code>PlotsSection-&gt;SelectPlots(Plots)</code>. No re-entrancy guard is needed the way <code>GEditor-&gt;SelectNone()</code> needed one in the SAME function: <code>SetItemSelection</code> only ever touches the Slate list's own internal selection set, never <code>GEditor</code>'s actor selection, so it can never re-broadcast <code>ActorSelectionChangeNotify</code> at all.</p>
+<h3 id="the-overview-outpost-combo-the-outpost-half-of-the-sync">The Overview Outpost Combo: the Outpost Half of the Sync</h3>
+<p>Selecting an outpost ACTOR in the viewport reflects into the Overview panel's outpost combo too, the outpost-shaped counterpart to the Plots-list sync just above, built along the exact same <code>ActorSelectionChangeNotify()</code> path and guards (<code>GIsTransacting</code>, the re-entrancy flag, the placement/positioning gate).</p>
+<p>It is deliberately BROADER than the click-clear/plot-sync logic it sits beside in that function: <code>SyncOverviewOutpostSelectionFromViewport()</code> runs regardless of <code>IsEditingOutpost()</code>. A selected outpost actor is just as meaningful while merely BROWSING the Overview (nothing being edited) as it is while editing a different outpost.</p>
+<p>So the call sits BEFORE that function's own <code>if (!IsEditingOutpost()) return;</code> early-out, not after it.</p>
+<p>The sync itself is narrow on purpose: it only ever reflects a selection of EXACTLY ONE <code>AOutpost</code> actor (<code>Owner-&gt;GetSelectedActors()-&gt;GetSelectedObjects&lt;AOutpost&gt;()</code>, <code>.Num() == 1</code>).</p>
+<p>A selection with zero or more than one outpost actor (including an ordinary plot-only selection, which the Plots-list sync above already handles) leaves the Overview combo's current entry alone rather than guessing.</p>
+<p>On a match, it calls <code>FOutpostBuilderToolkit::HandleViewportOutpostSelectionChanged(DefinitionId)</code>, which forwards to <code>SOutpostsOverviewPanel::SelectOutpost(DefinitionId)</code> (the SAME widget method the docs/QA capture run's <code>SelectOverviewOutpostForCapture</code> path uses), selecting the matching combo entry directly, bypassing the combo's own click handling exactly as the capture path does.</p>
+<p><strong>Reflects, never switches:</strong> this sync only ever updates what the Overview combo SHOWS. It never calls <code>StartEditingOutpost</code>/<code>StartOutpostPlacementForDefinition</code> or changes the active browse tab. Selecting an outpost actor while already editing a DIFFERENT one, for instance, updates the combo for whenever the designer next looks at (or switches to) the Overview tab, without touching the current editing session at all.</p>
+<h2 id="toasts-and-content-browser-sync">Toasts and Content Browser Sync</h2>
+<p>Every asset the toolkit creates gets the same transient notification. The toolkit's method only chooses the wording; the notification mechanics live in the shared editor-module helper <code>OutpostEditorUtils::ShowAssetCreatedToast</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkitBuildTab.cpp</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">FOutpostBuilderToolkit::ShowAssetCreatedToast</span><span class="p">(</span><span class="n">UObject</span><span class="o">*</span><span class="w"> </span><span class="n">Asset</span><span class="p">)</span><span class="w"> </span><span class="k">const</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">Asset</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">OutpostEditorUtils</span><span class="o">::</span><span class="n">ShowAssetCreatedToast</span><span class="p">(</span><span class="n">Asset</span><span class="p">,</span>
+<span class="w">        </span><span class="n">FText</span><span class="o">::</span><span class="n">Format</span><span class="p">(</span><span class="n">LOCTEXT</span><span class="p">(</span><span class="s">"AssetCreatedToast"</span><span class="p">,</span><span class="w"> </span><span class="s">"Created {0}"</span><span class="p">),</span><span class="w"> </span><span class="n">FText</span><span class="o">::</span><span class="n">FromName</span><span class="p">(</span><span class="n">Asset</span><span class="o">-&gt;</span><span class="n">GetFName</span><span class="p">())),</span>
+<span class="w">        </span><span class="cm">/*ExpireDuration=*/</span><span class="mf">4.f</span><span class="p">,</span><span class="w"> </span><span class="cm">/*bSuccessState=*/</span><span class="nb">false</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The shared helper (<code>OutpostEditorUtils.h</code>/<code>.cpp</code>) owns the <code>FNotificationInfo</code> plumbing: the caller's message and expire duration, the "Show in Content Browser" hyperlink, and an optional <code>CS_Success</code> completion state. Each caller keeps its own presentation: the ed mode's placement toast passes 6 seconds and success-green, the toolkit and the prefab fork toast pass 4 seconds and plain.</p>
+<p>The <code>TWeakObjectPtr</code> capture inside the helper's hyperlink lambda resolves the weak pointer at click time (through <code>OutpostEditorUtils::SyncContentBrowserToAsset</code>) rather than capturing a raw <code>UObject*</code> that could be dangling by the time a designer actually clicks it.</p>
+<h2 id="references">References</h2>
+<p>Repo files:</p>
+<ul>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkit.h</code> - the toolkit's full public and private surface, and the FILE MAP comment describing the one-file-per-panel split (see "File Map" above).</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkit.cpp</code> - lifecycle/<code>Init</code> (the Context/model bind + <code>ensure</code> sweep, all five viewport-overlay widgets, <code>ToolkitContent</code>), panel routing, the Editing panel's shell, the undo client, asset-registry hooks (<code>OnAssetRemoved</code>/<code>OnAssetRenamed</code>/<code>OnAssetAdded</code>), the shared overlay lifecycle (<code>SyncViewportOverlay</code>).</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkitOverview.cpp</code> - the Overview panel's browse shell and the Outposts-tab mount point.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkitBuildingsTab.cpp</code> - the Buildings-tab mount point plus the refresh plumbing.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkitBuildTab.cpp</code> - the Editing panel's WHOLE body (<code>BuildEditingPanelContent</code>): the identity header/Plots-section mounts, the Select Plot Contents shell (six pieces), the toolkit-level palette plumbing (<code>RefreshBuildingPalette</code>/<code>SelectHotBuilding</code>/<code>HandlePaletteHotkey</code>/<code>HandleEyedropperPick</code>/<code>CreateNewBuildingDefinitionInteractive</code>), and the button-recipe comment.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkitConfigureTab.cpp</code> - the identity header's mutation forwarders and the Overhead camera pilot's forwarders (called by the editing viewport bar); <code>IsSaveEnabled</code>/<code>HandleSaveClicked</code>.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkitPlacement.cpp</code> - <code>IsPlacingPlot</code> and the placement viewport overlay's bindings (<code>GetPlacementOverlayText</code>/<code>HandleCancelPlacementClicked</code>, the session's one Cancel affordance).</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderToolkitEditingBar.cpp</code> - the editing bar's content (<code>BuildEditingOutpostBarContent</code>, <code>OutpostBuilder::EditingBar::BuildBarButton</code>) and its five buttons' gate/handler pairs.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Widgets/OutpostBuilderWidgetContext.h</code> - <code>FOutpostBuilderWidgetContext</code>, the shared find-only read-model (see "Two Shared Primitives" above).</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Widgets/OutpostPaletteModel.h</code> / <code>.cpp</code> - <code>FOutpostPaletteModel</code> and <code>FScopedPaletteObserver</code>, the palette's shared state primitive.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Widgets/SOutpostSaveFooter.h</code> / <code>.cpp</code> (export-only, no internal mount), <code>SOutpostTabBar.h</code> (the Overview panel's bar), <code>SOutpostsOverviewPanel.h</code> / <code>.cpp</code>, <code>SOutpostIdentityHeader.h</code> / <code>.cpp</code>, <code>SOutpostPaletteTile.h</code> / <code>.cpp</code>, <code>SOutpostPaletteFilterRow.h</code> / <code>.cpp</code>, <code>SOutpostPaletteCategoryTabRow.h</code> / <code>.cpp</code>, <code>SOutpostBuildingPalette.h</code> / <code>.cpp</code>, <code>SOutpostSelectedBuildingPanel.h</code> / <code>.cpp</code>, <code>SOutpostAssignRow.h</code> / <code>.cpp</code>, <code>SOutpostPlotsSection.h</code> / <code>.cpp</code>, <code>SOutpostViewportOverlay.h</code> / <code>.cpp</code> (<code>MakeDisabledAwareCursor</code>), <code>SOutpostBuildingCommandGrid.h</code> / <code>.cpp</code> (the in-viewport building command grid).<ul>
+<li>13 of the 14 reusable <code>SOutpost*</code> widgets (see "The Widget Inventory" above). Each header's own class doc names the exact toolkit methods it was extracted from.</li>
+</ul>
+</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Widgets/SOutpostBuildingsBrowser.h</code> / <code>.cpp</code> (the original exemplar) - the building-definition browser: the list (<code>RefreshList()</code>), its inline details view, "+ New Building" via <code>OnCreateBuildingRequested</code>, and Find References in World.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Utils/OutpostEditorUtils.h</code> / <code>.cpp</code> - the shared toast / Content Browser sync / unique-label helpers.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilder/Settings/OutpostBuilderSettingsAsset.h</code> - the settings asset: <code>CreatedDefinitionDirectory</code>, <code>DefinitionAssetPrefix</code>, <code>OutpostExclusionDistance</code>, <code>MaxDefaultBuildingPaletteEntries</code>, and the Placement pair. The pin list lives off the asset, on <code>UOutpostRuntimeSettings::PinnedBuildingDefinitions</code> (hidden config).</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Mode/OutpostBuilderEdMode.h</code> / <code>.cpp</code> - <code>GetOutpostToolkit()</code> and the direct <code>Handle*</code> calls, <code>IsPlacementActive()</code>/<code>IsPlacingPlot()</code>, the command dispatch and the RMB cancel gesture. <code>edmode.html</code> has the authoritative deep dive on the mode.</li>
+<li><code>OutpostBuilder/Source/OutpostBuilderEditor/Toolkit/OutpostBuilderCommands.h</code> / <code>.cpp</code> - the <code>FUICommandInfo</code> set behind the palette hotkeys, Escape cancel, rotation, and Ctrl+S.</li>
+<li><code>contracts.md</code> - the frozen Toolkit surface and the multi-viewport-overlay note.</li>
+<li><code>research/19-reusable-widget-decomposition.md</code> / <code>research/20-extensibility-plan.md</code> - the plan and the safety rails (<code>OUTPOST_ENSURE_CONTEXT_BOUND</code>, <code>FScopedPaletteObserver</code>) behind the reusable-widget epic this page describes.</li>
+<li><code>research/06-rts-ux-research.md</code> - the UX research behind the palette, thumbnails, and hotkeys.</li>
+</ul>
+<p>Engine source (paths relative to the UE 5.8 install):</p>
+<ul>
+<li><code>Engine/Source/Editor/EditorFramework/Public/Toolkits/IToolkitHost.h</code> - <code>AddViewportOverlayWidget</code> / <code>RemoveViewportOverlayWidget</code>.</li>
+<li><code>Engine/Source/Editor/EditorFramework/Public/Toolkits/BaseToolkit.h</code> - <code>FModeToolkit</code>.</li>
+<li><code>Engine/Source/Editor/LevelInstanceEditor/Private/LevelInstanceEditorModeToolkit.cpp</code> - the viewport overlay exemplar this pattern is modeled on.</li>
+<li><code>Engine/Source/Editor/UnrealEd/Public/AssetThumbnail.h</code> - <code>FAssetThumbnailPool</code>, <code>FAssetThumbnail</code>.</li>
+<li><code>Engine/Source/Runtime/SlateCore/Public/Widgets/SBoxPanel.h</code> / <code>Engine/Source/Runtime/Slate/Public/Widgets/Layout/SUniformGridPanel.h</code> - both default <code>EVisibility::SelfHitTestInvisible</code> in their own <code>SLATE_BEGIN_ARGS</code>, verified for the building command grid's click-through claim.</li>
+<li><code>Engine/Source/Editor/PropertyEditor/Public/PropertyEditorDelegates.h</code> - <code>FPropertyAndParent</code>, <code>FIsPropertyVisible</code>.</li>
+<li><code>Engine/Source/Runtime/Engine/Public/ObjectEditorUtils.h</code> - <code>FObjectEditorUtils::GetCategoryFName</code>.</li>
+<li><code>Engine/Source/Editor/ContentBrowser/Public/IContentBrowserSingleton.h</code> - <code>CreateModalSaveAssetDialog</code>, <code>FSaveAssetDialogConfig</code>.</li>
+<li><code>Engine/Plugins/Editor/AssetManagerEditor/Source/AssetManagerEditor/Public/AssetManagerEditorModule.h</code> - <code>MakePrimaryAssetIdSelector</code>.</li>
+</ul>
+      </article>
+    <nav class="pager" aria-label="Page navigation">
+      <a class="pager-prev" href="edmode.html">
+        <span class="pager-dir">&larr; Previous</span>
+        <span class="pager-title">The Ed Mode - UEdMode Deep Dive</span>
+      </a>
+      <a class="pager-next" href="prefabs.html">
+        <span class="pager-dir">Next &rarr;</span>
+        <span class="pager-title">Prefabs &amp; Fork-on-Stamp</span>
+      </a>
+    </nav>
+    </main>
+
+    <footer class="foot">
+      <p>A tutorial and reference site for the OutpostBuilder editor plugin, an RTS-style outpost authoring tool for Unreal Engine 5.7/5.8.</p>
+      <a href="https://github.com/defessler/OutpostBuilder">View on GitHub</a>
+    </footer>
+  </div>
+</div>
+
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 470" font-family="'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="pm-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c7d0da" />
+    </marker>
+    <marker id="pm-arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#63c78a" />
+    </marker>
+    <marker id="pm-arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#e05959" />
+    </marker>
+  </defs>
+
+  <text x="490" y="26" text-anchor="middle" font-size="17" font-weight="bold" fill="#eef2f6">Placement state machine (bPlacingOutpost / bPlacingPlot)</text>
+  <text x="490" y="45" text-anchor="middle" font-size="12" fill="#a9b4bf">Every arrow into or out of Idle notifies the toolkit at most once, even though Start* calls CancelPlacement() internally first.</text>
+
+  <!-- Idle -->
+  <rect x="390" y="70" width="200" height="64" rx="10" fill="#8b98ab" fill-opacity="0.10" stroke="#8b98ab" stroke-width="1.8"/>
+  <text x="490" y="96" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#eef2f6">Idle</text>
+  <text x="490" y="114" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">bPlacingOutpost = bPlacingPlot = false</text>
+
+  <!-- Placing Outpost -->
+  <rect x="60" y="230" width="270" height="110" rx="10" fill="#63c78a" fill-opacity="0.09" stroke="#63c78a" stroke-width="1.8"/>
+  <text x="195" y="255" text-anchor="middle" font-size="14" font-weight="bold" fill="#eef2f6">Placing Outpost</text>
+  <text x="195" y="273" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#eef2f6">bPlacingOutpost = true</text>
+  <text x="195" y="292" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">wire sphere + box ghost, green (red if volume-blocked)</text>
+  <text x="195" y="308" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">yaw via [ / ]</text>
+  <text x="195" y="324" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">(rebindable commands, v1.7)</text>
+
+  <!-- Placing Plot -->
+  <rect x="650" y="230" width="270" height="110" rx="10" fill="#e6a528" fill-opacity="0.09" stroke="#e6a528" stroke-width="1.8"/>
+  <text x="785" y="255" text-anchor="middle" font-size="14" font-weight="bold" fill="#eef2f6">Placing Plot</text>
+  <text x="785" y="273" text-anchor="middle" font-family="Consolas, 'Cascadia Code', monospace" font-size="11" fill="#eef2f6">bPlacingPlot = true</text>
+  <text x="785" y="292" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">wire cylinder + mesh ghost pool</text>
+  <text x="785" y="308" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">graduated red/orange/valid tint,</text>
+  <text x="785" y="324" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">footprint rings, invalid reason text</text>
+
+  <!-- Idle -> Placing Outpost -->
+  <path d="M420,134 C320,175 250,195 205,228" fill="none" stroke="#c7d0da" stroke-width="1.8" marker-end="url(#pm-arrow)"/>
+  <text x="255" y="185" text-anchor="middle" font-size="11" fill="#eef2f6">StartOutpostPlacement()</text>
+  <text x="255" y="200" text-anchor="middle" font-size="10" fill="#a9b4bf" font-style="italic">toolkit "Create"</text>
+
+  <!-- Placing Outpost -> Idle (LMB) -->
+  <path d="M245,228 C300,190 350,160 415,138" fill="none" stroke="#63c78a" stroke-width="1.8" marker-end="url(#pm-arrow-green)"/>
+  <text x="410" y="185" text-anchor="middle" font-size="11" fill="#eef2f6">LMB (valid location)</text>
+  <text x="410" y="200" text-anchor="middle" font-size="10" fill="#a9b4bf" font-style="italic">ConfirmOutpostPlacement -&gt; EnterOutpostEditMode</text>
+
+  <!-- Placing Outpost -> Idle (RMB) -->
+  <path d="M150,230 C120,195 130,155 190,132" fill="none" stroke="#e05959" stroke-width="1.8" marker-end="url(#pm-arrow-red)"/>
+  <text x="70" y="190" text-anchor="middle" font-size="11" fill="#eef2f6">RMB tap</text>
+  <text x="70" y="205" text-anchor="middle" font-size="10" fill="#a9b4bf" font-style="italic">CancelPlacement() - drag still orbits</text>
+
+  <!-- Idle -> Placing Plot -->
+  <path d="M560,134 C660,175 730,195 775,228" fill="none" stroke="#c7d0da" stroke-width="1.8" marker-end="url(#pm-arrow)"/>
+  <text x="725" y="185" text-anchor="middle" font-size="11" fill="#eef2f6">StartPlotPlacement()</text>
+  <text x="725" y="200" text-anchor="middle" font-size="10" fill="#a9b4bf" font-style="italic">requires IsEditingOutpost()</text>
+
+  <!-- Placing Plot -> Idle (RMB) -->
+  <path d="M830,230 C860,195 850,155 790,132" fill="none" stroke="#e05959" stroke-width="1.8" marker-end="url(#pm-arrow-red)"/>
+  <text x="910" y="190" text-anchor="middle" font-size="11" fill="#eef2f6">RMB tap</text>
+  <text x="910" y="205" text-anchor="middle" font-size="10" fill="#a9b4bf" font-style="italic">also: world cleanup, mode/session exit</text>
+
+  <!-- Placing Plot self loop (LMB confirm, repeat placement) -->
+  <path d="M 920,270 C 970,250 970,320 920,300" fill="none" stroke="#63c78a" stroke-width="1.8" marker-end="url(#pm-arrow-green)"/>
+  <text x="960" y="285" text-anchor="middle" font-size="10.5" fill="#63c78a" transform="rotate(90 960 285)">LMB (valid) - repeat</text>
+
+  <!-- Placing Outpost <-> Placing Plot direct switch -->
+  <path d="M330,265 C450,265 550,265 650,265" fill="none" stroke="#c7d0da" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#pm-arrow)"/>
+  <text x="490" y="255" text-anchor="middle" font-size="10.5" fill="#eef2f6">StartPlotPlacement()</text>
+  <path d="M650,305 C550,305 450,305 330,305" fill="none" stroke="#c7d0da" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#pm-arrow)"/>
+  <text x="490" y="322" text-anchor="middle" font-size="10.5" fill="#eef2f6">StartOutpostPlacement()</text>
+  <text x="490" y="337" text-anchor="middle" font-size="9.5" fill="#a9b4bf" font-style="italic">each Start* cancels first, but the internal cancel is suppressed from broadcasting</text>
+
+  <!-- (v1.8 removed the ring-drag sub-state that used to be diagrammed here: HOutpostRotateRingProxy,
+       bDraggingRotateRing, and the DisallowMouseDeltaTracking() override are all gone. Ghost yaw is now
+       the [ / ] rotate commands - rebindable since v1.7 (a Ctrl+Scroll wheel alternate survived through
+       v1.25 and was removed entirely in v1.26 W-U2) - which are plain InputKey command dispatch and add
+       no sub-state to this machine.) -->
+
+  <text x="490" y="400" text-anchor="middle" font-size="11.5" fill="#a9b4bf">RMB cancels back to Idle only on a TAP (&lt;5px, &lt;0.35s); Escape always cancels. RMB drag is left unconsumed and orbits.</text>
+  <text x="490" y="418" text-anchor="middle" font-size="11.5" fill="#a9b4bf">World cleanup (Open Level) and mode/session exit also route through CancelPlacement() into Idle.</text>
+  <text x="490" y="440" text-anchor="middle" font-size="10.5" fill="#a9b4bf" font-style="italic">LMB is refused (but still consumed) while bPreviewPlacementValid is false, for either outpost or plot placement.</text>
+</svg>

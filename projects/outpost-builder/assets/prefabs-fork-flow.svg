@@ -1,0 +1,97 @@
+<svg viewBox="0 0 900 780" xmlns="http://www.w3.org/2000/svg" font-family="Consolas, 'Courier New', monospace" font-size="14">
+  <style>
+    .box { fill: none; stroke: #9fd0ff; stroke-width: 1.5; }
+    .box-fork { fill: none; stroke: #ffb86c; stroke-width: 1.5; }
+    .box-bail { fill: none; stroke: #ff8080; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .lbl { fill: #e8eef5; }
+    .sub { fill: #a9b6c4; font-size: 12px; }
+    .arrow { stroke: #9fd0ff; stroke-width: 1.5; fill: none; marker-end: url(#head); }
+    .arrow-bail { stroke: #ff8080; stroke-width: 1.5; fill: none; marker-end: url(#head-bail); }
+    .cond { fill: #ffd479; font-size: 12px; }
+    .title { fill: #e8eef5; font-size: 16px; font-weight: bold; }
+  </style>
+  <defs>
+    <marker id="head" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#9fd0ff" />
+    </marker>
+    <marker id="head-bail" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#ff8080" />
+    </marker>
+  </defs>
+
+  <text x="20" y="28" class="title">Drag-to-stamp: UActorFactoryOutpostPrefab::PostSpawnActor fires twice</text>
+
+  <!-- Step 1: drag -->
+  <rect x="300" y="50" width="300" height="40" rx="6" class="box" />
+  <text x="450" y="75" text-anchor="middle" class="lbl">Drag a UOutpostDefinition asset into the viewport</text>
+
+  <path d="M450,90 L450,115" class="arrow" />
+
+  <!-- Step 2: CreateActor spawns bare AOutpost -->
+  <rect x="300" y="118" width="300" height="42" rx="6" class="box" />
+  <text x="450" y="135" text-anchor="middle" class="lbl">UActorFactory::CreateActor</text>
+  <text x="450" y="152" text-anchor="middle" class="sub">spawns a bare AOutpost (no definition id yet)</text>
+
+  <path d="M450,160 L450,185" class="arrow" />
+
+  <!-- Call #1 -->
+  <rect x="270" y="188" width="360" height="42" rx="6" class="box" />
+  <text x="450" y="205" text-anchor="middle" class="lbl">PostSpawnActor call #1 (from CreateActor)</text>
+  <text x="450" y="222" text-anchor="middle" class="sub">still mid-drag or the real drop, both call it</text>
+
+  <path d="M450,230 L450,255" class="arrow" />
+
+  <!-- Preview check -->
+  <polygon points="450,258 590,300 450,342 310,300" class="box" />
+  <text x="450" y="296" text-anchor="middle" class="cond">bIsEditorPreviewActor?</text>
+  <text x="450" y="313" text-anchor="middle" class="sub">(ghost under cursor)</text>
+
+  <path d="M590,300 L700,300" class="arrow-bail" />
+  <text x="705" y="296" class="cond">yes</text>
+  <rect x="700" y="280" width="180" height="40" rx="6" class="box-bail" />
+  <text x="790" y="304" text-anchor="middle" class="lbl">return - no fork</text>
+
+  <path d="M450,342 L450,367" class="arrow" />
+  <text x="465" y="358" class="cond">no (real drop)</text>
+
+  <!-- OutpostDefinitionId valid check -->
+  <polygon points="450,370 610,412 450,454 290,412" class="box" />
+  <text x="450" y="408" text-anchor="middle" class="cond">OutpostDefinitionId valid?</text>
+  <text x="450" y="425" text-anchor="middle" class="sub">(already stamped this anchor?)</text>
+
+  <path d="M610,412 L720,412" class="arrow-bail" />
+  <text x="725" y="408" class="cond">yes</text>
+  <rect x="720" y="392" width="160" height="40" rx="6" class="box-bail" />
+  <text x="800" y="416" text-anchor="middle" class="lbl">bail (call #2)</text>
+
+  <path d="M450,454 L450,479" class="arrow" />
+  <text x="465" y="470" class="cond">no (first time)</text>
+
+  <!-- StampPrefab -->
+  <rect x="260" y="482" width="380" height="46" rx="6" class="box-fork" />
+  <text x="450" y="500" text-anchor="middle" class="lbl">OutpostPrefabUtils::StampPrefab</text>
+  <text x="450" y="518" text-anchor="middle" class="sub">FScopedTransaction "Stamp Outpost Prefab"</text>
+
+  <path d="M450,528 L450,553" class="arrow" />
+
+  <!-- ForkDefinition -->
+  <rect x="260" y="556" width="380" height="46" rx="6" class="box-fork" />
+  <text x="450" y="574" text-anchor="middle" class="lbl">ForkDefinition: duplicate the template asset</text>
+  <text x="450" y="592" text-anchor="middle" class="sub">"&lt;Name&gt;_Stamp", then RegeneratePlotIds()</text>
+
+  <path d="M450,602 L450,627" class="arrow" />
+
+  <!-- StampOutpost -->
+  <rect x="260" y="630" width="380" height="52" rx="6" class="box-fork" />
+  <text x="450" y="649" text-anchor="middle" class="lbl">UOutpostStampLibrary::StampOutpost(Fork, anchor)</text>
+  <text x="450" y="666" text-anchor="middle" class="sub">spawns plots/camera from the fork's records,</text>
+  <text x="450" y="681" text-anchor="middle" class="sub">SetOutpostDefinitionId(Fork) on the anchor</text>
+
+  <path d="M450,682 L450,707" class="arrow" />
+
+  <!-- Result -->
+  <rect x="230" y="710" width="440" height="46" rx="6" class="box" />
+  <text x="450" y="729" text-anchor="middle" class="lbl">Anchor now owns a PRIVATE fork - one definition per placed</text>
+  <text x="450" y="746" text-anchor="middle" class="sub">outpost, so call #2's guard above now bails cleanly</text>
+
+</svg>

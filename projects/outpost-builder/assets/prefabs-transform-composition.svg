@@ -1,0 +1,72 @@
+<svg viewBox="0 0 900 480" xmlns="http://www.w3.org/2000/svg" font-family="Consolas, 'Courier New', monospace" font-size="14">
+  <style>
+    .box { fill: none; stroke: #9fd0ff; stroke-width: 1.5; }
+    .box-warn { fill: none; stroke: #ff8080; stroke-width: 1.5; }
+    .box-ok { fill: none; stroke: #7ee6a0; stroke-width: 1.5; }
+    .lbl { fill: #e8eef5; }
+    .sub { fill: #a9b6c4; font-size: 12px; }
+    .title { fill: #e8eef5; font-size: 16px; font-weight: bold; }
+    .op { fill: #ffd479; font-size: 20px; font-weight: bold; }
+    .arrow { stroke: #9fd0ff; stroke-width: 1.5; fill: none; marker-end: url(#head); }
+  </style>
+  <defs>
+    <marker id="head" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#9fd0ff" />
+    </marker>
+  </defs>
+
+  <text x="20" y="28" class="title">World = RelativeTransform * GetRecordBasisTransform()</text>
+  <text x="20" y="48" class="sub">the composition every record write and every stamp uses - never the anchor's raw ActorTransform</text>
+
+  <!-- Record box -->
+  <rect x="30" y="80" width="240" height="110" rx="6" class="box" />
+  <text x="150" y="105" text-anchor="middle" class="lbl">FOutpostPlotRecord</text>
+  <text x="150" y="127" text-anchor="middle" class="sub">.RelativeTransform</text>
+  <text x="150" y="147" text-anchor="middle" class="sub">location, rotation, AND scale</text>
+  <text x="150" y="167" text-anchor="middle" class="sub">(the plot's own scale is free -</text>
+  <text x="150" y="182" text-anchor="middle" class="sub">only the anchor's is stripped)</text>
+
+  <text x="290" y="140" text-anchor="middle" class="op">*</text>
+
+  <!-- Basis box -->
+  <rect x="320" y="80" width="280" height="150" rx="6" class="box-ok" />
+  <text x="460" y="105" text-anchor="middle" class="lbl">AOutpost::GetRecordBasisTransform()</text>
+  <text x="460" y="127" text-anchor="middle" class="sub">FTransform(GetActorRotation(), GetActorLocation())</text>
+  <text x="460" y="150" text-anchor="middle" class="sub">rotation + translation ONLY</text>
+  <text x="460" y="170" text-anchor="middle" class="sub">scale forced to (1,1,1)</text>
+  <text x="460" y="205" text-anchor="middle" class="sub">used at write-back time (SyncRecordTransform,</text>
+  <text x="460" y="220" text-anchor="middle" class="sub">ReRelativizeOwnedRecords) AND at stamp time</text>
+
+  <text x="630" y="140" text-anchor="middle" class="op">=</text>
+
+  <!-- Result box -->
+  <rect x="660" y="80" width="210" height="110" rx="6" class="box" />
+  <text x="765" y="105" text-anchor="middle" class="lbl">World transform</text>
+  <text x="765" y="127" text-anchor="middle" class="sub">of the spawned</text>
+  <text x="765" y="147" text-anchor="middle" class="sub">AOutpostPlot /</text>
+  <text x="765" y="167" text-anchor="middle" class="sub">AOverheadCamera</text>
+
+  <path d="M270,135 L318,135" class="arrow" />
+  <path d="M600,135 L628,135" class="arrow" />
+  <path d="M652,135 L658,135" class="arrow" />
+
+  <!-- Why strip scale -->
+  <text x="20" y="270" class="title">Why the anchor's own scale never enters the composition</text>
+
+  <rect x="30" y="290" width="380" height="160" rx="6" class="box-warn" />
+  <text x="220" y="313" text-anchor="middle" class="lbl">If a designer scales the AOutpost actor to 2x</text>
+  <text x="220" y="335" text-anchor="middle" class="sub">(cosmetic resize of the preview cube, or a mistake)</text>
+  <text x="220" y="365" text-anchor="middle" class="sub">and the basis used raw ActorTransform:</text>
+  <text x="220" y="388" text-anchor="middle" class="sub">every plot distance from the anchor doubles,</text>
+  <text x="220" y="408" text-anchor="middle" class="sub">and FTransform composition multiplies scale too,</text>
+  <text x="220" y="428" text-anchor="middle" class="sub">so each plot's OWN scale would silently distort.</text>
+
+  <rect x="450" y="290" width="420" height="160" rx="6" class="box-ok" />
+  <text x="660" y="313" text-anchor="middle" class="lbl">With scale stripped from the basis:</text>
+  <text x="660" y="340" text-anchor="middle" class="sub">the anchor can be scaled purely as a visual nudge -</text>
+  <text x="660" y="360" text-anchor="middle" class="sub">plot positions and sizes stay exactly what was recorded,</text>
+  <text x="660" y="385" text-anchor="middle" class="sub">and a stamped fork of a scaled template comes out</text>
+  <text x="660" y="405" text-anchor="middle" class="sub">true to shape instead of inheriting whatever scale</text>
+  <text x="660" y="425" text-anchor="middle" class="sub">the anchor happened to carry when it was dropped.</text>
+
+</svg>
