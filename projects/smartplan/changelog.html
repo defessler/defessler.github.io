@@ -487,7 +487,7 @@ footer p { margin: 0; }
 <a class="current" href="whats-new.html">Project</a>
 <a href="m365-setup.html">M365 Agents</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.155.0 &middot; Updated 2026-11-02 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.156.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -503,7 +503,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-09-29-the-m365-agents-match-the-repo-and-the-exporters-recover-from-a-failed-run-v41431">2026-09-29 · The M365 agents match the repo, and the exporters recover from a failed run (v4.143.1)</a></li>
 <li><a href="#2026-09-30-gpt-61-sol-takes-both-copilot-sol-seats-v41440">2026-09-30 · GPT-6.1 Sol takes both Copilot Sol seats (v4.144.0)</a></li>
 <li><a href="#2026-10-08-haiku-55-takes-the-claude-code-scout-and-valsai-re-runs-its-board-v41450">2026-10-08 · Haiku 5.5 takes the Claude Code scout, and vals.ai re-runs its board (v4.145.0)</a></li>
 <li><a href="#2026-10-08-haiku-55-passes-the-implementer-trial-per-call-effort-beats-the-pin-and-copilot-is-back-on-free-v41460">2026-10-08 · Haiku 5.5 passes the implementer trial, per-call effort beats the pin, and Copilot is back on Free (v4.146.0)</a></li>
@@ -517,24 +516,13 @@ footer p { margin: 0; }
 <li><a href="#2026-11-02-smartdiff-reviews-only-the-agents-own-edits-on-copilot-cli-and-claude-code-v41530">2026-11-02 · smartdiff reviews only the agent's own edits, on Copilot CLI and Claude Code (v4.153.0)</a></li>
 <li><a href="#2026-11-02-the-weekly-sweep-aas-new-index-and-a-site-that-says-how-fresh-it-is-v41540">2026-11-02 · The weekly sweep, AA's new index, and a site that says how fresh it is (v4.154.0)</a></li>
 <li><a href="#2026-11-02-zcode-and-zai-leave-the-family-and-the-site-goes-wide-v41550">2026-11-02 · ZCode and z.ai leave the family, and the site goes wide (v4.155.0)</a></li>
+<li><a href="#2026-11-03-smartdiff-draws-each-changed-blueprint-graph-v41560">2026-11-03 · smartdiff draws each changed Blueprint graph (v4.156.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-09-29-the-m365-agents-match-the-repo-and-the-exporters-recover-from-a-failed-run-v41431">2026-09-29 · The M365 agents match the repo, and the exporters recover from a failed run (v4.143.1)</h2>
-<p>The three M365 agents had never been stamped, so <code>m365-agents.py status</code>
-couldn't say whether Agent Builder matched the repo. A live compare found
-UE5 Engineer behind on two fields: its description still said 5.7 only,
-and its review rule still asked for PASS, FAIL or N/A per rule instead of
-the three ranked lists. Both were updated in Agent Builder, re-read from
-the server and hash-matched. The other two already matched. All three are
-now stamped, so <code>status</code> reports real drift from here on.</p>
-<p><code>copilot-export.sh</code> and <code>zcode-export.sh</code> wrote their ownership marker as
-the last step, after wiping the output dir. A run that failed partway left
-a non-empty, unmarked dir that every later run refused. The marker now
-goes down right after the wipe, as <code>release-export.sh</code> already did.</p>
 <h2 id="2026-09-30-gpt-61-sol-takes-both-copilot-sol-seats-v41440">2026-09-30 · GPT-6.1 Sol takes both Copilot Sol seats (v4.144.0)</h2>
 <p>A same-day Copilot pass after the author reported that Copilot changed
 models. GitHub's changelog carried no new model, but two things the
@@ -867,9 +855,18 @@ now supports three harnesses: Claude Code, Copilot CLI and M365 Copilot.</p>
 <p><strong>The site is wider.</strong> Pages, the header and the footer share a 76rem
 column, and paragraphs fill it too instead of stopping at a reading
 measure.</p>
+<h2 id="2026-11-03-smartdiff-draws-each-changed-blueprint-graph-v41560">2026-11-03 · smartdiff draws each changed Blueprint graph (v4.156.0)</h2>
+<p>The smartdiff report now draws every changed graph, function graphs
+included, above its change list. Nodes sit where the editor saved them.
+Pins and wires carry Unreal-style type colors. Added nodes and wires are
+green. Removed ones are dashed red ghosts. Changed nodes are blue, with
+the change on hover. Big graphs crop to the changed area. Box sizes are
+estimated, since T3D saves no size for most nodes. The smartdiff
+self-test (oracle stage (k)) gains six drawing checks. Detail is in
+<code>docs/changelogs/smartdiff.md</code>.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-02 7:00 PM PST / 10:00 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 10:28 AM PST / 1:28 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
