@@ -380,6 +380,19 @@ h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
 .seats .t-strong { border-color: var(--t-strong); }
 .seats .t-cheap { border-color: var(--t-cheap); }
 .route-demo figcaption { margin-top: 0.6rem; font-size: 0.85rem; color: var(--ink-dim); }
+/* Getting Started videos. Rendered dark, so they get the terminal's own
+   edge in both themes. */
+figure.video { margin: 1.25rem 0 1.5rem; }
+figure.video video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  border: 1px solid var(--term-line);
+  background: #14171b;
+}
+figure.video figcaption { margin-top: 0.5rem; font-size: 0.88rem; color: var(--ink-dim); }
 @media (max-width: 52rem) {
   .hero { grid-template-columns: 1fr; gap: 1.75rem; }
 }
@@ -655,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.161.0 &middot; Updated 2026-11-02 &middot; <span class="fresh" data-checked="2026-11-03" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-03</span></span>
+<span class="stamp">v4.165.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-03" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-03</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -757,7 +770,7 @@ quant scores at or below its row.</p>
 <td>5.98</td>
 <td>4 / 20</td>
 <td>Powerful</td>
-<td>Claude Code session and planner; Claude Code verifier; Copilot implementer-reserve fallback, by ask</td>
+<td>Claude Code session and planner; Claude Code verifier; Copilot implementer-reserve fallback, by hand only</td>
 </tr>
 <tr>
 <td>Sonnet 5.5</td>
@@ -767,7 +780,7 @@ quant scores at or below its row.</p>
 <td>5.46</td>
 <td>2 / 10</td>
 <td>not listed</td>
-<td>Claude Code subagent default; Copilot implementer fallback, by ask</td>
+<td>Claude Code subagent default; Copilot implementer fallback, by hand only</td>
 </tr>
 <tr>
 <td>Fable 5.1</td>
@@ -787,7 +800,7 @@ quant scores at or below its row.</p>
 <td>3.26</td>
 <td>10 / 50</td>
 <td>Powerful</td>
-<td>Copilot implementer-reserve, by ask</td>
+<td>Copilot implementer-reserve, by hand only</td>
 </tr>
 <tr>
 <td>Gemini 4 Argon</td>
@@ -807,7 +820,7 @@ quant scores at or below its row.</p>
 <td>0.72</td>
 <td>2 / 10</td>
 <td>Powerful</td>
-<td>Copilot implementer, by ask; Copilot planner, by ask</td>
+<td>Copilot implementer, by hand only; Copilot planner, by hand only</td>
 </tr>
 <tr>
 <td>Opus 5</td>
@@ -837,7 +850,7 @@ quant scores at or below its row.</p>
 <td>1.04</td>
 <td>2 / 10</td>
 <td>Powerful</td>
-<td>Copilot implementer fallback, by ask; Copilot planner fallback, by ask</td>
+<td>Copilot implementer fallback, by hand only; Copilot planner fallback, by hand only</td>
 </tr>
 <tr>
 <td>GPT-5.6 Sol</td>
@@ -887,7 +900,7 @@ quant scores at or below its row.</p>
 <td>0.21</td>
 <td>0.10 / 0.50</td>
 <td>not listed</td>
-<td>Claude Code implementer-cheap; Claude Code implementer; Claude Code scout; Copilot implementer-cheap fallback, by ask</td>
+<td>Claude Code implementer-cheap; Claude Code implementer; Claude Code scout</td>
 </tr>
 <tr>
 <td>GPT-5.6 Terra</td>
@@ -917,7 +930,7 @@ quant scores at or below its row.</p>
 <td>1.24</td>
 <td>0.75 / 3.75</td>
 <td>Versatile</td>
-<td>Copilot verifier, by ask</td>
+<td>Copilot verifier, by hand only</td>
 </tr>
 <tr>
 <td>Sonnet 5</td>
@@ -927,7 +940,7 @@ quant scores at or below its row.</p>
 <td>5.09</td>
 <td>2 / 10</td>
 <td>Versatile</td>
-<td>Copilot implementer fallback, by ask</td>
+<td>Copilot implementer fallback, by hand only</td>
 </tr>
 <tr>
 <td>GPT-6 Luna</td>
@@ -1436,7 +1449,7 @@ so both Sol seats run it there.</p>
 and it wins on any drift.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 3:22 PM PST / 6:22 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 10:32 PM PST / 1:32 AM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the

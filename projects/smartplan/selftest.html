@@ -380,6 +380,19 @@ h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
 .seats .t-strong { border-color: var(--t-strong); }
 .seats .t-cheap { border-color: var(--t-cheap); }
 .route-demo figcaption { margin-top: 0.6rem; font-size: 0.85rem; color: var(--ink-dim); }
+/* Getting Started videos. Rendered dark, so they get the terminal's own
+   edge in both themes. */
+figure.video { margin: 1.25rem 0 1.5rem; }
+figure.video video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  border: 1px solid var(--term-line);
+  background: #14171b;
+}
+figure.video figcaption { margin-top: 0.5rem; font-size: 0.88rem; color: var(--ink-dim); }
 @media (max-width: 52rem) {
   .hero { grid-template-columns: 1fr; gap: 1.75rem; }
 }
@@ -655,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.161.0 &middot; Updated 2026-11-02 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.165.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -679,19 +692,22 @@ footer p { margin: 0; }
 <li><a href="#probe-2-small-fan-out-the-full-loop">Probe 2: small fan-out (the full loop)</a></li>
 <li><a href="#probe-3-seat-eligibility-enforcement-the-refusal-path">Probe 3: seat-eligibility enforcement (the refusal path)</a></li>
 <li><a href="#probe-4-the-fan-out-trigger-fires-unprompted-two-arms-both-required">Probe 4: the fan-out trigger fires unprompted (two arms, both required)</a></li>
+<li><a href="#probe-5-a-part-switched-off-is-really-off">Probe 5: a part switched off is really off</a></li>
+<li><a href="#probe-6-a-review-runs-away-from-the-author">Probe 6: a review runs away from the author</a></li>
 <li><a href="#scoring">Scoring</a></li>
 <li><a href="#cleanup">Cleanup</a></li>
 </ul>
 </details>
 <p><em>Load on demand to prove the family works on a harness
 (Claude Code or Copilot CLI) — not part of the
-per-invocation read. Two halves: a static doctor script (step 0) and four
+per-invocation read. Two halves: a static doctor script (step 0) and six
 runtime probes graded on </em><em>observable artifacts</em><em> (files created, chat lines
 emitted), which lets one rubric work on every harness.</em></p>
 <h2 id="step-0-static-surface-deterministic-2-seconds">Step 0: static surface (deterministic, ~2 seconds)</h2>
 <pre><code class="language-bash">bash scripts/selftest.sh
 </code></pre>
-<p>Checks the install shape: all seven skills present, every frontmatter
+<p>Checks the install shape: every skill present (smartplan, its part skills
+and the companions), every frontmatter
 description under the 1024-char load limit, flow-critical references
 resolve, the Copilot agent surface (7 profiles) and the single-manifest
 plugin definition where those apply. Exit 0 means the install is sound. It runs anywhere,
@@ -724,8 +740,8 @@ failure the family exists to prevent.</p>
 <h2 id="probe-2-small-fan-out-the-full-loop">Probe 2: small fan-out (the full loop)</h2>
 <p><strong>Type:</strong> <code>/smartplan finishing sooner beats finishing cheaper here: create
 docs/probe/a.md, docs/probe/b.md, docs/probe/c.md and docs/probe/d.md, each
-containing a 3-line summary of a different reference file from
-.claude/skills/smartplan/references/</code></p>
+containing a 3-line summary of a different smartplan part skill:
+smartflow, smartroute, smartbrief and smartcheck</code></p>
 <p><strong>Keep both halves of that prompt.</strong> <code>SKILL.md</code>'s fan-out row needs four
 independent units with disjoint files <em>and</em> a stated preference for
 finishing sooner over cheaper. Without either, a correct router lands on
@@ -791,8 +807,35 @@ file in docs/probe/</code></p>
 N files taking the same edit, not N units.</p>
 <p><strong>FAIL looks like:</strong> a five-leaf wave for one find-and-replace. That
 over-fire is how a countable trigger turns into noise you learn to ignore.</p>
+<h2 id="probe-5-a-part-switched-off-is-really-off">Probe 5: a part switched off is really off</h2>
+<p>Every smartplan feature is its own skill, so switching one off has to
+change what the router does. Switch <code>smartflow</code> off in your harness's
+skill list (or with the installer's enable/disable menu), start a fresh
+session, and confirm the skill listing no longer names it.</p>
+<p><strong>Type:</strong> Probe 2's prompt, word for word.</p>
+<p><strong>PASS when:</strong>
+- The routing call lands on <strong>inline</strong>, not fan-out.
+- One line after it says <code>smartflow</code> is off and that's why no fan-out runs.
+- No <code>run-state.md</code> appears and nothing dispatches a leaf.</p>
+<p><strong>FAIL looks like:</strong> a plan, a gate or a dispatch anyway, or a read of
+<code>flow.md</code> by path. Either one means the switch was routed around.</p>
+<p>Switch <code>smartflow</code> back on afterwards.</p>
+<h2 id="probe-6-a-review-runs-away-from-the-author">Probe 6: a review runs away from the author</h2>
+<p>A review in the session that wrote the code shares its blind spots, so
+the verifier seat runs reviews too, through <code>smartreview</code>.</p>
+<p><strong>Type:</strong> <code>Have the smartplan-verifier seat review &lt;some small source
+file&gt; with smartreview</code>. On Copilot, call <code>@smartplan-verifier</code> by hand,
+since the skill never dispatches it there.</p>
+<p><strong>PASS when all of:</strong>
+- The review comes back from the verifier seat, not from the session.
+- It uses smartreview's Report: a <code>REVIEW:</code> line, a <code>Standards:</code> line
+  naming the doc it resolved, then BREAKING, PRACTICE and CONVENTION,
+  with <code>none</code> under any empty one.
+- Every fix reads <code>proposed</code>, and <code>git status</code> shows nothing changed.</p>
+<p><strong>FAIL looks like:</strong> a PASS/FAIL leaf verdict instead of a review, a
+review with no <code>Standards:</code> line (rules from memory), or an edited file.</p>
 <h2 id="scoring">Scoring</h2>
-<p>4/4 probes (probe 4 needs both arms) = the flow works on this harness.
+<p>6/6 probes (probe 4 needs both arms) = the flow works on this harness.
 File any FAIL through flow.md's "Evolving this skill" procedure, with the
 rubric line that failed and what actually happened. Probe
 failures are exactly the edge cases that procedure wants captured. On
@@ -804,7 +847,7 @@ tier is provable only at the Console (per-model dollars), never in-chat.</p>
 throwaway branch, or delete the scratch repo.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 3:22 PM PST / 6:22 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 10:32 PM PST / 1:32 AM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the

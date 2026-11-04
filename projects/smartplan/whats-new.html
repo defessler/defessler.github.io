@@ -380,6 +380,19 @@ h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
 .seats .t-strong { border-color: var(--t-strong); }
 .seats .t-cheap { border-color: var(--t-cheap); }
 .route-demo figcaption { margin-top: 0.6rem; font-size: 0.85rem; color: var(--ink-dim); }
+/* Getting Started videos. Rendered dark, so they get the terminal's own
+   edge in both themes. */
+figure.video { margin: 1.25rem 0 1.5rem; }
+figure.video video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  border: 1px solid var(--term-line);
+  background: #14171b;
+}
+figure.video figcaption { margin-top: 0.5rem; font-size: 0.88rem; color: var(--ink-dim); }
 @media (max-width: 52rem) {
   .hero { grid-template-columns: 1fr; gap: 1.75rem; }
 }
@@ -655,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.161.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.165.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -675,6 +688,10 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
+<li><a href="#since-2026-11-03-v41650">Since 2026-11-03 (v4.165.0)</a></li>
+<li><a href="#since-2026-11-03-v41640">Since 2026-11-03 (v4.164.0)</a></li>
+<li><a href="#since-2026-11-03-v41630">Since 2026-11-03 (v4.163.0)</a></li>
+<li><a href="#since-2026-11-03-v41620">Since 2026-11-03 (v4.162.0)</a></li>
 <li><a href="#since-2026-11-03-v41610">Since 2026-11-03 (v4.161.0)</a></li>
 <li><a href="#since-2026-11-03-v41600">Since 2026-11-03 (v4.160.0)</a></li>
 <li><a href="#since-2026-11-03-v41590">Since 2026-11-03 (v4.159.0)</a></li>
@@ -718,9 +735,33 @@ footer p { margin: 0; }
 <li><a href="#where-to-go-next">Where to go next</a></li>
 </ul>
 </details>
-<p><em>Updated 2026-11-03, v4.161.0. Newest first, back to v4.59.0. Older windows
+<p><em>Updated 2026-11-03, v4.165.0. Newest first, back to v4.59.0. Older windows
 are in git. The <a href="changelog.html">changelog</a> has per-release detail for the
 fourteen most recent releases.</em></p>
+<h2 id="since-2026-11-03-v41650">Since 2026-11-03 (v4.165.0)</h2>
+<p><strong>Reviews run away from the author.</strong> Ask the <code>smartplan-verifier</code> seat
+to review a change and it loads <code>smartreview</code>, in a fresh context with
+no edit tools. You get the same three ranked categories, with every fix
+proposed rather than applied.</p>
+<h2 id="since-2026-11-03-v41640">Since 2026-11-03 (v4.164.0)</h2>
+<p><strong>Switch off any part of smartplan.</strong> Each feature is its own skill now:
+<code>smartflow</code> for fan-out, <code>smartroute</code> for model tiers, <code>smartmode</code> for
+the cost dial, <code>smartbrief</code>, <code>smartexec</code>, <code>smartcheck</code> and
+<code>smartcheck-cpp</code>. smartplan loads the parts a task needs. Turn one off
+in your skill list and smartplan works without it, saying once what it
+skipped.</p>
+<h2 id="since-2026-11-03-v41630">Since 2026-11-03 (v4.163.0)</h2>
+<p><strong>Copilot runs Luna-first.</strong> Every subagent the skill sends runs GPT-6
+Luna. Run the session on Luna and it does the work itself, with a fresh
+Luna checking it. Run it on a pricier model and that model plans and
+checks every Luna diff while Luna writes the code. The pricier agent
+profiles stay for calling by hand.</p>
+<p><strong>The Quickstart opens on Getting Started</strong>, with the first video right
+there.</p>
+<h2 id="since-2026-11-03-v41620">Since 2026-11-03 (v4.162.0)</h2>
+<p><strong>Watch a session instead of reading one.</strong> <a href="tutorial.html">Getting Started</a>
+has a short video for most steps. Each shows the prompt, the skill's
+output as it arrives and a caption on what to look at.</p>
 <h2 id="since-2026-11-03-v41610">Since 2026-11-03 (v4.161.0)</h2>
 <p><strong>See what each skill gives back.</strong> Every skill card on the home page
 has an example of its real output, from smartplan's routing call to a
@@ -1224,7 +1265,7 @@ and never overwritten. <a href="goals.html">Goals &amp; Status</a> tracks distan
 including the goals still unmet.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 3:22 PM PST / 6:22 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 10:32 PM PST / 1:32 AM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the

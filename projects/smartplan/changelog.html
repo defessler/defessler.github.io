@@ -380,6 +380,19 @@ h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
 .seats .t-strong { border-color: var(--t-strong); }
 .seats .t-cheap { border-color: var(--t-cheap); }
 .route-demo figcaption { margin-top: 0.6rem; font-size: 0.85rem; color: var(--ink-dim); }
+/* Getting Started videos. Rendered dark, so they get the terminal's own
+   edge in both themes. */
+figure.video { margin: 1.25rem 0 1.5rem; }
+figure.video video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  border: 1px solid var(--term-line);
+  background: #14171b;
+}
+figure.video figcaption { margin-top: 0.5rem; font-size: 0.88rem; color: var(--ink-dim); }
 @media (max-width: 52rem) {
   .hero { grid-template-columns: 1fr; gap: 1.75rem; }
 }
@@ -655,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.161.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.165.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -675,10 +688,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-10-13-no-model-grade-is-required-anywhere-v41480">2026-10-13 · No model grade is required anywhere (v4.148.0)</a></li>
-<li><a href="#2026-10-17-a-grilled-plan-a-ready-frontier-phased-diagnosis-and-leaner-references-v41490">2026-10-17 · A grilled plan, a ready frontier, phased diagnosis, and leaner references (v4.149.0)</a></li>
-<li><a href="#2026-10-19-haiku-takes-the-mid-seat-fable-gets-triggers-leaner-standing-load-v41500">2026-10-19 · Haiku takes the Mid seat, Fable gets triggers, leaner standing load (v4.150.0)</a></li>
-<li><a href="#2026-10-20-the-weekly-sweep-copilots-november-retirements-gpt-61-sol-takes-terras-verifier-slots-and-the-auto-pool-corrected-v41510">2026-10-20 · The weekly sweep: Copilot's November retirements, GPT-6.1 Sol takes Terra's verifier slots, and the Auto pool corrected (v4.151.0)</a></li>
 <li><a href="#2026-11-02-smartdiff-joins-the-family-with-a-semantic-diff-for-unreal-blueprints-v41520">2026-11-02 · smartdiff joins the family, with a semantic diff for Unreal Blueprints (v4.152.0)</a></li>
 <li><a href="#2026-11-02-smartdiff-reviews-only-the-agents-own-edits-on-copilot-cli-and-claude-code-v41530">2026-11-02 · smartdiff reviews only the agent's own edits, on Copilot CLI and Claude Code (v4.153.0)</a></li>
 <li><a href="#2026-11-02-the-weekly-sweep-aas-new-index-and-a-site-that-says-how-fresh-it-is-v41540">2026-11-02 · The weekly sweep, AA's new index, and a site that says how fresh it is (v4.154.0)</a></li>
@@ -689,132 +698,16 @@ footer p { margin: 0; }
 <li><a href="#2026-11-03-a-site-that-leads-with-the-picks-the-skills-and-how-they-work-v41590">2026-11-03 · A site that leads with the picks, the skills and how they work (v4.159.0)</a></li>
 <li><a href="#2026-11-03-roles-before-vendors-on-the-site-themed-controls-and-a-one-day-data-refresh-v41600">2026-11-03 · Roles before vendors on the site, themed controls, and a one-day data refresh (v4.160.0)</a></li>
 <li><a href="#2026-11-03-an-example-for-every-skill-a-getting-started-tutorial-and-the-turret-demo-back-on-the-site-v41610">2026-11-03 · An example for every skill, a Getting Started tutorial, and the turret demo back on the site (v4.161.0)</a></li>
+<li><a href="#2026-11-03-videos-for-getting-started-v41620">2026-11-03 · Videos for Getting Started (v4.162.0)</a></li>
+<li><a href="#2026-11-03-copilot-runs-luna-first-and-the-quickstart-opens-on-getting-started-v41630">2026-11-03 · Copilot runs Luna-first, and the Quickstart opens on Getting Started (v4.163.0)</a></li>
+<li><a href="#2026-11-03-every-smartplan-feature-is-its-own-skill-and-any-one-can-be-switched-off-v41640">2026-11-03 · Every smartplan feature is its own skill, and any one can be switched off (v4.164.0)</a></li>
+<li><a href="#2026-11-03-the-verifier-seat-runs-code-reviews-through-smartreview-v41650">2026-11-03 · The verifier seat runs code reviews through smartreview (v4.165.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-10-13-no-model-grade-is-required-anywhere-v41480">2026-10-13 · No model grade is required anywhere (v4.148.0)</h2>
-<p>The author asked that no part of smartplan require a specific grade of
-model. Offering one is fine. Requiring one isn't.</p>
-<p><strong>Every tier is now offered, never required.</strong> SKILL.md carries the rule
-on the inline route, and routing.md, flow.md, check.md and modes.md each
-point at it. A tier the user declines, or one the plan doesn't serve,
-falls to the strongest model on offer at or below the seat. The work
-leans on the executable oracle first, verifies in a fresh context, and
-names the gap at the gate and in the verdict. Judgment that reader can't
-settle comes back UNKNOWN for the human.</p>
-<p><strong>A Cheap seat no longer stops.</strong> It used to write the brief, stop, and
-name the session model to switch to. Now it writes the same brief,
-offers that model, and carries on at its own tier. The spiral diagnosis,
-the verify and a fail-twice retry run at its tier, and a Cheap session
-with no stronger planner plans the wave itself, flagged at the gate. It
-still never dispatches above its own price, so the cost ceiling is
-unchanged.</p>
-<p><strong>The fail-twice rule has an end that isn't a stop.</strong> On a no, or on a
-Cheap seat, the leaf gets one fresh retry at the top tier allowed, then
-comes back as the best attempt with its caveats. Below Strong, an Opus
-strike-out goes to the orchestrator with a stronger session offered.</p>
-<p><strong>The seats follow.</strong> The Claude Code verifier judges on whatever model
-the dispatcher can reach when Opus isn't on the account. Copilot's Cheap
-implementer and Cheap verifier take a never-Cheap leaf when the brief
-says the stronger seat was declined. <code>cpp-gamedev-check.md</code>, smartreview's
-breaking hunt and the GLM and local-model notes say the same. Four eval
-graders that passed a stop now fail it.</p>
-<p>The Claude Code Cheap seat's body still said it ran on Sonnet. It says
-Haiku now.</p>
-<h2 id="2026-10-17-a-grilled-plan-a-ready-frontier-phased-diagnosis-and-leaner-references-v41490">2026-10-17 · A grilled plan, a ready frontier, phased diagnosis, and leaner references (v4.149.0)</h2>
-<p>Six ideas from two outside skill sets, Matt Pocock's <code>mattpocock/skills</code>
-and affaan-m's <code>everything-claude-code</code>, checked against what the family
-already did.</p>
-<p><strong>The plan step grills.</strong> Ambiguity that would change the plan's shape
-is now walked one question at a time, each with a recommended answer,
-until no open branch would change it. The answers go into the persisted
-plan.</p>
-<p><strong>Leaves dispatch on a ready frontier.</strong> <code>run-state.md</code> gains a
-<code>blocked-by</code> column. A leaf is ready once every leaf it consumes has
-passed, and it dispatches at that pass rather than at the wave's end.</p>
-<p><strong>The spiral diagnosis is phased.</strong> Reproduce, narrow to the smallest
-input, state one falsifiable hypothesis, prove it with the oracle. No
-fix before the proof.</p>
-<p><strong>Compaction re-arms the run.</strong> SKILL.md says to re-read <code>flow.md</code>,
-<code>artifacts.md</code> and <code>run-state.md</code> mid-run after a compaction. This repo
-also wires a <code>SessionStart</code> hook on matcher <code>compact</code>,
-<code>rearm-after-compact.sh</code>, which tells Claude so when a <code>run-state.md</code>
-sits at the project root. It's silent otherwise and always exits 0.</p>
-<p><strong>The retro names a fix.</strong> The one retro line names the worst friction
-and its environment fix, landed as an executable check where one fits.</p>
-<p><strong>Verdicts print their grades.</strong> PASS and FAIL templates gain a Grades
-line, one grade per dimension, which step 6 already asked for.</p>
-<p><strong>References lost what other files already said, or what stopped being
-true.</strong> <code>copilot.md</code> dropped build-by-build slug history, a duplicate
-effort paragraph and account history, and no longer claims no seat has
-a T-record (T42 and T46 measured them) or that 3.8 Flash is untested.
-<code>modes.md</code> dropped a third copy of the T8 and T13 numbers. <code>routing.md</code>,
-<code>claude-code.md</code> and <code>modes.md</code> no longer describe Haiku by its 4.5
-window or missing effort dial. <code>routing.md</code>'s cheaper-row example cites
-T45 instead of a Haiku 4.5 result. Copilot effort pins point at
-<code>subagents.agents.&lt;name&gt;.effortLevel</code> everywhere, since dispatch ignores
-a seat's <code>reasoningEffort</code>. <code>artifacts.md</code>'s budget rose to 5.25KB for
-the new column.</p>
-<h2 id="2026-10-19-haiku-takes-the-mid-seat-fable-gets-triggers-leaner-standing-load-v41500">2026-10-19 · Haiku takes the Mid seat, Fable gets triggers, leaner standing load (v4.150.0)</h2>
-<p><strong>Haiku 5.5 writes general leaves on Claude Code.</strong> T47 measured it
-against Sonnet 5.5 on a planning task and a 16-defect C++ review.
-Planning came out at parity, 9.67 against 10.33 of 11, at 7% of the
-cost. The review didn't: 13.67 against 16. Haiku missed blocking I/O on
-the game thread and variable-DeltaTime determinism, which are the
-never-Cheap rows. Under the pre-registered rule <code>smartplan-implementer</code>
-moves to <code>model: haiku</code> at <code>effort: low</code>. A never-Cheap leaf and the
-first fail-twice go to the same seat with a per-call <code>model: sonnet</code> and
-<code>effort: medium</code>, since the low pin otherwise rides the override. Opus
-still verifies every diff.</p>
-<p><strong>Fable has named triggers.</strong> It stays by ask, and now on evidence: an
-Opus plan that already failed at integration, or the spiral guard's
-diagnosis on a never-Cheap row. It plans and diagnoses, never fixes.</p>
-<p><strong>UI leaves route Mid and verify from the render.</strong> <code>routing.md</code> gains a
-UI and visual design row, Mid on Sonnet and never Cheap, since design
-has no executable oracle and was trialed on Sonnet only. <code>check.md</code> gains a section saying to judge
-screenshots at the shipped widths, not the CSS diff, and to emulate a
-phone width rather than shrink a headless window, which Edge floors at
-504px. A trial of <code>pbakaus/impeccable</code> on the docs site found plain
-Sonnet winning 6 of 8 blind pairs, and its hook scoring one regression
-as its best result. Neither impeccable nor ui-ux-pro-max joins the
-family. The write-up is <code>research/2026-10-19-impeccable-trial.md</code>.</p>
-<p><strong>The registry and the project CLAUDE.md shed weight.</strong>
-<code>model-classes.md</code> drops from 97KB to 66KB. Sixteen retired or
-unreachable rows and twelve board notes moved to
-<code>research/2026-10-19-model-classes-retired.md</code>, and the registry now
-states the rule that keeps it that size. The project CLAUDE.md's Gotchas
-keep every rule at half the size, with the history in
-<code>research/2026-10-19-gotchas-history.md</code>.</p>
-<h2 id="2026-10-20-the-weekly-sweep-copilots-november-retirements-gpt-61-sol-takes-terras-verifier-slots-and-the-auto-pool-corrected-v41510">2026-10-20 · The weekly sweep: Copilot's November retirements, GPT-6.1 Sol takes Terra's verifier slots, and the Auto pool corrected (v4.151.0)</h2>
-<p><strong>Copilot retires Opus 4.8, Opus 5 and GPT-5.6 Terra on 2026-11-16.</strong>
-<code>copilot.md</code>, the registry and both Copilot guides carry the date, the
-named successors (Opus 5.5, and GPT-6.1 Sol or GPT-6 Luna) and the
-annual-plan carve-out for Opus 4.8. No seat pin names any of the three.</p>
-<p><strong>GPT-6.1 Sol replaces Terra in every verifier slot now.</strong> That's the
-interim C++ shared-blind-spot verifier in <code>cpp-gamedev-check.md</code>, the
-Tiering and Family decorrelation lines in <code>check.md</code>, and the Copilot
-verifier's Strong fallback, which also drops Opus 5. GitHub names Sol the
-successor. Each file says it's unmeasured on T42 and T34's fixtures,
-where Terra caught 13 of 16.</p>
-<p><strong>CLI Auto's pool was wrong in ten places.</strong> The live table lists 15
-models, Opus 5.5, GPT-6 Sol and GPT-6 Luna among them. The registry, the
-full guide's rows and the budget page said those three weren't in Auto.</p>
-<p><strong>The 2026-10-19 retirees leave the guides.</strong> Their successors moved to
-GPT-6.1 Sol, GPT-6 Luna and Grok 4.7. The five models left both Copilot
-guides and the new <code>research/2026-10-20-good-at-data.json</code> snapshot.</p>
-<p><strong>Harness facts.</strong> Claude Code 2.1.302 forks subagents by default in
-<code>claude -p</code> too, and 2.1.304 lets <code>CLAUDE_CODE_AUTO_COMPACT_WINDOW</code> take
-<code>k</code> and <code>M</code> suffixes. A probe on 2.1.304 re-confirmed that a per-call
-<code>model:</code> keeps the seat's effort pin. ZCode 3.16.2 is current, and its
-catalog still lacks every model newer than Astra. Opus 5.5's API fast
-mode is GA. vals.ai's re-run Terminal-Bench 4.0 ranks replace the
-Terminus 2 figures. Full note: <code>research/2026-10-20-sweep.md</code>.</p>
-<p><strong>Gate (q) matches a pin to its longest registry name.</strong> A substring test
-let the <code>claude-opus-5.5</code> pin inherit Opus 5's retirement, which would
-have failed every build from 2026-11-02.</p>
 <h2 id="2026-11-02-smartdiff-joins-the-family-with-a-semantic-diff-for-unreal-blueprints-v41520">2026-11-02 · smartdiff joins the family, with a semantic diff for Unreal Blueprints (v4.152.0)</h2>
 <p><strong>A seventh skill, <code>smartdiff</code>.</strong> It renders a session's changes, from git
 or Perforce, as one self-contained HTML review page with per-file intent
@@ -999,9 +892,105 @@ of a turret whose targeting moves from its Blueprint into a C++
 component, re-rendered with the current diffview.py and published at
 <code>examples/turret-demo.html</code>. build-site.py copies <code>docs/examples/*.html</code>
 as is, with no site chrome, so the page is exactly what the skill writes.</p>
+<h2 id="2026-11-03-videos-for-getting-started-v41620">2026-11-03 · Videos for Getting Started (v4.162.0)</h2>
+<p>The author asked for videos on the Getting Started page, like the ones
+on the sibling project sites. Seven short clips, 15 to 30 seconds each,
+cover steps 1 and 3 through 8. Each one types the prompt, prints the
+skill's output line by line, captions each beat and boxes the lines that
+matter. Step 7 ends on a pan through the turret demo's Blueprint graph.
+Step 2 is a table, so it has no clip.</p>
+<p><code>scripts/tutorial-videos.py</code> renders them into <code>docs/videos/</code> with the
+site's dark tokens and IBM Plex fonts, about 1.8 MB in all. It needs
+Pillow and imageio-ffmpeg, so CI never runs it. Its sample output follows
+the same report shapes as <code>docs/tutorial.md</code>, and a highlight finds its
+lines by their text, so a reworded line fails the render rather than
+boxing the wrong row. build-site.py copies the clips and posters as is.</p>
+<h2 id="2026-11-03-copilot-runs-luna-first-and-the-quickstart-opens-on-getting-started-v41630">2026-11-03 · Copilot runs Luna-first, and the Quickstart opens on Getting Started (v4.163.0)</h2>
+<p>The author set one primary rule for Copilot: GPT-6 Luna does as much of
+the work as it can. <code>copilot.md</code> § Luna ceiling is now that rule and
+little else.</p>
+<p><strong>Every subagent runs Luna.</strong> The skill dispatches only
+<code>@smartplan-scout</code>, <code>-implementer-cheap</code> and <code>-verifier-cheap</code>, each
+pinned <code>[gpt-6-luna]</code> alone. The Cheap implementer drops its Haiku 5.5
+fallback. The ask-per-dispatch climb above Luna is gone, since nothing
+above Luna is ever dispatched.</p>
+<p><strong>A pricier session is in charge, not a coder.</strong> When the user runs the
+session on Sol, Astra, Sonnet or Opus, it plans, briefs Luna subagents
+for the code and verifies every Luna diff itself. A Luna session works
+inline, sends a fresh Luna to check, and offers a pricier session where
+the work wants judgment.</p>
+<p>The four above-Luna profiles stay in <code>.github/agents/</code> for calling by
+hand. Their notes, <code>flow.md</code> §B, <code>SKILL.md</code>'s seat ceiling, <code>routing.md</code>,
+<code>model-classes.md</code>, the Copilot guide and the generated model-classes
+page all say so. The rule runs against two T46 results, which
+<code>copilot.md</code> keeps: Haiku 5.5 passed semver2 3 of 3 where Luna missed a
+case each time, and a Mid seat that always handed off to Luna cost 45%
+more for the same score.</p>
+<p><code>QUICKSTART.md</code> now opens with a pointer to Getting Started and its
+first video, and its Copilot paragraph describes the Luna-only dispatch.</p>
+<h2 id="2026-11-03-every-smartplan-feature-is-its-own-skill-and-any-one-can-be-switched-off-v41640">2026-11-03 · Every smartplan feature is its own skill, and any one can be switched off (v4.164.0)</h2>
+<p>The author asked for each smartplan feature to live in a separate skill,
+with smartplan picking the ones a task needs, and for any part to be
+switchable by disabling its skill.</p>
+<p><strong>Eight part skills.</strong> The references moved out of <code>smartplan/</code> with
+their history intact: <code>smartflow</code> (flow.md, artifacts.md), <code>smartroute</code>
+(routing.md, model-classes.md), <code>smartmode</code> (modes.md), <code>smartbrief</code>
+(brief.md), <code>smartcheck</code> (check.md), <code>smartcheck-cpp</code>
+(cpp-gamedev-check.md) and <code>smartcache</code> (caching.md, Claude Code only).
+<code>smartexec</code> joins them as a part. Each one's <code>SKILL.md</code> says to read its
+reference whole and states what smartplan does without it.</p>
+<p><strong>The listing is the switch.</strong> Parts are <code>user-invocable: false</code>, which
+keeps them off the slash menu but in the model's skill listing. smartplan
+treats a part as on only when that listing names it. A part switched off
+by the harness toggle, <code>skillOverrides</code> or the installer's <code>SKILL.md.off</code>
+rename is skipped. smartplan follows its Off column in the new Parts
+table, says so once after the routing call, and never reads the part's
+files by path to get around the switch. <code>smartexec</code> lost its
+<code>disable-model-invocation</code> line so it can be listed too. Turning
+<code>smartflow</code> off means no fan-out at all.</p>
+<p><strong>What stayed in smartplan.</strong> The harness references (copilot.md,
+claude-code.md, m365-copilot.md, local-models.md) and evidence.md are
+facts about a harness, not features, so they stay.</p>
+<p><strong>A live check.</strong> Probe 5 in <code>docs/selftest.md</code> switches <code>smartflow</code> off
+and reruns Probe 2's prompt. A headless Haiku 5.5 run with
+<code>skillOverrides</code> setting <code>smartflow</code> off listed the other parts, said
+<code>smartflow</code> was missing, routed inline and read none of its files.</p>
+<p><strong>The plumbing followed.</strong> check.sh gate (c) resolves a reference in any
+part, gate (p) reads the new hard-gate line, and gate (k) rises from
+2,816B to 4,096B for fourteen descriptions (3,745B used). selftest checks
+13 skills. Both exports carry the parts, and the Copilot bundle drops
+<code>smartcache</code> with a new assert that it can't leak. The three installers
+know the parts. <code>install.ps1</code> prints what you lose when you switch one
+off. <code>install-global.ps1</code> links smartcache for Claude Code only. Both
+verifier seats load <code>smartcheck</code>.</p>
+<h2 id="2026-11-03-the-verifier-seat-runs-code-reviews-through-smartreview-v41650">2026-11-03 · The verifier seat runs code reviews through smartreview (v4.165.0)</h2>
+<p>The author asked for the verifier to load <code>smartreview</code>. A review run in
+the session that wrote the code shares that code's blind spots, so
+reviews now go to the seat that already sits apart from the author.</p>
+<p><strong>One seat, two jobs.</strong> <code>smartplan-verifier</code> on Claude Code and Copilot
+CLI now has a review mode. Asked to review a change, a changelist or a
+fileset rather than verify a leaf, it loads <code>smartreview</code> and follows
+its Protocol and Report instead of check.md's verdict templates. It
+resolves the skill the same way it resolves check.md. It has no edit
+tools, so every fix is <code>proposed</code>. With no <code>smartreview</code> installed it
+reports BLOCKED rather than review from memory. No new seat, no new
+description in the standing load and no new Copilot profile.</p>
+<p><strong>Not on Luna.</strong> <code>smartplan-verifier-cheap</code> refuses a review outright,
+since a review is judgment from top to bottom and that seat is
+Mechanical. It names <code>@smartplan-verifier</code> as the Unblock, and unlike
+its other refusals this one never gives way.</p>
+<p><code>smartreview/SKILL.md</code> gains a short "Review away from the author"
+paragraph that points at the seat.</p>
+<p><strong>A live check.</strong> Probe 6 in <code>docs/selftest.md</code> asks the verifier seat
+for a review. A headless Claude Code run as <code>smartplan-verifier</code> on
+Opus 5.5 reviewed the vanilla ProjectilePool fixture. It came back in
+smartreview's Report shape with a <code>Standards:</code> line, BREAKING, PRACTICE
+and CONVENTION, and 23 proposed fixes, none applied, with the tree left
+clean. That run tested the seat's instructions, not a dispatch from
+another session.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 3:22 PM PST / 6:22 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 10:32 PM PST / 1:32 AM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the

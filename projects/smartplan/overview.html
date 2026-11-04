@@ -380,6 +380,19 @@ h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
 .seats .t-strong { border-color: var(--t-strong); }
 .seats .t-cheap { border-color: var(--t-cheap); }
 .route-demo figcaption { margin-top: 0.6rem; font-size: 0.85rem; color: var(--ink-dim); }
+/* Getting Started videos. Rendered dark, so they get the terminal's own
+   edge in both themes. */
+figure.video { margin: 1.25rem 0 1.5rem; }
+figure.video video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  border: 1px solid var(--term-line);
+  background: #14171b;
+}
+figure.video figcaption { margin-top: 0.5rem; font-size: 0.88rem; color: var(--ink-dim); }
 @media (max-width: 52rem) {
   .hero { grid-template-columns: 1fr; gap: 1.75rem; }
 }
@@ -655,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.161.0 &middot; Updated 2026-11-02 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.165.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -674,15 +687,30 @@ footer p { margin: 0; }
 <h1 id="smartplan-overview">smartplan overview</h1>
 <p>One family, one policy: route each model to the work it's good at.</p>
 <h2 id="the-skills">The skills</h2>
-<p>Seven skills ship in <code>.claude/skills/</code>.</p>
+<p>smartplan, its part skills, and five companions ship in
+<code>.claude/skills/</code>.</p>
 <ul>
-<li><code>smartplan</code> - The entry point and policy. It plans, dispatches,
-  verifies, and escalates.</li>
-<li><code>smartexec</code> - The cheap executor's instructions. It proves DONE with pasted
-  evidence. Otherwise it reports BLOCKED.</li>
-<li><code>smartreview</code> - Code review ranked into game-breaking bugs, best
+<li><code>smartplan</code> - The entry point and router. It decides the route and
+  loads each part it needs. A part that's switched off is skipped, and
+  smartplan says what it gave up.</li>
+<li>
+<p>The parts, one feature each, so you can switch any one off:
+  <code>smartflow</code> (fan-out, the human gate, run artifacts), <code>smartroute</code>
+  (class-to-tier mapping and the model registry), <code>smartmode</code> (the
+  quality and cost dial), <code>smartbrief</code> (briefs for Cheap leaves),
+  <code>smartexec</code> (the cheap executor's instructions, DONE with pasted
+  evidence or BLOCKED), <code>smartcheck</code> (independent verify),
+  <code>smartcheck-cpp</code> (its C++ gamedev layer).</p>
+</li>
+<li>
+<p><code>smartcache</code> - One more part, Claude Code only. Cache-aware ordering
+  for a fan-out wave.</p>
+</li>
+<li>
+<p><code>smartreview</code> - Code review ranked into game-breaking bugs, best
   practices, and conventions against a swappable standards doc (C++
-  gamedev by default: Unreal, custom engine, or vanilla).</li>
+  gamedev by default: Unreal, custom engine, or vanilla).</p>
+</li>
 <li><code>smartwiki</code> - Turns a commit, PR, or changelist (Git or Perforce)
   into a stakeholder wiki page.</li>
 <li><code>smartvoice</code> - Optional house voice, resolved per user
@@ -694,13 +722,14 @@ footer p { margin: 0; }
   Agent-only mode shows just the agent's own edits, read from the
   session record rather than the working tree.</li>
 </ul>
-<p><code>smartroute</code>, <code>smartbrief</code>, and <code>smartcheck</code> aren't skills. They are files in
-<code>smartplan/references/</code> (<code>routing.md</code>, <code>brief.md</code>, <code>check.md</code>).</p>
+<p>Switch a part off in your skill list, or with the installer's
+enable and disable menu, and smartplan runs without it. Its Parts table
+says what each part adds and what you get with it off.</p>
 <p>You invoke only <code>/smartplan &lt;task&gt;</code>. One dial, <code>{{MODE}}</code>, tunes the
 planner seat, floors, verification, effort, and fan-out width. It runs
 <code>max-quality</code>, <code>high-quality</code>, <code>balanced</code>, <code>budget</code>, or <code>max-savings</code>.
 The human gate, no unverified merges, and honest reporting never change.
-See <code>smartplan/references/modes.md</code>.</p>
+See <code>smartmode/references/modes.md</code>.</p>
 <p>Claude Code defaults to <strong><code>max-quality</code></strong>, since a subscription has no
 per-token bill. Copilot CLI meters credits per token. It defaults to
 <strong><code>max-savings</code></strong>. That setting held equal quality at 54% of balanced's cost on
@@ -758,8 +787,8 @@ the <code>.ps1</code>. The menu covers:</p>
 <p>It runs from a checkout or a Copilot export and never edits
 skill content or git history. QUICKSTART.md covers macOS/Linux
 (§ 1) and fill-once configuration (§ 2).</p>
-<p>On Windows, <code>scripts/install-global.ps1</code> junctions the core pair and
-agent dirs to this checkout machine-wide.
+<p>On Windows, <code>scripts/install-global.ps1</code> junctions smartplan, its parts
+and the agent dirs to this checkout machine-wide.
 <code>scripts/install-project.ps1</code> links the companions into one project.
 Note: Copilot's sandbox can't follow a junction out of the project
 root. With <code>install-project.ps1</code>, pass this checkout to <code>--add-dir</code>.</p>
@@ -777,11 +806,11 @@ on failure, not on a hunch.</p>
 <li><strong>Two seats.</strong> The planner defaults to Opus-class, since a planning
   flaw repeats in every executor. The implementer starts at its task
   class's <em>floor</em>, the cheapest tier that reliably lands it
-  (<code>smartplan/references/routing.md</code>).</li>
+  (<code>smartroute/references/routing.md</code>).</li>
 <li><strong>Floors.</strong> Mechanical, verifier-checkable leaves (single tasks like
   renames) floor at Haiku-class, correctness-sensitive work at
   Sonnet-class. Opus-class is the reserve for cross-cutting leaves and
-  escalations. <code>smartplan/references/model-classes.md</code> has the roster.</li>
+  escalations. <code>smartroute/references/model-classes.md</code> has the roster.</li>
 <li><strong>Cheap tiers are safe only behind a verifier.</strong> Every Cheap-tier
   result gets an independent smartcheck in a fresh context, from a
   verifier never weaker than the executor.</li>
@@ -804,7 +833,7 @@ on failure, not on a hunch.</p>
 <p>The full policy is in <code>.claude/skills/smartplan/SKILL.md</code>, goals in <code>GOALS.md</code>.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 3:22 PM PST / 6:22 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 10:32 PM PST / 1:32 AM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the

@@ -380,6 +380,19 @@ h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
 .seats .t-strong { border-color: var(--t-strong); }
 .seats .t-cheap { border-color: var(--t-cheap); }
 .route-demo figcaption { margin-top: 0.6rem; font-size: 0.85rem; color: var(--ink-dim); }
+/* Getting Started videos. Rendered dark, so they get the terminal's own
+   edge in both themes. */
+figure.video { margin: 1.25rem 0 1.5rem; }
+figure.video video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  border: 1px solid var(--term-line);
+  background: #14171b;
+}
+figure.video figcaption { margin-top: 0.5rem; font-size: 0.88rem; color: var(--ink-dim); }
 @media (max-width: 52rem) {
   .hero { grid-template-columns: 1fr; gap: 1.75rem; }
 }
@@ -655,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.161.0 &middot; Updated 2026-11-02 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.165.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -684,6 +697,11 @@ footer p { margin: 0; }
 <p>smartplan gives each model the work it's good at. A strong model plans and
 judges. Cheaper models do the building. An independent verifier checks their
 work. The flow moves to a stronger model only after a failure.</p>
+<p>New here? <a href="tutorial.html">Getting Started</a> walks you through a first
+run one step at a time, with a short video for most steps. Here's the
+first one, a small task that just runs inline.</p>
+<figure class="video"><video controls preload="none" playsinline poster="videos/01-small-task.jpg" src="videos/01-small-task.mp4"></video><figcaption>A small task gets a one-line routing call and runs inline.</figcaption></figure>
+
 <h2 id="1-install-pick-your-harness">1. Install (pick your harness)</h2>
 <p><strong>Windows:</strong> <code>scripts\install.cmd</code> or <code>scripts\install.ps1</code> replaces the
 manual steps below. It asks where to install and which skills to turn on.</p>
@@ -694,10 +712,14 @@ from <code>.claude/skills/</code>. Or, in any project, run
 in one repo. Plugin copies stay <strong>frozen at the version you installed</strong>
 until you run <code>/plugin update sp@smartplan</code>.</p>
 <p><strong>Copilot CLI.</strong> Open this project. The skills load from
-<code>.claude/skills/</code> and seven pinned agents from <code>.github/agents/</code>:
-<code>@smartplan-planner</code>, <code>@smartplan-implementer</code> (plus <code>-cheap</code> and
-<code>-reserve</code>), <code>@smartplan-verifier</code> (plus <code>-cheap</code> at max-savings), and
-<code>@smartplan-scout</code>. For personal use, copy the skill folders into
+<code>.claude/skills/</code> and seven pinned agents from <code>.github/agents/</code>. The
+skill only dispatches the three that run GPT-6 Luna:
+<code>@smartplan-scout</code>, <code>@smartplan-implementer-cheap</code> and
+<code>@smartplan-verifier-cheap</code>. On a Luna session, Luna does the work and
+a fresh Luna checks it. On a pricier session, that model plans and
+checks every Luna diff while Luna writes the code. The other four
+(<code>@smartplan-planner</code>, <code>@smartplan-implementer</code>, <code>-reserve</code> and
+<code>@smartplan-verifier</code>) are there to call by hand. For personal use, copy the skill folders into
 <code>~/.copilot/skills/</code> and the agents into <code>~/.copilot/agents/</code>.
 <strong>Don't leave the session model on Auto</strong> for tiered work. Auto
 overrides every subagent's pin and re-routes mid-task. Inline sessions
@@ -725,7 +747,7 @@ has the field limits. Most of this family does <strong>not</strong> port to M365
   sets which model class plans (the "seat"), the implementer's minimum
   tier (the "floor"), verify depth, effort, report detail, and
   parallelism. No mode changes the human gate, verify-before-merge, or
-  honest reporting. The full matrix is in <code>smartplan/references/modes.md</code>.</li>
+  honest reporting. The full matrix is in <code>smartmode/references/modes.md</code>.</li>
 </ul>
 <p>Defaults follow billing: <strong><code>max-quality</code></strong> on Claude Code,
   <strong><code>max-savings</code></strong> on Copilot CLI, which meters AI credits per token.</p>
@@ -752,7 +774,7 @@ has the field limits. Most of this family does <strong>not</strong> port to M365
 <li><strong>smartwiki (change writeups): ships ready</strong> for Git and Perforce. For
   another version control system (VCS), fill in the four verbs in its VCS Adapter.</li>
 <li><strong>Model roster: edit by hand when models move.</strong> Reclassify a model in
-  <code>.claude/skills/smartplan/references/model-classes.md</code> and every seat
+  <code>.claude/skills/smartroute/references/model-classes.md</code> and every seat
   rule follows.</li>
 </ul>
 <h2 id="3-first-run">3. First run</h2>
@@ -791,7 +813,7 @@ parallel leaves share. Commit or ignore them.</p>
 <h2 id="4-verify-it-actually-works">4. Verify it actually works</h2>
 <pre><code class="language-bash">bash scripts/selftest.sh
 </code></pre>
-<p>That checks the static install in about two seconds. Then run the four
+<p>That checks the static install in about two seconds. Then run the six
 behavioral probes in <code>docs/selftest.md</code>, graded on visible artifacts
 (files, board lines, gate behavior) rather than the model's claims.</p>
 <p>Note: on Claude Code, whether each leaf <em>bills</em> as its intended model is
@@ -807,11 +829,17 @@ per-model bill. If guaranteed tiering matters more than fan-out, use
   Planning waits for the reset instead.</li>
 <li>Repeated deterministic work moves into a script, which costs no model
   calls.</li>
+<li><strong>Switch off any part you don't want.</strong> Each smartplan feature is its
+  own skill: <code>smartflow</code> (fan-out), <code>smartroute</code> (model tiers),
+  <code>smartmode</code> (the dial), <code>smartbrief</code>, <code>smartexec</code>, <code>smartcheck</code>,
+  <code>smartcheck-cpp</code>. Turn one off in your skill list and
+  smartplan works without it, saying once per task what it skipped.</li>
 </ul>
 <h2 id="going-deeper">Going deeper</h2>
-<p>The skill body (<code>.claude/skills/smartplan/SKILL.md</code>) is the policy.
-<code>references/routing.md</code> maps task classes to tiers. <code>model-classes.md</code>
-is the roster.</p>
+<p>The skill body (<code>.claude/skills/smartplan/SKILL.md</code>) is the router, and
+its Parts table says what each part skill adds and what happens when
+it's off. <code>smartroute</code>'s <code>routing.md</code> maps task classes to tiers.
+<code>model-classes.md</code> is the roster.</p>
 <p><code>check.md</code> is the verifier protocol. <code>claude-code.md</code>, <code>copilot.md</code>
 and <code>m365-copilot.md</code> cover each harness. <code>local-models.md</code> covers a
 local model behind a shim. <code>caching.md</code>
@@ -819,7 +847,7 @@ covers prompt caching. The changelog (<code>docs/changelogs/smartplan.md</code>)
 records why each rule exists.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 3:22 PM PST / 6:22 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 10:32 PM PST / 1:32 AM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the

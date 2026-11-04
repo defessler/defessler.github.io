@@ -380,6 +380,19 @@ h4, h5, h6 { font-size: 1rem; margin: 1.5rem 0 0.4rem; color: var(--ink-2); }
 .seats .t-strong { border-color: var(--t-strong); }
 .seats .t-cheap { border-color: var(--t-cheap); }
 .route-demo figcaption { margin-top: 0.6rem; font-size: 0.85rem; color: var(--ink-dim); }
+/* Getting Started videos. Rendered dark, so they get the terminal's own
+   edge in both themes. */
+figure.video { margin: 1.25rem 0 1.5rem; }
+figure.video video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  border: 1px solid var(--term-line);
+  background: #14171b;
+}
+figure.video figcaption { margin-top: 0.5rem; font-size: 0.88rem; color: var(--ink-dim); }
 @media (max-width: 52rem) {
   .hero { grid-template-columns: 1fr; gap: 1.75rem; }
 }
@@ -655,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.161.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.165.0 &middot; Updated 2026-11-03 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -689,7 +702,8 @@ footer p { margin: 0; }
 <p>This page walks through one working session, start to finish. You'll run
 a small task, then a bigger one, and see what each skill hands back along
 the way. It takes about fifteen minutes to read. Nothing here needs a
-special project. Any repo with a test command works.</p>
+special project. Any repo with a test command works. Most steps have a
+short video, and they run in order if you'd rather just watch.</p>
 <h2 id="before-you-start">Before You Start</h2>
 <p>You need the skills installed on Claude Code or GitHub Copilot CLI.
 <a href="quickstart.html">Quickstart</a> covers both. Then run
@@ -728,6 +742,11 @@ test_retries_on_503 fails.
 <p>That last line matters most. A check only counts when the skill can say
 what would make it fail, and the answer names the code it just changed.
 If it can't say that, the green result doesn't prove anything.</p>
+<figure class="video">
+<video controls preload="none" playsinline poster="videos/01-small-task.jpg" src="videos/01-small-task.mp4"></video>
+<figcaption>A one-file task runs inline, and the check names what would make it fail.</figcaption>
+</figure>
+
 <h2 id="step-2-read-the-routing-call">Step 2: Read The Routing Call</h2>
 <p>The skill checks the work against five rows, top to bottom. The first
 one that matches wins.</p>
@@ -776,6 +795,11 @@ pins, settings, achievements and the photo mode
 <p>Six systems, each in its own files, each taking a different edit. That's
 six parts. If the same edit went into six files, it would be one part,
 and the task would stay inline.</p>
+<figure class="video">
+<video controls preload="none" playsinline poster="videos/03-bigger-task.jpg" src="videos/03-bigger-task.mp4"></video>
+<figcaption>A rename across a module stays inline. Six different edits fan out.</figcaption>
+</figure>
+
 <h2 id="step-4-approve-the-plan">Step 4: Approve The Plan</h2>
 <p>Before anything is built, you get a plan. Each part lists the files it
 may touch, what it changes and the check that proves it.</p>
@@ -806,6 +830,11 @@ your yes.</p>
 <p>Note: when a plan names a model above the one you're running, it says so
 here. Your yes covers that spend. Without it, the skill uses the best
 model at or below your own and tells you what it gave up.</p>
+<figure class="video">
+<video controls preload="none" playsinline poster="videos/04-approve-plan.jpg" src="videos/04-approve-plan.mp4"></video>
+<figcaption>Reading a plan: its files, its checks, the one pricier seat, then "go".</figcaption>
+</figure>
+
 <h2 id="step-5-watch-the-builders-report">Step 5: Watch The Builders Report</h2>
 <p>Each cheap builder works under smartexec. It does only what its brief
 says. When it's done, it pastes its proof.</p>
@@ -827,6 +856,11 @@ Unblock: add SaveTypes.h to FILES, or name the type
 </code></pre>
 <p>A BLOCKED report is a good outcome. It costs one short question instead
 of a change to a file nobody approved.</p>
+<figure class="video">
+<video controls preload="none" playsinline poster="videos/05-builders-report.jpg" src="videos/05-builders-report.mp4"></video>
+<figcaption>A DONE report with its proof, then a BLOCKED one, answered and rerun.</figcaption>
+</figure>
+
 <h2 id="step-6-read-the-verdicts">Step 6: Read The Verdicts</h2>
 <p>A fresh model checks every part. It reruns the check itself and reads
 the diff. It never takes the builder's word.</p>
@@ -843,6 +877,11 @@ Sweep: least-confident load of a v1 save · missing none
 fix that would flip it. UNKNOWN means the verifier couldn't see enough to
 judge, and it names the one thing that would settle it. That's not a
 failure. It's an honest "I can't tell".</p>
+<figure class="video">
+<video controls preload="none" playsinline poster="videos/06-verdicts.jpg" src="videos/06-verdicts.mp4"></video>
+<figcaption>A PASS with the check rerun, and a FAIL with the smallest fix that flips it.</figcaption>
+</figure>
+
 <h2 id="step-7-review-the-whole-change">Step 7: Review The Whole Change</h2>
 <p>Once the parts are in, review the change as a whole.</p>
 <pre><code>review this change
@@ -869,6 +908,11 @@ PRACTICE
 Blueprint it draws each changed graph, before and after.
 <a href="examples/turret-demo.html">The turret demo</a> is a real render you can
 click through.</p>
+<figure class="video">
+<video controls preload="none" playsinline poster="videos/07-review.jpg" src="videos/07-review.mp4"></video>
+<figcaption>A ranked review, then the diff page with a Blueprint graph drawn.</figcaption>
+</figure>
+
 <h2 id="step-8-write-it-up">Step 8: Write It Up</h2>
 <p>Last, tell the rest of the team what changed.</p>
 <pre><code>write up the working tree for designers
@@ -884,6 +928,11 @@ changed, how it works and what they might need to touch.</p>
 ## Quick Reference: What Designers Might Need to Touch
 - DA_SaveSlots: the number of save slots. It's 3.
 </code></pre>
+<figure class="video">
+<video controls preload="none" playsinline poster="videos/08-write-up.jpg" src="videos/08-write-up.mp4"></video>
+<figcaption>A write-up for designers, ending with what they might need to touch.</figcaption>
+</figure>
+
 <h2 id="when-things-go-wrong">When Things Go Wrong</h2>
 <h3 id="two-fixes-failed">Two Fixes Failed</h3>
 <p>If the skill tries to fix the same error twice and both fail, it stops.
@@ -910,7 +959,7 @@ Check which plan you're on before you trust a result there. The
 </ul>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 3:22 PM PST / 6:22 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-03 10:32 PM PST / 1:32 AM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
