@@ -668,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.166.0 &middot; Updated 2026-11-04 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.167.0 &middot; Updated 2026-11-04 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -688,7 +688,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-11-02-smartdiff-reviews-only-the-agents-own-edits-on-copilot-cli-and-claude-code-v41530">2026-11-02 · smartdiff reviews only the agent's own edits, on Copilot CLI and Claude Code (v4.153.0)</a></li>
 <li><a href="#2026-11-02-the-weekly-sweep-aas-new-index-and-a-site-that-says-how-fresh-it-is-v41540">2026-11-02 · The weekly sweep, AA's new index, and a site that says how fresh it is (v4.154.0)</a></li>
 <li><a href="#2026-11-02-zcode-and-zai-leave-the-family-and-the-site-goes-wide-v41550">2026-11-02 · ZCode and z.ai leave the family, and the site goes wide (v4.155.0)</a></li>
 <li><a href="#2026-11-03-smartdiff-draws-each-changed-blueprint-graph-v41560">2026-11-03 · smartdiff draws each changed Blueprint graph (v4.156.0)</a></li>
@@ -702,32 +701,13 @@ footer p { margin: 0; }
 <li><a href="#2026-11-03-every-smartplan-feature-is-its-own-skill-and-any-one-can-be-switched-off-v41640">2026-11-03 · Every smartplan feature is its own skill, and any one can be switched off (v4.164.0)</a></li>
 <li><a href="#2026-11-03-the-verifier-seat-runs-code-reviews-through-smartreview-v41650">2026-11-03 · The verifier seat runs code reviews through smartreview (v4.165.0)</a></li>
 <li><a href="#2026-11-04-copilot-sessions-run-on-luna-and-probes-5-and-6-run-on-copilot-v41660">2026-11-04 · Copilot sessions run on Luna, and Probes 5 and 6 run on Copilot (v4.166.0)</a></li>
+<li><a href="#2026-11-04-the-skills-get-shorter-and-the-caps-come-down-to-hold-it-v41670">2026-11-04 · The skills get shorter, and the caps come down to hold it (v4.167.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-11-02-smartdiff-reviews-only-the-agents-own-edits-on-copilot-cli-and-claude-code-v41530">2026-11-02 · smartdiff reviews only the agent's own edits, on Copilot CLI and Claude Code (v4.153.0)</h2>
-<p><strong>Agent-only mode.</strong> <code>trail.py</code> exports the edits the agent made and
-nothing else, read from the session record rather than the working tree,
-so a teammate's change or a hand edit can't leak into the review. It
-scopes to the last message, the last N messages or the whole session. It
-reads Copilot CLI sessions (<code>apply_patch</code>, <code>edit</code> and <code>create</code>) and
-Claude Code transcripts (Edit, Write and subagent edits), and finds the
-running session by itself. A change it can't prove from recorded
-evidence is left out and named, and the run exits 2. It ships the before
-and after files, a plain diff, the prompts and a transcript beside the
-page. Checked live on both harnesses: a real Copilot CLI edit session,
-and this repo's own Claude Code session, where every reconstructed file
-matched the live copy.</p>
-<p><strong>The page gains an expandable diff.</strong> <code>a</code> or a click on a hunk header
-shows the omitted lines between hunks. <code>b</code> or a chevron hides the file
-list, with <code>f</code> kept as an alias. Free functions, static calls, format
-strings and Unreal export macros get their own colors.
-<code>diffview.py --git-context &lt;repo&gt;</code> reads whole files from git so a
-normal session diff can expand too.</p>
-<p><strong>Oracle stage (k)</strong> now also runs a 31-case trail self-test.</p>
 <h2 id="2026-11-02-the-weekly-sweep-aas-new-index-and-a-site-that-says-how-fresh-it-is-v41540">2026-11-02 · The weekly sweep, AA's new index, and a site that says how fresh it is (v4.154.0)</h2>
 <p><strong>The sweep.</strong> Eight readers re-read every research area at vendor
 sources, and five Opus verifiers re-fetched each claimed change. 126
@@ -993,9 +973,38 @@ hash no longer matches.</p>
 <p><strong>Gate (i)'s cap on <code>m365-copilot.md</code> rises to 22.75KB</strong>, ahead of its
 next edit. That file is never pasted into Agent Builder, so the
 8,000-character field cap doesn't apply to it.</p>
+<h2 id="2026-11-04-the-skills-get-shorter-and-the-caps-come-down-to-hold-it-v41670">2026-11-04 · The skills get shorter, and the caps come down to hold it (v4.167.0)</h2>
+<p><strong>Twenty-one skill files lose 4%</strong> with no rule lost. The author asked
+for every skill compressed. Seven companion and router bodies and six
+harness references went 249,264 to 239,334 bytes. Each leaf wrote a
+numbered inventory of every rule, figure, name and path before it
+edited, and an Opus verifier checked the new text against that list
+and against its own word diff. The verifiers found 18 dropped clauses
+and 7 tightened table cells, all restored before the commit. One of
+the 18 was the line <code>scripts/chat-export.py</code> anchors on, which no gate
+checks. The 30% the plan hoped for wasn't there: under "no rule lost",
+with frontmatter, headings, fenced shapes, tables and the 58 lines the
+Copilot export asserts all frozen, these files hold about 3 to 8% of
+slack. The remaining references weren't touched, since they'd yield
+the same for the same spend.</p>
+<p><strong>Ten gate (i) caps come down</strong> to the new sizes plus 282 to 497 bytes
+of headroom, so the saving holds. <code>smartplan/SKILL.md</code> goes to 11KB,
+<code>flow.md</code> to 20.75KB, <code>routing.md</code> to 20KB, <code>modes.md</code> to 14.75KB,
+<code>copilot.md</code> to 27.25KB, <code>m365-copilot.md</code> to 22.25KB,
+<code>smartvoice/SKILL.md</code> to 12.75KB, <code>smartreview/SKILL.md</code> to 9.5KB,
+<code>smartwiki/SKILL.md</code> to 9.25KB and <code>smartdiagram/SKILL.md</code> to 5KB. The
+M4 table carries each rationale.</p>
+<p><strong>smartreview reviews web UI.</strong> A second standards doc,
+<code>web-ui-review-standards.md</code>, holds HTML and CSS to 51 rows condensed
+from hallmark's anti-slop gates (MIT, with its notice): a Surface
+selector, a waivable mark for model reflexes, and four breaking classes
+for the hunt. Themes, photos and the linter stay in hallmark.</p>
+<p><strong>TODO.md is a list of links.</strong> Each item has a page under <code>docs/todo/</code>
+with What, Why and Done when, so the BuildPipeline dashboard can open
+one.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-04 10:05 PM PST / 1:05 AM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-04 10:35 PM PST / 1:35 AM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
