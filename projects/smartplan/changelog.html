@@ -668,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.165.0 &middot; Updated 2026-11-04 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.166.0 &middot; Updated 2026-11-04 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -688,7 +688,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-11-02-smartdiff-joins-the-family-with-a-semantic-diff-for-unreal-blueprints-v41520">2026-11-02 · smartdiff joins the family, with a semantic diff for Unreal Blueprints (v4.152.0)</a></li>
 <li><a href="#2026-11-02-smartdiff-reviews-only-the-agents-own-edits-on-copilot-cli-and-claude-code-v41530">2026-11-02 · smartdiff reviews only the agent's own edits, on Copilot CLI and Claude Code (v4.153.0)</a></li>
 <li><a href="#2026-11-02-the-weekly-sweep-aas-new-index-and-a-site-that-says-how-fresh-it-is-v41540">2026-11-02 · The weekly sweep, AA's new index, and a site that says how fresh it is (v4.154.0)</a></li>
 <li><a href="#2026-11-02-zcode-and-zai-leave-the-family-and-the-site-goes-wide-v41550">2026-11-02 · ZCode and z.ai leave the family, and the site goes wide (v4.155.0)</a></li>
@@ -702,30 +701,13 @@ footer p { margin: 0; }
 <li><a href="#2026-11-03-copilot-runs-luna-first-and-the-quickstart-opens-on-getting-started-v41630">2026-11-03 · Copilot runs Luna-first, and the Quickstart opens on Getting Started (v4.163.0)</a></li>
 <li><a href="#2026-11-03-every-smartplan-feature-is-its-own-skill-and-any-one-can-be-switched-off-v41640">2026-11-03 · Every smartplan feature is its own skill, and any one can be switched off (v4.164.0)</a></li>
 <li><a href="#2026-11-03-the-verifier-seat-runs-code-reviews-through-smartreview-v41650">2026-11-03 · The verifier seat runs code reviews through smartreview (v4.165.0)</a></li>
+<li><a href="#2026-11-04-copilot-sessions-run-on-luna-and-probes-5-and-6-run-on-copilot-v41660">2026-11-04 · Copilot sessions run on Luna, and Probes 5 and 6 run on Copilot (v4.166.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-11-02-smartdiff-joins-the-family-with-a-semantic-diff-for-unreal-blueprints-v41520">2026-11-02 · smartdiff joins the family, with a semantic diff for Unreal Blueprints (v4.152.0)</h2>
-<p><strong>A seventh skill, <code>smartdiff</code>.</strong> It renders a session's changes, from git
-or Perforce, as one self-contained HTML review page with per-file intent
-notes. It started as a <code>session-diff</code> skill the author handed over, and it
-installs as an optional companion like <code>smartdiagram</code>.</p>
-<p><strong>Blueprints get a real diff.</strong> A <code>.uasset</code> used to read "binary file".
-<code>bp_prepare.py</code> now pulls each old revision, and <code>bp_export.py</code> dumps both
-revisions to T3D text inside a headless UE editor. The page then lists
-graph by graph what changed: nodes, wires, pin defaults, variables,
-components and class defaults. Checked against UE 5.8 on a test project
-and on Cropout's <code>BP_Player</code>.</p>
-<p><strong>The page matches a Rider diff.</strong> Dark by default, with green added
-lines, blue modified lines and grey removed ones. Changed lines pair by
-similarity rather than position. The file list hides with <code>f</code> or a
-<strong>Files</strong> button.</p>
-<p><strong>Gate (k)'s cap rises to 2,816B</strong> for the seventh description, with the
-dated rationale in <code>docs/v4-rule-inventory.md</code>. Oracle stage (k) runs
-smartdiff's renderer against a small Blueprint fixture.</p>
 <h2 id="2026-11-02-smartdiff-reviews-only-the-agents-own-edits-on-copilot-cli-and-claude-code-v41530">2026-11-02 · smartdiff reviews only the agent's own edits, on Copilot CLI and Claude Code (v4.153.0)</h2>
 <p><strong>Agent-only mode.</strong> <code>trail.py</code> exports the edits the agent made and
 nothing else, read from the session record rather than the working tree,
@@ -988,9 +970,32 @@ smartreview's Report shape with a <code>Standards:</code> line, BREAKING, PRACTI
 and CONVENTION, and 23 proposed fixes, none applied, with the tree left
 clean. That run tested the seat's instructions, not a dispatch from
 another session.</p>
+<h2 id="2026-11-04-copilot-sessions-run-on-luna-and-probes-5-and-6-run-on-copilot-v41660">2026-11-04 · Copilot sessions run on Luna, and Probes 5 and 6 run on Copilot (v4.166.0)</h2>
+<p><strong>Luna is the Copilot session to run.</strong> T48 and T49 tried pricier
+Copilot sessions with smartplan loaded on a coding task. On CLI 1.0.105
+GPT-6.1 Sol stopped on Copilot's content filter in 15 of 18 runs, Astra
+in its one run, and Sonnet 5.5 never called the skill from a
+<code>/smartplan</code> prompt. A shorter reference list cleared the block on one
+task and not on the other. <code>copilot.md</code> now says only Luna is known to
+load the skill cleanly and recommends a Luna session. Sol's three clean
+runs also edited every file itself and sent no Luna leaf, so the Luna
+bounce rate is still unmeasured.</p>
+<p><strong>Probes 5 and 6 on Copilot.</strong> Probe 5 gains a Copilot form that can
+fail. It switches off <code>smartcost</code> and names a mode, and a control run
+with the part on shows the difference. Luna kept the switch but didn't
+say the part was off, which is now a TODO. Probe 6 ran on the Gemini
+3.8 Flash verifier seat and passed, though it read the fixture's answer
+key.</p>
+<p><strong>The turret demo can't go stale quietly.</strong> Its generator moved into
+<code>scripts/make_turret_demo.py</code>. The page carries the hash of the
+<code>diffview.py</code> that rendered it, and check.sh gate (aa) fails when that
+hash no longer matches.</p>
+<p><strong>Gate (i)'s cap on <code>m365-copilot.md</code> rises to 22.75KB</strong>, ahead of its
+next edit. That file is never pasted into Agent Builder, so the
+8,000-character field cap doesn't apply to it.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-04 4:31 PM PST / 7:31 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-04 4:46 PM PST / 7:46 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
