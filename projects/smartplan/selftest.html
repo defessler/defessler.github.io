@@ -820,12 +820,26 @@ session, and confirm the skill listing no longer names it.</p>
 <p><strong>FAIL looks like:</strong> a plan, a gate or a dispatch anyway, or a read of
 <code>flow.md</code> by path. Either one means the switch was routed around.</p>
 <p>Switch <code>smartflow</code> back on afterwards.</p>
-<p>Note: on Copilot CLI the fan-out row never fires, so Probe 2's prompt
-routes inline with <code>smartflow</code> on or off, and the first PASS line can't
-fail there. What still tests the switch is the rest: <code>copilot skill
-disable smartflow</code> drops it, the session reports it missing, and nothing
-reads its files by path. A Luna run on CLI 1.0.105 on 2026-11-04 did all
-three, for 0.91 credits.</p>
+<p><strong>On Copilot CLI, switch off <code>smartcost</code> instead.</strong> The fan-out row
+never fires there, so Probe 2's prompt routes inline with <code>smartflow</code>
+on or off and can't fail. A named mode can. Run <code>copilot skill disable
+smartcost</code>, start a fresh session in a throwaway git folder holding a
+short readme, and type:</p>
+<p><code>/smartplan use max-quality mode for this: add a one-line comment to the
+top of README.md saying what the file is</code></p>
+<p><strong>PASS when:</strong>
+- The routing call lands on <strong>inline</strong>.
+- There's no <code>skill(smartcost)</code> call and no read of <code>modes.md</code>.
+- One line after the routing call says <code>smartcost</code> is off, so the run
+  stays in the default mode.</p>
+<p><strong>FAIL looks like:</strong> a <code>smartcost</code> load, a read of <code>modes.md</code> by path,
+or a run that takes up max-quality anyway.</p>
+<p>Run <code>copilot skill enable smartcost</code> afterwards. With it on, the same
+prompt loads <code>smartcost</code> and reads <code>modes.md</code>, which is how you know the
+probe can fail. On CLI 1.0.105 on 2026-11-04 a Luna session passed the
+first two lines with the part off and missed the third. It made the edit
+without saying the part was off. That run cost 0.32 credits, and the
+control with the part on cost 0.39.</p>
 <h2 id="probe-6-a-review-runs-away-from-the-author">Probe 6: a review runs away from the author</h2>
 <p>A review in the session that wrote the code shares its blind spots, so
 the verifier seat runs reviews too, through <code>smartreview</code>.</p>
@@ -859,7 +873,7 @@ tier is provable only at the Console (per-model dollars), never in-chat.</p>
 throwaway branch, or delete the scratch repo.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-04 3:14 PM PST / 6:14 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-04 4:31 PM PST / 7:31 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
