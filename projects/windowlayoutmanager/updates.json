@@ -1,14 +1,14 @@
 {
   "product": "WindowLayoutManager",
   "latest": {
-    "version": "1.3.0-496",
-    "tag": "v1.3.0-496",
-    "publishedAt": "2026-10-31T01:13:20Z",
-    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.3.0-496/WindowLayoutManager-v1.3.0-496-win-x64.zip",
-    "sizeBytes": 115321675,
-    "sha256": "123aa2656e722fd952c6204d0923c8ea99e391e243b24df6d084c88a9c6b0fc7",
+    "version": "1.3.0-513",
+    "tag": "v1.3.0-513",
+    "publishedAt": "2026-11-09T21:36:39Z",
+    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.3.0-513/WindowLayoutManager-v1.3.0-513-win-x64.zip",
+    "sizeBytes": 163510813,
+    "sha256": "3c7c25508ce574378315bc3c20340cc1d8e596eec6d3de418d60af011be3aa61",
     "prerelease": false,
     "pageUrl": "https://dougfessler.com/projects/windowlayoutmanager/",
-    "notes": "# v1.3.0-496: Telling twin windows apart by what they show\n\nBuilds on `v1.3.0-487`. That release recognised a window by the file or\nfolder it has open. This one covers windows that have none: two windows of\nthe same app, such as two Chrome windows on one profile, are now told\napart by what they show.\n\n## Recognising windows\n\n- Two windows of one app that nothing else separates are told apart by\n  their address bar and tab names. Two Chrome windows with the same title\n  now go back to their own places. It only ever breaks a tie: a window\n  whose page or tabs changed since the save still finds its place.\n- A File Explorer window with several tabs is recognised by the folder of\n  the tab on top. Before, it could take whichever tab Windows listed first,\n  and on Windows 11 a tabbed window wasn't recognised at all.\n- Each Notepad window is recognised by the file in its tab on top.\n- The window card has a new Content row showing the address, and the tab\n  names when you hover it. Like the other rows, it can be set to require,\n  prefer or ignore.\n\n## Privacy\n\n- The saved address keeps only what identifies the page. Query strings,\n  fragments and any user name or password in the URL are left out, and so\n  is anything that looks like typed text rather than an address.\n- None of it leaves your machine. Bug reports don't include it.\n\n## Fixes\n\n- A profile edited by hand with an unexpected value in a window's content\n  no longer stops the whole Load.\n\n## Good to know\n\n- Save or Re-capture a profile once to record the new details. Existing\n  profiles load exactly as before until then.\n- A capture or Load with two or more windows of one app open takes a\n  little longer, 30 to 70 ms per window, while it reads what they show.\n"
+    "notes": "# v1.3.0-513: Maximize draws the whole window again\n\nBuilds on `v1.3.0-496`. One fix, carried by a runtime upgrade.\n\n## Fixes\n\n- Pressing Maximize no longer leaves the page at its old size in the top-left\n  corner with the backdrop showing everywhere else. The frame grew, the page\n  did not, and a restore and a second maximize didn't help. It happened with\n  the Mica backdrop on, which is the default. The cause was in the Electron\n  runtime WLM ships on: a frameless window with a background material kept\n  its old drawing surface after a maximize. Electron fixed that in later\n  versions, so this release moves WLM from Electron 31 to Electron 45.\n\n## Good to know\n\n- The runtime jump is large, fourteen major versions, and nothing in WLM's own\n  code changed for it. Every test and the window probes pass on the new\n  runtime, and the packaged build maximizes and restores correctly. If a\n  dialog or a virtual window looks different from `v1.3.0-496`, that is worth\n  a report.\n- The Mica setting under Settings, Appearance keeps working as before. You no\n  longer need to turn it off to maximize.\n- Three small layout findings in the Settings dialog were measured during this\n  work and are the same on the old and new runtime. They're on the project's\n  todo list, not in this release.\n"
   }
 }
