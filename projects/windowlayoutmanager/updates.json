@@ -1,14 +1,14 @@
 {
   "product": "WindowLayoutManager",
   "latest": {
-    "version": "1.3.0-515",
-    "tag": "v1.3.0-515",
-    "publishedAt": "2026-11-10T01:50:04Z",
-    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.3.0-515/WindowLayoutManager-v1.3.0-515-win-x64.zip",
-    "sizeBytes": 163510924,
-    "sha256": "a21ec3ffd343b8eca9aea8eb8931ba210fe8c0b02489af9957f8f14fd3a5aee0",
+    "version": "1.3.0-517",
+    "tag": "v1.3.0-517",
+    "publishedAt": "2026-11-10T04:51:55Z",
+    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.3.0-517/WindowLayoutManager-v1.3.0-517-win-x64.zip",
+    "sizeBytes": 163511529,
+    "sha256": "ca0b8cbd27b2bc4b2d767f12c14fd21cc560ee990e07bb1003cef7ff85914732",
     "prerelease": false,
     "pageUrl": "https://dougfessler.com/projects/windowlayoutmanager/",
-    "notes": "# v1.3.0-515: Settings and display editor tidy-ups\n\nBuilds on `v1.3.0-513`, the Electron 45 release that fixed maximize. Small\nlayout fixes found by the spacing probe while checking that upgrade.\n\n## Fixes\n\n- In the display editor, each monitor's name and its controls share one\n  left edge. They were centred by a few pixels inside the card before.\n- On Settings, Companion Software, the cards no longer stretch past a\n  readable width on a wide dialog, so the one-line descriptions stay easy\n  to read.\n\n## Good to know\n\n- Nothing else changed since `v1.3.0-513`. If you skipped that one, it\n  carries the move from Electron 31 to Electron 45 and the maximize fix.\n"
+    "notes": "# v1.3.0-517: no blank box after opening from the tray\n\nBuilds on `v1.3.0-515`. One fix for a bug the move to Electron 45 brought in.\n\n## Fixes\n\n- Opening the app from the tray no longer shows a blank, dialog-sized box\n  over the window that you can't click or close. It showed after closing to\n  the tray and opening again, and after a sign-in start in the tray.\n  Minimize and restore were never affected.\n\n## Good to know\n\n- WLM keeps a dialog loaded in the background so the first dialog opens\n  fast. It now lets go of that dialog while the app sits in the tray and\n  loads a fresh one a moment after the window is back. Dialogs still open\n  quickly after a reopen.\n"
   }
 }
