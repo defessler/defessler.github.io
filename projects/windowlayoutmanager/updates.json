@@ -1,14 +1,14 @@
 {
   "product": "WindowLayoutManager",
   "latest": {
-    "version": "1.3.0-513",
-    "tag": "v1.3.0-513",
-    "publishedAt": "2026-11-09T21:36:39Z",
-    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.3.0-513/WindowLayoutManager-v1.3.0-513-win-x64.zip",
-    "sizeBytes": 163510813,
-    "sha256": "3c7c25508ce574378315bc3c20340cc1d8e596eec6d3de418d60af011be3aa61",
+    "version": "1.3.0-515",
+    "tag": "v1.3.0-515",
+    "publishedAt": "2026-11-10T01:50:04Z",
+    "url": "https://github.com/defessler/WindowLayoutManager-releases/releases/download/v1.3.0-515/WindowLayoutManager-v1.3.0-515-win-x64.zip",
+    "sizeBytes": 163510924,
+    "sha256": "a21ec3ffd343b8eca9aea8eb8931ba210fe8c0b02489af9957f8f14fd3a5aee0",
     "prerelease": false,
     "pageUrl": "https://dougfessler.com/projects/windowlayoutmanager/",
-    "notes": "# v1.3.0-513: Maximize draws the whole window again\n\nBuilds on `v1.3.0-496`. One fix, carried by a runtime upgrade.\n\n## Fixes\n\n- Pressing Maximize no longer leaves the page at its old size in the top-left\n  corner with the backdrop showing everywhere else. The frame grew, the page\n  did not, and a restore and a second maximize didn't help. It happened with\n  the Mica backdrop on, which is the default. The cause was in the Electron\n  runtime WLM ships on: a frameless window with a background material kept\n  its old drawing surface after a maximize. Electron fixed that in later\n  versions, so this release moves WLM from Electron 31 to Electron 45.\n\n## Good to know\n\n- The runtime jump is large, fourteen major versions, and nothing in WLM's own\n  code changed for it. Every test and the window probes pass on the new\n  runtime, and the packaged build maximizes and restores correctly. If a\n  dialog or a virtual window looks different from `v1.3.0-496`, that is worth\n  a report.\n- The Mica setting under Settings, Appearance keeps working as before. You no\n  longer need to turn it off to maximize.\n- Three small layout findings in the Settings dialog were measured during this\n  work and are the same on the old and new runtime. They're on the project's\n  todo list, not in this release.\n"
+    "notes": "# v1.3.0-515: Settings and display editor tidy-ups\n\nBuilds on `v1.3.0-513`, the Electron 45 release that fixed maximize. Small\nlayout fixes found by the spacing probe while checking that upgrade.\n\n## Fixes\n\n- In the display editor, each monitor's name and its controls share one\n  left edge. They were centred by a few pixels inside the card before.\n- On Settings, Companion Software, the cards no longer stretch past a\n  readable width on a wide dialog, so the one-line descriptions stay easy\n  to read.\n\n## Good to know\n\n- Nothing else changed since `v1.3.0-513`. If you skipped that one, it\n  carries the move from Electron 31 to Electron 45 and the maximize fix.\n"
   }
 }
