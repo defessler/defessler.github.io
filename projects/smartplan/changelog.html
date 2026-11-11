@@ -668,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.167.0 &middot; Updated 2026-11-04 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.168.0 &middot; Updated 2026-11-10 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -688,7 +688,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-11-02-the-weekly-sweep-aas-new-index-and-a-site-that-says-how-fresh-it-is-v41540">2026-11-02 · The weekly sweep, AA's new index, and a site that says how fresh it is (v4.154.0)</a></li>
 <li><a href="#2026-11-02-zcode-and-zai-leave-the-family-and-the-site-goes-wide-v41550">2026-11-02 · ZCode and z.ai leave the family, and the site goes wide (v4.155.0)</a></li>
 <li><a href="#2026-11-03-smartdiff-draws-each-changed-blueprint-graph-v41560">2026-11-03 · smartdiff draws each changed Blueprint graph (v4.156.0)</a></li>
 <li><a href="#2026-11-03-drag-and-zoom-on-smartdiffs-graph-drawings-v41570">2026-11-03 · Drag and zoom on smartdiff's graph drawings (v4.157.0)</a></li>
@@ -702,57 +701,13 @@ footer p { margin: 0; }
 <li><a href="#2026-11-03-the-verifier-seat-runs-code-reviews-through-smartreview-v41650">2026-11-03 · The verifier seat runs code reviews through smartreview (v4.165.0)</a></li>
 <li><a href="#2026-11-04-copilot-sessions-run-on-luna-and-probes-5-and-6-run-on-copilot-v41660">2026-11-04 · Copilot sessions run on Luna, and Probes 5 and 6 run on Copilot (v4.166.0)</a></li>
 <li><a href="#2026-11-04-the-skills-get-shorter-and-the-caps-come-down-to-hold-it-v41670">2026-11-04 · The skills get shorter, and the caps come down to hold it (v4.167.0)</a></li>
+<li><a href="#2026-11-11-smartdiffs-summary-and-notes-use-the-full-width-v41680">2026-11-11 · smartdiff's summary and notes use the full width (v4.168.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-11-02-the-weekly-sweep-aas-new-index-and-a-site-that-says-how-fresh-it-is-v41540">2026-11-02 · The weekly sweep, AA's new index, and a site that says how fresh it is (v4.154.0)</h2>
-<p><strong>The sweep.</strong> Eight readers re-read every research area at vendor
-sources, and five Opus verifiers re-fetched each claimed change. 126
-verdicts: 91 upheld, 34 corrected, 1 refuted. Every area stamp moves to
-2026-11-02. Full note: <code>research/2026-11-02-sweep.md</code>. Ledger:
-<code>VERIFIED.md</code>, "Sweep 2026-11-02".</p>
-<p><strong>Classes freeze on AA v4.3.2.</strong> Artificial Analysis moved to
-Intelligence Index v5.0 on 2026-10-27, and none of the three class
-anchors (Opus 4.8, Sonnet 5, Haiku 4.5) has a v5 score. Re-anchoring on
-models this repo never measured in those roles would break the rule
-that classes come from measured data. So the classes stay on v4.3.2,
-v5 scores sit beside them as information, and a new model stays
-Unclassified until a T-record re-sets the anchors on v5.</p>
-<p><strong>What moved.</strong></p>
-<ul>
-<li>GPT-6.1 Terra reached Copilot on 2026-10-26 at 1 / 5 on every paid
-  plan. It's Unclassified and holds no seat. On plain Pro it's the only
-  Terra-class model left after 2026-11-16.</li>
-<li>Copilot Fusion replaced Auto in the CLI, VS Code and the app on
-  2026-10-28, at 30% off on paid plans through 2026-11-30. The 10% Auto discount now
-  covers Chat and cloud agent only. Stable CLI is 1.0.105.</li>
-<li>Opus 4.8 fast mode goes on 2026-11-30. Opus 5.5 fast mode reached
-  Claude Models on Google Cloud on 2026-10-22.</li>
-<li>Off the Anthropic API, Claude Code's <code>haiku</code> alias still means Haiku
-  4.5, with no effort dial. Haiku 5.5 bills 5x past 100K input tokens.</li>
-<li>Claude Code 2.1.316 adds <code>CLAUDE_CODE_SUBAGENT_EFFORT</code>. <code>ultrathink</code>
-  can raise an interactive turn to xhigh on the 5.5 models and Fable
-  5.1, through Anthropic's API only.</li>
-<li>OpenAI added a 12-hour prompt cache at a 2.5x write.</li>
-<li>ZCode 3.17.1's catalog carries the 5.5 models and turns the old ones
-  off. ZCode isn't installed on this box any more.</li>
-<li>Claude Mythos 5 is limited availability only, and no harness here
-  serves it.</li>
-</ul>
-<p><strong>The site shows its own age.</strong> Each page's header now shows when that
-page last changed, read from git, instead of one date for the whole
-site. A "Facts checked" badge reads the research stamps for the areas
-that page depends on, and the browser works out its age. So it turns
-amber at 7 days and red at 30 even if nobody rebuilds the site. The
-home page lists every area with its age, and model pages say when their
-prices were last checked. The site has a calmer reference look, light
-and dark, and the pages got a plain-language pass that kept every fact.</p>
-<p><strong>Fixes.</strong> The m365-shim answered a 404 before reading the request
-body, so Windows reset the connection and oracle stage (f) failed about
-one run in four. It reads first now.</p>
 <h2 id="2026-11-02-zcode-and-zai-leave-the-family-and-the-site-goes-wide-v41550">2026-11-02 · ZCode and z.ai leave the family, and the site goes wide (v4.155.0)</h2>
 <p><strong>ZCode and z.ai are gone</strong>, at the author's direction. That covers
 <code>zcode.md</code>, <code>scripts/zcode-export.sh</code> and its download bundle, the ZCode
@@ -1009,9 +964,24 @@ files under <code>docs/rulebook/</code>. <code>scripts/build-rulebook.py</code> 
 them into <code>docs/examples/rulebook.html</code>, with a filter box and a skill
 nav. Three sources aren't restated because they're already tables or
 checklists: <code>model-classes.md</code> and smartreview's two standards docs.</p>
+<h2 id="2026-11-11-smartdiffs-summary-and-notes-use-the-full-width-v41680">2026-11-11 · smartdiff's summary and notes use the full width (v4.168.0)</h2>
+<p><strong>The 72-character cap is gone.</strong> The author asked for the page
+smartdiff renders to lose any max width, "in particular on the
+paragraphs". <code>diffview.py</code> capped <code>.summary p</code> and <code>.note p</code> at
+<code>max-width:72ch</code>, so the session summary and each file's intent note
+wrapped early on a wide window while the diff beside them ran edge to
+edge. That rule was the page's only width cap. The two
+<code>@media (max-width:...)</code> queries are layout breakpoints, and they stay.</p>
+<p><strong>The turret demo is re-rendered</strong> with <code>scripts/make_turret_demo.py</code>,
+so gate (aa) passes on the new <code>diffview.py</code> hash. The Getting Started
+videos aren't re-rendered yet. The turret scene shows the old wrap
+until <code>scripts/tutorial-videos.py</code> runs on a box with the fonts.</p>
+<p><strong>Also since v4.167.0.</strong> <code>ci-runner.ps1 -Uninstall</code> no longer stops
+when the scheduled task is already gone. On Windows PowerShell 5.1 a
+redirected <code>schtasks</code> error became a terminating one.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-04 11:37 PM PST / 2:37 AM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-10 7:45 PM PST / 10:45 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
