@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Local LLM hardware: measured inference speeds (Nov 2026)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --paper: #F2F4F1;
+  --sheet: #FBFCFA;
+  --ink: #17212A;
+  --muted: #5C6974;
+  --rule: #CBD3D8;
+  --bar: #C9DDE6;
+  --lead: #0E6F68;
+  --lead-tint: #D3ECE8;
+  --na: #9AA5AD;
+  --focus: #2457C5;
+  --font: "Archivo", "Helvetica Neue", Arial, system-ui, sans-serif;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #12181D;
+    --sheet: #182027;
+    --ink: #E3E8EB;
+    --muted: #93A0AA;
+    --rule: #2C3740;
+    --bar: #24404D;
+    --lead: #5CC8BC;
+    --lead-tint: #173B38;
+    --na: #5E6B75;
+    --focus: #7FA6FF;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #12181D; --sheet: #182027; --ink: #E3E8EB; --muted: #93A0AA; --rule: #2C3740;
+  --bar: #24404D; --lead: #5CC8BC; --lead-tint: #173B38; --na: #5E6B75; --focus: #7FA6FF;
+}
+*, *::before, *::after { box-sizing: inherit; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1480px; margin: 0 auto; padding: 40px 24px 64px; }
+
+header.top { display: grid; gap: 14px; max-width: 72ch; margin-bottom: 28px; }
+h1 {
+  font-stretch: 72%;
+  font-weight: 700;
+  font-size: clamp(32px, 5.2vw, 58px);
+  line-height: 0.98;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+.lede { font-size: 17px; margin: 0; }
+.lede strong { font-weight: 600; font-variant-numeric: tabular-nums; }
+.meta { color: var(--muted); font-size: 13px; margin: 0; }
+
+.controls {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px;
+  font-size: 13px; color: var(--muted); margin-bottom: 12px;
+}
+.switch { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); cursor: pointer; }
+.switch input { width: 16px; height: 16px; accent-color: var(--lead); margin: 0; }
+.key { display: inline-flex; align-items: center; gap: 6px; }
+.key-lead { width: 12px; height: 12px; background: var(--lead-tint); outline: 1px solid var(--lead); }
+.key-bar { width: 22px; height: 6px; background: var(--bar); }
+
+.sheet {
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  overflow-x: auto;
+}
+table {
+  border-collapse: separate; border-spacing: 0;
+  width: 100%;
+  font-stretch: 85%;
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+}
+th, td { padding: 9px 12px; text-align: right; vertical-align: top; white-space: nowrap; border-bottom: 1px solid var(--rule); }
+thead th { background: var(--sheet); font-weight: 600; }
+thead tr.groups th {
+  text-align: left; font-size: 13px; font-weight: 700; padding-top: 14px; padding-bottom: 4px;
+  border-bottom: none; border-left: 1px solid var(--rule);
+}
+thead tr.cols th { color: var(--muted); font-weight: 500; font-size: 12.5px; border-bottom: 2px solid var(--ink); }
+.gs { border-left: 1px solid var(--rule); }
+th.hw, td.hw {
+  text-align: left; position: sticky; left: 0; background: var(--sheet); z-index: 1;
+  white-space: normal; min-width: 168px; max-width: 200px;
+  border-right: 1px solid var(--rule);
+}
+thead th.hw { z-index: 2; vertical-align: bottom; border-left: none; }
+.hw-name { display: block; font-weight: 600; font-stretch: 90%; font-size: 14px; }
+.hw-mem { display: block; color: var(--muted); font-size: 12.5px; }
+
+th button.sort {
+  all: unset; cursor: pointer; display: inline-flex; gap: 4px; align-items: center;
+}
+th button.sort:hover { color: var(--ink); }
+th button.sort:focus-visible, .switch input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+th[aria-sort] button.sort { color: var(--ink); }
+th[aria-sort="descending"] button.sort::after { content: "↓"; }
+th[aria-sort="ascending"] button.sort::after { content: "↑"; }
+
+td.num { position: relative; min-width: 84px; }
+.bar { position: absolute; left: 6px; right: 6px; bottom: 5px; height: 4px; }
+.bar i { display: block; height: 100%; background: var(--bar); margin-left: auto; }
+.v { position: relative; font-size: 14px; }
+td.lead { background: var(--lead-tint); }
+td.lead .v { font-weight: 700; color: var(--lead); }
+td.lead .bar i { background: var(--lead); opacity: .55; }
+.na { color: var(--na); font-size: 12.5px; }
+.note { display: none; color: var(--muted); font-size: 11.5px; line-height: 1.35; white-space: normal; text-align: right; margin: 3px 0 6px; max-width: 190px; margin-left: auto; position: relative; }
+body.notes .note { display: block; }
+body.notes td.num { min-width: 128px; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td, tbody tr:hover td.hw { background: color-mix(in srgb, var(--bar) 35%, var(--sheet)); }
+tbody tr:hover td.lead { background: var(--lead-tint); }
+
+.reading { display: grid; gap: 28px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-top: 36px; }
+.reading h2 { font-stretch: 80%; font-size: 20px; font-weight: 700; margin: 0 0 8px; }
+.reading p, .reading li { font-size: 14px; max-width: 68ch; }
+.reading ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.reading p { margin: 0 0 8px; }
+footer { margin-top: 40px; color: var(--muted); font-size: 12.5px; max-width: 80ch; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Local LLM hardware, measured</h1>
+    <p class="lede" id="lede"></p>
+    <p class="meta">Tokens per second, single user, ~4-bit quantization, llama.cpp unless the test conditions say otherwise. Compiled from published benchmarks, November 2026.</p>
+  </header>
+
+  <div class="controls">
+    <label class="switch"><input type="checkbox" id="notes-toggle"> Show test conditions</label>
+    <span class="key"><span class="key-lead"></span>Fastest in column</span>
+    <span class="key"><span class="key-bar"></span>Bar shows share of the column’s best</span>
+    <span>DNF: doesn’t fit on one card</span>
+    <span>n/f: no measurement found</span>
+  </div>
+
+  <div class="sheet" role="region" aria-label="Speed comparison table" tabindex="0">
+    <table id="t">
+      <thead>
+        <tr class="groups">
+          <th class="hw" rowspan="2" data-key="hw" scope="col"><button class="sort" type="button">Hardware</button></th>
+          <th colspan="1">Spec</th>
+          <th colspan="3">Dense 27B</th>
+          <th colspan="2">MoE 35B-A3B</th>
+          <th colspan="2">gpt-oss-120b</th>
+          <th colspan="2">Dense 70B</th>
+          <th colspan="2">27B decode at depth</th>
+          <th colspan="2">Llama 2 7B scoreboard</th>
+        </tr>
+        <tr class="cols"></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <section class="reading">
+    <div>
+      <h2>How to read it</h2>
+      <ul>
+        <li>Decode is generation speed and tracks memory bandwidth. Prefill is prompt processing and tracks compute; it dominates wait time on long prompts.</li>
+        <li>“Decode + spec” uses speculative decoding (MTP, DFlash2 and similar), which multiplies speed 1.6–2.8×. Never compare it against plain decode.</li>
+        <li>The 27B columns mix Qwen3.6-27B and Qwen3.8-27B, which are close in size but not identical. Turn on test conditions to see which was used.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>What’s comparable</h2>
+      <p>Different testers, builds and runtimes produced these numbers. The cleanest like-for-like sets are Hardware Corner (5090, 3090, V100), Tom’s Hardware (M5 Ultra, DGX Spark), The Register (RTX Spark, DGX Spark, Strix Halo) and the llama.cpp 7B scoreboard columns.</p>
+      <p>Runtime choice can swing results 2× or more: MLX vs llama.cpp on Mac, vLLM vs llama.cpp on GB10, Vulkan vs ROCm on Strix Halo.</p>
+    </div>
+    <div>
+      <h2>Left out</h2>
+      <p>A reported 14–17 tok/s for 70B on RTX Spark and widely repeated 40–52 tok/s claims for 70B on M5 Ultra both exceed what those chips’ memory bandwidth allows, so they aren’t in the table.</p>
+    </div>
+  </section>
+
+  <footer>
+    Sources: Hardware Corner, Tom’s Hardware, The Register, MacStories, StorageReview, MindStudio, Petronella, llm-tracker.info, ggml-org/llama.cpp performance discussions (#15013, #4167), NVIDIA Developer Forums, Apple Machine Learning Research, slb350 and hogeheer Strix Halo benchmarks, InsiderLLM, miyagadget. Figures change as llama.cpp and drivers update; check the original source before quoting a single number.
+  </footer>
+</div>
+
+<script>
+const DATA = [{"id": "rtx5090", "hw": "RTX 5090", "mem": "32 GB GDDR7", "bw": 1792, "d27_plain": 75.6, "d27_plain_n": "Qwen3.6-27B Q4_K_XL @4K, llama.cpp (Hardware Corner). 59 in LM Studio (MacStories)", "d27_spec": null, "d27_spec_n": "", "d27_pp": 3874, "d27_pp_n": "@4K llama.cpp. 3,031 on a 6K prompt (MacStories)", "moe_tg": 262.5, "moe_tg_n": "@4K llama.cpp (Hardware Corner)", "moe_pp": 9130, "moe_pp_n": "@4K llama.cpp", "oss_tg": "DNF", "oss_tg_n": "Needs >32 GB", "oss_pp": "DNF", "oss_pp_n": "", "l70_tg": "DNF", "l70_tg_n": "Needs >32 GB", "l70_pp": "DNF", "l70_pp_n": "", "ctx32": 69.5, "ctx32_n": "27B decode at 32K depth", "ctx128": 54.6, "ctx128_n": "27B decode at 128K depth", "s7_pp": 14073, "s7_tg": 290.0, "s7_n": "llama.cpp CUDA scoreboard #15013"}, {"id": "pro6000", "hw": "RTX PRO 6000 Blackwell", "mem": "96 GB GDDR7 ECC", "bw": 1792, "d27_plain": 81, "d27_plain_n": "Qwen3.8-27B UD-Q4_K_M tg128, 500 W cap (single forum report)", "d27_spec": 79.4, "d27_spec_n": "Q8_0 with MTP, Server Edition (45.8 plain at Q8)", "d27_pp": 3920, "d27_pp_n": "pp512 (same forum report); ~13,000 vLLM NVFP4", "moe_tg": 193.4, "moe_tg_n": "Q8_0, Server Edition; 225.5 with MTP", "moe_pp": null, "moe_pp_n": "", "oss_tg": 210.1, "oss_tg_n": "MXFP4 llama.cpp, shallowest depth (Hardware Corner)", "oss_pp": 4578.6, "oss_pp_n": "Same run", "l70_tg": 34.05, "l70_tg_n": "Llama 3.3 70B Q4_K_M, llama.cpp b6413", "l70_pp": 1793.8, "l70_pp_n": "pp512", "ctx32": null, "ctx32_n": "gpt-oss-120b holds 195.2 at 32K", "ctx128": null, "ctx128_n": "gpt-oss-120b 158.2 at 131K; 70B 32.0 to 16.6 at deepest tested", "s7_pp": 14855, "s7_tg": 274.2, "s7_n": "llama.cpp CUDA scoreboard #15013"}, {"id": "m5ultra", "hw": "Mac Studio M5 Ultra", "mem": "96 to 512 GB unified", "bw": 1228, "d27_plain": 46.3, "d27_plain_n": "Qwen3.8-27B Q4_K_M @d0, llama.cpp (Tom's Hardware). 48 MLX (MacStories)", "d27_spec": null, "d27_spec_n": "", "d27_pp": 1701, "d27_pp_n": "6K prompt, MLX (MacStories). 2,733 @4K", "moe_tg": 153.4, "moe_tg_n": "MLX 4-bit, community run", "moe_pp": null, "moe_pp_n": "125B MoE prefill ~2,887 @16K, MLX", "oss_tg": 120, "oss_tg_n": "mlx-lm, single community source", "oss_pp": null, "oss_pp_n": "", "l70_tg": null, "l70_tg_n": "Not measured; ~20 to 25 estimated", "l70_pp": null, "l70_pp_n": "", "ctx32": null, "ctx32_n": "43.4 at 16K, 32.4 at 64K", "ctx128": 30.1, "ctx128_n": "llama.cpp; 32 MLX", "s7_pp": 4944.7, "s7_tg": 179.1, "s7_n": "Apple Silicon scoreboard #4167, 80-core"}, {"id": "m5max", "hw": "Mac Studio M5 Max", "mem": "Up to 128 GB unified", "bw": 614, "d27_plain": 36.6, "d27_plain_n": "MLX 4-bit @4K. ~31 in LM Studio", "d27_spec": 129, "d27_spec_n": "uzu engine; 76 oMLX", "d27_pp": 733, "d27_pp_n": "MLX 4-bit @4K; up to 1,727 with uzu", "moe_tg": 118, "moe_tg_n": "Q4_K_M llama.cpp; 125.8 MLX", "moe_pp": null, "moe_pp_n": "", "oss_tg": 87.9, "oss_tg_n": "Q8, MLX @4K (Hardware Corner)", "oss_pp": 1325, "oss_pp_n": "1,325 to 2,710 depending on prompt", "l70_tg": null, "l70_tg_n": "~15 reported, not independently verified", "l70_pp": null, "l70_pp_n": "", "ctx32": null, "ctx32_n": "gpt-oss-120b 64.5 at 32K", "ctx128": null, "ctx128_n": "", "s7_pp": 3220.0, "s7_tg": 119.9, "s7_n": "Apple Silicon scoreboard #4167, 40-core"}, {"id": "dgxspark", "hw": "DGX Spark / GB10", "mem": "128 GB unified (64 GB OEM)", "bw": 273, "d27_plain": 11.8, "d27_plain_n": "Qwen3.8-27B Q4_K_M @d0, llama.cpp (Tom's Hardware)", "d27_spec": 35, "d27_spec_n": "33 to 35, SGLang + MTP", "d27_pp": 823, "d27_pp_n": "pp512 llama.cpp; 1,914 vLLM", "moe_tg": 63.8, "moe_tg_n": "llama.cpp (The Register); 88.5 with MTP", "moe_pp": 1868, "moe_pp_n": "Same build as Strix Halo row (Petronella)", "oss_tg": 58.7, "oss_tg_n": "llama.cpp b7941", "oss_pp": 2443.9, "oss_pp_n": "pp2048", "l70_tg": 4.4, "l70_tg_n": "Llama 3.1 70B Q4_K_M, Ollama; 4.67 elsewhere", "l70_pp": null, "l70_pp_n": "803 at FP8, SGLang", "ctx32": null, "ctx32_n": "gpt-oss-120b 42.8 at 32K", "ctx128": 7.7, "ctx128_n": "27B, llama.cpp", "s7_pp": 3062.3, "s7_tg": 57.2, "s7_n": "llama.cpp CUDA scoreboard, launch-era build"}, {"id": "strixhalo", "hw": "Strix Halo (Ryzen AI Max+ 395)", "mem": "~96 to 120 GB of 128", "bw": 256, "d27_plain": 12.0, "d27_plain_n": "Qwen3.6-27B Q4_K_XL tg128, Vulkan RADV", "d27_spec": 21.3, "d27_spec_n": "MTP n=3, same build", "d27_pp": 322, "d27_pp_n": "pp512", "moe_tg": 76.9, "moe_tg_n": "Vulkan RADV (May 2026); 59.4 in same-build test vs Spark", "moe_pp": 1105.8, "moe_pp_n": "pp512; 628 in same-build test", "oss_tg": 55.57, "oss_tg_n": "llama.cpp b9049 Vulkan", "oss_pp": 727.0, "oss_pp_n": "pp512", "l70_tg": 4.6, "l70_tg_n": "Hermes 4 70B Q4_K_M, ROCm; 5.26 Vulkan", "l70_pp": 121.9, "l70_pp_n": "pp512 ROCm", "ctx32": null, "ctx32_n": "", "ctx128": null, "ctx128_n": "Vulkan prefill collapses at long context; ROCm far better", "s7_pp": 1014, "s7_tg": 45.8, "s7_n": "Vulkan, community run (not on official scoreboard)"}, {"id": "rtxspark", "hw": "RTX Spark N1X", "mem": "Up to 96 GB of 128", "bw": 300, "d27_plain": 15.76, "d27_plain_n": "Qwen3.8-27B, llama.cpp (The Register); 13.4 elsewhere", "d27_spec": 44.7, "d27_spec_n": "DFlash2, NVFP4, vLLM; 28.4 with MTP", "d27_pp": 530, "d27_pp_n": "Derived from 485 ms TTFT on 256 tokens", "moe_tg": 67.64, "moe_tg_n": "llama.cpp (The Register); 94.1 with MTP", "moe_pp": null, "moe_pp_n": "", "oss_tg": 65, "oss_tg_n": "llama.cpp on Windows; 35 in vLLM", "oss_pp": 1800, "oss_pp_n": "~1,800 llama.cpp; 4,681 vLLM", "l70_tg": null, "l70_tg_n": "One 14 to 17 tok/s report exceeds bandwidth limits; unverified", "l70_pp": null, "l70_pp_n": "", "ctx32": null, "ctx32_n": "", "ctx128": null, "ctx128_n": "", "s7_pp": null, "s7_tg": null, "s7_n": "No scoreboard entry yet"}, {"id": "rtx3090", "hw": "RTX 3090 (used)", "mem": "24 GB GDDR6X", "bw": 936, "d27_plain": 33.0, "d27_plain_n": "Qwen3.6-27B Q4_K_XL @4K, llama.cpp (Hardware Corner)", "d27_spec": 61.4, "d27_spec_n": "MTP n=3, llama.cpp", "d27_pp": 1165, "d27_pp_n": "@4K; 1,575 @1K", "moe_tg": 146.1, "moe_tg_n": "@4K llama.cpp (Hardware Corner)", "moe_pp": 2994, "moe_pp_n": "@4K", "oss_tg": "DNF", "oss_tg_n": "Needs 3 cards", "oss_pp": "DNF", "oss_pp_n": "", "l70_tg": "DNF", "l70_tg_n": "Needs 2 cards", "l70_pp": "DNF", "l70_pp_n": "", "ctx32": 30.3, "ctx32_n": "27B decode at 32K", "ctx128": "DNF", "ctx128_n": "27B at 128K needs more than 24 GB", "s7_pp": 5174.7, "s7_tg": 158.2, "s7_n": "llama.cpp CUDA scoreboard #15013"}, {"id": "v100", "hw": "Tesla V100 32 GB (used)", "mem": "32 GB HBM2", "bw": 900, "d27_plain": 33.9, "d27_plain_n": "Qwen3.6-27B Q4_K_XL @4K, llama.cpp (Hardware Corner)", "d27_spec": null, "d27_spec_n": "~50 to 52 on two V100s with MTP", "d27_pp": 814, "d27_pp_n": "@4K", "moe_tg": 106.4, "moe_tg_n": "@4K llama.cpp (Hardware Corner)", "moe_pp": 807, "moe_pp_n": "@4K", "oss_tg": "DNF", "oss_tg_n": "Needs >32 GB", "oss_pp": "DNF", "oss_pp_n": "", "l70_tg": "DNF", "l70_tg_n": "Needs >32 GB", "l70_pp": "DNF", "l70_pp_n": "", "ctx32": 29.2, "ctx32_n": "27B decode at 32K", "ctx128": 16.1, "ctx128_n": "27B decode at 128K", "s7_pp": 3042.6, "s7_tg": 129.1, "s7_n": "llama.cpp CUDA scoreboard #15013"}];
+
+const COLS = [
+  { k: 'bw',        label: 'Bandwidth GB/s', gs: true,  note: null },
+  { k: 'd27_plain', label: 'Decode',         gs: true },
+  { k: 'd27_spec',  label: 'Decode + spec' },
+  { k: 'd27_pp',    label: 'Prefill' },
+  { k: 'moe_tg',    label: 'Decode',         gs: true },
+  { k: 'moe_pp',    label: 'Prefill' },
+  { k: 'oss_tg',    label: 'Decode',         gs: true },
+  { k: 'oss_pp',    label: 'Prefill' },
+  { k: 'l70_tg',    label: 'Decode',         gs: true },
+  { k: 'l70_pp',    label: 'Prefill' },
+  { k: 'ctx32',     label: '@32K',           gs: true },
+  { k: 'ctx128',    label: '@128K' },
+  { k: 's7_pp',     label: 'pp512',          gs: true, note: 's7_n' },
+  { k: 's7_tg',     label: 'tg128',          note: null },
+];
+const noteKey = (c) => c.note !== undefined ? c.note : c.k + '_n';
+const fmt = (v) => v.toLocaleString('en-US', { maximumFractionDigits: 2 });
+
+const max = {};
+COLS.forEach((c) => {
+  const vals = DATA.map((r) => r[c.k]).filter((v) => typeof v === 'number');
+  max[c.k] = vals.length ? Math.max(...vals) : null;
+});
+
+// Lede from the data
+(function () {
+  const lead = (k) => DATA.filter((r) => typeof r[k] === 'number').reduce((a, r) => (!a || r[k] > a[k] ? r : a), null);
+  const d = lead('d27_plain'), o = lead('oss_tg');
+  const el = document.getElementById('lede');
+  const s = (t, strong) => { const n = document.createElement(strong ? 'strong' : 'span'); n.textContent = t; el.appendChild(n); };
+  s('Fastest plain dense-27B decode: '); s(d.hw, true); s(' at '); s(fmt(d.d27_plain) + ' tok/s', true);
+  s('. Fastest on gpt-oss-120b: '); s(o.hw, true); s(' at '); s(fmt(o.oss_tg) + ' tok/s', true); s('.');
+})();
+
+// Column headers
+const colRow = document.querySelector('thead tr.cols');
+COLS.forEach((c) => {
+  const th = document.createElement('th');
+  th.scope = 'col';
+  th.dataset.key = c.k;
+  if (c.gs) th.className = 'gs';
+  const b = document.createElement('button');
+  b.className = 'sort'; b.type = 'button'; b.textContent = c.label;
+  th.appendChild(b);
+  colRow.appendChild(th);
+});
+
+let sort = { key: null, dir: -1 };
+const tbody = document.querySelector('tbody');
+
+function render() {
+  const rows = DATA.slice();
+  if (sort.key === 'hw') rows.sort((a, b) => sort.dir * a.hw.localeCompare(b.hw));
+  else if (sort.key) rows.sort((a, b) => {
+    const av = typeof a[sort.key] === 'number' ? a[sort.key] : null;
+    const bv = typeof b[sort.key] === 'number' ? b[sort.key] : null;
+    if (av === null && bv === null) return 0;
+    if (av === null) return 1;
+    if (bv === null) return -1;
+    return sort.dir * (av - bv);
+  });
+  tbody.replaceChildren();
+  rows.forEach((r) => {
+    const tr = document.createElement('tr');
+    const hw = document.createElement('td');
+    hw.className = 'hw';
+    const n = document.createElement('span'); n.className = 'hw-name'; n.textContent = r.hw;
+    const m = document.createElement('span'); m.className = 'hw-mem'; m.textContent = r.mem;
+    hw.append(n, m);
+    tr.appendChild(hw);
+    COLS.forEach((c) => {
+      const td = document.createElement('td');
+      td.className = 'num' + (c.gs ? ' gs' : '');
+      const v = r[c.k];
+      if (typeof v === 'number') {
+        const bar = document.createElement('span'); bar.className = 'bar';
+        const i = document.createElement('i'); i.style.width = (100 * v / max[c.k]).toFixed(1) + '%';
+        bar.appendChild(i); td.appendChild(bar);
+        const s = document.createElement('span'); s.className = 'v'; s.textContent = fmt(v);
+        td.appendChild(s);
+        if (v === max[c.k]) td.classList.add('lead');
+      } else {
+        const s = document.createElement('span'); s.className = 'na';
+        s.textContent = v === 'DNF' ? 'DNF' : 'n/f';
+        td.appendChild(s);
+      }
+      const nk = noteKey(c);
+      if (nk && r[nk]) {
+        const note = document.createElement('div'); note.className = 'note'; note.textContent = r[nk];
+        td.appendChild(note);
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+}
+
+document.querySelectorAll('thead th[data-key]').forEach((th) => {
+  th.querySelector('button').addEventListener('click', () => {
+    const k = th.dataset.key;
+    if (sort.key === k) sort.dir = -sort.dir;
+    else sort = { key: k, dir: k === 'hw' ? 1 : -1 };
+    document.querySelectorAll('thead th[aria-sort]').forEach((h) => h.removeAttribute('aria-sort'));
+    th.setAttribute('aria-sort', sort.dir === -1 ? 'descending' : 'ascending');
+    render();
+  });
+});
+
+document.getElementById('notes-toggle').addEventListener('change', (e) => {
+  document.body.classList.toggle('notes', e.target.checked);
+});
+
+render();
+</script>
+</body>
+</html>
