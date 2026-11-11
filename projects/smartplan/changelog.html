@@ -668,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.168.0 &middot; Updated 2026-11-10 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.169.0 &middot; Updated 2026-11-11 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -688,7 +688,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-11-02-zcode-and-zai-leave-the-family-and-the-site-goes-wide-v41550">2026-11-02 · ZCode and z.ai leave the family, and the site goes wide (v4.155.0)</a></li>
 <li><a href="#2026-11-03-smartdiff-draws-each-changed-blueprint-graph-v41560">2026-11-03 · smartdiff draws each changed Blueprint graph (v4.156.0)</a></li>
 <li><a href="#2026-11-03-drag-and-zoom-on-smartdiffs-graph-drawings-v41570">2026-11-03 · Drag and zoom on smartdiff's graph drawings (v4.157.0)</a></li>
 <li><a href="#2026-11-03-before-and-after-views-filled-pins-and-folding-every-file-in-smartdiff-v41580">2026-11-03 · Before and After views, filled pins, and folding every file in smartdiff (v4.158.0)</a></li>
@@ -702,27 +701,13 @@ footer p { margin: 0; }
 <li><a href="#2026-11-04-copilot-sessions-run-on-luna-and-probes-5-and-6-run-on-copilot-v41660">2026-11-04 · Copilot sessions run on Luna, and Probes 5 and 6 run on Copilot (v4.166.0)</a></li>
 <li><a href="#2026-11-04-the-skills-get-shorter-and-the-caps-come-down-to-hold-it-v41670">2026-11-04 · The skills get shorter, and the caps come down to hold it (v4.167.0)</a></li>
 <li><a href="#2026-11-11-smartdiffs-summary-and-notes-use-the-full-width-v41680">2026-11-11 · smartdiff's summary and notes use the full width (v4.168.0)</a></li>
+<li><a href="#2026-11-11-smartdiff-reads-a-shelved-changelist-names-every-file-and-shows-added-values-v41690">2026-11-11 · smartdiff reads a shelved changelist, names every file, and shows added values (v4.169.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-11-02-zcode-and-zai-leave-the-family-and-the-site-goes-wide-v41550">2026-11-02 · ZCode and z.ai leave the family, and the site goes wide (v4.155.0)</h2>
-<p><strong>ZCode and z.ai are gone</strong>, at the author's direction. That covers
-<code>zcode.md</code>, <code>scripts/zcode-export.sh</code> and its download bundle, the ZCode
-rows in OVERVIEW, QUICKSTART and Downloads, the <code>zcode-harness</code> research
-area (now declared retired), and the GLM rows in the model registry, the
-class page and the open-weights table. The bench harness lost its <code>zai</code>
-arm. The 30 ledger rows about ZCode, z.ai and GLM pricing are out of
-<code>VERIFIED.md</code>. Dated history stays as it was: benchmark records, sweep
-notes and older changelog entries.</p>
-<p><code>glm-and-local.md</code> is now <code>local-models.md</code>. It keeps the shim ladder
-check and the local-model guidance, without the GLM section. The family
-now supports three harnesses: Claude Code, Copilot CLI and M365 Copilot.</p>
-<p><strong>The site is wider.</strong> Pages, the header and the footer share a 76rem
-column, and paragraphs fill it too instead of stopping at a reading
-measure.</p>
 <h2 id="2026-11-03-smartdiff-draws-each-changed-blueprint-graph-v41560">2026-11-03 · smartdiff draws each changed Blueprint graph (v4.156.0)</h2>
 <p>The smartdiff report now draws every changed graph, function graphs
 included, above its change list. Nodes sit where the editor saved them.
@@ -979,9 +964,42 @@ until <code>scripts/tutorial-videos.py</code> runs on a box with the fonts.</p>
 <p><strong>Also since v4.167.0.</strong> <code>ci-runner.ps1 -Uninstall</code> no longer stops
 when the scheduled task is already gone. On Windows PowerShell 5.1 a
 redirected <code>schtasks</code> error became a terminating one.</p>
+<h2 id="2026-11-11-smartdiff-reads-a-shelved-changelist-names-every-file-and-shows-added-values-v41690">2026-11-11 · smartdiff reads a shelved changelist, names every file, and shows added values (v4.169.0)</h2>
+<p>Three fixes from one field report: a Copilot session that rendered a
+shelved Perforce changelist and had to work around the skill to do it.</p>
+<p><strong>A shelved changelist works.</strong> <code>bp_prepare.py --p4 -c &lt;CL&gt;</code> only asked
+<code>p4 opened</code>, and a shelf has nothing opened, so it prepared zero
+Blueprints. It now reads the shelf with <code>p4 describe -S</code>. The old side
+is the revision each file was shelved against. The new side is the
+shelved file, <code>&lt;depotFile&gt;@=&lt;CL&gt;</code>, which isn't in the workspace, so
+<code>bp_export.py</code> stages it the way it already staged the old revision.
+<code>--shelved</code> asks for this outright. A <code>-c</code> changelist with nothing
+opened gets it unasked. SKILL.md's step 1 gains the matching capture,
+<code>p4 describe -S -du5 &lt;CL&gt;</code>.</p>
+<p><strong>No more "(unnamed)" files.</strong> <code>p4 describe -du</code> names a file only in
+its <code>==== //depot/path#rev (type) ====</code> line, with no <code>---</code> and <code>+++</code>
+lines after it. <code>diffview.py</code> read that header in <code>p4 diff</code>'s shape
+alone, so a text file from a shelf, a <code>.ini</code> in the report, came out
+unnamed. Both shapes are read now, and a binary type marks the file
+binary.</p>
+<p><strong>Added and removed items show their values.</strong> An added node lists the
+pin values it was given, an added variable its default, an added
+component or other subobject its properties (eight, then a count), and
+a pin added to an existing node its value. Removed ones show what they
+carried. Before this only a changed value was printed.</p>
+<p><strong>SKILL.md says not to text-diff the T3D exports.</strong> The session did,
+and got megabytes of serialized path noise. <code>--blueprints</code> is the
+reader. The file's gate (i) cap goes from 5.75KB to 6.0KB for these
+lines.</p>
+<p><strong>Tested against a stand-in, not a server.</strong> This box has no Perforce.
+A new self-test, <code>smartdiff-prepare-selftest.py</code> in oracle stage (k),
+plants a fake <code>p4</code> and checks which revisions <code>bp_prepare.py</code> asks for.
+The staged load of a shelved revision in the editor isn't exercised
+here. The turret demo is re-rendered for gate (aa). The videos aren't,
+as in v4.168.0.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-10 7:45 PM PST / 10:45 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-11 12:14 PM PST / 3:14 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
