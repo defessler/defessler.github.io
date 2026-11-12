@@ -668,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.170.0 &middot; Updated 2026-11-11 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.171.0 &middot; Updated 2026-11-11 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -688,7 +688,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-11-03-drag-and-zoom-on-smartdiffs-graph-drawings-v41570">2026-11-03 · Drag and zoom on smartdiff's graph drawings (v4.157.0)</a></li>
 <li><a href="#2026-11-03-before-and-after-views-filled-pins-and-folding-every-file-in-smartdiff-v41580">2026-11-03 · Before and After views, filled pins, and folding every file in smartdiff (v4.158.0)</a></li>
 <li><a href="#2026-11-03-a-site-that-leads-with-the-picks-the-skills-and-how-they-work-v41590">2026-11-03 · A site that leads with the picks, the skills and how they work (v4.159.0)</a></li>
 <li><a href="#2026-11-03-roles-before-vendors-on-the-site-themed-controls-and-a-one-day-data-refresh-v41600">2026-11-03 · Roles before vendors on the site, themed controls, and a one-day data refresh (v4.160.0)</a></li>
@@ -702,19 +701,13 @@ footer p { margin: 0; }
 <li><a href="#2026-11-11-smartdiffs-summary-and-notes-use-the-full-width-v41680">2026-11-11 · smartdiff's summary and notes use the full width (v4.168.0)</a></li>
 <li><a href="#2026-11-11-smartdiff-reads-a-shelved-changelist-names-every-file-and-shows-added-values-v41690">2026-11-11 · smartdiff reads a shelved changelist, names every file, and shows added values (v4.169.0)</a></li>
 <li><a href="#2026-11-11-fable-52-and-gemini-4-carbon-land-in-the-registry-and-the-data-is-eight-days-fresher-v41700">2026-11-11 · Fable 5.2 and Gemini 4 Carbon land in the registry, and the data is eight days fresher (v4.170.0)</a></li>
+<li><a href="#2026-11-11-the-newest-version-of-a-line-always-holds-its-seats-v41710">2026-11-11 · The newest version of a line always holds its seats (v4.171.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-11-03-drag-and-zoom-on-smartdiffs-graph-drawings-v41570">2026-11-03 · Drag and zoom on smartdiff's graph drawings (v4.157.0)</h2>
-<p>Each Blueprint graph drawing in a smartdiff report is now a view you can
-move around. Left-drag pans. The wheel zooms at the pointer.
-Double-click or <strong>Fit</strong> resets. <strong>All</strong> shows the whole graph, so a big
-graph that opens on its changed area no longer hides the rest. Scroll
-bars across the report are thin and follow the light or dark theme.
-Checked with real mouse events in headless Edge.</p>
 <h2 id="2026-11-03-before-and-after-views-filled-pins-and-folding-every-file-in-smartdiff-v41580">2026-11-03 · Before and After views, filled pins, and folding every file in smartdiff (v4.158.0)</h2>
 <p>Graph drawings get an editor-style grid, with a faint line every 16 units
 and a stronger one every 128. It lives in graph units, so it pans and
@@ -1028,9 +1021,31 @@ up for the new facts: <code>claude-code.md</code> to 24.5KB and <code>copilot.md
 27.75KB. <code>docs/model-classes.md</code> reads its Copilot column from a
 2026-11-11 cut, the first since 2026-10-08. <code>check-cross-page.py</code> learns
 the three new names, after Fable 5.2's 8 / 40 folded into Fable 5.</p>
+<h2 id="2026-11-11-the-newest-version-of-a-line-always-holds-its-seats-v41710">2026-11-11 · The newest version of a line always holds its seats (v4.171.0)</h2>
+<p>The author settled v4.170.0's open decision in one line: "always use the newest version of any specific model".
+Then: anything saying Fable 5.1 should say Fable, or the newest version
+where a number is needed.</p>
+<p><strong>The rule stops waiting on a score.</strong> <code>model-classes.md</code> § How to edit
+moved a line's seats to a new version once the harness served it "and
+its measured class meets the seat's". That clause is gone. A new version
+takes its line's seats when the harness serves it, and holds them while
+its class is unmeasured. Its Class cell still says Unclassified, since
+class comes from measured data only. An Unclassified row still can't
+take a seat its line never held.</p>
+<p><strong>Fable 5.2 holds the Max-tier row.</strong> It plans and diagnoses, by ask,
+exactly as Fable 5.1 did. Fable 5.1 becomes the fallback behind it. This
+matches what Claude Code already did: from 2.1.321 the <code>fable</code> alias
+serves 5.2.</p>
+<p><strong>Policy text names the line, not the version.</strong> <code>flow.md</code>'s lineup and
+Max row and <code>routing.md</code>'s Max row say Fable. So does the next version's
+arrival: nothing there needs an edit. Version numbers stay where the
+fact is about one version, such as a price, a cache rule or a board
+score.</p>
+<p>The two Copilot guides, the classes page, the quick-picks role marks and
+the rulebook follow. TODO.md's item is ticked.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-11 4:27 PM PST / 7:27 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-11 4:43 PM PST / 7:43 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
