@@ -668,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.171.0 &middot; Updated 2026-11-11 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.172.0 &middot; Updated 2026-11-11 &middot; <span class="fresh" data-checked="2026-11-11" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-11</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -688,7 +688,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-11-03-before-and-after-views-filled-pins-and-folding-every-file-in-smartdiff-v41580">2026-11-03 · Before and After views, filled pins, and folding every file in smartdiff (v4.158.0)</a></li>
 <li><a href="#2026-11-03-a-site-that-leads-with-the-picks-the-skills-and-how-they-work-v41590">2026-11-03 · A site that leads with the picks, the skills and how they work (v4.159.0)</a></li>
 <li><a href="#2026-11-03-roles-before-vendors-on-the-site-themed-controls-and-a-one-day-data-refresh-v41600">2026-11-03 · Roles before vendors on the site, themed controls, and a one-day data refresh (v4.160.0)</a></li>
 <li><a href="#2026-11-03-an-example-for-every-skill-a-getting-started-tutorial-and-the-turret-demo-back-on-the-site-v41610">2026-11-03 · An example for every skill, a Getting Started tutorial, and the turret demo back on the site (v4.161.0)</a></li>
@@ -702,29 +701,13 @@ footer p { margin: 0; }
 <li><a href="#2026-11-11-smartdiff-reads-a-shelved-changelist-names-every-file-and-shows-added-values-v41690">2026-11-11 · smartdiff reads a shelved changelist, names every file, and shows added values (v4.169.0)</a></li>
 <li><a href="#2026-11-11-fable-52-and-gemini-4-carbon-land-in-the-registry-and-the-data-is-eight-days-fresher-v41700">2026-11-11 · Fable 5.2 and Gemini 4 Carbon land in the registry, and the data is eight days fresher (v4.170.0)</a></li>
 <li><a href="#2026-11-11-the-newest-version-of-a-line-always-holds-its-seats-v41710">2026-11-11 · The newest version of a line always holds its seats (v4.171.0)</a></li>
+<li><a href="#2026-11-11-the-last-research-area-is-read-so-every-pages-date-is-current-v41720">2026-11-11 · The last research area is read, so every page's date is current (v4.172.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-11-03-before-and-after-views-filled-pins-and-folding-every-file-in-smartdiff-v41580">2026-11-03 · Before and After views, filled pins, and folding every file in smartdiff (v4.158.0)</h2>
-<p>Graph drawings get an editor-style grid, with a faint line every 16 units
-and a stronger one every 128. It lives in graph units, so it pans and
-zooms with the nodes and stays one pixel wide at any zoom. Each drawing
-gains <strong>Changes</strong>, <strong>Before</strong> and <strong>After</strong> buttons. Changes is the old
-merged picture. Before and After show either side alone at its own
-layout. In Changes, a removed node now moves with the neighbors it was
-wired to and steps clear of live nodes, instead of sitting at old
-coordinates the rest of the graph moved away from. A pin a kept node
-lost is drawn struck through, so its removed wire never ends in empty
-space. Wired pins draw filled, reroute nodes are small filled dots, and
-node boxes are closer to editor size.</p>
-<p>Elsewhere in the report, <strong>Expand all</strong> and <strong>Collapse all</strong> buttons and
-the <code>e</code> and <code>c</code> keys fold every file at once. The key list is now a row
-of labeled chips. Each file header carries a type badge such as C++, C#
-or INI, next to the existing Blueprint one. A file's intent note gets
-even spacing above and below. The smartdiff self-test gains eight checks.</p>
 <h2 id="2026-11-03-a-site-that-leads-with-the-picks-the-skills-and-how-they-work-v41590">2026-11-03 · A site that leads with the picks, the skills and how they work (v4.159.0)</h2>
 <p>The author asked for a site that puts the latest useful information
 first and tucks the history away. The home page is now its own source,
@@ -1043,9 +1026,36 @@ fact is about one version, such as a price, a cache rule or a board
 score.</p>
 <p>The two Copilot guides, the classes page, the quick-picks role marks and
 the rulebook follow. TODO.md's item is ticked.</p>
+<h2 id="2026-11-11-the-last-research-area-is-read-so-every-pages-date-is-current-v41720">2026-11-11 · The last research area is read, so every page's date is current (v4.172.0)</h2>
+<p>The author saw the Downloads page still reading as stale. Its bundles
+were current. The header badge wasn't: a page not tied to specific
+research areas shows the oldest area stamp, and token-efficiency had
+been held at 2026-11-02 because its pages weren't read through in the
+v4.170.0 sweep.</p>
+<p><strong>The area is read in full and restamped.</strong> A fifth reader went through
+eleven sources end to end against <code>caching.md</code>, and each finding was
+re-checked against the raw page. Nine statements moved:</p>
+<ul>
+<li>Three lists lacked Fable 5.2 and Mythos 5.2: the mid-conversation
+  system message, per-message effort, and the effort change that keeps
+  the cache in Claude Code, which the docs now give as "Fable 5.1 and
+  later".</li>
+<li>The prefix-edit 400 also covers Haiku 5.5 on newer accounts and Mythos
+  5.1 on every account.</li>
+<li><code>drop_block</code> is a stopgap, not the fix, since dropping blocks can raise
+  output tokens.</li>
+<li>A later fast-mode toggle isn't free. <code>caching.md</code> said it was.</li>
+<li>A move from Opus 5.5 to Sonnet 5.5 or Haiku 5.5 drops thinking blocks,
+  as does Fable 5.1 to Opus 5.5. Blocks from Sonnet 5.5, Haiku 5.5 and the
+  5.2 pair are bound to the account that made them.</li>
+</ul>
+<p><strong>The Downloads page said four bundles.</strong> There are three since ZCode
+left. Fixed.</p>
+<p>Leads that contradict nothing and didn't land are listed in
+<code>research/2026-11-11-sweep.md</code>.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-11 4:43 PM PST / 7:43 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-11 5:23 PM PST / 8:23 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
