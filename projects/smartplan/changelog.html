@@ -668,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.169.0 &middot; Updated 2026-11-11 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
+<span class="stamp">v4.170.0 &middot; Updated 2026-11-11 &middot; <span class="fresh" data-checked="2026-11-02" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-02</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -688,7 +688,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-11-03-smartdiff-draws-each-changed-blueprint-graph-v41560">2026-11-03 · smartdiff draws each changed Blueprint graph (v4.156.0)</a></li>
 <li><a href="#2026-11-03-drag-and-zoom-on-smartdiffs-graph-drawings-v41570">2026-11-03 · Drag and zoom on smartdiff's graph drawings (v4.157.0)</a></li>
 <li><a href="#2026-11-03-before-and-after-views-filled-pins-and-folding-every-file-in-smartdiff-v41580">2026-11-03 · Before and After views, filled pins, and folding every file in smartdiff (v4.158.0)</a></li>
 <li><a href="#2026-11-03-a-site-that-leads-with-the-picks-the-skills-and-how-they-work-v41590">2026-11-03 · A site that leads with the picks, the skills and how they work (v4.159.0)</a></li>
@@ -702,21 +701,13 @@ footer p { margin: 0; }
 <li><a href="#2026-11-04-the-skills-get-shorter-and-the-caps-come-down-to-hold-it-v41670">2026-11-04 · The skills get shorter, and the caps come down to hold it (v4.167.0)</a></li>
 <li><a href="#2026-11-11-smartdiffs-summary-and-notes-use-the-full-width-v41680">2026-11-11 · smartdiff's summary and notes use the full width (v4.168.0)</a></li>
 <li><a href="#2026-11-11-smartdiff-reads-a-shelved-changelist-names-every-file-and-shows-added-values-v41690">2026-11-11 · smartdiff reads a shelved changelist, names every file, and shows added values (v4.169.0)</a></li>
+<li><a href="#2026-11-11-fable-52-and-gemini-4-carbon-land-in-the-registry-and-the-data-is-eight-days-fresher-v41700">2026-11-11 · Fable 5.2 and Gemini 4 Carbon land in the registry, and the data is eight days fresher (v4.170.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-11-03-smartdiff-draws-each-changed-blueprint-graph-v41560">2026-11-03 · smartdiff draws each changed Blueprint graph (v4.156.0)</h2>
-<p>The smartdiff report now draws every changed graph, function graphs
-included, above its change list. Nodes sit where the editor saved them.
-Pins and wires carry Unreal-style type colors. Added nodes and wires are
-green. Removed ones are dashed red ghosts. Changed nodes are blue, with
-the change on hover. Big graphs crop to the changed area. Box sizes are
-estimated, since T3D saves no size for most nodes. The smartdiff
-self-test (oracle stage (k)) gains six drawing checks. Detail is in
-<code>docs/changelogs/smartdiff.md</code>.</p>
 <h2 id="2026-11-03-drag-and-zoom-on-smartdiffs-graph-drawings-v41570">2026-11-03 · Drag and zoom on smartdiff's graph drawings (v4.157.0)</h2>
 <p>Each Blueprint graph drawing in a smartdiff report is now a view you can
 move around. Left-drag pans. The wheel zooms at the pointer.
@@ -997,9 +988,49 @@ plants a fake <code>p4</code> and checks which revisions <code>bp_prepare.py</co
 The staged load of a shelved revision in the editor isn't exercised
 here. The turret demo is re-rendered for gate (aa). The videos aren't,
 as in v4.168.0.</p>
+<h2 id="2026-11-11-fable-52-and-gemini-4-carbon-land-in-the-registry-and-the-data-is-eight-days-fresher-v41700">2026-11-11 · Fable 5.2 and Gemini 4 Carbon land in the registry, and the data is eight days fresher (v4.170.0)</h2>
+<p>A delta sweep, asked as "refresh the data and then cut a release". Four
+Sonnet readers went to primary sources for what moved since 2026-11-03,
+and every claimed change was re-fetched first-hand before it landed.
+Full note: <code>research/2026-11-11-sweep.md</code>.</p>
+<p><strong>Fable 5.2 is in the registry, Unclassified and not a seat.</strong> Anthropic
+released it on 2026-11-09 at 8 / 40, 20% under Fable 5.1, with cache
+reads at 0.20. It tops Artificial Analysis's index and vals.ai's
+Terminal-Bench. It has no score on the frozen v4.3.2 scale, so by the
+class rule it holds no seat and Fable 5.1 keeps the Max-tier row. Claude
+Code 2.1.321 already points the <code>fable</code> alias at it, so a by-ask Fable
+dispatch there runs 5.2 unless it names <code>claude-fable-5-1</code>. TODO.md
+carries that as an open decision. Mythos 5.2 gets a lineup row.</p>
+<p><strong><code>best</code> is no longer a Fable.</strong> From 2.1.321 <code>best</code> resolves to
+whatever <code>opus</code> is. <code>claude-code.md</code> said Fable 5.1. <code>seat-map.py</code>'s
+alias table moves with it, so the cost ceiling prices <code>fable</code> at 8 / 40.</p>
+<p><strong>Copilot.</strong> Fable 5.2 is GA from 2026-11-09 on Pro+ and up, off by
+default on Business and Enterprise. Gemini 4 Carbon is GA from
+2026-11-10 at 2 / 0.10 / 10 until 2026-12-01, then double. CLI stable is
+1.0.109. Both guides gain a row for each, and the quick-picks marks are
+regenerated from a 2026-11-11 snapshot that carries both with no score.</p>
+<p><strong>M365 Copilot has a full Claude ladder.</strong> Copilot Studio's harness table
+grew from thirteen models to twenty, with Opus 5.5, Sonnet 5.5 and Haiku
+5.5 on it. <code>m365-copilot.md</code> no longer says the bottom Claude rung is
+Sonnet.</p>
+<p><strong>Boards.</strong> Artificial Analysis labels its index v5.0.1 and eleven
+registry figures moved by up to 0.7. vals.ai's Terminal-Bench board is
+dated 2026-11-09 with 63 models, so ranks moved. tbench.ai runs
+Terminal-Bench 4.1 now. Rows that bold a 4.0 figure say so and quote the
+4.1 score beside it.</p>
+<p><strong>The cache reference</strong> gains Fable 5.2's rules: a 0.025× read, a prefix
+check on every account, and thinking blocks no other model reads.</p>
+<p><strong>Housekeeping.</strong> The eight RECHECK markers due 2026-11-08 were re-read.
+Six move to 2026-12-11 and two are dropped as settled. Six of seven
+areas are restamped. token-efficiency keeps 2026-11-02, since its
+thinking and prompting pages weren't read through. Two gate (i) caps go
+up for the new facts: <code>claude-code.md</code> to 24.5KB and <code>copilot.md</code> to
+27.75KB. <code>docs/model-classes.md</code> reads its Copilot column from a
+2026-11-11 cut, the first since 2026-10-08. <code>check-cross-page.py</code> learns
+the three new names, after Fable 5.2's 8 / 40 folded into Fable 5.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-11 12:14 PM PST / 3:14 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-11 4:27 PM PST / 7:27 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the

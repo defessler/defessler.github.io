@@ -83,7 +83,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <body>
 <div class="layout">
 <nav id="nav" aria-label="Skills">
-  <p class="brand">smartplan rulebook<small>2,422 one-liners · 2026-11-11</small></p>
+  <p class="brand">smartplan rulebook<small>2,435 one-liners · 2026-11-11</small></p>
   <div class="nav-group">Router</div>
 <a href="#smartplan" data-sec="smartplan"><span>smartplan</span><span class="n">138</span></a>
 <div class="nav-group">Parts</div>
@@ -94,12 +94,12 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <a href="#smartexec" data-sec="smartexec"><span>smartexec</span><span class="n">47</span></a>
 <a href="#smartcheck" data-sec="smartcheck"><span>smartcheck</span><span class="n">113</span></a>
 <a href="#smartcheck-cpp" data-sec="smartcheck-cpp"><span>smartcheck-cpp</span><span class="n">97</span></a>
-<a href="#smartcache" data-sec="smartcache"><span>smartcache</span><span class="n">301</span></a>
+<a href="#smartcache" data-sec="smartcache"><span>smartcache</span><span class="n">305</span></a>
 <a href="#part-stubs-evidence-local-models" data-sec="part-stubs-evidence-local-models"><span>Part stubs, evidence, local models</span><span class="n">86</span></a>
 <div class="nav-group">Harnesses</div>
-<a href="#claude-code" data-sec="claude-code"><span>Claude Code</span><span class="n">183</span></a>
-<a href="#copilot-cli" data-sec="copilot-cli"><span>Copilot CLI</span><span class="n">149</span></a>
-<a href="#m365-copilot" data-sec="m365-copilot"><span>M365 Copilot</span><span class="n">100</span></a>
+<a href="#claude-code" data-sec="claude-code"><span>Claude Code</span><span class="n">185</span></a>
+<a href="#copilot-cli" data-sec="copilot-cli"><span>Copilot CLI</span><span class="n">154</span></a>
+<a href="#m365-copilot" data-sec="m365-copilot"><span>M365 Copilot</span><span class="n">102</span></a>
 <div class="nav-group">Companions</div>
 <a href="#smartreview" data-sec="smartreview"><span>smartreview</span><span class="n">89</span></a>
 <a href="#smartvoice" data-sec="smartvoice"><span>smartvoice</span><span class="n">160</span></a>
@@ -111,7 +111,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
   <div class="hero">
     <h1>Every rule, one line each.</h1>
     <p>The smartplan family's skill bodies and references, rewritten as plain one-line statements. One rule or figure per line. Numbers, names, paths and commands are kept exactly as the source has them.</p>
-    <p class="meta"><b>2,422</b> lines across <b>18</b> skills and reference sets, taken from the v4.169.0 tree on 2026-11-11. Three sources aren't restated because they're already tables or checklists: <code>model-classes.md</code> (the price registry), <code>cpp-review-standards.md</code> and <code>web-ui-review-standards.md</code>.</p>
+    <p class="meta"><b>2,435</b> lines across <b>18</b> skills and reference sets, taken from the v4.170.0 tree on 2026-11-11. Three sources aren't restated because they're already tables or checklists: <code>model-classes.md</code> (the price registry), <code>cpp-review-standards.md</code> and <code>web-ui-review-standards.md</code>.</p>
   </div>
   <div class="filter">
     <input id="q" type="search" placeholder="Filter lines, for example: cache, Luna, fail-twice, 1.25x" aria-label="Filter lines" autocomplete="off">
@@ -1511,7 +1511,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 </ol>
 </section>
 <section id="smartcache" class="skill">
-<header class="skill-head"><h2>smartcache</h2><p class="src">caching.md <span class="dot"></span> <span class="count" data-total="301">301 lines</span></p></header>
+<header class="skill-head"><h2>smartcache</h2><p class="src">caching.md <span class="dot"></span> <span class="count" data-total="305">305 lines</span></p></header>
 <ol>
 <li value="1"><span class="t">Facts verified 2026-07-09, re-checked 2026-07-11, 07-21, 08-28, 09-15, 09-22 and 11-02.</span></li>
 </ol>
@@ -1525,355 +1525,359 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <ol>
 <li value="5"><span class="t">A prompt-cache read costs 0.1x base input.</span></li>
 <li value="6"><span class="t">Matching is exact. A change invalidates everything after it.</span></li>
-<li value="7"><span class="t">Cache reads on Fable 5.1 and Mythos 5.1 bill at 0.025x base input.</span></li>
-<li value="8"><span class="t">Cache reads on Opus 5.5 and Sonnet 5.5 bill at 0.05x base input.</span></li>
-<li value="9"><span class="t">A broken prefix costs 50x the read on Fable 5.1 and Mythos 5.1.</span></li>
-<li value="10"><span class="t">A broken prefix costs 25x the read on Opus 5.5 and Sonnet 5.5.</span></li>
-<li value="11"><span class="t">Opus 5.5 has been the default Opus since 2026-09-22.</span></li>
-<li value="12"><span class="t">The 5-minute TTL write costs 1.25x base input and breaks even on the 1st reuse.</span></li>
-<li value="13"><span class="t">The 1-hour TTL write costs 2x base input and breaks even on the 2nd reuse.</span></li>
-<li value="14"><span class="t">Each request allows a maximum of 4 explicit cache breakpoints.</span></li>
-<li value="15"><span class="t">Every cache read resets the TTL clock. Only an idle gap longer than the TTL forces a rebuild.</span></li>
-<li value="16"><span class="t">The main conversation takes <code>promptCacheTtl</code> or <code>CLAUDE_CODE_PROMPT_CACHE_TTL</code>.</span></li>
-<li value="17"><span class="t">Subagents and other requests take <code>subagentPromptCacheTtl</code> or <code>CLAUDE_CODE_SUBAGENT_PROMPT_CACHE_TTL</code>.</span></li>
-<li value="18"><span class="t">Both bucket settings need Claude Code 2.1.242 or later.</span></li>
-<li value="19"><span class="t">TTL resolves in six levels, and the first match wins.</span></li>
-<li value="20"><span class="t">Level 1 is <code>FORCE_PROMPT_CACHING_5M=1</code>.</span></li>
-<li value="21"><span class="t">Level 2 is the bucket&#x27;s env var.</span></li>
-<li value="22"><span class="t">Level 3 is the bucket&#x27;s setting.</span></li>
-<li value="23"><span class="t">Level 4 is a subagent&#x27;s <code>experimental.cacheTtl</code> frontmatter, needing 2.1.248 or later.</span></li>
-<li value="24"><span class="t">Level 5 is <code>ENABLE_PROMPT_CACHING_1H=1</code>, which requests an hour for both buckets.</span></li>
-<li value="25"><span class="t">Level 6 is the bucket default.</span></li>
-<li value="26"><span class="t">Server-controlled helper requests get an hour only on a subscription within plan usage.</span></li>
-<li value="27"><span class="t">On usage credits, an API key or a cloud provider, the other bucket defaults to 5 minutes.</span></li>
-<li value="28"><span class="t">A subagent defaults to 5 minutes on every billing path. A longer tier is settable per seat.</span></li>
-<li value="29"><span class="t">Level 4 is ignored while a subscription runs on usage credits.</span></li>
-<li value="30"><span class="t">Switching <code>/model</code> mid-session busts the cache, because each model has its own cache.</span></li>
-<li value="31"><span class="t"><code>/effort</code> busts the cache on most models, and each effort level has its own cache there.</span></li>
-<li value="32"><span class="t">Opus 5.5, Sonnet 5.5, Haiku 5.5 and Fable 5.1 keep the cache across an effort change on an API key or subscription.</span></li>
-<li value="33"><span class="t">The effort-change keep does not apply on Bedrock, Google Cloud&#x27;s Agent Platform, a Claude apps gateway, or a HIPAA org.</span></li>
-<li value="34"><span class="t">The effort-change keep does not apply with <code>CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS</code> set.</span></li>
-<li value="35"><span class="t">Elsewhere Claude Code asks you to confirm an effort switch only while the cache is warm.</span></li>
-<li value="36"><span class="t"><code>/model</code> asks only while the cache is warm and the new model differs from the last response&#x27;s model.</span></li>
-<li value="37"><span class="t">Claude Code applies a Fable 5.1 effort change without asking, since v2.1.260.</span></li>
-<li value="38"><span class="t">A skill or command whose <code>model:</code> frontmatter differs from the session causes a model switch.</span></li>
-<li value="39"><span class="t">An automatic safety fallback causes a model switch.</span></li>
-<li value="40"><span class="t">An <code>opusplan</code> plan-mode toggle causes a model switch.</span></li>
-<li value="41"><span class="t">The first fast-mode enable in a conversation re-reads the whole history uncached, at fast-mode rates.</span></li>
-<li value="42"><span class="t">Enabling fast mode late in a long session is the expensive case.</span></li>
-<li value="43"><span class="t">Turning fast mode off and on again later is free.</span></li>
-<li value="44"><span class="t"><code>/clear</code> and <code>/compact</code> reset the once-per-conversation fast-mode clock.</span></li>
-<li value="45"><span class="t">A mid-turn fast-mode enable moves the miss to the next turn&#x27;s first request.</span></li>
-<li value="46"><span class="t">Enabling fast mode on an unsupported model switches models and starts a fresh cache.</span></li>
-<li value="47"><span class="t">Running out of usage credits retries at standard speed and keeps the cache.</span></li>
-<li value="48"><span class="t">Falling into usage-credit overage drops the main conversation from the 1-hour to the 5-minute TTL.</span></li>
-<li value="49"><span class="t">Adding or removing a tool or MCP server invalidates tools, system and messages together.</span></li>
-<li value="50"><span class="t">Toggling <code>/advisor</code> keeps the prefix.</span></li>
-<li value="51"><span class="t">A deny rule that removes a whole tool busts the cache when tool search is off or unavailable.</span></li>
-<li value="52"><span class="t">Examples of whole-tool denies are <code>deny:[&quot;Bash&quot;]</code>, <code>Bash(*)</code>, <code>&quot;*&quot;</code> and <code>&quot;mcp__*&quot;</code>.</span></li>
-<li value="53"><span class="t">With tool search on, which is the default on supported models, the prefix survives a whole-tool deny.</span></li>
-<li value="54"><span class="t">A scoped rule such as <code>Bash(rm *)</code> never touches the cache.</span></li>
-<li value="55"><span class="t"><code>CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS</code> stops caching of mid-conversation system context.</span></li>
-<li value="56"><span class="t"><code>CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS</code> turns MCP tool search off, unless managed settings keep it on (v2.1.227+).</span></li>
-<li value="57"><span class="t"><code>CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS</code> makes Opus 5.5, Sonnet 5.5 and Fable 5.1 lose the effort-change keep.</span></li>
-<li value="58"><span class="t">Accumulating images or PDFs triggers a partial rebuild when Claude Code drops the oldest batch.</span></li>
-<li value="59"><span class="t">Images and PDFs hit two limits: the API&#x27;s count per request and Claude Code&#x27;s total size cap.</span></li>
-<li value="60"><span class="t">A Claude Code version upgrade makes the next new conversation rebuild its cache from the top.</span></li>
-<li value="61"><span class="t"><code>--resume</code> keeps the prompt it started with by default, so its rebuild moves to the first compaction.</span></li>
-<li value="62"><span class="t">Auto-update applies on next launch, never mid-session.</span></li>
-<li value="63"><span class="t">Set <code>DISABLE_AUTOUPDATER=1</code> for predictable timing.</span></li>
-<li value="64"><span class="t">Prefer <code>/rewind</code> over <code>/clear</code> to back out of a bad turn, since <code>/clear</code> discards the cache.</span></li>
-<li value="65"><span class="t">Switching output style keeps the cache.</span></li>
-<li value="66"><span class="t">Since v2.1.251, a new output style applies from the next message.</span></li>
-<li value="67"><span class="t"><code>/recap</code> appends its summary as command output, which is cache-safe.</span></li>
-<li value="68"><span class="t"><code>/usage</code> breaks cost down by skills, subagents, plugins, Loops and per-MCP-server.</span></li>
-<li value="69"><span class="t">On v2.1.251+, <code>/usage</code> prints a <code>Prompt cache (main) hit-ratio</code> line.</span></li>
-<li value="70"><span class="t">The hit-ratio line covers the main conversation only, so a wave&#x27;s cold writes never show there.</span></li>
-<li value="71"><span class="t">A miss is more than 5% and at least 2,000 tokens re-processed.</span></li>
-<li value="72"><span class="t">On v2.1.260+, <code>/usage</code> names the likely cause, such as <code>tool definitions changed</code>.</span></li>
-<li value="73"><span class="t">The <code>cache misses</code> behavior flag fires on a 10% threshold.</span></li>
-<li value="74"><span class="t">The <code>Prompt cache (main)</code> line splits out misses Claude Code caused itself, by compaction or by clearing tool results.</span></li>
-<li value="75"><span class="t">A statusline reading <code>cache_read_input_tokens</code> and <code>cache_creation_input_tokens</code> still works without <code>/usage</code>.</span></li>
-<li value="76"><span class="t">Same-directory parallel sessions share cache entries.</span></li>
-<li value="77"><span class="t">Worktrees never share cache, because each is its own working directory.</span></li>
-<li value="78"><span class="t">A cache entry becomes readable only once the first response starts streaming.</span></li>
-<li value="79"><span class="t">N simultaneous same-prefix dispatches all pay the cold write.</span></li>
-<li value="80"><span class="t">Sequential sessions share cache only when the startup git-status snapshot matches.</span></li>
-<li value="81"><span class="t">A commit between two headless arms cools the second arm&#x27;s cache.</span></li>
-<li value="82"><span class="t">Deferred MCP tools, the default, are cache-safe for connect and disconnect.</span></li>
-<li value="83"><span class="t">Tool search is unavailable on a custom <code>ANTHROPIC_BASE_URL</code> gateway or on pre-4.5 Google Cloud models.</span></li>
-<li value="84"><span class="t">Microsoft Foundry on Azure rejects tool search, and <code>ENABLE_TOOL_SEARCH</code> cannot override it.</span></li>
-<li value="85"><span class="t">Skill listing truncates description plus <code>when_to_use</code> at 1,536 characters.</span></li>
-<li value="86"><span class="t">A skill with <code>disable-model-invocation: true</code> is never auto-loaded or preloaded into subagents.</span></li>
-<li value="87"><span class="t">Compaction re-injects invoked skill bodies, capped at 5,000 tokens per skill and 25,000 total.</span></li>
-<li value="88"><span class="t">Compaction drops the oldest skill bodies first when over the total cap.</span></li>
-<li value="89"><span class="t">The skill byte budget is 10,752B (check.sh gate (i)).</span></li>
-<li value="90"><span class="t">The budget went from 16KB to 4KB on 2026-07-13, then rose in steps, most recently on 2026-09-15.</span></li>
-<li value="91"><span class="t">The pre-M2 36KB kernel was silently truncated on every compaction.</span></li>
+<li value="7"><span class="t">Cache reads on Fable 5.2, Mythos 5.2, Fable 5.1 and Mythos 5.1 bill at 0.025x base input.</span></li>
+<li value="8"><span class="t">Fable 5.2 and Mythos 5.2 list at 8 / 40 from 2026-11-09, so a cache read costs 0.20.</span></li>
+<li value="9"><span class="t">Cache reads on Opus 5.5 and Sonnet 5.5 bill at 0.05x base input.</span></li>
+<li value="10"><span class="t">A broken prefix costs 50x the read on the Fable and Mythos 5.1 and 5.2 rows.</span></li>
+<li value="11"><span class="t">A broken prefix costs 25x the read on Opus 5.5 and Sonnet 5.5.</span></li>
+<li value="12"><span class="t">Opus 5.5 has been the default Opus since 2026-09-22.</span></li>
+<li value="13"><span class="t">The 5-minute TTL write costs 1.25x base input and breaks even on the 1st reuse.</span></li>
+<li value="14"><span class="t">The 1-hour TTL write costs 2x base input and breaks even on the 2nd reuse.</span></li>
+<li value="15"><span class="t">Each request allows a maximum of 4 explicit cache breakpoints.</span></li>
+<li value="16"><span class="t">Every cache read resets the TTL clock. Only an idle gap longer than the TTL forces a rebuild.</span></li>
+<li value="17"><span class="t">The main conversation takes <code>promptCacheTtl</code> or <code>CLAUDE_CODE_PROMPT_CACHE_TTL</code>.</span></li>
+<li value="18"><span class="t">Subagents and other requests take <code>subagentPromptCacheTtl</code> or <code>CLAUDE_CODE_SUBAGENT_PROMPT_CACHE_TTL</code>.</span></li>
+<li value="19"><span class="t">Both bucket settings need Claude Code 2.1.242 or later.</span></li>
+<li value="20"><span class="t">TTL resolves in six levels, and the first match wins.</span></li>
+<li value="21"><span class="t">Level 1 is <code>FORCE_PROMPT_CACHING_5M=1</code>.</span></li>
+<li value="22"><span class="t">Level 2 is the bucket&#x27;s env var.</span></li>
+<li value="23"><span class="t">Level 3 is the bucket&#x27;s setting.</span></li>
+<li value="24"><span class="t">Level 4 is a subagent&#x27;s <code>experimental.cacheTtl</code> frontmatter, needing 2.1.248 or later.</span></li>
+<li value="25"><span class="t">Level 5 is <code>ENABLE_PROMPT_CACHING_1H=1</code>, which requests an hour for both buckets.</span></li>
+<li value="26"><span class="t">Level 6 is the bucket default.</span></li>
+<li value="27"><span class="t">Server-controlled helper requests get an hour only on a subscription within plan usage.</span></li>
+<li value="28"><span class="t">On usage credits, an API key or a cloud provider, the other bucket defaults to 5 minutes.</span></li>
+<li value="29"><span class="t">A subagent defaults to 5 minutes on every billing path. A longer tier is settable per seat.</span></li>
+<li value="30"><span class="t">Level 4 is ignored while a subscription runs on usage credits.</span></li>
+<li value="31"><span class="t">Switching <code>/model</code> mid-session busts the cache, because each model has its own cache.</span></li>
+<li value="32"><span class="t"><code>/effort</code> busts the cache on most models, and each effort level has its own cache there.</span></li>
+<li value="33"><span class="t">Opus 5.5, Sonnet 5.5, Haiku 5.5 and Fable 5.1 keep the cache across an effort change on an API key or subscription.</span></li>
+<li value="34"><span class="t">The effort-change keep does not apply on Bedrock, Google Cloud&#x27;s Agent Platform, a Claude apps gateway, or a HIPAA org.</span></li>
+<li value="35"><span class="t">The effort-change keep does not apply with <code>CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS</code> set.</span></li>
+<li value="36"><span class="t">Elsewhere Claude Code asks you to confirm an effort switch only while the cache is warm.</span></li>
+<li value="37"><span class="t"><code>/model</code> asks only while the cache is warm and the new model differs from the last response&#x27;s model.</span></li>
+<li value="38"><span class="t">Claude Code applies a Fable 5.1 effort change without asking, since v2.1.260.</span></li>
+<li value="39"><span class="t">A skill or command whose <code>model:</code> frontmatter differs from the session causes a model switch.</span></li>
+<li value="40"><span class="t">An automatic safety fallback causes a model switch.</span></li>
+<li value="41"><span class="t">An <code>opusplan</code> plan-mode toggle causes a model switch.</span></li>
+<li value="42"><span class="t">The first fast-mode enable in a conversation re-reads the whole history uncached, at fast-mode rates.</span></li>
+<li value="43"><span class="t">Enabling fast mode late in a long session is the expensive case.</span></li>
+<li value="44"><span class="t">Turning fast mode off and on again later is free.</span></li>
+<li value="45"><span class="t"><code>/clear</code> and <code>/compact</code> reset the once-per-conversation fast-mode clock.</span></li>
+<li value="46"><span class="t">A mid-turn fast-mode enable moves the miss to the next turn&#x27;s first request.</span></li>
+<li value="47"><span class="t">Enabling fast mode on an unsupported model switches models and starts a fresh cache.</span></li>
+<li value="48"><span class="t">Running out of usage credits retries at standard speed and keeps the cache.</span></li>
+<li value="49"><span class="t">Falling into usage-credit overage drops the main conversation from the 1-hour to the 5-minute TTL.</span></li>
+<li value="50"><span class="t">Adding or removing a tool or MCP server invalidates tools, system and messages together.</span></li>
+<li value="51"><span class="t">Toggling <code>/advisor</code> keeps the prefix.</span></li>
+<li value="52"><span class="t">A deny rule that removes a whole tool busts the cache when tool search is off or unavailable.</span></li>
+<li value="53"><span class="t">Examples of whole-tool denies are <code>deny:[&quot;Bash&quot;]</code>, <code>Bash(*)</code>, <code>&quot;*&quot;</code> and <code>&quot;mcp__*&quot;</code>.</span></li>
+<li value="54"><span class="t">With tool search on, which is the default on supported models, the prefix survives a whole-tool deny.</span></li>
+<li value="55"><span class="t">A scoped rule such as <code>Bash(rm *)</code> never touches the cache.</span></li>
+<li value="56"><span class="t"><code>CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS</code> stops caching of mid-conversation system context.</span></li>
+<li value="57"><span class="t"><code>CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS</code> turns MCP tool search off, unless managed settings keep it on (v2.1.227+).</span></li>
+<li value="58"><span class="t"><code>CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS</code> makes Opus 5.5, Sonnet 5.5 and Fable 5.1 lose the effort-change keep.</span></li>
+<li value="59"><span class="t">Accumulating images or PDFs triggers a partial rebuild when Claude Code drops the oldest batch.</span></li>
+<li value="60"><span class="t">Images and PDFs hit two limits: the API&#x27;s count per request and Claude Code&#x27;s total size cap.</span></li>
+<li value="61"><span class="t">A Claude Code version upgrade makes the next new conversation rebuild its cache from the top.</span></li>
+<li value="62"><span class="t"><code>--resume</code> keeps the prompt it started with by default, so its rebuild moves to the first compaction.</span></li>
+<li value="63"><span class="t">Auto-update applies on next launch, never mid-session.</span></li>
+<li value="64"><span class="t">Set <code>DISABLE_AUTOUPDATER=1</code> for predictable timing.</span></li>
+<li value="65"><span class="t">Prefer <code>/rewind</code> over <code>/clear</code> to back out of a bad turn, since <code>/clear</code> discards the cache.</span></li>
+<li value="66"><span class="t">Switching output style keeps the cache.</span></li>
+<li value="67"><span class="t">Since v2.1.251, a new output style applies from the next message.</span></li>
+<li value="68"><span class="t"><code>/recap</code> appends its summary as command output, which is cache-safe.</span></li>
+<li value="69"><span class="t"><code>/usage</code> breaks cost down by skills, subagents, plugins, Loops and per-MCP-server.</span></li>
+<li value="70"><span class="t">On v2.1.251+, <code>/usage</code> prints a <code>Prompt cache (main) hit-ratio</code> line.</span></li>
+<li value="71"><span class="t">The hit-ratio line covers the main conversation only, so a wave&#x27;s cold writes never show there.</span></li>
+<li value="72"><span class="t">A miss is more than 5% and at least 2,000 tokens re-processed.</span></li>
+<li value="73"><span class="t">On v2.1.260+, <code>/usage</code> names the likely cause, such as <code>tool definitions changed</code>.</span></li>
+<li value="74"><span class="t">The <code>cache misses</code> behavior flag fires on a 10% threshold.</span></li>
+<li value="75"><span class="t">The <code>Prompt cache (main)</code> line splits out misses Claude Code caused itself, by compaction or by clearing tool results.</span></li>
+<li value="76"><span class="t">A statusline reading <code>cache_read_input_tokens</code> and <code>cache_creation_input_tokens</code> still works without <code>/usage</code>.</span></li>
+<li value="77"><span class="t">Same-directory parallel sessions share cache entries.</span></li>
+<li value="78"><span class="t">Worktrees never share cache, because each is its own working directory.</span></li>
+<li value="79"><span class="t">A cache entry becomes readable only once the first response starts streaming.</span></li>
+<li value="80"><span class="t">N simultaneous same-prefix dispatches all pay the cold write.</span></li>
+<li value="81"><span class="t">Sequential sessions share cache only when the startup git-status snapshot matches.</span></li>
+<li value="82"><span class="t">A commit between two headless arms cools the second arm&#x27;s cache.</span></li>
+<li value="83"><span class="t">Deferred MCP tools, the default, are cache-safe for connect and disconnect.</span></li>
+<li value="84"><span class="t">Tool search is unavailable on a custom <code>ANTHROPIC_BASE_URL</code> gateway or on pre-4.5 Google Cloud models.</span></li>
+<li value="85"><span class="t">Microsoft Foundry on Azure rejects tool search, and <code>ENABLE_TOOL_SEARCH</code> cannot override it.</span></li>
+<li value="86"><span class="t">Skill listing truncates description plus <code>when_to_use</code> at 1,536 characters.</span></li>
+<li value="87"><span class="t">A skill with <code>disable-model-invocation: true</code> is never auto-loaded or preloaded into subagents.</span></li>
+<li value="88"><span class="t">Compaction re-injects invoked skill bodies, capped at 5,000 tokens per skill and 25,000 total.</span></li>
+<li value="89"><span class="t">Compaction drops the oldest skill bodies first when over the total cap.</span></li>
+<li value="90"><span class="t">The skill byte budget is 10,752B (check.sh gate (i)).</span></li>
+<li value="91"><span class="t">The budget went from 16KB to 4KB on 2026-07-13, then rose in steps, most recently on 2026-09-15.</span></li>
+<li value="92"><span class="t">The pre-M2 36KB kernel was silently truncated on every compaction.</span></li>
 </ol>
 <h3>2. The two smartplan seams</h3>
 <ol>
-<li value="92"><span class="t">Seam A: <code>CLAUDE_CODE_SUBAGENT_MODEL=sonnet</code> in the settings <code>env</code> block changes only a dispatched subagent&#x27;s model.</span></li>
-<li value="93"><span class="t">That env default applies only when nothing else names a model, such as a per-call model or frontmatter.</span></li>
-<li value="94"><span class="t">The subagent env default never touches the main thread&#x27;s cache.</span></li>
-<li value="95"><span class="t">Dropping the orchestrator to Sonnet mid-run means paying full retail to rebuild the transcript.</span></li>
-<li value="96"><span class="t">Opus 5.5&#x27;s $0.20 cache read is double Sonnet 5.5&#x27;s $0.10, which was halved on 2026-10-07.</span></li>
-<li value="97"><span class="t">Opus 5.5 cold input runs 4 and Sonnet 5.5 runs 2, per the source&#x27;s unit-less comparison.</span></li>
-<li value="98"><span class="t">Opus 5.5 output runs 20 and Sonnet 5.5 runs 10, per the source&#x27;s unit-less comparison.</span></li>
-<li value="99"><span class="t">A <code>PreModelSwitch</code> hook (v2.1.251+) can allow, deny or ask before a model switch.</span></li>
-<li value="100"><span class="t">Seam B: fan-out width fights cache economics.</span></li>
-<li value="101"><span class="t">Every fresh subagent builds its own cold cache at the 5-minute TTL by default.</span></li>
-<li value="102"><span class="t">A 5-leaf wave means five cold writes of system, CLAUDE.md and tools.</span></li>
-<li value="103"><span class="t">Leaf sizing is a tradeoff, not free maximization.</span></li>
-<li value="104"><span class="t">For a leaf that needs the parent&#x27;s full context, prefer an in-session fork.</span></li>
-<li value="105"><span class="t">The fork command is <code>/subtask</code>, since v2.1.212.</span></li>
-<li value="106"><span class="t"><code>/fork</code> copies the whole session into a new background session, which is the wrong primitive here.</span></li>
-<li value="107"><span class="t">A fork&#x27;s first request reuses the parent&#x27;s warm cache.</span></li>
-<li value="108"><span class="t">A forked subagent cannot fork again.</span></li>
+<li value="93"><span class="t">Seam A: <code>CLAUDE_CODE_SUBAGENT_MODEL=sonnet</code> in the settings <code>env</code> block changes only a dispatched subagent&#x27;s model.</span></li>
+<li value="94"><span class="t">That env default applies only when nothing else names a model, such as a per-call model or frontmatter.</span></li>
+<li value="95"><span class="t">The subagent env default never touches the main thread&#x27;s cache.</span></li>
+<li value="96"><span class="t">Dropping the orchestrator to Sonnet mid-run means paying full retail to rebuild the transcript.</span></li>
+<li value="97"><span class="t">Opus 5.5&#x27;s $0.20 cache read is double Sonnet 5.5&#x27;s $0.10, which was halved on 2026-10-07.</span></li>
+<li value="98"><span class="t">Opus 5.5 cold input runs 4 and Sonnet 5.5 runs 2, per the source&#x27;s unit-less comparison.</span></li>
+<li value="99"><span class="t">Opus 5.5 output runs 20 and Sonnet 5.5 runs 10, per the source&#x27;s unit-less comparison.</span></li>
+<li value="100"><span class="t">A <code>PreModelSwitch</code> hook (v2.1.251+) can allow, deny or ask before a model switch.</span></li>
+<li value="101"><span class="t">Seam B: fan-out width fights cache economics.</span></li>
+<li value="102"><span class="t">Every fresh subagent builds its own cold cache at the 5-minute TTL by default.</span></li>
+<li value="103"><span class="t">A 5-leaf wave means five cold writes of system, CLAUDE.md and tools.</span></li>
+<li value="104"><span class="t">Leaf sizing is a tradeoff, not free maximization.</span></li>
+<li value="105"><span class="t">For a leaf that needs the parent&#x27;s full context, prefer an in-session fork.</span></li>
+<li value="106"><span class="t">The fork command is <code>/subtask</code>, since v2.1.212.</span></li>
+<li value="107"><span class="t"><code>/fork</code> copies the whole session into a new background session, which is the wrong primitive here.</span></li>
+<li value="108"><span class="t">A fork&#x27;s first request reuses the parent&#x27;s warm cache.</span></li>
+<li value="109"><span class="t">A forked subagent cannot fork again.</span></li>
 </ol>
 <h3>3. Batch API, not applicable</h3>
 <ol>
-<li value="109"><span class="t">The Batch API&#x27;s 50% discount is async only.</span></li>
-<li value="110"><span class="t"><code>/batch</code>, Task subagents, Agent Teams and Managed Agents cannot use the Batch API.</span></li>
+<li value="110"><span class="t">The Batch API&#x27;s 50% discount is async only.</span></li>
+<li value="111"><span class="t"><code>/batch</code>, Task subagents, Agent Teams and Managed Agents cannot use the Batch API.</span></li>
 </ol>
 <h3>4. Companion context levers</h3>
 <ol>
-<li value="111"><span class="t">At each wave boundary, run <code>/compact &lt;focus on the plan + open leaves&gt;</code>.</span></li>
-<li value="112"><span class="t">A <code># Compact instructions</code> block in CLAUDE.md steers every compaction in the project.</span></li>
-<li value="113"><span class="t">A mid-run CLAUDE.md edit takes effect only at the next <code>/compact</code>, <code>/clear</code> or restart.</span></li>
-<li value="114"><span class="t">Compact while the wave&#x27;s returns are still warm, not after an idle gap.</span></li>
-<li value="115"><span class="t">A cold <code>/compact</code> reprocesses the whole history as uncached input.</span></li>
-<li value="116"><span class="t">Compaction re-reads up to five recently modified files.</span></li>
-<li value="117"><span class="t">Files over 5,000 tokens come back as <code>Referenced file</code> path stubs.</span></li>
-<li value="118"><span class="t">Run <code>/context</code> between waves for the window-size read.</span></li>
-<li value="119"><span class="t">The 1M window has no pricing premium above 200K.</span></li>
-<li value="120"><span class="t">Haiku 5.5 prompts over 100K tokens bill 5x on every rate, with cache reads and writes counted.</span></li>
-<li value="121"><span class="t">Sonnet 5.5, Sonnet 5, Haiku 5.5 and every Opus from 4.7 on run 1M on every plan, Pro included.</span></li>
-<li value="122"><span class="t">Native-1M models auto-compact near 967K unless an auto-compact window is set.</span></li>
-<li value="123"><span class="t"><code>CLAUDE_CODE_DISABLE_1M_CONTEXT=1</code> drops those models to 200K.</span></li>
-<li value="124"><span class="t">The real cost of a long run is context rot, not dollars.</span></li>
-<li value="125"><span class="t">Idle compaction (2.1.290+) compacts a long idle thread before its cache expires.</span></li>
-<li value="126"><span class="t">Set <code>idleCompaction: false</code> to turn idle compaction off.</span></li>
-<li value="127"><span class="t">Measure before a benchmark arm keeps idle compaction on.</span></li>
-<li value="128"><span class="t">From 2.1.314, idle compaction runs in VS Code and Desktop, and on Bedrock, Vertex, Foundry and gateways with the one-hour cache on.</span></li>
-<li value="129"><span class="t"><code>run-state.md</code> (flow.md step 3) and <code>contracts.md</code> (step 1) carry a resumed run&#x27;s state.</span></li>
-<li value="130"><span class="t">Auto memory is on by default (v2.1.59+).</span></li>
-<li value="131"><span class="t">The first 200 lines or 25KB of <code>MEMORY.md</code> auto-load every session, about 680 tokens.</span></li>
-<li value="132"><span class="t">Auto memory survives <code>/compact</code> by re-injection, which is a re-spend.</span></li>
-<li value="133"><span class="t">Point <code>MEMORY.md</code> at an in-flight run so a resumed session finds it.</span></li>
-<li value="134"><span class="t"><code>CLAUDE_CODE_DISABLE_AUTO_MEMORY=1</code> turns auto memory off.</span></li>
-<li value="135"><span class="t">The API memory tool <code>memory_20250818</code> is not a Claude Code CLI command.</span></li>
+<li value="112"><span class="t">At each wave boundary, run <code>/compact &lt;focus on the plan + open leaves&gt;</code>.</span></li>
+<li value="113"><span class="t">A <code># Compact instructions</code> block in CLAUDE.md steers every compaction in the project.</span></li>
+<li value="114"><span class="t">A mid-run CLAUDE.md edit takes effect only at the next <code>/compact</code>, <code>/clear</code> or restart.</span></li>
+<li value="115"><span class="t">Compact while the wave&#x27;s returns are still warm, not after an idle gap.</span></li>
+<li value="116"><span class="t">A cold <code>/compact</code> reprocesses the whole history as uncached input.</span></li>
+<li value="117"><span class="t">Compaction re-reads up to five recently modified files.</span></li>
+<li value="118"><span class="t">Files over 5,000 tokens come back as <code>Referenced file</code> path stubs.</span></li>
+<li value="119"><span class="t">Run <code>/context</code> between waves for the window-size read.</span></li>
+<li value="120"><span class="t">The 1M window has no pricing premium above 200K.</span></li>
+<li value="121"><span class="t">Haiku 5.5 prompts over 100K tokens bill 5x on every rate, with cache reads and writes counted.</span></li>
+<li value="122"><span class="t">Sonnet 5.5, Sonnet 5, Haiku 5.5 and every Opus from 4.7 on run 1M on every plan, Pro included.</span></li>
+<li value="123"><span class="t">Native-1M models auto-compact near 967K unless an auto-compact window is set.</span></li>
+<li value="124"><span class="t"><code>CLAUDE_CODE_DISABLE_1M_CONTEXT=1</code> drops those models to 200K.</span></li>
+<li value="125"><span class="t">The real cost of a long run is context rot, not dollars.</span></li>
+<li value="126"><span class="t">Idle compaction (2.1.290+) compacts a long idle thread before its cache expires.</span></li>
+<li value="127"><span class="t">Set <code>idleCompaction: false</code> to turn idle compaction off.</span></li>
+<li value="128"><span class="t">Measure before a benchmark arm keeps idle compaction on.</span></li>
+<li value="129"><span class="t">From 2.1.314, idle compaction runs in VS Code and Desktop, and on Bedrock, Vertex, Foundry and gateways with the one-hour cache on.</span></li>
+<li value="130"><span class="t"><code>run-state.md</code> (flow.md step 3) and <code>contracts.md</code> (step 1) carry a resumed run&#x27;s state.</span></li>
+<li value="131"><span class="t">Auto memory is on by default (v2.1.59+).</span></li>
+<li value="132"><span class="t">The first 200 lines or 25KB of <code>MEMORY.md</code> auto-load every session, about 680 tokens.</span></li>
+<li value="133"><span class="t">Auto memory survives <code>/compact</code> by re-injection, which is a re-spend.</span></li>
+<li value="134"><span class="t">Point <code>MEMORY.md</code> at an in-flight run so a resumed session finds it.</span></li>
+<li value="135"><span class="t"><code>CLAUDE_CODE_DISABLE_AUTO_MEMORY=1</code> turns auto memory off.</span></li>
+<li value="136"><span class="t">The API memory tool <code>memory_20250818</code> is not a Claude Code CLI command.</span></li>
 </ol>
 <h3>5. Honest framing</h3>
 <ol>
-<li value="136"><span class="t">Caching lowers the bill on resent tokens, but not the token count.</span></li>
-<li value="137"><span class="t">A cold cache write costs 1.25x or 2x against 1x uncached, and it pays back only on reuse.</span></li>
-<li value="138"><span class="t">Caching, isolation and tiering are independent and additive levers.</span></li>
-<li value="139"><span class="t">Prices move, and you should re-check them rather than extrapolate.</span></li>
-<li value="140"><span class="t">Sonnet 5&#x27;s 2026-09-01 step-up was cancelled on 2026-08-10, so $2/$10 is the standard rate.</span></li>
-<li value="141"><span class="t"><code>VERIFIED.md</code> holds the source checks for the cache multipliers, base rates, compaction caps and skill-listing caps.</span></li>
-<li value="142"><span class="t"><code>/rewind</code> vs <code>/clear</code>, <code>/context</code> and the auto-memory bullet have no <code>VERIFIED.md</code> row.</span></li>
+<li value="137"><span class="t">Caching lowers the bill on resent tokens, but not the token count.</span></li>
+<li value="138"><span class="t">A cold cache write costs 1.25x or 2x against 1x uncached, and it pays back only on reuse.</span></li>
+<li value="139"><span class="t">Caching, isolation and tiering are independent and additive levers.</span></li>
+<li value="140"><span class="t">Prices move, and you should re-check them rather than extrapolate.</span></li>
+<li value="141"><span class="t">Sonnet 5&#x27;s 2026-09-01 step-up was cancelled on 2026-08-10, so $2/$10 is the standard rate.</span></li>
+<li value="142"><span class="t"><code>VERIFIED.md</code> holds the source checks for the cache multipliers, base rates, compaction caps and skill-listing caps.</span></li>
+<li value="143"><span class="t"><code>/rewind</code> vs <code>/clear</code>, <code>/context</code> and the auto-memory bullet have no <code>VERIFIED.md</code> row.</span></li>
 </ol>
 <h3>Language compression, which side of the token to compress</h3>
 <ol>
-<li value="143"><span class="t">Adopt telegraphic prose for agent-consumed output, since output costs about 5x input and is never cached.</span></li>
-<li value="144"><span class="t">Refuse grammar-stripping on input: briefs, skill bodies and policy text.</span></li>
-<li value="145"><span class="t">Input trimming degrades accuracy, because LLMs store signal in filler tokens (arXiv:2502.15007).</span></li>
-<li value="146"><span class="t">Input trimming saves little, because the cache already cut re-reads to 0.1x.</span></li>
-<li value="147"><span class="t">Cheap executors need more explicitness, not less.</span></li>
-<li value="148"><span class="t">Intensity is gated by the <code>modes.md</code> register row (lite, full, ultra).</span></li>
-<li value="149"><span class="t">A brief&#x27;s optional <code>MODE:</code> line carries the intensity.</span></li>
+<li value="144"><span class="t">Adopt telegraphic prose for agent-consumed output, since output costs about 5x input and is never cached.</span></li>
+<li value="145"><span class="t">Refuse grammar-stripping on input: briefs, skill bodies and policy text.</span></li>
+<li value="146"><span class="t">Input trimming degrades accuracy, because LLMs store signal in filler tokens (arXiv:2502.15007).</span></li>
+<li value="147"><span class="t">Input trimming saves little, because the cache already cut re-reads to 0.1x.</span></li>
+<li value="148"><span class="t">Cheap executors need more explicitness, not less.</span></li>
+<li value="149"><span class="t">Intensity is gated by the <code>modes.md</code> register row (lite, full, ultra).</span></li>
+<li value="150"><span class="t">A brief&#x27;s optional <code>MODE:</code> line carries the intensity.</span></li>
 </ol>
 <h3>External levers</h3>
 <ol>
-<li value="150"><span class="t">Stagger wave dispatch: fire one leaf, await first output, then the rest, when break-even favors it (flow.md step 3).</span></li>
-<li value="151"><span class="t">Keep dynamic bytes like timestamps and counters out of early reused prefix.</span></li>
-<li value="152"><span class="t">A gateway can forward <code>cache_control</code>, which caches like the provider&#x27;s endpoint.</span></li>
-<li value="153"><span class="t">A gateway can reject a marked request with a 400 naming <code>cache_control</code>, and Claude Code re-sends with the marker moved.</span></li>
-<li value="154"><span class="t">A gateway can strip markers and return success, so the whole history bills uncached every turn.</span></li>
-<li value="155"><span class="t">Check <code>/usage</code>&#x27;s <code>Prompt cache (main)</code> line to spot a stripped marker.</span></li>
-<li value="156"><span class="t"><code>/usage</code> ends with <code>no prompt caching reported by the API</code> when no response reported cache tokens.</span></li>
-<li value="157"><span class="t">An explicit one-hour TTL through a gateway needs the <code>anthropic-beta</code> header forwarded unchanged.</span></li>
-<li value="158"><span class="t">A Claude apps gateway cannot carry the one-hour TTL at all.</span></li>
-<li value="159"><span class="t"><code>max_tokens:0</code> pre-warm is API-axis only.</span></li>
-<li value="160"><span class="t">A pre-warm must match the follow-up&#x27;s thinking config and <code>output_config.effort</code>.</span></li>
-<li value="161"><span class="t">A pre-warm needs an explicit breakpoint, since automatic caching would key the entry to the placeholder.</span></li>
-<li value="162"><span class="t"><code>max_tokens:0</code> is rejected with <code>stream: true</code>, extended thinking, structured outputs, a forced <code>tool_choice</code> or Message Batches.</span></li>
-<li value="163"><span class="t">Cache hits inside a batch are best-effort, so write a 1-hour prefix first for batch verify.</span></li>
-<li value="164"><span class="t">A breakpoint finds writes only within the last 20 blocks.</span></li>
-<li value="165"><span class="t">A harness with a long growing transcript needs a second breakpoint.</span></li>
-<li value="166"><span class="t">Cache hits do not count against rate limits.</span></li>
-<li value="167"><span class="t">Two harnesses in different workspaces never share a cache on the Claude API.</span></li>
-<li value="168"><span class="t">On the API, the 1-hour TTL is <code>ttl: &quot;1h&quot;</code> at a 2x write.</span></li>
-<li value="169"><span class="t">A request can mix both TTLs if the 1-hour entries come before the 5-minute ones.</span></li>
-<li value="170"><span class="t">Appending a <code>role: &quot;system&quot;</code> message mid-conversation keeps caches on Fable 5.1, Mythos 5.1, Fable 5, Mythos 5, Opus 5.5, Sonnet 5.5, Haiku 5.5, Opus 4.8 and Opus 5.</span></li>
-<li value="171"><span class="t">Sonnet 5 is not on that list and pays a full miss for a system edit.</span></li>
-<li value="172"><span class="t">Adding or removing tools mid-conversation needs the <code>mid-conversation-tool-changes-2026-07-01</code> beta header.</span></li>
-<li value="173"><span class="t">Defining a tool by value in a <code>tool_addition</code> block uses <code>inline-tools-2026-09-15</code>, a Claude API beta since 2026-09-22.</span></li>
-<li value="174"><span class="t"><code>compact-2026-09-04</code> (beta since 2026-09-14, not on Bedrock) returns a signed compaction block.</span></li>
-<li value="175"><span class="t">For accounts created on or after 2026-08-31, replaying a Fable 5.1, Opus 5.5 or Sonnet 5.5 thinking block after an edit returns a 400.</span></li>
-<li value="176"><span class="t">The fix for that is an append-only conversation, or <code>drop_block</code> under <code>thinking-binding-controls-2026-08-01</code>.</span></li>
-<li value="177"><span class="t"><code>cache-diagnosis-2026-04-07</code> (beta, Claude API only) takes <code>diagnostics.previous_message_id</code>.</span></li>
-<li value="178"><span class="t"><code>inference_geo: &quot;us&quot;</code> on Claude 4.6+ multiplies every token category by 1.1x.</span></li>
-<li value="179"><span class="t"><code>/usage</code> applies the US residency multiplier since v2.1.239.</span></li>
-<li value="180"><span class="t">From GPT-5.6 on, an OpenAI cache write costs 1.25x and a read 0.1x.</span></li>
-<li value="181"><span class="t">GPT-6.1 Sol and GPT-6.1 Terra read at 0.05x.</span></li>
-<li value="182"><span class="t">Earlier OpenAI models carry no write charge.</span></li>
-<li value="183"><span class="t">An OpenAI cached prefix stays eligible 30 minutes by default after its latest write or reuse.</span></li>
-<li value="184"><span class="t">The Responses API offers a 12-hour TTL via <code>prompt_cache_options.ttl: &quot;12h&quot;</code> at a 2.5x write.</span></li>
-<li value="185"><span class="t">The OpenAI cache floor is 1,024 visible input tokens.</span></li>
-<li value="186"><span class="t">A request can make up to four OpenAI cache writes, and an implicit breakpoint takes one.</span></li>
-<li value="187"><span class="t">OpenAI traffic above 15 requests per minute can overflow to other machines, so a wide wave can miss even when staggered.</span></li>
-<li value="188"><span class="t">GitHub&#x27;s price table charges the cache write on Anthropic models and on GPT-5.6 and later.</span></li>
-<li value="189"><span class="t"><code>token-efficient-tools</code> is built into Claude 4+ as a no-op header.</span></li>
-<li value="190"><span class="t">Prompted LLM summarizing of context loses to omission (arXiv:2508.21433), so never spend a model call to recap state.</span></li>
-<li value="191"><span class="t">An RL-trained compactor beats a prompted one by +7.0pp SWE-V (arXiv:2607.05378).</span></li>
+<li value="151"><span class="t">Stagger wave dispatch: fire one leaf, await first output, then the rest, when break-even favors it (flow.md step 3).</span></li>
+<li value="152"><span class="t">Keep dynamic bytes like timestamps and counters out of early reused prefix.</span></li>
+<li value="153"><span class="t">A gateway can forward <code>cache_control</code>, which caches like the provider&#x27;s endpoint.</span></li>
+<li value="154"><span class="t">A gateway can reject a marked request with a 400 naming <code>cache_control</code>, and Claude Code re-sends with the marker moved.</span></li>
+<li value="155"><span class="t">A gateway can strip markers and return success, so the whole history bills uncached every turn.</span></li>
+<li value="156"><span class="t">Check <code>/usage</code>&#x27;s <code>Prompt cache (main)</code> line to spot a stripped marker.</span></li>
+<li value="157"><span class="t"><code>/usage</code> ends with <code>no prompt caching reported by the API</code> when no response reported cache tokens.</span></li>
+<li value="158"><span class="t">An explicit one-hour TTL through a gateway needs the <code>anthropic-beta</code> header forwarded unchanged.</span></li>
+<li value="159"><span class="t">A Claude apps gateway cannot carry the one-hour TTL at all.</span></li>
+<li value="160"><span class="t"><code>max_tokens:0</code> pre-warm is API-axis only.</span></li>
+<li value="161"><span class="t">A pre-warm must match the follow-up&#x27;s thinking config and <code>output_config.effort</code>.</span></li>
+<li value="162"><span class="t">A pre-warm needs an explicit breakpoint, since automatic caching would key the entry to the placeholder.</span></li>
+<li value="163"><span class="t"><code>max_tokens:0</code> is rejected with <code>stream: true</code>, extended thinking, structured outputs, a forced <code>tool_choice</code> or Message Batches.</span></li>
+<li value="164"><span class="t">Cache hits inside a batch are best-effort, so write a 1-hour prefix first for batch verify.</span></li>
+<li value="165"><span class="t">A breakpoint finds writes only within the last 20 blocks.</span></li>
+<li value="166"><span class="t">A harness with a long growing transcript needs a second breakpoint.</span></li>
+<li value="167"><span class="t">Cache hits do not count against rate limits.</span></li>
+<li value="168"><span class="t">Two harnesses in different workspaces never share a cache on the Claude API.</span></li>
+<li value="169"><span class="t">On the API, the 1-hour TTL is <code>ttl: &quot;1h&quot;</code> at a 2x write.</span></li>
+<li value="170"><span class="t">A request can mix both TTLs if the 1-hour entries come before the 5-minute ones.</span></li>
+<li value="171"><span class="t">Appending a <code>role: &quot;system&quot;</code> message mid-conversation keeps caches on Fable 5.1, Mythos 5.1, Fable 5, Mythos 5, Opus 5.5, Sonnet 5.5, Haiku 5.5, Opus 4.8 and Opus 5.</span></li>
+<li value="172"><span class="t">Sonnet 5 is not on that list and pays a full miss for a system edit.</span></li>
+<li value="173"><span class="t">Adding or removing tools mid-conversation needs the <code>mid-conversation-tool-changes-2026-07-01</code> beta header.</span></li>
+<li value="174"><span class="t">Defining a tool by value in a <code>tool_addition</code> block uses <code>inline-tools-2026-09-15</code>, a Claude API beta since 2026-09-22.</span></li>
+<li value="175"><span class="t"><code>compact-2026-09-04</code> (beta since 2026-09-14, not on Bedrock) returns a signed compaction block.</span></li>
+<li value="176"><span class="t">For accounts created on or after 2026-08-31, replaying a Fable 5.1, Opus 5.5 or Sonnet 5.5 thinking block after an edit returns a 400.</span></li>
+<li value="177"><span class="t">Fable 5.2 and Mythos 5.2 return that 400 for every account, whatever its age.</span></li>
+<li value="178"><span class="t">The fix for that is an append-only conversation, or <code>drop_block</code> under <code>thinking-binding-controls-2026-08-01</code>.</span></li>
+<li value="179"><span class="t"><code>cache-diagnosis-2026-04-07</code> (beta, Claude API only) takes <code>diagnostics.previous_message_id</code>.</span></li>
+<li value="180"><span class="t"><code>inference_geo: &quot;us&quot;</code> on Claude 4.6+ multiplies every token category by 1.1x.</span></li>
+<li value="181"><span class="t"><code>/usage</code> applies the US residency multiplier since v2.1.239.</span></li>
+<li value="182"><span class="t">From GPT-5.6 on, an OpenAI cache write costs 1.25x and a read 0.1x.</span></li>
+<li value="183"><span class="t">GPT-6.1 Sol and GPT-6.1 Terra read at 0.05x.</span></li>
+<li value="184"><span class="t">Earlier OpenAI models carry no write charge.</span></li>
+<li value="185"><span class="t">An OpenAI cached prefix stays eligible 30 minutes by default after its latest write or reuse.</span></li>
+<li value="186"><span class="t">The Responses API offers a 12-hour TTL via <code>prompt_cache_options.ttl: &quot;12h&quot;</code> at a 2.5x write.</span></li>
+<li value="187"><span class="t">The OpenAI cache floor is 1,024 visible input tokens.</span></li>
+<li value="188"><span class="t">A request can make up to four OpenAI cache writes, and an implicit breakpoint takes one.</span></li>
+<li value="189"><span class="t">OpenAI traffic above 15 requests per minute can overflow to other machines, so a wide wave can miss even when staggered.</span></li>
+<li value="190"><span class="t">GitHub&#x27;s price table charges the cache write on Anthropic models and on GPT-5.6 and later.</span></li>
+<li value="191"><span class="t"><code>token-efficient-tools</code> is built into Claude 4+ as a no-op header.</span></li>
+<li value="192"><span class="t">Prompted LLM summarizing of context loses to omission (arXiv:2508.21433), so never spend a model call to recap state.</span></li>
+<li value="193"><span class="t">An RL-trained compactor beats a prompted one by +7.0pp SWE-V (arXiv:2607.05378).</span></li>
 </ol>
 <h3>Measured levers, ranked by published saving (swept 2026-08-12)</h3>
 <ol>
-<li value="192"><span class="t">MCP tools as code on a filesystem cut 150,000 to 2,000 tokens, 98.7%, on one example, API axis only.</span></li>
-<li value="193"><span class="t">Tool Search Tool cuts 85% and lifts selection from 49 to 74% (Opus 4), or 79.5 to 88.1% (Opus 4.5), API axis only.</span></li>
-<li value="194"><span class="t">Programmatic tool calling cut 43,588 to 27,297 average tokens, 37%, API axis only.</span></li>
-<li value="195"><span class="t">Memory tool plus context editing shows 39% better performance over baseline, not a token cut.</span></li>
-<li value="196"><span class="t">Memory tool plus context editing also shows an 84% token reduction on a 100-turn web-search eval.</span></li>
-<li value="197"><span class="t">Context editing alone shows 29% better performance over baseline.</span></li>
-<li value="198"><span class="t">Tool-response verbosity enum cut 206 to 72 tokens, about 1/3, if you author the tool.</span></li>
-<li value="199"><span class="t">Only the 84% figure is a token saving. The 39% and 29% figures are performance over baseline.</span></li>
-<li value="200"><span class="t">Context editing delivers 29 of the 39 points, so build the pruning first.</span></li>
-<li value="201"><span class="t">Tool-selection accuracy falls off past 30 to 50 available tools.</span></li>
-<li value="202"><span class="t">Microsoft documents quality degrading past about 10 functions per plugin, and falling back to description matching beyond 5 plugins.</span></li>
-<li value="203"><span class="t">Claude Code caps one MCP tool response at 25,000 tokens by default, with a warning past 10,000.</span></li>
-<li value="204"><span class="t"><code>MAX_MCP_OUTPUT_TOKENS</code> raises the MCP response cap.</span></li>
-<li value="205"><span class="t">A tool declaring <code>anthropic/maxResultSizeChars</code> uses that limit for its text.</span></li>
-<li value="206"><span class="t">An over-limit MCP result with no image goes to a file in the session&#x27;s tool-results directory.</span></li>
-<li value="207"><span class="t">Bash output inlines up to about 30,000 characters by default.</span></li>
-<li value="208"><span class="t"><code>bashOutputMaxChars</code> raises the Bash limit up to 128,000.</span></li>
+<li value="194"><span class="t">MCP tools as code on a filesystem cut 150,000 to 2,000 tokens, 98.7%, on one example, API axis only.</span></li>
+<li value="195"><span class="t">Tool Search Tool cuts 85% and lifts selection from 49 to 74% (Opus 4), or 79.5 to 88.1% (Opus 4.5), API axis only.</span></li>
+<li value="196"><span class="t">Programmatic tool calling cut 43,588 to 27,297 average tokens, 37%, API axis only.</span></li>
+<li value="197"><span class="t">Memory tool plus context editing shows 39% better performance over baseline, not a token cut.</span></li>
+<li value="198"><span class="t">Memory tool plus context editing also shows an 84% token reduction on a 100-turn web-search eval.</span></li>
+<li value="199"><span class="t">Context editing alone shows 29% better performance over baseline.</span></li>
+<li value="200"><span class="t">Tool-response verbosity enum cut 206 to 72 tokens, about 1/3, if you author the tool.</span></li>
+<li value="201"><span class="t">Only the 84% figure is a token saving. The 39% and 29% figures are performance over baseline.</span></li>
+<li value="202"><span class="t">Context editing delivers 29 of the 39 points, so build the pruning first.</span></li>
+<li value="203"><span class="t">Tool-selection accuracy falls off past 30 to 50 available tools.</span></li>
+<li value="204"><span class="t">Microsoft documents quality degrading past about 10 functions per plugin, and falling back to description matching beyond 5 plugins.</span></li>
+<li value="205"><span class="t">Claude Code caps one MCP tool response at 25,000 tokens by default, with a warning past 10,000.</span></li>
+<li value="206"><span class="t"><code>MAX_MCP_OUTPUT_TOKENS</code> raises the MCP response cap.</span></li>
+<li value="207"><span class="t">A tool declaring <code>anthropic/maxResultSizeChars</code> uses that limit for its text.</span></li>
+<li value="208"><span class="t">An over-limit MCP result with no image goes to a file in the session&#x27;s tool-results directory.</span></li>
+<li value="209"><span class="t">Bash output inlines up to about 30,000 characters by default.</span></li>
+<li value="210"><span class="t"><code>bashOutputMaxChars</code> raises the Bash limit up to 128,000.</span></li>
 </ol>
 <h3>What does NOT save tokens</h3>
 <ol>
-<li value="209"><span class="t">Structured outputs (<code>output_config.format</code> with <code>strict: true</code>) buy reliability, not tokens.</span></li>
-<li value="210"><span class="t">Anthropic has no <code>verbosity</code> parameter.</span></li>
-<li value="211"><span class="t">Anthropic&#x27;s output levers are <code>output_config.effort</code>, a prompt length instruction, <code>max_tokens</code> and advisory task budgets.</span></li>
-<li value="212"><span class="t">No primary source gives a measured saving for <code>stop_sequences</code>.</span></li>
-<li value="213"><span class="t"><code>/clear</code> and <code>/compact</code> have no published figure in dollars or tokens.</span></li>
+<li value="211"><span class="t">Structured outputs (<code>output_config.format</code> with <code>strict: true</code>) buy reliability, not tokens.</span></li>
+<li value="212"><span class="t">Anthropic has no <code>verbosity</code> parameter.</span></li>
+<li value="213"><span class="t">Anthropic&#x27;s output levers are <code>output_config.effort</code>, a prompt length instruction, <code>max_tokens</code> and advisory task budgets.</span></li>
+<li value="214"><span class="t">No primary source gives a measured saving for <code>stop_sequences</code>.</span></li>
+<li value="215"><span class="t"><code>/clear</code> and <code>/compact</code> have no published figure in dollars or tokens.</span></li>
 </ol>
 <h3>Effort is a cost lever, and not the one you think</h3>
 <ol>
-<li value="214"><span class="t">Effort reduces the number of tool calls, which dominate agentic cost.</span></li>
-<li value="215"><span class="t">Opus 5.5&#x27;s default effort is medium, and it cannot turn thinking off.</span></li>
-<li value="216"><span class="t">Effort does not reliably shorten visible output on Opus 5. Do not drop effort to cut output tokens.</span></li>
-<li value="217"><span class="t">AA&#x27;s index scores Opus 5.5 at 51 at medium, at $1.34 per task, against Opus 5 at max at $5.86 per task.</span></li>
-<li value="218"><span class="t">Model tier and effort are not independent, and the registry models only one of them.</span></li>
+<li value="216"><span class="t">Effort reduces the number of tool calls, which dominate agentic cost.</span></li>
+<li value="217"><span class="t">Opus 5.5&#x27;s default effort is medium, and it cannot turn thinking off.</span></li>
+<li value="218"><span class="t">Effort does not reliably shorten visible output on Opus 5. Do not drop effort to cut output tokens.</span></li>
+<li value="219"><span class="t">AA&#x27;s index scores Opus 5.5 at 51 at medium, at $1.34 per task, against Opus 5 at max at $5.86 per task.</span></li>
+<li value="220"><span class="t">Model tier and effort are not independent, and the registry models only one of them.</span></li>
 </ol>
 <h3>Where a skill&#x27;s cost actually lands</h3>
 <ol>
-<li value="219"><span class="t">A loaded skill body is a recurring cost, re-sent on every later request in the session.</span></li>
-<li value="220"><span class="t">Setting <code>disable-model-invocation: true</code> removes the description from context and allows manual invoke only.</span></li>
-<li value="221"><span class="t">Setting <code>user-invocable: false</code> keeps the description in context and loads the body on invocation.</span></li>
-<li value="222"><span class="t">Skills named in a subagent&#x27;s <code>skills:</code> field are fully preloaded.</span></li>
-<li value="223"><span class="t">CLAUDE.md loads in full every request, and the rule of thumb is under 200 lines.</span></li>
-<li value="224"><span class="t">The repo&#x27;s own CLAUDE.md is well past 200 lines.</span></li>
-<li value="225"><span class="t">Output styles load at session start, and the Default style loads nothing.</span></li>
-<li value="226"><span class="t">MCP loads names only, with schemas deferred.</span></li>
-<li value="227"><span class="t">Hooks cost nothing unless they return output.</span></li>
-<li value="228"><span class="t">Official SKILL.md guidance is under 500 lines.</span></li>
+<li value="221"><span class="t">A loaded skill body is a recurring cost, re-sent on every later request in the session.</span></li>
+<li value="222"><span class="t">Setting <code>disable-model-invocation: true</code> removes the description from context and allows manual invoke only.</span></li>
+<li value="223"><span class="t">Setting <code>user-invocable: false</code> keeps the description in context and loads the body on invocation.</span></li>
+<li value="224"><span class="t">Skills named in a subagent&#x27;s <code>skills:</code> field are fully preloaded.</span></li>
+<li value="225"><span class="t">CLAUDE.md loads in full every request, and the rule of thumb is under 200 lines.</span></li>
+<li value="226"><span class="t">The repo&#x27;s own CLAUDE.md is well past 200 lines.</span></li>
+<li value="227"><span class="t">Output styles load at session start, and the Default style loads nothing.</span></li>
+<li value="228"><span class="t">MCP loads names only, with schemas deferred.</span></li>
+<li value="229"><span class="t">Hooks cost nothing unless they return output.</span></li>
+<li value="230"><span class="t">Official SKILL.md guidance is under 500 lines.</span></li>
 </ol>
 <h3>Sizing a fan-out, with both halves</h3>
 <ol>
-<li value="229"><span class="t">Inbound cost: N leaves cost N cold writes at 1.25x, unless staggered.</span></li>
-<li value="230"><span class="t">Outbound cost: a subagent summary runs 1,000 to 2,000 tokens.</span></li>
-<li value="231"><span class="t">A session allows 20 concurrent subagents, and the 21st fails with <code>Concurrent subagent limit reached</code>.</span></li>
-<li value="232"><span class="t"><code>CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS</code> configures that limit, which needs v2.1.217+.</span></li>
-<li value="233"><span class="t">Sessions with ultracode active are exempt from the concurrent limit.</span></li>
-<li value="234"><span class="t">The cache TTL runs from request start, not response end.</span></li>
-<li value="235"><span class="t">On a 5-minute TTL, a 4-minute response leaves about 1 minute of usable cache.</span></li>
+<li value="231"><span class="t">Inbound cost: N leaves cost N cold writes at 1.25x, unless staggered.</span></li>
+<li value="232"><span class="t">Outbound cost: a subagent summary runs 1,000 to 2,000 tokens.</span></li>
+<li value="233"><span class="t">A session allows 20 concurrent subagents, and the 21st fails with <code>Concurrent subagent limit reached</code>.</span></li>
+<li value="234"><span class="t"><code>CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS</code> configures that limit, which needs v2.1.217+.</span></li>
+<li value="235"><span class="t">Sessions with ultracode active are exempt from the concurrent limit.</span></li>
+<li value="236"><span class="t">The cache TTL runs from request start, not response end.</span></li>
+<li value="237"><span class="t">On a 5-minute TTL, a 4-minute response leaves about 1 minute of usable cache.</span></li>
 </ol>
 <h3>Verified 2026-08-31: controls, confirmation, and what is free</h3>
 <ol>
-<li value="236"><span class="t">Confirm the TTL with <code>claude -p &quot;hello&quot; --output-format json</code> and read <code>usage.cache_creation</code>.</span></li>
-<li value="237"><span class="t">One-hour writes land under <code>ephemeral_1h_input_tokens</code>, and five-minute writes under <code>ephemeral_5m_input_tokens</code>.</span></li>
-<li value="238"><span class="t">Claude Code holds all but the first agent in a same-prefix fan-out for up to 5 seconds by default.</span></li>
-<li value="239"><span class="t">Workflow agents share a prefix only when model, effort, agent type, tools, output schema and working directory all match.</span></li>
-<li value="240"><span class="t">Keep effort uniform within a fan-out stage.</span></li>
-<li value="241"><span class="t"><code>CLAUDE_CODE_WORKFLOW_PREFIX_STAGGER_MS</code> defaults to 5000, <code>0</code> disables the wait, and it needs v2.1.229+.</span></li>
-<li value="242"><span class="t">Workflow agents default to the 5-minute TTL, even on a subscription.</span></li>
-<li value="243"><span class="t"><code>DISABLE_PROMPT_CACHING</code> turns caching off everywhere.</span></li>
-<li value="244"><span class="t"><code>DISABLE_PROMPT_CACHING_HAIKU</code>, <code>_SONNET</code>, <code>_OPUS</code> and <code>_FABLE</code> turn it off per model.</span></li>
-<li value="245"><span class="t">Claude Code warns at startup when caching is off this way, since 2.1.108.</span></li>
-<li value="246"><span class="t">Run <code>/doctor</code> for a listing cost estimate, and <code>/skill-doctor</code> to find skills to turn off (needs v2.1.252).</span></li>
-<li value="247"><span class="t">Agent teams in plan mode cost about 7x a standard session.</span></li>
-<li value="248"><span class="t">2.1.248 fixed a miss recurring about hourly, caused by tool definitions re-rendering after an OAuth refresh.</span></li>
-<li value="249"><span class="t">Thirteen more prompt-cache fixes landed from 2.1.268 to 2.1.281.</span></li>
-<li value="250"><span class="t">npm&#x27;s <code>stable</code> tag reached 2.1.277 by 2026-09-29, and <code>latest</code> was 2.1.284.</span></li>
-<li value="251"><span class="t">On stable 2.1.277, a resumed session or fork subagent still pays the 2.1.280 and 2.1.281 misses.</span></li>
-<li value="252"><span class="t">2.1.273 fixed advisor-tool turns counted at twice size, which fired auto-compact at about half the real window.</span></li>
-<li value="253"><span class="t">A plugin added mid-session appends after the conversation and does not invalidate the cache.</span></li>
-<li value="254"><span class="t">A plugin that ships MCP servers follows the MCP rule and forces a full re-read.</span></li>
-<li value="255"><span class="t"><code>/reload-plugins</code> holds the reload unless you pass <code>--force</code>.</span></li>
-<li value="256"><span class="t">A top-level <code>cache_control</code> takes one of the four breakpoint slots.</span></li>
-<li value="257"><span class="t">A top-level <code>cache_control</code> returns a 400 when four explicit breakpoints exist, or when the TTLs differ.</span></li>
-<li value="258"><span class="t">The legacy Bedrock integration (Opus 4.6 and earlier) returns a 400 for a top-level <code>cache_control</code>. Use explicit breakpoints there.</span></li>
-<li value="259"><span class="t">Extended thinking blocks are preserved on Opus 4.5+, Sonnet 4.6+, Haiku 5.5, Fable and Mythos.</span></li>
-<li value="260"><span class="t">Haiku 4.5 and earlier strip thinking blocks, which invalidates the cache.</span></li>
-<li value="261"><span class="t">Claude 4.7+ and Mythos Preview use a tokenizer producing about 30% more tokens for the same text.</span></li>
-<li value="262"><span class="t">Repo byte budgets stay in bytes because a byte count is stable across tokenizer changes.</span></li>
+<li value="238"><span class="t">Confirm the TTL with <code>claude -p &quot;hello&quot; --output-format json</code> and read <code>usage.cache_creation</code>.</span></li>
+<li value="239"><span class="t">One-hour writes land under <code>ephemeral_1h_input_tokens</code>, and five-minute writes under <code>ephemeral_5m_input_tokens</code>.</span></li>
+<li value="240"><span class="t">Claude Code holds all but the first agent in a same-prefix fan-out for up to 5 seconds by default.</span></li>
+<li value="241"><span class="t">Workflow agents share a prefix only when model, effort, agent type, tools, output schema and working directory all match.</span></li>
+<li value="242"><span class="t">Keep effort uniform within a fan-out stage.</span></li>
+<li value="243"><span class="t"><code>CLAUDE_CODE_WORKFLOW_PREFIX_STAGGER_MS</code> defaults to 5000, <code>0</code> disables the wait, and it needs v2.1.229+.</span></li>
+<li value="244"><span class="t">Workflow agents default to the 5-minute TTL, even on a subscription.</span></li>
+<li value="245"><span class="t"><code>DISABLE_PROMPT_CACHING</code> turns caching off everywhere.</span></li>
+<li value="246"><span class="t"><code>DISABLE_PROMPT_CACHING_HAIKU</code>, <code>_SONNET</code>, <code>_OPUS</code> and <code>_FABLE</code> turn it off per model.</span></li>
+<li value="247"><span class="t">Claude Code warns at startup when caching is off this way, since 2.1.108.</span></li>
+<li value="248"><span class="t">Run <code>/doctor</code> for a listing cost estimate, and <code>/skill-doctor</code> to find skills to turn off (needs v2.1.252).</span></li>
+<li value="249"><span class="t">Agent teams in plan mode cost about 7x a standard session.</span></li>
+<li value="250"><span class="t">2.1.248 fixed a miss recurring about hourly, caused by tool definitions re-rendering after an OAuth refresh.</span></li>
+<li value="251"><span class="t">Thirteen more prompt-cache fixes landed from 2.1.268 to 2.1.281.</span></li>
+<li value="252"><span class="t">npm&#x27;s <code>stable</code> tag reached 2.1.277 by 2026-09-29, and <code>latest</code> was 2.1.284.</span></li>
+<li value="253"><span class="t">On stable 2.1.277, a resumed session or fork subagent still pays the 2.1.280 and 2.1.281 misses.</span></li>
+<li value="254"><span class="t">2.1.273 fixed advisor-tool turns counted at twice size, which fired auto-compact at about half the real window.</span></li>
+<li value="255"><span class="t">A plugin added mid-session appends after the conversation and does not invalidate the cache.</span></li>
+<li value="256"><span class="t">A plugin that ships MCP servers follows the MCP rule and forces a full re-read.</span></li>
+<li value="257"><span class="t"><code>/reload-plugins</code> holds the reload unless you pass <code>--force</code>.</span></li>
+<li value="258"><span class="t">A top-level <code>cache_control</code> takes one of the four breakpoint slots.</span></li>
+<li value="259"><span class="t">A top-level <code>cache_control</code> returns a 400 when four explicit breakpoints exist, or when the TTLs differ.</span></li>
+<li value="260"><span class="t">The legacy Bedrock integration (Opus 4.6 and earlier) returns a 400 for a top-level <code>cache_control</code>. Use explicit breakpoints there.</span></li>
+<li value="261"><span class="t">Extended thinking blocks are preserved on Opus 4.5+, Sonnet 4.6+, Haiku 5.5, Fable and Mythos.</span></li>
+<li value="262"><span class="t">Haiku 4.5 and earlier strip thinking blocks, which invalidates the cache.</span></li>
+<li value="263"><span class="t">Claude 4.7+ and Mythos Preview use a tokenizer producing about 30% more tokens for the same text.</span></li>
+<li value="264"><span class="t">Repo byte budgets stay in bytes because a byte count is stable across tokenizer changes.</span></li>
 </ol>
 <h3>Two caps on the skill listing, not one</h3>
 <ol>
-<li value="263"><span class="t">The per-skill description cap of 1,536 characters is configurable with <code>skillListingMaxDescChars</code>.</span></li>
-<li value="264"><span class="t">The repo&#x27;s gate (k) caps six descriptions at 2,304 bytes combined.</span></li>
-<li value="265"><span class="t">The listing budget is 1% of the model&#x27;s context window, with a fallback of 8,000 characters.</span></li>
-<li value="266"><span class="t">The budget is raised with <code>skillListingBudgetFraction</code>, such as <code>0.02</code>, or <code>SLASH_COMMAND_TOOL_CHAR_BUDGET</code>.</span></li>
-<li value="267"><span class="t"><code>skillOverrides: name-only</code> frees budget by listing a skill without its description.</span></li>
-<li value="268"><span class="t">Overflow drops descriptions starting with the least-invoked skills.</span></li>
-<li value="269"><span class="t">Overflow writes a warning to the debug log when run with <code>--debug</code>.</span></li>
-<li value="270"><span class="t"><code>/context</code>&#x27;s Skills row reports the post-budget size.</span></li>
-<li value="271"><span class="t"><code>/compact</code> does not reload skill descriptions, only invoked skill bodies.</span></li>
-<li value="272"><span class="t">Truncation keeps the start of a skill body, so put the key instruction near the top.</span></li>
-<li value="273"><span class="t">Re-invoking an unchanged skill adds a note rather than a second copy.</span></li>
+<li value="265"><span class="t">The per-skill description cap of 1,536 characters is configurable with <code>skillListingMaxDescChars</code>.</span></li>
+<li value="266"><span class="t">The repo&#x27;s gate (k) caps six descriptions at 2,304 bytes combined.</span></li>
+<li value="267"><span class="t">The listing budget is 1% of the model&#x27;s context window, with a fallback of 8,000 characters.</span></li>
+<li value="268"><span class="t">The budget is raised with <code>skillListingBudgetFraction</code>, such as <code>0.02</code>, or <code>SLASH_COMMAND_TOOL_CHAR_BUDGET</code>.</span></li>
+<li value="269"><span class="t"><code>skillOverrides: name-only</code> frees budget by listing a skill without its description.</span></li>
+<li value="270"><span class="t">Overflow drops descriptions starting with the least-invoked skills.</span></li>
+<li value="271"><span class="t">Overflow writes a warning to the debug log when run with <code>--debug</code>.</span></li>
+<li value="272"><span class="t"><code>/context</code>&#x27;s Skills row reports the post-budget size.</span></li>
+<li value="273"><span class="t"><code>/compact</code> does not reload skill descriptions, only invoked skill bodies.</span></li>
+<li value="274"><span class="t">Truncation keeps the start of a skill body, so put the key instruction near the top.</span></li>
+<li value="275"><span class="t">Re-invoking an unchanged skill adds a note rather than a second copy.</span></li>
 </ol>
 <h3>Cache invalidation is tiered, not all-or-nothing</h3>
 <ol>
-<li value="274"><span class="t">Render order is tools, then system, then messages.</span></li>
-<li value="275"><span class="t">A change invalidates its own level and everything after it.</span></li>
-<li value="276"><span class="t">Tool definitions are the only thing that blows the whole cache.</span></li>
-<li value="277"><span class="t"><code>tool_choice</code> and images invalidate the messages cache alone.</span></li>
-<li value="278"><span class="t">Web search, citations and <code>speed</code> invalidate system and messages but keep tools.</span></li>
-<li value="279"><span class="t">Effort and thinking always invalidate the messages cache.</span></li>
-<li value="280"><span class="t">An explicit effort equal to the model default is a no-op.</span></li>
-<li value="281"><span class="t">A per-message effort change in a <code>role: &quot;system&quot;</code> message keeps the prefix on listed models, behind <code>mid-conversation-output-config-2026-07-01</code>.</span></li>
-<li value="282"><span class="t">Sonnet 5.5 on <code>between_tools</code>, and Haiku 5.5 on <code>disabled</code>, cannot change effort mid-conversation.</span></li>
-<li value="283"><span class="t">A top-level effort change starts the cache over.</span></li>
-<li value="284"><span class="t">On-demand compaction drops per-message effort, so later turns run at the top-level or default effort.</span></li>
-<li value="285"><span class="t">Dropped thinking blocks invalidate the messages cache from that block onward.</span></li>
+<li value="276"><span class="t">Render order is tools, then system, then messages.</span></li>
+<li value="277"><span class="t">A change invalidates its own level and everything after it.</span></li>
+<li value="278"><span class="t">Tool definitions are the only thing that blows the whole cache.</span></li>
+<li value="279"><span class="t"><code>tool_choice</code> and images invalidate the messages cache alone.</span></li>
+<li value="280"><span class="t">Web search, citations and <code>speed</code> invalidate system and messages but keep tools.</span></li>
+<li value="281"><span class="t">Effort and thinking always invalidate the messages cache.</span></li>
+<li value="282"><span class="t">An explicit effort equal to the model default is a no-op.</span></li>
+<li value="283"><span class="t">A per-message effort change in a <code>role: &quot;system&quot;</code> message keeps the prefix on listed models, behind <code>mid-conversation-output-config-2026-07-01</code>.</span></li>
+<li value="284"><span class="t">Sonnet 5.5 on <code>between_tools</code>, and Haiku 5.5 on <code>disabled</code>, cannot change effort mid-conversation.</span></li>
+<li value="285"><span class="t">A top-level effort change starts the cache over.</span></li>
+<li value="286"><span class="t">On-demand compaction drops per-message effort, so later turns run at the top-level or default effort.</span></li>
+<li value="287"><span class="t">Dropped thinking blocks invalidate the messages cache from that block onward.</span></li>
+<li value="288"><span class="t">No model outside Fable 5.2 and Mythos 5.2 reads their thinking blocks, so any move off Fable 5.2 drops them.</span></li>
+<li value="289"><span class="t">Fable 5.2 and Mythos 5.2 read other models&#x27; thinking blocks on the Claude API and Google Cloud.</span></li>
 </ol>
 <h3>Minimum cacheable prefix is per-model and not monotonic</h3>
 <ol>
-<li value="286"><span class="t">Floor of 512 tokens: Fable 5.1, Mythos 5.1, Opus 5.5, Opus 5, Sonnet 5.5, Haiku 5.5, Fable 5 and Mythos 5.</span></li>
-<li value="287"><span class="t">Floor of 1,024 tokens: Opus 4.8, Sonnet 5, Sonnet 4.6, Sonnet 4.5, Opus 4.1, Opus 4 and Sonnet 4.</span></li>
-<li value="288"><span class="t">Floor of 2,048 tokens: Opus 4.7, Mythos Preview and Haiku 3.5.</span></li>
-<li value="289"><span class="t">Floor of 4,096 tokens: Opus 4.6, Opus 4.5 and Haiku 4.5.</span></li>
-<li value="290"><span class="t">Below the floor nothing caches, and no error comes back.</span></li>
-<li value="291"><span class="t">To prove a miss, check that both <code>cache_creation_input_tokens</code> and <code>cache_read_input_tokens</code> are 0.</span></li>
+<li value="290"><span class="t">Floor of 512 tokens: Fable 5.2, Mythos 5.2, Fable 5.1, Mythos 5.1, Opus 5.5, Opus 5, Sonnet 5.5, Haiku 5.5, Fable 5 and Mythos 5.</span></li>
+<li value="291"><span class="t">Floor of 1,024 tokens: Opus 4.8, Sonnet 5, Sonnet 4.6, Sonnet 4.5, Opus 4.1, Opus 4 and Sonnet 4.</span></li>
+<li value="292"><span class="t">Floor of 2,048 tokens: Opus 4.7, Mythos Preview and Haiku 3.5.</span></li>
+<li value="293"><span class="t">Floor of 4,096 tokens: Opus 4.6, Opus 4.5 and Haiku 4.5.</span></li>
+<li value="294"><span class="t">Below the floor nothing caches, and no error comes back.</span></li>
+<li value="295"><span class="t">To prove a miss, check that both <code>cache_creation_input_tokens</code> and <code>cache_read_input_tokens</code> are 0.</span></li>
 </ol>
 <h3>An external yardstick for the benchmark corpus</h3>
 <ol>
-<li value="292"><span class="t">Anthropic&#x27;s baseline is about $13 per developer per active day.</span></li>
-<li value="293"><span class="t">Anthropic&#x27;s baseline is $150 to 250 per developer per month.</span></li>
-<li value="294"><span class="t">Under $30 per active day covers 90% of users.</span></li>
+<li value="296"><span class="t">Anthropic&#x27;s baseline is about $13 per developer per active day.</span></li>
+<li value="297"><span class="t">Anthropic&#x27;s baseline is $150 to 250 per developer per month.</span></li>
+<li value="298"><span class="t">Under $30 per active day covers 90% of users.</span></li>
 </ol>
 <h3>What the community converged on</h3>
 <ol>
-<li value="295"><span class="t">Star counts from 2026-08-12 are adoption signals, not evidence of efficacy.</span></li>
-<li value="296"><span class="t"><code>superpowers</code> runs brainstorm, git worktree, plan into 2 to 5 minute tasks, a fresh agent per task, TDD, two-stage review, then branch completion.</span></li>
+<li value="299"><span class="t">Star counts from 2026-08-12 are adoption signals, not evidence of efficacy.</span></li>
+<li value="300"><span class="t"><code>superpowers</code> runs brainstorm, git worktree, plan into 2 to 5 minute tasks, a fresh agent per task, TDD, two-stage review, then branch completion.</span></li>
 </ol>
 <h3>Anthropic&#x27;s own guidance pushes toward inline, twice</h3>
 <ol>
-<li value="297"><span class="t">Anthropic&#x27;s multi-agent research post measured about 15x a chat&#x27;s tokens and calls coding a poor fit for fan-out.</span></li>
-<li value="298"><span class="t">Anthropic&#x27;s foundational agents post says to find the simplest solution first and add complexity only when needed.</span></li>
-<li value="299"><span class="t">Anthropic tells callers to delete &quot;legacy harness scaffolding that adds separate verification steps&quot; on Opus 5.</span></li>
-<li value="300"><span class="t">A standing blanket self-verify instruction must go on Opus 5.</span></li>
-<li value="301"><span class="t">An invoked gate run by a context that did not produce the work survives.</span></li>
+<li value="301"><span class="t">Anthropic&#x27;s multi-agent research post measured about 15x a chat&#x27;s tokens and calls coding a poor fit for fan-out.</span></li>
+<li value="302"><span class="t">Anthropic&#x27;s foundational agents post says to find the simplest solution first and add complexity only when needed.</span></li>
+<li value="303"><span class="t">Anthropic tells callers to delete &quot;legacy harness scaffolding that adds separate verification steps&quot; on Opus 5.</span></li>
+<li value="304"><span class="t">A standing blanket self-verify instruction must go on Opus 5.</span></li>
+<li value="305"><span class="t">An invoked gate run by a context that did not produce the work survives.</span></li>
 </ol>
 </section>
 <section id="part-stubs-evidence-local-models" class="skill">
@@ -1993,7 +1997,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 </ol>
 </section>
 <section id="claude-code" class="skill">
-<header class="skill-head"><h2>Claude Code</h2><p class="src">claude-code.md <span class="dot"></span> <span class="count" data-total="183">183 lines</span></p></header>
+<header class="skill-head"><h2>Claude Code</h2><p class="src">claude-code.md <span class="dot"></span> <span class="count" data-total="185">185 lines</span></p></header>
 <h3>The lever</h3>
 <ol>
 <li value="1"><span class="t">Resolution order: per-call <code>model:</code> beats frontmatter, which beats <code>CLAUDE_CODE_SUBAGENT_MODEL</code>, which beats the session model (v2.1.251 and later).</span></li>
@@ -2024,7 +2028,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <li value="23"><span class="t"><code>maxEffortLevel</code> clamps.</span></li>
 <li value="24"><span class="t">An unpinned seat takes the explicit session level, else its own model&#x27;s saved level or default.</span></li>
 <li value="25"><span class="t">2.1.316 adds <code>CLAUDE_CODE_SUBAGENT_EFFORT</code>, used when nothing else sets effort (changelog only, unprobed).</span></li>
-<li value="26"><span class="t">Re-probed 2026-10-08 on 2.1.294: Opus 5.5, Sonnet 5.5 and Haiku 5.5 default to medium, the rest to high, and Opus 4.7 to xhigh.</span></li>
+<li value="26"><span class="t">Re-probed 2026-11-11 on 2.1.322: Fable 5.2, Opus 5.5, Sonnet 5.5 and Haiku 5.5 default to medium, the rest to high, and Opus 4.7 to xhigh.</span></li>
 <li value="27"><span class="t">The legacy top-level <code>effortLevel</code> no longer reaches Opus 5.5.</span></li>
 </ol>
 <h3>Naming the seat</h3>
@@ -2135,99 +2139,101 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <li value="107"><span class="t">Custom deployment names fall back too.</span></li>
 <li value="108"><span class="t">With <code>switchModelsOnFlag: false</code> in the benchmark harness, interactive asks and <code>-p</code> ends the main-thread turn.</span></li>
 <li value="109"><span class="t">A flagged subagent or workflow leaf still re-serves (2.1.280 code read plus #91923, unprobed).</span></li>
-<li value="110"><span class="t">Check OTel <code>subagent_completed</code> for <code>model_swapped</code> and <code>final_model</code>.</span></li>
-<li value="111"><span class="t">opusplan: <code>/model opusplan</code> is native (Opus 5.5 plan mode, Sonnet execution, main session), immune to #43869, and captures most of the core rule minus fan-out and the Cheap floor.</span></li>
+<li value="110"><span class="t">From 2.1.318 a subagent stops instead when the setting is &quot;Ask each time&quot; (changelog, unprobed).</span></li>
+<li value="111"><span class="t">Check OTel <code>subagent_completed</code> for <code>model_swapped</code> and <code>final_model</code>.</span></li>
+<li value="112"><span class="t">opusplan: <code>/model opusplan</code> is native (Opus 5.5 plan mode, Sonnet execution, main session), immune to #43869, and captures most of the core rule minus fan-out and the Cheap floor.</span></li>
 </ol>
 <h3>Caching-aware fan-out</h3>
 <ol>
-<li value="112"><span class="t">A fresh subagent&#x27;s cold cache write runs on a 5-minute TTL.</span></li>
-<li value="113"><span class="t">Lift it to an hour with <code>subagentPromptCacheTtl</code>, <code>CLAUDE_CODE_SUBAGENT_PROMPT_CACHE_TTL</code>, or per-agent <code>experimental.cacheTtl</code>.</span></li>
-<li value="114"><span class="t">A subscription on usage credits ignores the per-agent 1h (caching.md).</span></li>
-<li value="115"><span class="t">Weigh leaf count against spawn cost. Prefer a fork for a full-context leaf.</span></li>
-<li value="116"><span class="t">Rule (a), measured 2026-07-11: end the turn while the wave is in flight.</span></li>
-<li value="117"><span class="t">An idle wait turn rereads at cache price. About 30 wait turns at about 150k equals a 10-dispatch probe wave.</span></li>
-<li value="118"><span class="t">Scheduled tasks, <code>crossSessionInbound: hold</code>, and <code>/goal</code> check-ins (<code>CLAUDE_CODE_GOAL_CHECKIN_MINUTES=0</code>) start idle turns too.</span></li>
-<li value="119"><span class="t">Rule (b): shared prefix first, brief last: <code>[protocol+conventions][brief]</code>.</span></li>
-<li value="120"><span class="t">Byte-identical prefixes cache-hit within the TTL. Leaves 2 to N read at 0.1x once the first streams (stagger per flow.md step 3).</span></li>
-<li value="121"><span class="t">Workflow siblings share only when model, effort, agent type, tools, output schema and cwd match.</span></li>
-<li value="122"><span class="t">Rule (c): a Mid-or-stronger seat reads the protocol. Paste it only for Cheap.</span></li>
-<li value="123"><span class="t">Orchestrator output costs about 5x input. &quot;Read references/check.md and follow it&quot; beats pasting about 4k tokens.</span></li>
-<li value="124"><span class="t">A Cheap executor may skip a read, so Haiku keeps the payload.</span></li>
+<li value="113"><span class="t">A fresh subagent&#x27;s cold cache write runs on a 5-minute TTL.</span></li>
+<li value="114"><span class="t">Lift it to an hour with <code>subagentPromptCacheTtl</code>, <code>CLAUDE_CODE_SUBAGENT_PROMPT_CACHE_TTL</code>, or per-agent <code>experimental.cacheTtl</code>.</span></li>
+<li value="115"><span class="t">A subscription on usage credits ignores the per-agent 1h (caching.md).</span></li>
+<li value="116"><span class="t">Weigh leaf count against spawn cost. Prefer a fork for a full-context leaf.</span></li>
+<li value="117"><span class="t">Rule (a), measured 2026-07-11: end the turn while the wave is in flight.</span></li>
+<li value="118"><span class="t">An idle wait turn rereads at cache price. About 30 wait turns at about 150k equals a 10-dispatch probe wave.</span></li>
+<li value="119"><span class="t">Scheduled tasks, <code>crossSessionInbound: hold</code>, and <code>/goal</code> check-ins (<code>CLAUDE_CODE_GOAL_CHECKIN_MINUTES=0</code>) start idle turns too.</span></li>
+<li value="120"><span class="t">Rule (b): shared prefix first, brief last: <code>[protocol+conventions][brief]</code>.</span></li>
+<li value="121"><span class="t">Byte-identical prefixes cache-hit within the TTL. Leaves 2 to N read at 0.1x once the first streams (stagger per flow.md step 3).</span></li>
+<li value="122"><span class="t">Workflow siblings share only when model, effort, agent type, tools, output schema and cwd match.</span></li>
+<li value="123"><span class="t">Rule (c): a Mid-or-stronger seat reads the protocol. Paste it only for Cheap.</span></li>
+<li value="124"><span class="t">Orchestrator output costs about 5x input. &quot;Read references/check.md and follow it&quot; beats pasting about 4k tokens.</span></li>
+<li value="125"><span class="t">A Cheap executor may skip a read, so Haiku keeps the payload.</span></li>
 </ol>
 <h3>Adjacent primitives</h3>
 <ol>
-<li value="125"><span class="t">Agent Teams (<code>CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</code>): teammates fall back to the lead&#x27;s priciest model.</span></li>
-<li value="126"><span class="t">Teammate precedence: the spawn prompt&#x27;s model, the definition&#x27;s <code>model:</code> (inherit means the lead&#x27;s), <code>CLAUDE_CODE_SUBAGENT_MODEL</code> unless inherit, then the lead&#x27;s model.</span></li>
-<li value="127"><span class="t">Name the model in the spawn prompt.</span></li>
-<li value="128"><span class="t">Reserve teams for adversarial or competing-hypothesis review.</span></li>
-<li value="129"><span class="t">Hazard: with teams enabled, an Agent call with <code>name</code> launches a teammate (idle notification). Claude may add a name on its own.</span></li>
-<li value="130"><span class="t"><code>subagent_type</code> alone, a fork, or <code>isolation</code> stays a subagent, as does every named call under <code>claude -p</code> or the SDK.</span></li>
-<li value="131"><span class="t">Setting the variable to 0 in the settings env block reverts without a restart.</span></li>
-<li value="132"><span class="t">Teammates inherit the lead&#x27;s effort.</span></li>
-<li value="133"><span class="t">TeammateIdle and TaskCompleted hooks (exit 2 blocks) enforce smartcheck-before-done.</span></li>
-<li value="134"><span class="t">Advisor: the seat inherits it. Check <code>advisorModel</code> before a Cheap wave.</span></li>
-<li value="135"><span class="t">Dynamic workflows (<code>pipeline()</code> and <code>parallel()</code>, schemas, resumable, auto-planned at <code>/effort ultracode</code>, 2.1.203 and later). Pro switches them on in <code>/config</code>.</span></li>
-<li value="136"><span class="t">Never run a workflow unprompted.</span></li>
-<li value="137"><span class="t">Five opt-ins: the ultracode keyword, ultracode on, the user asking, a user-invoked skill or slash command that says to, or a named or saved workflow the user asked for.</span></li>
-<li value="138"><span class="t">A self-loaded skill, smartplan included, is not an opt-in. &quot;Would benefit&quot; is not one. Ask first.</span></li>
-<li value="139"><span class="t">Agent dispatch is the default.</span></li>
-<li value="140"><span class="t"><code>agent()</code> opts carry only the per-call effort dial (model plus effort low to max).</span></li>
-<li value="141"><span class="t">The tool script reference says to omit model. The workflows cost docs say to ask a smaller model for easy stages.</span></li>
-<li value="142"><span class="t">A workflow is an execution engine, not policy: no mid-run input beyond permission prompts.</span></li>
-<li value="143"><span class="t">Gate before the workflow, route tiers in the script, and run the verify floor as stages.</span></li>
-<li value="144"><span class="t">It inherits the permission mode. A definition&#x27;s <code>permissionMode</code> counts only from default, dontAsk, or plan.</span></li>
-<li value="145"><span class="t">The auto mode classifier reads an <code>agent()</code> prompt as computed text, so a leaf&#x27;s destructive or outward action cannot lean on the brief.</span></li>
-<li value="146"><span class="t">The launch carries a mode-dependent approval prompt.</span></li>
-<li value="147"><span class="t">Security sweeps go to the Claude Security plugin.</span></li>
+<li value="126"><span class="t">Agent Teams (<code>CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</code>): teammates fall back to the lead&#x27;s priciest model.</span></li>
+<li value="127"><span class="t">Teammate precedence: the spawn prompt&#x27;s model, the definition&#x27;s <code>model:</code> (inherit means the lead&#x27;s), <code>CLAUDE_CODE_SUBAGENT_MODEL</code> unless inherit, then the lead&#x27;s model.</span></li>
+<li value="128"><span class="t">Name the model in the spawn prompt.</span></li>
+<li value="129"><span class="t">Reserve teams for adversarial or competing-hypothesis review.</span></li>
+<li value="130"><span class="t">Hazard: with teams enabled, an Agent call with <code>name</code> launches a teammate (idle notification). Claude may add a name on its own.</span></li>
+<li value="131"><span class="t"><code>subagent_type</code> alone, a fork, or <code>isolation</code> stays a subagent, as does every named call under <code>claude -p</code> or the SDK.</span></li>
+<li value="132"><span class="t">Setting the variable to 0 in the settings env block reverts without a restart.</span></li>
+<li value="133"><span class="t">Teammates inherit the lead&#x27;s effort.</span></li>
+<li value="134"><span class="t">TeammateIdle and TaskCompleted hooks (exit 2 blocks) enforce smartcheck-before-done.</span></li>
+<li value="135"><span class="t">Advisor: the seat inherits it. Check <code>advisorModel</code> before a Cheap wave.</span></li>
+<li value="136"><span class="t">Dynamic workflows (<code>pipeline()</code> and <code>parallel()</code>, schemas, resumable, auto-planned at <code>/effort ultracode</code>, 2.1.203 and later). Pro switches them on in <code>/config</code>.</span></li>
+<li value="137"><span class="t">Never run a workflow unprompted.</span></li>
+<li value="138"><span class="t">Five opt-ins: the ultracode keyword, ultracode on, the user asking, a user-invoked skill or slash command that says to, or a named or saved workflow the user asked for.</span></li>
+<li value="139"><span class="t">A self-loaded skill, smartplan included, is not an opt-in. &quot;Would benefit&quot; is not one. Ask first.</span></li>
+<li value="140"><span class="t">Agent dispatch is the default.</span></li>
+<li value="141"><span class="t"><code>agent()</code> opts carry only the per-call effort dial (model plus effort low to max).</span></li>
+<li value="142"><span class="t">The tool script reference says to omit model. The workflows cost docs say to ask a smaller model for easy stages.</span></li>
+<li value="143"><span class="t">A workflow is an execution engine, not policy: no mid-run input beyond permission prompts.</span></li>
+<li value="144"><span class="t">Gate before the workflow, route tiers in the script, and run the verify floor as stages.</span></li>
+<li value="145"><span class="t">It inherits the permission mode. A definition&#x27;s <code>permissionMode</code> counts only from default, dontAsk, or plan.</span></li>
+<li value="146"><span class="t">The auto mode classifier reads an <code>agent()</code> prompt as computed text, so a leaf&#x27;s destructive or outward action cannot lean on the brief.</span></li>
+<li value="147"><span class="t">The launch carries a mode-dependent approval prompt.</span></li>
+<li value="148"><span class="t">Security sweeps go to the Claude Security plugin.</span></li>
 </ol>
 <h3>Mechanical enforcement</h3>
 <ol>
-<li value="148"><span class="t"><code>docs/enforcement-hook.md</code> describes a PreToolUse hook plus <code>Agent(model:...)</code> deny rules.</span></li>
-<li value="149"><span class="t">The warn-only instance lives in <code>.claude/settings.json</code> and <code>.claude/hooks/</code>.</span></li>
-<li value="150"><span class="t">Its note rides exit-0 JSON (<code>systemMessage</code>, <code>additionalContext</code>). Exit-0 stderr reaches only the debug log.</span></li>
-<li value="151"><span class="t">Hard-deny is a one-line opt-in.</span></li>
-<li value="152"><span class="t">A SessionStart hook with the <code>compact</code> matcher (<code>rearm-after-compact.sh</code>) tells Claude to re-read flow.md, artifacts.md and run-state.md when run-state.md sits at the project root.</span></li>
+<li value="149"><span class="t"><code>docs/enforcement-hook.md</code> describes a PreToolUse hook plus <code>Agent(model:...)</code> deny rules.</span></li>
+<li value="150"><span class="t">The warn-only instance lives in <code>.claude/settings.json</code> and <code>.claude/hooks/</code>.</span></li>
+<li value="151"><span class="t">Its note rides exit-0 JSON (<code>systemMessage</code>, <code>additionalContext</code>). Exit-0 stderr reaches only the debug log.</span></li>
+<li value="152"><span class="t">Hard-deny is a one-line opt-in.</span></li>
+<li value="153"><span class="t">A SessionStart hook with the <code>compact</code> matcher (<code>rearm-after-compact.sh</code>) tells Claude to re-read flow.md, artifacts.md and run-state.md when run-state.md sits at the project root.</span></li>
 </ol>
 <h3>Structural tool-lockdown</h3>
 <ol>
-<li value="153"><span class="t">Per-call <code>model:</code> tiers the model, not the tools. Ad-hoc <code>Agent()</code> rules are prompt-only.</span></li>
-<li value="154"><span class="t">The quartet in <code>.claude/agents/</code>: smartplan-scout (Read, Glob, Grep), smartplan-verifier (no Write, Edit or NotebookEdit), smartplan-implementer, smartplan-implementer-cheap.</span></li>
-<li value="155"><span class="t">Dispatch them via <code>subagent_type</code>. Copy the files to reuse them.</span></li>
-<li value="156"><span class="t">Lockdown closes only the tool-permission half. <code>model:</code> frontmatter is still under #43869, so confirm with <code>/tasks</code> and cross-check <code>/usage</code>.</span></li>
+<li value="154"><span class="t">Per-call <code>model:</code> tiers the model, not the tools. Ad-hoc <code>Agent()</code> rules are prompt-only.</span></li>
+<li value="155"><span class="t">The quartet in <code>.claude/agents/</code>: smartplan-scout (Read, Glob, Grep), smartplan-verifier (no Write, Edit or NotebookEdit), smartplan-implementer, smartplan-implementer-cheap.</span></li>
+<li value="156"><span class="t">Dispatch them via <code>subagent_type</code>. Copy the files to reuse them.</span></li>
+<li value="157"><span class="t">Lockdown closes only the tool-permission half. <code>model:</code> frontmatter is still under #43869, so confirm with <code>/tasks</code> and cross-check <code>/usage</code>.</span></li>
 </ol>
 <h3>Cost levers</h3>
 <ol>
-<li value="157"><span class="t">Forking is on by default since 2.1.232 interactive, and 2.1.302 in <code>-p</code>, the Agent SDK, desktop and VS Code (headless arm read 2026-10-20).</span></li>
-<li value="158"><span class="t"><code>CLAUDE_CODE_FORK_SUBAGENT=0</code> turns it off.</span></li>
-<li value="159"><span class="t">An untyped Agent is still general-purpose.</span></li>
-<li value="160"><span class="t"><code>/subtask</code> is the in-session fork (2.1.212). <code>/fork</code> copies the session to a new background one.</span></li>
-<li value="161"><span class="t">A <code>context: fork</code> skill is not a fork. It is a fresh subagent with its own <code>model:</code> frontmatter, background by default since 2.1.218 (<code>background: false</code> opts out).</span></li>
-<li value="162"><span class="t">Sibling forks stopped cross-launching in 2.1.307.</span></li>
-<li value="163"><span class="t">Explore and Plan skip CLAUDE.md and git status, run the session model (Explore capped at Opus on the API), ignore a bare <code>CLAUDE_CODE_SUBAGENT_MODEL</code>, and cannot resume.</span></li>
-<li value="164"><span class="t">Prefer the scout.</span></li>
-<li value="165"><span class="t">From 2.1.271, <code>omitClaudeMd: true</code> drops user, project and local CLAUDE.md. Git status still loads.</span></li>
-<li value="166"><span class="t"><code>skillOverrides</code> has four states: on, off, name-only, user-invocable-only. Plugin skills are exempt (re-verified 2026-08-12).</span></li>
-<li value="167"><span class="t"><code>disable-model-invocation: true</code> removes the description.</span></li>
-<li value="168"><span class="t"><code>skillListingBudgetFraction</code> and <code>skillListingMaxDescChars</code> cap the listing.</span></li>
-<li value="169"><span class="t"><code>/skill-doctor</code> needs 2.1.252 or later.</span></li>
-<li value="170"><span class="t">2.1.277 reads AGENTS.md when there is no CLAUDE.md (Project instructions in <code>/config</code>, all providers and telemetry from 2.1.281).</span></li>
-<li value="171"><span class="t">The Windows docs recommend an <code>@AGENTS.md</code> import in CLAUDE.md, with no double-read.</span></li>
-<li value="172"><span class="t">claude.ai skill sync (2.1.275) lands in <code>~/.claude/skills/synced/</code>, refreshing about every 10 minutes, with collisions at <code>/anthropic-skills:&lt;name&gt;</code>.</span></li>
-<li value="173"><span class="t">Opt out with <code>syncClaudeAiSkills</code> or <code>syncClaudeAiPlugins</code>.</span></li>
-<li value="174"><span class="t"><code>ANTHROPIC_DEFAULT_MODEL</code> (2.1.236 and later) is the fifth link below <code>/model</code>, <code>--model</code> and <code>ANTHROPIC_MODEL</code>. It can repoint sessions, so check it on a shared box.</span></li>
-<li value="175"><span class="t">The <code>best</code> alias is a moving target (Fable 5.1 since 2.1.257, not Fable 5). Never pin a benchmark arm to it.</span></li>
-<li value="176"><span class="t"><code>ANTHROPIC_DEFAULT_HAIKU_MODEL</code> sets the background model. Helpers are pre-seated cheap: statusline setup on Sonnet, the docs guide on Haiku.</span></li>
-<li value="177"><span class="t"><code>CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC</code> is indirect. No switch suppresses background model calls.</span></li>
-<li value="178"><span class="t">Compaction: <code>/autocompact</code> (<code>autoCompactWindow</code>, 100K to 1M), <code>--autocompact</code>, and <code>CLAUDE_CODE_AUTO_COMPACT_WINDOW</code>, which wins.</span></li>
-<li value="179"><span class="t">2.1.312: a subagent&#x27;s <code>autoCompactWindow</code> can lower but never raise (changelog only).</span></li>
-<li value="180"><span class="t">2.1.304 accepts k and M suffixes (500k, 1M). Bare means raw tokens. 500 clamps to 100K with a warning. An unusable value is ignored with a warning and the next source applies.</span></li>
-<li value="181"><span class="t"><code>CLAUDE_AUTOCOMPACT_PCT_OVERRIDE</code> only lowers, subagents included.</span></li>
-<li value="182"><span class="t">Frontmatter <code>autoCompactWindow</code> arrived in 2.1.296.</span></li>
-<li value="183"><span class="t">Earlier compaction shrinks rereads but busts the prefix. Measure first.</span></li>
+<li value="158"><span class="t">Forking is on by default since 2.1.232 interactive, and 2.1.302 in <code>-p</code>, the Agent SDK, desktop and VS Code (headless arm read 2026-10-20).</span></li>
+<li value="159"><span class="t"><code>CLAUDE_CODE_FORK_SUBAGENT=0</code> turns it off.</span></li>
+<li value="160"><span class="t">An untyped Agent is still general-purpose.</span></li>
+<li value="161"><span class="t"><code>/subtask</code> is the in-session fork (2.1.212). <code>/fork</code> copies the session to a new background one.</span></li>
+<li value="162"><span class="t">A <code>context: fork</code> skill is not a fork. It is a fresh subagent with its own <code>model:</code> frontmatter, background by default since 2.1.218 (<code>background: false</code> opts out).</span></li>
+<li value="163"><span class="t">Sibling forks stopped cross-launching in 2.1.307.</span></li>
+<li value="164"><span class="t">Explore and Plan skip CLAUDE.md and git status, run the session model (Explore capped at Opus on the API), ignore a bare <code>CLAUDE_CODE_SUBAGENT_MODEL</code>, and cannot resume.</span></li>
+<li value="165"><span class="t">Prefer the scout.</span></li>
+<li value="166"><span class="t">From 2.1.271, <code>omitClaudeMd: true</code> drops user, project and local CLAUDE.md. Git status still loads.</span></li>
+<li value="167"><span class="t"><code>skillOverrides</code> has four states: on, off, name-only, user-invocable-only. Plugin skills are exempt (re-verified 2026-08-12).</span></li>
+<li value="168"><span class="t"><code>disable-model-invocation: true</code> removes the description.</span></li>
+<li value="169"><span class="t"><code>skillListingBudgetFraction</code> and <code>skillListingMaxDescChars</code> cap the listing.</span></li>
+<li value="170"><span class="t"><code>/skill-doctor</code> needs 2.1.252 or later.</span></li>
+<li value="171"><span class="t">2.1.277 reads AGENTS.md when there is no CLAUDE.md (Project instructions in <code>/config</code>, all providers and telemetry from 2.1.281).</span></li>
+<li value="172"><span class="t">The Windows docs recommend an <code>@AGENTS.md</code> import in CLAUDE.md, with no double-read.</span></li>
+<li value="173"><span class="t">claude.ai skill sync (2.1.275) lands in <code>~/.claude/skills/synced/</code>, refreshing about every 10 minutes, with collisions at <code>/anthropic-skills:&lt;name&gt;</code>.</span></li>
+<li value="174"><span class="t">Opt out with <code>syncClaudeAiSkills</code> or <code>syncClaudeAiPlugins</code>.</span></li>
+<li value="175"><span class="t"><code>ANTHROPIC_DEFAULT_MODEL</code> (2.1.236 and later) is the fifth link below <code>/model</code>, <code>--model</code> and <code>ANTHROPIC_MODEL</code>. It can repoint sessions, so check it on a shared box.</span></li>
+<li value="176"><span class="t"><code>best</code> and <code>fable</code> are moving targets. From 2.1.321 <code>best</code> is <code>opus</code> and <code>fable</code> is Fable 5.2. Never pin a benchmark arm to either.</span></li>
+<li value="177"><span class="t">Fable 5.1 needs its full id, <code>claude-fable-5-1</code>.</span></li>
+<li value="178"><span class="t"><code>ANTHROPIC_DEFAULT_HAIKU_MODEL</code> sets the background model. Helpers are pre-seated cheap: statusline setup on Sonnet, the docs guide on Haiku.</span></li>
+<li value="179"><span class="t"><code>CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC</code> is indirect. No switch suppresses background model calls.</span></li>
+<li value="180"><span class="t">Compaction: <code>/autocompact</code> (<code>autoCompactWindow</code>, 100K to 1M), <code>--autocompact</code>, and <code>CLAUDE_CODE_AUTO_COMPACT_WINDOW</code>, which wins.</span></li>
+<li value="181"><span class="t">2.1.312: a subagent&#x27;s <code>autoCompactWindow</code> can lower but never raise (changelog only).</span></li>
+<li value="182"><span class="t">2.1.304 accepts k and M suffixes (500k, 1M). Bare means raw tokens. 500 clamps to 100K with a warning. An unusable value is ignored with a warning and the next source applies.</span></li>
+<li value="183"><span class="t"><code>CLAUDE_AUTOCOMPACT_PCT_OVERRIDE</code> only lowers, subagents included.</span></li>
+<li value="184"><span class="t">Frontmatter <code>autoCompactWindow</code> arrived in 2.1.296.</span></li>
+<li value="185"><span class="t">Earlier compaction shrinks rereads but busts the prefix. Measure first.</span></li>
 </ol>
 </section>
 <section id="copilot-cli" class="skill">
-<header class="skill-head"><h2>Copilot CLI</h2><p class="src">copilot.md <span class="dot"></span> <span class="count" data-total="149">149 lines</span></p></header>
+<header class="skill-head"><h2>Copilot CLI</h2><p class="src">copilot.md <span class="dot"></span> <span class="count" data-total="154">154 lines</span></p></header>
 <h3>Header</h3>
 <ol>
 <li value="1"><span class="t">Facts verified 2026-07-06, re-swept 2026-10-20.</span></li>
@@ -2258,188 +2264,193 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <li value="20"><span class="t">Subagent tokens bill.</span></li>
 <li value="21"><span class="t">Anthropic list rates equal the Copilot rows.</span></li>
 <li value="22"><span class="t">Four SKUs at $10/$50: Fable 5, Fable 5.1 (cache read $0.25), Opus 4.8 fast mode (Preview), GPT-6 Astra (over 272K is $20/$75).</span></li>
-<li value="23"><span class="t">The three Claude planning-only models are those.</span></li>
-<li value="24"><span class="t">Opus 4.8 fast mode is removed 2026-11-30 and errors rather than falls back.</span></li>
+<li value="23"><span class="t">Fable 5.2 (GA 2026-11-09) lists at $8/$40, cache read $0.20.</span></li>
+<li value="24"><span class="t">The four Claude SKUs above Opus are planning-only.</span></li>
+<li value="25"><span class="t">The three Claude planning-only models are those.</span></li>
+<li value="26"><span class="t">Opus 4.8 fast mode is removed 2026-11-30 and errors rather than falls back.</span></li>
 </ol>
 <h3>Soft caps</h3>
 <ol>
-<li value="25"><span class="t"><code>/limits</code> and <code>--max-ai-credits</code>, on CLI 1.0.66 or later and SDK 1.0.5 or later.</span></li>
-<li value="26"><span class="t">In-flight work finishes. The minimum cap is 30 credits (1.0.67). The scope docs disagree. <code>-p</code> covers one message.</span></li>
-<li value="27"><span class="t">T25 (2026-07-12): caps are visible to the model and suppress skill loading.</span></li>
-<li value="28"><span class="t"><code>-p</code> does not expand slash commands, though descriptions still load (T30). The headless fan-out flow is untested.</span></li>
-<li value="29"><span class="t">T28 (2026-07-21): junctions outside the project root are unreadable (13.2 cr lost). Use <code>--add-dir &lt;checkout&gt;</code> or <code>install-project.ps1</code>.</span></li>
+<li value="27"><span class="t"><code>/limits</code> and <code>--max-ai-credits</code>, on CLI 1.0.66 or later and SDK 1.0.5 or later.</span></li>
+<li value="28"><span class="t">In-flight work finishes. The minimum cap is 30 credits (1.0.67). The scope docs disagree. <code>-p</code> covers one message.</span></li>
+<li value="29"><span class="t">T25 (2026-07-12): caps are visible to the model and suppress skill loading.</span></li>
+<li value="30"><span class="t"><code>-p</code> does not expand slash commands, though descriptions still load (T30). The headless fan-out flow is untested.</span></li>
+<li value="31"><span class="t">T28 (2026-07-21): junctions outside the project root are unreadable (13.2 cr lost). Use <code>--add-dir &lt;checkout&gt;</code> or <code>install-project.ps1</code>.</span></li>
 </ol>
 <h3>Concurrency</h3>
 <ol>
-<li value="30"><span class="t">Free 2, Pro and Pro+ 4, Max 8, Business 16, Enterprise and usage-based 32, depth 6 (read 2026-09-22).</span></li>
-<li value="31"><span class="t">The env-var table says 32 and depth 4.</span></li>
-<li value="32"><span class="t"><code>subagents.*</code> knobs: <code>maxConcurrency</code> caps at 32, <code>maxDepth</code> at 256, plus <code>disabledSubagents</code>, in <code>~/.copilot/settings.json</code> or <code>/settings</code>. The first two are usage-based only.</span></li>
-<li value="33"><span class="t">Size waves to your plan&#x27;s row.</span></li>
+<li value="32"><span class="t">Free 2, Pro and Pro+ 4, Max 8, Business 16, Enterprise and usage-based 32, depth 6 (read 2026-09-22).</span></li>
+<li value="33"><span class="t">The env-var table says 32 and depth 4.</span></li>
+<li value="34"><span class="t"><code>subagents.*</code> knobs: <code>maxConcurrency</code> caps at 32, <code>maxDepth</code> at 256, plus <code>disabledSubagents</code>, in <code>~/.copilot/settings.json</code> or <code>/settings</code>. The first two are usage-based only.</span></li>
+<li value="35"><span class="t">Size waves to your plan&#x27;s row.</span></li>
 </ol>
 <h3>Metering</h3>
 <ol>
-<li value="34"><span class="t"><code>/usage</code> is session-level only, confirmed 2026-07-08.</span></li>
-<li value="35"><span class="t">CLI 1.0.85 adds per-model rows and 1.0.97 billed credits.</span></li>
-<li value="36"><span class="t">Live-tested 2026-07-09: <code>/context</code> under <code>/experimental</code>, <code>/statusline ai-credits</code> and <code>ai-used</code>, and run-state.md rows.</span></li>
-<li value="37"><span class="t">Headless metering (T30): the <code>-p</code> AI Credits footer, and <code>session-store.db</code>&#x27;s <code>assistant_usage_events</code> in nano-AIU, where 1e9 equals 1 credit.</span></li>
+<li value="36"><span class="t"><code>/usage</code> is session-level only, confirmed 2026-07-08.</span></li>
+<li value="37"><span class="t">CLI 1.0.85 adds per-model rows and 1.0.97 billed credits.</span></li>
+<li value="38"><span class="t">Live-tested 2026-07-09: <code>/context</code> under <code>/experimental</code>, <code>/statusline ai-credits</code> and <code>ai-used</code>, and run-state.md rows.</span></li>
+<li value="39"><span class="t">Headless metering (T30): the <code>-p</code> AI Credits footer, and <code>session-store.db</code>&#x27;s <code>assistant_usage_events</code> in nano-AIU, where 1e9 equals 1 credit.</span></li>
 </ol>
 <h3>Plan gating</h3>
 <ol>
-<li value="38"><span class="t">Opus 4.8, Opus 5 (GA 2026-07-24), Opus 5.5 (GA 2026-09-22), and Fable 5 and 5.1 (GA 2026-09-01) need Pro+ or Max.</span></li>
-<li value="39"><span class="t">The gate has moved before (T30).</span></li>
-<li value="40"><span class="t">The Fables retain data (plans footnote 2026-09-15).</span></li>
-<li value="41"><span class="t">Re-derived 2026-09-15 from model-supported-plans.yml: plain Pro excludes GPT-5.6 Sol, GPT-6 Sol, GPT-6.1 Sol, GPT-6 Astra, GPT-5.4 nano, and every Opus and Fable.</span></li>
-<li value="42"><span class="t">Plain Pro reaches Terra, Luna, GPT-5.3-Codex, Kimi K3, Sonnet 5.5, the Gemini Flashes, and the Groks (re-read 2026-09-29).</span></li>
-<li value="43"><span class="t">Vendors on Copilot: Anthropic, OpenAI, Google, xAI, Moonshot, Microsoft.</span></li>
-<li value="44"><span class="t">Grok 4.7 is GA on every paid plan at 2 / 6 (read 2026-10-20).</span></li>
-<li value="45"><span class="t">Grok 4.5 retired 2026-10-19 per the changelog, though the docs still list it GA.</span></li>
-<li value="46"><span class="t">Grok 4.6 is GA on every paid plan including Pro, at 2 / 6 (read 2026-11-02).</span></li>
+<li value="40"><span class="t">Opus 4.8, Opus 5 (GA 2026-07-24), Opus 5.5 (GA 2026-09-22), Fable 5 and 5.1 (GA 2026-09-01) and Fable 5.2 (GA 2026-11-09) need Pro+ or Max.</span></li>
+<li value="41"><span class="t">Fable 5.2 is off by default on Business and Enterprise.</span></li>
+<li value="42"><span class="t">The gate has moved before (T30).</span></li>
+<li value="43"><span class="t">The Fables retain data (plans footnote 2026-09-15).</span></li>
+<li value="44"><span class="t">Re-derived 2026-09-15 from model-supported-plans.yml: plain Pro excludes GPT-5.6 Sol, GPT-6 Sol, GPT-6.1 Sol, GPT-6 Astra, GPT-5.4 nano, and every Opus and Fable.</span></li>
+<li value="45"><span class="t">Plain Pro reaches Terra, Luna, GPT-5.3-Codex, Kimi K3, Sonnet 5.5, the Gemini Flashes, and the Groks (re-read 2026-09-29).</span></li>
+<li value="46"><span class="t">Vendors on Copilot: Anthropic, OpenAI, Google, xAI, Moonshot, Microsoft.</span></li>
+<li value="47"><span class="t">Grok 4.7 is GA on every paid plan at 2 / 6 (read 2026-10-20).</span></li>
+<li value="48"><span class="t">Grok 4.5 retired 2026-10-19 per the changelog, though the docs still list it GA.</span></li>
+<li value="49"><span class="t">Grok 4.6 is GA on every paid plan including Pro, at 2 / 6 (read 2026-11-02).</span></li>
 </ol>
 <h3>Seat verdicts</h3>
 <ol>
-<li value="47"><span class="t">Author&#x27;s verdicts dated 2026-09-23.</span></li>
-<li value="48"><span class="t">Luna ceiling (author, 2026-11-03): the session is <code>gpt-6-luna</code>, never Auto.</span></li>
-<li value="49"><span class="t">The subagents scout, implementer-cheap and verifier-cheap are pinned <code>[gpt-6-luna]</code>. Nothing above Luna is dispatched.</span></li>
-<li value="50"><span class="t">A Luna session works inline with a fresh Luna verifier (Mechanical, AA 38.1), scripted acceptance, and UNKNOWN on judgment.</span></li>
-<li value="51"><span class="t">A Luna session writes the brief or report in full, offers a pricier session, and carries on.</span></li>
-<li value="52"><span class="t">A pricier session is in charge: it plans, briefs Luna, and verifies every Luna diff.</span></li>
-<li value="53"><span class="t">On CLI 1.0.105 only Luna loads the skill cleanly.</span></li>
-<li value="54"><span class="t">Sol hit content_filter on 15 of 18 runs and Astra on 1 of 1 (T48, T49, 2026-11-04). The block rises with the reference list, and fires on a one-file list too.</span></li>
-<li value="55"><span class="t">Sonnet 5.5 never called the skill.</span></li>
-<li value="56"><span class="t">Sol&#x27;s 3 clean runs did the work themselves with no Luna leaf.</span></li>
-<li value="57"><span class="t">Recommend a Luna session.</span></li>
-<li value="58"><span class="t">Other profiles: planner <code>[gpt-6.1-sol, gpt-6-sol]</code>, Mid, Reserve <code>[gpt-6-astra, claude-opus-5.5]</code>, verifier <code>gemini-3.8-flash</code>. By hand only. Fable has no seat.</span></li>
-<li value="59"><span class="t">T46: Haiku 5.5 passed semver2 3 of 3, Luna missed a case each time, and a Mid seat handing to Luna cost 45% more. Luna-first is the author&#x27;s call.</span></li>
+<li value="50"><span class="t">Author&#x27;s verdicts dated 2026-09-23.</span></li>
+<li value="51"><span class="t">Luna ceiling (author, 2026-11-03): the session is <code>gpt-6-luna</code>, never Auto.</span></li>
+<li value="52"><span class="t">The subagents scout, implementer-cheap and verifier-cheap are pinned <code>[gpt-6-luna]</code>. Nothing above Luna is dispatched.</span></li>
+<li value="53"><span class="t">A Luna session works inline with a fresh Luna verifier (Mechanical, AA 38.1), scripted acceptance, and UNKNOWN on judgment.</span></li>
+<li value="54"><span class="t">A Luna session writes the brief or report in full, offers a pricier session, and carries on.</span></li>
+<li value="55"><span class="t">A pricier session is in charge: it plans, briefs Luna, and verifies every Luna diff.</span></li>
+<li value="56"><span class="t">On CLI 1.0.105 only Luna loads the skill cleanly.</span></li>
+<li value="57"><span class="t">Sol hit content_filter on 15 of 18 runs and Astra on 1 of 1 (T48, T49, 2026-11-04). The block rises with the reference list, and fires on a one-file list too.</span></li>
+<li value="58"><span class="t">Sonnet 5.5 never called the skill.</span></li>
+<li value="59"><span class="t">Sol&#x27;s 3 clean runs did the work themselves with no Luna leaf.</span></li>
+<li value="60"><span class="t">Recommend a Luna session.</span></li>
+<li value="61"><span class="t">Other profiles: planner <code>[gpt-6.1-sol, gpt-6-sol]</code>, Mid, Reserve <code>[gpt-6-astra, claude-opus-5.5]</code>, verifier <code>gemini-3.8-flash</code>. By hand only. Fable has no seat.</span></li>
+<li value="62"><span class="t">T46: Haiku 5.5 passed semver2 3 of 3, Luna missed a case each time, and a Mid seat handing to Luna cost 45% more. Luna-first is the author&#x27;s call.</span></li>
 </ol>
 <h3>Effort</h3>
 <ol>
-<li value="60"><span class="t">In <code>~/.copilot/settings.json</code>, 1.0.88 ignores <code>reasoningEffort</code>. Use <code>subagents.agents.&lt;name&gt;.effortLevel</code> (probed 2026-09-23).</span></li>
-<li value="61"><span class="t">The repo&#x27;s <code>.github/copilot/settings.json</code> ignores <code>subagents.*</code>.</span></li>
-<li value="62"><span class="t">Rule: the cheapest effort that meets the class.</span></li>
-<li value="63"><span class="t">GPT-6.1 Sol runs low on both Sol seats (42.1, $0.13).</span></li>
-<li value="64"><span class="t">The Gemini verifier runs medium (39.8, $0.93).</span></li>
-<li value="65"><span class="t">The Astra Reserve runs xhigh (59.6% TB4, $2.31, against Opus 5.5 max at $5.98).</span></li>
-<li value="66"><span class="t">The Luna session runs medium (T42 and T43: 44 to 44, 45 to 45.3, under a third of the credits, while TB4 favours max by 12.6% to 2.5%).</span></li>
-<li value="67"><span class="t">The Cheap verifier runs low.</span></li>
-<li value="68"><span class="t">CLI 1.0.90 and later, else it falls to GPT-6 Sol at 33.9 on low.</span></li>
+<li value="63"><span class="t">In <code>~/.copilot/settings.json</code>, 1.0.88 ignores <code>reasoningEffort</code>. Use <code>subagents.agents.&lt;name&gt;.effortLevel</code> (probed 2026-09-23).</span></li>
+<li value="64"><span class="t">The repo&#x27;s <code>.github/copilot/settings.json</code> ignores <code>subagents.*</code>.</span></li>
+<li value="65"><span class="t">Rule: the cheapest effort that meets the class.</span></li>
+<li value="66"><span class="t">GPT-6.1 Sol runs low on both Sol seats (42.1, $0.13).</span></li>
+<li value="67"><span class="t">The Gemini verifier runs medium (39.8, $0.93).</span></li>
+<li value="68"><span class="t">The Astra Reserve runs xhigh (59.6% TB4, $2.31, against Opus 5.5 max at $5.98).</span></li>
+<li value="69"><span class="t">The Luna session runs medium (T42 and T43: 44 to 44, 45 to 45.3, under a third of the credits, while TB4 favours max by 12.6% to 2.5%).</span></li>
+<li value="70"><span class="t">The Cheap verifier runs low.</span></li>
+<li value="71"><span class="t">CLI 1.0.90 and later, else it falls to GPT-6 Sol at 33.9 on low.</span></li>
 </ol>
 <h3>SKU and catalog</h3>
 <ol>
-<li value="69"><span class="t">Read the SKU first: <code>gh api copilot_internal/user</code>.</span></li>
-<li value="70"><span class="t">Free refuses pins, Luna included, and <code>-p</code> runs Auto.</span></li>
-<li value="71"><span class="t">Pro+ probes served every slug (last 1.0.93, 2026-10-08). T42 covered verifier and Reserve, T46 Cheap and Mid.</span></li>
-<li value="72"><span class="t">GPT-6.1 Sol is an untrialed planner (T43 used GPT-6 Sol).</span></li>
-<li value="73"><span class="t">A rubber-duck critic gives no PASS or FAIL and is not a smartcheck.</span></li>
-<li value="74"><span class="t"><code>copilot help config</code> is a static list. The server catalog is the <code>/model</code> picker.</span></li>
-<li value="75"><span class="t">1.0.105 prints six retired slugs (read 2026-10-20).</span></li>
-<li value="76"><span class="t">1.0.94 adds <code>claude-haiku-5.5</code>.</span></li>
-<li value="77"><span class="t">1.0.98 adds <code>gemini-4-argon</code> (GA 2026-10-13, Pro+ up). 1.0.105 lists it, unprobed, promo to 2026-12-01, outside Auto, not a seat.</span></li>
-<li value="78"><span class="t">The cost ceiling (routing.md § The cost ceiling) binds pinned seats. Never Auto. Ask at the plan gate.</span></li>
+<li value="72"><span class="t">Read the SKU first: <code>gh api copilot_internal/user</code>.</span></li>
+<li value="73"><span class="t">Free refuses pins, Luna included, and <code>-p</code> runs Auto.</span></li>
+<li value="74"><span class="t">Pro+ probes served every slug (last 1.0.93, 2026-10-08). T42 covered verifier and Reserve, T46 Cheap and Mid.</span></li>
+<li value="75"><span class="t">GPT-6.1 Sol is an untrialed planner (T43 used GPT-6 Sol).</span></li>
+<li value="76"><span class="t">A rubber-duck critic gives no PASS or FAIL and is not a smartcheck.</span></li>
+<li value="77"><span class="t"><code>copilot help config</code> is a static list. The server catalog is the <code>/model</code> picker.</span></li>
+<li value="78"><span class="t">1.0.105 prints six retired slugs (read 2026-10-20).</span></li>
+<li value="79"><span class="t">1.0.94 adds <code>claude-haiku-5.5</code>.</span></li>
+<li value="80"><span class="t">1.0.98 adds <code>gemini-4-argon</code> (GA 2026-10-13, Pro+ up). 1.0.105 lists it, unprobed, promo to 2026-12-01, outside Auto, not a seat.</span></li>
+<li value="81"><span class="t">1.0.106 adds GPT-6.1 Terra to the picker and 1.0.109 adds Fable 5.2.</span></li>
+<li value="82"><span class="t">Gemini 4 Carbon is GA on Copilot from 2026-11-10 (Pro+ up, $2/$10 to 2026-12-01, then $4/$20), with no CLI slug yet.</span></li>
+<li value="83"><span class="t">The cost ceiling (routing.md § The cost ceiling) binds pinned seats. Never Auto. Ask at the plan gate.</span></li>
 </ol>
 <h3>Long-context surcharges (2026-09-22)</h3>
 <ol>
-<li value="79"><span class="t">Haiku 5.5 over 100K: $0.50/$2.50.</span></li>
-<li value="80"><span class="t">Sol over 272K: $8/$30.</span></li>
-<li value="81"><span class="t">Terra over 272K: $4/$18.</span></li>
-<li value="82"><span class="t">Luna over 200K: $0.40/$1.80.</span></li>
-<li value="83"><span class="t">GPT-6 and 6.1 Sol over 272K: $4/$15.</span></li>
-<li value="84"><span class="t">GPT-6 Luna over 272K: $0.20/$0.75.</span></li>
-<li value="85"><span class="t">Grok over 200K: $4/$12.</span></li>
-<li value="86"><span class="t">The GPT-5.5 and 5.4 rows went with the 2026-10-19 retirements.</span></li>
-<li value="87"><span class="t">Roster watch (re-read 2026-09-30): model-classes.md. Business and Enterprise get new GA models by default since 2026-08-26. Trust the 2026-10-19 changelog batch over the retirement table.</span></li>
+<li value="84"><span class="t">Haiku 5.5 over 100K: $0.50/$2.50.</span></li>
+<li value="85"><span class="t">Sol over 272K: $8/$30.</span></li>
+<li value="86"><span class="t">Terra over 272K: $4/$18.</span></li>
+<li value="87"><span class="t">Luna over 200K: $0.40/$1.80.</span></li>
+<li value="88"><span class="t">GPT-6 and 6.1 Sol over 272K: $4/$15.</span></li>
+<li value="89"><span class="t">GPT-6 Luna over 272K: $0.20/$0.75.</span></li>
+<li value="90"><span class="t">Grok over 200K: $4/$12.</span></li>
+<li value="91"><span class="t">The GPT-5.5 and 5.4 rows went with the 2026-10-19 retirements.</span></li>
+<li value="92"><span class="t">Roster watch (re-read 2026-09-30): model-classes.md. Business and Enterprise get new GA models by default since 2026-08-26. Trust the 2026-10-19 changelog batch over the retirement table.</span></li>
 </ol>
 <h3>Auto</h3>
 <ol>
-<li value="88"><span class="t">Auto went GA 2026-04-17 on all plans and routes on task complexity.</span></li>
-<li value="89"><span class="t">Tiers Efficiency, Balance and Intelligence arrived 2026-09-14.</span></li>
-<li value="90"><span class="t">Since 2026-10-28 Fusion replaces Auto in the picker (CLI, VS Code, app, JetBrains). Standard is on every plan, and High and Max are Pro+.</span></li>
-<li value="91"><span class="t">Fusion bills each model, 30% off paid through 2026-11-30.</span></li>
-<li value="92"><span class="t">The 10% Auto discount applies to Chat and the cloud agent only.</span></li>
-<li value="93"><span class="t">Auto will not pick an excluded model.</span></li>
-<li value="94"><span class="t">GPT-5.3-Codex base and LTS are the last resort on Business and Enterprise.</span></li>
-<li value="95"><span class="t">The CLI Auto pool holds GPT-6 Astra from 2026-09-16 and lists Gemini 3.8 Flash as Included (read 2026-10-20). Gemini survives the retirements.</span></li>
-<li value="96"><span class="t">Description routing is first-party. What is left is the regime gate plus the verify floor.</span></li>
-<li value="97"><span class="t">&quot;Along natural cache boundaries&quot; is a rationale, not a guarantee.</span></li>
-<li value="98"><span class="t">Inline Auto sessions are a fair control.</span></li>
-<li value="99"><span class="t">Individual plans carry codenamed evaluation models. Record or disable them for a control.</span></li>
-<li value="100"><span class="t">A tiered wave pins explicitly. Under Auto a subagent inherits the session model (read 2026-09-15).</span></li>
-<li value="101"><span class="t">Rechecked 2026-08-05, tiers added 2026-09-20.</span></li>
+<li value="93"><span class="t">Auto went GA 2026-04-17 on all plans and routes on task complexity.</span></li>
+<li value="94"><span class="t">Tiers Efficiency, Balance and Intelligence arrived 2026-09-14.</span></li>
+<li value="95"><span class="t">Since 2026-10-28 Fusion replaces Auto in the picker (CLI, VS Code, app, JetBrains). Standard is on every plan, and High and Max are Pro+.</span></li>
+<li value="96"><span class="t">Fusion bills each model, 30% off paid through 2026-11-30.</span></li>
+<li value="97"><span class="t">The 10% Auto discount applies to Chat and the cloud agent only.</span></li>
+<li value="98"><span class="t">Auto will not pick an excluded model.</span></li>
+<li value="99"><span class="t">GPT-5.3-Codex base and LTS are the last resort on Business and Enterprise.</span></li>
+<li value="100"><span class="t">The CLI Auto pool holds GPT-6 Astra from 2026-09-16 and lists Gemini 3.8 Flash as Included (read 2026-10-20). Gemini survives the retirements.</span></li>
+<li value="101"><span class="t">Description routing is first-party. What is left is the regime gate plus the verify floor.</span></li>
+<li value="102"><span class="t">&quot;Along natural cache boundaries&quot; is a rationale, not a guarantee.</span></li>
+<li value="103"><span class="t">Inline Auto sessions are a fair control.</span></li>
+<li value="104"><span class="t">Individual plans carry codenamed evaluation models. Record or disable them for a control.</span></li>
+<li value="105"><span class="t">A tiered wave pins explicitly. Under Auto a subagent inherits the session model (read 2026-09-15).</span></li>
+<li value="106"><span class="t">Rechecked 2026-08-05, tiers added 2026-09-20.</span></li>
 </ol>
 <h3>Verify on credits</h3>
 <ol>
-<li value="102"><span class="t">check.md&#x27;s credit-billed default: script first, then batched and sampled.</span></li>
-<li value="103"><span class="t">T22: one batched model verify cost 83% of the inline arm.</span></li>
+<li value="107"><span class="t">check.md&#x27;s credit-billed default: script first, then batched and sampled.</span></li>
+<li value="108"><span class="t">T22: one batched model verify cost 83% of the inline arm.</span></li>
 </ol>
 <h3>Context tiers (docs 2026-09-15)</h3>
 <ol>
-<li value="104"><span class="t">Default (picker 2026-08-06): Claude 264K, Geminis 264K, GPT-5.6 Sol and Terra 400K, Luna and Grok 4.5 328K (4.5 retired, 4.7 unread).</span></li>
-<li value="105"><span class="t">Use a cross-family seat for room.</span></li>
-<li value="106"><span class="t">Reasoning is Medium except Kimi K3 at High.</span></li>
-<li value="107"><span class="t">The selectable 1M tier is <code>--context long_context</code>.</span></li>
+<li value="109"><span class="t">Default (picker 2026-08-06): Claude 264K, Geminis 264K, GPT-5.6 Sol and Terra 400K, Luna and Grok 4.5 328K (4.5 retired, 4.7 unread).</span></li>
+<li value="110"><span class="t">Use a cross-family seat for room.</span></li>
+<li value="111"><span class="t">Reasoning is Medium except Kimi K3 at High.</span></li>
+<li value="112"><span class="t">The selectable 1M tier is <code>--context long_context</code>.</span></li>
 </ol>
 <h3>Per-seat control</h3>
 <ol>
-<li value="108"><span class="t">Checked 2026-08-05: #2758 open since 2026-04-16 (downgrade, log line, repo pins subject).</span></li>
-<li value="109"><span class="t">#3824 closed 2026-06-17 with no resolution note, a server-side arm. Closed is not fixed.</span></li>
-<li value="110"><span class="t">Pins are not guaranteed. Pin anyway, report intent, keep the verify floor independent, and never mix Auto with tiered.</span></li>
+<li value="113"><span class="t">Checked 2026-08-05: #2758 open since 2026-04-16 (downgrade, log line, repo pins subject).</span></li>
+<li value="114"><span class="t">#3824 closed 2026-06-17 with no resolution note, a server-side arm. Closed is not fixed.</span></li>
+<li value="115"><span class="t">Pins are not guaranteed. Pin anyway, report intent, keep the verify floor independent, and never mix Auto with tiered.</span></li>
 </ol>
 <h3>Dispatch (updated 2026-07-09)</h3>
 <ol>
-<li value="111"><span class="t">Fan out yourself with the task tool, in parallel, within concurrency and depth.</span></li>
-<li value="112"><span class="t">Issue #3568 is tracked. Seven agents are listed, and none carries <code>disable-model-invocation</code>.</span></li>
-<li value="113"><span class="t">v1.0.74 hides a <code>disable-model-invocation</code> agent from task (probe 2026-09-23 on CLI 1.0.83: &quot;Unknown agent_type&quot;).</span></li>
-<li value="114"><span class="t">Never ask the user to invoke. The Luna ceiling keeps the dear seats out.</span></li>
-<li value="115"><span class="t">Built-in defaults (read 2026-10-20): task runs <code>gpt-5.6-luna</code> with fallback <code>claude-haiku-4.5</code>, explore runs <code>gpt-5.6-luna</code>, and code-review, general-purpose and security-review run <code>claude-sonnet-4.6</code>.</span></li>
-<li value="116"><span class="t"><code>tools [&quot;*&quot;]</code> includes task.</span></li>
-<li value="117"><span class="t">Live probe 2026-10-13 on CLI 1.0.93: a Luna session dispatched smartplan-implementer (gpt-6.1-sol, low), which dispatched smartplan-scout (gpt-6-luna) at low.</span></li>
-<li value="118"><span class="t"><code>~/.copilot/agents</code> junctions to <code>.github/agents</code>. A same-name agent via <code>--add-dir</code> is lost, so a trial seat needs its own name.</span></li>
-<li value="119"><span class="t">1.0.96 adds <code>/add-dir</code> sandbox access. 1.0.97 adds agent-scoped hooks.</span></li>
-<li value="120"><span class="t">Stable is 1.0.105 (2026-10-28, read 2026-11-02).</span></li>
-<li value="121"><span class="t"><code>/fleet</code> needs a human: decompose through synthesize. It is not a substitute for smartcheck.</span></li>
-<li value="122"><span class="t">Three <code>/fleet</code> triggers: typed, autopilot after <code>/plan</code> and Shift+Tab, and the <code>--fleet</code> flag (also in <code>-p</code>). Optional, never blocked on.</span></li>
-<li value="123"><span class="t">The serial path is single-agent auto-inference. The <code>infer</code> key is retired though the CLI table lists it. Concurrency comes from task. Monitor with <code>/tasks</code>.</span></li>
+<li value="116"><span class="t">Fan out yourself with the task tool, in parallel, within concurrency and depth.</span></li>
+<li value="117"><span class="t">Issue #3568 is tracked. Seven agents are listed, and none carries <code>disable-model-invocation</code>.</span></li>
+<li value="118"><span class="t">v1.0.74 hides a <code>disable-model-invocation</code> agent from task (probe 2026-09-23 on CLI 1.0.83: &quot;Unknown agent_type&quot;).</span></li>
+<li value="119"><span class="t">Never ask the user to invoke. The Luna ceiling keeps the dear seats out.</span></li>
+<li value="120"><span class="t">Built-in defaults (read 2026-10-20): task runs <code>gpt-5.6-luna</code> with fallback <code>claude-haiku-4.5</code>, explore runs <code>gpt-5.6-luna</code>, and code-review, general-purpose and security-review run <code>claude-sonnet-4.6</code>.</span></li>
+<li value="121"><span class="t"><code>tools [&quot;*&quot;]</code> includes task.</span></li>
+<li value="122"><span class="t">Live probe 2026-10-13 on CLI 1.0.93: a Luna session dispatched smartplan-implementer (gpt-6.1-sol, low), which dispatched smartplan-scout (gpt-6-luna) at low.</span></li>
+<li value="123"><span class="t"><code>~/.copilot/agents</code> junctions to <code>.github/agents</code>. A same-name agent via <code>--add-dir</code> is lost, so a trial seat needs its own name.</span></li>
+<li value="124"><span class="t">1.0.96 adds <code>/add-dir</code> sandbox access. 1.0.97 adds agent-scoped hooks.</span></li>
+<li value="125"><span class="t">Stable is 1.0.109 (2026-11-10, read 2026-11-11).</span></li>
+<li value="126"><span class="t"><code>/fleet</code> needs a human: decompose through synthesize. It is not a substitute for smartcheck.</span></li>
+<li value="127"><span class="t">Three <code>/fleet</code> triggers: typed, autopilot after <code>/plan</code> and Shift+Tab, and the <code>--fleet</code> flag (also in <code>-p</code>). Optional, never blocked on.</span></li>
+<li value="128"><span class="t">The serial path is single-agent auto-inference. The <code>infer</code> key is retired though the CLI table lists it. Concurrency comes from task. Monitor with <code>/tasks</code>.</span></li>
 </ol>
 <h3>Command naming</h3>
 <ol>
-<li value="124"><span class="t">Commands are <code>&lt;plugin&gt;:&lt;skill&gt;</code>, with no bare form, default, or alias. The <code>plugin.json</code> name field sets the prefix, and the <code>/</code> menu is alphabetical (re-verified 2026-07-22).</span></li>
-<li value="125"><span class="t">The plugin is named sp, so <code>/sp:smartplan</code>. Directories are <code>smart*</code>. Project-local gives <code>/smartplan</code> from <code>.claude/skills</code>.</span></li>
-<li value="126"><span class="t">smartexec is <code>user-invocable: false</code> (#3095). v1.0.74 (2026-07-23) enforces <code>disable-model-invocation</code>. exec sorts before plan, so <code>/sp</code> plus Enter.</span></li>
-<li value="127"><span class="t"><code>copilot skill list</code> confirms (<code>--help</code>, and <code>--output-format=json</code> shows source and path).</span></li>
-<li value="128"><span class="t">A bare <code>/smartplan</code> is project-local only. One copy, and uncommitted edits go live.</span></li>
-<li value="129"><span class="t">Marketplace vs project-local: the plugin is lowest priority. <code>.github/skills</code> and <code>.claude/skills</code> are project-level. A same-name skill wins silently. Pick one (verified 2026-07-22).</span></li>
+<li value="129"><span class="t">Commands are <code>&lt;plugin&gt;:&lt;skill&gt;</code>, with no bare form, default, or alias. The <code>plugin.json</code> name field sets the prefix, and the <code>/</code> menu is alphabetical (re-verified 2026-07-22).</span></li>
+<li value="130"><span class="t">The plugin is named sp, so <code>/sp:smartplan</code>. Directories are <code>smart*</code>. Project-local gives <code>/smartplan</code> from <code>.claude/skills</code>.</span></li>
+<li value="131"><span class="t">smartexec is <code>user-invocable: false</code> (#3095). v1.0.74 (2026-07-23) enforces <code>disable-model-invocation</code>. exec sorts before plan, so <code>/sp</code> plus Enter.</span></li>
+<li value="132"><span class="t"><code>copilot skill list</code> confirms (<code>--help</code>, and <code>--output-format=json</code> shows source and path).</span></li>
+<li value="133"><span class="t">A bare <code>/smartplan</code> is project-local only. One copy, and uncommitted edits go live.</span></li>
+<li value="134"><span class="t">Marketplace vs project-local: the plugin is lowest priority. <code>.github/skills</code> and <code>.claude/skills</code> are project-level. A same-name skill wins silently. Pick one (verified 2026-07-22).</span></li>
 </ol>
 <h3>Standing levers</h3>
 <ol>
-<li value="130"><span class="t">Repo instructions: <code>.github/copilot-instructions.md</code>, AGENTS.md, CLAUDE.md, and <code>NAME.instructions.md</code> with <code>applyTo</code> (checked 2026-07-24).</span></li>
-<li value="131"><span class="t"><code>include-custom-instructions: true</code> on CLI 1.0.86 defaults to false.</span></li>
-<li value="132"><span class="t">Hooks (reference checked 2026-07-24): <code>.github/hooks/</code> and <code>~/.copilot/hooks/</code>, 14 events.</span></li>
-<li value="133"><span class="t"><code>preToolUse</code> fails closed, a timeout fails open, <code>agentStop</code> blocks up to 8 times, and <code>stop_hook_active</code> arrived in v1.0.72.</span></li>
-<li value="134"><span class="t">Claude Code hooks run here too: <code>.claude/settings.json</code>, PreToolUse on Agent and Task, <code>.claude/agents/</code>. A non-zero exit denies, so the wrapper exits 0 (docs/enforcement-hook.md).</span></li>
-<li value="135"><span class="t">Effort: <code>--effort none|minimal|low|medium|high|xhigh|max</code>. Drop effort before dropping tier. <code>effortLevel</code> runs low to xhigh.</span></li>
+<li value="135"><span class="t">Repo instructions: <code>.github/copilot-instructions.md</code>, AGENTS.md, CLAUDE.md, and <code>NAME.instructions.md</code> with <code>applyTo</code> (checked 2026-07-24).</span></li>
+<li value="136"><span class="t"><code>include-custom-instructions: true</code> on CLI 1.0.86 defaults to false.</span></li>
+<li value="137"><span class="t">Hooks (reference checked 2026-07-24): <code>.github/hooks/</code> and <code>~/.copilot/hooks/</code>, 14 events.</span></li>
+<li value="138"><span class="t"><code>preToolUse</code> fails closed, a timeout fails open, <code>agentStop</code> blocks up to 8 times, and <code>stop_hook_active</code> arrived in v1.0.72.</span></li>
+<li value="139"><span class="t">Claude Code hooks run here too: <code>.claude/settings.json</code>, PreToolUse on Agent and Task, <code>.claude/agents/</code>. A non-zero exit denies, so the wrapper exits 0 (docs/enforcement-hook.md).</span></li>
+<li value="140"><span class="t">Effort: <code>--effort none|minimal|low|medium|high|xhigh|max</code>. Drop effort before dropping tier. <code>effortLevel</code> runs low to xhigh.</span></li>
 </ol>
 <h3>Probe playbook (2026-07-12)</h3>
 <ol>
-<li value="136"><span class="t">Seven levers. Oracle grading (T8 to T13).</span></li>
-<li value="137"><span class="t">Batch about 3 leaves per verifier for a 32% cut (T10, T11).</span></li>
-<li value="138"><span class="t">Only the leaves under test bill (T11, 7.1 cr).</span></li>
-<li value="139"><span class="t"><code>--resume</code> the same seat, since a cold restart costs 75 to 160k. Never resume verifiers.</span></li>
-<li value="140"><span class="t">Caps: 167 cr on T9, 30 cr minimum, 1 to 13 cr per leaf.</span></li>
-<li value="141"><span class="t">A minimal workspace saves about 40%.</span></li>
-<li value="142"><span class="t">The cheapest models are Luna (T43, T46), per routing.md § Seat eligibility.</span></li>
+<li value="141"><span class="t">Seven levers. Oracle grading (T8 to T13).</span></li>
+<li value="142"><span class="t">Batch about 3 leaves per verifier for a 32% cut (T10, T11).</span></li>
+<li value="143"><span class="t">Only the leaves under test bill (T11, 7.1 cr).</span></li>
+<li value="144"><span class="t"><code>--resume</code> the same seat, since a cold restart costs 75 to 160k. Never resume verifiers.</span></li>
+<li value="145"><span class="t">Caps: 167 cr on T9, 30 cr minimum, 1 to 13 cr per leaf.</span></li>
+<li value="146"><span class="t">A minimal workspace saves about 40%.</span></li>
+<li value="147"><span class="t">The cheapest models are Luna (T43, T46), per routing.md § Seat eligibility.</span></li>
 </ol>
 <h3>UE5 on Copilot (2026-07-12)</h3>
 <ol>
-<li value="143"><span class="t">Gemini 3.8 Flash is the cross-family verify for cpp-gamedev-check.md and check.md. It caught 13 of 16 on T42, level with GPT-5.6 Terra at a seventh of the cost. UB leaves stay Strong.</span></li>
-<li value="144"><span class="t">Context costs about 40%. The cache lasts 5 min on Claude and 30 min on OpenAI from GPT-5.6. Scope the brief.</span></li>
-<li value="145"><span class="t">The C++ language server (2026-09-22) is unmeasured, and indexing costs.</span></li>
-<li value="146"><span class="t">Batch about 3 for 32%.</span></li>
-<li value="147"><span class="t">Drop effort before model, and verify at strength.</span></li>
-<li value="148"><span class="t">Lone stubs go Mid (routing.md hard floor #4). Cheap UE5 pays on wide waves.</span></li>
-<li value="149"><span class="t">Attribution discipline: <code>/usage</code> has no skill attribution even with 1.0.85 rows. Use a minimal workspace and <code>/context</code>. T17 ran three verify arms.</span></li>
+<li value="148"><span class="t">Gemini 3.8 Flash is the cross-family verify for cpp-gamedev-check.md and check.md. It caught 13 of 16 on T42, level with GPT-5.6 Terra at a seventh of the cost. UB leaves stay Strong.</span></li>
+<li value="149"><span class="t">Context costs about 40%. The cache lasts 5 min on Claude and 30 min on OpenAI from GPT-5.6. Scope the brief.</span></li>
+<li value="150"><span class="t">The C++ language server (2026-09-22) is unmeasured, and indexing costs.</span></li>
+<li value="151"><span class="t">Batch about 3 for 32%.</span></li>
+<li value="152"><span class="t">Drop effort before model, and verify at strength.</span></li>
+<li value="153"><span class="t">Lone stubs go Mid (routing.md hard floor #4). Cheap UE5 pays on wide waves.</span></li>
+<li value="154"><span class="t">Attribution discipline: <code>/usage</code> has no skill attribution even with 1.0.85 rows. Use a minimal workspace and <code>/context</code>. T17 ran three verify arms.</span></li>
 </ol>
 </section>
 <section id="m365-copilot" class="skill">
-<header class="skill-head"><h2>M365 Copilot</h2><p class="src">m365-copilot.md <span class="dot"></span> <span class="count" data-total="100">100 lines</span></p></header>
+<header class="skill-head"><h2>M365 Copilot</h2><p class="src">m365-copilot.md <span class="dot"></span> <span class="count" data-total="102">102 lines</span></p></header>
 <h3>Header</h3>
 <ol>
 <li value="1"><span class="t">Verified 2026-08-12 against learn.microsoft.com and the raw declarative-agent JSON schemas. Pricing re-read 2026-09-29.</span></li>
@@ -2509,69 +2520,71 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 </ol>
 <h3>Roster (dated 2026-11-02, re-read 2026-11-03)</h3>
 <ol>
-<li value="53"><span class="t">Thirteen models: Opus 5, Opus 4.8, Fable 5, Fable 5.1, Sonnet 5, Sonnet 4.6, GPT-6 Astra, GPT-6.1 Sol, GPT-6 Luna (GA), GPT-5.6 Sol, GPT-5.6 Luna, GPT-5 Chat, Mistral Medium 3.5 (Experimental).</span></li>
-<li value="54"><span class="t">GPT-5 Chat retires 2026-11-12 to GPT-6.1 Sol or GPT-6 Luna.</span></li>
-<li value="55"><span class="t">GPT-5.5 Chat retired 2026-10-31.</span></li>
-<li value="56"><span class="t">FedRAMP and cross-geo keep GPT-5 Chat.</span></li>
-<li value="57"><span class="t">Region (2026-10-13): the Fables skip Australia and Saudi Arabia. The US column reads &quot;GA (early access environment)&quot; for the Fables and Sonnet 5, and standard-release US lacks all three.</span></li>
-<li value="58"><span class="t">Sonnet 5 skips Australia and Saudi Arabia.</span></li>
-<li value="59"><span class="t">The standard harness table (dated 2026-09-18) defaults to GPT-5.5 Chat, with Claude at Opus 4.7 and Opus 4.6, plus GPT-4.1 and Grok 4.1 Fast. A policy-only port gets the older ladder.</span></li>
-<li value="60"><span class="t">Opus 5 is live. The Fables are live except Australia, Saudi Arabia, and standard-release US.</span></li>
-<li value="61"><span class="t">Fable 5 needs the admin &quot;Anthropic models with Data Retention&quot; opt-in, outside the DPA, 30 days.</span></li>
-<li value="62"><span class="t">Fable 5.1 is a subprocessor &quot;for certain organizations&quot; (connect-to-ai-subprocessor, 2026-10-31).</span></li>
-<li value="63"><span class="t">EU/EFTA and UK opt in. Power Platform has an external-models switch. Only non-federal GCC (since 2026-07-22).</span></li>
-<li value="64"><span class="t">The ladder mostly exists: no Haiku, the bottom Claude rung is Sonnet, and GPT-6 Luna is the GA Cheap rung from 2026-11-02.</span></li>
-<li value="65"><span class="t">The blog puts Opus 5.5 and GPT-6 Sol across Word, Excel, PowerPoint, Chat, Cowork and Studio from 2026-09-22.</span></li>
-<li value="66"><span class="t">Learn&#x27;s Claude rows stop at Opus 5 (2026-11-03). Researcher runs unversioned &quot;Claude&quot;.</span></li>
-<li value="67"><span class="t">Seat by capability class and say so at the gate.</span></li>
+<li value="53"><span class="t">Twenty models (ms.date 2026-11-06): Opus 5.5, Opus 5, Opus 4.8, Fable 5, Fable 5.1, Sonnet 5.5, Sonnet 5, Sonnet 4.6, Haiku 5.5, GPT-6 Astra, GPT-6 Sol, GPT-6.1 Sol, GPT-6.1 Terra, GPT-5.6 Terra, GPT-6 Luna, Grok 4.6 (GA), GPT-5.6 Sol, GPT-5.6 Luna, GPT-5 Chat, Mistral Medium 3.5 (Experimental).</span></li>
+<li value="54"><span class="t">The table has no Fable 5.2.</span></li>
+<li value="55"><span class="t">EU/EFTA tenants with cross-region data movement off keep GPT-5 Chat to 2026-11-30.</span></li>
+<li value="56"><span class="t">GPT-5 Chat retires 2026-11-12 to GPT-6.1 Sol or GPT-6 Luna.</span></li>
+<li value="57"><span class="t">GPT-5.5 Chat retired 2026-10-31.</span></li>
+<li value="58"><span class="t">FedRAMP and cross-geo keep GPT-5 Chat.</span></li>
+<li value="59"><span class="t">Region (2026-10-13): the Fables skip Australia and Saudi Arabia. The US column reads &quot;GA (early access environment)&quot; for the Fables and Sonnet 5, and standard-release US lacks all three.</span></li>
+<li value="60"><span class="t">Sonnet 5 skips Australia and Saudi Arabia.</span></li>
+<li value="61"><span class="t">The standard harness table (dated 2026-09-18) defaults to GPT-5.5 Chat, with Claude at Opus 4.7 and Opus 4.6, plus GPT-4.1 and Grok 4.1 Fast. A policy-only port gets the older ladder.</span></li>
+<li value="62"><span class="t">Opus 5 is live. The Fables are live except Australia, Saudi Arabia, and standard-release US.</span></li>
+<li value="63"><span class="t">Fable 5 needs the admin &quot;Anthropic models with Data Retention&quot; opt-in, outside the DPA, 30 days.</span></li>
+<li value="64"><span class="t">Fable 5.1 is a subprocessor &quot;for certain organizations&quot; (connect-to-ai-subprocessor, 2026-10-31).</span></li>
+<li value="65"><span class="t">EU/EFTA and UK opt in. Power Platform has an external-models switch. Only non-federal GCC (since 2026-07-22).</span></li>
+<li value="66"><span class="t">The ladder exists from the 2026-11-06 table: Opus 5.5 on top, Sonnet 5.5 in the middle, and Haiku 5.5 and GPT-6 Luna as Cheap rungs.</span></li>
+<li value="67"><span class="t">The blog puts Opus 5.5 and GPT-6 Sol across Word, Excel, PowerPoint, Chat, Cowork and Studio from 2026-09-22.</span></li>
+<li value="68"><span class="t">Learn&#x27;s roster carries Opus 5.5 and GPT-6 Sol from 2026-11-06. Researcher runs unversioned &quot;Claude&quot;.</span></li>
+<li value="69"><span class="t">Seat by capability class and say so at the gate.</span></li>
 </ol>
 <h3><code>reason</code> and multi-agent</h3>
 <ol>
-<li value="68"><span class="t"><code>reason</code> is standard-harness, the closest thing to per-call tiering, in natural language.</span></li>
-<li value="69"><span class="t">Four gates: preview (title), two switches (generative orchestration, deep-reasoning access under Settings → Deep reasoning (preview)), region US and EU excluding UK, and the model is Azure OpenAI o3, separate from the primary.</span></li>
-<li value="70"><span class="t">Multi-agent Studio: child agents, connected agents, A2A, Foundry, Fabric Data agents, M365 Agents SDK (preview). Fan-out is prompt-directed.</span></li>
+<li value="70"><span class="t"><code>reason</code> is standard-harness, the closest thing to per-call tiering, in natural language.</span></li>
+<li value="71"><span class="t">Four gates: preview (title), two switches (generative orchestration, deep-reasoning access under Settings → Deep reasoning (preview)), region US and EU excluding UK, and the model is Azure OpenAI o3, separate from the primary.</span></li>
+<li value="72"><span class="t">Multi-agent Studio: child agents, connected agents, A2A, Foundry, Fabric Data agents, M365 Agents SDK (preview). Fan-out is prompt-directed.</span></li>
 </ol>
 <h3>Hard limits</h3>
 <ol>
-<li value="71"><span class="t">Instructions 8,000, name 100, description 1,000, unspecified strings 4,000, conversation_starters 12, actions 1 to 10, knowledge files 10 at 1 MB, disclaimer 500, group mailboxes 25, meetings items_by_id 5.</span></li>
-<li value="72"><span class="t">Plugins: up to 5 injected, beyond that semantic match on description, degrading past about 10 functions or tools. Same shape as Anthropic&#x27;s tool-selection limit.</span></li>
-<li value="73"><span class="t">MCP runs only inside declarative agents as plugin actions.</span></li>
-<li value="74"><span class="t"><code>ai-plugin.json</code> schema_version v2.4 adds RemoteMCPServer alongside OpenApi and LocalPlugin, with <code>url</code> and <code>mcp_tool_description</code>.</span></li>
-<li value="75"><span class="t">Auth is None, OAuthPluginVault, or ApiKeyPluginVault. Dynamic or pinned. Agents Toolkit 6.12.0 or later. Studio Tools is the source.</span></li>
+<li value="73"><span class="t">Instructions 8,000, name 100, description 1,000, unspecified strings 4,000, conversation_starters 12, actions 1 to 10, knowledge files 10 at 1 MB, disclaimer 500, group mailboxes 25, meetings items_by_id 5.</span></li>
+<li value="74"><span class="t">Plugins: up to 5 injected, beyond that semantic match on description, degrading past about 10 functions or tools. Same shape as Anthropic&#x27;s tool-selection limit.</span></li>
+<li value="75"><span class="t">MCP runs only inside declarative agents as plugin actions.</span></li>
+<li value="76"><span class="t"><code>ai-plugin.json</code> schema_version v2.4 adds RemoteMCPServer alongside OpenApi and LocalPlugin, with <code>url</code> and <code>mcp_tool_description</code>.</span></li>
+<li value="77"><span class="t">Auth is None, OAuthPluginVault, or ApiKeyPluginVault. Dynamic or pinned. Agents Toolkit 6.12.0 or later. Studio Tools is the source.</span></li>
 </ol>
 <h3>CLIs</h3>
 <ol>
-<li value="76"><span class="t">atk: <code>npm install -g @microsoft/m365agentstoolkit-cli</code>, with <code>atk new -c declarative-agent</code>.</span></li>
-<li value="77"><span class="t">wiqd (github.com/microsoft/wiqd, docs and downloads only, npm latest 0.17.0 on 2026-09-28): <code>agent create|validate|provision|package|eval</code>, plugin tree preview, create pins manifest 1.29, import reads Claude, Cursor and Open Plugin, but only validates, shows and lists.</span></li>
-<li value="78"><span class="t">atk is the export target.</span></li>
+<li value="78"><span class="t">atk: <code>npm install -g @microsoft/m365agentstoolkit-cli</code>, with <code>atk new -c declarative-agent</code>.</span></li>
+<li value="79"><span class="t">wiqd (github.com/microsoft/wiqd, docs and downloads only, npm latest 0.17.0 on 2026-09-28): <code>agent create|validate|provision|package|eval</code>, plugin tree preview, create pins manifest 1.29, import reads Claude, Cursor and Open Plugin, but only validates, shows and lists.</span></li>
+<li value="80"><span class="t">atk is the export target.</span></li>
 </ol>
 <h3>Money</h3>
 <ol>
-<li value="79"><span class="t">Enterprise $30.00 / $31.50.</span></li>
-<li value="80"><span class="t">Business $18.00 through 2026-12-31 for the first year (regular $21.00), $25.20 monthly. RECHECK 2026-12-31.</span></li>
-<li value="81"><span class="t">Bundles $32.00 ($38.40) and $23.50 ($28.20), read 2026-09-22.</span></li>
-<li value="82"><span class="t">Chat is free. Cowork is usage-billed, under a Cost Management policy, with a one-credit limit.</span></li>
-<li value="83"><span class="t">A capacity pack is $200.00 for 25,000 credits.</span></li>
-<li value="84"><span class="t">Credit rates: classic 1, generative 2, agent action 5, graph grounding 10, flow actions 13 per 100.</span></li>
-<li value="85"><span class="t">AI tools: basic 1 and standard 15 per 10 responses (0.1 and 1.5 per 1,000 tokens), premium 10 per 1,000 tokens, content processing 8 per page.</span></li>
-<li value="86"><span class="t">Reasoning bills twice. Cache reads are free, and writes bill as input.</span></li>
-<li value="87"><span class="t">Overage disables custom agents at 125%.</span></li>
-<li value="88"><span class="t">An add-on license adds no extra charges. Declarative agents have no hosting cost. Custom engine agents are self-hosted.</span></li>
-<li value="89"><span class="t">PAYG is $0.01 per credit in 37 regions (2026-09-22). &quot;$-&quot; means browserless.</span></li>
-<li value="90"><span class="t">The GitHub harness is credit-billed from build. Learn and the pricing page conflict.</span></li>
-<li value="91"><span class="t">Pre-Purchase Plan: up to 20% off (5% to 20%, nine tiers, 300,000 to 300,000,000 credits), Licensing Guide Sept 2026, unused credits expire.</span></li>
-<li value="92"><span class="t">Agent Pre-Purchase Plan: $1 per ACU (100 credits), 5% to 15% off.</span></li>
+<li value="81"><span class="t">Enterprise $30.00 / $31.50.</span></li>
+<li value="82"><span class="t">Business $18.00 through 2026-12-31 for the first year (regular $21.00), $25.20 monthly. RECHECK 2026-12-31.</span></li>
+<li value="83"><span class="t">Bundles $32.00 ($38.40) and $23.50 ($28.20), read 2026-09-22.</span></li>
+<li value="84"><span class="t">Chat is free. Cowork is usage-billed, under a Cost Management policy, with a one-credit limit.</span></li>
+<li value="85"><span class="t">A capacity pack is $200.00 for 25,000 credits.</span></li>
+<li value="86"><span class="t">Credit rates: classic 1, generative 2, agent action 5, graph grounding 10, flow actions 13 per 100.</span></li>
+<li value="87"><span class="t">AI tools: basic 1 and standard 15 per 10 responses (0.1 and 1.5 per 1,000 tokens), premium 10 per 1,000 tokens, content processing 8 per page.</span></li>
+<li value="88"><span class="t">Reasoning bills twice. Cache reads are free, and writes bill as input.</span></li>
+<li value="89"><span class="t">Overage disables custom agents at 125%.</span></li>
+<li value="90"><span class="t">An add-on license adds no extra charges. Declarative agents have no hosting cost. Custom engine agents are self-hosted.</span></li>
+<li value="91"><span class="t">PAYG is $0.01 per credit in 37 regions (2026-09-22). &quot;$-&quot; means browserless.</span></li>
+<li value="92"><span class="t">The GitHub harness is credit-billed from build. Learn and the pricing page conflict.</span></li>
+<li value="93"><span class="t">Pre-Purchase Plan: up to 20% off (5% to 20%, nine tiers, 300,000 to 300,000,000 credits), Licensing Guide Sept 2026, unused credits expire.</span></li>
+<li value="94"><span class="t">Agent Pre-Purchase Plan: $1 per ACU (100 credits), 5% to 15% off.</span></li>
 </ol>
 <h3>What smartplan becomes</h3>
 <ol>
-<li value="93"><span class="t">The policy ports. The machinery does not.</span></li>
-<li value="94"><span class="t">Tiering has two dials: no Haiku, no Opus 5.5 listed (announced 2026-09-22), no per-call override, newest version first (model-classes.md § How to edit).</span></li>
-<li value="95"><span class="t">Verify has no dispatch lever. flow.md&#x27;s verifier seat maps to <code>reason</code>, not smartcheck.</span></li>
-<li value="96"><span class="t">Nothing is measured. There is no T-record.</span></li>
-<li value="97"><span class="t">Checked 2026-08-12: no atk, wiqd, <code>@microsoft/*</code>, toolkit dir, or login trace on this box.</span></li>
-<li value="98"><span class="t">The file is documentation-only by necessity.</span></li>
-<li value="99"><span class="t">The only runnable surface is the repo&#x27;s tenant agents, and none exercises the family.</span></li>
-<li value="100"><span class="t">Never describe any of it as observed.</span></li>
+<li value="95"><span class="t">The policy ports. The machinery does not.</span></li>
+<li value="96"><span class="t">Tiering has two dials: the roster lists Haiku 5.5 and Opus 5.5 from 2026-11-06 and no Fable 5.2, no per-call override, newest version first (model-classes.md § How to edit).</span></li>
+<li value="97"><span class="t">Verify has no dispatch lever. flow.md&#x27;s verifier seat maps to <code>reason</code>, not smartcheck.</span></li>
+<li value="98"><span class="t">Nothing is measured. There is no T-record.</span></li>
+<li value="99"><span class="t">Checked 2026-08-12: no atk, wiqd, <code>@microsoft/*</code>, toolkit dir, or login trace on this box.</span></li>
+<li value="100"><span class="t">The file is documentation-only by necessity.</span></li>
+<li value="101"><span class="t">The only runnable surface is the repo&#x27;s tenant agents, and none exercises the family.</span></li>
+<li value="102"><span class="t">Never describe any of it as observed.</span></li>
 </ol>
 </section>
 <section id="smartreview" class="skill">
