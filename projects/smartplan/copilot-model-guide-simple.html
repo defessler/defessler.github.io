@@ -668,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.173.0 &middot; Updated 2026-11-11 &middot; <span class="fresh" data-checked="2026-11-11" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-11</span></span>
+<span class="stamp">v4.174.0 &middot; Updated 2026-11-17 &middot; <span class="fresh" data-checked="2026-11-17" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-17</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -682,36 +682,37 @@ footer p { margin: 0; }
 </header>
 <main>
 <h1 id="copilot-models-quick-picks-by-task">Copilot models: quick picks by task</h1>
-<p class="fresh-note">Prices, models and scores on this page were last checked against vendor sources on <span class="date">2026-11-11</span>. <span class="fresh" data-checked="2026-11-11" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-11</span></p>
+<p class="fresh-note">Prices, models and scores on this page were last checked against vendor sources on <span class="date">2026-11-17</span>. <span class="fresh" data-checked="2026-11-17" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-17</span></p>
 <p>This is the short list. For the evidence, tier definitions and deprecation
 table, see the <a href="copilot-model-guide.html">full guide</a>. Prices are $/1M
 tokens in/out from GitHub's pricing table, read 2026-08-22 to 2026-10-13.
 Artificial Analysis (AA) values were read on 2026-09-30, except Gemini 4
 Argon's (read 2026-10-13) and GPT-6 Sol's (read 2026-10-20). The Good at
 scores were read 2026-10-13. They were re-cut on 2026-10-20 without the
-models retired on 2026-10-19.</p>
+models retired on 2026-10-19, and on 2026-11-17 without Opus 5 and GPT-5.6
+Terra, which left Copilot on 2026-11-16.</p>
 <h2 id="quick-picks">Quick picks</h2>
 <ul>
 <li><strong>Writing code</strong> - GPT-6 Luna, behind a scripted check. For judgment
   calls, use GPT-6.1 Sol on Pro+ and up, or Sonnet 5.5 on plain Pro.
   GPT-6.1 Sol needs CLI 1.0.90 or later. On an older build, use GPT-6 Sol
   instead. Neither GPT-6 pick has been trialed here.</li>
-<li><strong>Code reviews</strong> - Gemini 3.8 Flash. In T42 it caught 13 of 16 seeded
-  C++ defects for 5.8 credits. GPT-5.6 Terra caught the same 13 for 41.7
-  credits. If the budget allows, GPT-6 Sol caught 14 to 15. On the
-  tightest budget, a fresh Luna re-runs the scripted check on its own
-  simple work.</li>
-<li><strong>Writing docs</strong> - Sonnet 5.5 for technical reports. Use GPT-5.6 Terra
-  until it leaves Copilot on 2026-11-16. Pick Opus 5.5 when the prose is
-  the product, though only one writing board lists it so far.</li>
+<li><strong>Code reviews</strong> - Gemini 4 Hydrogen, which took over from Gemini 3.8
+  Flash on 2026-11-17. 3.8 Flash leaves Copilot on 2026-12-14. Hydrogen
+  hasn't run a review trial here yet. In T42 3.8 Flash caught 13 of 16
+  seeded C++ defects for 5.8 credits. If the budget allows, GPT-6 Sol
+  caught 14 to 15. On the tightest budget, a fresh Luna re-runs the
+  scripted check on its own simple work.</li>
+<li><strong>Writing docs</strong> - Sonnet 5.5 for technical reports. Pick Opus 5.5 when
+  the prose is the product, though only one writing board lists it so far.</li>
 <li><strong>Exploring a codebase</strong> - Use GPT-6 Luna or GPT-5.6 Luna to find
   things. Haiku 5.5 serves at the same price. Use Sonnet 5.5 to understand
   what you find. On Pro+ and up, GPT-6.1 Sol reads long context better at
   the same list price.</li>
-<li><strong>Planning and architecture</strong> - Opus 5.5 on Pro+ and up, with Opus 5 as
-  the pricier fallback</li>
+<li><strong>Planning and architecture</strong> - Opus 5.5 on Pro+ and up</li>
 <li><strong>Don't want to pick</strong> - "Auto" routes each request to a model. It shows
-  as Copilot Fusion in the CLI, VS Code and the app. On a paid plan it takes
+  as Copilot Fusion in the CLI, VS Code, the app, github.com and Visual
+  Studio. On a paid plan it takes
   30% off through 2026-11-30. The 10% Auto discount now covers Chat and
   cloud agent only. Pin a model when the tier matters. On Pro+ and up, Auto
   can send a hard prompt to GPT-6 Astra at 10 / 50.</li>
@@ -780,7 +781,14 @@ value column cycles through value and index.</p>
 <td>0.20 / 1.20</td>
 <td><span class="dual" data-k="" data-k2="" data-n="Value" data-n2="AA Index"><span class="dv" title="Not measured. Artificial Analysis has no row for any Microsoft model. With no index and no measured cost, no value can be computed.">—</span></span></td>
 <td><span class="caps"><span class="u" title="No Artificial Analysis row, so no score.">? Writing code</span><span class="n" title="Wrong tool: The vendor scopes it to coding.">❌ Writing docs</span><span class="u" title="No Artificial Analysis row, so no score.">? Code reviews</span><span class="u" title="No Artificial Analysis row, so no score.">? Research</span><span class="n" title="Wrong tool: Cheap and unclassified, with no planner role.">❌ Planning</span></span></td>
-<td><strong>No independent benchmark covers it.</strong> Microsoft's own card gives it 72.6 on SWE-bench Verified in Copilot's VS Code harness. Trial it before relying on it</td>
+<td><strong>No independent benchmark covers it.</strong> Microsoft's own card gives it 72.6 on SWE-bench Verified in Copilot's VS Code harness. Trial it before relying on it. <strong>Retires from Copilot 2026-12-18</strong>, successor MAI Code 2 Flash</td>
+</tr>
+<tr>
+<td><strong>MAI Code 2 Flash</strong></td>
+<td>0.05 / 0.25</td>
+<td><span class="dual" data-k="" data-k2="" data-n="Value" data-n2="AA Index"><span class="dv" title="Not measured on this scale. It reached Copilot on 2026-11-17, and these picks use the frozen v4.3.2 index, which never scored it. With no index and no measured cost, no value can be computed.">—</span></span></td>
+<td><span class="caps"><span class="u" title="No Artificial Analysis row, so no score.">? Writing code</span><span class="n" title="Wrong tool: The vendor scopes it to coding.">❌ Writing docs</span><span class="u" title="No Artificial Analysis row, so no score.">? Code reviews</span><span class="u" title="No Artificial Analysis row, so no score.">? Research</span><span class="n" title="Wrong tool: Cheap and unclassified, with no planner role.">❌ Planning</span></span></td>
+<td><strong>No independent benchmark covers it.</strong> It reached Copilot on 2026-11-17 on every plan, Free and Student included, as MAI-Code-1.1-Flash's successor. The price is a promotion until 2027-05-17, then 0.10 / 0.50, GPT-6 Luna's rate. Trial it before relying on it</td>
 </tr>
 </tbody>
 </table></div>
@@ -802,13 +810,6 @@ value column cycles through value and index.</p>
 <td><span class="dual" data-k="223.6" data-k2="47.8" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 47.78 ÷ AA's measured $0.214 per index task, both from one Artificial Analysis row, read 2026-09-30. The bracketed number under it is the index.">224</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names GPT-6.1 Sol (medium). Medium is its vendor's default. Copilot's picker files it under Powerful (read 2026-09-30).">(47.8)</span></span></td>
 <td><span class="caps"><span class="s" title="Score 7.0 of 10, grade B. Best in its band.">★ Writing code</span><span class="s" title="Score 7.3 of 10, grade B. Best in its band.">★ Writing docs</span><span class="s" title="Score 6.4 of 10, grade B. Best in its band.">★ Code reviews</span><span class="s" title="Score 8.0 of 10, grade A. Best in its band.">★ Research</span><span class="s" title="Score 8.7 of 10, grade A. Best in its band.">★ Planning</span></span></td>
 <td><strong>New 2026-09-29.</strong> It beats GPT-6 Sol on AA at every effort for less per task, and it leads both Sol seats from 2026-09-30. It has no tbench.ai or vals.ai row yet. Needs CLI 1.0.90 or later. Past 272K it bills <strong>4 / 15 on the whole request</strong></td>
-</tr>
-<tr>
-<td><strong>GPT-5.6 Terra</strong></td>
-<td>2 / 12</td>
-<td><span class="dual" data-k="164.1" data-k2="30.1" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 30.09 ÷ AA's measured $0.183 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">164</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names GPT-5.6 Terra (medium). Copilot's picker showed Medium for it on 2026-08-06.">(30.1)</span></span></td>
-<td><span class="caps"><span class="w" title="Score 2.2 of 10, grade D. Band leader: GPT-6.1 Sol at 7.0.">🟠 Writing code</span><span class="m" title="Score 5.5 of 10, grade B. Band leader: GPT-6.1 Sol at 7.3.">🟡 Writing docs</span><span class="w" title="Score 1.5 of 10, grade D. Band leader: GPT-6.1 Sol at 6.4.">🟠 Code reviews</span><span class="w" title="Score 3.6 of 10, grade C. Band leader: GPT-6.1 Sol at 8.0.">🟠 Research</span><span class="w" title="Score 3.7 of 10, grade C. Band leader: GPT-6.1 Sol at 8.7.">🟠 Planning</span></span></td>
-<td><strong>It's the most thorough reviewer measured here</strong> (T18). AA's Terminal-Bench 4.0 run gives it 1% at medium and 35% at max. It gives no cross-family check on GPT-written code. Above 272K it bills 4 / 18. <strong>Retires from Copilot 2026-11-16</strong>, successor GPT-6.1 Sol or GPT-6 Luna</td>
 </tr>
 <tr>
 <td><strong>GPT-6 Sol</strong> ¹</td>
@@ -836,7 +837,14 @@ value column cycles through value and index.</p>
 <td>1 / 5</td>
 <td><span class="dual" data-k="61.0" data-k2="16.9" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 16.88 ÷ AA's measured $0.277 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">61.0</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Claude 4.5 Haiku (Reasoning). Haiku 4.5 has no effort dial. AA splits it by thinking on or off. Only the thinking row is measured.">(16.9)</span></span></td>
 <td><span class="caps"><span class="w" title="Score 0.0 of 10, grade D. Band leader: GPT-6.1 Sol at 7.0.">🟠 Writing code</span><span class="w" title="Score 0.0 of 10, grade D. Band leader: GPT-6.1 Sol at 7.3.">🟠 Writing docs</span><span class="w" title="Score 2.8 of 10, grade C. Band leader: GPT-6.1 Sol at 6.4.">🟠 Code reviews</span><span class="w" title="Score 0.1 of 10, grade D. Band leader: GPT-6.1 Sol at 8.0.">🟠 Research</span><span class="n" title="Wrong tool: Mechanical-tier, with no planner role.">❌ Planning</span></span></td>
-<td><strong>It has the second-lowest index here.</strong> Keep it behind a check. Its value assumes thinking mode, which Copilot may not serve</td>
+<td><strong>It has the second-lowest index here.</strong> Keep it behind a check. Its value assumes thinking mode, which Copilot may not serve. <strong>Retires from Copilot 2026-12-14</strong>, successor Haiku 5.5, though individual subscribers on annual plans keep it</td>
+</tr>
+<tr>
+<td><strong>MAI Code 2</strong></td>
+<td>0.50 / 2.50</td>
+<td><span class="dual" data-k="" data-k2="" data-n="Value" data-n2="AA Index"><span class="dv" title="Not measured on this scale. It reached Copilot on 2026-11-17, and these picks use the frozen v4.3.2 index, which never scored it. With no index and no measured cost, no value can be computed.">—</span></span></td>
+<td><span class="caps"><span class="u" title="No Artificial Analysis row, so no score.">? Writing code</span><span class="n" title="Wrong tool: The vendor scopes it to coding.">❌ Writing docs</span><span class="u" title="No Artificial Analysis row, so no score.">? Code reviews</span><span class="u" title="No Artificial Analysis row, so no score.">? Research</span><span class="u" title="No Artificial Analysis row, so no score.">? Planning</span></span></td>
+<td><strong>No independent benchmark covers it.</strong> It reached Copilot on 2026-11-17 on Pro and up. The price is a promotion until 2027-05-17, then 1 / 5. Not a seat</td>
 </tr>
 </tbody>
 </table></div>
@@ -857,14 +865,14 @@ value column cycles through value and index.</p>
 <td>0.75 / 3.75</td>
 <td><span class="dual" data-k="42.7" data-k2="39.8" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 39.77 ÷ AA's measured $0.931 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">42.7</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Gemini 3.8 Flash (medium). Medium by pattern. The 2026-08-06 picker read showed Medium on every roster model but Kimi K3. This one arrived later.">(39.8)</span></span></td>
 <td><span class="caps"><span class="s" title="Score 5.0 of 10, grade B. Best in its band.">★ Writing code</span><span class="m" title="Score 7.1 of 10, grade B. Band leader: Grok 4.6 at 9.0.">🟡 Writing docs</span><span class="y" title="Score 5.1 of 10, grade B. Band leader: Grok 4.6 at 6.0.">✅ Code reviews</span><span class="s" title="Score 7.0 of 10, grade B. Best in its band.">★ Research</span><span class="y" title="Score 6.4 of 10, grade B. Band leader: Grok 4.6 at 7.3.">✅ Planning</span></span></td>
-<td><strong>It hasn't run T34, the seeded C++ recall trial.</strong> Despite the low list price it costs $0.93 a task, near Sonnet 5's $1.00. Its promotional rate runs through 2026-12-31, then 1.50 / 7.50. In CLI Auto's pool.</td>
+<td><strong>Retires from Copilot 2026-12-14</strong>, successor Gemini 4 Hydrogen, which took the verifier pin on 2026-11-17. Despite the low list price it costs $0.93 a task, near Sonnet 5's $1.00. Its promotional rate runs through 2026-12-31, then 1.50 / 7.50. In CLI Auto's pool.</td>
 </tr>
 <tr>
 <td><strong>Grok 4.6</strong></td>
 <td>2 / 6</td>
 <td><span class="dual" data-k="28.6" data-k2="42.8" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 42.84 ÷ AA's measured $1.50 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">28.6</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Grok 4.6 (medium). Medium by pattern. The 2026-08-06 picker read showed Medium on every roster model but Kimi K3. This one arrived later.">(42.8)</span></span></td>
 <td><span class="caps"><span class="y" title="Score 4.6 of 10, grade C. Band leader: Gemini 3.8 Flash at 5.0.">✅ Writing code</span><span class="s" title="Score 9.0 of 10, grade A. Best in its band.">★ Writing docs</span><span class="s" title="Score 6.0 of 10, grade B. Best in its band.">★ Code reviews</span><span class="y" title="Score 5.6 of 10, grade B. Band leader: Gemini 3.8 Flash at 7.0.">✅ Research</span><span class="s" title="Score 7.3 of 10, grade B. Best in its band.">★ Planning</span></span></td>
-<td>Grok 4.7 scores higher on all three Terminal-Bench 4.0 boards at the same list price. Past 200K it bills <strong>4 / 12 on the whole request</strong></td>
+<td>Grok 4.7 scores higher on all three Terminal-Bench 4.0 boards at the same list price. Past 200K it bills <strong>4 / 12 on the whole request</strong>. <strong>Retires from Copilot 2026-12-14</strong>, successor Grok 4.7</td>
 </tr>
 <tr>
 <td><strong>Sonnet 5</strong></td>
@@ -878,7 +886,7 @@ value column cycles through value and index.</p>
 <td>1 / 5</td>
 <td><span class="dual" data-k="" data-k2="" data-n="Value" data-n2="AA Index"><span class="dv" title="Not measured on this scale. It reached Copilot on 2026-10-26, and these picks use the frozen v4.3.2 index, which never scored it. With no index and no measured cost, no value can be computed.">—</span></span></td>
 <td><span class="caps"><span class="u" title="No Artificial Analysis row, so no score.">? Writing code</span><span class="u" title="No Artificial Analysis row, so no score.">? Writing docs</span><span class="u" title="No Artificial Analysis row, so no score.">? Code reviews</span><span class="u" title="No Artificial Analysis row, so no score.">? Research</span><span class="u" title="No Artificial Analysis row, so no score.">? Planning</span></span></td>
-<td><strong>Too new for the frozen scores.</strong> It reached Copilot on 2026-10-26, a day before Artificial Analysis moved to index v5.0, so it has no score on the scale these picks use. Not a seat yet. On plain Pro it's the only Terra-class model left after 2026-11-16</td>
+<td><strong>Too new for the frozen scores.</strong> It reached Copilot on 2026-10-26, a day before Artificial Analysis moved to index v5.0, so it has no score on the scale these picks use. Not a seat yet. On plain Pro it's the only Terra-class model left since 2026-11-16</td>
 </tr>
 </tbody>
 </table></div>
@@ -913,21 +921,14 @@ value column cycles through value and index.</p>
 <td>2 / 10 (cache 0.10)</td>
 <td><span class="dual" data-k="26.4" data-k2="52.6" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 52.56 ÷ AA's measured $1.99 per index task, both from one Artificial Analysis row, read 2026-10-13. The bracketed number under it is the index.">26.4</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Gemini 4 Argon (High), AA's only row for this model. No Copilot picker read covers its default effort yet.">(52.6)</span></span></td>
 <td><span class="caps"><span class="s" title="Score 10.0 of 10, grade A. Best in its band.">★ Writing code</span><span class="s" title="Score 9.1 of 10, grade A. Best in its band.">★ Writing docs</span><span class="s" title="Score 10.0 of 10, grade A. Best in its band.">★ Code reviews</span><span class="m" title="Score 6.9 of 10, grade B. Band leader: Opus 5.5 at 8.8.">🟡 Research</span><span class="s" title="Score 10.0 of 10, grade A. Best in its band.">★ Planning</span></span></td>
-<td>GA on Copilot 2026-10-13 for Pro+, Max, Business and Enterprise only. <strong>The 2 / 0.10 / 10 rate is promotional until 2026-12-01</strong>, and Google's own rate doubles from then. Stable CLI 1.0.98 added its slug. It's unprobed, not in Auto, and not a seat. Untrialed. vals.ai Terminal-Bench is 57.58, 9th of 63</td>
+<td>GA on Copilot 2026-10-13 for Pro+, Max, Business and Enterprise only. <strong>The 2 / 0.10 / 10 rate is promotional until 2026-12-01</strong>, and Google's own rate doubles from then. Stable CLI 1.0.98 added its slug. It's unprobed, not in Auto, and not a seat. Untrialed. vals.ai Terminal-Bench is 57.58, 11th of 68. <strong>Retires from Copilot 2026-12-14</strong>, successor Gemini 4 Carbon</td>
 </tr>
 <tr>
 <td><strong>Kimi K3</strong></td>
 <td>3 / 15</td>
 <td><span class="dual" data-k="21.8" data-k2="43.6" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 43.59 ÷ AA's measured $2.00 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">21.8</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Kimi K3 (max). Copilot's picker shows High for it. AA has no high row, only max and an estimated low.">(43.6)</span></span></td>
 <td><span class="caps"><span class="w" title="Score 5.5 of 10, grade B. Band leader: Gemini 4 Argon at 10.0.">🟠 Writing code</span><span class="y" title="Score 8.2 of 10, grade A. Band leader: Gemini 4 Argon at 9.1.">✅ Writing docs</span><span class="w" title="Score 5.3 of 10, grade B. Band leader: Gemini 4 Argon at 10.0.">🟠 Code reviews</span><span class="y" title="Score 8.0 of 10, grade A. Band leader: Opus 5.5 at 8.8.">✅ Research</span><span class="m" title="Score 7.5 of 10, grade A. Band leader: Gemini 4 Argon at 10.0.">🟡 Planning</span></span></td>
-<td>It's the strongest open-weight coder here. It costs <strong>more</strong> than Sonnet 5 on both list axes. Trial it before relying on it. Copilot runs it at High, while the value reads AA's max row</td>
-</tr>
-<tr>
-<td><strong>Opus 5</strong></td>
-<td>5 / 25</td>
-<td><span class="dual" data-k="20.5" data-k2="44.8" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 44.83 ÷ AA's measured $2.19 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">20.5</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Claude Opus 5 (Adaptive Reasoning, Medium Effort). Copilot's picker showed Medium for it on 2026-08-06.">(44.8)</span></span></td>
-<td><span class="caps"><span class="w" title="Score 5.4 of 10, grade B. Band leader: Gemini 4 Argon at 10.0.">🟠 Writing code</span><span class="y" title="Score 7.8 of 10, grade A. Band leader: Gemini 4 Argon at 9.1.">✅ Writing docs</span><span class="w" title="Score 4.9 of 10, grade C. Band leader: Gemini 4 Argon at 10.0.">🟠 Code reviews</span><span class="y" title="Score 7.5 of 10, grade A. Band leader: Opus 5.5 at 8.8.">✅ Research</span><span class="m" title="Score 7.8 of 10, grade A. Band leader: Gemini 4 Argon at 10.0.">🟡 Planning</span></span></td>
-<td><strong>Legacy since 2026-09-22. Retires from Copilot 2026-11-16</strong>, successor Opus 5.5. It costs more per task than Opus 5.5 at every effort but max, for a lower index. It's fine for one planning pass and ruinous when fanned out to many agents. It tops EQ-Bench's long-form writing board</td>
+<td>It's the strongest open-weight coder here. It costs <strong>more</strong> than Sonnet 5 on both list axes. Trial it before relying on it. Copilot runs it at High, while the value reads AA's max row. <strong>Retires from Copilot 2026-12-14</strong>, successor to be announced</td>
 </tr>
 <tr>
 <td><strong>Gemini 4 Carbon</strong></td>
@@ -935,6 +936,13 @@ value column cycles through value and index.</p>
 <td><span class="dual" data-k="" data-k2="" data-n="Value" data-n2="AA Index"><span class="dv" title="Not measured on this scale. It reached Copilot on 2026-11-10, and these picks use the frozen v4.3.2 index, which never scored it. With no index and no measured cost, no value can be computed.">—</span></span></td>
 <td><span class="caps"><span class="u" title="No Artificial Analysis row, so no score.">? Writing code</span><span class="u" title="No Artificial Analysis row, so no score.">? Writing docs</span><span class="u" title="No Artificial Analysis row, so no score.">? Code reviews</span><span class="u" title="No Artificial Analysis row, so no score.">? Research</span><span class="u" title="No Artificial Analysis row, so no score.">? Planning</span></span></td>
 <td><strong>Too new for the frozen scores.</strong> It reached Copilot on 2026-11-10. The price is a promotion until 2026-12-01, then 4 / 20. No CLI slug yet. Not a seat</td>
+</tr>
+<tr>
+<td><strong>Gemini 4 Hydrogen</strong></td>
+<td>1.50 / 7.50 (cache 0.075)</td>
+<td><span class="dual" data-k="" data-k2="" data-n="Value" data-n2="AA Index"><span class="dv" title="Not measured on this scale. It reached Copilot on 2026-11-13, and these picks use the frozen v4.3.2 index, which never scored it. With no index and no measured cost, no value can be computed.">—</span></span></td>
+<td><span class="caps"><span class="u" title="No Artificial Analysis row, so no score.">? Writing code</span><span class="u" title="No Artificial Analysis row, so no score.">? Writing docs</span><span class="u" title="No Artificial Analysis row, so no score.">? Code reviews</span><span class="u" title="No Artificial Analysis row, so no score.">? Research</span><span class="u" title="No Artificial Analysis row, so no score.">? Planning</span></span></td>
+<td><strong>Too new for the frozen scores.</strong> It reached Copilot on 2026-11-13 on Pro and up, as Gemini 3.8 Flash's successor at twice its promotional rate. It holds the cross-family verifier pin from 2026-11-17, unmeasured on T42 and T34. No CLI build lists its slug yet, though a live probe on 1.0.113 served it</td>
 </tr>
 </tbody>
 </table></div>
@@ -969,14 +977,14 @@ value column cycles through value and index.</p>
 <td>5 / 25</td>
 <td><span class="dual" data-k="10.2" data-k2="41.8" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 41.79 ÷ AA's measured $4.08 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">10.2</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Claude Opus 4.8 (Adaptive Reasoning, Max Effort). It's AA's only row for this model, above the Medium Copilot's picker showed on 2026-08-06.">(41.8)</span></span></td>
 <td><span class="caps"><span class="y" title="Score 5.0 of 10, grade B. Band leader: Grok 4.7 at 6.1.">✅ Writing code</span><span class="m" title="Score 7.4 of 10, grade B. Band leader: Grok 4.7 at 10.0.">🟡 Writing docs</span><span class="y" title="Score 5.6 of 10, grade B. Band leader: Grok 4.7 at 6.7.">✅ Code reviews</span><span class="s" title="Score 5.8 of 10, grade B. Best in its band.">★ Research</span><span class="m" title="Score 7.0 of 10, grade B. Band leader: Fable 5 at 9.2.">🟡 Planning</span></span></td>
-<td>Opus 5 supersedes it at the same price. <strong>Retires from Copilot 2026-11-16</strong>, successor Opus 5.5, though individual subscribers on annual plans keep it. Its value reads AA's only row, at max. Fable 5's safeguards and Opus 5.5's cybersecurity safeguard fall back to it</td>
+<td><strong>Retired from Copilot 2026-11-16</strong>, successor Opus 5.5, but individual subscribers on annual plans keep it. Its value reads AA's only row, at max. Fable 5's safeguards and Opus 5.5's cybersecurity safeguard fall back to it</td>
 </tr>
 <tr>
 <td><strong>Fable 5</strong> ¹</td>
 <td>10 / 50</td>
 <td><span class="dual" data-k="5.7" data-k2="49.6" data-n="Value" data-n2="AA Index"><span class="dv" title="Value = quality ÷ cost. AA Intelligence Index 49.63 ÷ AA's measured $8.75 per index task, both from one Artificial Analysis row, read 2026-09-29. The bracketed number under it is the index.">5.7</span><span class="ds" title="AA Index = the quality half of the value above it. Artificial Analysis's Intelligence Index v4.3.2 on the row AA names Claude Fable 5 (Adaptive Reasoning, Max Effort, Opus 4.8 Fallback). It's AA's only row for this model, above the Medium Copilot's picker showed on 2026-08-06. AA's row includes tasks a safety fallback handed to another model.">(49.6)</span></span></td>
 <td><span class="caps"><span class="n" title="Wrong tool: It only plans, per the registry's seat rules.">❌ Writing code</span><span class="y" title="Score 9.0 of 10, grade A. Band leader: Grok 4.7 at 10.0.">✅ Writing docs</span><span class="n" title="Wrong tool: It only plans, per the registry's seat rules.">❌ Code reviews</span><span class="n" title="Wrong tool: It only plans, per the registry's seat rules.">❌ Research</span><span class="s" title="Score 9.2 of 10, grade A. Best in its band.">★ Planning</span></span></td>
-<td><strong>Legacy as of 2026-09-07.</strong> Its value reads AA's only row, at max. Like Fable 5.1, it only plans and retains data by default</td>
+<td><strong>Legacy as of 2026-09-07. Retires from Copilot 2026-12-14</strong>, successor Fable 5.2. Its value reads AA's only row, at max. Like Fable 5.1, it only plans and retains data by default</td>
 </tr>
 <tr>
 <td><strong>Fable 5.2</strong> ¹</td>
@@ -1050,6 +1058,15 @@ That prediction comes from a fit across the whole roster:</p>
 <td>❌</td>
 </tr>
 <tr>
+<td><strong>MAI Code 2 Flash</strong></td>
+<td>Budget</td>
+<td>?</td>
+<td>❌</td>
+<td>?</td>
+<td>?</td>
+<td>❌</td>
+</tr>
+<tr>
 <td><strong>GPT-6.1 Sol</strong> ¹</td>
 <td>Low</td>
 <td>B ↑</td>
@@ -1057,15 +1074,6 @@ That prediction comes from a fit across the whole roster:</p>
 <td>B ↑</td>
 <td>A ↑</td>
 <td>A ↑</td>
-</tr>
-<tr>
-<td><strong>GPT-5.6 Terra</strong></td>
-<td>Low</td>
-<td>D ↓</td>
-<td>B →</td>
-<td>D ↓</td>
-<td>C →</td>
-<td>C ↓</td>
 </tr>
 <tr>
 <td><strong>GPT-6 Sol</strong> ¹</td>
@@ -1081,7 +1089,7 @@ That prediction comes from a fit across the whole roster:</p>
 <td>Low</td>
 <td>B →</td>
 <td>B →</td>
-<td>C →</td>
+<td>C ↓</td>
 <td>B →</td>
 <td>B →</td>
 </tr>
@@ -1099,9 +1107,18 @@ That prediction comes from a fit across the whole roster:</p>
 <td>Low</td>
 <td>D ↓</td>
 <td>D ↓</td>
-<td>C →</td>
+<td>C ↓</td>
 <td>D ↓</td>
 <td>❌</td>
+</tr>
+<tr>
+<td><strong>MAI Code 2</strong></td>
+<td>Low</td>
+<td>?</td>
+<td>❌</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
 </tr>
 <tr>
 <td><strong>Gemini 3.8 Flash</strong></td>
@@ -1176,16 +1193,16 @@ That prediction comes from a fit across the whole roster:</p>
 <td>A →</td>
 </tr>
 <tr>
-<td><strong>Opus 5</strong></td>
+<td><strong>Gemini 4 Carbon</strong></td>
 <td>Premium</td>
-<td>B →</td>
-<td>A →</td>
-<td>C →</td>
-<td>A →</td>
-<td>A →</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
 </tr>
 <tr>
-<td><strong>Gemini 4 Carbon</strong></td>
+<td><strong>Gemini 4 Hydrogen</strong></td>
 <td>Premium</td>
 <td>?</td>
 <td>?</td>
@@ -1218,7 +1235,7 @@ That prediction comes from a fit across the whole roster:</p>
 <td>B →</td>
 <td>B →</td>
 <td>B →</td>
-<td>B →</td>
+<td>B ↓</td>
 </tr>
 <tr>
 <td><strong>Fable 5</strong> ¹</td>
@@ -1294,6 +1311,15 @@ model at either end moves everyone's number.</p>
 <td>❌</td>
 </tr>
 <tr>
+<td><strong>MAI Code 2 Flash</strong></td>
+<td>—</td>
+<td>—</td>
+<td>❌</td>
+<td>—</td>
+<td>—</td>
+<td>❌</td>
+</tr>
+<tr>
 <td><strong>GPT-6.1 Sol</strong> ¹</td>
 <td>$0.214</td>
 <td>7.0</td>
@@ -1301,15 +1327,6 @@ model at either end moves everyone's number.</p>
 <td>6.4</td>
 <td>8.0</td>
 <td>8.7</td>
-</tr>
-<tr>
-<td><strong>GPT-5.6 Terra</strong></td>
-<td>$0.183</td>
-<td>2.2</td>
-<td>5.5</td>
-<td>1.5</td>
-<td>3.6</td>
-<td>3.7</td>
 </tr>
 <tr>
 <td><strong>GPT-6 Sol</strong> ¹</td>
@@ -1346,6 +1363,15 @@ model at either end moves everyone's number.</p>
 <td>2.8</td>
 <td>0.1</td>
 <td>❌</td>
+</tr>
+<tr>
+<td><strong>MAI Code 2</strong></td>
+<td>—</td>
+<td>—</td>
+<td>❌</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
 </tr>
 <tr>
 <td><strong>Gemini 3.8 Flash</strong></td>
@@ -1420,16 +1446,16 @@ model at either end moves everyone's number.</p>
 <td>7.5</td>
 </tr>
 <tr>
-<td><strong>Opus 5</strong></td>
-<td>$2.19</td>
-<td>5.4</td>
-<td>7.8</td>
-<td>4.9</td>
-<td>7.5</td>
-<td>7.8</td>
+<td><strong>Gemini 4 Carbon</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
 </tr>
 <tr>
-<td><strong>Gemini 4 Carbon</strong></td>
+<td><strong>Gemini 4 Hydrogen</strong></td>
 <td>—</td>
 <td>—</td>
 <td>—</td>
@@ -1485,8 +1511,8 @@ model at either end moves everyone's number.</p>
 </tbody>
 </table></div>
 <h2 id="fine-print">Fine print</h2>
-<p>¹ <strong>Pro+/Max only.</strong> GitHub documents Opus 5 and Opus 4.8 this way too,
-though both served on a plain Pro account on 2026-07-25 (T30). On base Pro a
+<p>¹ <strong>Pro+/Max only.</strong> GitHub documents Opus 4.8 this way too, though it
+served on a plain Pro account on 2026-07-25 (T30). On base Pro a
 gated model falls back to a Sonnet with a printed warning. Check what your
 plan serves.</p>
 <p><strong>How the scores are computed.</strong> Every score comes from one AA row per
@@ -1525,7 +1551,7 @@ that effort.</p>
 <p><strong>Cheap models fail silently.</strong> Only put them on work something else checks.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-17 12:01 PM PST / 3:01 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-17 1:03 PM PST / 4:03 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the

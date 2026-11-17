@@ -668,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.173.0 &middot; Updated 2026-11-17 &middot; <span class="fresh" data-checked="2026-11-11" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-11</span></span>
+<span class="stamp">v4.174.0 &middot; Updated 2026-11-17 &middot; <span class="fresh" data-checked="2026-11-17" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-17</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -688,6 +688,7 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
+<li><a href="#since-2026-11-17-v41740">Since 2026-11-17 (v4.174.0)</a></li>
 <li><a href="#since-2026-11-17-v41730">Since 2026-11-17 (v4.173.0)</a></li>
 <li><a href="#since-2026-11-11-v41720">Since 2026-11-11 (v4.172.0)</a></li>
 <li><a href="#since-2026-11-11-v41710">Since 2026-11-11 (v4.171.0)</a></li>
@@ -743,9 +744,24 @@ footer p { margin: 0; }
 <li><a href="#where-to-go-next">Where to go next</a></li>
 </ul>
 </details>
-<p><em>Updated 2026-11-17, v4.173.0. Newest first, back to v4.59.0. Older windows
+<p><em>Updated 2026-11-17, v4.174.0. Newest first, back to v4.59.0. Older windows
 are in git. The <a href="changelog.html">changelog</a> has per-release detail for the
 fourteen most recent releases.</em></p>
+<h2 id="since-2026-11-17-v41740">Since 2026-11-17 (v4.174.0)</h2>
+<p><strong>An Unreal reviewer.</strong> Call <code>smartreview-unreal</code> for any review of
+Unreal code. A plain review runs the vanilla profile and skips every
+Unreal rule. This seat pins the Unreal profile, reads your engine
+version, checks <code>Build.cs</code> and <code>[CoreRedirects]</code>, and sends Blueprints
+through smartdiff. The check layer gains ten Unreal rows, from unbound
+delegates to replication without authority.</p>
+<p><strong>smartdiff is sturdier.</strong> A deep audit found thirteen breaking bugs,
+each now fixed with a test: line numbers that drifted on odd line
+breaks, quoted or spaced paths, a user's git settings changing the
+parse, and gaps in an agent-only diff that only the exit code showed.</p>
+<p><strong>The data is six days fresher.</strong> Copilot retires six models on
+2026-12-14 and one on 2026-12-18. The Copilot verifier moved to Gemini
+4 Hydrogen ahead of that. Opus 5 and GPT-5.6 Terra left Copilot on
+2026-11-16. GPT-6.2, MAI Code 2 and Hydrogen join the registry.</p>
 <h2 id="since-2026-11-17-v41730">Since 2026-11-17 (v4.173.0)</h2>
 <p><strong>smartdiff shows review findings on their lines.</strong> Pass smartreview's
 report with <code>--review</code> and each finding sits under the line it names.
@@ -1323,7 +1339,7 @@ and never overwritten. <a href="goals.html">Goals &amp; Status</a> tracks distan
 including the goals still unmet.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-17 12:01 PM PST / 3:01 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-17 1:03 PM PST / 4:03 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the

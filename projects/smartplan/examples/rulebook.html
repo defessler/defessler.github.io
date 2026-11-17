@@ -83,7 +83,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <body>
 <div class="layout">
 <nav id="nav" aria-label="Skills">
-  <p class="brand">smartplan rulebook<small>2,445 one-liners · 2026-11-17</small></p>
+  <p class="brand">smartplan rulebook<small>2,462 one-liners · 2026-11-17</small></p>
   <div class="nav-group">Router</div>
 <a href="#smartplan" data-sec="smartplan"><span>smartplan</span><span class="n">138</span></a>
 <div class="nav-group">Parts</div>
@@ -93,15 +93,15 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <a href="#smartbrief" data-sec="smartbrief"><span>smartbrief</span><span class="n">123</span></a>
 <a href="#smartexec" data-sec="smartexec"><span>smartexec</span><span class="n">47</span></a>
 <a href="#smartcheck" data-sec="smartcheck"><span>smartcheck</span><span class="n">113</span></a>
-<a href="#smartcheck-cpp" data-sec="smartcheck-cpp"><span>smartcheck-cpp</span><span class="n">97</span></a>
+<a href="#smartcheck-cpp" data-sec="smartcheck-cpp"><span>smartcheck-cpp</span><span class="n">109</span></a>
 <a href="#smartcache" data-sec="smartcache"><span>smartcache</span><span class="n">309</span></a>
 <a href="#part-stubs-evidence-local-models" data-sec="part-stubs-evidence-local-models"><span>Part stubs, evidence, local models</span><span class="n">86</span></a>
 <div class="nav-group">Harnesses</div>
-<a href="#claude-code" data-sec="claude-code"><span>Claude Code</span><span class="n">185</span></a>
-<a href="#copilot-cli" data-sec="copilot-cli"><span>Copilot CLI</span><span class="n">154</span></a>
+<a href="#claude-code" data-sec="claude-code"><span>Claude Code</span><span class="n">187</span></a>
+<a href="#copilot-cli" data-sec="copilot-cli"><span>Copilot CLI</span><span class="n">155</span></a>
 <a href="#m365-copilot" data-sec="m365-copilot"><span>M365 Copilot</span><span class="n">102</span></a>
 <div class="nav-group">Companions</div>
-<a href="#smartreview" data-sec="smartreview"><span>smartreview</span><span class="n">90</span></a>
+<a href="#smartreview" data-sec="smartreview"><span>smartreview</span><span class="n">92</span></a>
 <a href="#smartvoice" data-sec="smartvoice"><span>smartvoice</span><span class="n">160</span></a>
 <a href="#smartwiki" data-sec="smartwiki"><span>smartwiki</span><span class="n">96</span></a>
 <a href="#smartdiff" data-sec="smartdiff"><span>smartdiff</span><span class="n">116</span></a>
@@ -111,7 +111,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
   <div class="hero">
     <h1>Every rule, one line each.</h1>
     <p>The smartplan family's skill bodies and references, rewritten as plain one-line statements. One rule or figure per line. Numbers, names, paths and commands are kept exactly as the source has them.</p>
-    <p class="meta"><b>2,445</b> lines across <b>18</b> skills and reference sets, taken from the v4.173.0 tree on 2026-11-17. Three sources aren't restated because they're already tables or checklists: <code>model-classes.md</code> (the price registry), <code>cpp-review-standards.md</code> and <code>web-ui-review-standards.md</code>.</p>
+    <p class="meta"><b>2,462</b> lines across <b>18</b> skills and reference sets, taken from the v4.174.0 tree on 2026-11-17. Three sources aren't restated because they're already tables or checklists: <code>model-classes.md</code> (the price registry), <code>cpp-review-standards.md</code> and <code>web-ui-review-standards.md</code>.</p>
   </div>
   <div class="filter">
     <input id="q" type="search" placeholder="Filter lines, for example: cache, Luna, fail-twice, 1.25x" aria-label="Filter lines" autocomplete="off">
@@ -929,7 +929,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <li value="179"><span class="t">Say so at the gate when a refusal happens, and do not present the mode as landed.</span></li>
 <li value="180"><span class="t">Route the verify cross-family on price either way.</span></li>
 <li value="181"><span class="t"><code>check.md</code> § Tiering sends every Mid leaf to a Strong verifier.</span></li>
-<li value="182"><span class="t">The pinned Gemini 3.8 Flash (0.75/3.75) is the price-sensitive pick, per <code>check.md</code> § Family decorrelation.</span></li>
+<li value="182"><span class="t">The pinned Gemini 4 Hydrogen (1.50/7.50) is the price-sensitive pick, per <code>check.md</code> § Family decorrelation.</span></li>
 <li value="183"><span class="t">Never let Sonnet judge Sonnet as a silent self-check.</span></li>
 <li value="184"><span class="t">Panel concurrency rides the plan&#x27;s subagent cap.</span></li>
 <li value="185"><span class="t">Panel concurrency may partially serialize on Copilot Pro.</span></li>
@@ -1361,9 +1361,9 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <li value="103"><span class="t">Fable is never a verifier.</span></li>
 <li value="104"><span class="t">Inline work counts as executor work, so self-review is banned.</span></li>
 <li value="105"><span class="t">An Opus-or-stronger session model reading the full diff may verify leaves it did not author.</span></li>
-<li value="106"><span class="t">On Copilot, Mid and Strong leaves go to Gemini 3.8 Flash, or GPT-6.1 Sol on a non-GPT executor.</span></li>
-<li value="107"><span class="t">Gemini 3.8 Flash costs 0.75/3.75 and caught 13 of 16 on T42.</span></li>
-<li value="108"><span class="t">GitHub names GPT-6.1 Sol the successor for Terra&#x27;s 2026-11-16 retirement.</span></li>
+<li value="106"><span class="t">On Copilot, Mid and Strong leaves go to Gemini 4 Hydrogen, or GPT-6.1 Sol on a non-GPT executor.</span></li>
+<li value="107"><span class="t">Gemini 4 Hydrogen costs 1.50/7.50 and is unmeasured. Its predecessor 3.8 Flash caught 13 of 16 on T42.</span></li>
+<li value="108"><span class="t">GitHub named GPT-6.1 Sol Terra&#x27;s successor at its 2026-11-16 retirement.</span></li>
 <li value="109"><span class="t">Sol is unmeasured on T42 and T34, and it needs Pro+.</span></li>
 <li value="110"><span class="t">Self-review stays banned, since a judge&#x27;s mislabel rate swung from 74.4% to 3.3%.</span></li>
 <li value="111"><span class="t">Decorrelation has a ceiling: cross-family fixes idiosyncratic blind spots, not systemic ones.</span></li>
@@ -1372,7 +1372,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 </ol>
 </section>
 <section id="smartcheck-cpp" class="skill">
-<header class="skill-head"><h2>smartcheck-cpp</h2><p class="src">cpp-gamedev-check.md <span class="dot"></span> <span class="count" data-total="97">97 lines</span></p></header>
+<header class="skill-head"><h2>smartcheck-cpp</h2><p class="src">cpp-gamedev-check.md <span class="dot"></span> <span class="count" data-total="109">109 lines</span></p></header>
 <h3>Preamble</h3>
 <ol>
 <li value="1"><span class="t">This is the companion to <code>check.md</code> and implements the six-category taxonomy from <code>docs/cpp-gamedev-contracts.md</code> Surface B.</span></li>
@@ -1382,13 +1382,13 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <li value="5"><span class="t">Run this layer on at least a Mid (Sonnet) verifier, never a Cheap one.</span></li>
 <li value="6"><span class="t">A Sonnet- or Opus-authored gamedev diff gets this layer at Opus-or-comparable strength.</span></li>
 <li value="7"><span class="t">With no such reader on offer, the strongest available runs it, and judgment rows go UNKNOWN where needed.</span></li>
-<li value="8"><span class="t">On Copilot, Gemini 3.8 Flash stands in for Opus-comparable strength on these six categories.</span></li>
+<li value="8"><span class="t">On Copilot, Gemini 4 Hydrogen stands in for Opus-comparable strength on these six categories.</span></li>
 <li value="9"><span class="t">That Gemini exception rests on decorrelation and price, not benchmark parity.</span></li>
 <li value="10"><span class="t">Never accept an Opus pin that silently degrades to Sonnet judging Sonnet.</span></li>
-<li value="11"><span class="t">Copilot retires Gemini 3.6 Flash on 2026-10-02, and Gemini 3.8 Flash is its successor.</span></li>
-<li value="12"><span class="t">Gemini 3.8 Flash keeps the 0.75/3.75 promotional price through 2026-12-31.</span></li>
-<li value="13"><span class="t">Copilot retires GPT-5.6 Terra on 2026-11-16 (changelog 2026-10-15).</span></li>
-<li value="14"><span class="t">For these six categories, use GPT-6.1 Sol as the cross-family verifier on a non-GPT executor until a trial clears it.</span></li>
+<li value="11"><span class="t">Copilot retires Gemini 3.8 Flash on 2026-12-14, and Gemini 4 Hydrogen is its successor.</span></li>
+<li value="12"><span class="t">Hydrogen lists at 1.50/7.50 and took the pin 2026-11-17, untested on T34.</span></li>
+<li value="13"><span class="t">Copilot retired GPT-5.6 Terra on 2026-11-16.</span></li>
+<li value="14"><span class="t">For these six categories, use GPT-6.1 Sol as the cross-family verifier on a non-GPT executor until a trial clears Hydrogen.</span></li>
 <li value="15"><span class="t">With a Sol model executing, use the Strong Opus pin or name the same-family pairing in the verdict.</span></li>
 <li value="16"><span class="t">Sol is unmeasured on T42 and T34 and needs Pro+, and plain Pro&#x27;s verdict says the tier sat below the floor.</span></li>
 </ol>
@@ -1424,90 +1424,102 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <li value="38"><span class="t">[G] An iterator, pointer or reference is held across an insert, erase or reallocation.</span></li>
 <li value="39"><span class="t">[G] A self-referential pointer sits on a type moved or copied without a fix-up.</span></li>
 <li value="40"><span class="t">[U] A <code>UObject*</code> or <code>TObjectPtr</code> member has no <code>UPROPERTY()</code>, is not a <code>TWeakObjectPtr</code>, and is not reported through <code>AddReferencedObjects</code>.</span></li>
-<li value="41"><span class="t">[C] A raw pointer points into an engine pool where the convention is an index-plus-generation handle.</span></li>
-<li value="42"><span class="t">Example: <code>Enemy.cpp:142</code> should use <code>TWeakObjectPtr&lt;AController&gt;</code> with <code>IsValid()</code> before use.</span></li>
+<li value="41"><span class="t">[U] A delegate, timer or async lambda bound to a <code>UObject</code> is never unbound or cleared in <code>EndPlay</code>, or captures raw <code>this</code> where a weak capture is needed.</span></li>
+<li value="42"><span class="t">[U] <code>GetWorld()</code>, <code>GetOwner()</code> or a subsystem lookup is dereferenced unchecked in a constructor, the CDO, an editor-only context or teardown.</span></li>
+<li value="43"><span class="t">[C] A raw pointer points into an engine pool where the convention is an index-plus-generation handle.</span></li>
+<li value="44"><span class="t">Example: <code>Enemy.cpp:142</code> should use <code>TWeakObjectPtr&lt;AController&gt;</code> with <code>IsValid()</code> before use.</span></li>
 </ol>
 <h3>2. Undefined behavior</h3>
 <ol>
-<li value="43"><span class="t">[G] <code>reinterpret_cast</code> or a union between unrelated types is used instead of <code>memcpy</code> or <code>std::bit_cast</code>.</span></li>
-<li value="44"><span class="t">[G] A buffer is cast to a stricter-alignment type with no alignment guarantee.</span></li>
-<li value="45"><span class="t">[G] Signed arithmetic can overflow near a range boundary, or a narrowing conversion can truncate.</span></li>
-<li value="46"><span class="t">[G] A variable or field is read before it is initialized.</span></li>
-<li value="47"><span class="t">[G] A <code>string_view</code>, <code>span</code> or <code>FStringView</code> is bound to a temporary destroyed before use.</span></li>
-<li value="48"><span class="t">[G] An object is touched after its lifetime ends, including use after <code>delete</code> or after <code>BeginDestroy</code>.</span></li>
+<li value="45"><span class="t">[G] <code>reinterpret_cast</code> or a union between unrelated types is used instead of <code>memcpy</code> or <code>std::bit_cast</code>.</span></li>
+<li value="46"><span class="t">[G] A buffer is cast to a stricter-alignment type with no alignment guarantee.</span></li>
+<li value="47"><span class="t">[G] Signed arithmetic can overflow near a range boundary, or a narrowing conversion can truncate.</span></li>
+<li value="48"><span class="t">[G] A variable or field is read before it is initialized.</span></li>
+<li value="49"><span class="t">[G] A <code>string_view</code>, <code>span</code> or <code>FStringView</code> is bound to a temporary destroyed before use.</span></li>
+<li value="50"><span class="t">[G] An object is touched after its lifetime ends, including use after <code>delete</code> or after <code>BeginDestroy</code>.</span></li>
 </ol>
 <h3>3. Performance hot-path</h3>
 <ol>
-<li value="49"><span class="t">[G] A heap allocation sits inside a per-frame function or an inner entity loop.</span></li>
-<li value="50"><span class="t">[G] A virtual call or <code>std::function</code> dispatch sits in a tight loop where the type is knowable.</span></li>
-<li value="51"><span class="t">[G] A pass-by-value or <code>push_back</code> copies a non-trivial type where a move or <code>const&amp;</code> would do.</span></li>
-<li value="52"><span class="t">[G] A hot loop touches a few fields of a large AoS struct that is SoA-shaped.</span></li>
-<li value="53"><span class="t">[G] A <code>shared_ptr</code> is copied across a per-frame boundary with no ownership transfer.</span></li>
-<li value="54"><span class="t">[G] Logging or formatting sits on a hot path with no build-config guard.</span></li>
+<li value="51"><span class="t">[G] A heap allocation sits inside a per-frame function or an inner entity loop.</span></li>
+<li value="52"><span class="t">[G] A virtual call or <code>std::function</code> dispatch sits in a tight loop where the type is knowable.</span></li>
+<li value="53"><span class="t">[G] A pass-by-value or <code>push_back</code> copies a non-trivial type where a move or <code>const&amp;</code> would do.</span></li>
+<li value="54"><span class="t">[G] A hot loop touches a few fields of a large AoS struct that is SoA-shaped.</span></li>
+<li value="55"><span class="t">[G] A <code>shared_ptr</code> is copied across a per-frame boundary with no ownership transfer.</span></li>
+<li value="56"><span class="t">[G] Logging or formatting sits on a hot path with no build-config guard.</span></li>
+<li value="57"><span class="t">[U] A synchronous asset load runs on a gameplay path, or a world scan like <code>GetAllActorsOfClass</code> runs in <code>Tick</code>.</span></li>
 </ol>
 <h3>4. Threading model</h3>
 <ol>
-<li value="55"><span class="t">[G] Shared mutable state is written from several threads with no lock or atomic.</span></li>
-<li value="56"><span class="t">[G] Game-thread-only state is touched from a render or job thread.</span></li>
-<li value="57"><span class="t">[G] An atomic memory order does not match its invariant, or a non-atomic access races an atomic write.</span></li>
-<li value="58"><span class="t">[G] A blocking call runs on a worker thread or on the game thread&#x27;s per-frame path.</span></li>
-<li value="59"><span class="t">[G] A lambda captured by reference is queued to another thread with no outlives guarantee.</span></li>
-<li value="60"><span class="t">[G] A lazy singleton or double-checked lock lacks an atomic or once guard.</span></li>
+<li value="58"><span class="t">[G] Shared mutable state is written from several threads with no lock or atomic.</span></li>
+<li value="59"><span class="t">[G] Game-thread-only state is touched from a render or job thread.</span></li>
+<li value="60"><span class="t">[G] An atomic memory order does not match its invariant, or a non-atomic access races an atomic write.</span></li>
+<li value="61"><span class="t">[G] A blocking call runs on a worker thread or on the game thread&#x27;s per-frame path.</span></li>
+<li value="62"><span class="t">[G] A lambda captured by reference is queued to another thread with no outlives guarantee.</span></li>
+<li value="63"><span class="t">[G] A lazy singleton or double-checked lock lacks an atomic or once guard.</span></li>
+<li value="64"><span class="t">[U] A <code>UObject</code> is created or written inside <code>Async</code>, <code>ParallelFor</code> or a task with no hop back to the game thread, or handed to a worker with nothing keeping it alive.</span></li>
 </ol>
 <h3>5. Build and header hygiene</h3>
 <ol>
-<li value="61"><span class="t">[G] A header includes something used only in the <code>.cpp</code>, or relies on a transitive include.</span></li>
-<li value="62"><span class="t">[G] A full type is included where a forward declaration would do.</span></li>
-<li value="63"><span class="t">[G] A heavy header is pulled into a widely included header.</span></li>
-<li value="64"><span class="t">[G] A non-<code>inline</code> function or variable is defined in a header, which risks an ODR violation.</span></li>
-<li value="65"><span class="t">[G] A stable, widely used header is added per file instead of through the PCH.</span></li>
-<li value="66"><span class="t">[U] A <code>*.generated.h</code> file is not the last include.</span></li>
-<li value="67"><span class="t">[C] An engine-layer header is pulled into a lower layer that should not depend on it.</span></li>
+<li value="65"><span class="t">[G] A header includes something used only in the <code>.cpp</code>, or relies on a transitive include.</span></li>
+<li value="66"><span class="t">[G] A full type is included where a forward declaration would do.</span></li>
+<li value="67"><span class="t">[G] A heavy header is pulled into a widely included header.</span></li>
+<li value="68"><span class="t">[G] A non-<code>inline</code> function or variable is defined in a header, which risks an ODR violation.</span></li>
+<li value="69"><span class="t">[G] A stable, widely used header is added per file instead of through the PCH.</span></li>
+<li value="70"><span class="t">[U] A <code>*.generated.h</code> file is not the last include.</span></li>
+<li value="71"><span class="t">[U] Editor-only code in a runtime module sits outside a <code>WITH_EDITOR</code> or <code>WITH_EDITORONLY_DATA</code> guard, so the cook or Shipping build fails.</span></li>
+<li value="72"><span class="t">[U] A module is used without its <code>Build.cs</code> dependency, or a private dependency&#x27;s type is exposed in a public header.</span></li>
+<li value="73"><span class="t">[U] A side effect sits inside <code>check()</code>, which compiles out of Shipping, or code relies on an <code>ensure()</code> condition after it returns.</span></li>
+<li value="74"><span class="t">[U] An RPC or <code>BlueprintNativeEvent</code> has no <code>_Implementation</code>, or a reflected signature UHT can&#x27;t take.</span></li>
+<li value="75"><span class="t">[C] An engine-layer header is pulled into a lower layer that should not depend on it.</span></li>
 </ol>
 <h3>6. Determinism and serialization</h3>
 <ol>
-<li value="68"><span class="t">[G] Sim logic reads <code>DeltaTime</code> directly instead of a fixed timestep where determinism is needed.</span></li>
-<li value="69"><span class="t">[G] A float comes from a platform-varying path with no bit-identical guarantee.</span></li>
-<li value="70"><span class="t">[G] A save or replay format change has no version tag or upgrade path.</span></li>
-<li value="71"><span class="t">[G] A static or singleton has no re-init path across hot-reload.</span></li>
-<li value="72"><span class="t">[G] Non-deterministic container iteration feeds a saved, replayed or cross-client result.</span></li>
-<li value="73"><span class="t">[G] A random source is not seeded per the determinism contract, such as a global <code>rand()</code>.</span></li>
+<li value="76"><span class="t">[G] Sim logic reads <code>DeltaTime</code> directly instead of a fixed timestep where determinism is needed.</span></li>
+<li value="77"><span class="t">[G] A float comes from a platform-varying path with no bit-identical guarantee.</span></li>
+<li value="78"><span class="t">[G] A save or replay format change has no version tag or upgrade path.</span></li>
+<li value="79"><span class="t">[G] A static or singleton has no re-init path across hot-reload.</span></li>
+<li value="80"><span class="t">[G] Non-deterministic container iteration feeds a saved, replayed or cross-client result.</span></li>
+<li value="81"><span class="t">[G] A random source is not seeded per the determinism contract, such as a global <code>rand()</code>.</span></li>
+<li value="82"><span class="t">[U] A reflected name is renamed, moved or removed with no <code>[CoreRedirects]</code> entry, or a <code>UENUM</code> entry is reordered, so saved data is lost.</span></li>
+<li value="83"><span class="t">[U] Replicated state changes without authority, a property is missing from <code>GetLifetimeReplicatedProps</code>, or a server RPC trusts client input.</span></li>
 </ol>
 <h3>Severity</h3>
 <ol>
-<li value="74"><span class="t">Always blocking: any diff-introduced finding in Ownership and lifetime, Undefined behavior or Threading model.</span></li>
-<li value="75"><span class="t">Performance hot-path blocks only when the code is per-frame or an inner loop.</span></li>
-<li value="76"><span class="t">Determinism blocks only when the system is sim-, replay- or save-critical, and editor or debug paths are notes.</span></li>
-<li value="77"><span class="t">Build and header hygiene blocks only if it breaks the build or violates ODR.</span></li>
+<li value="84"><span class="t">Always blocking: any diff-introduced finding in Ownership and lifetime, Undefined behavior or Threading model.</span></li>
+<li value="85"><span class="t">Performance hot-path blocks only when the code is per-frame or an inner loop.</span></li>
+<li value="86"><span class="t">Determinism blocks only when the system is sim-, replay- or save-critical, and editor or debug paths are notes.</span></li>
+<li value="87"><span class="t">A [U] reflected rename with no <code>[CoreRedirects]</code> entry and a [U] replicated change without authority always block.</span></li>
+<li value="88"><span class="t">Build and header hygiene blocks only if it breaks the build or violates ODR.</span></li>
+<li value="89"><span class="t">A break that shows only in another configuration blocks too: unguarded editor-only code, a missing <code>Build.cs</code> dependency, or an RPC with no <code>_Implementation</code>.</span></li>
 </ol>
 <h3>Report</h3>
 <ol>
-<li value="78"><span class="t">Produce the <code>C++ GAMEDEV CORRECTNESS</code> block before handing off to <code>check.md</code>.</span></li>
-<li value="79"><span class="t">Zero findings still gets the block, and the block says so.</span></li>
-<li value="80"><span class="t">Fold BLOCKING rows into <code>check.md</code> FAIL Reasons and Evidence.</span></li>
-<li value="81"><span class="t">Fold note rows into the PASS Notes line.</span></li>
+<li value="90"><span class="t">Produce the <code>C++ GAMEDEV CORRECTNESS</code> block before handing off to <code>check.md</code>.</span></li>
+<li value="91"><span class="t">Zero findings still gets the block, and the block says so.</span></li>
+<li value="92"><span class="t">Fold BLOCKING rows into <code>check.md</code> FAIL Reasons and Evidence.</span></li>
+<li value="93"><span class="t">Fold note rows into the PASS Notes line.</span></li>
 </ol>
 <h3>Hard rules</h3>
 <ol>
-<li value="82"><span class="t">Diff-scoped: judge only lines the leaf added or changed, plus minimal context.</span></li>
-<li value="83"><span class="t">A brief silent on profile means <code>vanilla</code>, [G] only, with the default noted.</span></li>
-<li value="84"><span class="t">One bug gets one finding, filed under the more severe category.</span></li>
-<li value="85"><span class="t">A defect in two or more always-blocking categories is filed under each of them.</span></li>
-<li value="86"><span class="t">This file has no PASS or FAIL verdict of its own.</span></li>
-<li value="87"><span class="t">This is not a style pass, since naming and formatting belong to <code>smartreview</code>.</span></li>
-<li value="88"><span class="t">When both seats run, mark already-filed findings rather than raising them twice.</span></li>
-<li value="89"><span class="t">The PCH row and the [C] layering row need a PCH manifest or module graph in the brief, or they are skipped.</span></li>
+<li value="94"><span class="t">Diff-scoped: judge only lines the leaf added or changed, plus minimal context.</span></li>
+<li value="95"><span class="t">A brief silent on profile means <code>vanilla</code>, [G] only, with the default noted.</span></li>
+<li value="96"><span class="t">One bug gets one finding, filed under the more severe category.</span></li>
+<li value="97"><span class="t">A defect in two or more always-blocking categories is filed under each of them.</span></li>
+<li value="98"><span class="t">This file has no PASS or FAIL verdict of its own.</span></li>
+<li value="99"><span class="t">This is not a style pass, since naming and formatting belong to <code>smartreview</code>.</span></li>
+<li value="100"><span class="t">When both seats run, mark already-filed findings rather than raising them twice.</span></li>
+<li value="101"><span class="t">The PCH row and the [C] layering row need a PCH manifest or module graph in the brief, or they are skipped.</span></li>
 </ol>
 <h3>Pitfall catalog (VERIFY FIRST source)</h3>
 <ol>
-<li value="90"><span class="t">The pitfall catalog is for smartbrief, not for the verifier.</span></li>
-<li value="91"><span class="t"><code>brief.md</code> rule 9 draws one flagged verify-first fact from this list.</span></li>
-<li value="92"><span class="t">Ownership pitfalls: raw owning pointer, use-after-move, iterator across reallocation, and [U] <code>UObject*</code> with no <code>UPROPERTY()</code>.</span></li>
-<li value="93"><span class="t">Undefined behavior pitfalls: signed overflow in index math, <code>reinterpret_cast</code> punning, dangling view, and uninitialized POD.</span></li>
-<li value="94"><span class="t">Performance pitfalls: heap allocation in a loop, missing move, virtual dispatch where static would do, and AoS on a hot path.</span></li>
-<li value="95"><span class="t">Threading pitfalls: a write without an owning-thread handoff, a blocking call on a must-not-block thread, and the wrong memory order.</span></li>
-<li value="96"><span class="t">Build pitfalls: a transitive-only include, a full type where a forward declaration would do, and [U] <code>*.generated.h</code> not last.</span></li>
-<li value="97"><span class="t">Determinism pitfalls: a wall-clock or unseeded RNG in the sim, a save format with no version field, and a hot-reload-unsafe static.</span></li>
+<li value="102"><span class="t">The pitfall catalog is for smartbrief, not for the verifier.</span></li>
+<li value="103"><span class="t"><code>brief.md</code> rule 9 draws one flagged verify-first fact from this list.</span></li>
+<li value="104"><span class="t">Ownership pitfalls: raw owning pointer, use-after-move, iterator across reallocation, [U] <code>UObject*</code> with no <code>UPROPERTY()</code>, [U] a delegate or timer never unbound, and [U] <code>GetWorld()</code> in a constructor.</span></li>
+<li value="105"><span class="t">Undefined behavior pitfalls: signed overflow in index math, <code>reinterpret_cast</code> punning, dangling view, and uninitialized POD.</span></li>
+<li value="106"><span class="t">Performance pitfalls: heap allocation in a loop, missing move, virtual dispatch where static would do, and AoS on a hot path.</span></li>
+<li value="107"><span class="t">Threading pitfalls: a write without an owning-thread handoff, a blocking call on a must-not-block thread, the wrong memory order, and [U] a <code>UObject</code> touched inside <code>Async</code> or <code>ParallelFor</code>.</span></li>
+<li value="108"><span class="t">Build pitfalls: a transitive-only include, a full type where a forward declaration would do, [U] <code>*.generated.h</code> not last, [U] editor-only code outside <code>WITH_EDITOR</code>, and [U] a module used without its <code>Build.cs</code> entry.</span></li>
+<li value="109"><span class="t">Determinism pitfalls: a wall-clock or unseeded RNG in the sim, a save format with no version field, a hot-reload-unsafe static, [U] a reflected rename with no <code>[CoreRedirects]</code>, and [U] a replicated change without authority.</span></li>
 </ol>
 </section>
 <section id="smartcache" class="skill">
@@ -2001,249 +2013,251 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 </ol>
 </section>
 <section id="claude-code" class="skill">
-<header class="skill-head"><h2>Claude Code</h2><p class="src">claude-code.md <span class="dot"></span> <span class="count" data-total="185">185 lines</span></p></header>
+<header class="skill-head"><h2>Claude Code</h2><p class="src">claude-code.md <span class="dot"></span> <span class="count" data-total="187">187 lines</span></p></header>
 <h3>The lever</h3>
 <ol>
-<li value="1"><span class="t">Resolution order: per-call <code>model:</code> beats frontmatter, which beats <code>CLAUDE_CODE_SUBAGENT_MODEL</code>, which beats the session model (v2.1.251 and later).</span></li>
-<li value="2"><span class="t">Before 2.1.251 the env var came first.</span></li>
-<li value="3"><span class="t">Since 2.1.196, <code>inherit</code> is identical to unset (re-verified 2026-08-12).</span></li>
-<li value="4"><span class="t">A per-call <code>model:</code> takes only sonnet, opus, haiku, or fable (2.1.280 schema).</span></li>
-<li value="5"><span class="t">A full model id goes in seat frontmatter or the env var.</span></li>
-<li value="6"><span class="t">The standing default is <code>CLAUDE_CODE_SUBAGENT_MODEL=sonnet</code> in the settings env block.</span></li>
-<li value="7"><span class="t">Probed 2026-09-23 on 2.1.280: an unnamed dispatch ran Sonnet under a Haiku session, and a per-call haiku still won.</span></li>
-<li value="8"><span class="t">That probe supersedes the #43869 ignored-entry report from 2.1.263.</span></li>
-<li value="9"><span class="t">A Bash export never reaches the harness.</span></li>
-<li value="10"><span class="t"><code>CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1</code> (2.1.257) pins every leaf and drops model from the Agent schema and <code>agent()</code> opts. Never use it for a verified wave.</span></li>
-<li value="11"><span class="t"><code>CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL</code> (2.1.296, binary read, unprobed) is the workflow-scoped FORCE. It beats <code>opts.model</code> and the seat model. Never use it for a tiered wave.</span></li>
-<li value="12"><span class="t">The model swap is subagent-scoped and cache-safe.</span></li>
-<li value="13"><span class="t">A main-session model or effort switch busts the main cache (caching.md).</span></li>
+<li value="1"><span class="t">A mod whose <code>agent.spawn</code> hook sets a model beats the per-call <code>model:</code> (docs, read 2026-11-17).</span></li>
+<li value="2"><span class="t">Resolution order: per-call <code>model:</code> beats frontmatter, which beats <code>CLAUDE_CODE_SUBAGENT_MODEL</code>, which beats the session model (v2.1.251 and later).</span></li>
+<li value="3"><span class="t">Before 2.1.251 the env var came first.</span></li>
+<li value="4"><span class="t">Since 2.1.196, <code>inherit</code> is identical to unset (re-verified 2026-08-12).</span></li>
+<li value="5"><span class="t">A per-call <code>model:</code> takes only sonnet, opus, haiku, or fable (2.1.280 schema).</span></li>
+<li value="6"><span class="t">A full model id goes in seat frontmatter or the env var.</span></li>
+<li value="7"><span class="t">The standing default is <code>CLAUDE_CODE_SUBAGENT_MODEL=sonnet</code> in the settings env block.</span></li>
+<li value="8"><span class="t">Probed 2026-09-23 on 2.1.280: an unnamed dispatch ran Sonnet under a Haiku session, and a per-call haiku still won.</span></li>
+<li value="9"><span class="t">That probe supersedes the #43869 ignored-entry report from 2.1.263.</span></li>
+<li value="10"><span class="t">A Bash export never reaches the harness.</span></li>
+<li value="11"><span class="t"><code>CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1</code> (2.1.257) pins every leaf and drops model from the Agent schema and <code>agent()</code> opts. Never use it for a verified wave.</span></li>
+<li value="12"><span class="t"><code>CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL</code> (2.1.296, binary read, unprobed) is the workflow-scoped FORCE. It beats <code>opts.model</code> and the seat model. Never use it for a tiered wave.</span></li>
+<li value="13"><span class="t">The model swap is subagent-scoped and cache-safe.</span></li>
+<li value="14"><span class="t">A main-session model or effort switch busts the main cache (caching.md).</span></li>
 </ol>
 <h3>Effort</h3>
 <ol>
-<li value="14"><span class="t">Effort is a per-dispatch knob from 2.1.292: <code>Agent()</code> takes <code>effort</code>, which beats the seat pin.</span></li>
-<li value="15"><span class="t">Probed 2026-10-08 on 2.1.294: a low-pinned seat ran high when the call said so.</span></li>
-<li value="16"><span class="t">Otherwise effort comes from frontmatter <code>effort:</code> or an <code>agent()</code> opt.</span></li>
-<li value="17"><span class="t">The Mid implementer pins low on Haiku (T47). A Sonnet dispatch passes <code>effort: medium</code>.</span></li>
-<li value="18"><span class="t">The verifier pins high. Cheap seats pin low.</span></li>
-<li value="19"><span class="t">Haiku 5.5 is live on the API. Elsewhere Haiku 4.5 has no effort dial.</span></li>
-<li value="20"><span class="t">A pin beats <code>/effort</code> and <code>--effort ultracode xhigh</code>.</span></li>
-<li value="21"><span class="t">A per-call model on the low-pinned implementer passes <code>effort: medium</code> (a Sonnet or Opus escalation, a failed Cheap leaf). A bare <code>model:</code> runs low.</span></li>
-<li value="22"><span class="t">Only <code>CLAUDE_CODE_EFFORT_LEVEL</code> (auto included) outranks the pin.</span></li>
-<li value="23"><span class="t"><code>maxEffortLevel</code> clamps.</span></li>
-<li value="24"><span class="t">An unpinned seat takes the explicit session level, else its own model&#x27;s saved level or default.</span></li>
-<li value="25"><span class="t">2.1.316 adds <code>CLAUDE_CODE_SUBAGENT_EFFORT</code>, used when nothing else sets effort (changelog only, unprobed).</span></li>
-<li value="26"><span class="t">Re-probed 2026-11-11 on 2.1.322: Fable 5.2, Opus 5.5, Sonnet 5.5 and Haiku 5.5 default to medium, the rest to high, and Opus 4.7 to xhigh.</span></li>
-<li value="27"><span class="t">The legacy top-level <code>effortLevel</code> no longer reaches Opus 5.5.</span></li>
+<li value="15"><span class="t">Effort is a per-dispatch knob from 2.1.292: <code>Agent()</code> takes <code>effort</code>, which beats the seat pin.</span></li>
+<li value="16"><span class="t">Probed 2026-10-08 on 2.1.294: a low-pinned seat ran high when the call said so.</span></li>
+<li value="17"><span class="t">Otherwise effort comes from frontmatter <code>effort:</code> or an <code>agent()</code> opt.</span></li>
+<li value="18"><span class="t">The Mid implementer pins low on Haiku (T47). A Sonnet dispatch passes <code>effort: medium</code>.</span></li>
+<li value="19"><span class="t">The verifier pins high. Cheap seats pin low.</span></li>
+<li value="20"><span class="t">Haiku 5.5 is live on the API. Elsewhere Haiku 4.5 has no effort dial.</span></li>
+<li value="21"><span class="t">A pin beats <code>/effort</code> and <code>--effort ultracode xhigh</code>.</span></li>
+<li value="22"><span class="t">A per-call model on the low-pinned implementer passes <code>effort: medium</code> (a Sonnet or Opus escalation, a failed Cheap leaf). A bare <code>model:</code> runs low.</span></li>
+<li value="23"><span class="t">Only <code>CLAUDE_CODE_EFFORT_LEVEL</code> (auto included) outranks the pin.</span></li>
+<li value="24"><span class="t"><code>maxEffortLevel</code> clamps.</span></li>
+<li value="25"><span class="t">An unpinned seat takes the explicit session level, else its own model&#x27;s saved level or default.</span></li>
+<li value="26"><span class="t">2.1.316 adds <code>CLAUDE_CODE_SUBAGENT_EFFORT</code>, used when nothing else sets effort (changelog only, unprobed).</span></li>
+<li value="27"><span class="t">Re-probed 2026-11-11 on 2.1.322: Fable 5.2, Opus 5.5, Sonnet 5.5 and Haiku 5.5 default to medium, the rest to high, and Opus 4.7 to xhigh.</span></li>
+<li value="28"><span class="t">The legacy top-level <code>effortLevel</code> no longer reaches Opus 5.5.</span></li>
 </ol>
 <h3>Naming the seat</h3>
 <ol>
-<li value="28"><span class="t">Name the seat from the system prompt&#x27;s model line, <code>/model</code>, or <code>/status</code>.</span></li>
-<li value="29"><span class="t">A per-call model above the seat waits on a user yes. A brief does not.</span></li>
-<li value="30"><span class="t">A Haiku seat sends no model above Haiku (routing.md Cheap hard floor #6).</span></li>
-<li value="31"><span class="t"><code>opus</code> means Opus 5.5 from 2.1.280 on the API, Platform on AWS, Bedrock and Google Cloud. Foundry keeps 4.6.</span></li>
-<li value="32"><span class="t"><code>default</code> is Opus 5.5 on every paid plan, Pro included.</span></li>
-<li value="33"><span class="t">A subagent asking for <code>opus</code> takes the session&#x27;s Opus.</span></li>
-<li value="34"><span class="t">Newest version first (model-classes.md How to edit): the session runs default or opus, and seats run aliases. A full id freezes.</span></li>
-<li value="35"><span class="t">Lagging aliases: <code>sonnet</code> is 4.6 on Platform on AWS and 4.5 on Bedrock, Google Cloud and Foundry. <code>haiku</code> is 4.5 off the API.</span></li>
-<li value="36"><span class="t">Fix a lagging alias with <code>ANTHROPIC_DEFAULT_SONNET_MODEL</code> or <code>_OPUS_MODEL</code>.</span></li>
-<li value="37"><span class="t">2.1.280 is the floor for Opus 5.5.</span></li>
-<li value="38"><span class="t"><code>sonnet</code> is 5.5 on the API from 2.1.284. <code>haiku</code> is 5.5 on the API from 2.1.293 (2026-10-07), and 4.5 on AWS, Bedrock, Google Cloud and Foundry.</span></li>
+<li value="29"><span class="t">Name the seat from the system prompt&#x27;s model line, <code>/model</code>, or <code>/status</code>.</span></li>
+<li value="30"><span class="t">A per-call model above the seat waits on a user yes. A brief does not.</span></li>
+<li value="31"><span class="t">A Haiku seat sends no model above Haiku (routing.md Cheap hard floor #6).</span></li>
+<li value="32"><span class="t"><code>opus</code> means Opus 5.5 from 2.1.280 on the API, Platform on AWS, Bedrock and Google Cloud. Foundry keeps 4.6.</span></li>
+<li value="33"><span class="t"><code>default</code> is Opus 5.5 on every paid plan, Pro included.</span></li>
+<li value="34"><span class="t">A subagent asking for <code>opus</code> takes the session&#x27;s Opus.</span></li>
+<li value="35"><span class="t">Newest version first (model-classes.md How to edit): the session runs default or opus, and seats run aliases. A full id freezes.</span></li>
+<li value="36"><span class="t">Lagging aliases: <code>sonnet</code> is 4.6 on Platform on AWS and 4.5 on Bedrock, Google Cloud and Foundry. <code>haiku</code> is 4.5 off the API.</span></li>
+<li value="37"><span class="t">Fix a lagging alias with <code>ANTHROPIC_DEFAULT_SONNET_MODEL</code> or <code>_OPUS_MODEL</code>.</span></li>
+<li value="38"><span class="t">2.1.280 is the floor for Opus 5.5.</span></li>
+<li value="39"><span class="t"><code>sonnet</code> is 5.5 on the API from 2.1.284. <code>haiku</code> is 5.5 on the API from 2.1.293 (2026-10-07), and 4.5 on AWS, Bedrock, Google Cloud and Foundry.</span></li>
 </ol>
 <h3>Fast mode</h3>
 <ol>
-<li value="39"><span class="t"><code>/fast</code> is not a cheap tier. It is Opus with faster output (Opus 5.5, 5, and 4.8 until 2026-11-30).</span></li>
-<li value="40"><span class="t">Fast mode on Opus 5.5 is the default at $8/$40.</span></li>
-<li value="41"><span class="t">The fast header is part of the cache key.</span></li>
-<li value="42"><span class="t">The first enable per conversation re-reads the history uncached at fast rates. Later toggles keep it.</span></li>
-<li value="43"><span class="t">On Sonnet or Haiku, <code>/fast</code> switches the session to Opus, and it stays there after fast is off.</span></li>
+<li value="40"><span class="t"><code>/fast</code> is not a cheap tier. It is Opus with faster output (Opus 5.5, 5, and 4.8 until 2026-11-30).</span></li>
+<li value="41"><span class="t">Fast mode on Opus 5.5 is the default at $8/$40.</span></li>
+<li value="42"><span class="t">The fast header is part of the cache key.</span></li>
+<li value="43"><span class="t">The first enable per conversation re-reads the history uncached at fast rates. Later toggles keep it.</span></li>
+<li value="44"><span class="t">On Sonnet or Haiku, <code>/fast</code> switches the session to Opus, and it stays there after fast is off.</span></li>
 </ol>
 <h3>Windows and fan-out</h3>
 <ol>
-<li value="44"><span class="t">A seat&#x27;s window is sized by its own model.</span></li>
-<li value="45"><span class="t">Current aliases run 1M. Legacy Haiku 4.5 runs 200k.</span></li>
-<li value="46"><span class="t">The beyond-one-context argument holds only where windows match.</span></li>
-<li value="47"><span class="t">Fan-out is background by default since 2.1.198. Fire all Agent calls and watch the agent panel.</span></li>
+<li value="45"><span class="t">A seat&#x27;s window is sized by its own model.</span></li>
+<li value="46"><span class="t">Current aliases run 1M. Legacy Haiku 4.5 runs 200k.</span></li>
+<li value="47"><span class="t">The beyond-one-context argument holds only where windows match.</span></li>
+<li value="48"><span class="t">Fan-out is background by default since 2.1.198. Fire all Agent calls and watch the agent panel.</span></li>
 </ol>
 <h3>Auto mode</h3>
 <ol>
-<li value="48"><span class="t">Auto mode is a built-in start mode on all plans and providers (2.1.283 and later).</span></li>
-<li value="49"><span class="t">The classifier is Sonnet 5 unless server-set, pinned after first-request validation, and billed as tokens on API and Enterprise.</span></li>
-<li value="50"><span class="t">From 2.1.278, Enterprise, API, cloud, and <code>ANTHROPIC_BASE_URL</code> gateways fold checks into session requests where rolled out (the <code>/status</code> &quot;Auto mode server&quot; row).</span></li>
-<li value="51"><span class="t">A header-stripping gateway falls back to billed local calls.</span></li>
-<li value="52"><span class="t"><code>CLAUDE_CODE_AUTO_MODE_SERVER=0</code> is not read on the direct API.</span></li>
-<li value="53"><span class="t">A subscription keeps the local classifier.</span></li>
-<li value="54"><span class="t">3 consecutive or 20 total blocks pause auto mode.</span></li>
+<li value="49"><span class="t">Auto mode is a built-in start mode on all plans and providers (2.1.283 and later).</span></li>
+<li value="50"><span class="t">The classifier is Sonnet 5 unless server-set, pinned after first-request validation, and billed as tokens on API and Enterprise.</span></li>
+<li value="51"><span class="t">From 2.1.278, Enterprise, API, cloud, and <code>ANTHROPIC_BASE_URL</code> gateways fold checks into session requests where rolled out (the <code>/status</code> &quot;Auto mode server&quot; row).</span></li>
+<li value="52"><span class="t">A header-stripping gateway falls back to billed local calls.</span></li>
+<li value="53"><span class="t">A direct API connection asks the server classifier on every plan: Pro, Max, Ultra and Team from 2.1.271, Enterprise and API from 2.1.278.</span></li>
+<li value="54"><span class="t"><code>CLAUDE_CODE_AUTO_MODE_SERVER=0</code> is read on a direct connection from 2.1.281.</span></li>
+<li value="55"><span class="t">3 consecutive or 20 total blocks pause auto mode.</span></li>
 </ol>
 <h3>Isolation and forks</h3>
 <ol>
-<li value="55"><span class="t">Use <code>isolation: worktree</code> for parallel edit leaves. It is auto-cleaned if unchanged.</span></li>
-<li value="56"><span class="t">Worktrees do not share the prompt cache (caching.md).</span></li>
-<li value="57"><span class="t">Read-only and scout leaves stay in the same directory.</span></li>
-<li value="58"><span class="t">A fork ignores <code>model:</code> and runs the session model on the parent&#x27;s warm prefix.</span></li>
-<li value="59"><span class="t">A fork is a context lever, not a cost lever. Use it for audit or synthesis, and a normal subagent to route down.</span></li>
-<li value="60"><span class="t">A same-tier retry is a resume via SendMessage, on a warm cache. It is tier-safe on 2.1.211 or later.</span></li>
-<li value="61"><span class="t">A resumed agent with MCP tools keeps its cache from 2.1.277, and a resumed fork from 2.1.280.</span></li>
-<li value="62"><span class="t">The §B analog is <code>--resume</code>.</span></li>
+<li value="56"><span class="t">Use <code>isolation: worktree</code> for parallel edit leaves. It is auto-cleaned if unchanged.</span></li>
+<li value="57"><span class="t">Worktrees do not share the prompt cache (caching.md).</span></li>
+<li value="58"><span class="t">Read-only and scout leaves stay in the same directory.</span></li>
+<li value="59"><span class="t">A fork ignores <code>model:</code> and runs the session model on the parent&#x27;s warm prefix.</span></li>
+<li value="60"><span class="t">A fork is a context lever, not a cost lever. Use it for audit or synthesis, and a normal subagent to route down.</span></li>
+<li value="61"><span class="t">A same-tier retry is a resume via SendMessage, on a warm cache. It is tier-safe on 2.1.211 or later.</span></li>
+<li value="62"><span class="t">A resumed agent with MCP tools keeps its cache from 2.1.277, and a resumed fork from 2.1.280.</span></li>
+<li value="63"><span class="t">The §B analog is <code>--resume</code>.</span></li>
 </ol>
 <h3>Ceilings</h3>
 <ol>
-<li value="63"><span class="t">20 concurrent subagents (2.1.217, <code>CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS</code>), exempt under ultracode.</span></li>
-<li value="64"><span class="t">A resume takes a slot unchecked.</span></li>
-<li value="65"><span class="t"><code>--max-budget-usd</code> (print mode only) halts background subagents.</span></li>
-<li value="66"><span class="t">Depth is 3 since 2.1.219 (<code>CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH</code>). At the limit the seat does the work itself and returns a summary.</span></li>
-<li value="67"><span class="t">Workflows run 16 concurrent agents by default, fewer on fewer CPUs, 1 to 256 via <code>CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS</code> on 2.1.269 and later.</span></li>
-<li value="68"><span class="t">A workflow run allows 1,000 agents.</span></li>
-<li value="69"><span class="t">The size guideline is under 10 agents (under 5 on Pro). A Large warning fires past 25 agents or 1.5M tokens.</span></li>
-<li value="70"><span class="t">From 2.1.271 an interactive subscription workflow pauses at the usage limit and resumes after the reset.</span></li>
-<li value="71"><span class="t">Size to these ceilings as routing.md sizes to credit caps.</span></li>
+<li value="64"><span class="t">20 concurrent subagents (2.1.217, <code>CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS</code>), exempt under ultracode.</span></li>
+<li value="65"><span class="t">A resume takes a slot unchecked.</span></li>
+<li value="66"><span class="t"><code>--max-budget-usd</code> (print mode only) halts background subagents.</span></li>
+<li value="67"><span class="t">Depth is 3 since 2.1.219 (<code>CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH</code>). At the limit the seat does the work itself and returns a summary.</span></li>
+<li value="68"><span class="t">Workflows run 16 concurrent agents by default, fewer on fewer CPUs, 1 to 256 via <code>CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS</code> on 2.1.269 and later.</span></li>
+<li value="69"><span class="t">A workflow run allows 1,000 agents.</span></li>
+<li value="70"><span class="t">The size guideline is under 10 agents (under 5 on Pro). A Large warning fires past 25 agents or 1.5M tokens.</span></li>
+<li value="71"><span class="t">From 2.1.271 an interactive subscription workflow pauses at the usage limit and resumes after the reset.</span></li>
+<li value="72"><span class="t">Size to these ceilings as routing.md sizes to credit caps.</span></li>
 </ol>
 <h3>Opus 5 and 5.5 seats</h3>
 <ol>
-<li value="72"><span class="t"><code>tengu_auto_mode_config.severityByModel</code> has no claude-opus-5 or claude-opus-5-5 entry (#80977 open, stale-labelled, re-read 2026-09-22). The default is stricter.</span></li>
-<li value="73"><span class="t">Use plan mode or allow-rules there.</span></li>
-<li value="74"><span class="t">Opus 5&#x27;s system prompt has a don&#x27;t-dispatch section. 2.1.280 gates it on the <code>opus_5_prompt_bundle</code> capability, absent on 5.5 unless server text adds it (code-read 2026-09-22).</span></li>
-<li value="75"><span class="t">The skill and CLAUDE.md routing policy already ask. Plan-gate approval does too: quote it and dispatch.</span></li>
-<li value="76"><span class="t">A <code>## Delegating to subagents</code> section appears on any model when <code>tengu_thistle_grebe</code> (or env <code>CLAUDE_CODE_THISTLE_GREBE</code>) is <code>counter_steer</code>: work inline unless delegation pays. Read as the default 2026-09-22.</span></li>
-<li value="77"><span class="t">Log that section as a confound.</span></li>
-<li value="78"><span class="t">ultrathink is a confound too (xhigh for the turn on the API, 2.1.311 terminal, 2.1.316 VS Code). <code>CLAUDE_CODE_DISABLE_ULTRATHINK=1</code> turns it off.</span></li>
+<li value="73"><span class="t"><code>tengu_auto_mode_config.severityByModel</code> has no claude-opus-5 or claude-opus-5-5 entry (#80977 open, stale-labelled, re-read 2026-09-22). The default is stricter.</span></li>
+<li value="74"><span class="t">Use plan mode or allow-rules there.</span></li>
+<li value="75"><span class="t">Opus 5&#x27;s system prompt has a don&#x27;t-dispatch section. 2.1.280 gates it on the <code>opus_5_prompt_bundle</code> capability, absent on 5.5 unless server text adds it (code-read 2026-09-22).</span></li>
+<li value="76"><span class="t">The skill and CLAUDE.md routing policy already ask. Plan-gate approval does too: quote it and dispatch.</span></li>
+<li value="77"><span class="t">A <code>## Delegating to subagents</code> section appears on any model when <code>tengu_thistle_grebe</code> (or env <code>CLAUDE_CODE_THISTLE_GREBE</code>) is <code>counter_steer</code>: work inline unless delegation pays. Read as the default 2026-09-22.</span></li>
+<li value="78"><span class="t">Log that section as a confound.</span></li>
+<li value="79"><span class="t">ultrathink is a confound too (xhigh for the turn on the API, 2.1.311 terminal, 2.1.316 VS Code). <code>CLAUDE_CODE_DISABLE_ULTRATHINK=1</code> turns it off.</span></li>
 </ol>
 <h3>Whether the tier lands</h3>
 <ol>
-<li value="79"><span class="t">#43869 is open. Per-call, frontmatter and env levers are each ignored on some paths.</span></li>
-<li value="80"><span class="t"><code>/usage</code>&#x27;s Session block lists &quot;Usage by model:&quot; with per-model tokens and dollars at list rates (or managed <code>modelPricing</code>).</span></li>
-<li value="81"><span class="t">That is not a bill on Max or Pro, but the attribution is real on the Anthropic endpoint.</span></li>
-<li value="82"><span class="t">The free offline check: dispatch a cheap wave and look for the model&#x27;s line. All-Opus after a Haiku wave is a failure.</span></li>
-<li value="83"><span class="t">Behind a rerouting gateway, <code>/usage</code> names the requested alias (cost-state read 2026-09-22). Read the provider&#x27;s monitor instead.</span></li>
-<li value="84"><span class="t">Never grep the transcript for the model.</span></li>
-<li value="85"><span class="t">The JSONL model field can disagree: requested in one place, served in a 2.1.233 repro with the request in meta.json (third-party, unprobed).</span></li>
-<li value="86"><span class="t">Until a local probe, metadata proves nothing.</span></li>
-<li value="87"><span class="t">Do not brief a seat to quote its system prompt or model line. Opus 5.5 refuses that as reasoning_extraction (#96139).</span></li>
-<li value="88"><span class="t">An <code>availableModels</code> substitution prints an interactive-only warning naming both models. Check for it before calling a #43869 hit.</span></li>
-<li value="89"><span class="t">Check <code>/tasks</code> first. It shows the model each subagent ran at, plus effort when pinned. For an inheriting seat, read <code>$CLAUDE_EFFORT</code> in Bash.</span></li>
-<li value="90"><span class="t"><code>/tasks</code> is sharper than <code>/usage</code>.</span></li>
-<li value="91"><span class="t">A PostToolUse hook on Agent logs <code>resolvedModel</code>, and from 2.1.212 <code>modelsUsed</code> after a mid-run swap. That is harness resolution, blind to the server.</span></li>
-<li value="92"><span class="t">In auto mode (2.1.271 and later) the report arrives via SubagentHandback, edits nothing, and passes the classifier first. Match that too.</span></li>
-<li value="93"><span class="t">A second de-tiering path: fallback chains cover subagents (2.1.247).</span></li>
-<li value="94"><span class="t"><code>--fallback-model</code> or a <code>fallbackModel</code> array (max 3, turn-scoped, availability-only, never shrinks context at compaction) can move a pinned leaf mid-wave.</span></li>
-<li value="95"><span class="t">Fallbacks are not shown at startup or <code>/status</code>. The parent error text names the model, and <code>modelsUsed</code> records it. Track it like #43869.</span></li>
-<li value="96"><span class="t">Partial fixes: 2.1.211 (resume and follow-up), 2.1.222 (allowlist), 2.1.316 (a leaf on a parent leaf&#x27;s model stays when woken).</span></li>
-<li value="97"><span class="t">Treat a landing as unconfirmed until <code>/tasks</code> or <code>/usage</code> shows it.</span></li>
+<li value="80"><span class="t">#43869 is open. Per-call, frontmatter and env levers are each ignored on some paths.</span></li>
+<li value="81"><span class="t"><code>/usage</code>&#x27;s Session block lists &quot;Usage by model:&quot; with per-model tokens and dollars at list rates (or managed <code>modelPricing</code>).</span></li>
+<li value="82"><span class="t">That is not a bill on Max or Pro, but the attribution is real on the Anthropic endpoint.</span></li>
+<li value="83"><span class="t">The free offline check: dispatch a cheap wave and look for the model&#x27;s line. All-Opus after a Haiku wave is a failure.</span></li>
+<li value="84"><span class="t">Behind a rerouting gateway, <code>/usage</code> names the requested alias (cost-state read 2026-09-22). Read the provider&#x27;s monitor instead.</span></li>
+<li value="85"><span class="t">Never grep the transcript for the model.</span></li>
+<li value="86"><span class="t">The JSONL model field can disagree: requested in one place, served in a 2.1.233 repro with the request in meta.json (third-party, unprobed).</span></li>
+<li value="87"><span class="t">Until a local probe, metadata proves nothing.</span></li>
+<li value="88"><span class="t">Do not brief a seat to quote its system prompt or model line. Opus 5.5 refuses that as reasoning_extraction (#96139).</span></li>
+<li value="89"><span class="t">An <code>availableModels</code> substitution prints an interactive-only warning naming both models. Check for it before calling a #43869 hit.</span></li>
+<li value="90"><span class="t">Check <code>/tasks</code> first. It shows the model each subagent ran at, plus effort when pinned. For an inheriting seat, read <code>$CLAUDE_EFFORT</code> in Bash.</span></li>
+<li value="91"><span class="t"><code>/tasks</code> is sharper than <code>/usage</code>.</span></li>
+<li value="92"><span class="t">A PostToolUse hook on Agent logs <code>resolvedModel</code>, and from 2.1.212 <code>modelsUsed</code> after a mid-run swap. That is harness resolution, blind to the server.</span></li>
+<li value="93"><span class="t">In auto mode (2.1.271 and later) the report arrives via SubagentHandback, edits nothing, and passes the classifier first. Match that too.</span></li>
+<li value="94"><span class="t">A second de-tiering path: fallback chains cover subagents (2.1.247).</span></li>
+<li value="95"><span class="t"><code>--fallback-model</code> or a <code>fallbackModel</code> array (max 3, turn-scoped, availability-only, never shrinks context at compaction) can move a pinned leaf mid-wave.</span></li>
+<li value="96"><span class="t">Fallbacks are not shown at startup or <code>/status</code>. The parent error text names the model, and <code>modelsUsed</code> records it. Track it like #43869.</span></li>
+<li value="97"><span class="t">Partial fixes: 2.1.211 (resume and follow-up), 2.1.222 (allowlist), 2.1.316 (a leaf on a parent leaf&#x27;s model stays when woken).</span></li>
+<li value="98"><span class="t">Treat a landing as unconfirmed until <code>/tasks</code> or <code>/usage</code> shows it.</span></li>
 </ol>
 <h3>Safety fallback</h3>
 <ol>
-<li value="98"><span class="t">A content-flagged request re-runs on a different model, and the session continues.</span></li>
-<li value="99"><span class="t">It can fire on the first request (CLAUDE.md, git status). <code>--safe-mode</code> isolates.</span></li>
-<li value="100"><span class="t">Map as of 2026-09-29: Opus 5.5, Fable 5.1 and Fable 5 send biology to Opus 5 and cyber to Opus 4.8.</span></li>
-<li value="101"><span class="t">Opus 5.5 sends frontier-LLM-dev to Opus 5.</span></li>
-<li value="102"><span class="t">Opus 5 sends cyber to 4.8 and refuses biology.</span></li>
-<li value="103"><span class="t">Sonnet 5.5 sends cyber to Sonnet 5 and refuses biology.</span></li>
-<li value="104"><span class="t">reasoning_extraction refuses everywhere.</span></li>
-<li value="105"><span class="t">From Opus 5.5, the fallback goes down in capability and up in price.</span></li>
-<li value="106"><span class="t"><code>CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK=1</code> (2.1.312) turns it off.</span></li>
-<li value="107"><span class="t">Custom deployment names fall back too.</span></li>
-<li value="108"><span class="t">With <code>switchModelsOnFlag: false</code> in the benchmark harness, interactive asks and <code>-p</code> ends the main-thread turn.</span></li>
-<li value="109"><span class="t">A flagged subagent or workflow leaf still re-serves (2.1.280 code read plus #91923, unprobed).</span></li>
-<li value="110"><span class="t">From 2.1.318 a subagent stops instead when the setting is &quot;Ask each time&quot; (changelog, unprobed).</span></li>
-<li value="111"><span class="t">Check OTel <code>subagent_completed</code> for <code>model_swapped</code> and <code>final_model</code>.</span></li>
-<li value="112"><span class="t">opusplan: <code>/model opusplan</code> is native (Opus 5.5 plan mode, Sonnet execution, main session), immune to #43869, and captures most of the core rule minus fan-out and the Cheap floor.</span></li>
+<li value="99"><span class="t">A content-flagged request re-runs on a different model, and the session continues.</span></li>
+<li value="100"><span class="t">It can fire on the first request (CLAUDE.md, git status). <code>--safe-mode</code> isolates.</span></li>
+<li value="101"><span class="t">Map as of 2026-09-29: Opus 5.5, Fable 5.1 and Fable 5 send biology to Opus 5 and cyber to Opus 4.8.</span></li>
+<li value="102"><span class="t">Opus 5.5 sends frontier-LLM-dev to Opus 5.</span></li>
+<li value="103"><span class="t">Opus 5 sends cyber to 4.8 and refuses biology.</span></li>
+<li value="104"><span class="t">Sonnet 5.5 sends cyber to Sonnet 5 and refuses biology.</span></li>
+<li value="105"><span class="t">reasoning_extraction refuses everywhere.</span></li>
+<li value="106"><span class="t">From Opus 5.5, the fallback goes down in capability and up in price.</span></li>
+<li value="107"><span class="t"><code>CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK=1</code> (2.1.312) turns it off.</span></li>
+<li value="108"><span class="t">Custom deployment names fall back too.</span></li>
+<li value="109"><span class="t">With <code>switchModelsOnFlag: false</code> in the benchmark harness, interactive asks and <code>-p</code> ends the main-thread turn.</span></li>
+<li value="110"><span class="t">A flagged subagent or workflow leaf still re-serves (2.1.280 code read plus #91923, unprobed).</span></li>
+<li value="111"><span class="t">From 2.1.318 a subagent stops instead when the setting is &quot;Ask each time&quot; (changelog, unprobed).</span></li>
+<li value="112"><span class="t">Check OTel <code>subagent_completed</code> for <code>model_swapped</code> and <code>final_model</code>.</span></li>
+<li value="113"><span class="t">opusplan: <code>/model opusplan</code> is native (Opus 5.5 plan mode, Sonnet execution, main session), immune to #43869, and captures most of the core rule minus fan-out and the Cheap floor.</span></li>
+<li value="114"><span class="t">Before 2.1.325 a seat with its own <code>model:</code> moved to the plan-mode model under <code>opusplan</code> or <code>haiku</code>.</span></li>
 </ol>
 <h3>Caching-aware fan-out</h3>
 <ol>
-<li value="113"><span class="t">A fresh subagent&#x27;s cold cache write runs on a 5-minute TTL.</span></li>
-<li value="114"><span class="t">Lift it to an hour with <code>subagentPromptCacheTtl</code>, <code>CLAUDE_CODE_SUBAGENT_PROMPT_CACHE_TTL</code>, or per-agent <code>experimental.cacheTtl</code>.</span></li>
-<li value="115"><span class="t">A subscription on usage credits ignores the per-agent 1h (caching.md).</span></li>
-<li value="116"><span class="t">Weigh leaf count against spawn cost. Prefer a fork for a full-context leaf.</span></li>
-<li value="117"><span class="t">Rule (a), measured 2026-07-11: end the turn while the wave is in flight.</span></li>
-<li value="118"><span class="t">An idle wait turn rereads at cache price. About 30 wait turns at about 150k equals a 10-dispatch probe wave.</span></li>
-<li value="119"><span class="t">Scheduled tasks, <code>crossSessionInbound: hold</code>, and <code>/goal</code> check-ins (<code>CLAUDE_CODE_GOAL_CHECKIN_MINUTES=0</code>) start idle turns too.</span></li>
-<li value="120"><span class="t">Rule (b): shared prefix first, brief last: <code>[protocol+conventions][brief]</code>.</span></li>
-<li value="121"><span class="t">Byte-identical prefixes cache-hit within the TTL. Leaves 2 to N read at 0.1x once the first streams (stagger per flow.md step 3).</span></li>
-<li value="122"><span class="t">Workflow siblings share only when model, effort, agent type, tools, output schema and cwd match.</span></li>
-<li value="123"><span class="t">Rule (c): a Mid-or-stronger seat reads the protocol. Paste it only for Cheap.</span></li>
-<li value="124"><span class="t">Orchestrator output costs about 5x input. &quot;Read references/check.md and follow it&quot; beats pasting about 4k tokens.</span></li>
-<li value="125"><span class="t">A Cheap executor may skip a read, so Haiku keeps the payload.</span></li>
+<li value="115"><span class="t">A fresh subagent&#x27;s cold cache write runs on a 5-minute TTL.</span></li>
+<li value="116"><span class="t">Lift it to an hour with <code>subagentPromptCacheTtl</code>, <code>CLAUDE_CODE_SUBAGENT_PROMPT_CACHE_TTL</code>, or per-agent <code>experimental.cacheTtl</code>.</span></li>
+<li value="117"><span class="t">A subscription on usage credits ignores the per-agent 1h (caching.md).</span></li>
+<li value="118"><span class="t">Weigh leaf count against spawn cost. Prefer a fork for a full-context leaf.</span></li>
+<li value="119"><span class="t">Rule (a), measured 2026-07-11: end the turn while the wave is in flight.</span></li>
+<li value="120"><span class="t">An idle wait turn rereads at cache price. About 30 wait turns at about 150k equals a 10-dispatch probe wave.</span></li>
+<li value="121"><span class="t">Scheduled tasks, <code>crossSessionInbound: hold</code>, and <code>/goal</code> check-ins (<code>CLAUDE_CODE_GOAL_CHECKIN_MINUTES=0</code>) start idle turns too.</span></li>
+<li value="122"><span class="t">Rule (b): shared prefix first, brief last: <code>[protocol+conventions][brief]</code>.</span></li>
+<li value="123"><span class="t">Byte-identical prefixes cache-hit within the TTL. Leaves 2 to N read at 0.1x once the first streams (stagger per flow.md step 3).</span></li>
+<li value="124"><span class="t">Workflow siblings share only when model, effort, agent type, tools, output schema and cwd match.</span></li>
+<li value="125"><span class="t">Rule (c): a Mid-or-stronger seat reads the protocol. Paste it only for Cheap.</span></li>
+<li value="126"><span class="t">Orchestrator output costs about 5x input. &quot;Read references/check.md and follow it&quot; beats pasting about 4k tokens.</span></li>
+<li value="127"><span class="t">A Cheap executor may skip a read, so Haiku keeps the payload.</span></li>
 </ol>
 <h3>Adjacent primitives</h3>
 <ol>
-<li value="126"><span class="t">Agent Teams (<code>CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</code>): teammates fall back to the lead&#x27;s priciest model.</span></li>
-<li value="127"><span class="t">Teammate precedence: the spawn prompt&#x27;s model, the definition&#x27;s <code>model:</code> (inherit means the lead&#x27;s), <code>CLAUDE_CODE_SUBAGENT_MODEL</code> unless inherit, then the lead&#x27;s model.</span></li>
-<li value="128"><span class="t">Name the model in the spawn prompt.</span></li>
-<li value="129"><span class="t">Reserve teams for adversarial or competing-hypothesis review.</span></li>
-<li value="130"><span class="t">Hazard: with teams enabled, an Agent call with <code>name</code> launches a teammate (idle notification). Claude may add a name on its own.</span></li>
-<li value="131"><span class="t"><code>subagent_type</code> alone, a fork, or <code>isolation</code> stays a subagent, as does every named call under <code>claude -p</code> or the SDK.</span></li>
-<li value="132"><span class="t">Setting the variable to 0 in the settings env block reverts without a restart.</span></li>
-<li value="133"><span class="t">Teammates inherit the lead&#x27;s effort.</span></li>
-<li value="134"><span class="t">TeammateIdle and TaskCompleted hooks (exit 2 blocks) enforce smartcheck-before-done.</span></li>
-<li value="135"><span class="t">Advisor: the seat inherits it. Check <code>advisorModel</code> before a Cheap wave.</span></li>
-<li value="136"><span class="t">Dynamic workflows (<code>pipeline()</code> and <code>parallel()</code>, schemas, resumable, auto-planned at <code>/effort ultracode</code>, 2.1.203 and later). Pro switches them on in <code>/config</code>.</span></li>
-<li value="137"><span class="t">Never run a workflow unprompted.</span></li>
-<li value="138"><span class="t">Five opt-ins: the ultracode keyword, ultracode on, the user asking, a user-invoked skill or slash command that says to, or a named or saved workflow the user asked for.</span></li>
-<li value="139"><span class="t">A self-loaded skill, smartplan included, is not an opt-in. &quot;Would benefit&quot; is not one. Ask first.</span></li>
-<li value="140"><span class="t">Agent dispatch is the default.</span></li>
-<li value="141"><span class="t"><code>agent()</code> opts carry only the per-call effort dial (model plus effort low to max).</span></li>
-<li value="142"><span class="t">The tool script reference says to omit model. The workflows cost docs say to ask a smaller model for easy stages.</span></li>
-<li value="143"><span class="t">A workflow is an execution engine, not policy: no mid-run input beyond permission prompts.</span></li>
-<li value="144"><span class="t">Gate before the workflow, route tiers in the script, and run the verify floor as stages.</span></li>
-<li value="145"><span class="t">It inherits the permission mode. A definition&#x27;s <code>permissionMode</code> counts only from default, dontAsk, or plan.</span></li>
-<li value="146"><span class="t">The auto mode classifier reads an <code>agent()</code> prompt as computed text, so a leaf&#x27;s destructive or outward action cannot lean on the brief.</span></li>
-<li value="147"><span class="t">The launch carries a mode-dependent approval prompt.</span></li>
-<li value="148"><span class="t">Security sweeps go to the Claude Security plugin.</span></li>
+<li value="128"><span class="t">Agent Teams (<code>CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</code>): teammates fall back to the lead&#x27;s priciest model.</span></li>
+<li value="129"><span class="t">Teammate precedence: the spawn prompt&#x27;s model, the definition&#x27;s <code>model:</code> (inherit means the lead&#x27;s), <code>CLAUDE_CODE_SUBAGENT_MODEL</code> unless inherit, then the lead&#x27;s model.</span></li>
+<li value="130"><span class="t">Name the model in the spawn prompt.</span></li>
+<li value="131"><span class="t">Reserve teams for adversarial or competing-hypothesis review.</span></li>
+<li value="132"><span class="t">Hazard: with teams enabled, an Agent call with <code>name</code> launches a teammate (idle notification). Claude may add a name on its own.</span></li>
+<li value="133"><span class="t"><code>subagent_type</code> alone, a fork, or <code>isolation</code> stays a subagent, as does every named call under <code>claude -p</code> or the SDK.</span></li>
+<li value="134"><span class="t">Setting the variable to 0 in the settings env block reverts without a restart.</span></li>
+<li value="135"><span class="t">Teammates inherit the lead&#x27;s effort.</span></li>
+<li value="136"><span class="t">TeammateIdle and TaskCompleted hooks (exit 2 blocks) enforce smartcheck-before-done.</span></li>
+<li value="137"><span class="t">Advisor: the seat inherits it. Check <code>advisorModel</code> before a Cheap wave.</span></li>
+<li value="138"><span class="t">Dynamic workflows (<code>pipeline()</code> and <code>parallel()</code>, schemas, resumable, auto-planned at <code>/effort ultracode</code>, 2.1.203 and later). Pro switches them on in <code>/config</code>.</span></li>
+<li value="139"><span class="t">Never run a workflow unprompted.</span></li>
+<li value="140"><span class="t">Five opt-ins: the ultracode keyword, ultracode on, the user asking, a user-invoked skill or slash command that says to, or a named or saved workflow the user asked for.</span></li>
+<li value="141"><span class="t">A self-loaded skill, smartplan included, is not an opt-in. &quot;Would benefit&quot; is not one. Ask first.</span></li>
+<li value="142"><span class="t">Agent dispatch is the default.</span></li>
+<li value="143"><span class="t"><code>agent()</code> opts carry only the per-call effort dial (model plus effort low to max).</span></li>
+<li value="144"><span class="t">The tool script reference says to omit model. The workflows cost docs say to ask a smaller model for easy stages.</span></li>
+<li value="145"><span class="t">A workflow is an execution engine, not policy: no mid-run input beyond permission prompts.</span></li>
+<li value="146"><span class="t">Gate before the workflow, route tiers in the script, and run the verify floor as stages.</span></li>
+<li value="147"><span class="t">It inherits the permission mode. A definition&#x27;s <code>permissionMode</code> counts only from default, dontAsk, or plan.</span></li>
+<li value="148"><span class="t">The auto mode classifier reads an <code>agent()</code> prompt as computed text, so a leaf&#x27;s destructive or outward action cannot lean on the brief.</span></li>
+<li value="149"><span class="t">The launch carries a mode-dependent approval prompt.</span></li>
+<li value="150"><span class="t">Security sweeps go to the Claude Security plugin.</span></li>
 </ol>
 <h3>Mechanical enforcement</h3>
 <ol>
-<li value="149"><span class="t"><code>docs/enforcement-hook.md</code> describes a PreToolUse hook plus <code>Agent(model:...)</code> deny rules.</span></li>
-<li value="150"><span class="t">The warn-only instance lives in <code>.claude/settings.json</code> and <code>.claude/hooks/</code>.</span></li>
-<li value="151"><span class="t">Its note rides exit-0 JSON (<code>systemMessage</code>, <code>additionalContext</code>). Exit-0 stderr reaches only the debug log.</span></li>
-<li value="152"><span class="t">Hard-deny is a one-line opt-in.</span></li>
-<li value="153"><span class="t">A SessionStart hook with the <code>compact</code> matcher (<code>rearm-after-compact.sh</code>) tells Claude to re-read flow.md, artifacts.md and run-state.md when run-state.md sits at the project root.</span></li>
+<li value="151"><span class="t"><code>docs/enforcement-hook.md</code> describes a PreToolUse hook plus <code>Agent(model:...)</code> deny rules.</span></li>
+<li value="152"><span class="t">The warn-only instance lives in <code>.claude/settings.json</code> and <code>.claude/hooks/</code>.</span></li>
+<li value="153"><span class="t">Its note rides exit-0 JSON (<code>systemMessage</code>, <code>additionalContext</code>). Exit-0 stderr reaches only the debug log.</span></li>
+<li value="154"><span class="t">Hard-deny is a one-line opt-in.</span></li>
+<li value="155"><span class="t">A SessionStart hook with the <code>compact</code> matcher (<code>rearm-after-compact.sh</code>) tells Claude to re-read flow.md, artifacts.md and run-state.md when run-state.md sits at the project root.</span></li>
 </ol>
 <h3>Structural tool-lockdown</h3>
 <ol>
-<li value="154"><span class="t">Per-call <code>model:</code> tiers the model, not the tools. Ad-hoc <code>Agent()</code> rules are prompt-only.</span></li>
-<li value="155"><span class="t">The quartet in <code>.claude/agents/</code>: smartplan-scout (Read, Glob, Grep), smartplan-verifier (no Write, Edit or NotebookEdit), smartplan-implementer, smartplan-implementer-cheap.</span></li>
-<li value="156"><span class="t">Dispatch them via <code>subagent_type</code>. Copy the files to reuse them.</span></li>
-<li value="157"><span class="t">Lockdown closes only the tool-permission half. <code>model:</code> frontmatter is still under #43869, so confirm with <code>/tasks</code> and cross-check <code>/usage</code>.</span></li>
+<li value="156"><span class="t">Per-call <code>model:</code> tiers the model, not the tools. Ad-hoc <code>Agent()</code> rules are prompt-only.</span></li>
+<li value="157"><span class="t">The quartet in <code>.claude/agents/</code>: smartplan-scout (Read, Glob, Grep), smartplan-verifier (no Write, Edit or NotebookEdit), smartplan-implementer, smartplan-implementer-cheap.</span></li>
+<li value="158"><span class="t">Dispatch them via <code>subagent_type</code>. Copy the files to reuse them.</span></li>
+<li value="159"><span class="t">Lockdown closes only the tool-permission half. <code>model:</code> frontmatter is still under #43869, so confirm with <code>/tasks</code> and cross-check <code>/usage</code>.</span></li>
 </ol>
 <h3>Cost levers</h3>
 <ol>
-<li value="158"><span class="t">Forking is on by default since 2.1.232 interactive, and 2.1.302 in <code>-p</code>, the Agent SDK, desktop and VS Code (headless arm read 2026-10-20).</span></li>
-<li value="159"><span class="t"><code>CLAUDE_CODE_FORK_SUBAGENT=0</code> turns it off.</span></li>
-<li value="160"><span class="t">An untyped Agent is still general-purpose.</span></li>
-<li value="161"><span class="t"><code>/subtask</code> is the in-session fork (2.1.212). <code>/fork</code> copies the session to a new background one.</span></li>
-<li value="162"><span class="t">A <code>context: fork</code> skill is not a fork. It is a fresh subagent with its own <code>model:</code> frontmatter, background by default since 2.1.218 (<code>background: false</code> opts out).</span></li>
-<li value="163"><span class="t">Sibling forks stopped cross-launching in 2.1.307.</span></li>
-<li value="164"><span class="t">Explore and Plan skip CLAUDE.md and git status, run the session model (Explore capped at Opus on the API), ignore a bare <code>CLAUDE_CODE_SUBAGENT_MODEL</code>, and cannot resume.</span></li>
-<li value="165"><span class="t">Prefer the scout.</span></li>
-<li value="166"><span class="t">From 2.1.271, <code>omitClaudeMd: true</code> drops user, project and local CLAUDE.md. Git status still loads.</span></li>
-<li value="167"><span class="t"><code>skillOverrides</code> has four states: on, off, name-only, user-invocable-only. Plugin skills are exempt (re-verified 2026-08-12).</span></li>
-<li value="168"><span class="t"><code>disable-model-invocation: true</code> removes the description.</span></li>
-<li value="169"><span class="t"><code>skillListingBudgetFraction</code> and <code>skillListingMaxDescChars</code> cap the listing.</span></li>
-<li value="170"><span class="t"><code>/skill-doctor</code> needs 2.1.252 or later.</span></li>
-<li value="171"><span class="t">2.1.277 reads AGENTS.md when there is no CLAUDE.md (Project instructions in <code>/config</code>, all providers and telemetry from 2.1.281).</span></li>
-<li value="172"><span class="t">The Windows docs recommend an <code>@AGENTS.md</code> import in CLAUDE.md, with no double-read.</span></li>
-<li value="173"><span class="t">claude.ai skill sync (2.1.275) lands in <code>~/.claude/skills/synced/</code>, refreshing about every 10 minutes, with collisions at <code>/anthropic-skills:&lt;name&gt;</code>.</span></li>
-<li value="174"><span class="t">Opt out with <code>syncClaudeAiSkills</code> or <code>syncClaudeAiPlugins</code>.</span></li>
-<li value="175"><span class="t"><code>ANTHROPIC_DEFAULT_MODEL</code> (2.1.236 and later) is the fifth link below <code>/model</code>, <code>--model</code> and <code>ANTHROPIC_MODEL</code>. It can repoint sessions, so check it on a shared box.</span></li>
-<li value="176"><span class="t"><code>best</code> and <code>fable</code> are moving targets. From 2.1.321 <code>best</code> is <code>opus</code> and <code>fable</code> is Fable 5.2. Never pin a benchmark arm to either.</span></li>
-<li value="177"><span class="t">Fable 5.1 needs its full id, <code>claude-fable-5-1</code>.</span></li>
-<li value="178"><span class="t"><code>ANTHROPIC_DEFAULT_HAIKU_MODEL</code> sets the background model. Helpers are pre-seated cheap: statusline setup on Sonnet, the docs guide on Haiku.</span></li>
-<li value="179"><span class="t"><code>CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC</code> is indirect. No switch suppresses background model calls.</span></li>
-<li value="180"><span class="t">Compaction: <code>/autocompact</code> (<code>autoCompactWindow</code>, 100K to 1M), <code>--autocompact</code>, and <code>CLAUDE_CODE_AUTO_COMPACT_WINDOW</code>, which wins.</span></li>
-<li value="181"><span class="t">2.1.312: a subagent&#x27;s <code>autoCompactWindow</code> can lower but never raise (changelog only).</span></li>
-<li value="182"><span class="t">2.1.304 accepts k and M suffixes (500k, 1M). Bare means raw tokens. 500 clamps to 100K with a warning. An unusable value is ignored with a warning and the next source applies.</span></li>
-<li value="183"><span class="t"><code>CLAUDE_AUTOCOMPACT_PCT_OVERRIDE</code> only lowers, subagents included.</span></li>
-<li value="184"><span class="t">Frontmatter <code>autoCompactWindow</code> arrived in 2.1.296.</span></li>
-<li value="185"><span class="t">Earlier compaction shrinks rereads but busts the prefix. Measure first.</span></li>
+<li value="160"><span class="t">Forking is on by default since 2.1.232 interactive, and 2.1.302 in <code>-p</code>, the Agent SDK, desktop and VS Code (headless arm read 2026-10-20).</span></li>
+<li value="161"><span class="t"><code>CLAUDE_CODE_FORK_SUBAGENT=0</code> turns it off.</span></li>
+<li value="162"><span class="t">An untyped Agent is still general-purpose.</span></li>
+<li value="163"><span class="t"><code>/subtask</code> is the in-session fork (2.1.212). <code>/fork</code> copies the session to a new background one.</span></li>
+<li value="164"><span class="t">A <code>context: fork</code> skill is not a fork. It is a fresh subagent with its own <code>model:</code> frontmatter, background by default since 2.1.218 (<code>background: false</code> opts out).</span></li>
+<li value="165"><span class="t">Sibling forks stopped cross-launching in 2.1.307.</span></li>
+<li value="166"><span class="t">Explore and Plan skip CLAUDE.md and git status, run the session model (Explore capped at Opus on the API), ignore a bare <code>CLAUDE_CODE_SUBAGENT_MODEL</code>, and cannot resume.</span></li>
+<li value="167"><span class="t">Prefer the scout.</span></li>
+<li value="168"><span class="t">From 2.1.271, <code>omitClaudeMd: true</code> drops user, project and local CLAUDE.md. Git status still loads.</span></li>
+<li value="169"><span class="t"><code>skillOverrides</code> has four states: on, off, name-only, user-invocable-only. Plugin skills are exempt (re-verified 2026-08-12).</span></li>
+<li value="170"><span class="t"><code>disable-model-invocation: true</code> removes the description.</span></li>
+<li value="171"><span class="t"><code>skillListingBudgetFraction</code> and <code>skillListingMaxDescChars</code> cap the listing.</span></li>
+<li value="172"><span class="t"><code>/skill-doctor</code> needs 2.1.252 or later.</span></li>
+<li value="173"><span class="t">2.1.277 reads AGENTS.md when there is no CLAUDE.md (Project instructions in <code>/config</code>, all providers and telemetry from 2.1.281).</span></li>
+<li value="174"><span class="t">The Windows docs recommend an <code>@AGENTS.md</code> import in CLAUDE.md, with no double-read.</span></li>
+<li value="175"><span class="t">claude.ai skill sync (2.1.275) lands in <code>~/.claude/skills/synced/</code>, refreshing about every 10 minutes, with collisions at <code>/anthropic-skills:&lt;name&gt;</code>.</span></li>
+<li value="176"><span class="t">Opt out with <code>syncClaudeAiSkills</code> or <code>syncClaudeAiPlugins</code>.</span></li>
+<li value="177"><span class="t"><code>ANTHROPIC_DEFAULT_MODEL</code> (2.1.236 and later) is the fifth link below <code>/model</code>, <code>--model</code> and <code>ANTHROPIC_MODEL</code>. It can repoint sessions, so check it on a shared box.</span></li>
+<li value="178"><span class="t"><code>best</code> and <code>fable</code> are moving targets. From 2.1.321 <code>best</code> is <code>opus</code> and <code>fable</code> is Fable 5.2. Never pin a benchmark arm to either.</span></li>
+<li value="179"><span class="t">Fable 5.1 needs its full id, <code>claude-fable-5-1</code>.</span></li>
+<li value="180"><span class="t"><code>ANTHROPIC_DEFAULT_HAIKU_MODEL</code> sets the background model. Helpers are pre-seated cheap: statusline setup on Sonnet, the docs guide on Haiku.</span></li>
+<li value="181"><span class="t"><code>CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC</code> is indirect. No switch suppresses background model calls.</span></li>
+<li value="182"><span class="t">Compaction: <code>/autocompact</code> (<code>autoCompactWindow</code>, 100K to 1M), <code>--autocompact</code>, and <code>CLAUDE_CODE_AUTO_COMPACT_WINDOW</code>, which wins.</span></li>
+<li value="183"><span class="t">2.1.312: a subagent&#x27;s <code>autoCompactWindow</code> can lower but never raise (changelog only).</span></li>
+<li value="184"><span class="t">2.1.304 accepts k and M suffixes (500k, 1M). Bare means raw tokens. 500 clamps to 100K with a warning. An unusable value is ignored with a warning and the next source applies.</span></li>
+<li value="185"><span class="t"><code>CLAUDE_AUTOCOMPACT_PCT_OVERRIDE</code> only lowers, subagents included.</span></li>
+<li value="186"><span class="t">Frontmatter <code>autoCompactWindow</code> arrived in 2.1.296.</span></li>
+<li value="187"><span class="t">Earlier compaction shrinks rereads but busts the prefix. Measure first.</span></li>
 </ol>
 </section>
 <section id="copilot-cli" class="skill">
-<header class="skill-head"><h2>Copilot CLI</h2><p class="src">copilot.md <span class="dot"></span> <span class="count" data-total="154">154 lines</span></p></header>
+<header class="skill-head"><h2>Copilot CLI</h2><p class="src">copilot.md <span class="dot"></span> <span class="count" data-total="155">155 lines</span></p></header>
 <h3>Header</h3>
 <ol>
-<li value="1"><span class="t">Facts verified 2026-07-06, re-swept 2026-10-20.</span></li>
-<li value="2"><span class="t">Re-check trigger 2026-11-16: Copilot retires Opus 4.8, Opus 5 and GPT-5.6 Terra (changelog 2026-10-15).</span></li>
-<li value="3"><span class="t">GitHub names Opus 5.5 for the Opus pair, and GPT-6.1 Sol or GPT-6 Luna for Terra.</span></li>
-<li value="4"><span class="t">Opus 4.8 stays for the individual annual plan.</span></li>
+<li value="1"><span class="t">Facts verified 2026-07-06, re-swept 2026-11-17.</span></li>
+<li value="2"><span class="t">Re-check trigger 2026-12-14: Copilot retires Fable 5, Haiku 4.5, Gemini 3.8 Flash, Gemini 4 Argon, Grok 4.6 and Kimi K3 (changelog 2026-11-13), then MAI-Code-1.1-Flash on 2026-12-18.</span></li>
+<li value="3"><span class="t">Haiku 4.5 stays on individual annual plans.</span></li>
+<li value="4"><span class="t">The 2026-11-16 retirements of Opus 4.8, Opus 5 and GPT-5.6 Terra have landed.</span></li>
 <li value="5"><span class="t">GPT-6.1 Terra went GA 2026-10-26 on every paid plan at 1 / 5, unnamed by GitHub. It is the same-family step on plain Pro, which has no 6.1 Sol.</span></li>
 <li value="6"><span class="t">The 2026-10-19 batch of six retirements landed.</span></li>
 <li value="7"><span class="t">Load this file only on Copilot CLI, for dispatch mechanics, budget, fan-out sizing, and repo setup.</span></li>
@@ -2321,7 +2335,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <li value="58"><span class="t">Sonnet 5.5 never called the skill.</span></li>
 <li value="59"><span class="t">Sol&#x27;s 3 clean runs did the work themselves with no Luna leaf.</span></li>
 <li value="60"><span class="t">Recommend a Luna session.</span></li>
-<li value="61"><span class="t">Other profiles: planner <code>[gpt-6.1-sol, gpt-6-sol]</code>, Mid, Reserve <code>[gpt-6-astra, claude-opus-5.5]</code>, verifier <code>gemini-3.8-flash</code>. By hand only. Fable has no seat.</span></li>
+<li value="61"><span class="t">Other profiles: planner <code>[gpt-6.1-sol, gpt-6-sol]</code>, Mid, Reserve <code>[gpt-6-astra, claude-opus-5.5]</code>, verifier <code>gemini-4-hydrogen</code>, Unreal reviewer <code>[claude-opus-5.5, gpt-6.1-sol]</code>. By hand only. Fable has no seat.</span></li>
 <li value="62"><span class="t">T46: Haiku 5.5 passed semver2 3 of 3, Luna missed a case each time, and a Mid seat handing to Luna cost 45% more. Luna-first is the author&#x27;s call.</span></li>
 </ol>
 <h3>Effort</h3>
@@ -2368,89 +2382,90 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <li value="93"><span class="t">Auto went GA 2026-04-17 on all plans and routes on task complexity.</span></li>
 <li value="94"><span class="t">Tiers Efficiency, Balance and Intelligence arrived 2026-09-14.</span></li>
 <li value="95"><span class="t">Since 2026-10-28 Fusion replaces Auto in the picker (CLI, VS Code, app, JetBrains). Standard is on every plan, and High and Max are Pro+.</span></li>
-<li value="96"><span class="t">Fusion bills each model, 30% off paid through 2026-11-30.</span></li>
-<li value="97"><span class="t">The 10% Auto discount applies to Chat and the cloud agent only.</span></li>
-<li value="98"><span class="t">Auto will not pick an excluded model.</span></li>
-<li value="99"><span class="t">GPT-5.3-Codex base and LTS are the last resort on Business and Enterprise.</span></li>
-<li value="100"><span class="t">The CLI Auto pool holds GPT-6 Astra from 2026-09-16 and lists Gemini 3.8 Flash as Included (read 2026-10-20). Gemini survives the retirements.</span></li>
-<li value="101"><span class="t">Description routing is first-party. What is left is the regime gate plus the verify floor.</span></li>
-<li value="102"><span class="t">&quot;Along natural cache boundaries&quot; is a rationale, not a guarantee.</span></li>
-<li value="103"><span class="t">Inline Auto sessions are a fair control.</span></li>
-<li value="104"><span class="t">Individual plans carry codenamed evaluation models. Record or disable them for a control.</span></li>
-<li value="105"><span class="t">A tiered wave pins explicitly. Under Auto a subagent inherits the session model (read 2026-09-15).</span></li>
-<li value="106"><span class="t">Rechecked 2026-08-05, tiers added 2026-09-20.</span></li>
+<li value="96"><span class="t">github.com, Visual Studio and the Mobile beta show Fusion from 2026-11-17.</span></li>
+<li value="97"><span class="t">Fusion bills each model, 30% off paid through 2026-11-30.</span></li>
+<li value="98"><span class="t">The 10% Auto discount applies to Chat and the cloud agent only.</span></li>
+<li value="99"><span class="t">Auto will not pick an excluded model.</span></li>
+<li value="100"><span class="t">GPT-5.3-Codex base and LTS are the last resort on Business and Enterprise.</span></li>
+<li value="101"><span class="t">The CLI Auto pool holds GPT-6 Astra from 2026-09-16 and lists Gemini 3.8 Flash as Included (read 2026-10-20), until it leaves Copilot 2026-12-14.</span></li>
+<li value="102"><span class="t">Description routing is first-party. What is left is the regime gate plus the verify floor.</span></li>
+<li value="103"><span class="t">&quot;Along natural cache boundaries&quot; is a rationale, not a guarantee.</span></li>
+<li value="104"><span class="t">Inline Auto sessions are a fair control.</span></li>
+<li value="105"><span class="t">Individual plans carry codenamed evaluation models. Record or disable them for a control.</span></li>
+<li value="106"><span class="t">A tiered wave pins explicitly. Under Auto a subagent inherits the session model (read 2026-09-15).</span></li>
+<li value="107"><span class="t">Rechecked 2026-08-05, tiers added 2026-09-20.</span></li>
 </ol>
 <h3>Verify on credits</h3>
 <ol>
-<li value="107"><span class="t">check.md&#x27;s credit-billed default: script first, then batched and sampled.</span></li>
-<li value="108"><span class="t">T22: one batched model verify cost 83% of the inline arm.</span></li>
+<li value="108"><span class="t">check.md&#x27;s credit-billed default: script first, then batched and sampled.</span></li>
+<li value="109"><span class="t">T22: one batched model verify cost 83% of the inline arm.</span></li>
 </ol>
 <h3>Context tiers (docs 2026-09-15)</h3>
 <ol>
-<li value="109"><span class="t">Default (picker 2026-08-06): Claude 264K, Geminis 264K, GPT-5.6 Sol and Terra 400K, Luna and Grok 4.5 328K (4.5 retired, 4.7 unread).</span></li>
-<li value="110"><span class="t">Use a cross-family seat for room.</span></li>
-<li value="111"><span class="t">Reasoning is Medium except Kimi K3 at High.</span></li>
-<li value="112"><span class="t">The selectable 1M tier is <code>--context long_context</code>.</span></li>
+<li value="110"><span class="t">Default (picker 2026-08-06): Claude 264K, Geminis 264K, GPT-5.6 Sol and Terra 400K, Luna and Grok 4.5 328K (4.5 retired, 4.7 unread).</span></li>
+<li value="111"><span class="t">Use a cross-family seat for room.</span></li>
+<li value="112"><span class="t">Reasoning is Medium except Kimi K3 at High.</span></li>
+<li value="113"><span class="t">The selectable 1M tier is <code>--context long_context</code>.</span></li>
 </ol>
 <h3>Per-seat control</h3>
 <ol>
-<li value="113"><span class="t">Checked 2026-08-05: #2758 open since 2026-04-16 (downgrade, log line, repo pins subject).</span></li>
-<li value="114"><span class="t">#3824 closed 2026-06-17 with no resolution note, a server-side arm. Closed is not fixed.</span></li>
-<li value="115"><span class="t">Pins are not guaranteed. Pin anyway, report intent, keep the verify floor independent, and never mix Auto with tiered.</span></li>
+<li value="114"><span class="t">Checked 2026-08-05: #2758 open since 2026-04-16 (downgrade, log line, repo pins subject).</span></li>
+<li value="115"><span class="t">#3824 closed 2026-06-17 with no resolution note, a server-side arm. Closed is not fixed.</span></li>
+<li value="116"><span class="t">Pins are not guaranteed. Pin anyway, report intent, keep the verify floor independent, and never mix Auto with tiered.</span></li>
 </ol>
 <h3>Dispatch (updated 2026-07-09)</h3>
 <ol>
-<li value="116"><span class="t">Fan out yourself with the task tool, in parallel, within concurrency and depth.</span></li>
-<li value="117"><span class="t">Issue #3568 is tracked. Seven agents are listed, and none carries <code>disable-model-invocation</code>.</span></li>
-<li value="118"><span class="t">v1.0.74 hides a <code>disable-model-invocation</code> agent from task (probe 2026-09-23 on CLI 1.0.83: &quot;Unknown agent_type&quot;).</span></li>
-<li value="119"><span class="t">Never ask the user to invoke. The Luna ceiling keeps the dear seats out.</span></li>
-<li value="120"><span class="t">Built-in defaults (read 2026-10-20): task runs <code>gpt-5.6-luna</code> with fallback <code>claude-haiku-4.5</code>, explore runs <code>gpt-5.6-luna</code>, and code-review, general-purpose and security-review run <code>claude-sonnet-4.6</code>.</span></li>
-<li value="121"><span class="t"><code>tools [&quot;*&quot;]</code> includes task.</span></li>
-<li value="122"><span class="t">Live probe 2026-10-13 on CLI 1.0.93: a Luna session dispatched smartplan-implementer (gpt-6.1-sol, low), which dispatched smartplan-scout (gpt-6-luna) at low.</span></li>
-<li value="123"><span class="t"><code>~/.copilot/agents</code> junctions to <code>.github/agents</code>. A same-name agent via <code>--add-dir</code> is lost, so a trial seat needs its own name.</span></li>
-<li value="124"><span class="t">1.0.96 adds <code>/add-dir</code> sandbox access. 1.0.97 adds agent-scoped hooks.</span></li>
-<li value="125"><span class="t">Stable is 1.0.109 (2026-11-10, read 2026-11-11).</span></li>
-<li value="126"><span class="t"><code>/fleet</code> needs a human: decompose through synthesize. It is not a substitute for smartcheck.</span></li>
-<li value="127"><span class="t">Three <code>/fleet</code> triggers: typed, autopilot after <code>/plan</code> and Shift+Tab, and the <code>--fleet</code> flag (also in <code>-p</code>). Optional, never blocked on.</span></li>
-<li value="128"><span class="t">The serial path is single-agent auto-inference. The <code>infer</code> key is retired though the CLI table lists it. Concurrency comes from task. Monitor with <code>/tasks</code>.</span></li>
+<li value="117"><span class="t">Fan out yourself with the task tool, in parallel, within concurrency and depth.</span></li>
+<li value="118"><span class="t">Issue #3568 is tracked. Seven agents are listed, and none carries <code>disable-model-invocation</code>.</span></li>
+<li value="119"><span class="t">v1.0.74 hides a <code>disable-model-invocation</code> agent from task (probe 2026-09-23 on CLI 1.0.83: &quot;Unknown agent_type&quot;).</span></li>
+<li value="120"><span class="t">Never ask the user to invoke. The Luna ceiling keeps the dear seats out.</span></li>
+<li value="121"><span class="t">Built-in defaults (read 2026-10-20): task runs <code>gpt-5.6-luna</code> with fallback <code>claude-haiku-4.5</code>, explore runs <code>gpt-5.6-luna</code>, and code-review, general-purpose and security-review run <code>claude-sonnet-4.6</code>.</span></li>
+<li value="122"><span class="t"><code>tools [&quot;*&quot;]</code> includes task.</span></li>
+<li value="123"><span class="t">Live probe 2026-10-13 on CLI 1.0.93: a Luna session dispatched smartplan-implementer (gpt-6.1-sol, low), which dispatched smartplan-scout (gpt-6-luna) at low.</span></li>
+<li value="124"><span class="t"><code>~/.copilot/agents</code> junctions to <code>.github/agents</code>. A same-name agent via <code>--add-dir</code> is lost, so a trial seat needs its own name.</span></li>
+<li value="125"><span class="t">1.0.96 adds <code>/add-dir</code> sandbox access. 1.0.97 adds agent-scoped hooks.</span></li>
+<li value="126"><span class="t">Stable is 1.0.113 (read 2026-11-17).</span></li>
+<li value="127"><span class="t"><code>/fleet</code> needs a human: decompose through synthesize. It is not a substitute for smartcheck.</span></li>
+<li value="128"><span class="t">Three <code>/fleet</code> triggers: typed, autopilot after <code>/plan</code> and Shift+Tab, and the <code>--fleet</code> flag (also in <code>-p</code>). Optional, never blocked on.</span></li>
+<li value="129"><span class="t">The serial path is single-agent auto-inference. The <code>infer</code> key is retired though the CLI table lists it. Concurrency comes from task. Monitor with <code>/tasks</code>.</span></li>
 </ol>
 <h3>Command naming</h3>
 <ol>
-<li value="129"><span class="t">Commands are <code>&lt;plugin&gt;:&lt;skill&gt;</code>, with no bare form, default, or alias. The <code>plugin.json</code> name field sets the prefix, and the <code>/</code> menu is alphabetical (re-verified 2026-07-22).</span></li>
-<li value="130"><span class="t">The plugin is named sp, so <code>/sp:smartplan</code>. Directories are <code>smart*</code>. Project-local gives <code>/smartplan</code> from <code>.claude/skills</code>.</span></li>
-<li value="131"><span class="t">smartexec is <code>user-invocable: false</code> (#3095). v1.0.74 (2026-07-23) enforces <code>disable-model-invocation</code>. exec sorts before plan, so <code>/sp</code> plus Enter.</span></li>
-<li value="132"><span class="t"><code>copilot skill list</code> confirms (<code>--help</code>, and <code>--output-format=json</code> shows source and path).</span></li>
-<li value="133"><span class="t">A bare <code>/smartplan</code> is project-local only. One copy, and uncommitted edits go live.</span></li>
-<li value="134"><span class="t">Marketplace vs project-local: the plugin is lowest priority. <code>.github/skills</code> and <code>.claude/skills</code> are project-level. A same-name skill wins silently. Pick one (verified 2026-07-22).</span></li>
+<li value="130"><span class="t">Commands are <code>&lt;plugin&gt;:&lt;skill&gt;</code>, with no bare form, default, or alias. The <code>plugin.json</code> name field sets the prefix, and the <code>/</code> menu is alphabetical (re-verified 2026-07-22).</span></li>
+<li value="131"><span class="t">The plugin is named sp, so <code>/sp:smartplan</code>. Directories are <code>smart*</code>. Project-local gives <code>/smartplan</code> from <code>.claude/skills</code>.</span></li>
+<li value="132"><span class="t">smartexec is <code>user-invocable: false</code> (#3095). v1.0.74 (2026-07-23) enforces <code>disable-model-invocation</code>. exec sorts before plan, so <code>/sp</code> plus Enter.</span></li>
+<li value="133"><span class="t"><code>copilot skill list</code> confirms (<code>--help</code>, and <code>--output-format=json</code> shows source and path).</span></li>
+<li value="134"><span class="t">A bare <code>/smartplan</code> is project-local only. One copy, and uncommitted edits go live.</span></li>
+<li value="135"><span class="t">Marketplace vs project-local: the plugin is lowest priority. <code>.github/skills</code> and <code>.claude/skills</code> are project-level. A same-name skill wins silently. Pick one (verified 2026-07-22).</span></li>
 </ol>
 <h3>Standing levers</h3>
 <ol>
-<li value="135"><span class="t">Repo instructions: <code>.github/copilot-instructions.md</code>, AGENTS.md, CLAUDE.md, and <code>NAME.instructions.md</code> with <code>applyTo</code> (checked 2026-07-24).</span></li>
-<li value="136"><span class="t"><code>include-custom-instructions: true</code> on CLI 1.0.86 defaults to false.</span></li>
-<li value="137"><span class="t">Hooks (reference checked 2026-07-24): <code>.github/hooks/</code> and <code>~/.copilot/hooks/</code>, 14 events.</span></li>
-<li value="138"><span class="t"><code>preToolUse</code> fails closed, a timeout fails open, <code>agentStop</code> blocks up to 8 times, and <code>stop_hook_active</code> arrived in v1.0.72.</span></li>
-<li value="139"><span class="t">Claude Code hooks run here too: <code>.claude/settings.json</code>, PreToolUse on Agent and Task, <code>.claude/agents/</code>. A non-zero exit denies, so the wrapper exits 0 (docs/enforcement-hook.md).</span></li>
-<li value="140"><span class="t">Effort: <code>--effort none|minimal|low|medium|high|xhigh|max</code>. Drop effort before dropping tier. <code>effortLevel</code> runs low to xhigh.</span></li>
+<li value="136"><span class="t">Repo instructions: <code>.github/copilot-instructions.md</code>, AGENTS.md, CLAUDE.md, and <code>NAME.instructions.md</code> with <code>applyTo</code> (checked 2026-07-24).</span></li>
+<li value="137"><span class="t"><code>include-custom-instructions: true</code> on CLI 1.0.86 defaults to false.</span></li>
+<li value="138"><span class="t">Hooks (reference checked 2026-07-24): <code>.github/hooks/</code> and <code>~/.copilot/hooks/</code>, 14 events.</span></li>
+<li value="139"><span class="t"><code>preToolUse</code> fails closed, a timeout fails open, <code>agentStop</code> blocks up to 8 times, and <code>stop_hook_active</code> arrived in v1.0.72.</span></li>
+<li value="140"><span class="t">Claude Code hooks run here too: <code>.claude/settings.json</code>, PreToolUse on Agent and Task, <code>.claude/agents/</code>. A non-zero exit denies, so the wrapper exits 0 (docs/enforcement-hook.md).</span></li>
+<li value="141"><span class="t">Effort: <code>--effort none|minimal|low|medium|high|xhigh|max</code>. Drop effort before dropping tier. <code>effortLevel</code> runs low to xhigh.</span></li>
 </ol>
 <h3>Probe playbook (2026-07-12)</h3>
 <ol>
-<li value="141"><span class="t">Seven levers. Oracle grading (T8 to T13).</span></li>
-<li value="142"><span class="t">Batch about 3 leaves per verifier for a 32% cut (T10, T11).</span></li>
-<li value="143"><span class="t">Only the leaves under test bill (T11, 7.1 cr).</span></li>
-<li value="144"><span class="t"><code>--resume</code> the same seat, since a cold restart costs 75 to 160k. Never resume verifiers.</span></li>
-<li value="145"><span class="t">Caps: 167 cr on T9, 30 cr minimum, 1 to 13 cr per leaf.</span></li>
-<li value="146"><span class="t">A minimal workspace saves about 40%.</span></li>
-<li value="147"><span class="t">The cheapest models are Luna (T43, T46), per routing.md § Seat eligibility.</span></li>
+<li value="142"><span class="t">Seven levers. Oracle grading (T8 to T13).</span></li>
+<li value="143"><span class="t">Batch about 3 leaves per verifier for a 32% cut (T10, T11).</span></li>
+<li value="144"><span class="t">Only the leaves under test bill (T11, 7.1 cr).</span></li>
+<li value="145"><span class="t"><code>--resume</code> the same seat, since a cold restart costs 75 to 160k. Never resume verifiers.</span></li>
+<li value="146"><span class="t">Caps: 167 cr on T9, 30 cr minimum, 1 to 13 cr per leaf.</span></li>
+<li value="147"><span class="t">A minimal workspace saves about 40%.</span></li>
+<li value="148"><span class="t">The cheapest models are Luna (T43, T46), per routing.md § Seat eligibility.</span></li>
 </ol>
 <h3>UE5 on Copilot (2026-07-12)</h3>
 <ol>
-<li value="148"><span class="t">Gemini 3.8 Flash is the cross-family verify for cpp-gamedev-check.md and check.md. It caught 13 of 16 on T42, level with GPT-5.6 Terra at a seventh of the cost. UB leaves stay Strong.</span></li>
-<li value="149"><span class="t">Context costs about 40%. The cache lasts 5 min on Claude and 30 min on OpenAI from GPT-5.6. Scope the brief.</span></li>
-<li value="150"><span class="t">The C++ language server (2026-09-22) is unmeasured, and indexing costs.</span></li>
-<li value="151"><span class="t">Batch about 3 for 32%.</span></li>
-<li value="152"><span class="t">Drop effort before model, and verify at strength.</span></li>
-<li value="153"><span class="t">Lone stubs go Mid (routing.md hard floor #4). Cheap UE5 pays on wide waves.</span></li>
-<li value="154"><span class="t">Attribution discipline: <code>/usage</code> has no skill attribution even with 1.0.85 rows. Use a minimal workspace and <code>/context</code>. T17 ran three verify arms.</span></li>
+<li value="149"><span class="t">Gemini 4 Hydrogen is the cross-family verify for cpp-gamedev-check.md and check.md. Its predecessor 3.8 Flash caught 13 of 16 on T42. Hydrogen is unmeasured. UB leaves stay Strong.</span></li>
+<li value="150"><span class="t">Context costs about 40%. The cache lasts 5 min on Claude and 30 min on OpenAI from GPT-5.6. Scope the brief.</span></li>
+<li value="151"><span class="t">The C++ language server (2026-09-22) is unmeasured, and indexing costs.</span></li>
+<li value="152"><span class="t">Batch about 3 for 32%.</span></li>
+<li value="153"><span class="t">Drop effort before model, and verify at strength.</span></li>
+<li value="154"><span class="t">Lone stubs go Mid (routing.md hard floor #4). Cheap UE5 pays on wide waves.</span></li>
+<li value="155"><span class="t">Attribution discipline: <code>/usage</code> has no skill attribution even with 1.0.85 rows. Use a minimal workspace and <code>/context</code>. T17 ran three verify arms.</span></li>
 </ol>
 </section>
 <section id="m365-copilot" class="skill">
@@ -2465,10 +2480,10 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <h3>Verdict table</h3>
 <ol>
 <li value="5"><span class="t">Declarative agent: an 8,000-character instructions cap.</span></li>
-<li value="6"><span class="t">Copilot Studio with the GitHub Copilot harness.</span></li>
+<li value="6"><span class="t">Copilot Studio with the Microsoft Copilot harness.</span></li>
 <li value="7"><span class="t">Copilot Studio with the standard harness: <code>reason</code>.</span></li>
 <li value="8"><span class="t">Cowork: <code>atk import openplugin</code> (2026-09-21).</span></li>
-<li value="9"><span class="t">The shape is a mapping doc plus a narrow GitHub Copilot harness export.</span></li>
+<li value="9"><span class="t">The shape is a mapping doc plus a narrow Microsoft Copilot harness export.</span></li>
 <li value="10"><span class="t">The declarative-agent path is closed by structure and reopens through the custom-skills preview.</span></li>
 <li value="11"><span class="t">Cowork converts Claude packages: a bare <code>SKILL.md</code> up to 1 MB, a <code>.zip</code> or <code>.skill</code> with a root SKILL.md up to 10 MB compressed, 50 MB uncompressed, 100 files.</span></li>
 <li value="12"><span class="t">Documented, unprobed. The plugin-dev page is dated 2026-09-21.</span></li>
@@ -2524,8 +2539,8 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 </ol>
 <h3>Roster (dated 2026-11-02, re-read 2026-11-03)</h3>
 <ol>
-<li value="53"><span class="t">Twenty models (ms.date 2026-11-06): Opus 5.5, Opus 5, Opus 4.8, Fable 5, Fable 5.1, Sonnet 5.5, Sonnet 5, Sonnet 4.6, Haiku 5.5, GPT-6 Astra, GPT-6 Sol, GPT-6.1 Sol, GPT-6.1 Terra, GPT-5.6 Terra, GPT-6 Luna, Grok 4.6 (GA), GPT-5.6 Sol, GPT-5.6 Luna, GPT-5 Chat, Mistral Medium 3.5 (Experimental).</span></li>
-<li value="54"><span class="t">The table has no Fable 5.2.</span></li>
+<li value="53"><span class="t">22 models (ms.date 2026-11-16, titled for Microsoft Copilot): Opus 5.5, Opus 5, Opus 4.8, Fable 5.2, Fable 5.1, Fable 5, Sonnet 5.5, Sonnet 5, Sonnet 4.6, Haiku 5.5, GPT-6 Astra, GPT-6 Sol, GPT-6.1 Sol, GPT-6.1 Terra, GPT-5.6 Terra, GPT-6 Luna, Grok 4.6 (GA), Mistral Large 4 (Preview), GPT-5.6 Sol, GPT-5.6 Luna, GPT-5 Chat, Mistral Medium 3.5 (Experimental).</span></li>
+<li value="54"><span class="t">It still lists the three models GitHub&#x27;s Copilot dropped on 2026-11-16.</span></li>
 <li value="55"><span class="t">EU/EFTA tenants with cross-region data movement off keep GPT-5 Chat to 2026-11-30.</span></li>
 <li value="56"><span class="t">GPT-5 Chat retires 2026-11-12 to GPT-6.1 Sol or GPT-6 Luna.</span></li>
 <li value="57"><span class="t">GPT-5.5 Chat retired 2026-10-31.</span></li>
@@ -2582,7 +2597,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <h3>What smartplan becomes</h3>
 <ol>
 <li value="95"><span class="t">The policy ports. The machinery does not.</span></li>
-<li value="96"><span class="t">Tiering has two dials: the roster lists Haiku 5.5 and Opus 5.5 from 2026-11-06 and no Fable 5.2, no per-call override, newest version first (model-classes.md § How to edit).</span></li>
+<li value="96"><span class="t">Tiering has two dials: the roster lists Haiku 5.5 and Opus 5.5 from 2026-11-06 and Fable 5.2 from 2026-11-16, no per-call override, newest version first (model-classes.md § How to edit).</span></li>
 <li value="97"><span class="t">Verify has no dispatch lever. flow.md&#x27;s verifier seat maps to <code>reason</code>, not smartcheck.</span></li>
 <li value="98"><span class="t">Nothing is measured. There is no T-record.</span></li>
 <li value="99"><span class="t">Checked 2026-08-12: no atk, wiqd, <code>@microsoft/*</code>, toolkit dir, or login trace on this box.</span></li>
@@ -2592,7 +2607,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 </ol>
 </section>
 <section id="smartreview" class="skill">
-<header class="skill-head"><h2>smartreview</h2><p class="src">SKILL.md, completion-exemplar.md <span class="dot"></span> <span class="count" data-total="90">90 lines</span></p></header>
+<header class="skill-head"><h2>smartreview</h2><p class="src">SKILL.md, completion-exemplar.md <span class="dot"></span> <span class="count" data-total="92">92 lines</span></p></header>
 <h3>What it does</h3>
 <ol>
 <li value="1"><span class="t">Review one changelist or fileset and report in three ranked categories.</span></li>
@@ -2638,71 +2653,73 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <li value="32"><span class="t">The report template is fixed.</span></li>
 <li value="33"><span class="t">An empty category prints its heading and <code>none</code>. Silence reads as not looked at.</span></li>
 <li value="34"><span class="t">The standards line reads <code>cpp-review-standards.md · Engine: vanilla</code> (or custom, or unreal) when Engine is unset.</span></li>
-<li value="35"><span class="t">To see findings on their lines, save the report and pass it to smartdiff&#x27;s render as <code>--review &lt;report&gt;</code>.</span></li>
-<li value="36"><span class="t">smartreview is the merge gate over a whole fileset. smartcheck&#x27;s cpp-gamedev-check.md is the verify seat over one leaf&#x27;s diff.</span></li>
-<li value="37"><span class="t">Both reuse the taxonomy through the standards doc.</span></li>
-<li value="38"><span class="t">Name the category on every BREAKING row so reports collate on category · file:line.</span></li>
-<li value="39"><span class="t">Mark rows already filed by a leaf&#x27;s smartcheck as already-filed.</span></li>
-<li value="40"><span class="t">Review away from the author: hand it to the smartplan-verifier seat, which loads the skill read-only.</span></li>
-<li value="41"><span class="t">Fixes are always proposed, never applied by the reviewer.</span></li>
+<li value="35"><span class="t">For Unreal code, use the <code>smartreview-unreal</code> seat. It pins <code>unreal</code>, reads the engine version from the <code>.uproject</code>, and checks a claimed deprecation against the installed engine&#x27;s <code>UE_DEPRECATED</code> markers.</span></li>
+<li value="36"><span class="t">The [U] rows were last checked against UE 5.8. UE 5.9 is current at time of writing, and its re-check is open.</span></li>
+<li value="37"><span class="t">To see findings on their lines, save the report and pass it to smartdiff&#x27;s render as <code>--review &lt;report&gt;</code>.</span></li>
+<li value="38"><span class="t">smartreview is the merge gate over a whole fileset. smartcheck&#x27;s cpp-gamedev-check.md is the verify seat over one leaf&#x27;s diff.</span></li>
+<li value="39"><span class="t">Both reuse the taxonomy through the standards doc.</span></li>
+<li value="40"><span class="t">Name the category on every BREAKING row so reports collate on category · file:line.</span></li>
+<li value="41"><span class="t">Mark rows already filed by a leaf&#x27;s smartcheck as already-filed.</span></li>
+<li value="42"><span class="t">Review away from the author: hand it to the smartplan-verifier seat, which loads the skill read-only.</span></li>
+<li value="43"><span class="t">Fixes are always proposed, never applied by the reviewer.</span></li>
 </ol>
 <h3>Output register</h3>
 <ol>
-<li value="42"><span class="t">When the only reader is another model seat, free-text fields follow modes.md&#x27;s caveman register.</span></li>
-<li value="43"><span class="t">The free-text fields are <code>&lt;what&#x27;s wrong&gt;</code> and <code>&lt;why unsure&gt;</code>, not counts, rule IDs or headings.</span></li>
-<li value="44"><span class="t">The default for that case is max-savings (caveman ultra).</span></li>
-<li value="45"><span class="t">That default replaces smartplan&#x27;s per-harness shipped default, and the higher-set mode wins.</span></li>
-<li value="46"><span class="t">Paths, rule IDs, quoted code, and the BREAKING failure description stay verbatim.</span></li>
-<li value="47"><span class="t">Interactive output is full prose, per modes.md&#x27;s human-facing floor.</span></li>
+<li value="44"><span class="t">When the only reader is another model seat, free-text fields follow modes.md&#x27;s caveman register.</span></li>
+<li value="45"><span class="t">The free-text fields are <code>&lt;what&#x27;s wrong&gt;</code> and <code>&lt;why unsure&gt;</code>, not counts, rule IDs or headings.</span></li>
+<li value="46"><span class="t">The default for that case is max-savings (caveman ultra).</span></li>
+<li value="47"><span class="t">That default replaces smartplan&#x27;s per-harness shipped default, and the higher-set mode wins.</span></li>
+<li value="48"><span class="t">Paths, rule IDs, quoted code, and the BREAKING failure description stay verbatim.</span></li>
+<li value="49"><span class="t">Interactive output is full prose, per modes.md&#x27;s human-facing floor.</span></li>
 </ol>
 <h3>Hard rules</h3>
 <ol>
-<li value="48"><span class="t">Breaking first, even with 200 convention rows.</span></li>
-<li value="49"><span class="t">Exhaustive, not sampled.</span></li>
-<li value="50"><span class="t">Resolve the Profile first. An unset knob or token is N/A, never invented.</span></li>
-<li value="51"><span class="t">Do not guess. Flag ambiguity.</span></li>
-<li value="52"><span class="t">Reproduce before you file: name the input or path (check.md § Review / audit output).</span></li>
-<li value="53"><span class="t">An unreproducible finding is Ambiguous.</span></li>
-<li value="54"><span class="t">Respect enforcement tags. [U] rows are externally enforced. Change only project-choice rows.</span></li>
-<li value="55"><span class="t">Gated-off rows are N/A, not deleted, and appear in the tally.</span></li>
-<li value="56"><span class="t">Tiering follows smartroute. The convention pass is mechanical, and Cheap is fine for it.</span></li>
-<li value="57"><span class="t">The breaking hunt runs at least Mid.</span></li>
-<li value="58"><span class="t">The floor tracks the executor. A Sonnet- or Opus-authored diff gets Opus or comparable.</span></li>
-<li value="59"><span class="t">Below that floor, ask first (smartplan&#x27;s Seat ceiling). On a no, the seat runs the hunt and the report names the gap.</span></li>
-<li value="60"><span class="t">Inline unless the fileset will not fit one context.</span></li>
-<li value="61"><span class="t">Verify before merge (smartcheck). The floor holds at any size.</span></li>
-<li value="62"><span class="t">The verify is an independent check. This seat cannot be it, and it covers the fixes the review makes.</span></li>
-<li value="63"><span class="t">Inline completions ignore instruction files but read open tabs.</span></li>
-<li value="64"><span class="t">The changelog is <code>docs/changelogs/smartreview.md</code>, kept out of the shipped plugin.</span></li>
+<li value="50"><span class="t">Breaking first, even with 200 convention rows.</span></li>
+<li value="51"><span class="t">Exhaustive, not sampled.</span></li>
+<li value="52"><span class="t">Resolve the Profile first. An unset knob or token is N/A, never invented.</span></li>
+<li value="53"><span class="t">Do not guess. Flag ambiguity.</span></li>
+<li value="54"><span class="t">Reproduce before you file: name the input or path (check.md § Review / audit output).</span></li>
+<li value="55"><span class="t">An unreproducible finding is Ambiguous.</span></li>
+<li value="56"><span class="t">Respect enforcement tags. [U] rows are externally enforced. Change only project-choice rows.</span></li>
+<li value="57"><span class="t">Gated-off rows are N/A, not deleted, and appear in the tally.</span></li>
+<li value="58"><span class="t">Tiering follows smartroute. The convention pass is mechanical, and Cheap is fine for it.</span></li>
+<li value="59"><span class="t">The breaking hunt runs at least Mid.</span></li>
+<li value="60"><span class="t">The floor tracks the executor. A Sonnet- or Opus-authored diff gets Opus or comparable.</span></li>
+<li value="61"><span class="t">Below that floor, ask first (smartplan&#x27;s Seat ceiling). On a no, the seat runs the hunt and the report names the gap.</span></li>
+<li value="62"><span class="t">Inline unless the fileset will not fit one context.</span></li>
+<li value="63"><span class="t">Verify before merge (smartcheck). The floor holds at any size.</span></li>
+<li value="64"><span class="t">The verify is an independent check. This seat cannot be it, and it covers the fixes the review makes.</span></li>
+<li value="65"><span class="t">Inline completions ignore instruction files but read open tabs.</span></li>
+<li value="66"><span class="t">The changelog is <code>docs/changelogs/smartreview.md</code>, kept out of the shipped plugin.</span></li>
 </ol>
 <h3>completion-exemplar.md</h3>
 <ol>
-<li value="65"><span class="t">The exemplar is a short source file showing the conventions, kept open in a tab.</span></li>
-<li value="66"><span class="t">Completions never read instruction files. Copilot custom instructions, AGENTS.md, the standards doc and resident rules reach Chat and agent only.</span></li>
-<li value="67"><span class="t">Completions read the code around the cursor and the open files.</span></li>
-<li value="68"><span class="t">Unmeasured: vendor docs say open files feed completions, and a language-server issue says sometimes only the focused file does. Run § Proving it works first.</span></li>
-<li value="69"><span class="t">Make one when asked for a completion or conventions exemplar, or for inline suggestions that follow house style.</span></li>
-<li value="70"><span class="t">One file per hand-written language.</span></li>
-<li value="71"><span class="t">Inputs: <code>{{STANDARDS}}</code> and the profile selector, the three knobs, and two or three real files the user names.</span></li>
-<li value="72"><span class="t">The real files supply comment voice, include grouping, and blank-line rhythm. Do not pick them from extensions.</span></li>
-<li value="73"><span class="t">An unset input asks, never invents. A guessed knob teaches the wrong style quietly.</span></li>
-<li value="74"><span class="t">Content is only correct code: no bad examples, no before/after, no commented anti-patterns.</span></li>
-<li value="75"><span class="t">Length is 80 to 150 lines. Dense beats thorough.</span></li>
-<li value="76"><span class="t">Show one instance of each rule: header and include order, naming for every kind, indentation and braces and line length from the knobs, comment style, null, error, ownership and containers, logging if the doc has rules, one complete realistic function.</span></li>
-<li value="77"><span class="t">Show [U] rules as the engine or toolchain requires.</span></li>
-<li value="78"><span class="t">Use synthetic names only (inventory, timer queue), no proprietary code.</span></li>
-<li value="79"><span class="t">It must parse cleanly with every symbol declared, because red squiggles pull suggestions toward fixing them.</span></li>
-<li value="80"><span class="t">Put it at <code>docs/conventions-exemplar.&lt;ext&gt;</code> or the project docs folder, outside build targets (Unreal: outside <code>Source/</code>).</span></li>
-<li value="81"><span class="t">The path does not matter to completions.</span></li>
-<li value="82"><span class="t">Check: run the review protocol on the exemplar against the same <code>{{STANDARDS}}</code> and expect zero CONVENTION and zero PRACTICE. Then compile or lint it standalone.</span></li>
-<li value="83"><span class="t">Use: open it in a tab beside the file you are writing, same language, and pin it.</span></li>
-<li value="84"><span class="t">Regenerate when the doc or a knob changes.</span></li>
-<li value="85"><span class="t">Proof is an A/B of about an hour, costing completions rather than chat credits.</span></li>
-<li value="86"><span class="t">Write 5 stubs with a one-line intent comment.</span></li>
-<li value="87"><span class="t">Arm A: target file only, accept the first suggestion, save.</span></li>
-<li value="88"><span class="t">Arm B: same stubs and model with the exemplar pinned.</span></li>
-<li value="89"><span class="t">Review both with the skill and compare CONVENTION counts.</span></li>
-<li value="90"><span class="t">No cut in arm B means the exemplar is not reaching completions. Do not maintain it.</span></li>
+<li value="67"><span class="t">The exemplar is a short source file showing the conventions, kept open in a tab.</span></li>
+<li value="68"><span class="t">Completions never read instruction files. Copilot custom instructions, AGENTS.md, the standards doc and resident rules reach Chat and agent only.</span></li>
+<li value="69"><span class="t">Completions read the code around the cursor and the open files.</span></li>
+<li value="70"><span class="t">Unmeasured: vendor docs say open files feed completions, and a language-server issue says sometimes only the focused file does. Run § Proving it works first.</span></li>
+<li value="71"><span class="t">Make one when asked for a completion or conventions exemplar, or for inline suggestions that follow house style.</span></li>
+<li value="72"><span class="t">One file per hand-written language.</span></li>
+<li value="73"><span class="t">Inputs: <code>{{STANDARDS}}</code> and the profile selector, the three knobs, and two or three real files the user names.</span></li>
+<li value="74"><span class="t">The real files supply comment voice, include grouping, and blank-line rhythm. Do not pick them from extensions.</span></li>
+<li value="75"><span class="t">An unset input asks, never invents. A guessed knob teaches the wrong style quietly.</span></li>
+<li value="76"><span class="t">Content is only correct code: no bad examples, no before/after, no commented anti-patterns.</span></li>
+<li value="77"><span class="t">Length is 80 to 150 lines. Dense beats thorough.</span></li>
+<li value="78"><span class="t">Show one instance of each rule: header and include order, naming for every kind, indentation and braces and line length from the knobs, comment style, null, error, ownership and containers, logging if the doc has rules, one complete realistic function.</span></li>
+<li value="79"><span class="t">Show [U] rules as the engine or toolchain requires.</span></li>
+<li value="80"><span class="t">Use synthetic names only (inventory, timer queue), no proprietary code.</span></li>
+<li value="81"><span class="t">It must parse cleanly with every symbol declared, because red squiggles pull suggestions toward fixing them.</span></li>
+<li value="82"><span class="t">Put it at <code>docs/conventions-exemplar.&lt;ext&gt;</code> or the project docs folder, outside build targets (Unreal: outside <code>Source/</code>).</span></li>
+<li value="83"><span class="t">The path does not matter to completions.</span></li>
+<li value="84"><span class="t">Check: run the review protocol on the exemplar against the same <code>{{STANDARDS}}</code> and expect zero CONVENTION and zero PRACTICE. Then compile or lint it standalone.</span></li>
+<li value="85"><span class="t">Use: open it in a tab beside the file you are writing, same language, and pin it.</span></li>
+<li value="86"><span class="t">Regenerate when the doc or a knob changes.</span></li>
+<li value="87"><span class="t">Proof is an A/B of about an hour, costing completions rather than chat credits.</span></li>
+<li value="88"><span class="t">Write 5 stubs with a one-line intent comment.</span></li>
+<li value="89"><span class="t">Arm A: target file only, accept the first suggestion, save.</span></li>
+<li value="90"><span class="t">Arm B: same stubs and model with the exemplar pinned.</span></li>
+<li value="91"><span class="t">Review both with the skill and compare CONVENTION counts.</span></li>
+<li value="92"><span class="t">No cut in arm B means the exemplar is not reaching completions. Do not maintain it.</span></li>
 </ol>
 </section>
 <section id="smartvoice" class="skill">
@@ -3039,7 +3056,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 </ol>
 <h3>Step 1: capture</h3>
 <ol>
-<li value="9"><span class="t">Git: <code>git add -N . &amp;&amp; git diff -U5 &gt; &lt;work&gt;/session.diff</code>.</span></li>
+<li value="9"><span class="t">Git: copy the index to <code>&lt;work&gt;/idx</code>, then run <code>git add -N .</code> and <code>git diff HEAD -U5 --no-color --no-ext-diff --src-prefix=a/ --dst-prefix=b/</code> with <code>GIT_INDEX_FILE</code> pointed at the copy, so your own index and staged hunks are never touched.</span></li>
 <li value="10"><span class="t">Perforce, all opened files: <code>p4 diff -du5 &gt; &lt;work&gt;/session.diff</code>.</span></li>
 <li value="11"><span class="t">Perforce, one changelist: <code>p4 -F %depotFile% opened -c &lt;CL&gt; | p4 -x - diff -du5 &gt; &lt;work&gt;/session.diff</code>.</span></li>
 <li value="12"><span class="t">Files opened for add are not in <code>p4 diff</code>.</span></li>
@@ -3049,7 +3066,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <h3>Step 2: export Blueprints</h3>
 <ol>
 <li value="15"><span class="t">Run the export when any <code>.uasset</code> changed.</span></li>
-<li value="16"><span class="t">The command is <code>python &lt;this skill dir&gt;/scripts/bp_prepare.py --project &lt;Game.uproject&gt; --out &lt;work&gt;/bp --run</code>.</span></li>
+<li value="16"><span class="t">The command is <code>python &lt;this skill dir&gt;/scripts/bp_prepare.py --project &lt;Game.uproject&gt; --out &lt;work&gt;/bp --run</code>. <code>--run</code> is Windows-only. Elsewhere, run the command the script prints.</span></li>
 <li value="17"><span class="t">Add <code>--p4</code> (and <code>-c &lt;CL&gt;</code>) for Perforce.</span></li>
 <li value="18"><span class="t">Add <code>--shelved</code> for a shelved changelist.</span></li>
 <li value="19"><span class="t"><code>--shelved</code> is automatic when the changelist has nothing opened.</span></li>
@@ -3101,7 +3118,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <li value="53"><span class="t">Each file shows once, as its final diff.</span></li>
 <li value="54"><span class="t">Render one page for the range, never one per prompt.</span></li>
 <li value="55"><span class="t">Add <code>--notes</code> and <code>--review</code> as in steps 3 and 4.</span></li>
-<li value="56"><span class="t">Exit 2 means partial: a shell command ran, or evidence did not check out. Say so when reporting.</span></li>
+<li value="56"><span class="t">Exit 2 means partial: a shell command ran, evidence did not check out, or a file changed between two agent edits. Say so when reporting.</span></li>
 <li value="57"><span class="t">Scope flags, evidence and outputs are in <code>references/trail.md</code>.</span></li>
 </ol>
 <h3>Blueprint diff</h3>
@@ -3120,9 +3137,9 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 </ol>
 <h3>Page keys</h3>
 <ol>
-<li value="69"><span class="t"><code>j</code> and <code>k</code> move between files.</span></li>
+<li value="69"><span class="t"><code>j</code> and <code>k</code> move between files, and <code>n</code> and <code>p</code> move between review comments.</span></li>
 <li value="70"><span class="t"><code>v</code> toggles split and unified.</span></li>
-<li value="71"><span class="t"><code>b</code> or the chevron hides the file list.</span></li>
+<li value="71"><span class="t"><code>b</code>, <code>f</code>, or the chevron hides the file list.</span></li>
 <li value="72"><span class="t"><code>e</code> and <code>c</code> expand or collapse every file.</span></li>
 <li value="73"><span class="t"><code>a</code> expands every run of omitted lines.</span></li>
 <li value="74"><span class="t">Expanding needs whole files. Trail mode has them, and <code>diffview.py --git-context &lt;repo&gt;</code> reads them from git.</span></li>
@@ -3163,7 +3180,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <li value="103"><span class="t">A file that ends where it started is dropped.</span></li>
 <li value="104"><span class="t">A partial export exits 2 with a warning per gap.</span></li>
 <li value="105"><span class="t">Gaps are: a shell command ran, a patch mismatch or missing before-image, a tool edited files with no supported evidence, the person changed the proposed edit before accepting, or the file changed between two agent edits.</span></li>
-<li value="106"><span class="t">The page shows what was proved. Treat the rest as unreviewed.</span></li>
+<li value="106"><span class="t">The page shows what was proved, and it marks each file that changed between two agent edits. Treat the rest as unreviewed.</span></li>
 <li value="107"><span class="t">Exit 1 means no export, with the cause on stderr.</span></li>
 <li value="108"><span class="t">Output is one timestamped folder under <code>--out</code>.</span></li>
 <li value="109"><span class="t">The default <code>--out</code> is <code>Saved/smartdiff/</code> in an Unreal project, and the system temp elsewhere.</span></li>

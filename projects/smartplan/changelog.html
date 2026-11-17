@@ -668,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.173.0 &middot; Updated 2026-11-17 &middot; <span class="fresh" data-checked="2026-11-11" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-11</span></span>
+<span class="stamp">v4.174.0 &middot; Updated 2026-11-17 &middot; <span class="fresh" data-checked="2026-11-17" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-17</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -688,7 +688,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-11-03-roles-before-vendors-on-the-site-themed-controls-and-a-one-day-data-refresh-v41600">2026-11-03 · Roles before vendors on the site, themed controls, and a one-day data refresh (v4.160.0)</a></li>
 <li><a href="#2026-11-03-an-example-for-every-skill-a-getting-started-tutorial-and-the-turret-demo-back-on-the-site-v41610">2026-11-03 · An example for every skill, a Getting Started tutorial, and the turret demo back on the site (v4.161.0)</a></li>
 <li><a href="#2026-11-03-videos-for-getting-started-v41620">2026-11-03 · Videos for Getting Started (v4.162.0)</a></li>
 <li><a href="#2026-11-03-copilot-runs-luna-first-and-the-quickstart-opens-on-getting-started-v41630">2026-11-03 · Copilot runs Luna-first, and the Quickstart opens on Getting Started (v4.163.0)</a></li>
@@ -702,31 +701,13 @@ footer p { margin: 0; }
 <li><a href="#2026-11-11-the-newest-version-of-a-line-always-holds-its-seats-v41710">2026-11-11 · The newest version of a line always holds its seats (v4.171.0)</a></li>
 <li><a href="#2026-11-11-the-last-research-area-is-read-so-every-pages-date-is-current-v41720">2026-11-11 · The last research area is read, so every page's date is current (v4.172.0)</a></li>
 <li><a href="#2026-11-17-smartdiff-names-events-as-the-editor-does-shows-one-final-diff-per-file-and-puts-review-findings-on-their-lines-v41730">2026-11-17 · smartdiff names events as the editor does, shows one final diff per file, and puts review findings on their lines (v4.173.0)</a></li>
+<li><a href="#2026-11-17-an-unreal-reviewer-seat-a-smartdiff-audit-and-the-data-six-days-fresher-v41740">2026-11-17 · An Unreal reviewer seat, a smartdiff audit, and the data six days fresher (v4.174.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-11-03-roles-before-vendors-on-the-site-themed-controls-and-a-one-day-data-refresh-v41600">2026-11-03 · Roles before vendors on the site, themed controls, and a one-day data refresh (v4.160.0)</h2>
-<p>The author asked for a site that's generic to the vendor. The home page
-hero now names each step's role (a strong model plans, a cheap model
-builds, a fresh model verifies), with the current Claude Code and Copilot
-seats listed under each. The roles paragraph under the quick picks names
-both harnesses' models side by side. On a phone the three roles stack.</p>
-<p>At the author's request every control follows the theme now, not just
-the scroll bars: the page, tables, code blocks and the terminal sample
-all get thin themed bars. Disclosures get one chevron that turns on open,
-focus rings reach every focusable element, and <code>kbd</code>, <code>mark</code> and <code>abbr</code>
-have styles. An anchor jump lands below the sticky header instead of
-under it.</p>
-<p>A one-day delta sweep re-read six areas at primary sources. Copilot
-Studio's GitHub harness now lists GPT-6.1 Sol and GPT-6 Luna as GA, with
-GPT-5.6 Sol, GPT-5.6 Luna and GPT-5 Chat retiring 2026-11-12, so
-<code>m365-copilot.md</code> gains a Cheap rung there. Kimi K3.1 Pro and Gemini 4
-Carbon gain their vals.ai Terminal-Bench 4.0 scores. Gemini 3.8 Flash's
-2027 step-up is stated inline. Claude Code reached 2.1.317 with no seat
-impact. Note: research/2026-11-03-sweep.md.</p>
 <h2 id="2026-11-03-an-example-for-every-skill-a-getting-started-tutorial-and-the-turret-demo-back-on-the-site-v41610">2026-11-03 · An example for every skill, a Getting Started tutorial, and the turret demo back on the site (v4.161.0)</h2>
 <p>The author asked for an example of what each skill's result looks like.
 Every skill card on the home page has a See an example fold now. It shows
@@ -1076,9 +1057,55 @@ expect one comparison and a warning where they expected a split. Not
 tried on a real UE export here. The event titles follow the engine's
 DisplayName metadata as of UE 5.8, at time of writing, so a project
 event with its own DisplayName still shows its function name.</p>
+<h2 id="2026-11-17-an-unreal-reviewer-seat-a-smartdiff-audit-and-the-data-six-days-fresher-v41740">2026-11-17 · An Unreal reviewer seat, a smartdiff audit, and the data six days fresher (v4.174.0)</h2>
+<p>Three asks from the author the same day: a deep audit of smartdiff,
+a refresh of the data, skills, agents and site, and a reviewer that
+handles Unreal code properly now that UE 5.9 is out.</p>
+<p><strong><code>smartreview-unreal</code>, a new seat on both harnesses.</strong> A plain review
+defaults to the <code>vanilla</code> profile, which marks every Unreal row N/A,
+so Unreal code got a C++ review with the engine rules switched off.
+The new seat pins <code>Engine = unreal</code>, reads the engine version from the
+<code>.uproject</code> or <code>Build.version</code>, pulls in <code>*.Build.cs</code>, the
+<code>[CoreRedirects]</code> section and the plugin descriptor, checks a claimed
+deprecation against the installed engine's <code>UE_DEPRECATED</code> markers,
+and sends Blueprint assets through smartdiff's semantic diff. It's
+read-only, Opus 5.5 on Claude Code and <code>[claude-opus-5.5, gpt-6.1-sol]</code>
+on Copilot, where it sits above the Luna ceiling and runs by hand. On
+the Unreal fixture it caught all 7 gradeable seeds, where the cold
+baseline caught 5, and filed the unseeded authority and BeginPlay
+overwrite bugs as bonus findings.</p>
+<p><strong><code>cpp-gamedev-check.md</code> gains ten [U] rows</strong>, the classes a review
+of real Unreal code kept missing: a delegate, timer or async lambda
+never unbound in <code>EndPlay</code>, <code>GetWorld()</code> in a constructor or CDO, a
+synchronous load or world scan on a gameplay path, a <code>UObject</code> written
+from <code>Async</code> or <code>ParallelFor</code>, editor-only code outside <code>WITH_EDITOR</code>,
+a missing <code>Build.cs</code> dependency, a side effect inside <code>check()</code>, an RPC
+with no <code>_Implementation</code>, a reflected rename with no <code>[CoreRedirects]</code>,
+and replicated state changed without authority. The last two always
+block, and so does any break that shows only in another configuration.
+The rows were checked against UE 5.8. Epic's site refused every fetch
+on 2026-11-17, so a 5.9 re-check is open.</p>
+<p><strong>smartdiff audit.</strong> Thirteen breaking defects fixed, each with a test.
+See smartdiff's changelog, v1.9.</p>
+<p><strong>Data.</strong> A delta sweep re-read all seven areas, with an Opus refuter
+on every claimed change. Copilot retires six models on 2026-12-14
+(Fable 5, Haiku 4.5, Gemini 3.8 Flash, Gemini 4 Argon, Grok 4.6, Kimi
+K3) and MAI-Code-1.1-Flash on 2026-12-18. The Copilot verifier moved
+from Gemini 3.8 Flash to its successor, Gemini 4 Hydrogen, served by a
+live probe on CLI 1.0.113 and unmeasured on T42 and T34. Opus 5 and
+GPT-5.6 Terra left Copilot on 2026-11-16 and leave both guides' roster
+tables. New registry rows: Gemini 4 Hydrogen, MAI Code 2, MAI Code 2
+Flash, and GPT-6.2 Astra and Sol, the last two <code>not a seat</code> until
+Copilot serves them. GPT-5.6 Sol's promo now ends 2026-11-30. Claude
+Code's auto-mode classifier scope was wrong for subscriptions since
+2.1.281 and is corrected. A mod's <code>agent.spawn</code> model now heads the
+resolution order. vals.ai ranks moved to its 68-model board. Note:
+research/2026-11-17-sweep.md.</p>
+<p>Note: the M365 UE5 Engineer and Build &amp; Crash Doctor blocks now name UE
+5.7 through 5.9, so both need a fresh paste into Agent Builder.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-17 12:01 PM PST / 3:01 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-17 1:03 PM PST / 4:03 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
