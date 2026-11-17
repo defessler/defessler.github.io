@@ -668,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.174.0 &middot; Updated 2026-11-17 &middot; <span class="fresh" data-checked="2026-11-17" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-17</span></span>
+<span class="stamp">v4.175.0 &middot; Updated 2026-11-17 &middot; <span class="fresh" data-checked="2026-11-17" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-17</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -688,7 +688,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-11-03-an-example-for-every-skill-a-getting-started-tutorial-and-the-turret-demo-back-on-the-site-v41610">2026-11-03 · An example for every skill, a Getting Started tutorial, and the turret demo back on the site (v4.161.0)</a></li>
 <li><a href="#2026-11-03-videos-for-getting-started-v41620">2026-11-03 · Videos for Getting Started (v4.162.0)</a></li>
 <li><a href="#2026-11-03-copilot-runs-luna-first-and-the-quickstart-opens-on-getting-started-v41630">2026-11-03 · Copilot runs Luna-first, and the Quickstart opens on Getting Started (v4.163.0)</a></li>
 <li><a href="#2026-11-03-every-smartplan-feature-is-its-own-skill-and-any-one-can-be-switched-off-v41640">2026-11-03 · Every smartplan feature is its own skill, and any one can be switched off (v4.164.0)</a></li>
@@ -702,31 +701,13 @@ footer p { margin: 0; }
 <li><a href="#2026-11-11-the-last-research-area-is-read-so-every-pages-date-is-current-v41720">2026-11-11 · The last research area is read, so every page's date is current (v4.172.0)</a></li>
 <li><a href="#2026-11-17-smartdiff-names-events-as-the-editor-does-shows-one-final-diff-per-file-and-puts-review-findings-on-their-lines-v41730">2026-11-17 · smartdiff names events as the editor does, shows one final diff per file, and puts review findings on their lines (v4.173.0)</a></li>
 <li><a href="#2026-11-17-an-unreal-reviewer-seat-a-smartdiff-audit-and-the-data-six-days-fresher-v41740">2026-11-17 · An Unreal reviewer seat, a smartdiff audit, and the data six days fresher (v4.174.0)</a></li>
+<li><a href="#2026-11-17-one-reviewer-for-every-engine-detection-and-project-overlays-replace-the-unreal-seat-v41750">2026-11-17 · One reviewer for every engine: detection and project overlays replace the Unreal seat (v4.175.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-11-03-an-example-for-every-skill-a-getting-started-tutorial-and-the-turret-demo-back-on-the-site-v41610">2026-11-03 · An example for every skill, a Getting Started tutorial, and the turret demo back on the site (v4.161.0)</h2>
-<p>The author asked for an example of what each skill's result looks like.
-Every skill card on the home page has a See an example fold now. It shows
-the skill's real report shape: smartplan's routing call and verify line,
-smartexec's DONE and BLOCKED reports, smartreview's three ranked groups,
-a smartwiki page, a smartdiagram outline and a smartvoice before and
-after. An opened card takes the whole row, so the report lines don't
-scroll inside a narrow column.</p>
-<p>At the author's request the site gains a Getting Started page, modeled
-on the sibling project sites' tutorials. It walks one session in eight
-steps, from a small inline task through a six-part fan-out, the plan
-approval, the builders' reports, the verdicts, a review and a write-up.
-A When Things Go Wrong section covers the spiral guard, a BLOCKED
-builder, a model the plan names but you don't have, and Copilot Free.</p>
-<p>The author also asked for the turret demo back. It's smartdiff's render
-of a turret whose targeting moves from its Blueprint into a C++
-component, re-rendered with the current diffview.py and published at
-<code>examples/turret-demo.html</code>. build-site.py copies <code>docs/examples/*.html</code>
-as is, with no site chrome, so the page is exactly what the skill writes.</p>
 <h2 id="2026-11-03-videos-for-getting-started-v41620">2026-11-03 · Videos for Getting Started (v4.162.0)</h2>
 <p>The author asked for videos on the Getting Started page, like the ones
 on the sibling project sites. Seven short clips, 15 to 30 seconds each,
@@ -1103,9 +1084,33 @@ resolution order. vals.ai ranks moved to its 68-model board. Note:
 research/2026-11-17-sweep.md.</p>
 <p>Note: the M365 UE5 Engineer and Build &amp; Crash Doctor blocks now name UE
 5.7 through 5.9, so both need a fresh paste into Agent Builder.</p>
+<h2 id="2026-11-17-one-reviewer-for-every-engine-detection-and-project-overlays-replace-the-unreal-seat-v41750">2026-11-17 · One reviewer for every engine: detection and project overlays replace the Unreal seat (v4.175.0)</h2>
+<p>The author asked whether the new Unreal reviewer should be a mechanism
+instead of a special seat, then pointed out that <code>EngineAssociation</code>
+often isn't set. Both answers landed.</p>
+<p><strong>Detection.</strong> smartreview's C++ standards doc now resolves the Engine
+itself: stated by the project, else detected from project files, else
+<code>vanilla</code>. A new stdlib script, <code>smartreview/scripts/ue_engine.py</code>,
+finds the <code>.uproject</code>, <code>.uplugin</code> or <code>*.Build.cs</code> and works out the
+engine version even when <code>EngineAssociation</code> is empty or a build id.
+It tries an engine tree above the project, the binaries' <code>BuildId</code>, the
+editor log, the engine that saved the assets, and the one engine
+installed, and it lists every probe's answer with any conflicts. Oracle
+stage (l) plants each case. smartcheck-cpp and smartbrief resolve the
+Engine Profile the same way when a brief leaves it out.</p>
+<p><strong>Mechanism.</strong> A standards doc can add steps the driver runs, and the
+C++ doc's Unreal procedure (version, <code>Build.cs</code> and config, header-checked
+deprecations, Blueprints through smartdiff) moved there from the seat.
+A project's own rules go in an overlay, <code>REVIEW-STANDARDS.md</code> with an
+<code>Extends:</code> line, rather than a fork or a seat.</p>
+<p><strong>The seat is gone.</strong> <code>smartreview-unreal</code> left both harnesses, and the
+Copilot profile count is back to seven. On the Unreal fixture, in a
+project with an empty <code>EngineAssociation</code> and a brief that never said
+Unreal, the plain verifier caught all 7 gradeable seeds, the same as the
+seat, for 157,433 tokens.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-17 1:03 PM PST / 4:03 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-17 3:10 PM PST / 6:10 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
