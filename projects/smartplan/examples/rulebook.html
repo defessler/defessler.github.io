@@ -83,7 +83,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <body>
 <div class="layout">
 <nav id="nav" aria-label="Skills">
-  <p class="brand">smartplan rulebook<small>2,439 one-liners · 2026-11-11</small></p>
+  <p class="brand">smartplan rulebook<small>2,445 one-liners · 2026-11-17</small></p>
   <div class="nav-group">Router</div>
 <a href="#smartplan" data-sec="smartplan"><span>smartplan</span><span class="n">138</span></a>
 <div class="nav-group">Parts</div>
@@ -101,17 +101,17 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <a href="#copilot-cli" data-sec="copilot-cli"><span>Copilot CLI</span><span class="n">154</span></a>
 <a href="#m365-copilot" data-sec="m365-copilot"><span>M365 Copilot</span><span class="n">102</span></a>
 <div class="nav-group">Companions</div>
-<a href="#smartreview" data-sec="smartreview"><span>smartreview</span><span class="n">89</span></a>
+<a href="#smartreview" data-sec="smartreview"><span>smartreview</span><span class="n">90</span></a>
 <a href="#smartvoice" data-sec="smartvoice"><span>smartvoice</span><span class="n">160</span></a>
 <a href="#smartwiki" data-sec="smartwiki"><span>smartwiki</span><span class="n">96</span></a>
-<a href="#smartdiff" data-sec="smartdiff"><span>smartdiff</span><span class="n">111</span></a>
+<a href="#smartdiff" data-sec="smartdiff"><span>smartdiff</span><span class="n">116</span></a>
 <a href="#smartdiagram" data-sec="smartdiagram"><span>smartdiagram</span><span class="n">54</span></a>
 </nav>
 <main>
   <div class="hero">
     <h1>Every rule, one line each.</h1>
     <p>The smartplan family's skill bodies and references, rewritten as plain one-line statements. One rule or figure per line. Numbers, names, paths and commands are kept exactly as the source has them.</p>
-    <p class="meta"><b>2,439</b> lines across <b>18</b> skills and reference sets, taken from the v4.172.0 tree on 2026-11-11. Three sources aren't restated because they're already tables or checklists: <code>model-classes.md</code> (the price registry), <code>cpp-review-standards.md</code> and <code>web-ui-review-standards.md</code>.</p>
+    <p class="meta"><b>2,445</b> lines across <b>18</b> skills and reference sets, taken from the v4.173.0 tree on 2026-11-17. Three sources aren't restated because they're already tables or checklists: <code>model-classes.md</code> (the price registry), <code>cpp-review-standards.md</code> and <code>web-ui-review-standards.md</code>.</p>
   </div>
   <div class="filter">
     <input id="q" type="search" placeholder="Filter lines, for example: cache, Luna, fail-twice, 1.25x" aria-label="Filter lines" autocomplete="off">
@@ -2592,7 +2592,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 </ol>
 </section>
 <section id="smartreview" class="skill">
-<header class="skill-head"><h2>smartreview</h2><p class="src">SKILL.md, completion-exemplar.md <span class="dot"></span> <span class="count" data-total="89">89 lines</span></p></header>
+<header class="skill-head"><h2>smartreview</h2><p class="src">SKILL.md, completion-exemplar.md <span class="dot"></span> <span class="count" data-total="90">90 lines</span></p></header>
 <h3>What it does</h3>
 <ol>
 <li value="1"><span class="t">Review one changelist or fileset and report in three ranked categories.</span></li>
@@ -2638,70 +2638,71 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <li value="32"><span class="t">The report template is fixed.</span></li>
 <li value="33"><span class="t">An empty category prints its heading and <code>none</code>. Silence reads as not looked at.</span></li>
 <li value="34"><span class="t">The standards line reads <code>cpp-review-standards.md · Engine: vanilla</code> (or custom, or unreal) when Engine is unset.</span></li>
-<li value="35"><span class="t">smartreview is the merge gate over a whole fileset. smartcheck&#x27;s cpp-gamedev-check.md is the verify seat over one leaf&#x27;s diff.</span></li>
-<li value="36"><span class="t">Both reuse the taxonomy through the standards doc.</span></li>
-<li value="37"><span class="t">Name the category on every BREAKING row so reports collate on category · file:line.</span></li>
-<li value="38"><span class="t">Mark rows already filed by a leaf&#x27;s smartcheck as already-filed.</span></li>
-<li value="39"><span class="t">Review away from the author: hand it to the smartplan-verifier seat, which loads the skill read-only.</span></li>
-<li value="40"><span class="t">Fixes are always proposed, never applied by the reviewer.</span></li>
+<li value="35"><span class="t">To see findings on their lines, save the report and pass it to smartdiff&#x27;s render as <code>--review &lt;report&gt;</code>.</span></li>
+<li value="36"><span class="t">smartreview is the merge gate over a whole fileset. smartcheck&#x27;s cpp-gamedev-check.md is the verify seat over one leaf&#x27;s diff.</span></li>
+<li value="37"><span class="t">Both reuse the taxonomy through the standards doc.</span></li>
+<li value="38"><span class="t">Name the category on every BREAKING row so reports collate on category · file:line.</span></li>
+<li value="39"><span class="t">Mark rows already filed by a leaf&#x27;s smartcheck as already-filed.</span></li>
+<li value="40"><span class="t">Review away from the author: hand it to the smartplan-verifier seat, which loads the skill read-only.</span></li>
+<li value="41"><span class="t">Fixes are always proposed, never applied by the reviewer.</span></li>
 </ol>
 <h3>Output register</h3>
 <ol>
-<li value="41"><span class="t">When the only reader is another model seat, free-text fields follow modes.md&#x27;s caveman register.</span></li>
-<li value="42"><span class="t">The free-text fields are <code>&lt;what&#x27;s wrong&gt;</code> and <code>&lt;why unsure&gt;</code>, not counts, rule IDs or headings.</span></li>
-<li value="43"><span class="t">The default for that case is max-savings (caveman ultra).</span></li>
-<li value="44"><span class="t">That default replaces smartplan&#x27;s per-harness shipped default, and the higher-set mode wins.</span></li>
-<li value="45"><span class="t">Paths, rule IDs, quoted code, and the BREAKING failure description stay verbatim.</span></li>
-<li value="46"><span class="t">Interactive output is full prose, per modes.md&#x27;s human-facing floor.</span></li>
+<li value="42"><span class="t">When the only reader is another model seat, free-text fields follow modes.md&#x27;s caveman register.</span></li>
+<li value="43"><span class="t">The free-text fields are <code>&lt;what&#x27;s wrong&gt;</code> and <code>&lt;why unsure&gt;</code>, not counts, rule IDs or headings.</span></li>
+<li value="44"><span class="t">The default for that case is max-savings (caveman ultra).</span></li>
+<li value="45"><span class="t">That default replaces smartplan&#x27;s per-harness shipped default, and the higher-set mode wins.</span></li>
+<li value="46"><span class="t">Paths, rule IDs, quoted code, and the BREAKING failure description stay verbatim.</span></li>
+<li value="47"><span class="t">Interactive output is full prose, per modes.md&#x27;s human-facing floor.</span></li>
 </ol>
 <h3>Hard rules</h3>
 <ol>
-<li value="47"><span class="t">Breaking first, even with 200 convention rows.</span></li>
-<li value="48"><span class="t">Exhaustive, not sampled.</span></li>
-<li value="49"><span class="t">Resolve the Profile first. An unset knob or token is N/A, never invented.</span></li>
-<li value="50"><span class="t">Do not guess. Flag ambiguity.</span></li>
-<li value="51"><span class="t">Reproduce before you file: name the input or path (check.md § Review / audit output).</span></li>
-<li value="52"><span class="t">An unreproducible finding is Ambiguous.</span></li>
-<li value="53"><span class="t">Respect enforcement tags. [U] rows are externally enforced. Change only project-choice rows.</span></li>
-<li value="54"><span class="t">Gated-off rows are N/A, not deleted, and appear in the tally.</span></li>
-<li value="55"><span class="t">Tiering follows smartroute. The convention pass is mechanical, and Cheap is fine for it.</span></li>
-<li value="56"><span class="t">The breaking hunt runs at least Mid.</span></li>
-<li value="57"><span class="t">The floor tracks the executor. A Sonnet- or Opus-authored diff gets Opus or comparable.</span></li>
-<li value="58"><span class="t">Below that floor, ask first (smartplan&#x27;s Seat ceiling). On a no, the seat runs the hunt and the report names the gap.</span></li>
-<li value="59"><span class="t">Inline unless the fileset will not fit one context.</span></li>
-<li value="60"><span class="t">Verify before merge (smartcheck). The floor holds at any size.</span></li>
-<li value="61"><span class="t">The verify is an independent check. This seat cannot be it, and it covers the fixes the review makes.</span></li>
-<li value="62"><span class="t">Inline completions ignore instruction files but read open tabs.</span></li>
-<li value="63"><span class="t">The changelog is <code>docs/changelogs/smartreview.md</code>, kept out of the shipped plugin.</span></li>
+<li value="48"><span class="t">Breaking first, even with 200 convention rows.</span></li>
+<li value="49"><span class="t">Exhaustive, not sampled.</span></li>
+<li value="50"><span class="t">Resolve the Profile first. An unset knob or token is N/A, never invented.</span></li>
+<li value="51"><span class="t">Do not guess. Flag ambiguity.</span></li>
+<li value="52"><span class="t">Reproduce before you file: name the input or path (check.md § Review / audit output).</span></li>
+<li value="53"><span class="t">An unreproducible finding is Ambiguous.</span></li>
+<li value="54"><span class="t">Respect enforcement tags. [U] rows are externally enforced. Change only project-choice rows.</span></li>
+<li value="55"><span class="t">Gated-off rows are N/A, not deleted, and appear in the tally.</span></li>
+<li value="56"><span class="t">Tiering follows smartroute. The convention pass is mechanical, and Cheap is fine for it.</span></li>
+<li value="57"><span class="t">The breaking hunt runs at least Mid.</span></li>
+<li value="58"><span class="t">The floor tracks the executor. A Sonnet- or Opus-authored diff gets Opus or comparable.</span></li>
+<li value="59"><span class="t">Below that floor, ask first (smartplan&#x27;s Seat ceiling). On a no, the seat runs the hunt and the report names the gap.</span></li>
+<li value="60"><span class="t">Inline unless the fileset will not fit one context.</span></li>
+<li value="61"><span class="t">Verify before merge (smartcheck). The floor holds at any size.</span></li>
+<li value="62"><span class="t">The verify is an independent check. This seat cannot be it, and it covers the fixes the review makes.</span></li>
+<li value="63"><span class="t">Inline completions ignore instruction files but read open tabs.</span></li>
+<li value="64"><span class="t">The changelog is <code>docs/changelogs/smartreview.md</code>, kept out of the shipped plugin.</span></li>
 </ol>
 <h3>completion-exemplar.md</h3>
 <ol>
-<li value="64"><span class="t">The exemplar is a short source file showing the conventions, kept open in a tab.</span></li>
-<li value="65"><span class="t">Completions never read instruction files. Copilot custom instructions, AGENTS.md, the standards doc and resident rules reach Chat and agent only.</span></li>
-<li value="66"><span class="t">Completions read the code around the cursor and the open files.</span></li>
-<li value="67"><span class="t">Unmeasured: vendor docs say open files feed completions, and a language-server issue says sometimes only the focused file does. Run § Proving it works first.</span></li>
-<li value="68"><span class="t">Make one when asked for a completion or conventions exemplar, or for inline suggestions that follow house style.</span></li>
-<li value="69"><span class="t">One file per hand-written language.</span></li>
-<li value="70"><span class="t">Inputs: <code>{{STANDARDS}}</code> and the profile selector, the three knobs, and two or three real files the user names.</span></li>
-<li value="71"><span class="t">The real files supply comment voice, include grouping, and blank-line rhythm. Do not pick them from extensions.</span></li>
-<li value="72"><span class="t">An unset input asks, never invents. A guessed knob teaches the wrong style quietly.</span></li>
-<li value="73"><span class="t">Content is only correct code: no bad examples, no before/after, no commented anti-patterns.</span></li>
-<li value="74"><span class="t">Length is 80 to 150 lines. Dense beats thorough.</span></li>
-<li value="75"><span class="t">Show one instance of each rule: header and include order, naming for every kind, indentation and braces and line length from the knobs, comment style, null, error, ownership and containers, logging if the doc has rules, one complete realistic function.</span></li>
-<li value="76"><span class="t">Show [U] rules as the engine or toolchain requires.</span></li>
-<li value="77"><span class="t">Use synthetic names only (inventory, timer queue), no proprietary code.</span></li>
-<li value="78"><span class="t">It must parse cleanly with every symbol declared, because red squiggles pull suggestions toward fixing them.</span></li>
-<li value="79"><span class="t">Put it at <code>docs/conventions-exemplar.&lt;ext&gt;</code> or the project docs folder, outside build targets (Unreal: outside <code>Source/</code>).</span></li>
-<li value="80"><span class="t">The path does not matter to completions.</span></li>
-<li value="81"><span class="t">Check: run the review protocol on the exemplar against the same <code>{{STANDARDS}}</code> and expect zero CONVENTION and zero PRACTICE. Then compile or lint it standalone.</span></li>
-<li value="82"><span class="t">Use: open it in a tab beside the file you are writing, same language, and pin it.</span></li>
-<li value="83"><span class="t">Regenerate when the doc or a knob changes.</span></li>
-<li value="84"><span class="t">Proof is an A/B of about an hour, costing completions rather than chat credits.</span></li>
-<li value="85"><span class="t">Write 5 stubs with a one-line intent comment.</span></li>
-<li value="86"><span class="t">Arm A: target file only, accept the first suggestion, save.</span></li>
-<li value="87"><span class="t">Arm B: same stubs and model with the exemplar pinned.</span></li>
-<li value="88"><span class="t">Review both with the skill and compare CONVENTION counts.</span></li>
-<li value="89"><span class="t">No cut in arm B means the exemplar is not reaching completions. Do not maintain it.</span></li>
+<li value="65"><span class="t">The exemplar is a short source file showing the conventions, kept open in a tab.</span></li>
+<li value="66"><span class="t">Completions never read instruction files. Copilot custom instructions, AGENTS.md, the standards doc and resident rules reach Chat and agent only.</span></li>
+<li value="67"><span class="t">Completions read the code around the cursor and the open files.</span></li>
+<li value="68"><span class="t">Unmeasured: vendor docs say open files feed completions, and a language-server issue says sometimes only the focused file does. Run § Proving it works first.</span></li>
+<li value="69"><span class="t">Make one when asked for a completion or conventions exemplar, or for inline suggestions that follow house style.</span></li>
+<li value="70"><span class="t">One file per hand-written language.</span></li>
+<li value="71"><span class="t">Inputs: <code>{{STANDARDS}}</code> and the profile selector, the three knobs, and two or three real files the user names.</span></li>
+<li value="72"><span class="t">The real files supply comment voice, include grouping, and blank-line rhythm. Do not pick them from extensions.</span></li>
+<li value="73"><span class="t">An unset input asks, never invents. A guessed knob teaches the wrong style quietly.</span></li>
+<li value="74"><span class="t">Content is only correct code: no bad examples, no before/after, no commented anti-patterns.</span></li>
+<li value="75"><span class="t">Length is 80 to 150 lines. Dense beats thorough.</span></li>
+<li value="76"><span class="t">Show one instance of each rule: header and include order, naming for every kind, indentation and braces and line length from the knobs, comment style, null, error, ownership and containers, logging if the doc has rules, one complete realistic function.</span></li>
+<li value="77"><span class="t">Show [U] rules as the engine or toolchain requires.</span></li>
+<li value="78"><span class="t">Use synthetic names only (inventory, timer queue), no proprietary code.</span></li>
+<li value="79"><span class="t">It must parse cleanly with every symbol declared, because red squiggles pull suggestions toward fixing them.</span></li>
+<li value="80"><span class="t">Put it at <code>docs/conventions-exemplar.&lt;ext&gt;</code> or the project docs folder, outside build targets (Unreal: outside <code>Source/</code>).</span></li>
+<li value="81"><span class="t">The path does not matter to completions.</span></li>
+<li value="82"><span class="t">Check: run the review protocol on the exemplar against the same <code>{{STANDARDS}}</code> and expect zero CONVENTION and zero PRACTICE. Then compile or lint it standalone.</span></li>
+<li value="83"><span class="t">Use: open it in a tab beside the file you are writing, same language, and pin it.</span></li>
+<li value="84"><span class="t">Regenerate when the doc or a knob changes.</span></li>
+<li value="85"><span class="t">Proof is an A/B of about an hour, costing completions rather than chat credits.</span></li>
+<li value="86"><span class="t">Write 5 stubs with a one-line intent comment.</span></li>
+<li value="87"><span class="t">Arm A: target file only, accept the first suggestion, save.</span></li>
+<li value="88"><span class="t">Arm B: same stubs and model with the exemplar pinned.</span></li>
+<li value="89"><span class="t">Review both with the skill and compare CONVENTION counts.</span></li>
+<li value="90"><span class="t">No cut in arm B means the exemplar is not reaching completions. Do not maintain it.</span></li>
 </ol>
 </section>
 <section id="smartvoice" class="skill">
@@ -3024,7 +3025,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 </ol>
 </section>
 <section id="smartdiff" class="skill">
-<header class="skill-head"><h2>smartdiff</h2><p class="src">SKILL.md, trail.md <span class="dot"></span> <span class="count" data-total="111">111 lines</span></p></header>
+<header class="skill-head"><h2>smartdiff</h2><p class="src">SKILL.md, trail.md <span class="dot"></span> <span class="count" data-total="116">116 lines</span></p></header>
 <h3>What it makes</h3>
 <ol>
 <li value="1"><span class="t">One self-contained HTML page per change set.</span></li>
@@ -3082,92 +3083,97 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <ol>
 <li value="42"><span class="t">Run <code>python &lt;this skill dir&gt;/scripts/diffview.py &lt;work&gt;/session.diff --notes &lt;work&gt;/notes.json --title &quot;&lt;short change-set title&gt;&quot; -o &lt;work&gt;/session-diff.html</code>.</span></li>
 <li value="43"><span class="t">Add <code>--blueprints &lt;work&gt;/bp</code> when step 2 ran.</span></li>
+<li value="44"><span class="t">Add <code>--review &lt;report&gt;</code> to show smartreview&#x27;s findings as comments on their lines.</span></li>
 </ol>
 <h3>Step 5: report</h3>
 <ol>
-<li value="44"><span class="t">Report the output path and the totals the script prints.</span></li>
-<li value="45"><span class="t">Do not open the file unless asked.</span></li>
+<li value="45"><span class="t">Report the output path and the totals the script prints.</span></li>
+<li value="46"><span class="t">Do not open the file unless asked.</span></li>
 </ol>
 <h3>Agent-only mode</h3>
 <ol>
-<li value="46"><span class="t">Use it when the tree mixes agent edits with other changes, or when asked for one message&#x27;s work.</span></li>
-<li value="47"><span class="t">It rebuilds from the session record (the file before each edit plus the patch the tool applied), never from live files.</span></li>
-<li value="48"><span class="t">It finds the running session itself.</span></li>
-<li value="49"><span class="t">Run <code>python &lt;this skill dir&gt;/scripts/trail.py --messages 1 --out &lt;work&gt;/trail</code>.</span></li>
-<li value="50"><span class="t"><code>--messages N</code> means the last N human messages before the newest.</span></li>
-<li value="51"><span class="t"><code>--whole-session</code> takes all of them.</span></li>
-<li value="52"><span class="t">Add <code>--notes</code> as in step 3.</span></li>
-<li value="53"><span class="t">Exit 2 means partial: a shell command ran, or evidence did not check out. Say so when reporting.</span></li>
-<li value="54"><span class="t">Scope flags, evidence and outputs are in <code>references/trail.md</code>.</span></li>
+<li value="47"><span class="t">Use it when the tree mixes agent edits with other changes, or when asked for one message&#x27;s work.</span></li>
+<li value="48"><span class="t">It rebuilds from the session record (the file before each edit plus the patch the tool applied), never from live files.</span></li>
+<li value="49"><span class="t">It finds the running session itself.</span></li>
+<li value="50"><span class="t">Run <code>python &lt;this skill dir&gt;/scripts/trail.py --messages 1 --out &lt;work&gt;/trail</code>.</span></li>
+<li value="51"><span class="t"><code>--messages N</code> means the last N human messages before the newest.</span></li>
+<li value="52"><span class="t"><code>--whole-session</code> takes all of them.</span></li>
+<li value="53"><span class="t">Each file shows once, as its final diff.</span></li>
+<li value="54"><span class="t">Render one page for the range, never one per prompt.</span></li>
+<li value="55"><span class="t">Add <code>--notes</code> and <code>--review</code> as in steps 3 and 4.</span></li>
+<li value="56"><span class="t">Exit 2 means partial: a shell command ran, or evidence did not check out. Say so when reporting.</span></li>
+<li value="57"><span class="t">Scope flags, evidence and outputs are in <code>references/trail.md</code>.</span></li>
 </ol>
 <h3>Blueprint diff</h3>
 <ol>
-<li value="55"><span class="t">Nodes match by <code>NodeGuid</code>, so moves are not changes.</span></li>
-<li value="56"><span class="t">Per graph it lists added and removed nodes, changed pin defaults and node properties, and added or removed wires as <code>Node.pin → Node.pin</code>.</span></li>
-<li value="57"><span class="t">An added or removed node, variable or subobject shows the values it carried.</span></li>
-<li value="58"><span class="t">Layout-only moves collapse to one count.</span></li>
-<li value="59"><span class="t">Above the graphs it lists variables (matched by <code>VarGuid</code>, so a rename reads as a rename), components and other subobjects, Blueprint settings, and class defaults.</span></li>
-<li value="60"><span class="t">Compiler-generated graphs are filtered out.</span></li>
-<li value="61"><span class="t">Each graph is drawn at saved node positions: added green, removed as a dashed red ghost, changed blue.</span></li>
-<li value="62"><span class="t">Box sizes are estimates.</span></li>
-<li value="63"><span class="t">Big graphs open on the change.</span></li>
-<li value="64"><span class="t">Drag to pan, scroll to zoom.</span></li>
-<li value="65"><span class="t">Before and After show either side alone.</span></li>
+<li value="58"><span class="t">Nodes match by <code>NodeGuid</code>, so moves are not changes.</span></li>
+<li value="59"><span class="t">Per graph it lists added and removed nodes, changed pin defaults and node properties, and added or removed wires as <code>Node.pin → Node.pin</code>.</span></li>
+<li value="60"><span class="t">An added or removed node, variable or subobject shows the values it carried.</span></li>
+<li value="61"><span class="t">Layout-only moves collapse to one count.</span></li>
+<li value="62"><span class="t">Above the graphs it lists variables (matched by <code>VarGuid</code>, so a rename reads as a rename), components and other subobjects, Blueprint settings, and class defaults.</span></li>
+<li value="63"><span class="t">Compiler-generated graphs are filtered out.</span></li>
+<li value="64"><span class="t">Each graph is drawn at saved node positions: added green, removed as a dashed red ghost, changed blue.</span></li>
+<li value="65"><span class="t">Box sizes are estimates.</span></li>
+<li value="66"><span class="t">Big graphs open on the change.</span></li>
+<li value="67"><span class="t">Drag to pan, scroll to zoom.</span></li>
+<li value="68"><span class="t">Before and After show either side alone.</span></li>
 </ol>
 <h3>Page keys</h3>
 <ol>
-<li value="66"><span class="t"><code>j</code> and <code>k</code> move between files.</span></li>
-<li value="67"><span class="t"><code>v</code> toggles split and unified.</span></li>
-<li value="68"><span class="t"><code>b</code> or the chevron hides the file list.</span></li>
-<li value="69"><span class="t"><code>e</code> and <code>c</code> expand or collapse every file.</span></li>
-<li value="70"><span class="t"><code>a</code> expands every run of omitted lines.</span></li>
-<li value="71"><span class="t">Expanding needs whole files. Trail mode has them, and <code>diffview.py --git-context &lt;repo&gt;</code> reads them from git.</span></li>
-<li value="72"><span class="t">The theme defaults to dark.</span></li>
-<li value="73"><span class="t">Each choice persists per browser.</span></li>
+<li value="69"><span class="t"><code>j</code> and <code>k</code> move between files.</span></li>
+<li value="70"><span class="t"><code>v</code> toggles split and unified.</span></li>
+<li value="71"><span class="t"><code>b</code> or the chevron hides the file list.</span></li>
+<li value="72"><span class="t"><code>e</code> and <code>c</code> expand or collapse every file.</span></li>
+<li value="73"><span class="t"><code>a</code> expands every run of omitted lines.</span></li>
+<li value="74"><span class="t">Expanding needs whole files. Trail mode has them, and <code>diffview.py --git-context &lt;repo&gt;</code> reads them from git.</span></li>
+<li value="75"><span class="t">The theme defaults to dark.</span></li>
+<li value="76"><span class="t">Each choice persists per browser.</span></li>
 </ol>
 <h3>Family fit</h3>
 <ol>
-<li value="74"><span class="t">smartdiff is an optional companion seat like <code>smartreview</code>, outside the tiering loop.</span></li>
-<li value="75"><span class="t">It pairs with <code>smartreview</code> (render, then review) and <code>smartwiki</code> (non-engineer audience).</span></li>
-<li value="76"><span class="t">Tiering follows <code>smartroute</code>: inline when the change set fits one context.</span></li>
-<li value="77"><span class="t">Capture, export and render are scripts, so they are free.</span></li>
-<li value="78"><span class="t">The notes are the judgment step. They fit Mid, or the seat that wrote the change.</span></li>
-<li value="79"><span class="t">The changelog is <code>docs/changelogs/smartdiff.md</code>, in the source repo only.</span></li>
+<li value="77"><span class="t">smartdiff is an optional companion seat like <code>smartreview</code>, outside the tiering loop.</span></li>
+<li value="78"><span class="t">It pairs with <code>smartreview</code> (render, then review) and <code>smartwiki</code> (non-engineer audience).</span></li>
+<li value="79"><span class="t">Tiering follows <code>smartroute</code>: inline when the change set fits one context.</span></li>
+<li value="80"><span class="t">Capture, export and render are scripts, so they are free.</span></li>
+<li value="81"><span class="t">The notes are the judgment step. They fit Mid, or the seat that wrote the change.</span></li>
+<li value="82"><span class="t">The changelog is <code>docs/changelogs/smartdiff.md</code>, in the source repo only.</span></li>
 </ol>
 <h3>trail.md</h3>
 <ol>
-<li value="80"><span class="t">trail.py exports only the agent&#x27;s edits from the session record.</span></li>
-<li value="81"><span class="t">It never reads live files, so teammate, hand, or build changes cannot leak in.</span></li>
-<li value="82"><span class="t">The boundary is the newest human message, usually the export request.</span></li>
-<li value="83"><span class="t">The count is in human messages. Tool results, subagent prompts and harness reminders do not count.</span></li>
-<li value="84"><span class="t">The flag table has 5 rows.</span></li>
-<li value="85"><span class="t">With no <code>--session</code>, it reads the session running it.</span></li>
-<li value="86"><span class="t">On Copilot CLI the folder is <code>~/.copilot/session-state/&lt;id&gt;</code>, named by <code>COPILOT_AGENT_SESSION_ID</code>.</span></li>
-<li value="87"><span class="t">On Claude Code the transcript is named by <code>CLAUDE_CODE_SESSION_ID</code> under <code>~/.claude/projects/</code>, or under <code>CLAUDE_CONFIG_DIR</code> when set.</span></li>
-<li value="88"><span class="t">Subagent transcripts beside it are read too, counting toward the message that started them.</span></li>
-<li value="89"><span class="t">When one harness starts inside the other, both ids are inherited, and the most recently written transcript wins, since the parent waits on a tool call.</span></li>
-<li value="90"><span class="t"><code>--session &lt;folder or .jsonl&gt;</code> reads any other session.</span></li>
-<li value="91"><span class="t">Evidence is the file before the edit plus the recorded patch.</span></li>
-<li value="92"><span class="t">Every removed and context line is checked against the before-image. A mismatch is refused, never guessed.</span></li>
-<li value="93"><span class="t">On Copilot, before-images come from <code>rewind-file-snapshots</code>, hash-checked.</span></li>
-<li value="94"><span class="t">On Copilot, patches come from <code>apply_patch</code>, <code>edit</code> and <code>create</code> results. Which tool depends on the model.</span></li>
-<li value="95"><span class="t">On Claude Code, before-images come from the Edit or Write result&#x27;s <code>originalFile</code>, then the previous edit in the chain, then <code>file-history</code> backups.</span></li>
-<li value="96"><span class="t">On Claude Code, patches come from <code>structuredPatch</code>.</span></li>
-<li value="97"><span class="t">Consecutive edits to a file merge into one comparison.</span></li>
-<li value="98"><span class="t">A hand edit between two agent edits splits them into two comparisons.</span></li>
-<li value="99"><span class="t">A file that ends where it started is dropped.</span></li>
-<li value="100"><span class="t">A partial export exits 2 with a warning per gap.</span></li>
-<li value="101"><span class="t">Gaps are: a shell command ran, a patch mismatch or missing before-image, a tool edited files with no supported evidence, or the person changed the proposed edit before accepting.</span></li>
-<li value="102"><span class="t">The page shows what was proved. Treat the rest as unreviewed.</span></li>
-<li value="103"><span class="t">Exit 1 means no export, with the cause on stderr.</span></li>
-<li value="104"><span class="t">Output is one timestamped folder under <code>--out</code>.</span></li>
-<li value="105"><span class="t">The default <code>--out</code> is <code>Saved/smartdiff/</code> in an Unreal project, and the system temp elsewhere.</span></li>
-<li value="106"><span class="t">Per change it writes <code>&lt;name&gt;-before.&lt;ext&gt;</code> and <code>&lt;name&gt;-after.&lt;ext&gt;</code>.</span></li>
-<li value="107"><span class="t">It also writes <code>agent-only.diff</code>, <code>comparisons.json</code> with warnings, <code>prompts.md</code>, and <code>transcript.md</code> (private reasoning left out).</span></li>
-<li value="108"><span class="t"><code>index.html</code> is the same page <code>diffview.py</code> writes.</span></li>
-<li value="109"><span class="t">The page lists source files only. <code>--all-files</code> adds docs and data.</span></li>
-<li value="110"><span class="t"><code>--notes</code> takes the same JSON as the main procedure.</span></li>
-<li value="111"><span class="t"><code>--no-open</code> skips the browser, and <code>--no-html</code> skips the page.</span></li>
+<li value="83"><span class="t">trail.py exports only the agent&#x27;s edits from the session record.</span></li>
+<li value="84"><span class="t">It never reads live files, so a change before the agent&#x27;s first edit to a file, or after its last, cannot leak in.</span></li>
+<li value="85"><span class="t">A change between two agent edits can, and the run names it.</span></li>
+<li value="86"><span class="t">The boundary is the newest human message, usually the export request.</span></li>
+<li value="87"><span class="t">The count is in human messages. Tool results, subagent prompts and harness reminders do not count.</span></li>
+<li value="88"><span class="t">The flag table has 5 rows.</span></li>
+<li value="89"><span class="t">With no <code>--session</code>, it reads the session running it.</span></li>
+<li value="90"><span class="t">On Copilot CLI the folder is <code>~/.copilot/session-state/&lt;id&gt;</code>, named by <code>COPILOT_AGENT_SESSION_ID</code>.</span></li>
+<li value="91"><span class="t">On Claude Code the transcript is named by <code>CLAUDE_CODE_SESSION_ID</code> under <code>~/.claude/projects/</code>, or under <code>CLAUDE_CONFIG_DIR</code> when set.</span></li>
+<li value="92"><span class="t">Subagent transcripts beside it are read too, counting toward the message that started them.</span></li>
+<li value="93"><span class="t">When one harness starts inside the other, both ids are inherited, and the most recently written transcript wins, since the parent waits on a tool call.</span></li>
+<li value="94"><span class="t"><code>--session &lt;folder or .jsonl&gt;</code> reads any other session.</span></li>
+<li value="95"><span class="t">Evidence is the file before the edit plus the recorded patch.</span></li>
+<li value="96"><span class="t">Every removed and context line is checked against the before-image. A mismatch is refused, never guessed.</span></li>
+<li value="97"><span class="t">On Copilot, before-images come from <code>rewind-file-snapshots</code>, hash-checked.</span></li>
+<li value="98"><span class="t">On Copilot, patches come from <code>apply_patch</code>, <code>edit</code> and <code>create</code> results. Which tool depends on the model.</span></li>
+<li value="99"><span class="t">On Claude Code, before-images come from the Edit or Write result&#x27;s <code>originalFile</code>, then the previous edit in the chain, then <code>file-history</code> backups.</span></li>
+<li value="100"><span class="t">On Claude Code, patches come from <code>structuredPatch</code>.</span></li>
+<li value="101"><span class="t">Each file is one comparison for the whole range, from before the first agent edit to after the last.</span></li>
+<li value="102"><span class="t">The page shows where the work ended up, never one diff per prompt.</span></li>
+<li value="103"><span class="t">A file that ends where it started is dropped.</span></li>
+<li value="104"><span class="t">A partial export exits 2 with a warning per gap.</span></li>
+<li value="105"><span class="t">Gaps are: a shell command ran, a patch mismatch or missing before-image, a tool edited files with no supported evidence, the person changed the proposed edit before accepting, or the file changed between two agent edits.</span></li>
+<li value="106"><span class="t">The page shows what was proved. Treat the rest as unreviewed.</span></li>
+<li value="107"><span class="t">Exit 1 means no export, with the cause on stderr.</span></li>
+<li value="108"><span class="t">Output is one timestamped folder under <code>--out</code>.</span></li>
+<li value="109"><span class="t">The default <code>--out</code> is <code>Saved/smartdiff/</code> in an Unreal project, and the system temp elsewhere.</span></li>
+<li value="110"><span class="t">Per change it writes <code>&lt;name&gt;-before.&lt;ext&gt;</code> and <code>&lt;name&gt;-after.&lt;ext&gt;</code>.</span></li>
+<li value="111"><span class="t">It also writes <code>agent-only.diff</code>, <code>comparisons.json</code> with warnings, <code>prompts.md</code>, and <code>transcript.md</code> (private reasoning left out).</span></li>
+<li value="112"><span class="t"><code>index.html</code> is the same page <code>diffview.py</code> writes.</span></li>
+<li value="113"><span class="t">The page lists source files only. <code>--all-files</code> adds docs and data.</span></li>
+<li value="114"><span class="t"><code>--notes</code> takes the same JSON as the main procedure.</span></li>
+<li value="115"><span class="t"><code>--review</code> takes the same smartreview report, shown as comments on their lines.</span></li>
+<li value="116"><span class="t"><code>--no-open</code> skips the browser, and <code>--no-html</code> skips the page.</span></li>
 </ol>
 </section>
 <section id="smartdiagram" class="skill">

@@ -668,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.172.0 &middot; Updated 2026-11-11 &middot; <span class="fresh" data-checked="2026-11-11" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-11</span></span>
+<span class="stamp">v4.173.0 &middot; Updated 2026-11-17 &middot; <span class="fresh" data-checked="2026-11-11" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-11</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -688,7 +688,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-11-03-a-site-that-leads-with-the-picks-the-skills-and-how-they-work-v41590">2026-11-03 · A site that leads with the picks, the skills and how they work (v4.159.0)</a></li>
 <li><a href="#2026-11-03-roles-before-vendors-on-the-site-themed-controls-and-a-one-day-data-refresh-v41600">2026-11-03 · Roles before vendors on the site, themed controls, and a one-day data refresh (v4.160.0)</a></li>
 <li><a href="#2026-11-03-an-example-for-every-skill-a-getting-started-tutorial-and-the-turret-demo-back-on-the-site-v41610">2026-11-03 · An example for every skill, a Getting Started tutorial, and the turret demo back on the site (v4.161.0)</a></li>
 <li><a href="#2026-11-03-videos-for-getting-started-v41620">2026-11-03 · Videos for Getting Started (v4.162.0)</a></li>
@@ -702,27 +701,13 @@ footer p { margin: 0; }
 <li><a href="#2026-11-11-fable-52-and-gemini-4-carbon-land-in-the-registry-and-the-data-is-eight-days-fresher-v41700">2026-11-11 · Fable 5.2 and Gemini 4 Carbon land in the registry, and the data is eight days fresher (v4.170.0)</a></li>
 <li><a href="#2026-11-11-the-newest-version-of-a-line-always-holds-its-seats-v41710">2026-11-11 · The newest version of a line always holds its seats (v4.171.0)</a></li>
 <li><a href="#2026-11-11-the-last-research-area-is-read-so-every-pages-date-is-current-v41720">2026-11-11 · The last research area is read, so every page's date is current (v4.172.0)</a></li>
+<li><a href="#2026-11-17-smartdiff-names-events-as-the-editor-does-shows-one-final-diff-per-file-and-puts-review-findings-on-their-lines-v41730">2026-11-17 · smartdiff names events as the editor does, shows one final diff per file, and puts review findings on their lines (v4.173.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-11-03-a-site-that-leads-with-the-picks-the-skills-and-how-they-work-v41590">2026-11-03 · A site that leads with the picks, the skills and how they work (v4.159.0)</h2>
-<p>The author asked for a site that puts the latest useful information
-first and tucks the history away. The home page is now its own source,
-<code>docs/home.md</code>, built from the frontend-design skill's guidance. It
-opens with the routing call shown as real <code>/smartplan</code> output and the
-Plan, Build and Verify seats. Below that come the quick picks, pulled
-straight from the simple model guide so the two can't drift, then the
-seven skills with an example prompt each, how the routing works, the
-measured result and the install commands.</p>
-<p>The Evidence and Project nav groups became one quieter Details group
-holding What's New, the overview, benchmarks, goals and the changelog.
-The per-area freshness table moved into a disclosure at the foot of the
-home page. The header's Updated date on the home page counts the quick
-picks page it embeds. A history line about a September probe left the
-simple guide, and the full guide keeps it.</p>
 <h2 id="2026-11-03-roles-before-vendors-on-the-site-themed-controls-and-a-one-day-data-refresh-v41600">2026-11-03 · Roles before vendors on the site, themed controls, and a one-day data refresh (v4.160.0)</h2>
 <p>The author asked for a site that's generic to the vendor. The home page
 hero now names each step's role (a strong model plans, a cheap model
@@ -1053,9 +1038,47 @@ re-checked against the raw page. Nine statements moved:</p>
 left. Fixed.</p>
 <p>Leads that contradict nothing and didn't land are listed in
 <code>research/2026-11-11-sweep.md</code>.</p>
+<h2 id="2026-11-17-smartdiff-names-events-as-the-editor-does-shows-one-final-diff-per-file-and-puts-review-findings-on-their-lines-v41730">2026-11-17 · smartdiff names events as the editor does, shows one final diff per file, and puts review findings on their lines (v4.173.0)</h2>
+<p>Three asks from the author: the wrong event names on deleted nodes, a
+diff that is the final result rather than one per prompt, and
+smartreview's findings shown as comments on the lines they name.</p>
+<p><strong>Events carry the editor's name.</strong> T3D saves an overridden event by
+its function, so a removed wire read <code>Event ReceiveBeginPlay.then</code>
+where the editor says <code>Event BeginPlay</code>. <code>node_title</code> now drops the
+<code>Receive</code> or <code>K2_</code> prefix, spaces End Play and component events the
+way the editor does, and titles component-bound, actor-bound, input
+key, input action and input axis events by what they listen to. Those
+used to fall through to a bare class name like <code>ComponentBoundEvent</code>,
+so two removed overlap events couldn't be told apart. A removed wire
+also names its nodes from the old revision now. A custom event renamed
+in the same change used to show its new name on a wire that only the
+old one had.</p>
+<p><strong>One comparison per file in agent-only mode.</strong> <code>trail.py</code> joined a
+file's edits only while each began exactly where the last ended. A
+hand edit or a formatter in between split the file into one diff per
+prompt. Each file is now one comparison from before the first agent
+edit in the range to after the last. A change between two agent edits
+sits inside it, so the run names the file and exits 2 rather than
+splitting it. SKILL.md says to render one page for the range.</p>
+<p><strong>Review findings sit on their lines.</strong> <code>diffview.py --review</code> and
+<code>trail.py --review</code> take smartreview's report as written, or JSON
+findings, and put each one under the line it names, on its own side
+in the split view. A finding on a line the diff doesn't show sits above
+its file, and one on no file in the diff sits above the file list. The
+header counts them, a file with comments always opens, and <code>n</code> and <code>p</code>
+step through them. smartreview's SKILL.md points at the flag.</p>
+<p><code>smartdiff-selftest.py</code> gains 21 checks: seven event titles, no event
+left under its function name on the planted page, the removed wire's
+old name, and twelve on review comments (rows in both views, both side
+blocks, the counts, the keys, a skipped Ambiguous line, and JSON
+findings on a removed line and on a Blueprint). Two trail tests now
+expect one comparison and a warning where they expected a split. Not
+tried on a real UE export here. The event titles follow the engine's
+DisplayName metadata as of UE 5.8, at time of writing, so a project
+event with its own DisplayName still shows its function name.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-17 12:45 AM PST / 3:45 AM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-17 12:01 PM PST / 3:01 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
