@@ -555,9 +555,10 @@
 <p>Prerequisites: Visual Studio 2022+ (2026 recommended) with the C++ workload, CMake 3.28+, Ninja, Git.</p>
 <div class="highlight"><pre><span></span><code>git clone https://github.com/defessler/Dokicraft.git
 cd Dokicraft
-git clone --depth 1 https://github.com/microsoft/vcpkg.git extern/vcpkg
+git clone https://github.com/microsoft/vcpkg.git extern/vcpkg
 extern\vcpkg\bootstrap-vcpkg.bat -disableMetrics
 </code></pre></div>
+<p>Clone vcpkg in full. <code>vcpkg.json</code> pins a <code>builtin-baseline</code> commit, and a <code>--depth 1</code> clone doesn't have it, so the first configure fails with "failed to <code>git show</code> versions/baseline.json".</p>
 <p>Then, from a <strong>Developer Command Prompt / PowerShell for VS</strong> (so <code>cl</code> and the Windows SDK are on <code>PATH</code>):</p>
 <div class="highlight"><pre><span></span><code>cmake --preset windows-release
 cmake --build --preset windows-release
