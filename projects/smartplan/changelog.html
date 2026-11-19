@@ -668,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.175.0 &middot; Updated 2026-11-17 &middot; <span class="fresh" data-checked="2026-11-17" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-17</span></span>
+<span class="stamp">v4.176.0 &middot; Updated 2026-11-19 &middot; <span class="fresh" data-checked="2026-11-17" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-17</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -688,7 +688,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-11-03-videos-for-getting-started-v41620">2026-11-03 · Videos for Getting Started (v4.162.0)</a></li>
 <li><a href="#2026-11-03-copilot-runs-luna-first-and-the-quickstart-opens-on-getting-started-v41630">2026-11-03 · Copilot runs Luna-first, and the Quickstart opens on Getting Started (v4.163.0)</a></li>
 <li><a href="#2026-11-03-every-smartplan-feature-is-its-own-skill-and-any-one-can-be-switched-off-v41640">2026-11-03 · Every smartplan feature is its own skill, and any one can be switched off (v4.164.0)</a></li>
 <li><a href="#2026-11-03-the-verifier-seat-runs-code-reviews-through-smartreview-v41650">2026-11-03 · The verifier seat runs code reviews through smartreview (v4.165.0)</a></li>
@@ -702,25 +701,13 @@ footer p { margin: 0; }
 <li><a href="#2026-11-17-smartdiff-names-events-as-the-editor-does-shows-one-final-diff-per-file-and-puts-review-findings-on-their-lines-v41730">2026-11-17 · smartdiff names events as the editor does, shows one final diff per file, and puts review findings on their lines (v4.173.0)</a></li>
 <li><a href="#2026-11-17-an-unreal-reviewer-seat-a-smartdiff-audit-and-the-data-six-days-fresher-v41740">2026-11-17 · An Unreal reviewer seat, a smartdiff audit, and the data six days fresher (v4.174.0)</a></li>
 <li><a href="#2026-11-17-one-reviewer-for-every-engine-detection-and-project-overlays-replace-the-unreal-seat-v41750">2026-11-17 · One reviewer for every engine: detection and project overlays replace the Unreal seat (v4.175.0)</a></li>
+<li><a href="#2026-11-19-smartdiff-reads-more-than-blueprints-and-a-move-no-longer-looks-like-a-new-wire-v41760">2026-11-19 · smartdiff reads more than Blueprints, and a move no longer looks like a new wire (v4.176.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-11-03-videos-for-getting-started-v41620">2026-11-03 · Videos for Getting Started (v4.162.0)</h2>
-<p>The author asked for videos on the Getting Started page, like the ones
-on the sibling project sites. Seven short clips, 15 to 30 seconds each,
-cover steps 1 and 3 through 8. Each one types the prompt, prints the
-skill's output line by line, captions each beat and boxes the lines that
-matter. Step 7 ends on a pan through the turret demo's Blueprint graph.
-Step 2 is a table, so it has no clip.</p>
-<p><code>scripts/tutorial-videos.py</code> renders them into <code>docs/videos/</code> with the
-site's dark tokens and IBM Plex fonts, about 1.8 MB in all. It needs
-Pillow and imageio-ffmpeg, so CI never runs it. Its sample output follows
-the same report shapes as <code>docs/tutorial.md</code>, and a highlight finds its
-lines by their text, so a reworded line fails the render rather than
-boxing the wrong row. build-site.py copies the clips and posters as is.</p>
 <h2 id="2026-11-03-copilot-runs-luna-first-and-the-quickstart-opens-on-getting-started-v41630">2026-11-03 · Copilot runs Luna-first, and the Quickstart opens on Getting Started (v4.163.0)</h2>
 <p>The author set one primary rule for Copilot: GPT-6 Luna does as much of
 the work as it can. <code>copilot.md</code> § Luna ceiling is now that rule and
@@ -1108,9 +1095,32 @@ Copilot profile count is back to seven. On the Unreal fixture, in a
 project with an empty <code>EngineAssociation</code> and a brief that never said
 Unreal, the plain verifier caught all 7 gradeable seeds, the same as the
 seat, for 157,433 tokens.</p>
+<h2 id="2026-11-19-smartdiff-reads-more-than-blueprints-and-a-move-no-longer-looks-like-a-new-wire-v41760">2026-11-19 · smartdiff reads more than Blueprints, and a move no longer looks like a new wire (v4.176.0)</h2>
+<p>Two asks from the author: turn a design note on generic graph-asset
+reading into a solution for smartdiff, and give Blueprints whose nodes
+or wires only moved a treatment that doesn't look like new connections.</p>
+<p><strong>Readers.</strong> <code>bp_export.py</code> now picks a reader by the asset's type or
+what it holds: <code>blueprint</code>, <code>material</code> for Materials and Material
+Functions, and <code>edgraph</code> for any other asset that saves editor graphs,
+like a Sound Cue. Each side's record says which reader ran and whether
+it worked. <code>diffview.py</code> trusts that record instead of looking for
+"Blueprint" in the class name. A revision that didn't load or didn't
+export now marks the file "Not compared" with the reason. It used to
+show every node as added, or no changes at all.</p>
+<p><strong>Moves.</strong> Wires compare as real connections, with reroute chains
+collapsed, and a cut-and-pasted node pairs with the one it replaced.
+Only a changed endpoint is a new wire. In the drawing a moved node gets
+a dotted grey outline and shows its old place on hover, a new route for
+an old connection draws dotted, and green and red are kept for real
+changes.</p>
+<p>Checked end to end on UE 5.8 with a Material, a Sound Cue and a
+Blueprint through the real export, and by screenshot. An Opus verifier
+found a crash on a deleted reroute-only graph in its first round, now
+fixed. The smartdiff self-test gains 34 checks. smartdiff's SKILL.md cap went from 6.5KB to
+6.75KB, recorded in the M4 table.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-17 3:10 PM PST / 6:10 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-19 2:57 PM PST / 5:57 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
