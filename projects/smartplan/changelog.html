@@ -668,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.176.0 &middot; Updated 2026-11-19 &middot; <span class="fresh" data-checked="2026-11-17" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-17</span></span>
+<span class="stamp">v4.177.0 &middot; Updated 2026-11-21 &middot; <span class="fresh" data-checked="2026-11-17" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-17</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -688,7 +688,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-11-03-copilot-runs-luna-first-and-the-quickstart-opens-on-getting-started-v41630">2026-11-03 · Copilot runs Luna-first, and the Quickstart opens on Getting Started (v4.163.0)</a></li>
 <li><a href="#2026-11-03-every-smartplan-feature-is-its-own-skill-and-any-one-can-be-switched-off-v41640">2026-11-03 · Every smartplan feature is its own skill, and any one can be switched off (v4.164.0)</a></li>
 <li><a href="#2026-11-03-the-verifier-seat-runs-code-reviews-through-smartreview-v41650">2026-11-03 · The verifier seat runs code reviews through smartreview (v4.165.0)</a></li>
 <li><a href="#2026-11-04-copilot-sessions-run-on-luna-and-probes-5-and-6-run-on-copilot-v41660">2026-11-04 · Copilot sessions run on Luna, and Probes 5 and 6 run on Copilot (v4.166.0)</a></li>
@@ -702,35 +701,13 @@ footer p { margin: 0; }
 <li><a href="#2026-11-17-an-unreal-reviewer-seat-a-smartdiff-audit-and-the-data-six-days-fresher-v41740">2026-11-17 · An Unreal reviewer seat, a smartdiff audit, and the data six days fresher (v4.174.0)</a></li>
 <li><a href="#2026-11-17-one-reviewer-for-every-engine-detection-and-project-overlays-replace-the-unreal-seat-v41750">2026-11-17 · One reviewer for every engine: detection and project overlays replace the Unreal seat (v4.175.0)</a></li>
 <li><a href="#2026-11-19-smartdiff-reads-more-than-blueprints-and-a-move-no-longer-looks-like-a-new-wire-v41760">2026-11-19 · smartdiff reads more than Blueprints, and a move no longer looks like a new wire (v4.176.0)</a></li>
+<li><a href="#2026-11-21-smartdiffs-trail-mode-shows-the-unreal-assets-an-agent-changed-through-aethyr-v41770">2026-11-21 · smartdiff's trail mode shows the Unreal assets an agent changed through Aethyr (v4.177.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-11-03-copilot-runs-luna-first-and-the-quickstart-opens-on-getting-started-v41630">2026-11-03 · Copilot runs Luna-first, and the Quickstart opens on Getting Started (v4.163.0)</h2>
-<p>The author set one primary rule for Copilot: GPT-6 Luna does as much of
-the work as it can. <code>copilot.md</code> § Luna ceiling is now that rule and
-little else.</p>
-<p><strong>Every subagent runs Luna.</strong> The skill dispatches only
-<code>@smartplan-scout</code>, <code>-implementer-cheap</code> and <code>-verifier-cheap</code>, each
-pinned <code>[gpt-6-luna]</code> alone. The Cheap implementer drops its Haiku 5.5
-fallback. The ask-per-dispatch climb above Luna is gone, since nothing
-above Luna is ever dispatched.</p>
-<p><strong>A pricier session is in charge, not a coder.</strong> When the user runs the
-session on Sol, Astra, Sonnet or Opus, it plans, briefs Luna subagents
-for the code and verifies every Luna diff itself. A Luna session works
-inline, sends a fresh Luna to check, and offers a pricier session where
-the work wants judgment.</p>
-<p>The four above-Luna profiles stay in <code>.github/agents/</code> for calling by
-hand. Their notes, <code>flow.md</code> §B, <code>SKILL.md</code>'s seat ceiling, <code>routing.md</code>,
-<code>model-classes.md</code>, the Copilot guide and the generated model-classes
-page all say so. The rule runs against two T46 results, which
-<code>copilot.md</code> keeps: Haiku 5.5 passed semver2 3 of 3 where Luna missed a
-case each time, and a Mid seat that always handed off to Luna cost 45%
-more for the same score.</p>
-<p><code>QUICKSTART.md</code> now opens with a pointer to Getting Started and its
-first video, and its Copilot paragraph describes the Luna-only dispatch.</p>
 <h2 id="2026-11-03-every-smartplan-feature-is-its-own-skill-and-any-one-can-be-switched-off-v41640">2026-11-03 · Every smartplan feature is its own skill, and any one can be switched off (v4.164.0)</h2>
 <p>The author asked for each smartplan feature to live in a separate skill,
 with smartplan picking the ones a task needs, and for any part to be
@@ -1118,9 +1095,38 @@ Blueprint through the real export, and by screenshot. An Opus verifier
 found a crash on a deleted reroute-only graph in its first round, now
 fixed. The smartdiff self-test gains 34 checks. smartdiff's SKILL.md cap went from 6.5KB to
 6.75KB, recorded in the M4 table.</p>
+<h2 id="2026-11-21-smartdiffs-trail-mode-shows-the-unreal-assets-an-agent-changed-through-aethyr-v41770">2026-11-21 · smartdiff's trail mode shows the Unreal assets an agent changed through Aethyr (v4.177.0)</h2>
+<p>The author planned this with an Aethyr-MCP change on 2026-11-20. An
+agent's asset edits through Aethyr reached the session record only as
+JSON replies, so trail mode, which exports just the agent's own work,
+showed none of them.</p>
+<p><strong>Assets in trail mode.</strong> <code>trail.py</code> reads <code>saved_packages</code> from each
+<code>mcp__*</code> tool result in a Claude Code transcript. Each entry names the
+SHA-1 and journal blob of the file before and after the save. Both sides
+are copied into <code>&lt;output&gt;/bp</code>, each checked against its hash first, and
+the range rule matches the one for files: the first save's before-image
+against the last save's after-image. <code>--export-assets</code> runs the headless
+export and puts the Blueprint diff on the page. A package the call
+deleted stages its old side only and lists as removed. A missing or
+mismatched blob is named under the partial results, never guessed at.</p>
+<p><strong>Safer staging.</strong> A <code>saved_packages</code> entry comes from a tool result, so
+its package name has to match a long package name, its extension has to
+be an asset extension, and each staged file has to resolve inside the
+export folder.</p>
+<p><code>bp_prepare.py</code>'s export command is now <code>export_command()</code>, shared by
+both paths. The new <code>smartdiff-trail-selftest.py</code> covers the reader, the
+range rule, the hash check, staging, deletes and the refused names.
+Aethyr's own live check fed real blobs from a headless editor through
+the same functions, and the page showed the Blueprint diff. Still open:
+one run from a real session record, which waits on a gate token. Copilot
+CLI sessions aren't read for assets yet, so the feature stays out of the
+Copilot export.</p>
+<p>Also in this release: the public README, the downloads page and
+QUICKSTART said five Claude Code seats and eight Copilot seats after the
+v4.175.0 seat removal. They now say four and seven.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-21 1:03 PM PST / 4:03 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-21 2:02 PM PST / 5:02 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the

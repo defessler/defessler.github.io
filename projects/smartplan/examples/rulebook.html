@@ -83,7 +83,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <body>
 <div class="layout">
 <nav id="nav" aria-label="Skills">
-  <p class="brand">smartplan rulebook<small>2,481 one-liners · 2026-11-19</small></p>
+  <p class="brand">smartplan rulebook<small>2,488 one-liners · 2026-11-21</small></p>
   <div class="nav-group">Router</div>
 <a href="#smartplan" data-sec="smartplan"><span>smartplan</span><span class="n">138</span></a>
 <div class="nav-group">Parts</div>
@@ -104,14 +104,14 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <a href="#smartreview" data-sec="smartreview"><span>smartreview</span><span class="n">107</span></a>
 <a href="#smartvoice" data-sec="smartvoice"><span>smartvoice</span><span class="n">160</span></a>
 <a href="#smartwiki" data-sec="smartwiki"><span>smartwiki</span><span class="n">96</span></a>
-<a href="#smartdiff" data-sec="smartdiff"><span>smartdiff</span><span class="n">120</span></a>
+<a href="#smartdiff" data-sec="smartdiff"><span>smartdiff</span><span class="n">127</span></a>
 <a href="#smartdiagram" data-sec="smartdiagram"><span>smartdiagram</span><span class="n">54</span></a>
 </nav>
 <main>
   <div class="hero">
     <h1>Every rule, one line each.</h1>
     <p>The smartplan family's skill bodies and references, rewritten as plain one-line statements. One rule or figure per line. Numbers, names, paths and commands are kept exactly as the source has them.</p>
-    <p class="meta"><b>2,481</b> lines across <b>18</b> skills and reference sets, taken from the v4.176.0 tree on 2026-11-19. Three sources aren't restated because they're already tables or checklists: <code>model-classes.md</code> (the price registry), <code>cpp-review-standards.md</code> and <code>web-ui-review-standards.md</code>.</p>
+    <p class="meta"><b>2,488</b> lines across <b>18</b> skills and reference sets, taken from the v4.177.0 tree on 2026-11-21. Three sources aren't restated because they're already tables or checklists: <code>model-classes.md</code> (the price registry), <code>cpp-review-standards.md</code> and <code>web-ui-review-standards.md</code>.</p>
   </div>
   <div class="filter">
     <input id="q" type="search" placeholder="Filter lines, for example: cache, Luna, fail-twice, 1.25x" aria-label="Filter lines" autocomplete="off">
@@ -3060,7 +3060,7 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 </ol>
 </section>
 <section id="smartdiff" class="skill">
-<header class="skill-head"><h2>smartdiff</h2><p class="src">SKILL.md, trail.md <span class="dot"></span> <span class="count" data-total="120">120 lines</span></p></header>
+<header class="skill-head"><h2>smartdiff</h2><p class="src">SKILL.md, trail.md <span class="dot"></span> <span class="count" data-total="127">127 lines</span></p></header>
 <h3>What it makes</h3>
 <ol>
 <li value="1"><span class="t">One self-contained HTML page per change set.</span></li>
@@ -3138,81 +3138,88 @@ li mark{background:var(--hit);color:inherit;border-radius:2px;padding:0 1px}
 <li value="55"><span class="t">Add <code>--notes</code> and <code>--review</code> as in steps 3 and 4.</span></li>
 <li value="56"><span class="t">Exit 2 means partial: a shell command ran, evidence did not check out, or a file changed between two agent edits. Say so when reporting.</span></li>
 <li value="57"><span class="t">Scope flags, evidence and outputs are in <code>references/trail.md</code>.</span></li>
+<li value="58"><span class="t">When the report&#x27;s <code>assets</code> is above 0, an MCP tool (Aethyr) saved Unreal assets in the range. Add <code>--export-assets</code> for their Blueprint diff, and close the editor first.</span></li>
 </ol>
 <h3>Blueprint diff</h3>
 <ol>
-<li value="58"><span class="t">Nodes match by <code>NodeGuid</code>, so moves are not changes.</span></li>
-<li value="59"><span class="t">A pasted node (new <code>NodeGuid</code>, same settings) pairs with the one it replaced.</span></li>
-<li value="60"><span class="t">Wires compare as connections with reroute chains collapsed, so only a changed endpoint is a new wire.</span></li>
-<li value="61"><span class="t">Per graph it lists added and removed nodes, changed pin defaults and node properties, and added or removed wires as <code>Node.pin → Node.pin</code>.</span></li>
-<li value="62"><span class="t">An added or removed node, variable or subobject shows the values it carried.</span></li>
-<li value="63"><span class="t">Moves, new routes and pastes collapse to counts.</span></li>
-<li value="64"><span class="t">Above the graphs it lists variables (matched by <code>VarGuid</code>, so a rename reads as a rename), components and other subobjects, Blueprint settings, and class defaults.</span></li>
-<li value="65"><span class="t">Compiler-generated graphs are filtered out.</span></li>
-<li value="66"><span class="t">Each graph is drawn at saved node positions: added green, removed as a dashed red ghost, changed blue.</span></li>
-<li value="67"><span class="t">A moved node draws with a dotted grey outline, and hovering it shows where it was.</span></li>
-<li value="68"><span class="t">A wire that only took a new route draws dotted. Only a wire that carries a new or lost connection draws as added or removed.</span></li>
-<li value="69"><span class="t">Box sizes are estimates.</span></li>
-<li value="70"><span class="t">Big graphs open on the change.</span></li>
-<li value="71"><span class="t">Drag to pan, scroll to zoom.</span></li>
-<li value="72"><span class="t">Before and After show either side alone.</span></li>
+<li value="59"><span class="t">Nodes match by <code>NodeGuid</code>, so moves are not changes.</span></li>
+<li value="60"><span class="t">A pasted node (new <code>NodeGuid</code>, same settings) pairs with the one it replaced.</span></li>
+<li value="61"><span class="t">Wires compare as connections with reroute chains collapsed, so only a changed endpoint is a new wire.</span></li>
+<li value="62"><span class="t">Per graph it lists added and removed nodes, changed pin defaults and node properties, and added or removed wires as <code>Node.pin → Node.pin</code>.</span></li>
+<li value="63"><span class="t">An added or removed node, variable or subobject shows the values it carried.</span></li>
+<li value="64"><span class="t">Moves, new routes and pastes collapse to counts.</span></li>
+<li value="65"><span class="t">Above the graphs it lists variables (matched by <code>VarGuid</code>, so a rename reads as a rename), components and other subobjects, Blueprint settings, and class defaults.</span></li>
+<li value="66"><span class="t">Compiler-generated graphs are filtered out.</span></li>
+<li value="67"><span class="t">Each graph is drawn at saved node positions: added green, removed as a dashed red ghost, changed blue.</span></li>
+<li value="68"><span class="t">A moved node draws with a dotted grey outline, and hovering it shows where it was.</span></li>
+<li value="69"><span class="t">A wire that only took a new route draws dotted. Only a wire that carries a new or lost connection draws as added or removed.</span></li>
+<li value="70"><span class="t">Box sizes are estimates.</span></li>
+<li value="71"><span class="t">Big graphs open on the change.</span></li>
+<li value="72"><span class="t">Drag to pan, scroll to zoom.</span></li>
+<li value="73"><span class="t">Before and After show either side alone.</span></li>
 </ol>
 <h3>Page keys</h3>
 <ol>
-<li value="73"><span class="t"><code>j</code> and <code>k</code> move between files, and <code>n</code> and <code>p</code> move between review comments.</span></li>
-<li value="74"><span class="t"><code>v</code> toggles split and unified.</span></li>
-<li value="75"><span class="t"><code>b</code>, <code>f</code>, or the chevron hides the file list.</span></li>
-<li value="76"><span class="t"><code>e</code> and <code>c</code> expand or collapse every file.</span></li>
-<li value="77"><span class="t"><code>a</code> expands every run of omitted lines.</span></li>
-<li value="78"><span class="t">Expanding needs whole files. Trail mode has them, and <code>diffview.py --git-context &lt;repo&gt;</code> reads them from git.</span></li>
-<li value="79"><span class="t">The theme defaults to dark.</span></li>
-<li value="80"><span class="t">Each choice persists per browser.</span></li>
+<li value="74"><span class="t"><code>j</code> and <code>k</code> move between files, and <code>n</code> and <code>p</code> move between review comments.</span></li>
+<li value="75"><span class="t"><code>v</code> toggles split and unified.</span></li>
+<li value="76"><span class="t"><code>b</code>, <code>f</code>, or the chevron hides the file list.</span></li>
+<li value="77"><span class="t"><code>e</code> and <code>c</code> expand or collapse every file.</span></li>
+<li value="78"><span class="t"><code>a</code> expands every run of omitted lines.</span></li>
+<li value="79"><span class="t">Expanding needs whole files. Trail mode has them, and <code>diffview.py --git-context &lt;repo&gt;</code> reads them from git.</span></li>
+<li value="80"><span class="t">The theme defaults to dark.</span></li>
+<li value="81"><span class="t">Each choice persists per browser.</span></li>
 </ol>
 <h3>Family fit</h3>
 <ol>
-<li value="81"><span class="t">smartdiff is an optional companion seat like <code>smartreview</code>, outside the tiering loop.</span></li>
-<li value="82"><span class="t">It pairs with <code>smartreview</code> (render, then review) and <code>smartwiki</code> (non-engineer audience).</span></li>
-<li value="83"><span class="t">Tiering follows <code>smartroute</code>: inline when the change set fits one context.</span></li>
-<li value="84"><span class="t">Capture, export and render are scripts, so they are free.</span></li>
-<li value="85"><span class="t">The notes are the judgment step. They fit Mid, or the seat that wrote the change.</span></li>
-<li value="86"><span class="t">The changelog is <code>docs/changelogs/smartdiff.md</code>, in the source repo only.</span></li>
+<li value="82"><span class="t">smartdiff is an optional companion seat like <code>smartreview</code>, outside the tiering loop.</span></li>
+<li value="83"><span class="t">It pairs with <code>smartreview</code> (render, then review) and <code>smartwiki</code> (non-engineer audience).</span></li>
+<li value="84"><span class="t">Tiering follows <code>smartroute</code>: inline when the change set fits one context.</span></li>
+<li value="85"><span class="t">Capture, export and render are scripts, so they are free.</span></li>
+<li value="86"><span class="t">The notes are the judgment step. They fit Mid, or the seat that wrote the change.</span></li>
+<li value="87"><span class="t">The changelog is <code>docs/changelogs/smartdiff.md</code>, in the source repo only.</span></li>
 </ol>
 <h3>trail.md</h3>
 <ol>
-<li value="87"><span class="t">trail.py exports only the agent&#x27;s edits from the session record.</span></li>
-<li value="88"><span class="t">It never reads live files, so a change before the agent&#x27;s first edit to a file, or after its last, cannot leak in.</span></li>
-<li value="89"><span class="t">A change between two agent edits can, and the run names it.</span></li>
-<li value="90"><span class="t">The boundary is the newest human message, usually the export request.</span></li>
-<li value="91"><span class="t">The count is in human messages. Tool results, subagent prompts and harness reminders do not count.</span></li>
-<li value="92"><span class="t">The flag table has 5 rows.</span></li>
-<li value="93"><span class="t">With no <code>--session</code>, it reads the session running it.</span></li>
-<li value="94"><span class="t">On Copilot CLI the folder is <code>~/.copilot/session-state/&lt;id&gt;</code>, named by <code>COPILOT_AGENT_SESSION_ID</code>.</span></li>
-<li value="95"><span class="t">On Claude Code the transcript is named by <code>CLAUDE_CODE_SESSION_ID</code> under <code>~/.claude/projects/</code>, or under <code>CLAUDE_CONFIG_DIR</code> when set.</span></li>
-<li value="96"><span class="t">Subagent transcripts beside it are read too, counting toward the message that started them.</span></li>
-<li value="97"><span class="t">When one harness starts inside the other, both ids are inherited, and the most recently written transcript wins, since the parent waits on a tool call.</span></li>
-<li value="98"><span class="t"><code>--session &lt;folder or .jsonl&gt;</code> reads any other session.</span></li>
-<li value="99"><span class="t">Evidence is the file before the edit plus the recorded patch.</span></li>
-<li value="100"><span class="t">Every removed and context line is checked against the before-image. A mismatch is refused, never guessed.</span></li>
-<li value="101"><span class="t">On Copilot, before-images come from <code>rewind-file-snapshots</code>, hash-checked.</span></li>
-<li value="102"><span class="t">On Copilot, patches come from <code>apply_patch</code>, <code>edit</code> and <code>create</code> results. Which tool depends on the model.</span></li>
-<li value="103"><span class="t">On Claude Code, before-images come from the Edit or Write result&#x27;s <code>originalFile</code>, then the previous edit in the chain, then <code>file-history</code> backups.</span></li>
-<li value="104"><span class="t">On Claude Code, patches come from <code>structuredPatch</code>.</span></li>
-<li value="105"><span class="t">Each file is one comparison for the whole range, from before the first agent edit to after the last.</span></li>
-<li value="106"><span class="t">The page shows where the work ended up, never one diff per prompt.</span></li>
-<li value="107"><span class="t">A file that ends where it started is dropped.</span></li>
-<li value="108"><span class="t">A partial export exits 2 with a warning per gap.</span></li>
-<li value="109"><span class="t">Gaps are: a shell command ran, a patch mismatch or missing before-image, a tool edited files with no supported evidence, the person changed the proposed edit before accepting, or the file changed between two agent edits.</span></li>
-<li value="110"><span class="t">The page shows what was proved, and it marks each file that changed between two agent edits. Treat the rest as unreviewed.</span></li>
-<li value="111"><span class="t">Exit 1 means no export, with the cause on stderr.</span></li>
-<li value="112"><span class="t">Output is one timestamped folder under <code>--out</code>.</span></li>
-<li value="113"><span class="t">The default <code>--out</code> is <code>Saved/smartdiff/</code> in an Unreal project, and the system temp elsewhere.</span></li>
-<li value="114"><span class="t">Per change it writes <code>&lt;name&gt;-before.&lt;ext&gt;</code> and <code>&lt;name&gt;-after.&lt;ext&gt;</code>.</span></li>
-<li value="115"><span class="t">It also writes <code>agent-only.diff</code>, <code>comparisons.json</code> with warnings, <code>prompts.md</code>, and <code>transcript.md</code> (private reasoning left out).</span></li>
-<li value="116"><span class="t"><code>index.html</code> is the same page <code>diffview.py</code> writes.</span></li>
-<li value="117"><span class="t">The page lists source files only. <code>--all-files</code> adds docs and data.</span></li>
-<li value="118"><span class="t"><code>--notes</code> takes the same JSON as the main procedure.</span></li>
-<li value="119"><span class="t"><code>--review</code> takes the same smartreview report, shown as comments on their lines.</span></li>
-<li value="120"><span class="t"><code>--no-open</code> skips the browser, and <code>--no-html</code> skips the page.</span></li>
+<li value="88"><span class="t">trail.py exports only the agent&#x27;s edits from the session record.</span></li>
+<li value="89"><span class="t">It never reads live files, so a change before the agent&#x27;s first edit to a file, or after its last, cannot leak in.</span></li>
+<li value="90"><span class="t">A change between two agent edits can, and the run names it.</span></li>
+<li value="91"><span class="t">The boundary is the newest human message, usually the export request.</span></li>
+<li value="92"><span class="t">The count is in human messages. Tool results, subagent prompts and harness reminders do not count.</span></li>
+<li value="93"><span class="t">The flag table has 5 rows.</span></li>
+<li value="94"><span class="t">With no <code>--session</code>, it reads the session running it.</span></li>
+<li value="95"><span class="t">On Copilot CLI the folder is <code>~/.copilot/session-state/&lt;id&gt;</code>, named by <code>COPILOT_AGENT_SESSION_ID</code>.</span></li>
+<li value="96"><span class="t">On Claude Code the transcript is named by <code>CLAUDE_CODE_SESSION_ID</code> under <code>~/.claude/projects/</code>, or under <code>CLAUDE_CONFIG_DIR</code> when set.</span></li>
+<li value="97"><span class="t">Subagent transcripts beside it are read too, counting toward the message that started them.</span></li>
+<li value="98"><span class="t">When one harness starts inside the other, both ids are inherited, and the most recently written transcript wins, since the parent waits on a tool call.</span></li>
+<li value="99"><span class="t"><code>--session &lt;folder or .jsonl&gt;</code> reads any other session.</span></li>
+<li value="100"><span class="t">Evidence is the file before the edit plus the recorded patch.</span></li>
+<li value="101"><span class="t">Every removed and context line is checked against the before-image. A mismatch is refused, never guessed.</span></li>
+<li value="102"><span class="t">On Copilot, before-images come from <code>rewind-file-snapshots</code>, hash-checked.</span></li>
+<li value="103"><span class="t">On Copilot, patches come from <code>apply_patch</code>, <code>edit</code> and <code>create</code> results. Which tool depends on the model.</span></li>
+<li value="104"><span class="t">On Claude Code, before-images come from the Edit or Write result&#x27;s <code>originalFile</code>, then the previous edit in the chain, then <code>file-history</code> backups.</span></li>
+<li value="105"><span class="t">On Claude Code, patches come from <code>structuredPatch</code>.</span></li>
+<li value="106"><span class="t">On Claude Code, Unreal assets an MCP tool saved come from <code>saved_packages</code> in its result, with the SHA-1 and blob path of each side.</span></li>
+<li value="107"><span class="t">Both sides are copied from those blobs into <code>&lt;output&gt;/bp</code>, each checked against its hash first. A blob that&#x27;s missing (pruned after 7 days) or doesn&#x27;t match is refused.</span></li>
+<li value="108"><span class="t">For assets the range rule is the same: the first save&#x27;s before-image against the last save&#x27;s after-image.</span></li>
+<li value="109"><span class="t">Each file is one comparison for the whole range, from before the first agent edit to after the last.</span></li>
+<li value="110"><span class="t">The page shows where the work ended up, never one diff per prompt.</span></li>
+<li value="111"><span class="t">A file that ends where it started is dropped.</span></li>
+<li value="112"><span class="t">A partial export exits 2 with a warning per gap.</span></li>
+<li value="113"><span class="t">Gaps are: a shell command ran, a patch mismatch or missing before-image, a tool edited files with no supported evidence, the person changed the proposed edit before accepting, the file changed between two agent edits, an asset&#x27;s blob is missing or fails its hash, or an asset was saved between two agent saves.</span></li>
+<li value="114"><span class="t">The page shows what was proved, and it marks each file that changed between two agent edits. Treat the rest as unreviewed.</span></li>
+<li value="115"><span class="t">Exit 1 means no export, with the cause on stderr.</span></li>
+<li value="116"><span class="t">Output is one timestamped folder under <code>--out</code>.</span></li>
+<li value="117"><span class="t">The default <code>--out</code> is <code>Saved/smartdiff/</code> in an Unreal project, and the system temp elsewhere.</span></li>
+<li value="118"><span class="t">Per change it writes <code>&lt;name&gt;-before.&lt;ext&gt;</code> and <code>&lt;name&gt;-after.&lt;ext&gt;</code>.</span></li>
+<li value="119"><span class="t">It also writes <code>agent-only.diff</code>, <code>comparisons.json</code> with warnings, <code>prompts.md</code>, and <code>transcript.md</code> (private reasoning left out).</span></li>
+<li value="120"><span class="t"><code>index.html</code> is the same page <code>diffview.py</code> writes.</span></li>
+<li value="121"><span class="t"><code>bp/</code> holds <code>manifest.json</code> and both sides of each asset an MCP tool saved, ready for <code>bp_export.py</code>.</span></li>
+<li value="122"><span class="t"><code>--export-assets</code> runs that export in a headless editor (Windows, 30 to 90 seconds) and puts the Blueprint diff on the page. Without it the assets list as binary files.</span></li>
+<li value="123"><span class="t"><code>--project</code> names the <code>.uproject</code> when it can&#x27;t be found from the files, and <code>--editor</code> names <code>UnrealEditor-Cmd.exe</code>. Levels are listed but not exported.</span></li>
+<li value="124"><span class="t">The page lists source files only. <code>--all-files</code> adds docs and data.</span></li>
+<li value="125"><span class="t"><code>--notes</code> takes the same JSON as the main procedure.</span></li>
+<li value="126"><span class="t"><code>--review</code> takes the same smartreview report, shown as comments on their lines.</span></li>
+<li value="127"><span class="t"><code>--no-open</code> skips the browser, and <code>--no-html</code> skips the page.</span></li>
 </ol>
 </section>
 <section id="smartdiagram" class="skill">
