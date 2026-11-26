@@ -668,7 +668,7 @@ footer p { margin: 0; }
 <a href="m365-setup.html">M365 Agents</a>
 <a class="current aside" href="whats-new.html">Details</a>
 <a href="https://github.com/defessler/smartplan">GitHub</a>
-<span class="stamp">v4.177.0 &middot; Updated 2026-11-21 &middot; <span class="fresh" data-checked="2026-11-17" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-17</span></span>
+<span class="stamp">v4.178.0 &middot; Updated 2026-11-25 &middot; <span class="fresh" data-checked="2026-11-17" title="The date someone last re-read the vendor's own pages for the facts on this page. Green under 7 days, amber 7 to 29, red 30 or more.">Facts checked 2026-11-17</span></span>
 <a class="dl-btn" href="downloads.html">Download</a>
 
 </div>
@@ -688,7 +688,6 @@ footer p { margin: 0; }
 <details class="page-toc" open>
 <summary>On this page</summary>
 <ul>
-<li><a href="#2026-11-03-every-smartplan-feature-is-its-own-skill-and-any-one-can-be-switched-off-v41640">2026-11-03 · Every smartplan feature is its own skill, and any one can be switched off (v4.164.0)</a></li>
 <li><a href="#2026-11-03-the-verifier-seat-runs-code-reviews-through-smartreview-v41650">2026-11-03 · The verifier seat runs code reviews through smartreview (v4.165.0)</a></li>
 <li><a href="#2026-11-04-copilot-sessions-run-on-luna-and-probes-5-and-6-run-on-copilot-v41660">2026-11-04 · Copilot sessions run on Luna, and Probes 5 and 6 run on Copilot (v4.166.0)</a></li>
 <li><a href="#2026-11-04-the-skills-get-shorter-and-the-caps-come-down-to-hold-it-v41670">2026-11-04 · The skills get shorter, and the caps come down to hold it (v4.167.0)</a></li>
@@ -702,47 +701,13 @@ footer p { margin: 0; }
 <li><a href="#2026-11-17-one-reviewer-for-every-engine-detection-and-project-overlays-replace-the-unreal-seat-v41750">2026-11-17 · One reviewer for every engine: detection and project overlays replace the Unreal seat (v4.175.0)</a></li>
 <li><a href="#2026-11-19-smartdiff-reads-more-than-blueprints-and-a-move-no-longer-looks-like-a-new-wire-v41760">2026-11-19 · smartdiff reads more than Blueprints, and a move no longer looks like a new wire (v4.176.0)</a></li>
 <li><a href="#2026-11-21-smartdiffs-trail-mode-shows-the-unreal-assets-an-agent-changed-through-aethyr-v41770">2026-11-21 · smartdiff's trail mode shows the Unreal assets an agent changed through Aethyr (v4.177.0)</a></li>
+<li><a href="#2026-11-25-smartdiff-reads-blueprints-from-their-files-with-no-editor-v41780">2026-11-25 · smartdiff reads Blueprints from their files, with no editor (v4.178.0)</a></li>
 </ul>
 </details>
 <p>History for the
 <a href="https://github.com/defessler/smartplan/blob/main/.claude/skills/smartplan/SKILL.md"><code>smartplan</code></a>
 skill, one section per release, oldest first. The fourteen most recent entries
 live here. Everything older is in git.</p>
-<h2 id="2026-11-03-every-smartplan-feature-is-its-own-skill-and-any-one-can-be-switched-off-v41640">2026-11-03 · Every smartplan feature is its own skill, and any one can be switched off (v4.164.0)</h2>
-<p>The author asked for each smartplan feature to live in a separate skill,
-with smartplan picking the ones a task needs, and for any part to be
-switchable by disabling its skill.</p>
-<p><strong>Eight part skills.</strong> The references moved out of <code>smartplan/</code> with
-their history intact: <code>smartflow</code> (flow.md, artifacts.md), <code>smartroute</code>
-(routing.md, model-classes.md), <code>smartcost</code> (modes.md), <code>smartbrief</code>
-(brief.md), <code>smartcheck</code> (check.md), <code>smartcheck-cpp</code>
-(cpp-gamedev-check.md) and <code>smartcache</code> (caching.md, Claude Code only).
-<code>smartexec</code> joins them as a part. Each one's <code>SKILL.md</code> says to read its
-reference whole and states what smartplan does without it.</p>
-<p><strong>The listing is the switch.</strong> Parts are <code>user-invocable: false</code>, which
-keeps them off the slash menu but in the model's skill listing. smartplan
-treats a part as on only when that listing names it. A part switched off
-by the harness toggle, <code>skillOverrides</code> or the installer's <code>SKILL.md.off</code>
-rename is skipped. smartplan follows its Off column in the new Parts
-table, says so once after the routing call, and never reads the part's
-files by path to get around the switch. <code>smartexec</code> lost its
-<code>disable-model-invocation</code> line so it can be listed too. Turning
-<code>smartflow</code> off means no fan-out at all.</p>
-<p><strong>What stayed in smartplan.</strong> The harness references (copilot.md,
-claude-code.md, m365-copilot.md, local-models.md) and evidence.md are
-facts about a harness, not features, so they stay.</p>
-<p><strong>A live check.</strong> Probe 5 in <code>docs/selftest.md</code> switches <code>smartflow</code> off
-and reruns Probe 2's prompt. A headless Haiku 5.5 run with
-<code>skillOverrides</code> setting <code>smartflow</code> off listed the other parts, said
-<code>smartflow</code> was missing, routed inline and read none of its files.</p>
-<p><strong>The plumbing followed.</strong> check.sh gate (c) resolves a reference in any
-part, gate (p) reads the new hard-gate line, and gate (k) rises from
-2,816B to 4,096B for fourteen descriptions (3,745B used). selftest checks
-13 skills. Both exports carry the parts, and the Copilot bundle drops
-<code>smartcache</code> with a new assert that it can't leak. The three installers
-know the parts. <code>install.ps1</code> prints what you lose when you switch one
-off. <code>install-global.ps1</code> links smartcache for Claude Code only. Both
-verifier seats load <code>smartcheck</code>.</p>
 <h2 id="2026-11-03-the-verifier-seat-runs-code-reviews-through-smartreview-v41650">2026-11-03 · The verifier seat runs code reviews through smartreview (v4.165.0)</h2>
 <p>The author asked for the verifier to load <code>smartreview</code>. A review run in
 the session that wrote the code shares that code's blind spots, so
@@ -1124,9 +1089,30 @@ Copilot export.</p>
 <p>Also in this release: the public README, the downloads page and
 QUICKSTART said five Claude Code seats and eight Copilot seats after the
 v4.175.0 seat removal. They now say four and seven.</p>
+<h2 id="2026-11-25-smartdiff-reads-blueprints-from-their-files-with-no-editor-v41780">2026-11-25 · smartdiff reads Blueprints from their files, with no editor (v4.178.0)</h2>
+<p>The author asked how smartdiff could avoid launching the editor, then
+whether reading the files directly was feasible, then for it to be
+built.</p>
+<p><strong>No editor.</strong> <code>bp_read.py</code> reads an editor <code>.uasset</code> with the Python
+standard library and writes the same T3D files the headless export
+wrote, so <code>diffview.py</code> reads them unchanged. <code>bp_prepare.py</code> and
+<code>trail.py</code> use it by default. A Blueprint diff took 30 to 90 seconds of
+headless <code>UnrealEditor-Cmd</code> on Windows. It now takes seconds on any OS,
+and nothing is staged in the project. <code>--reader editor</code> keeps the
+editor export as the fallback for an asset the reader can't read.</p>
+<p><strong>Nothing silently missing.</strong> A value it can't decode is written as a
+hash of its bytes, so a change to it still shows. An object it can't
+read is hashed and counted. A root it can't read fails the asset, with
+a pointer to the editor fallback.</p>
+<p><strong>Checked.</strong> The new <code>smartdiff-read-selftest.py</code> holds the reader to
+the editor's own export of a fixture Blueprint, object for object and
+pin field for pin field, and runs in oracle stage (k). A sweep over 501
+assets on this machine read every Blueprint, material and graph asset
+with no failures. <code>diffview.py</code> now keeps Control Rig wires, whose node
+names have spaces. The turret demo is re-rendered for that change.</p>
 </main>
 <footer>
-<p>smartplan · MIT · generated from repo markdown · Built 2026-11-21 2:14 PM PST / 5:14 PM EST</p>
+<p>smartplan · MIT · generated from repo markdown · Built 2026-11-25 4:45 PM PST / 7:45 PM EST</p>
 </footer>
 <script>
 /* Freshness badges. Colored in the browser, not at build time, because the
