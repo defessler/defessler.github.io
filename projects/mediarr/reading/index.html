@@ -52,7 +52,7 @@
 <li class="toc-h3"><a href="#comics-and-books-automated">Comics and Books: Automated</a></li>
 <li class="toc-h3"><a href="#shelfmark-is-a-search-page-not-a-tracker">Shelfmark Is a Search Page, Not a Tracker</a></li>
 <li class="toc-h3"><a href="#what-you-finish-by-hand-in-mylar3">What You Finish By Hand in Mylar3</a></li>
-<li class="toc-h3"><a href="#coming-from-lazylibrarian">Coming From LazyLibrarian</a></li>
+<li class="toc-h3"><a href="#lazylibrarian-if-you-want-author-tracking">LazyLibrarian, If You Want Author Tracking</a></li>
 <li class="toc-h3"><a href="#manga-not-automated-and-thats-not-an-oversight">Manga: Not Automated, and That&#39;s Not an Oversight</a></li>
 <li class="toc-h3"><a href="#or-just-drop-files-in">Or Just Drop Files In</a></li>
 <li class="toc-h3"><a href="#the-one-layout-rule-that-matters">The One Layout Rule That Matters</a></li>
@@ -115,13 +115,13 @@
 <h2 id="getting-files-in">Getting Files In</h2>
 <p>Comics and books can be automated. Manga can&#39;t, and it&#39;s worth understanding why before you go looking for the setting.</p>
 <h3 id="comics-and-books-automated">Comics and Books: Automated</h3>
-<p>Two more opt-in services, both of which search the indexers you already set up in Prowlarr:</p>
+<p>Three more opt-in services, all of which search the indexers you already set up in Prowlarr:</p>
 <ul>
 <li><strong>Mylar3</strong> on <code>http://&lt;NAS-IP&gt;:49159</code> for comics. Add a series, it watches for new issues.</li>
-<li><strong>Shelfmark</strong> on <code>http://&lt;NAS-IP&gt;:49163</code> for ebooks and audiobooks. Look a book up, pick a release, and it lands in your library.</li>
+<li><strong>Shelfmark</strong> on <code>http://&lt;NAS-IP&gt;:49163</code> for ebooks and audiobooks. Look a book up, pick a release, and it lands in your library. This is the one we recommend for books.</li>
+<li><strong>LazyLibrarian</strong> on <code>http://&lt;NAS-IP&gt;:49160</code> for following authors. It&#39;s marked not recommended in the installer. See <a href="#lazylibrarian-if-you-want-author-tracking">LazyLibrarian, If You Want Author Tracking</a> below for why it&#39;s still there.</li>
 </ul>
 <p>They use the same SABnzbd and qBittorrent as the rest of the stack, with no new accounts and no separate download path.</p>
-<p>Shelfmark replaced LazyLibrarian in v0.33.0. If you&#39;re upgrading from an older install, see <a href="#coming-from-lazylibrarian">Coming From LazyLibrarian</a> below.</p>
 <h3 id="shelfmark-is-a-search-page-not-a-tracker">Shelfmark Is a Search Page, Not a Tracker</h3>
 <p>This is the part to know before you turn it on. Mylar3 works like Sonarr. Shelfmark doesn&#39;t. You ask for a book and it fetches that book. It doesn&#39;t watch an author and grab their next release when it comes out.</p>
 <p>Shelfmark&#39;s own README calls that a non-goal. The one piece of automation it has is an optional sync from a Hardcover shelf, which you turn on in its own settings. If you want new audiobooks requested for you as a series continues, that&#39;s what ReadMeABook does, further down this page.</p>
@@ -149,17 +149,46 @@
 </li>
 </ul>
 <p>One more honest caveat: comic and book coverage on general-purpose indexers is thinner than TV or movies, so expect a lower hit rate than Sonarr gives you. That&#39;s the cost of using your own indexers rather than a dedicated source.</p>
-<h3 id="coming-from-lazylibrarian">Coming From LazyLibrarian</h3>
-<p>LazyLibrarian was the book automation here until v0.33.0. It tracked authors, which Shelfmark doesn&#39;t, and it needed its download client and library folder set by hand, which Shelfmark doesn&#39;t. We swapped it because Shelfmark needs nothing finished by hand and covers audiobooks too.</p>
-<p>When you update an install that had it on:</p>
+<h3 id="lazylibrarian-if-you-want-author-tracking">LazyLibrarian, If You Want Author Tracking</h3>
+<p>LazyLibrarian was the book automation here until v0.33.0, when Shelfmark took over. It came back in v0.33.1 as an option marked not recommended, for the one job Shelfmark won&#39;t do. You add an author, and it grabs their new books as they come out.</p>
+<p>Here&#39;s how the two compare:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Shelfmark</th>
+<th>LazyLibrarian</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Set up for you</td>
+<td>Everything: Prowlarr, both download clients, library folders</td>
+<td>Only its API, its Prowlarr link and its provider settings</td>
+</tr>
+<tr>
+<td>Audiobooks</td>
+<td>Yes</td>
+<td>Supported, but the installer doesn&#39;t set it up</td>
+</tr>
+<tr>
+<td>Follows authors</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Keeps looking for a book it hasn&#39;t found</td>
+<td>No</td>
+<td>Yes, from its wanted list</td>
+</tr>
+</tbody></table></div>
+<p>If you tick both, the installer shows you this trade-off and asks which you want to keep. Running both works. They share the <code>books</code> download category and both write into <code>Media/Books</code>, so the same book can land twice if you ask both for it.</p>
+<p>What you finish by hand in LazyLibrarian, the same kind of steps as Mylar3:</p>
 <ul>
-<li>The LazyLibrarian container is stopped and removed. Its settings and database stay where they were, in the <code>lazylibrarian</code> folder of your install directory.</li>
-<li>Your books in <code>Media/Books</code> aren&#39;t touched.</li>
-<li>The LazyLibrarian entry the installer added to Prowlarr is removed, so Prowlarr doesn&#39;t keep failing to sync to it.</li>
-<li><code>ENABLE_LAZYLIBRARIAN</code> does nothing now. Shelfmark isn&#39;t switched on for you. Tick it in the installer, or set <code>ENABLE_SHELFMARK=true</code>.</li>
+<li><strong>Point it at a download client.</strong> Add SABnzbd (<code>sabnzbd:8080</code>) or qBittorrent (<code>gluetun:49156</code>) in its own settings, with the <code>books</code> category the installer already created.</li>
+<li><strong>Set the library folder</strong> to <code>/books</code>. That&#39;s <code>Media/Books</code> on the NAS, which Kavita reads.</li>
 </ul>
-<div class="callout callout-note"><p><span class="callout-label">Note:</span> updating through the installer&#39;s Update button doesn&#39;t remove the old container. A full re-run of the installer does.</p></div>
-<p>If author tracking is what you used LazyLibrarian for, you can keep running it yourself from its own compose file, pointed at the settings folder the installer left in place.</p>
+<p>On its sources we should be straight with you too. LazyLibrarian ships with direct-download providers built in, including Anna&#39;s Archive, Z-Library, and IRC. The installer switches those off and leaves Prowlarr as its only source. If the Prowlarr link doesn&#39;t land, LazyLibrarian has nothing to search, and the installer warns you about it. The providers are still in its own settings if you decide otherwise.</p>
+<p>If you had LazyLibrarian on before v0.33.0, its settings folder is still in your install directory. Tick it again and it picks up where it left off.</p>
 <h3 id="manga-not-automated-and-thats-not-an-oversight">Manga: Not Automated, and That&#39;s Not an Oversight</h3>
 <p>There&#39;s no manga equivalent because there&#39;s nothing to build it on. Prowlarr supports exactly seven application types and none of them is a manga app. Manga simply isn&#39;t in the usenet or torrent indexer world the way TV, movies, and comics are, so the whole Sonarr pattern has nothing to attach to. Every real manga tool scrapes scanlation sites through Mihon extensions instead, which is a separate lane with its own source questions.</p>
 <p>Suwayomi is the tool people use, and it works well pointed at <code>Media/Manga</code>, but it ships with no extension sources at all and you&#39;d have to supply your own. That&#39;s a decision we&#39;d rather leave with you than make on your behalf, so it isn&#39;t bundled.</p>
